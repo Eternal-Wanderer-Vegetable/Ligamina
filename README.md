@@ -4,7 +4,7 @@ Ligamina 的初步定位是：**个人部署优先、独立于具体机器人的
 
 它计划保留 NoneBot、Koishi、AstrBot 等生态的原生插件与宿主机制，通过公共接口连接插件能力、聊天事件与生命周期管理。Stella 将作为首个集成客户端；其他机器人与非 AI 客户端也应能够独立接入。
 
-工程执行已通过 T01–T12 的 G1 技术闭环，并已实现 T13/T14 验收工具。T13 的 Windows 20 样本 gate 通过，含每生态 2 个 L4 通过样本；本机 WSL Linux 初扫时两个 Koishi L4 候选的 tarball 下载超时，两项单样本重试均已通过 L4，完整 WSL Linux 矩阵重跑中。T14 在 Windows 和本机 WSL 的短测均验证生产 Core 双 Host 恢复、CLI 检查和进程清理；WSL 100 次/Host、24 小时稳定性长测正在运行，短测资源门槛按设计为 `skipped`。T15 的 Windows bundle 更新安装、交互式首启、Core/双 Host 运行、停机清理与默认卸载数据保留已在本机通过；干净 VM 和真实第三方插件验收仍待完成，详见[首启验收报告](outputs/acceptance/t15-windows-first-run-probe-20261010.json)。T16 Linux 容器 smoke 已通过；T17 修正后的 GitHub `CI #2` Windows/Linux jobs 全部通过，托管 Linux 代表样本 gate 也通过；Windows 代表样本 job 正在运行。本机 WSL 的 T13 重跑仍是 Linux 环境 gate 的裁决依据；T18 未完成，G2 保持 `NOT READY`。
+工程执行已通过 T01–T12 的 G1 技术闭环，并已实现 T13/T14 验收工具。T13 的 Windows 20 样本 gate 通过，含每生态 2 个 L4 通过样本；本机 WSL Linux 初扫时两个 Koishi L4 候选的 tarball 下载超时，两项单样本重试均已通过 L4，完整 WSL Linux 矩阵重跑中。T14 在 Windows 和本机 WSL 的短测均验证生产 Core 双 Host 恢复、CLI 检查和进程清理；WSL 100 次/Host、24 小时稳定性长测正在运行，短测资源门槛按设计为 `skipped`。T15 的 Windows bundle 更新安装、交互式首启、Core/双 Host 运行、停机清理与默认卸载数据保留已在本机通过；干净 VM 和真实第三方插件验收仍待完成，详见[首启验收报告](outputs/acceptance/t15-windows-first-run-probe-20261010.json)。T16 Linux 容器 smoke 已通过；GitHub `CI #2`、`CI #3` 双 OS checks、G1 smoke 与 Linux 镜像构建均通过；手动代表扫描的 Windows 与 Ubuntu jobs 各完成 20 个样本且 gate PASS（每生态 L4 各 2）。本机 WSL 的 T13 重跑仍是 Linux 环境 gate 的裁决依据；T18 未完成，G2 保持 `NOT READY`。
 
 ## 规划文档
 
