@@ -60,6 +60,71 @@ try {
     }
     Add-Check "first_run_configuration" "Generated loopback-only configuration, per-install tokens, separate user data, and no operation grants."
 
+    $sampleManifest = Get-Content -LiteralPath (Join-Path $repoRoot "samples\third-party.lock.json") -Raw | ConvertFrom-Json
+    $sample = $sampleManifest.samples | Where-Object sample_id -eq "nonebot-autohelp"
+    if ($null -eq $sample) { throw "The pinned NoneBot autohelp acceptance sample is missing." }
+    $pluginModule = $sample.package.Replace("-", "_")
+    $wheelName = [System.IO.Path]::GetFileName(([Uri]$sample.artifact_url).AbsolutePath)
+    $wheelPath = Join-Path $testRoot $wheelName
+    Invoke-WebRequest -UseBasicParsing -Uri $sample.artifact_url -OutFile $wheelPath -TimeoutSec 180
+    $wheelHash = (Get-FileHash -LiteralPath $wheelPath -Algorithm SHA256).Hash.ToLowerInvariant()
+    if ($wheelHash -ne $sample.artifact_hash) {
+        throw "Third-party wheel SHA-256 mismatch: expected $($sample.artifact_hash), got $wheelHash."
+    }
+
+    $runtimeEvidence = Get-Content -LiteralPath (Join-Path $versionRoot "runtime-evidence.json") -Raw | ConvertFrom-Json
+    $uvExe = Join-Path (Join-Path $versionRoot "runtimes\uv-$($runtimeEvidence.runtimes.uv.version)") "uv.exe"
+    $nonebotPython = Join-Path $versionRoot "hosts\nonebot\.venv\Scripts\python.exe"
+    if (-not (Test-Path -LiteralPath $uvExe) -or -not (Test-Path -LiteralPath $nonebotPython)) {
+        throw "The bundled uv or NoneBot Python executable is missing from the fresh install."
+    }
+    $sampleProfileRoot = Join-Path $repoRoot "outputs\acceptance\t13-representative-wsl-final-20261010-locks\nonebot-autohelp"
+    if (-not (Test-Path -LiteralPath (Join-Path $sampleProfileRoot "uv.lock"))) {
+        throw "The hash-verified T13 NoneBot autohelp lock profile is missing."
+    }
+    $previousUvProjectEnvironment = $env:UV_PROJECT_ENVIRONMENT
+    $env:UV_PROJECT_ENVIRONMENT = Join-Path $versionRoot "hosts\nonebot\.venv"
+    try {
+        & $uvExe sync --project $sampleProfileRoot --locked --no-dev --no-build --no-progress --python $nonebotPython
+        if ($LASTEXITCODE -ne 0) { throw "Installing the locked third-party plugin profile failed with exit code $LASTEXITCODE." }
+    }
+    finally {
+        if ($null -eq $previousUvProjectEnvironment) {
+            Remove-Item Env:\UV_PROJECT_ENVIRONMENT -ErrorAction SilentlyContinue
+        }
+        else {
+            $env:UV_PROJECT_ENVIRONMENT = $previousUvProjectEnvironment
+        }
+    }
+    $installedPluginVersion = (& $nonebotPython -c "from importlib.metadata import version; print(version('nonebot-plugin-autohelp'))" | Out-String).Trim()
+    if ($LASTEXITCODE -ne 0 -or $installedPluginVersion -ne $sample.version) {
+        throw "The installed third-party plugin version was '$installedPluginVersion', expected '$($sample.version)'."
+    }
+
+    $nonebotHostConfig = $config.hosts | Where-Object id -eq "nonebot-default" | Select-Object -First 1
+    if ($null -eq $nonebotHostConfig) { throw "The fresh configuration is missing the NoneBot Host." }
+    $config.gateways[0].account_id = "9000"
+    Add-Member -InputObject $nonebotHostConfig.environment -MemberType NoteProperty -Name "LIGAMINA_NONEBOT_PLUGINS" -Value $pluginModule -Force
+    Add-Member -InputObject $nonebotHostConfig.environment -MemberType NoteProperty -Name "LIGAMINA_NONEBOT_NICKNAMES" -Value "Bot" -Force
+    $hostGrant = [ordered]@{
+        id = "nonebot-default-send-grant"
+        client_id = $config.mcp_client_id
+        account_id = $config.gateways[0].account_id
+        operations = @("send_message")
+        targets = $null
+    }
+    $clientGrant = [ordered]@{
+        id = "ligamina-local-client-send-grant"
+        account_id = $config.gateways[0].account_id
+        operations = @("send_message")
+        targets = $null
+    }
+    $nonebotHostConfig.operation_grants = @($hostGrant)
+    $config.clients[0].operation_grants = @($clientGrant)
+    $encodedConfig = $config | ConvertTo-Json -Depth 16
+    [System.IO.File]::WriteAllText($configPath, $encodedConfig + [Environment]::NewLine, (New-Object System.Text.UTF8Encoding($false)))
+    Add-Check "third_party_plugin_install" "Installed $($sample.package)==$($sample.version) from the pinned wheel ($wheelHash) into the bundled NoneBot profile; dependencies came from the T13 hash-verified lock profile, and its module was enabled."
+
     $pwshPath = (Get-Command pwsh.exe -ErrorAction Stop).Source
     $systemPath = @((Join-Path $env:SystemRoot "System32"), $env:SystemRoot) -join ";"
     $env:PATH = $systemPath
@@ -99,6 +164,96 @@ try {
     }
     Add-Check "core_and_hosts" "Packaged Core became ready; both Host processes were active, error-free, and launched from the installed version while system Node/Python were absent from PATH."
 
+    $gateway = $config.gateways[0]
+    $gatewayHeaders = @{ Authorization = ("Bearer " + $gateway.registration_token) }
+    $lease = Invoke-RestMethod -Method Post -Uri ("http://127.0.0.1:26701/v1/gateways/" + [Uri]::EscapeDataString($gateway.id) + "/lease") `
+        -Headers $gatewayHeaders -ContentType "application/json" -Body (@{ ttl_ms = 300000 } | ConvertTo-Json -Compress)
+    $fixture = Get-Content -LiteralPath (Join-Path $repoRoot "samples\fixtures\third-party\nonebot-autohelp-help-h.json") -Raw | ConvertFrom-Json
+    $eventId = "t15-nonebot-autohelp-" + [guid]::NewGuid().ToString("N")
+    $event = [ordered]@{
+        schema_version = "ligamina/0.1"
+        event_id = $eventId
+        trace_id = "trace-$eventId"
+        platform = "onebot.v11"
+        account_id = $gateway.account_id
+        conversation = [ordered]@{ kind = "group"; id = [string]$fixture.conversation.id }
+        actor_id = [string]$fixture.actor_id
+        timestamp = [DateTimeOffset]::UtcNow.ToString("o")
+        target_host = "nonebot-default"
+        message = @([ordered]@{ type = "text"; text = $fixture.input_texts[0] })
+        extensions = [ordered]@{ "onebot.v11" = [ordered]@{ message_id = "80000"; sender = [ordered]@{ nickname = "Alice" } } }
+    }
+    $clientHeaders = @{ Authorization = ("Bearer " + $config.clients[0].token) }
+    Invoke-RestMethod -Method Post -Uri "http://127.0.0.1:26701/v1/events" -Headers $clientHeaders `
+        -ContentType "application/json" -Body ($event | ConvertTo-Json -Depth 12 -Compress) | Out-Null
+
+    $operationPayloads = [System.Collections.Generic.List[object]]::new()
+    $pluginStatus = $null
+    $eventQuery = "platform=onebot.v11&account_id=$([Uri]::EscapeDataString($gateway.account_id))&conversation_kind=group&conversation_id=$([Uri]::EscapeDataString([string]$fixture.conversation.id))"
+    $eventStatusUri = "http://127.0.0.1:26701/v1/events/$([Uri]::EscapeDataString($eventId))?$eventQuery"
+    $eventDeadline = [DateTime]::UtcNow.AddSeconds(30)
+    while ([DateTime]::UtcNow -lt $eventDeadline) {
+        $operation = Invoke-RestMethod -Method Post -Uri ("http://127.0.0.1:26701/v1/gateways/" + [Uri]::EscapeDataString($gateway.id) + "/actions/claim") `
+            -Headers @{ Authorization = ("Bearer " + $lease.token) } -ContentType "application/json" `
+            -Body ($lease | ConvertTo-Json -Depth 8 -Compress)
+        if ($null -ne $operation) {
+            $params = $operation.operation_payload.params
+            $messageParts = [System.Collections.Generic.List[string]]::new()
+            if ($params.message -is [string]) {
+                $messageParts.Add([string]$params.message)
+            }
+            else {
+                foreach ($segment in @($params.message)) {
+                    if ($segment.type -eq "text") {
+                        $textProperty = $segment.PSObject.Properties["text"]
+                        if ($null -ne $textProperty) { $messageParts.Add([string]$textProperty.Value) }
+                        else {
+                            $dataProperty = $segment.PSObject.Properties["data"]
+                            if ($null -ne $dataProperty) {
+                                if ($dataProperty.Value -is [string]) { $messageParts.Add([string]$dataProperty.Value) }
+                                else {
+                                    $nestedText = $dataProperty.Value.PSObject.Properties["text"]
+                                    if ($null -ne $nestedText) { $messageParts.Add([string]$nestedText.Value) }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            $outgoingText = [string]::Concat($messageParts.ToArray())
+            $target = $operation.operation_payload.target
+            if ($operation.key.operation -ne "send_message" -or $target.kind -ne "group" -or [string]$target.id -ne [string]$fixture.expected_target.id) {
+                throw "The third-party plugin sent an operation to an unexpected type or target."
+            }
+            if ($outgoingText -cne [string]$fixture.expected_outgoing_texts[0]) {
+                throw "The third-party plugin output did not match the pinned L4 fixture."
+            }
+            $operationPayloads.Add($operation)
+            $receiptId = "700001"
+            $receipt = [ordered]@{
+                key = $operation.key
+                fingerprint = $operation.fingerprint
+                status = "succeeded"
+                platform_message_id = $receiptId
+                data = $null
+                error = $null
+                observed_at_ms = [DateTimeOffset]::UtcNow.ToUnixTimeMilliseconds()
+                evidence_ref = "ligamina-windows-acceptance://gateway/$receiptId"
+            }
+            $resultBody = [ordered]@{ credential = $lease; result = $receipt } | ConvertTo-Json -Depth 12 -Compress
+            Invoke-RestMethod -Method Post -Uri ("http://127.0.0.1:26701/v1/gateways/" + [Uri]::EscapeDataString($gateway.id) + "/actions/" + [Uri]::EscapeDataString($operation.key.operation_id) + "/result") `
+                -Headers @{ Authorization = ("Bearer " + $lease.token) } -ContentType "application/json" -Body $resultBody | Out-Null
+        }
+
+        $pluginStatus = Invoke-RestMethod -Method Get -Uri $eventStatusUri -Headers $clientHeaders
+        if ($pluginStatus.status -in @("completed", "failed", "unknown")) { break }
+        Start-Sleep -Milliseconds 50
+    }
+    if ($null -eq $pluginStatus -or $pluginStatus.status -ne "completed" -or $operationPayloads.Count -ne 1) {
+        throw "The third-party plugin event did not complete through one virtual gateway receipt: $($pluginStatus | ConvertTo-Json -Compress -Depth 6)"
+    }
+    Add-Check "third_party_plugin_event" "The bundled NoneBot Host ran the pinned autohelp plugin, matched its help response and group target, and received one successful virtual gateway receipt."
+
     $shutdown = Invoke-WebRequest -Method Post -Uri "http://127.0.0.1:26701/v1/shutdown" -Headers @{ Authorization = ("Bearer " + $config.admin_token) }
     $shutdownStatus = [int]$shutdown.StatusCode
     if ($shutdownStatus -ne 202) { throw "Core shutdown returned HTTP $shutdownStatus instead of 202." }
@@ -136,6 +291,19 @@ finally {
     }
     $env:APPDATA = $previousAppData
     $env:PATH = $previousPath
+}
+
+try {
+    $runnerRootFull = [System.IO.Path]::GetFullPath($runnerRoot).TrimEnd([System.IO.Path]::DirectorySeparatorChar, [System.IO.Path]::AltDirectorySeparatorChar)
+    $runnerPrefix = $runnerRootFull + [System.IO.Path]::DirectorySeparatorChar
+    $testRootFull = [System.IO.Path]::GetFullPath($testRoot)
+    if (-not $testRootFull.StartsWith($runnerPrefix, [System.StringComparison]::OrdinalIgnoreCase)) {
+        throw "Refusing to remove an acceptance scratch directory outside the runner temp root: '$testRootFull'."
+    }
+    if (Test-Path -LiteralPath $testRootFull) { Remove-Item -LiteralPath $testRootFull -Recurse -Force }
+}
+catch {
+    if ($null -eq $failure) { $failure = "Acceptance scratch cleanup failed: $($_.Exception.Message)" }
 }
 
 $reportFull = [System.IO.Path]::GetFullPath($ReportPath)
