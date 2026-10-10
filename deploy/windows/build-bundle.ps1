@@ -73,7 +73,7 @@ Copy-Item -LiteralPath (Join-Path $nonebotSource "pyproject.toml"), (Join-Path $
 Copy-Item -LiteralPath (Join-Path $nonebotSource "ligamina_nonebot") -Destination $payloadNonebot -Recurse -Force
 Copy-Item -LiteralPath (Join-Path $koishiRoot "package.json"), (Join-Path $koishiRoot "package-lock.json") -Destination $payloadKoishi -Force
 Copy-Item -LiteralPath $koishiDist -Destination $payloadKoishi -Recurse -Force
-Copy-Item -LiteralPath (Join-Path $PSScriptRoot "runtime-manifest.json"), (Join-Path $PSScriptRoot "install.ps1"), (Join-Path $PSScriptRoot "update.ps1"), (Join-Path $PSScriptRoot "uninstall.ps1"), (Join-Path $PSScriptRoot "run.ps1") -Destination $payloadDeploy -Force
+Copy-Item -LiteralPath (Join-Path $PSScriptRoot "runtime-manifest.json"), (Join-Path $PSScriptRoot "install.ps1"), (Join-Path $PSScriptRoot "update.ps1"), (Join-Path $PSScriptRoot "uninstall.ps1"), (Join-Path $PSScriptRoot "run.ps1"), (Join-Path $PSScriptRoot "configure.ps1") -Destination $payloadDeploy -Force
 Copy-Item -LiteralPath (Join-Path $PSScriptRoot "licenses") -Destination $payloadDeploy -Recurse -Force
 Copy-Item -LiteralPath (Join-Path $repo "README.md") -Destination $output -Force
 

@@ -24,7 +24,7 @@ pwsh -File .work/releases/ligamina-win-x64/deploy/windows/run.ps1 `
   -ConfigPath "$env:APPDATA/Ligamina/daemon.json"
 ```
 
-`daemon.json` must point to the selected Host executable under the active version (`hosts/nonebot/.venv/Scripts/python.exe` or `runtimes/node-v24.20.0/node.exe`) and keep its database and credentials under the user data directory. A first-run configuration wizard and one-click clean-machine acceptance are still open T15 work; this bundle is not a G2-ready installer yet.
+If `daemon.json` does not exist, `run.ps1` starts `configure.ps1`. The wizard lets you select installed Host profiles and creates a loopback-only configuration, per-install random credentials, a user-data database path, and no platform operation grants. It refuses to overwrite an existing configuration. The generated administrator token stays in the configuration file; keep that file private. This first-run flow still needs validation on a clean Windows VM, with a selected third-party plugin, and after an update, so the bundle is not a G2-ready installer yet.
 
 Uninstall removes application versions and leaves `%APPDATA%/Ligamina` untouched by default. `-RemoveUserData` is required to delete that separate directory.
 
