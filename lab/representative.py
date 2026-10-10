@@ -150,6 +150,16 @@ def validate_manifest(path: Path, selected: set[str] | None) -> tuple[dict[str, 
             raise ValueError(f"{prefix} artifact hash must match sha256 hex or npm sha512 SRI")
         if not isinstance(categories, list) or not categories or not all(isinstance(value, str) and value for value in categories):
             raise ValueError(f"{prefix}.category must be a non-empty string array")
+        preload_plugins = item.get("preload_plugins", [])
+        if not isinstance(preload_plugins, list) or not all(
+            isinstance(value, str) and re.fullmatch(r"[A-Za-z_][A-Za-z0-9_.]*", value)
+            for value in preload_plugins
+        ):
+            raise ValueError(f"{prefix}.preload_plugins must be an array of importable plugin module names")
+        if ecosystem != "nonebot" and preload_plugins:
+            raise ValueError(f"{prefix}.preload_plugins is only supported for NoneBot samples")
+        if len(set(preload_plugins)) != len(preload_plugins):
+            raise ValueError(f"{prefix}.preload_plugins cannot contain duplicates")
         coordinate = (ecosystem, package.casefold(), version)
         if coordinate in coordinates:
             raise ValueError(f"duplicate ecosystem/package/version sample: {coordinate}")
@@ -159,6 +169,7 @@ def validate_manifest(path: Path, selected: set[str] | None) -> tuple[dict[str, 
             raise ValueError(f"{prefix}.entry_module must be an importable module name")
         item = dict(item)
         item["_entry"] = entry
+        item["preload_plugins"] = preload_plugins
         item["_artifact_hash"] = artifact_hash
         item["_artifact_hash_algorithm"] = artifact_hash_algorithm
         normalized.append(item)
@@ -344,7 +355,7 @@ def install_sample(sample: dict[str, Any], work: Path, cache_root: Path | None =
             python_path = work / ".venv" / ("Scripts/python.exe" if os.name == "nt" else "bin/python")
             environment.update({
                 "PYTHONPATH": str(ROOT / "hosts/nonebot"),
-                "LIGAMINA_NONEBOT_PLUGINS": entry,
+                "LIGAMINA_NONEBOT_PLUGINS": ",".join([*sample.get("preload_plugins", []), entry]),
             })
             run = command_step(
                 "verify installed Python package metadata",
@@ -688,7 +699,7 @@ def run_federated(sample: dict[str, Any], work: Path, host_environment: dict[str
         "operations": ["send_message"], "targets": None,
     }
     host_env = {
-        "LIGAMINA_NONEBOT_PLUGINS": sample["_entry"],
+        "LIGAMINA_NONEBOT_PLUGINS": ",".join([*sample.get("preload_plugins", []), sample["_entry"]]),
         "LIGAMINA_NONEBOT_NICKNAMES": "Bot",
         "LIGAMINA_NONEBOT_DATA_DIR": str(work / "nonebot-data"),
         "LIGAMINA_KOISHI_PLUGINS": host_environment.get("LIGAMINA_KOISHI_PLUGINS", ""),
@@ -963,6 +974,7 @@ def run_samples(manifest_path: Path, report_path: Path, sample_ids: set[str] | N
                     "license": sample["license"], "category": sample["category"],
                     "source_url": sample["source_url"], "artifact_hash_algorithm": sample["_artifact_hash_algorithm"],
                     "artifact_hash": sample["_artifact_hash"],
+                    "preload_plugins": sample.get("preload_plugins", []),
                     "fixture_path": sample.get("_fixture_path"),
                     "reproduction_command": f"uv run --project lab python lab/run.py --suite representative --manifest samples/third-party.lock.json --worker isolated --sample-id {sample['sample_id']}",
                     "levels": {},
@@ -1092,7 +1104,11 @@ def run_samples(manifest_path: Path, report_path: Path, sample_ids: set[str] | N
                     }
                 record["levels"]["L5"] = {"status": "not_run", "reason": "repeated lifecycle/resource stability belongs to T14"}
                 if "failure_classification" not in record and record["levels"]["L3"]["status"] != "passed":
-                    record["failure_classification"] = ["federated_core_route_or_lifecycle_failure"]
+                    record["failure_classification"] = [
+                        "native_host_or_event_dispatch_failure"
+                        if record["levels"]["L2"]["status"] == "failed"
+                        else "federated_core_route_or_lifecycle_failure"
+                    ]
                 report["samples"].append(record)
         leftover_path = Path(temp_root)
         report["temporary_profile_cleanup"] = remove_temporary_tree(leftover_path) if leftover_path.exists() else {"status": "passed", "path": str(leftover_path), "already_removed": True}
