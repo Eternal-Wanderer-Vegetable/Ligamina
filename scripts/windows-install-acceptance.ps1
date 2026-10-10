@@ -43,6 +43,40 @@ try {
     }
     Add-Check "fresh_install" "Both locked profiles installed and the candidate version activated from the bundled installer."
 
+    $activePath = Join-Path $installRoot "active.json"
+    $initialActiveJson = Get-Content -LiteralPath $activePath -Raw
+    $initialActive = $initialActiveJson | ConvertFrom-Json
+    $initialActiveHash = (Get-FileHash -LiteralPath $activePath -Algorithm SHA256).Hash.ToLowerInvariant()
+    $invalidManifest = Get-Content -LiteralPath (Join-Path $payloadRoot "deploy\windows\runtime-manifest.json") -Raw | ConvertFrom-Json
+    $invalidManifest.runtimes.uv.sha256 = "0" * 64
+    $invalidManifestPath = Join-Path $testRoot "runtime-manifest-invalid-sha256.json"
+    [System.IO.File]::WriteAllText($invalidManifestPath, ($invalidManifest | ConvertTo-Json -Depth 16) + [Environment]::NewLine, (New-Object System.Text.UTF8Encoding($false)))
+    $updateScript = Join-Path $payloadRoot "deploy\windows\update.ps1"
+    $rollbackError = $null
+    try {
+        & $updateScript -PayloadRoot $payloadRoot -InstallRoot $installRoot -Profile @("nonebot", "koishi") -ManifestPath $invalidManifestPath
+        throw "The synthetic update unexpectedly succeeded with an invalid runtime SHA-256."
+    }
+    catch {
+        $rollbackError = $_.Exception.Message
+    }
+    if ($rollbackError -notmatch "SHA256 mismatch for") {
+        throw "The synthetic update failed for an unexpected reason: $rollbackError"
+    }
+    $activeAfterFailedUpdate = Get-Content -LiteralPath $activePath -Raw | ConvertFrom-Json
+    $activeHashAfterFailedUpdate = (Get-FileHash -LiteralPath $activePath -Algorithm SHA256).Hash.ToLowerInvariant()
+    $versionsRoot = Join-Path $installRoot "versions"
+    $versionDirs = @(Get-ChildItem -LiteralPath $versionsRoot -Directory)
+    $originalVersionRoot = Join-Path $installRoot $initialActive.version_path
+    if ($activeAfterFailedUpdate.version_id -ne $initialActive.version_id -or
+        $activeAfterFailedUpdate.version_path -ne $initialActive.version_path -or
+        $activeHashAfterFailedUpdate -ne $initialActiveHash -or
+        -not (Test-Path -LiteralPath $originalVersionRoot) -or
+        $versionDirs.Count -ne 1) {
+        throw "Failed update changed the active version, removed the previous version, or left its failed candidate behind."
+    }
+    Add-Check "failed_update_rollback" "Rejected a candidate with a corrupted pinned uv archive hash; active.json and the previous version stayed byte-for-byte unchanged and the failed candidate was removed."
+
     $configureScript = Join-Path $payloadRoot "deploy\windows\configure.ps1"
     & $configureScript -InstallRoot $installRoot -ConfigPath $configPath -UserDataRoot $userDataRoot -Profiles @("nonebot", "koishi")
     $config = Get-Content -LiteralPath $configPath -Raw | ConvertFrom-Json

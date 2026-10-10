@@ -1,0 +1,28 @@
+{
+  "schema_version": 1,
+  "task": "T14",
+  "status": "skipped",
+  "gate": "NOT READY",
+  "platform": "linux-wsl",
+  "requested": {
+    "cycles_per_host": 100,
+    "duration_hours": 24,
+    "interval_seconds": 60,
+    "warmup_minutes": 30
+  },
+  "observed": {
+    "user_reported_continuous_runtime_hours_lower_bound": 10,
+    "last_process_snapshot_elapsed": "05:16:01",
+    "last_process_snapshot_pids": [3845, 3848],
+    "process_found_when_checked_after_skip_request": false,
+    "final_24h_report_generated": false,
+    "completed_cycles_per_host": null
+  },
+  "decision": {
+    "requested_by_user": true,
+    "reason": "The user elected to skip the 24-hour WSL run after more than 10 hours of continuous execution, judging the remaining intermittent-failure probability very low.",
+    "termination_signal_sent_by_agent": false,
+    "acceptance_effect": "The partial run is not a 24-hour pass. Resource and full-duration stability gates remain unresolved; skipped is not counted as pass."
+  },
+  "original_report_path": "outputs/acceptance/t14-stability-linux-wsl-100x24h-20261010.json"
+}
