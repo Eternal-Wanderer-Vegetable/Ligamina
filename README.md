@@ -16,7 +16,7 @@ Ligamina 的初步定位是：**个人部署优先、独立于具体机器人的
 
 规划依据：[原始分享讨论](https://chatgpt.com/share/6ac8b4f4-4ad8-83e9-b269-90629f1c7979)。
 
-初步计划已由用户核实通过。执行计划记录 T01–T17 的实现进展及阶段证据；G1 于 2026-10-10 通过。验收报告位于 [acceptance](outputs/acceptance/)。T13 WSL 完整 Linux 矩阵重跑中；T14 长测尚未完成；T15 首启向导已实现，但干净 VM 与插件验收仍待完成；T17 GitHub `CI #2` 两 OS 均通过，手动代表样本扫描的 Linux job 已通过、Windows job 仍在执行；T18 和 C01–C15 总体验收仍待完成，G2 保持 `NOT READY`。
+初步计划已由用户核实通过。执行计划记录 T01–T17 的实现进展及阶段证据；G1 于 2026-10-10 通过。验收报告位于 [acceptance](outputs/acceptance/)。T13 WSL 完整 Linux 矩阵重跑中；T14 长测尚未完成；T15 首启向导已实现，但干净 VM 与插件验收仍待完成；T17 GitHub `CI #2`–`CI #5` 均已通过，手动代表样本扫描和草稿 PR #1 的 `pull_request` run（`38029089731`）也通过 Windows/Linux jobs；T18 和 C01–C15 总体验收仍待完成，G2 保持 `NOT READY`。
 
 ## 本机运行诊断
 
@@ -49,6 +49,6 @@ pwsh -NoProfile -File scripts/check.ps1
 bash scripts/check.sh
 ```
 
-GitHub Actions 工作流位于 `.github/workflows/ci.yml` 和 `.github/workflows/representative.yml`。本地检查记录见 [T17 报告](outputs/acceptance/t17-local-ci-checks-20261010.json)，Windows 与 WSL smoke 证据分别见 [Windows](outputs/acceptance/ci-smoke-windows.json) 和 [Linux](outputs/acceptance/ci-smoke-linux.json)。首个托管 CI 的 Windows job 发现 Git 默认换行转换改变锁文件与 profile 的 SHA-256。仓库现通过 `.gitattributes` 固定 LF，Windows autocrlf 模拟 checkout 下 Runner 17 项复测通过；修正后的 GitHub `CI #2` Windows/Linux jobs（含 Linux 镜像构建）已全部通过。手动代表样本扫描中，GitHub Linux job 扫完 20 个样本且 gate PASS（每生态 2 个 L4），Windows job 仍在运行。本机 WSL 的扫描结果仍独立裁决 Linux gate，因此 T17 仍为部分通过。
+GitHub Actions 工作流位于 `.github/workflows/ci.yml` 和 `.github/workflows/representative.yml`。本地检查记录见 [T17 报告](outputs/acceptance/t17-local-ci-checks-20261010.json)，Windows 与 WSL smoke 证据分别见 [Windows](outputs/acceptance/ci-smoke-windows.json) 和 [Linux](outputs/acceptance/ci-smoke-linux.json)。首个托管 CI 的 Windows job 发现 Git 默认换行转换改变锁文件与 profile 的 SHA-256。仓库现通过 `.gitattributes` 固定 LF，Windows autocrlf 模拟 checkout 下 Runner 17 项复测通过；GitHub `CI #2`–`CI #5` 的 Windows/Linux jobs（含 Linux 镜像构建）均通过。手动代表样本扫描中，GitHub Windows 与 Linux jobs 均扫完 20 个样本且 gate PASS（每生态 2 个 L4）。草稿 PR #1 的 `pull_request` run `38029089731` 也通过 Windows/Linux checks、G1 smoke 与 Linux 镜像构建；artifact ID 为 `11661283178`（Windows）和 `11661258225`（Linux）。本机 WSL 的扫描结果仍独立裁决 Linux gate；完整重跑正在进行。
 
 仓库：[Eternal-Wanderer-Vegetable/Ligamina](https://github.com/Eternal-Wanderer-Vegetable/Ligamina)。
