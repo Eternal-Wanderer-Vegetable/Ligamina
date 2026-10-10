@@ -1,0 +1,43 @@
+{
+  "schema_version": 1,
+  "task": "T15",
+  "status": "partial",
+  "date": "2026-10-10",
+  "environment": {
+    "platform": "Windows x64 local workspace",
+    "isolated_test_install_root": ".work/部署 路径/Ligamina",
+    "isolated_user_data_root": ".work/t15-wizard-first-run/appdata/Ligamina",
+    "app_version": "0.1.0",
+    "installed_version_id": "0.1.0-20261010130308-818f4e1c",
+    "profiles": ["nonebot", "koishi"]
+  },
+  "issues_found_and_fixed": [
+    {
+      "issue": "The Windows release bundle omitted contracts/v0.1 JSON schemas. The packaged NoneBot worker then failed to import its contracts module; the Koishi worker uses the same version-root schema directory.",
+      "fix": "build-bundle.ps1 now validates and copies the contracts tree; install.ps1 validates the required schemas and copies them into each installed version."
+    },
+    {
+      "issue": "The previous installed NoneBot profile kept the FastAPI extra in the development group, so installation with --no-dev could not initialize the pinned FastAPI driver.",
+      "fix": "The current locked production dependencies include nonebot2[fastapi]; the updated installation installed FastAPI 0.143.0 and imported the worker successfully."
+    },
+    {
+      "issue": "Updating an existing installation passed a null backup path to System.IO.File.Replace, which .NET rejected before activation.",
+      "fix": "install.ps1 now uses a unique same-directory backup file while atomically replacing active.json, then removes the backup."
+    }
+  ],
+  "checks": [
+    {"id": "release_bundle_schemas", "status": "pass", "detail": "All three required v0.1 schemas were present in the built bundle and installed version."},
+    {"id": "update_existing_install", "status": "pass", "detail": "The updated release bundle installed both profiles and activated the new version after replacing the prior active pointer."},
+    {"id": "nonebot_production_runtime", "status": "pass", "detail": "Locked NoneBot dependencies installed with FastAPI 0.143.0; imports for FastAPI, NoneBot, OneBot v11, and the Ligamina worker passed."},
+    {"id": "interactive_first_run", "status": "pass", "detail": "run.ps1 prompted for profile selection and confirmation with APPDATA redirected into the isolated workspace, created configuration, and started Core."},
+    {"id": "configuration_safety", "status": "pass", "detail": "Core listened on 127.0.0.1:26701; non-loopback listening was disabled; administrator/client tokens were 43 characters; operation grants were empty; database and host data were under the isolated user data root."},
+    {"id": "core_and_hosts", "status": "pass", "detail": "CLI reported ready=true; authenticated /v1/status returned koishi-default and nonebot-default active, restart_count=0, and last_error=null."},
+    {"id": "graceful_shutdown", "status": "pass", "detail": "Authenticated POST /v1/shutdown returned HTTP 202; Core, Python, and Node process checks found no remaining packaged processes."},
+    {"id": "default_uninstall_data_preservation", "status": "pass", "detail": "The isolated application version directory was removed while daemon.json and ligamina.sqlite remained under the separate user data root."}
+  ],
+  "not_yet_verified": [
+    "Clean Windows virtual machine with no preinstalled runtimes.",
+    "Loading and running a selected third-party plugin through the packaged first-run flow."
+  ],
+  "verdict": "T15 improved and the local Windows upgrade/first-run/start/stop/default-uninstall path passed. C14 and G2 remain open because clean-VM and third-party-plugin acceptance are still missing."
+}

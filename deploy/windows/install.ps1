@@ -45,7 +45,13 @@ function Write-AtomicJson([string]$Path, $Value) {
     $json = $Value | ConvertTo-Json -Depth 16
     [System.IO.File]::WriteAllText($temporary, $json + [Environment]::NewLine, (New-Object System.Text.UTF8Encoding($false)))
     if (Test-Path -LiteralPath $Path) {
-        [System.IO.File]::Replace($temporary, $Path, $null)
+        $backup = Join-Path $parent (".active-" + [guid]::NewGuid().ToString("N") + ".bak")
+        try {
+            [System.IO.File]::Replace($temporary, $Path, $backup)
+        }
+        finally {
+            Remove-Item -LiteralPath $backup -Force -ErrorAction SilentlyContinue
+        }
     }
     else {
         [System.IO.File]::Move($temporary, $Path)
@@ -66,6 +72,12 @@ if ($manifest.schema_version -ne 1 -or $manifest.platform -ne "windows-x64") {
 if (-not (Test-Path -LiteralPath (Join-Path $payloadFull "target\release\ligamina-cli.exe"))) {
     throw "Missing target/release/ligamina-cli.exe. Build or unpack the Windows release bundle first."
 }
+$contractsSource = Join-Path $payloadFull "contracts"
+foreach ($schemaName in @("event-envelope.schema.json", "platform-operation.schema.json", "capability-descriptor.schema.json")) {
+    if (-not (Test-Path -LiteralPath (Join-Path $contractsSource "v0.1\$schemaName"))) {
+        throw "Missing contracts/v0.1/$schemaName in the release bundle."
+    }
+}
 
 $versionsRoot = Join-Path $installFull "versions"
 $activePath = Join-Path $installFull "active.json"
@@ -77,6 +89,7 @@ New-Item -ItemType Directory -Force -Path $candidate | Out-Null
 $activated = $false
 
 try {
+    Copy-Item -LiteralPath $contractsSource -Destination $candidate -Recurse -Force
     $cacheRoot = Join-Path $candidate "downloads"
     $runtimeRoot = Join-Path $candidate "runtimes"
     New-Item -ItemType Directory -Force -Path $cacheRoot, $runtimeRoot | Out-Null

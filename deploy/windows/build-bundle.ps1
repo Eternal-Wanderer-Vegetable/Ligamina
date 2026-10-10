@@ -44,6 +44,7 @@ finally { Pop-Location }
 $cliSource = Join-Path $repo "target\release\ligamina-cli.exe"
 $nonebotSource = Join-Path $repo "hosts\nonebot"
 $koishiDist = Join-Path $koishiRoot "dist"
+$contractsSource = Join-Path $repo "contracts"
 foreach ($required in @(
     $cliSource,
     (Join-Path $nonebotSource "pyproject.toml"),
@@ -51,7 +52,10 @@ foreach ($required in @(
     (Join-Path $nonebotSource "ligamina_nonebot\worker.py"),
     (Join-Path $koishiRoot "package.json"),
     (Join-Path $koishiRoot "package-lock.json"),
-    (Join-Path $koishiDist "worker.js")
+    (Join-Path $koishiDist "worker.js"),
+    (Join-Path $contractsSource "v0.1\event-envelope.schema.json"),
+    (Join-Path $contractsSource "v0.1\platform-operation.schema.json"),
+    (Join-Path $contractsSource "v0.1\capability-descriptor.schema.json")
 )) {
     if (-not (Test-Path -LiteralPath $required)) { throw "Required bundle input is missing: '$required'." }
 }
@@ -73,6 +77,7 @@ Copy-Item -LiteralPath (Join-Path $nonebotSource "pyproject.toml"), (Join-Path $
 Copy-Item -LiteralPath (Join-Path $nonebotSource "ligamina_nonebot") -Destination $payloadNonebot -Recurse -Force
 Copy-Item -LiteralPath (Join-Path $koishiRoot "package.json"), (Join-Path $koishiRoot "package-lock.json") -Destination $payloadKoishi -Force
 Copy-Item -LiteralPath $koishiDist -Destination $payloadKoishi -Recurse -Force
+Copy-Item -LiteralPath $contractsSource -Destination $output -Recurse -Force
 Copy-Item -LiteralPath (Join-Path $PSScriptRoot "runtime-manifest.json"), (Join-Path $PSScriptRoot "install.ps1"), (Join-Path $PSScriptRoot "update.ps1"), (Join-Path $PSScriptRoot "uninstall.ps1"), (Join-Path $PSScriptRoot "run.ps1"), (Join-Path $PSScriptRoot "configure.ps1") -Destination $payloadDeploy -Force
 Copy-Item -LiteralPath (Join-Path $PSScriptRoot "licenses") -Destination $payloadDeploy -Recurse -Force
 Copy-Item -LiteralPath (Join-Path $repo "README.md") -Destination $output -Force
