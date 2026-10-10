@@ -1,0 +1,69 @@
+{
+  "listen": "127.0.0.1:26701",
+  "allow_non_loopback_listen": false,
+  "database_path": "/var/lib/ligamina/ligamina.sqlite",
+  "admin_token": "CHANGE_ME",
+  "mcp_client_id": "ligamina-container-client",
+  "clients": [
+    {
+      "id": "ligamina-container-client",
+      "token": "CHANGE_ME_CLIENT_TOKEN",
+      "capabilities": [
+        "ligamina.nonebot.math.add",
+        "ligamina.koishi.math.add"
+      ],
+      "operation_grants": []
+    }
+  ],
+  "gateways": [
+    {
+      "id": "ligamina-container-gateway",
+      "client_id": "ligamina-container-client",
+      "account_id": "container-account",
+      "registration_token": "CHANGE_ME_GATEWAY_REGISTRATION_TOKEN_0123456789"
+    }
+  ],
+  "hosts": [
+    {
+      "id": "nonebot-container",
+      "enabled": true,
+      "program": "/opt/ligamina/hosts/nonebot/.venv/bin/python",
+      "args": ["-m", "ligamina_nonebot.worker"],
+      "current_dir": "/opt/ligamina/hosts/nonebot",
+      "environment": {
+        "LIGAMINA_NONEBOT_PLUGINS": "ligamina_nonebot.federated_smoke_plugin",
+        "LIGAMINA_NONEBOT_NICKNAMES": "Bot",
+        "LIGAMINA_NONEBOT_DATA_DIR": "/var/lib/ligamina/nonebot"
+      },
+      "max_restarts": 3,
+      "restart_backoff_ms": 1000,
+      "startup_timeout_ms": 60000,
+      "shutdown_timeout_ms": 10000,
+      "operation_grants": []
+    },
+    {
+      "id": "koishi-container",
+      "enabled": true,
+      "program": "/usr/local/bin/node",
+      "args": ["/opt/ligamina/hosts/koishi/dist/worker.js"],
+      "current_dir": "/opt/ligamina/hosts/koishi",
+      "environment": {
+        "LIGAMINA_KOISHI_PLUGINS": "file:///opt/ligamina/hosts/koishi/dist/federated-smoke-plugin.js",
+        "LIGAMINA_KOISHI_DATA_DIR": "/var/lib/ligamina/koishi",
+        "LIGAMINA_KOISHI_NICKNAMES": "Bot"
+      },
+      "max_restarts": 3,
+      "restart_backoff_ms": 1000,
+      "startup_timeout_ms": 60000,
+      "shutdown_timeout_ms": 10000,
+      "operation_grants": []
+    }
+  ],
+  "router": {
+    "max_pending_per_conversation": 16,
+    "max_outstanding_events": 64,
+    "max_tracked_conversations": 64,
+    "max_concurrent_conversations": 8,
+    "processing_timeout_ms": 30000
+  }
+}

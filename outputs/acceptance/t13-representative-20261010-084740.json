@@ -1,0 +1,36 @@
+{
+  "suite": "representative",
+  "status": "failed",
+  "worker": "isolated",
+  "started_at": "2026-10-10T00:47:40.212Z",
+  "platform": "Windows-11-10.0.26200-SP0",
+  "samples": [],
+  "error": "ValueError: cannot unambiguously discover one plugin module from wheel: []",
+  "definition": {
+    "L0": "source metadata and the registry-declared artifact digest were verified from downloaded bytes",
+    "L1": "exact framework and plugin dependencies resolved and installed in a disposable profile",
+    "L2": "unmodified plugin imported and initialized through its native framework Host; fixture event dispatched",
+    "L3": "plugin receives the same fixture through the production Core federated route",
+    "L4": "expected behavior and native/federated operation traces both match the sample fixture",
+    "L5": "repeated lifecycle/resource stability; belongs to T14",
+    "isolation_boundary": "disposable dependency profile, HOME, caches, credentials, process lifetime and data directory; not an OS security sandbox"
+  },
+  "manifest": {
+    "path": "E:\\stella\\Ligamina\\samples\\third-party.lock.json",
+    "sha256": "111641bf5c0c616a61ba404e445047d68aaab5d9392fd760fa81ed0ac5ba7bad",
+    "sample_count": 2
+  },
+  "framework_versions": {
+    "nonebot": {
+      "nonebot2": "2.5.0",
+      "nonebot-adapter-onebot": "2.4.6"
+    },
+    "koishi": {
+      "@koishijs/core": "4.18.11",
+      "@minatojs/driver-sqlite": "4.7.0"
+    }
+  },
+  "traceback": "Traceback (most recent call last):\n  File \"E:\\stella\\Ligamina\\lab\\representative.py\", line 801, in run_samples\n    sample[\"_entry\"] = discover_python_entry(sample, artifact)\n                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"E:\\stella\\Ligamina\\lab\\representative.py\", line 195, in discover_python_entry\n    raise ValueError(f\"cannot unambiguously discover one plugin module from wheel: {modules}\")\nValueError: cannot unambiguously discover one plugin module from wheel: []\n",
+  "ended_at": "2026-10-10T00:47:41.555Z",
+  "report": "E:\\stella\\Ligamina\\outputs\\acceptance\\t13-representative-20261010-084740.json"
+}

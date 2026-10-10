@@ -1,0 +1,75 @@
+{
+  "suite": "windows-runtime-probe",
+  "status": "completed",
+  "gate": "NOT READY",
+  "started_at": "2026-10-10T02:04:00Z",
+  "ended_at": "2026-10-10T02:09:00Z",
+  "platform": "Windows 11 x64 development host",
+  "bundle": {
+    "status": "passed",
+    "path": ".work/releases/ligamina-win-x64",
+    "core_sha256": "970d63ebeb6011376403fb715829de28e459d9a9a9c35ff91114db169818f466",
+    "cargo_release_build": "passed",
+    "koishi_typescript_build": "passed"
+  },
+  "install": {
+    "status": "passed",
+    "install_path": ".work/部署 路径/Ligamina",
+    "profile": [
+      "nonebot",
+      "koishi"
+    ],
+    "runtimes": {
+      "uv": {
+        "version": "0.12.5",
+        "archive_sha256": "4c4d49d8738847d9b71ba319e49a5688c93eac0fe6204b1df24e98528dddf39a"
+      },
+      "python": {
+        "version": "3.12.14",
+        "python_exe_sha256": "4eb51b7d5963d9e0dc356bd209b1d55360c73db39d8d458ceee084610ca48fd1",
+        "checks": [
+          "uv managed install under version directory",
+          "no Windows registry registration",
+          "no global executable shim",
+          "locked NoneBot dependencies installed",
+          "NoneBot and OneBot adapter import passed"
+        ]
+      },
+      "node": {
+        "version": "24.20.0",
+        "archive_sha256": "6cac9ffbca8f6a47091e4b5c772e0606049c3871cb67d900c0cedde630e545ba",
+        "node_exe_sha256": "5c976096e04e5c2c1f091938926234cc9fbebfe9787ddd149351b3b0ecc707b5",
+        "checks": [
+          "locked production dependencies installed",
+          "npm dependency tree passed",
+          "Koishi core import passed"
+        ]
+      }
+    },
+    "user_data_location": "%APPDATA%/Ligamina",
+    "path_character_checks": [
+      "Chinese characters",
+      "spaces"
+    ]
+  },
+  "update_rollback": {
+    "status": "passed",
+    "injected_failure": "Node archive SHA-256 set to all zeroes",
+    "update_exit_code": 1,
+    "active_version_unchanged": true,
+    "candidate_directory_removed": true
+  },
+  "uninstall": {
+    "status": "passed",
+    "application_directory_removed": true,
+    "separate_user_data_preserved_by_default": true
+  },
+  "not_yet_verified": [
+    "fresh Windows x64 machine without Rust, Python, Node, Docker, or uv",
+    "first-run daemon configuration generation",
+    "starting selected Host profiles through the packaged CLI",
+    "updating a running deployment and starting the new active version",
+    "real platform integration"
+  ],
+  "gate_reason": "Local runtime packaging and rollback probes passed, but C14 clean-machine, first-run, and selected-plugin runtime acceptance remain open."
+}

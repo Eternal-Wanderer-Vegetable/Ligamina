@@ -1,0 +1,30 @@
+services:
+  ligamina:
+    image: ligamina:0.1.0
+    platform: linux/amd64
+    build:
+      context: ../..
+      dockerfile: deploy/linux/Dockerfile
+    profiles: [nonebot, koishi]
+    init: true
+    read_only: true
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    tmpfs:
+      - /tmp:rw,noexec,nosuid,nodev,size=32m,mode=1777
+      - /run/ligamina:rw,noexec,nosuid,nodev,size=1m,uid=10001,gid=10001,mode=0700
+    ports:
+      - "127.0.0.1:${LIGAMINA_PORT:-26701}:26701"
+    environment:
+      LIGAMINA_ADMIN_TOKEN: ${LIGAMINA_ADMIN_TOKEN:?Set LIGAMINA_ADMIN_TOKEN in deploy/linux/.env}
+      LIGAMINA_PROFILES: ${LIGAMINA_PROFILES:-nonebot,koishi}
+    volumes:
+      - ./daemon.json:/etc/ligamina/daemon.json:ro
+      - ligamina-data:/var/lib/ligamina
+    restart: unless-stopped
+    stop_grace_period: 15s
+
+volumes:
+  ligamina-data:

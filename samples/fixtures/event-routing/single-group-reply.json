@@ -1,0 +1,73 @@
+{
+  "case_id": "single-group-reply-v1",
+  "stimulus": {
+    "events": [
+      {
+        "schema_version": "ligamina/0.1",
+        "event_id": "evt-fixture-1",
+        "trace_id": "trace-fixture-1",
+        "platform": "virtual.onebot",
+        "account_id": "account-1",
+        "conversation": { "kind": "group", "id": "room-1" },
+        "actor_id": "user-1",
+        "timestamp": "2026-10-10T00:00:00Z",
+        "target_host": "nonebot-default",
+        "message": [
+          { "type": "mention", "user_id": "bot-1" },
+          { "type": "text", "text": "/echo hello" },
+          { "type": "reply", "message_id": "source-1" }
+        ]
+      }
+    ]
+  },
+  "expected": {
+    "environment": {
+      "ecosystem": "nonebot",
+      "framework_version": "2.5.0",
+      "runtime_version": "3.12.14",
+      "lockfile_sha256": "B10A130C2DC23AA0369CBA59FE5285F1FAE9F10C6683EF35C5540430632171AE",
+      "profile_sha256": "4B77454753FA5181A90BB3C339DE6970BBE1B2F57FF8FF2DC15D63A2BEA929A6"
+    },
+    "events": [
+      {
+        "schema_version": "ligamina/0.1",
+        "event_id": "evt-fixture-1",
+        "trace_id": "trace-fixture-1",
+        "platform": "virtual.onebot",
+        "account_id": "account-1",
+        "conversation": { "kind": "group", "id": "room-1" },
+        "actor_id": "user-1",
+        "timestamp": "2026-10-10T00:00:00Z",
+        "target_host": "nonebot-default",
+        "message": [
+          { "type": "mention", "user_id": "bot-1" },
+          { "type": "text", "text": "/echo hello" },
+          { "type": "reply", "message_id": "source-1" }
+        ]
+      }
+    ],
+    "operations": [
+      {
+        "operation_id": "op-fixture-1",
+        "account_id": "account-1",
+        "operation": "send_message",
+        "target": { "kind": "group", "id": "room-1" },
+        "params": {
+          "message": [
+            { "type": "reply", "message_id": "source-1" },
+            { "type": "text", "text": "hello" }
+          ]
+        }
+      }
+    ],
+    "operation_receipts": [
+      {
+        "operation_id": "op-fixture-1",
+        "status": "succeeded",
+        "platform_message_id": "virtual-message-1",
+        "target": { "kind": "group", "id": "room-1" }
+      }
+    ],
+    "cleanup": { "active_capability_count": 0, "live_processes": [] }
+  }
+}

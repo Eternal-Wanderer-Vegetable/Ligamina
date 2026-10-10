@@ -1,0 +1,88 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ligamina.dev/contracts/v0.1/event-envelope.schema.json",
+  "title": "Ligamina EventEnvelope v0.1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "event_id",
+    "trace_id",
+    "platform",
+    "account_id",
+    "conversation",
+    "actor_id",
+    "timestamp",
+    "target_host",
+    "message"
+  ],
+  "properties": {
+    "schema_version": { "const": "ligamina/0.1" },
+    "event_id": { "$ref": "#/$defs/id" },
+    "trace_id": { "$ref": "#/$defs/id" },
+    "platform": { "type": "string", "minLength": 1, "maxLength": 128 },
+    "account_id": { "$ref": "#/$defs/id" },
+    "conversation": { "$ref": "#/$defs/conversation" },
+    "actor_id": { "$ref": "#/$defs/id" },
+    "timestamp": { "type": "string", "minLength": 1 },
+    "target_host": { "$ref": "#/$defs/id" },
+    "message": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/messageSegment" }
+    },
+    "extensions": { "type": "object", "additionalProperties": true }
+  },
+  "$defs": {
+    "id": { "type": "string", "minLength": 1, "maxLength": 256 },
+    "conversation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind", "id"],
+      "properties": {
+        "kind": { "enum": ["group", "private"] },
+        "id": { "$ref": "#/$defs/id" }
+      }
+    },
+    "messageSegment": {
+      "oneOf": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["type", "text"],
+          "properties": {
+            "type": { "const": "text" },
+            "text": { "type": "string" }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["type", "user_id"],
+          "properties": {
+            "type": { "const": "mention" },
+            "user_id": { "$ref": "#/$defs/id" }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["type", "message_id"],
+          "properties": {
+            "type": { "const": "reply" },
+            "message_id": { "$ref": "#/$defs/id" }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["type", "resource_ref"],
+          "properties": {
+            "type": { "const": "image_ref" },
+            "resource_ref": { "type": "string", "minLength": 1 },
+            "media_type": { "type": "string", "minLength": 1 }
+          }
+        }
+      ]
+    }
+  }
+}

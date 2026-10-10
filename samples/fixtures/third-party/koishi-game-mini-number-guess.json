@@ -1,0 +1,26 @@
+{
+  "fixture_id": "koishi-game-mini-number-guess-v1",
+  "conversation": {"kind": "group", "id": "4242"},
+  "actor_id": "2323",
+  "input_texts": ["猜数字 开始", "猜数字 结束"],
+  "plugin_config": {
+    "enableNumberGuess": true,
+    "enableTurtleSoup": false,
+    "guessNumber": {
+      "min": 0,
+      "max": 100,
+      "totalRounds": 1,
+      "showRank": false,
+      "botParticipateInGroup": false,
+      "enablePenalty": false,
+      "autoStopInactiveTime": 60
+    }
+  },
+  "expected_target": {"kind": "group", "id": "4242"},
+  "expected_outgoing_texts": [
+    "比赛开始！本次共 1 回合～",
+    "猜数字范围：0 - 100",
+    "比赛已停止"
+  ],
+  "notes": "Disables turtle soup, bot autoplay, and rankings; start/stop checks a deterministic command path without relying on the upstream random target."
+}

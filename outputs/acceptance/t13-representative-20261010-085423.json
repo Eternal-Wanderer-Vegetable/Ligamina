@@ -1,0 +1,677 @@
+{
+  "suite": "representative",
+  "status": "completed",
+  "worker": "isolated",
+  "started_at": "2026-10-10T00:54:23.370Z",
+  "platform": "Windows-11-10.0.26200-SP0",
+  "samples": [
+    {
+      "sample_id": "nonebot-autohelp",
+      "ecosystem": "nonebot",
+      "package": "nonebot-plugin-autohelp",
+      "version": "0.1.7",
+      "license": "MIT",
+      "category": [
+        "command",
+        "message"
+      ],
+      "source_url": "https://github.com/ffreemt/nonebot-plugin-autohelp",
+      "artifact_hash_algorithm": "sha256",
+      "artifact_hash": "70faef1a7f05a42a448e4d886a4b4a58611d86260df7d6f6e2e2b9deb0e49472",
+      "fixture_path": "E:\\stella\\Ligamina\\samples\\fixtures\\third-party\\nonebot-autohelp-help-h.json",
+      "reproduction_command": "uv run --project lab python lab/run.py --suite representative --manifest samples/third-party.lock.json --worker isolated --sample-id nonebot-autohelp",
+      "levels": {
+        "L0": {
+          "status": "passed",
+          "artifact_url": "https://files.pythonhosted.org/packages/fc/c0/f6e010f1d0ae8bf2e8fe067ea031b0debb3f764f5480022903f5e5179471/nonebot_plugin_autohelp-0.1.7-py3-none-any.whl",
+          "artifact_hash_algorithm": "sha256",
+          "expected_artifact_hash": "70faef1a7f05a42a448e4d886a4b4a58611d86260df7d6f6e2e2b9deb0e49472",
+          "actual_artifact_hash": "70faef1a7f05a42a448e4d886a4b4a58611d86260df7d6f6e2e2b9deb0e49472",
+          "actual_sha256": "70faef1a7f05a42a448e4d886a4b4a58611d86260df7d6f6e2e2b9deb0e49472",
+          "size_bytes": 9152,
+          "error": null
+        },
+        "L1": {
+          "status": "passed",
+          "steps": [
+            {
+              "label": "resolve exact Python sample profile",
+              "status": "passed",
+              "command": [
+                "C:\\Users\\Vegetable\\AppData\\Local\\FreeToken\\bin\\uv.EXE",
+                "lock"
+              ],
+              "returncode": 0,
+              "stdout_tail": "",
+              "stderr_tail": "Using CPython 3.12.14 interpreter at: C:\\Users\\Vegetable\\AppData\\Roaming\\uv\\python\\cpython-3.12.14-windows-x86_64-none\\python.exe\nResolved 39 packages in 10.32s\n"
+            },
+            {
+              "label": "install locked Python sample profile",
+              "status": "passed",
+              "command": [
+                "C:\\Users\\Vegetable\\AppData\\Local\\FreeToken\\bin\\uv.EXE",
+                "sync",
+                "--locked",
+                "--no-dev",
+                "--no-build",
+                "--python",
+                "3.12.14"
+              ],
+              "returncode": 0,
+              "stdout_tail": "",
+              "stderr_tail": "Using CPython 3.12.14 interpreter at: C:\\Users\\Vegetable\\AppData\\Roaming\\uv\\python\\cpython-3.12.14-windows-x86_64-none\\python.exe\nCreating virtual environment at: .venv\nResolved 39 packages in 3ms\nDownloading pydantic-core (2.1MiB)\n Downloaded pydantic-core\nPrepared 36 packages in 10.38s\nInstalled 37 packages in 273ms\n + annotated-doc==0.0.5\n + annotated-types==0.8.0\n + anyio==4.15.1\n + attrs==26.1.0\n + click==8.5.0\n + colorama==0.4.6\n + exceptiongroup==1.3.1\n + fastapi==0.143.0\n + h11==0.16.0\n + httptools==0.9.0\n + idna==3.20\n + jsonschema==4.25.1\n + jsonschema-specifications==2025.9.1\n + loguru==0.7.3\n + logzero==1.7.0\n + msgpack==1.2.3\n + multidict==7.1.0\n + nonebot-adapter-onebot==2.4.6\n + nonebot-plugin-autohelp==0.1.7 (from https://files.pythonhosted.org/packages/fc/c0/f6e010f1d0ae8bf2e8fe067ea031b0debb3f764f5480022903f5e5179471/nonebot_plugin_autohelp-0.1.7-py3-none-any.whl)\n + nonebot2==2.5.0\n + opentelemetry-api==1.45.1\n + propcache==0.5.4\n + pydantic==2.14.0\n + pydantic-core==2.50.0\n + pygtrie==2.6.2\n + python-dotenv==1.2.4\n + pyyaml==6.0.3\n + referencing==0.37.0\n + rpds-py==2026.9.1\n + starlette==1.7.0\n + typing-extensions==4.16.0\n + typing-inspection==0.4.4\n + uvicorn==0.54.0\n + watchfiles==1.3.0\n + websockets==17.2\n + win32-setctime==1.2.0\n + yarl==1.25.1\n"
+            },
+            {
+              "label": "verify installed Python package metadata",
+              "status": "passed",
+              "command": [
+                "C:\\Users\\VEGETA~1\\AppData\\Local\\Temp\\ligamina-representative-g77nadla\\nonebot-autohelp\\.venv\\Scripts\\python.exe",
+                "-c",
+                "from importlib.metadata import version; import sys; print(version(sys.argv[1]))",
+                "nonebot-plugin-autohelp"
+              ],
+              "returncode": 0,
+              "stdout_tail": "0.1.7\n",
+              "stderr_tail": ""
+            }
+          ],
+          "lock_sha256": "f6b67541a6e9ca52aea719733984326a05211423597cafff502ceb2effee9a2f"
+        },
+        "L2": {
+          "status": "passed",
+          "native_trace": {
+            "initialize": {
+              "jsonrpc": "2.0",
+              "id": "representative-init",
+              "result": {
+                "ready": true,
+                "protocol_version": "0.1",
+                "capabilities": [
+                  {
+                    "capability_id": "ligamina.nonebot.math.add",
+                    "input_schema": {
+                      "type": "object",
+                      "properties": {
+                        "left": {
+                          "type": "integer",
+                          "minimum": -9007199254740991,
+                          "maximum": 9007199254740991
+                        },
+                        "right": {
+                          "type": "integer",
+                          "minimum": -9007199254740991,
+                          "maximum": 9007199254740991
+                        }
+                      },
+                      "required": [
+                        "left",
+                        "right"
+                      ],
+                      "additionalProperties": false
+                    },
+                    "output_schema": {
+                      "type": "integer",
+                      "minimum": -9007199254740991,
+                      "maximum": 9007199254740991
+                    },
+                    "pure": true
+                  }
+                ]
+              }
+            },
+            "dispatches": [
+              {
+                "jsonrpc": "2.0",
+                "id": "representative-event-1",
+                "result": {
+                  "accepted": true,
+                  "event_id": "sample-nonebot-autohelp-1"
+                }
+              }
+            ],
+            "outgoing": [
+              {
+                "jsonrpc": "2.0",
+                "id": "platform-57b461de-6482-4bf3-b634-bba78edcb404",
+                "method": "platform.execute",
+                "params": {
+                  "operation_id": "1b07b61c-8fd6-4e71-a0e8-e1724256edbe",
+                  "trace_id": "trace-sample-nonebot-autohelp-1",
+                  "account_id": "9000",
+                  "operation": "send_message",
+                  "target": {
+                    "kind": "group",
+                    "id": "4242"
+                  },
+                  "params": {
+                    "message": [
+                      {
+                        "type": "text",
+                        "text": "usage: help [-h] [-d] [params ...]\n\npositional arguments:\n  params         list of parameters of type str (default: None)\n\noptions:\n  -h, --help     show this help message and exit\n  -d, --details  show __doc__ for each plugin (default: False)\n\n---\n"
+                      }
+                    ]
+                  }
+                }
+              }
+            ],
+            "stderr_tail": "0>\n          �� Matcher(type='message', module=nonebot_plugin_autohelp.nonebot_plugin_autohelp, lineno=35)\n  File \"C:\\Users\\VEGETA~1\\AppData\\Local\\Temp\\ligamina-representative-g77nadla\\nonebot-autohelp\\.venv\\Lib\\site-packages\\nonebot\\internal\\matcher\\matcher.py\", line 855, in simple_run\n    await handler(\n          �� Dependent(call=handle)\n  File \"C:\\Users\\VEGETA~1\\AppData\\Local\\Temp\\ligamina-representative-g77nadla\\nonebot-autohelp\\.venv\\Lib\\site-packages\\nonebot\\dependencies\\__init__.py\", line 113, in __call__\n    return await cast(Callable[..., Awaitable[R]], self.call)(**values)\n                 ��    ��             ��         ��    ��    ��       �� {'bot': Bot(type='Ligamina OneBot V11 Bridge', self_id='9000'), 'event': GroupMessageEvent(time=1791593686, self_id=9000, pos...\n                 ��    ��             ��         ��    ��    �� <function handle at 0x000002088DC4ECA0>\n                 ��    ��             ��         ��    �� Dependent(call=handle)\n                 ��    ��             ��         �� ~R\n                 ��    ��             �� <class 'collections.abc.Awaitable'>\n                 ��    �� <class 'collections.abc.Callable'>\n                 �� <function cast at 0x000002088AC4CB80>\n  File \"C:\\Users\\VEGETA~1\\AppData\\Local\\Temp\\ligamina-representative-g77nadla\\nonebot-autohelp\\.venv\\Lib\\site-packages\\nonebot_plugin_autohelp\\nonebot_plugin_autohelp.py\", line 94, in handle\n    await bot.send(message=\"\\n---\\n\".join([stdout, stderr]), event=event)\n          ��   ��                            ��       ��               �� GroupMessageEvent(time=1791593686, self_id=9000, post_type='message', sub_type='normal', user_id=2323, message_type='group', ...\n          ��   ��                            ��       �� ''\n          ��   ��                            �� 'usage: help [-h] [-d] [params ...]\\n\\npositional arguments:\\n  params         list of parameters of type str (default: None)...\n          ��   �� <function Bot.send at 0x000002088D44B880>\n          �� Bot(type='Ligamina OneBot V11 Bridge', self_id='9000')\n  File \"C:\\Users\\VEGETA~1\\AppData\\Local\\Temp\\ligamina-representative-g77nadla\\nonebot-autohelp\\.venv\\Lib\\site-packages\\nonebot\\adapters\\onebot\\v11\\bot.py\", line 237, in send\n    return await self.__class__.send_handler(self, event, message, **kwargs)\n                 ��    ��                      ��     ��      ��          �� {}\n                 ��    ��                      ��     ��      �� 'usage: help [-h] [-d] [params ...]\\n\\npositional arguments:\\n  params         list of parameters of type str (default: None)...\n                 ��    ��                      ��     �� GroupMessageEvent(time=1791593686, self_id=9000, post_type='message', sub_type='normal', user_id=2323, message_type='group', ...\n                 ��    ��                      �� Bot(type='Ligamina OneBot V11 Bridge', self_id='9000')\n                 ��    �� <attribute '__class__' of 'object' objects>\n                 �� Bot(type='Ligamina OneBot V11 Bridge', self_id='9000')\n  File \"C:\\Users\\VEGETA~1\\AppData\\Local\\Temp\\ligamina-representative-g77nadla\\nonebot-autohelp\\.venv\\Lib\\site-packages\\nonebot\\adapters\\onebot\\v11\\bot.py\", line 190, in send\n    return await bot.send_msg(**params)\n                 ��              �� {'user_id': 2323, 'group_id': 4242, 'message_type': 'group', 'message': [MessageSegment(type='text', data={'text': 'usage: he...\n                 �� Bot(type='Ligamina OneBot V11 Bridge', self_id='9000')\n  File \"C:\\Users\\VEGETA~1\\AppData\\Local\\Temp\\ligamina-representative-g77nadla\\nonebot-autohelp\\.venv\\Lib\\site-packages\\nonebot\\internal\\adapter\\bot.py\", line 176, in call_api\n    raise exception\n          �� BridgeApiError('platform_message_id is outside the OneBot v11 numeric ID profile')\n  File \"C:\\Users\\VEGETA~1\\AppData\\Local\\Temp\\ligamina-representative-g77nadla\\nonebot-autohelp\\.venv\\Lib\\site-packages\\nonebot\\internal\\adapter\\bot.py\", line 128, in call_api\n    result = await self.adapter._call_api(self, api, **data)\n                   ��    ��       ��         ��     ��      �� {'user_id': 2323, 'group_id': 4242, 'message_type': 'group', 'message': [MessageSegment(type='text', data={'text': 'usage: he...\n                   ��    ��       ��         ��     �� 'send_msg'\n                   ��    ��       ��         �� Bot(type='Ligamina OneBot V11 Bridge', self_id='9000')\n                   ��    ��       �� <function BridgeAdapter._call_api at 0x000002088D64D760>\n                   ��    �� Adapter(name='Ligamina OneBot V11 Bridge')\n                   �� Bot(type='Ligamina OneBot V11 Bridge', self_id='9000')\n\n  File \"E:\\stella\\Ligamina\\hosts\\nonebot\\ligamina_nonebot\\adapter.py\", line 129, in _call_api\n    return await self._send_message(bot, data)\n                 ��    ��             ��    �� {'user_id': 2323, 'group_id': 4242, 'message_type': 'group', 'message': [MessageSegment(type='text', data={'text': 'usage: he...\n                 ��    ��             �� Bot(type='Ligamina OneBot V11 Bridge', self_id='9000')\n                 ��    �� <function BridgeAdapter._send_message at 0x000002088D64D800>\n                 �� Adapter(name='Ligamina OneBot V11 Bridge')\n\n  File \"E:\\stella\\Ligamina\\hosts\\nonebot\\ligamina_nonebot\\adapter.py\", line 152, in _send_message\n    numeric_message_id = _onebot_id(message_id, \"platform_message_id\")\n                         ��          �� 'native-1'\n                         �� <function _onebot_id at 0x000002088D64DF80>\n\n  File \"E:\\stella\\Ligamina\\hosts\\nonebot\\ligamina_nonebot\\adapter.py\", line 358, in _onebot_id\n    raise BridgeApiError(\"unsupported_api\", f\"{field} is outside the OneBot v11 numeric ID profile\")\n          ��                                    �� 'platform_message_id'\n          �� <class 'ligamina_nonebot.adapter.BridgeApiError'>\n\nligamina_nonebot.adapter.BridgeApiError: platform_message_id is outside the OneBot v11 numeric ID profile\n2026-10-10 08:54:47.988 | DEBUG    | nonebot:handle_event:604 - Checking for matchers completed\n"
+          }
+        },
+        "L3": {
+          "status": "passed",
+          "federated_trace": {
+            "event_requests": [
+              {
+                "schema_version": "ligamina/0.1",
+                "event_id": "sample-nonebot-autohelp-1",
+                "trace_id": "trace-sample-nonebot-autohelp-1",
+                "platform": "onebot.v11",
+                "account_id": "9000",
+                "conversation": {
+                  "kind": "group",
+                  "id": "4242"
+                },
+                "actor_id": "2323",
+                "timestamp": "2026-10-10T00:54:46.054Z",
+                "target_host": "sample-nonebot-autohelp",
+                "message": [
+                  {
+                    "type": "text",
+                    "text": "help -h"
+                  }
+                ],
+                "extensions": {
+                  "onebot.v11": {
+                    "message_id": "80000",
+                    "sender": {
+                      "nickname": "Ligamina"
+                    }
+                  }
+                }
+              }
+            ],
+            "gateway_operations": [
+              {
+                "operation": {
+                  "core_epoch_created": "edbf2b45-8114-4c13-abfb-38f976848ab3",
+                  "created_at_ms": 1791593689892,
+                  "dispatched_core_epoch": "edbf2b45-8114-4c13-abfb-38f976848ab3",
+                  "dispatched_lease_epoch": 1,
+                  "dispatched_lease_id": "4f83c062-bf56-4481-9d74-339aa9c717f6",
+                  "fingerprint": "26ebece84dd380e7b0e237fc77f3ae1bcfbc0bf65d257f52b7cf76198599f037",
+                  "grant_id": "nonebot-autohelp-host-send",
+                  "host_epoch": 2,
+                  "key": {
+                    "account_id": "9000",
+                    "client_id": "ligamina-sample-client",
+                    "operation": "send_message",
+                    "operation_id": "1d5bc1ac-23c5-4efb-b116-75247d86e04e"
+                  },
+                  "operation_payload": {
+                    "account_id": "9000",
+                    "operation": "send_message",
+                    "operation_id": "1d5bc1ac-23c5-4efb-b116-75247d86e04e",
+                    "params": {
+                      "message": [
+                        {
+                          "text": "usage: help [-h] [-d] [params ...]\n\npositional arguments:\n  params         list of parameters of type str (default: None)\n\noptions:\n  -h, --help     show this help message and exit\n  -d, --details  show __doc__ for each plugin (default: False)\n\n---\n",
+                          "type": "text"
+                        }
+                      ]
+                    },
+                    "target": {
+                      "id": "4242",
+                      "kind": "group"
+                    },
+                    "trace_id": "trace-sample-nonebot-autohelp-1"
+                  },
+                  "principal": {
+                    "id": "sample-nonebot-autohelp",
+                    "kind": "host"
+                  },
+                  "result": null,
+                  "status": "dispatched",
+                  "trace_id": "trace-sample-nonebot-autohelp-1",
+                  "updated_at_ms": 1791593689940
+                },
+                "message": [
+                  {
+                    "text": "usage: help [-h] [-d] [params ...]\n\npositional arguments:\n  params         list of parameters of type str (default: None)\n\noptions:\n  -h, --help     show this help message and exit\n  -d, --details  show __doc__ for each plugin (default: False)\n\n---\n",
+                    "type": "text"
+                  }
+                ],
+                "receipt": {
+                  "core_epoch_created": "edbf2b45-8114-4c13-abfb-38f976848ab3",
+                  "created_at_ms": 1791593689892,
+                  "dispatched_core_epoch": "edbf2b45-8114-4c13-abfb-38f976848ab3",
+                  "dispatched_lease_epoch": 1,
+                  "dispatched_lease_id": "4f83c062-bf56-4481-9d74-339aa9c717f6",
+                  "fingerprint": "26ebece84dd380e7b0e237fc77f3ae1bcfbc0bf65d257f52b7cf76198599f037",
+                  "grant_id": "nonebot-autohelp-host-send",
+                  "host_epoch": 2,
+                  "key": {
+                    "account_id": "9000",
+                    "client_id": "ligamina-sample-client",
+                    "operation": "send_message",
+                    "operation_id": "1d5bc1ac-23c5-4efb-b116-75247d86e04e"
+                  },
+                  "operation_payload": {
+                    "account_id": "9000",
+                    "operation": "send_message",
+                    "operation_id": "1d5bc1ac-23c5-4efb-b116-75247d86e04e",
+                    "params": {
+                      "message": [
+                        {
+                          "text": "usage: help [-h] [-d] [params ...]\n\npositional arguments:\n  params         list of parameters of type str (default: None)\n\noptions:\n  -h, --help     show this help message and exit\n  -d, --details  show __doc__ for each plugin (default: False)\n\n---\n",
+                          "type": "text"
+                        }
+                      ]
+                    },
+                    "target": {
+                      "id": "4242",
+                      "kind": "group"
+                    },
+                    "trace_id": "trace-sample-nonebot-autohelp-1"
+                  },
+                  "principal": {
+                    "id": "sample-nonebot-autohelp",
+                    "kind": "host"
+                  },
+                  "result": {
+                    "data": null,
+                    "error": null,
+                    "evidence_ref": "ligamina-sample://gateway/sample-message-1",
+                    "observed_at_ms": 1791593689938,
+                    "platform_message_id": "sample-message-1",
+                    "status": "succeeded"
+                  },
+                  "status": "succeeded",
+                  "trace_id": "trace-sample-nonebot-autohelp-1",
+                  "updated_at_ms": 1791593689941
+                }
+              }
+            ],
+            "cleanup": {
+              "host_pid": 19832,
+              "host_alive_after_shutdown": false
+            },
+            "host_status": {
+              "epoch": 2,
+              "id": "sample-nonebot-autohelp",
+              "last_error": null,
+              "pid": 19832,
+              "restart_count": 0,
+              "state": "active"
+            },
+            "event_statuses": [
+              {
+                "accepted": {
+                  "disposition": "accepted",
+                  "event": {
+                    "created_at_ms": 1791593689885,
+                    "error": null,
+                    "event": {
+                      "account_id": "9000",
+                      "actor_id": "2323",
+                      "conversation": {
+                        "id": "4242",
+                        "kind": "group"
+                      },
+                      "event_id": "sample-nonebot-autohelp-1",
+                      "extensions": {
+                        "onebot.v11": {
+                          "message_id": "80000",
+                          "sender": {
+                            "nickname": "Ligamina"
+                          }
+                        }
+                      },
+                      "message": [
+                        {
+                          "text": "help -h",
+                          "type": "text"
+                        }
+                      ],
+                      "platform": "onebot.v11",
+                      "schema_version": "ligamina/0.1",
+                      "target_host": "sample-nonebot-autohelp",
+                      "timestamp": "2026-10-10T00:54:46.054Z",
+                      "trace_id": "trace-sample-nonebot-autohelp-1"
+                    },
+                    "fingerprint": "2db7ba338c4e6642894f28c97da8e6ffac1febd7fb2e63ffab68685c3c65e535",
+                    "key": {
+                      "account_id": "9000",
+                      "client_id": "ligamina-sample-client",
+                      "conversation_id": "4242",
+                      "conversation_kind": "group",
+                      "event_id": "sample-nonebot-autohelp-1",
+                      "platform": "onebot.v11"
+                    },
+                    "status": "accepted",
+                    "target_host": "sample-nonebot-autohelp",
+                    "trace_id": "trace-sample-nonebot-autohelp-1",
+                    "updated_at_ms": 1791593689885
+                  }
+                },
+                "final": {
+                  "created_at_ms": 1791593689885,
+                  "error": null,
+                  "event": {
+                    "account_id": "9000",
+                    "actor_id": "2323",
+                    "conversation": {
+                      "id": "4242",
+                      "kind": "group"
+                    },
+                    "event_id": "sample-nonebot-autohelp-1",
+                    "extensions": {
+                      "onebot.v11": {
+                        "message_id": "80000",
+                        "sender": {
+                          "nickname": "Ligamina"
+                        }
+                      }
+                    },
+                    "message": [
+                      {
+                        "text": "help -h",
+                        "type": "text"
+                      }
+                    ],
+                    "platform": "onebot.v11",
+                    "schema_version": "ligamina/0.1",
+                    "target_host": "sample-nonebot-autohelp",
+                    "timestamp": "2026-10-10T00:54:46.054Z",
+                    "trace_id": "trace-sample-nonebot-autohelp-1"
+                  },
+                  "fingerprint": "2db7ba338c4e6642894f28c97da8e6ffac1febd7fb2e63ffab68685c3c65e535",
+                  "key": {
+                    "account_id": "9000",
+                    "client_id": "ligamina-sample-client",
+                    "conversation_id": "4242",
+                    "conversation_kind": "group",
+                    "event_id": "sample-nonebot-autohelp-1",
+                    "platform": "onebot.v11"
+                  },
+                  "status": "completed",
+                  "target_host": "sample-nonebot-autohelp",
+                  "trace_id": "trace-sample-nonebot-autohelp-1",
+                  "updated_at_ms": 1791593689967
+                }
+              }
+            ],
+            "core_exit_code": 0,
+            "stderr_tail": "",
+            "gateway_errors": []
+          }
+        },
+        "L4": {
+          "status": "failed",
+          "expected_outgoing_texts": [
+            "usage: help [-h] [-d] [params [params ...]]\n\npositional arguments:\n  params         list of parameters of type str (default: None)\n\noptions:\n  -h, --help     show this help message and exit\n  -d, --details  show __doc__ for each plugin (default: False)\n\n---\n"
+          ],
+          "native_messages": [
+            {
+              "text": "usage: help [-h] [-d] [params ...]\n\npositional arguments:\n  params         list of parameters of type str (default: None)\n\noptions:\n  -h, --help     show this help message and exit\n  -d, --details  show __doc__ for each plugin (default: False)\n\n---\n",
+              "target": {
+                "kind": "group",
+                "id": "4242"
+              }
+            }
+          ],
+          "federated_messages": [
+            {
+              "text": "usage: help [-h] [-d] [params ...]\n\npositional arguments:\n  params         list of parameters of type str (default: None)\n\noptions:\n  -h, --help     show this help message and exit\n  -d, --details  show __doc__ for each plugin (default: False)\n\n---\n",
+              "target": {
+                "id": "4242",
+                "kind": "group"
+              }
+            }
+          ],
+          "expected_target": {
+            "kind": "group",
+            "id": "4242"
+          }
+        },
+        "L5": {
+          "status": "not_run",
+          "reason": "repeated lifecycle/resource stability belongs to T14"
+        }
+      },
+      "entry_module": "nonebot_plugin_autohelp",
+      "input_events": [
+        {
+          "schema_version": "ligamina/0.1",
+          "event_id": "sample-nonebot-autohelp-1",
+          "trace_id": "trace-sample-nonebot-autohelp-1",
+          "platform": "onebot.v11",
+          "account_id": "9000",
+          "conversation": {
+            "kind": "group",
+            "id": "4242"
+          },
+          "actor_id": "2323",
+          "timestamp": "2026-10-10T00:54:46.054Z",
+          "target_host": "sample-nonebot-autohelp",
+          "message": [
+            {
+              "type": "text",
+              "text": "help -h"
+            }
+          ],
+          "extensions": {
+            "onebot.v11": {
+              "message_id": "80000",
+              "sender": {
+                "nickname": "Ligamina"
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "sample_id": "koishi-multi-qa",
+      "ecosystem": "koishi",
+      "package": "koishi-plugin-multi-qa",
+      "version": "1.0.8",
+      "license": "MIT",
+      "category": [
+        "command",
+        "message",
+        "storage"
+      ],
+      "source_url": "https://github.com/aynuzbh/koishi-plugin-multi-qa",
+      "artifact_hash_algorithm": "sri-sha512",
+      "artifact_hash": "sha512-gdXhFXMUlhkwDJSFRlHDNXG/4NocLS/pYNDKSrQ3quxgwtNzQcjALMbEZrWFFOOYzu9pv8//u23t9Pt6wktLmg==",
+      "fixture_path": "E:\\stella\\Ligamina\\samples\\fixtures\\third-party\\koishi-multi-qa-fixed-text.json",
+      "reproduction_command": "uv run --project lab python lab/run.py --suite representative --manifest samples/third-party.lock.json --worker isolated --sample-id koishi-multi-qa",
+      "levels": {
+        "L0": {
+          "status": "passed",
+          "artifact_url": "https://registry.npmjs.org/koishi-plugin-multi-qa/-/koishi-plugin-multi-qa-1.0.8.tgz",
+          "artifact_hash_algorithm": "sri-sha512",
+          "expected_artifact_hash": "sha512-gdXhFXMUlhkwDJSFRlHDNXG/4NocLS/pYNDKSrQ3quxgwtNzQcjALMbEZrWFFOOYzu9pv8//u23t9Pt6wktLmg==",
+          "actual_artifact_hash": "sha512-gdXhFXMUlhkwDJSFRlHDNXG/4NocLS/pYNDKSrQ3quxgwtNzQcjALMbEZrWFFOOYzu9pv8//u23t9Pt6wktLmg==",
+          "actual_sha256": "8beb5b5377f09981ff437f3b1c982fc3f4591582ef966b35c027082aee5f39bb",
+          "size_bytes": 3942,
+          "error": null
+        },
+        "L1": {
+          "status": "passed",
+          "steps": [
+            {
+              "label": "resolve exact Node sample profile",
+              "status": "passed",
+              "command": [
+                "C:\\windows\\system32\\cmd.exe",
+                "/d",
+                "/c",
+                "C:\\Program Files\\nodejs\\npm.cmd",
+                "install",
+                "--package-lock-only",
+                "--ignore-scripts",
+                "--no-audit",
+                "--fund=false"
+              ],
+              "returncode": 0,
+              "stdout_tail": "\nup to date in 27s\n",
+              "stderr_tail": ""
+            },
+            {
+              "label": "install locked Node sample profile",
+              "status": "passed",
+              "command": [
+                "C:\\windows\\system32\\cmd.exe",
+                "/d",
+                "/c",
+                "C:\\Program Files\\nodejs\\npm.cmd",
+                "ci",
+                "--ignore-scripts",
+                "--no-audit",
+                "--fund=false"
+              ],
+              "returncode": 0,
+              "stdout_tail": "\nadded 240 packages in 12s\n",
+              "stderr_tail": "npm warn deprecated @koa/router@10.1.1: **IMPORTANT 10x+ PERFORMANCE UPGRADE**: Please upgrade to v12.0.1+ as we have fixed an issue with debuglog causing 10x slower router benchmark performance, see https://github.com/koajs/router/pull/173\n"
+            },
+            {
+              "label": "verify installed Node package metadata",
+              "status": "passed",
+              "command": [
+                "C:\\Program Files\\nodejs\\node.EXE",
+                "-e",
+                "console.log(require(\"C:\\\\Users\\\\VEGETA~1\\\\AppData\\\\Local\\\\Temp\\\\ligamina-representative-g77nadla\\\\koishi-multi-qa\\\\node_modules\\\\koishi-plugin-multi-qa\\\\package.json\").version)"
+              ],
+              "returncode": 0,
+              "stdout_tail": "1.0.8\n",
+              "stderr_tail": ""
+            },
+            {
+              "label": "resolve Koishi plugin entry",
+              "status": "passed",
+              "entry_url": "file:///C:/Users/VEGETA%7E1/AppData/Local/Temp/ligamina-representative-g77nadla/koishi-multi-qa/node_modules/koishi-plugin-multi-qa/lib/index.js"
+            }
+          ],
+          "lock_sha256": "54c6f231a15c10420acd49d450a7f69f1ecebb842cbec2e38af79cf4fdcc4da7"
+        },
+        "L2": {
+          "status": "failed",
+          "error": "RuntimeError: worker exited early: 1; stderr=\"node:fs:484\\n    return binding.readFileUtf8(path, stringToFlags(options.flag));\\n                   ^\\n\\nError: ENOENT: no such file or directory, open 'C:\\\\Users\\\\VEGETA~1\\\\AppData\\\\Local\\\\Temp\\\\ligamina-representative-g77nadla\\\\contracts\\\\v0.1\\\\event-envelope.schema.json'\\n    at readFileSync (node:fs:484:20)\\n    at file:///C:/Users/VEGETA%7E1/AppData/Local/Temp/ligamina-representative-g77nadla/koishi-multi-qa/ligamina-koishi-host/dist/contracts.js:7:32\\n    at ModuleJob.run (node:internal/modules/esm/module_job:561:25)\\n    at async node:internal/modules/esm/loader:647:26\\n    at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:101:5) {\\n  errno: -4058,\\n  code: 'ENOENT',\\n  syscall: 'open',\\n  path: 'C:\\\\\\\\Users\\\\\\\\VEGETA~1\\\\\\\\AppData\\\\\\\\Local\\\\\\\\Temp\\\\\\\\ligamina-representative-g77nadla\\\\\\\\contracts\\\\\\\\v0.1\\\\\\\\event-envelope.schema.json'\\n}\\n\\nNode.js v24.20.0\\n\"",
+          "traceback": "Traceback (most recent call last):\n  File \"E:\\stella\\Ligamina\\lab\\representative.py\", line 963, in run_samples\n    native = DirectWorker(sample, work, environment).run(events)\n             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"E:\\stella\\Ligamina\\lab\\representative.py\", line 542, in run\n    result[\"initialize\"] = self.request(\"representative-init\", \"host.initialize\", {\n                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"E:\\stella\\Ligamina\\lab\\representative.py\", line 536, in request\n    return self._receive_for(request_id, timeout)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"E:\\stella\\Ligamina\\lab\\representative.py\", line 503, in _receive_for\n    raise RuntimeError(f\"worker exited early: {self.process.returncode if self.process else None}; stderr={stderr_tail!r}\")\nRuntimeError: worker exited early: 1; stderr=\"node:fs:484\\n    return binding.readFileUtf8(path, stringToFlags(options.flag));\\n                   ^\\n\\nError: ENOENT: no such file or directory, open 'C:\\\\Users\\\\VEGETA~1\\\\AppData\\\\Local\\\\Temp\\\\ligamina-representative-g77nadla\\\\contracts\\\\v0.1\\\\event-envelope.schema.json'\\n    at readFileSync (node:fs:484:20)\\n    at file:///C:/Users/VEGETA%7E1/AppData/Local/Temp/ligamina-representative-g77nadla/koishi-multi-qa/ligamina-koishi-host/dist/contracts.js:7:32\\n    at ModuleJob.run (node:internal/modules/esm/module_job:561:25)\\n    at async node:internal/modules/esm/loader:647:26\\n    at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:101:5) {\\n  errno: -4058,\\n  code: 'ENOENT',\\n  syscall: 'open',\\n  path: 'C:\\\\\\\\Users\\\\\\\\VEGETA~1\\\\\\\\AppData\\\\\\\\Local\\\\\\\\Temp\\\\\\\\ligamina-representative-g77nadla\\\\\\\\contracts\\\\\\\\v0.1\\\\\\\\event-envelope.schema.json'\\n}\\n\\nNode.js v24.20.0\\n\"\n"
+        },
+        "L3": {
+          "status": "skipped",
+          "reason": "L2 native baseline did not complete"
+        },
+        "L4": {
+          "status": "not_run",
+          "reason": "L3 did not complete",
+          "expected_outgoing_texts": [
+            "ligamina-multiqa-ok"
+          ]
+        },
+        "L5": {
+          "status": "not_run",
+          "reason": "repeated lifecycle/resource stability belongs to T14"
+        }
+      },
+      "entry_point": ".",
+      "input_events": [
+        {
+          "schema_version": "ligamina/0.1",
+          "event_id": "sample-koishi-multi-qa-1",
+          "trace_id": "trace-sample-koishi-multi-qa-1",
+          "platform": "koishi",
+          "account_id": "9000",
+          "conversation": {
+            "kind": "group",
+            "id": "4242"
+          },
+          "actor_id": "2323",
+          "timestamp": "2026-10-10T00:55:45.812Z",
+          "target_host": "sample-koishi-multi-qa",
+          "message": [
+            {
+              "type": "text",
+              "text": "ligamina-probe"
+            }
+          ],
+          "extensions": {
+            "onebot.v11": {
+              "message_id": "80000",
+              "sender": {
+                "nickname": "Ligamina"
+              }
+            }
+          }
+        }
+      ]
+    }
+  ],
+  "error": null,
+  "definition": {
+    "L0": "source metadata and the registry-declared artifact digest were verified from downloaded bytes",
+    "L1": "exact framework and plugin dependencies resolved and installed in a disposable profile",
+    "L2": "unmodified plugin imported and initialized through its native framework Host; fixture event dispatched",
+    "L3": "plugin receives the same fixture through the production Core federated route",
+    "L4": "expected behavior and native/federated operation traces both match the sample fixture",
+    "L5": "repeated lifecycle/resource stability; belongs to T14",
+    "isolation_boundary": "disposable dependency profile, HOME, caches, credentials, process lifetime and data directory; not an OS security sandbox"
+  },
+  "manifest": {
+    "path": "E:\\stella\\Ligamina\\samples\\third-party.lock.json",
+    "sha256": "442d245205d5c866613d8e1fb778b64ca266bebd153276779702bd25bbcf84d7",
+    "sample_count": 2
+  },
+  "framework_versions": {
+    "nonebot": {
+      "nonebot2[fastapi]": "2.5.0",
+      "nonebot-adapter-onebot": "2.4.6",
+      "jsonschema": "4.25.1"
+    },
+    "koishi": {
+      "@koishijs/core": "4.18.11",
+      "@minatojs/driver-sqlite": "4.7.0"
+    }
+  },
+  "core_build": {
+    "label": "build production Core daemon",
+    "status": "passed",
+    "command": [
+      "C:\\Users\\Vegetable\\.cargo\\bin\\cargo.EXE",
+      "build",
+      "-p",
+      "ligamina-cli",
+      "--locked"
+    ],
+    "returncode": 0,
+    "stdout_tail": "",
+    "stderr_tail": "    Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.19s\n"
+  },
+  "temporary_profile_cleanup": {
+    "status": "passed",
+    "path": "C:\\Users\\VEGETA~1\\AppData\\Local\\Temp\\ligamina-representative-g77nadla",
+    "attempts": 1
+  },
+  "l4_pass_count": {
+    "nonebot": 0,
+    "koishi": 0
+  },
+  "l4_message_pass_count": {
+    "nonebot": 0,
+    "koishi": 0
+  },
+  "category_coverage": {
+    "command": true,
+    "dependency": false,
+    "storage": true,
+    "task": false
+  },
+  "sample_failure_count": 2,
+  "gate": "NOT READY",
+  "gate_reason": "C11 requires at least two L4 behavior passes per ecosystem, with at least one passing message plugin per ecosystem. L0-L3 failures remain recorded per exact package version and are not included in the support list.",
+  "support_list": [],
+  "ended_at": "2026-10-10T00:55:50.530Z",
+  "report": "E:\\stella\\Ligamina\\outputs\\acceptance\\t13-representative-20261010-085423.json"
+}

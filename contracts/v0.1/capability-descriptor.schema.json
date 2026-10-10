@@ -1,0 +1,14 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ligamina.dev/contracts/v0.1/capability-descriptor.schema.json",
+  "title": "Ligamina v0.1 capability descriptor",
+  "type": "object",
+  "required": ["capability_id", "input_schema", "output_schema", "pure"],
+  "properties": {
+    "capability_id": { "type": "string", "minLength": 1, "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._:-]*$" },
+    "input_schema": { "anyOf": [{ "type": "object" }, { "type": "boolean" }] },
+    "output_schema": { "anyOf": [{ "type": "object" }, { "type": "boolean" }] },
+    "pure": { "const": true }
+  },
+  "additionalProperties": false
+}

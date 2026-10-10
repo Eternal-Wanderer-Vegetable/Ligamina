@@ -1,0 +1,72 @@
+{
+  "task": "T17",
+  "evidence_date": "2026-10-10",
+  "status": "local_checks_passed",
+  "gate": "PARTIAL",
+  "windows": {
+    "command": "pwsh -NoProfile -File scripts/check.ps1",
+    "exit_code": 0,
+    "checks": {
+      "nonebot_pytest": "3 passed",
+      "runner_unittest": "17 passed",
+      "nonebot_native_bridge_and_worker": "passed",
+      "koishi": "6 passed",
+      "koishi_mcp_interop": "1 passed",
+      "reference_client": "5 passed",
+      "rust_workspace": "28 passed",
+      "g1_smoke": "passed; 4 events, 4 gateway receipts, MCP client passed, zero remaining Host PIDs",
+      "windows_runtime_bundle_build": "passed"
+    },
+    "smoke_report": "ci-smoke-windows.json"
+  },
+  "linux_wsl": {
+    "distribution": "Ubuntu 24.04.5",
+    "command": "bash scripts/check.sh",
+    "checkout": "/root/ligamina-t17 (fresh WSL copy, isolated from the active T14 long run)",
+    "exit_code": 0,
+    "checks": {
+      "nonebot_pytest": "3 passed",
+      "runner_unittest": "17 passed",
+      "nonebot_native_bridge_and_worker": "passed",
+      "koishi": "6 passed",
+      "koishi_mcp_interop": "1 passed",
+      "reference_client": "5 passed",
+      "rust_workspace": "28 passed",
+      "g1_smoke": "passed; 4 events, 4 gateway receipts, MCP client passed, zero remaining Host PIDs"
+    },
+    "smoke_report": "ci-smoke-linux.json"
+  },
+  "workflow_validation": {
+    "bash_syntax": "passed",
+    "powershell_parser": "passed",
+    "yaml_parser": "passed",
+    "immutable_action_refs": {
+      "actions/checkout": "08c6903cd8c0fde910a37f88322edcfb5dd907a8",
+      "actions/setup-node": "a0853c24544627f65ddf259abe73b1d18a591444",
+      "astral-sh/setup-uv": "bec219d24cd3e171d82865faccec33120bb574f4",
+      "actions/upload-artifact": "ea165f8d65b6e75b540449e92b4886f43607fa02"
+    },
+    "workflows": [
+      {
+        "file": ".github/workflows/ci.yml",
+        "triggers": ["push", "pull_request", "workflow_dispatch"],
+        "matrix": ["windows-2025", "ubuntu-24.04"],
+        "linux_container_build": true
+      },
+      {
+        "file": ".github/workflows/representative.yml",
+        "triggers": ["weekly schedule", "workflow_dispatch"],
+        "matrix": ["windows-2025", "ubuntu-24.04"],
+        "permissions": "contents: read",
+        "checkout_credentials_persisted": false,
+        "sample_worker": "isolated"
+      }
+    ]
+  },
+  "hosted_workflow_run": "not_run; this workspace has no remote CI run evidence",
+  "limitations": [
+    "GitHub-hosted Actions jobs were not dispatched from this local workspace; workflow behavior still needs a push, pull request, or workflow_dispatch run.",
+    "The weekly representative workflow has been configured but its third-party package scan has not yet run on GitHub-hosted Windows and Linux runners.",
+    "T13 WSL full representative scan and T14 24-hour resource acceptance remain open; G2 remains NOT READY."
+  ]
+}

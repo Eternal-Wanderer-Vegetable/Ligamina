@@ -1,0 +1,62 @@
+name: Representative compatibility scan
+
+on:
+  schedule:
+    - cron: '23 4 * * 1'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  scan:
+    name: ${{ matrix.platform }} pinned samples
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 180
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - platform: windows
+            os: windows-2025
+          - platform: linux
+            os: ubuntu-24.04
+    steps:
+      - name: Checkout without persisted credentials
+        uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
+        with:
+          persist-credentials: false
+
+      - name: Install locked Node runtime
+        uses: actions/setup-node@a0853c24544627f65ddf259abe73b1d18a591444 # v5.0.0
+        with:
+          node-version: 24.20.0
+          package-manager-cache: false
+
+      - name: Install locked uv runtime
+        uses: astral-sh/setup-uv@bec219d24cd3e171d82865faccec33120bb574f4 # v10.1.0
+        with:
+          version: 0.12.5
+          enable-cache: false
+          github-token: ${{ github.token }}
+
+      - name: Install locked Python runtime
+        run: uv python install 3.12.14
+
+      - name: Scan exact-version samples in isolated Workers
+        run: >-
+          uv run --locked --project lab --python 3.12.14 python lab/run.py
+          --suite representative
+          --platform ${{ matrix.platform }}
+          --manifest samples/third-party.lock.json
+          --worker isolated
+          --report outputs/acceptance/ci-representative-${{ matrix.platform }}.json
+
+      - name: Upload compatibility report
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: representative-${{ matrix.platform }}
+          path: outputs/acceptance/ci-representative-${{ matrix.platform }}.json
+          if-no-files-found: warn
+          retention-days: 90

@@ -1,0 +1,27 @@
+{
+  "name": "@ligamina/koishi-host",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": "24.20.0"
+  },
+  "scripts": {
+    "build": "tsc --project tsconfig.json",
+    "test": "npm run build && node --test tests/contracts.test.mjs tests/native-smoke.test.mjs tests/native-bridge.test.mjs tests/worker-smoke.test.mjs",
+    "test:mcp": "node --test tests/mcp-interoperability.test.mjs"
+  },
+  "dependencies": {
+    "@koishijs/core": "4.18.11",
+    "@minatojs/driver-sqlite": "4.7.0",
+    "@modelcontextprotocol/sdk": "1.32.1",
+    "ajv": "8.20.0"
+  },
+  "devDependencies": {
+    "@koishijs/plugin-mock": "2.6.6",
+    "typescript": "5.9.3"
+  },
+  "overrides": {
+    "file-type": "21.3.2"
+  }
+}

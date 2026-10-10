@@ -1,0 +1,3613 @@
+{
+  "suite": "smoke",
+  "platform": "linux",
+  "status": "passed",
+  "started_at": "2026-10-10T00:32:41.268Z",
+  "build_steps": [
+    {
+      "label": "build Core daemon",
+      "command": [
+        "cargo",
+        "build",
+        "-p",
+        "ligamina-cli",
+        "--locked",
+        "--offline"
+      ],
+      "cwd": "/root/ligamina",
+      "status": "passed",
+      "returncode": 0,
+      "stdout_tail": "",
+      "stderr_tail": "    Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.44s\n"
+    },
+    {
+      "label": "install Koishi locked dependencies",
+      "command": [
+        "npm",
+        "ci",
+        "--no-audit",
+        "--fund=false",
+        "--prefer-offline"
+      ],
+      "cwd": "/root/ligamina/hosts/koishi",
+      "status": "passed",
+      "returncode": 0,
+      "stdout_tail": "\nadded 233 packages in 4s\n",
+      "stderr_tail": "npm warn deprecated @koa/router@10.1.1: **IMPORTANT 10x+ PERFORMANCE UPGRADE**: Please upgrade to v12.0.1+ as we have fixed an issue with debuglog causing 10x slower router benchmark performance, see https://github.com/koajs/router/pull/173\n"
+    },
+    {
+      "label": "install reference client locked dependencies",
+      "command": [
+        "npm",
+        "ci",
+        "--no-audit",
+        "--fund=false",
+        "--prefer-offline"
+      ],
+      "cwd": "/root/ligamina/clients/reference",
+      "status": "passed",
+      "returncode": 0,
+      "stdout_tail": "\nadded 98 packages in 2s\n",
+      "stderr_tail": ""
+    },
+    {
+      "label": "build Koishi Host",
+      "command": [
+        "npm",
+        "run",
+        "build"
+      ],
+      "cwd": "/root/ligamina/hosts/koishi",
+      "status": "passed",
+      "returncode": 0,
+      "stdout_tail": "\n> @ligamina/koishi-host@0.1.0 build\n> tsc --project tsconfig.json\n\n",
+      "stderr_tail": ""
+    },
+    {
+      "label": "build reference MCP client",
+      "command": [
+        "npm",
+        "run",
+        "build"
+      ],
+      "cwd": "/root/ligamina/clients/reference",
+      "status": "passed",
+      "returncode": 0,
+      "stdout_tail": "\n> @ligamina/reference-client@0.1.0 build\n> tsc --project tsconfig.json\n\n",
+      "stderr_tail": ""
+    },
+    {
+      "label": "resolve locked NoneBot runtime",
+      "command": [
+        "uv",
+        "run",
+        "--locked",
+        "--project",
+        "/root/ligamina/hosts/nonebot",
+        "--python",
+        "3.12.14",
+        "python",
+        "-c",
+        "import nonebot; print(nonebot.__version__)"
+      ],
+      "cwd": "/root/ligamina",
+      "status": "passed",
+      "returncode": 0,
+      "stdout_tail": "2.5.0\n",
+      "stderr_tail": "warning: `VIRTUAL_ENV=lab/.venv` does not match the project environment path `hosts/nonebot/.venv` and will be ignored; use `--active` to target the active environment instead\n"
+    }
+  ],
+  "http_requests": [
+    {
+      "method": "GET",
+      "path": "/v1/status",
+      "request": null,
+      "status": 200,
+      "response": {
+        "core_epoch": "3ce095b3-28df-46d5-9b88-7879ca00fe4f",
+        "hosts": [
+          {
+            "epoch": 2,
+            "id": "koishi-smoke",
+            "last_error": null,
+            "pid": 537,
+            "restart_count": 0,
+            "state": "active"
+          },
+          {
+            "epoch": 2,
+            "id": "nonebot-smoke",
+            "last_error": null,
+            "pid": 532,
+            "restart_count": 0,
+            "state": "active"
+          }
+        ],
+        "schema_version": 2
+      }
+    },
+    {
+      "method": "POST",
+      "path": "/v1/gateways/smoke-gateway/lease",
+      "request": {
+        "ttl_ms": 300000
+      },
+      "status": 200,
+      "response": {
+        "core_epoch": "3ce095b3-28df-46d5-9b88-7879ca00fe4f",
+        "expires_at_ms": 1791592671784,
+        "lease_epoch": 1,
+        "lease_id": "9ac0074c-2b4c-4e05-bbac-b0c3fd332d9f",
+        "token": "<redacted>"
+      }
+    },
+    {
+      "method": "POST",
+      "path": "/v1/gateways/smoke-gateway/actions/claim",
+      "request": {
+        "core_epoch": "3ce095b3-28df-46d5-9b88-7879ca00fe4f",
+        "expires_at_ms": 1791592671784,
+        "lease_epoch": 1,
+        "lease_id": "9ac0074c-2b4c-4e05-bbac-b0c3fd332d9f",
+        "token": "<redacted>"
+      },
+      "status": 200,
+      "response": null
+    },
+    {
+      "method": "POST",
+      "path": "/v1/events",
+      "request": {
+        "schema_version": "ligamina/0.1",
+        "event_id": "g1-nonebot-smoke-group",
+        "trace_id": "trace-g1-nonebot-smoke-group",
+        "platform": "onebot.v11",
+        "account_id": "9000",
+        "conversation": {
+          "kind": "group",
+          "id": "42"
+        },
+        "actor_id": "23",
+        "timestamp": "2026-10-10T00:32:51.786Z",
+        "target_host": "nonebot-smoke",
+        "message": [
+          {
+            "type": "text",
+            "text": "smoke-nonebot-smoke-group"
+          }
+        ],
+        "extensions": {
+          "onebot.v11": {
+            "message_id": "1001",
+            "sender": {
+              "nickname": "Alice"
+            }
+          }
+        }
+      },
+      "status": 202,
+      "response": {
+        "disposition": "accepted",
+        "event": {
+          "created_at_ms": 1791592371786,
+          "error": null,
+          "event": {
+            "account_id": "9000",
+            "actor_id": "23",
+            "conversation": {
+              "id": "42",
+              "kind": "group"
+            },
+            "event_id": "g1-nonebot-smoke-group",
+            "extensions": {
+              "onebot.v11": {
+                "message_id": "1001",
+                "sender": {
+                  "nickname": "Alice"
+                }
+              }
+            },
+            "message": [
+              {
+                "text": "smoke-nonebot-smoke-group",
+                "type": "text"
+              }
+            ],
+            "platform": "onebot.v11",
+            "schema_version": "ligamina/0.1",
+            "target_host": "nonebot-smoke",
+            "timestamp": "2026-10-10T00:32:51.786Z",
+            "trace_id": "trace-g1-nonebot-smoke-group"
+          },
+          "fingerprint": "7b475d1a777c5afaa8ce4429729bf5c03383d426aa6f31d0d025ce51c47ed52e",
+          "key": {
+            "account_id": "9000",
+            "client_id": "ligamina-smoke-client",
+            "conversation_id": "42",
+            "conversation_kind": "group",
+            "event_id": "g1-nonebot-smoke-group",
+            "platform": "onebot.v11"
+          },
+          "status": "accepted",
+          "target_host": "nonebot-smoke",
+          "trace_id": "trace-g1-nonebot-smoke-group",
+          "updated_at_ms": 1791592371786
+        }
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/v1/events/g1-nonebot-smoke-group?platform=onebot.v11&account_id=9000&conversation_kind=group&conversation_id=42",
+      "request": null,
+      "status": 200,
+      "response": {
+        "created_at_ms": 1791592371786,
+        "error": null,
+        "event": {
+          "account_id": "9000",
+          "actor_id": "23",
+          "conversation": {
+            "id": "42",
+            "kind": "group"
+          },
+          "event_id": "g1-nonebot-smoke-group",
+          "extensions": {
+            "onebot.v11": {
+              "message_id": "1001",
+              "sender": {
+                "nickname": "Alice"
+              }
+            }
+          },
+          "message": [
+            {
+              "text": "smoke-nonebot-smoke-group",
+              "type": "text"
+            }
+          ],
+          "platform": "onebot.v11",
+          "schema_version": "ligamina/0.1",
+          "target_host": "nonebot-smoke",
+          "timestamp": "2026-10-10T00:32:51.786Z",
+          "trace_id": "trace-g1-nonebot-smoke-group"
+        },
+        "fingerprint": "7b475d1a777c5afaa8ce4429729bf5c03383d426aa6f31d0d025ce51c47ed52e",
+        "key": {
+          "account_id": "9000",
+          "client_id": "ligamina-smoke-client",
+          "conversation_id": "42",
+          "conversation_kind": "group",
+          "event_id": "g1-nonebot-smoke-group",
+          "platform": "onebot.v11"
+        },
+        "status": "processing",
+        "target_host": "nonebot-smoke",
+        "trace_id": "trace-g1-nonebot-smoke-group",
+        "updated_at_ms": 1791592371790
+      }
+    },
+    {
+      "method": "POST",
+      "path": "/v1/gateways/smoke-gateway/actions/claim",
+      "request": {
+        "core_epoch": "3ce095b3-28df-46d5-9b88-7879ca00fe4f",
+        "expires_at_ms": 1791592671784,
+        "lease_epoch": 1,
+        "lease_id": "9ac0074c-2b4c-4e05-bbac-b0c3fd332d9f",
+        "token": "<redacted>"
+      },
+      "status": 200,
+      "response": {
+        "core_epoch_created": "3ce095b3-28df-46d5-9b88-7879ca00fe4f",
+        "created_at_ms": 1791592371795,
+        "dispatched_core_epoch": "3ce095b3-28df-46d5-9b88-7879ca00fe4f",
+        "dispatched_lease_epoch": 1,
+        "dispatched_lease_id": "9ac0074c-2b4c-4e05-bbac-b0c3fd332d9f",
+        "fingerprint": "77d3db7c09c97aedb086044aafb7f5abb1f15cbdce835b823162558763385270",
+        "grant_id": "nonebot-smoke-send-grant",
+        "host_epoch": 2,
+        "key": {
+          "account_id": "9000",
+          "client_id": "ligamina-smoke-client",
+          "operation": "send_message",
+          "operation_id": "f25c5da4-b037-4cdb-a7d3-4bc7cd32b1f3"
+        },
+        "operation_payload": {
+          "account_id": "9000",
+          "operation": "send_message",
+          "operation_id": "f25c5da4-b037-4cdb-a7d3-4bc7cd32b1f3",
+          "params": {
+            "message": [
+              {
+                "text": "nonebot:group:smoke-nonebot-smoke-group",
+                "type": "text"
+              }
+            ]
+          },
+          "target": {
+            "id": "42",
+            "kind": "group"
+          },
+          "trace_id": "trace-g1-nonebot-smoke-group"
+        },
+        "principal": {
+          "id": "nonebot-smoke",
+          "kind": "host"
+        },
+        "result": null,
+        "status": "dispatched",
+        "trace_id": "trace-g1-nonebot-smoke-group",
+        "updated_at_ms": 1791592371839
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/v1/events/g1-nonebot-smoke-group?platform=onebot.v11&account_id=9000&conversation_kind=group&conversation_id=42",
+      "request": null,
+      "status": 200,
+      "response": {
+        "created_at_ms": 1791592371786,
+        "error": null,
+        "event": {
+          "account_id": "9000",
+          "actor_id": "23",
+          "conversation": {
+            "id": "42",
+            "kind": "group"
+          },
+          "event_id": "g1-nonebot-smoke-group",
+          "extensions": {
+            "onebot.v11": {
+              "message_id": "1001",
+              "sender": {
+                "nickname": "Alice"
+              }
+            }
+          },
+          "message": [
+            {
+              "text": "smoke-nonebot-smoke-group",
+              "type": "text"
+            }
+          ],
+          "platform": "onebot.v11",
+          "schema_version": "ligamina/0.1",
+          "target_host": "nonebot-smoke",
+          "timestamp": "2026-10-10T00:32:51.786Z",
+          "trace_id": "trace-g1-nonebot-smoke-group"
+        },
+        "fingerprint": "7b475d1a777c5afaa8ce4429729bf5c03383d426aa6f31d0d025ce51c47ed52e",
+        "key": {
+          "account_id": "9000",
+          "client_id": "ligamina-smoke-client",
+          "conversation_id": "42",
+          "conversation_kind": "group",
+          "event_id": "g1-nonebot-smoke-group",
+          "platform": "onebot.v11"
+        },
+        "status": "processing",
+        "target_host": "nonebot-smoke",
+        "trace_id": "trace-g1-nonebot-smoke-group",
+        "updated_at_ms": 1791592371790
+      }
+    },
+    {
+      "method": "POST",
+      "path": "/v1/gateways/smoke-gateway/actions/f25c5da4-b037-4cdb-a7d3-4bc7cd32b1f3/result",
+      "request": {
+        "credential": {
+          "core_epoch": "3ce095b3-28df-46d5-9b88-7879ca00fe4f",
+          "expires_at_ms": 1791592671784,
+          "lease_epoch": 1,
+          "lease_id": "9ac0074c-2b4c-4e05-bbac-b0c3fd332d9f",
+          "token": "<redacted>"
+        },
+        "result": {
+          "key": {
+            "account_id": "9000",
+            "client_id": "ligamina-smoke-client",
+            "operation": "send_message",
+            "operation_id": "f25c5da4-b037-4cdb-a7d3-4bc7cd32b1f3"
+          },
+          "fingerprint": "77d3db7c09c97aedb086044aafb7f5abb1f15cbdce835b823162558763385270",
+          "status": "succeeded",
+          "platform_message_id": "virtual-message-1",
+          "data": null,
+          "error": null,
+          "observed_at_ms": 1791592371841,
+          "evidence_ref": "ligamina-smoke://gateway/virtual-message-1"
+        }
+      },
+      "status": 200,
+      "response": {
+        "core_epoch_created": "3ce095b3-28df-46d5-9b88-7879ca00fe4f",
+        "created_at_ms": 1791592371795,
+        "dispatched_core_epoch": "3ce095b3-28df-46d5-9b88-7879ca00fe4f",
+        "dispatched_lease_epoch": 1,
+        "dispatched_lease_id": "9ac0074c-2b4c-4e05-bbac-b0c3fd332d9f",
+        "fingerprint": "77d3db7c09c97aedb086044aafb7f5abb1f15cbdce835b823162558763385270",
+        "grant_id": "nonebot-smoke-send-grant",
+        "host_epoch": 2,
+        "key": {
+          "account_id": "9000",
+          "client_id": "ligamina-smoke-client",
+          "operation": "send_message",
+          "operation_id": "f25c5da4-b037-4cdb-a7d3-4bc7cd32b1f3"
+        },
+        "operation_payload": {
+          "account_id": "9000",
+          "operation": "send_message",
+          "operation_id": "f25c5da4-b037-4cdb-a7d3-4bc7cd32b1f3",
+          "params": {
+            "message": [
+              {
+                "text": "nonebot:group:smoke-nonebot-smoke-group",
+                "type": "text"
+              }
+            ]
+          },
+          "target": {
+            "id": "42",
+            "kind": "group"
+          },
+          "trace_id": "trace-g1-nonebot-smoke-group"
+        },
+        "principal": {
+          "id": "nonebot-smoke",
+          "kind": "host"
+        },
+        "result": {
+          "data": null,
+          "error": null,
+          "evidence_ref": "ligamina-smoke://gateway/virtual-message-1",
+          "observed_at_ms": 1791592371841,
+          "platform_message_id": "virtual-message-1",
+          "status": "succeeded"
+        },
+        "status": "succeeded",
+        "trace_id": "trace-g1-nonebot-smoke-group",
+        "updated_at_ms": 1791592371842
+      }
+    },
+    {
+      "method": "POST",
+      "path": "/v1/gateways/smoke-gateway/actions/claim",
+      "request": {
+        "core_epoch": "3ce095b3-28df-46d5-9b88-7879ca00fe4f",
+        "expires_at_ms": 1791592671784,
+        "lease_epoch": 1,
+        "lease_id": "9ac0074c-2b4c-4e05-bbac-b0c3fd332d9f",
+        "token": "<redacted>"
+      },
+      "status": 200,
+      "response": null
+    },
+    {
+      "method": "GET",
+      "path": "/v1/events/g1-nonebot-smoke-group?platform=onebot.v11&account_id=9000&conversation_kind=group&conversation_id=42",
+      "request": null,
+      "status": 200,
+      "response": {
+        "created_at_ms": 1791592371786,
+        "error": null,
+        "event": {
+          "account_id": "9000",
+          "actor_id": "23",
+          "conversation": {
+            "id": "42",
+            "kind": "group"
+          },
+          "event_id": "g1-nonebot-smoke-group",
+          "extensions": {
+            "onebot.v11": {
+              "message_id": "1001",
+              "sender": {
+                "nickname": "Alice"
+              }
+            }
+          },
+          "message": [
+            {
+              "text": "smoke-nonebot-smoke-group",
+              "type": "text"
+            }
+          ],
+          "platform": "onebot.v11",
+          "schema_version": "ligamina/0.1",
+          "target_host": "nonebot-smoke",
+          "timestamp": "2026-10-10T00:32:51.786Z",
+          "trace_id": "trace-g1-nonebot-smoke-group"
+        },
+        "fingerprint": "7b475d1a777c5afaa8ce4429729bf5c03383d426aa6f31d0d025ce51c47ed52e",
+        "key": {
+          "account_id": "9000",
+          "client_id": "ligamina-smoke-client",
+          "conversation_id": "42",
+          "conversation_kind": "group",
+          "event_id": "g1-nonebot-smoke-group",
+          "platform": "onebot.v11"
+        },
+        "status": "completed",
+        "target_host": "nonebot-smoke",
+        "trace_id": "trace-g1-nonebot-smoke-group",
+        "updated_at_ms": 1791592371872
+      }
+    },
+    {
+      "method": "POST",
+      "path": "/v1/gateways/smoke-gateway/actions/claim",
+      "request": {
+        "core_epoch": "3ce095b3-28df-46d5-9b88-7879ca00fe4f",
+        "expires_at_ms": 1791592671784,
+        "lease_epoch": 1,
+        "lease_id": "9ac0074c-2b4c-4e05-bbac-b0c3fd332d9f",
+        "token": "<redacted>"
+      },
+      "status": 200,
+      "response": null
+    },
+    {
+      "method": "POST",
+      "path": "/v1/events",
+      "request": {
+        "schema_version": "ligamina/0.1",
+        "event_id": "g1-nonebot-smoke-private",
+        "trace_id": "trace-g1-nonebot-smoke-private",
+        "platform": "onebot.v11",
+        "account_id": "9000",
+        "conversation": {
+          "kind": "private",
+          "id": "23"
+        },
+        "actor_id": "23",
+        "timestamp": "2026-10-10T00:32:51.786Z",
+        "target_host": "nonebot-smoke",
+        "message": [
+          {
+            "type": "text",
+            "text": "smoke-nonebot-smoke-private"
+          }
+        ],
+        "extensions": {
+          "onebot.v11": {
+            "message_id": "1002",
+            "sender": {
+              "nickname": "Alice"
+            }
+          }
+        }
+      },
+      "status": 202,
+      "response": {
+        "disposition": "accepted",
+        "event": {
+          "created_at_ms": 1791592371895,
+          "error": null,
+          "event": {
+            "account_id": "9000",
+            "actor_id": "23",
+            "conversation": {
+              "id": "23",
+              "kind": "private"
+            },
+            "event_id": "g1-nonebot-smoke-private",
+            "extensions": {
+              "onebot.v11": {
+                "message_id": "1002",
+                "sender": {
+                  "nickname": "Alice"
+                }
+              }
+            },
+            "message": [
+              {
+                "text": "smoke-nonebot-smoke-private",
+                "type": "text"
+              }
+            ],
+            "platform": "onebot.v11",
+            "schema_version": "ligamina/0.1",
+            "target_host": "nonebot-smoke",
+            "timestamp": "2026-10-10T00:32:51.786Z",
+            "trace_id": "trace-g1-nonebot-smoke-private"
+          },
+          "fingerprint": "9c8e965f109e780674f4c93700263c548fd43392e120b1f04ae2949c2bec0843",
+          "key": {
+            "account_id": "9000",
+            "client_id": "ligamina-smoke-client",
+            "conversation_id": "23",
+            "conversation_kind": "private",
+            "event_id": "g1-nonebot-smoke-private",
+            "platform": "onebot.v11"
+          },
+          "status": "accepted",
+          "target_host": "nonebot-smoke",
+          "trace_id": "trace-g1-nonebot-smoke-private",
+          "updated_at_ms": 1791592371895
+        }
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/v1/events/g1-nonebot-smoke-private?platform=onebot.v11&account_id=9000&conversation_kind=private&conversation_id=23",
+      "request": null,
+      "status": 200,
+      "response": {
+        "created_at_ms": 1791592371895,
+        "error": null,
+        "event": {
+          "account_id": "9000",
+          "actor_id": "23",
+          "conversation": {
+            "id": "23",
+            "kind": "private"
+          },
+          "event_id": "g1-nonebot-smoke-private",
+          "extensions": {
+            "onebot.v11": {
+              "message_id": "1002",
+              "sender": {
+                "nickname": "Alice"
+              }
+            }
+          },
+          "message": [
+            {
+              "text": "smoke-nonebot-smoke-private",
+              "type": "text"
+            }
+          ],
+          "platform": "onebot.v11",
+          "schema_version": "ligamina/0.1",
+          "target_host": "nonebot-smoke",
+          "timestamp": "2026-10-10T00:32:51.786Z",
+          "trace_id": "trace-g1-nonebot-smoke-private"
+        },
+        "fingerprint": "9c8e965f109e780674f4c93700263c548fd43392e120b1f04ae2949c2bec0843",
+        "key": {
+          "account_id": "9000",
+          "client_id": "ligamina-smoke-client",
+          "conversation_id": "23",
+          "conversation_kind": "private",
+          "event_id": "g1-nonebot-smoke-private",
+          "platform": "onebot.v11"
+        },
+        "status": "processing",
+        "target_host": "nonebot-smoke",
+        "trace_id": "trace-g1-nonebot-smoke-private",
+        "updated_at_ms": 1791592371897
+      }
+    },
+    {
+      "method": "POST",
+      "path": "/v1/gateways/smoke-gateway/actions/claim",
+      "request": {
+        "core_epoch": "3ce095b3-28df-46d5-9b88-7879ca00fe4f",
+        "expires_at_ms": 1791592671784,
+        "lease_epoch": 1,
+        "lease_id": "9ac0074c-2b4c-4e05-bbac-b0c3fd332d9f",
+        "token": "<redacted>"
+      },
+      "status": 200,
+      "response": {
+        "core_epoch_created": "3ce095b3-28df-46d5-9b88-7879ca00fe4f",
+        "created_at_ms": 1791592371900,
+        "dispatched_core_epoch": "3ce095b3-28df-46d5-9b88-7879ca00fe4f",
+        "dispatched_lease_epoch": 1,
+        "dispatched_lease_id": "9ac0074c-2b4c-4e05-bbac-b0c3fd332d9f",
+        "fingerprint": "249c6d03cf035101dced281be2b18545905b289e8cb6d5cfb1a417d7a92b89c9",
+        "grant_id": "nonebot-smoke-send-grant",
+        "host_epoch": 2,
+        "key": {
+          "account_id": "9000",
+          "client_id": "ligamina-smoke-client",
+          "operation": "send_message",
+          "operation_id": "19bd5371-adc4-4baf-86b6-dfdc0e7e4a54"
+        },
+        "operation_payload": {
+          "account_id": "9000",
+          "operation": "send_message",
+          "operation_id": "19bd5371-adc4-4baf-86b6-dfdc0e7e4a54",
+          "params": {
+            "message": [
+              {
+                "text": "nonebot:private:smoke-nonebot-smoke-private",
+                "type": "text"
+              }
+            ]
+          },
+          "target": {
+            "id": "23",
+            "kind": "private"
+          },
+          "trace_id": "trace-g1-nonebot-smoke-private"
+        },
+        "principal": {
+          "id": "nonebot-smoke",
+          "kind": "host"
+        },
+        "result": null,
+        "status": "dispatched",
+        "trace_id": "trace-g1-nonebot-smoke-private",
+        "updated_at_ms": 1791592371947
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/v1/events/g1-nonebot-smoke-private?platform=onebot.v11&account_id=9000&conversation_kind=private&conversation_id=23",
+      "request": null,
+      "status": 200,
+      "response": {
+        "created_at_ms": 1791592371895,
+        "error": null,
+        "event": {
+          "account_id": "9000",
+          "actor_id": "23",
+          "conversation": {
+            "id": "23",
+            "kind": "private"
+          },
+          "event_id": "g1-nonebot-smoke-private",
+          "extensions": {
+            "onebot.v11": {
+              "message_id": "1002",
+              "sender": {
+                "nickname": "Alice"
+              }
+            }
+          },
+          "message": [
+            {
+              "text": "smoke-nonebot-smoke-private",
+              "type": "text"
+            }
+          ],
+          "platform": "onebot.v11",
+          "schema_version": "ligamina/0.1",
+          "target_host": "nonebot-smoke",
+          "timestamp": "2026-10-10T00:32:51.786Z",
+          "trace_id": "trace-g1-nonebot-smoke-private"
+        },
+        "fingerprint": "9c8e965f109e780674f4c93700263c548fd43392e120b1f04ae2949c2bec0843",
+        "key": {
+          "account_id": "9000",
+          "client_id": "ligamina-smoke-client",
+          "conversation_id": "23",
+          "conversation_kind": "private",
+          "event_id": "g1-nonebot-smoke-private",
+          "platform": "onebot.v11"
+        },
+        "status": "processing",
+        "target_host": "nonebot-smoke",
+        "trace_id": "trace-g1-nonebot-smoke-private",
+        "updated_at_ms": 1791592371897
+      }
+    },
+    {
+      "method": "POST",
+      "path": "/v1/gateways/smoke-gateway/actions/19bd5371-adc4-4baf-86b6-dfdc0e7e4a54/result",
+      "request": {
+        "credential": {
+          "core_epoch": "3ce095b3-28df-46d5-9b88-7879ca00fe4f",
+          "expires_at_ms": 1791592671784,
+          "lease_epoch": 1,
+          "lease_id": "9ac0074c-2b4c-4e05-bbac-b0c3fd332d9f",
+          "token": "<redacted>"
+        },
+        "result": {
+          "key": {
+            "account_id": "9000",
+            "client_id": "ligamina-smoke-client",
+            "operation": "send_message",
+            "operation_id": "19bd5371-adc4-4baf-86b6-dfdc0e7e4a54"
+          },
+          "fingerprint": "249c6d03cf035101dced281be2b18545905b289e8cb6d5cfb1a417d7a92b89c9",
+          "status": "succeeded",
+          "platform_message_id": "virtual-message-2",
+          "data": null,
+          "error": null,
+          "observed_at_ms": 1791592371948,
+          "evidence_ref": "ligamina-smoke://gateway/virtual-message-2"
+        }
+      },
+      "status": 200,
+      "response": {
+        "core_epoch_created": "3ce095b3-28df-46d5-9b88-7879ca00fe4f",
+        "created_at_ms": 1791592371900,
+        "dispatched_core_epoch": "3ce095b3-28df-46d5-9b88-7879ca00fe4f",
+        "dispatched_lease_epoch": 1,
+        "dispatched_lease_id": "9ac0074c-2b4c-4e05-bbac-b0c3fd332d9f",
+        "fingerprint": "249c6d03cf035101dced281be2b18545905b289e8cb6d5cfb1a417d7a92b89c9",
+        "grant_id": "nonebot-smoke-send-grant",
+        "host_epoch": 2,
+        "key": {
+          "account_id": "9000",
+          "client_id": "ligamina-smoke-client",
+          "operation": "send_message",
+          "operation_id": "19bd5371-adc4-4baf-86b6-dfdc0e7e4a54"
+        },
+        "operation_payload": {
+          "account_id": "9000",
+          "operation": "send_message",
+          "operation_id": "19bd5371-adc4-4baf-86b6-dfdc0e7e4a54",
+          "params": {
+            "message": [
+              {
+                "text": "nonebot:private:smoke-nonebot-smoke-private",
+                "type": "text"
+              }
+            ]
+          },
+          "target": {
+            "id": "23",
+            "kind": "private"
+          },
+          "trace_id": "trace-g1-nonebot-smoke-private"
+        },
+        "principal": {
+          "id": "nonebot-smoke",
+          "kind": "host"
+        },
+        "result": {
+          "data": null,
+          "error": null,
+          "evidence_ref": "ligamina-smoke://gateway/virtual-message-2",
+          "observed_at_ms": 1791592371948,
+          "platform_message_id": "virtual-message-2",
+          "status": "succeeded"
+        },
+        "status": "succeeded",
+        "trace_id": "trace-g1-nonebot-smoke-private",
+        "updated_at_ms": 1791592371949
+      }
+    },
+    {
+      "method": "POST",
+      "path": "/v1/gateways/smoke-gateway/actions/claim",
+      "request": {
+        "core_epoch": "3ce095b3-28df-46d5-9b88-7879ca00fe4f",
+        "expires_at_ms": 1791592671784,
+        "lease_epoch": 1,
+        "lease_id": "9ac0074c-2b4c-4e05-bbac-b0c3fd332d9f",
+        "token": "<redacted>"
+      },
+      "status": 200,
+      "response": null
+    },
+    {
+      "method": "GET",
+      "path": "/v1/events/g1-nonebot-smoke-private?platform=onebot.v11&account_id=9000&conversation_kind=private&conversation_id=23",
+      "request": null,
+      "status": 200,
+      "response": {
+        "created_at_ms": 1791592371895,
+        "error": null,
+        "event": {
+          "account_id": "9000",
+          "actor_id": "23",
+          "conversation": {
+            "id": "23",
+            "kind": "private"
+          },
+          "event_id": "g1-nonebot-smoke-private",
+          "extensions": {
+            "onebot.v11": {
+              "message_id": "1002",
+              "sender": {
+                "nickname": "Alice"
+              }
+            }
+          },
+          "message": [
+            {
+              "text": "smoke-nonebot-smoke-private",
+              "type": "text"
+            }
+          ],
+          "platform": "onebot.v11",
+          "schema_version": "ligamina/0.1",
+          "target_host": "nonebot-smoke",
+          "timestamp": "2026-10-10T00:32:51.786Z",
+          "trace_id": "trace-g1-nonebot-smoke-private"
+        },
+        "fingerprint": "9c8e965f109e780674f4c93700263c548fd43392e120b1f04ae2949c2bec0843",
+        "key": {
+          "account_id": "9000",
+          "client_id": "ligamina-smoke-client",
+          "conversation_id": "23",
+          "conversation_kind": "private",
+          "event_id": "g1-nonebot-smoke-private",
+          "platform": "onebot.v11"
+        },
+        "status": "completed",
+        "target_host": "nonebot-smoke",
+        "trace_id": "trace-g1-nonebot-smoke-private",
+        "updated_at_ms": 1791592371970
+      }
+    },
+    {
+      "method": "POST",
+      "path": "/v1/gateways/smoke-gateway/actions/claim",
+      "request": {
+        "core_epoch": "3ce095b3-28df-46d5-9b88-7879ca00fe4f",
+        "expires_at_ms": 1791592671784,
+        "lease_epoch": 1,
+        "lease_id": "9ac0074c-2b4c-4e05-bbac-b0c3fd332d9f",
+        "token": "<redacted>"
+      },
+      "status": 200,
+      "response": null
+    },
+    {
+      "method": "POST",
+      "path": "/v1/events",
+      "request": {
+        "schema_version": "ligamina/0.1",
+        "event_id": "g1-koishi-smoke-group",
+        "trace_id": "trace-g1-koishi-smoke-group",
+        "platform": "onebot.v11",
+        "account_id": "9000",
+        "conversation": {
+          "kind": "group",
+          "id": "72"
+        },
+        "actor_id": "24",
+        "timestamp": "2026-10-10T00:32:51.786Z",
+        "target_host": "koishi-smoke",
+        "message": [
+          {
+            "type": "text",
+            "text": "smoke-koishi-smoke-group"
+          }
+        ],
+        "extensions": {
+          "onebot.v11": {
+            "message_id": "2001",
+            "sender": {
+              "nickname": "Alice"
+            }
+          }
+        }
+      },
+      "status": 202,
+      "response": {
+        "disposition": "accepted",
+        "event": {
+          "created_at_ms": 1791592372003,
+          "error": null,
+          "event": {
+            "account_id": "9000",
+            "actor_id": "24",
+            "conversation": {
+              "id": "72",
+              "kind": "group"
+            },
+            "event_id": "g1-koishi-smoke-group",
+            "extensions": {
+              "onebot.v11": {
+                "message_id": "2001",
+                "sender": {
+                  "nickname": "Alice"
+                }
+              }
+            },
+            "message": [
+              {
+                "text": "smoke-koishi-smoke-group",
+                "type": "text"
+              }
+            ],
+            "platform": "onebot.v11",
+            "schema_version": "ligamina/0.1",
+            "target_host": "koishi-smoke",
+            "timestamp": "2026-10-10T00:32:51.786Z",
+            "trace_id": "trace-g1-koishi-smoke-group"
+          },
+          "fingerprint": "204013301659a412d17e13d4a7fd11fb5a055417e59003551ba8ae14c51d85de",
+          "key": {
+            "account_id": "9000",
+            "client_id": "ligamina-smoke-client",
+            "conversation_id": "72",
+            "conversation_kind": "group",
+            "event_id": "g1-koishi-smoke-group",
+            "platform": "onebot.v11"
+          },
+          "status": "accepted",
+          "target_host": "koishi-smoke",
+          "trace_id": "trace-g1-koishi-smoke-group",
+          "updated_at_ms": 1791592372003
+        }
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/v1/events/g1-koishi-smoke-group?platform=onebot.v11&account_id=9000&conversation_kind=group&conversation_id=72",
+      "request": null,
+      "status": 200,
+      "response": {
+        "created_at_ms": 1791592372003,
+        "error": null,
+        "event": {
+          "account_id": "9000",
+          "actor_id": "24",
+          "conversation": {
+            "id": "72",
+            "kind": "group"
+          },
+          "event_id": "g1-koishi-smoke-group",
+          "extensions": {
+            "onebot.v11": {
+              "message_id": "2001",
+              "sender": {
+                "nickname": "Alice"
+              }
+            }
+          },
+          "message": [
+            {
+              "text": "smoke-koishi-smoke-group",
+              "type": "text"
+            }
+          ],
+          "platform": "onebot.v11",
+          "schema_version": "ligamina/0.1",
+          "target_host": "koishi-smoke",
+          "timestamp": "2026-10-10T00:32:51.786Z",
+          "trace_id": "trace-g1-koishi-smoke-group"
+        },
+        "fingerprint": "204013301659a412d17e13d4a7fd11fb5a055417e59003551ba8ae14c51d85de",
+        "key": {
+          "account_id": "9000",
+          "client_id": "ligamina-smoke-client",
+          "conversation_id": "72",
+          "conversation_kind": "group",
+          "event_id": "g1-koishi-smoke-group",
+          "platform": "onebot.v11"
+        },
+        "status": "processing",
+        "target_host": "koishi-smoke",
+        "trace_id": "trace-g1-koishi-smoke-group",
+        "updated_at_ms": 1791592372004
+      }
+    },
+    {
+      "method": "POST",
+      "path": "/v1/gateways/smoke-gateway/actions/claim",
+      "request": {
+        "core_epoch": "3ce095b3-28df-46d5-9b88-7879ca00fe4f",
+        "expires_at_ms": 1791592671784,
+        "lease_epoch": 1,
+        "lease_id": "9ac0074c-2b4c-4e05-bbac-b0c3fd332d9f",
+        "token": "<redacted>"
+      },
+      "status": 200,
+      "response": {
+        "core_epoch_created": "3ce095b3-28df-46d5-9b88-7879ca00fe4f",
+        "created_at_ms": 1791592372015,
+        "dispatched_core_epoch": "3ce095b3-28df-46d5-9b88-7879ca00fe4f",
+        "dispatched_lease_epoch": 1,
+        "dispatched_lease_id": "9ac0074c-2b4c-4e05-bbac-b0c3fd332d9f",
+        "fingerprint": "e94965e1c2d7599650ecc0d9269cc78dd4b05a3482329bffe2bac7a6696d79cc",
+        "grant_id": "koishi-smoke-send-grant",
+        "host_epoch": 2,
+        "key": {
+          "account_id": "9000",
+          "client_id": "ligamina-smoke-client",
+          "operation": "send_message",
+          "operation_id": "2029a274-c59a-4174-a2cc-000531445427"
+        },
+        "operation_payload": {
+          "account_id": "9000",
+          "operation": "send_message",
+          "operation_id": "2029a274-c59a-4174-a2cc-000531445427",
+          "params": {
+            "message": [
+              {
+                "text": "koishi:group:smoke-koishi-smoke-group",
+                "type": "text"
+              }
+            ]
+          },
+          "target": {
+            "id": "72",
+            "kind": "group"
+          },
+          "trace_id": "trace-g1-koishi-smoke-group"
+        },
+        "principal": {
+          "id": "koishi-smoke",
+          "kind": "host"
+        },
+        "result": null,
+        "status": "dispatched",
+        "trace_id": "trace-g1-koishi-smoke-group",
+        "updated_at_ms": 1791592372054
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/v1/events/g1-koishi-smoke-group?platform=onebot.v11&account_id=9000&conversation_kind=group&conversation_id=72",
+      "request": null,
+      "status": 200,
+      "response": {
+        "created_at_ms": 1791592372003,
+        "error": null,
+        "event": {
+          "account_id": "9000",
+          "actor_id": "24",
+          "conversation": {
+            "id": "72",
+            "kind": "group"
+          },
+          "event_id": "g1-koishi-smoke-group",
+          "extensions": {
+            "onebot.v11": {
+              "message_id": "2001",
+              "sender": {
+                "nickname": "Alice"
+              }
+            }
+          },
+          "message": [
+            {
+              "text": "smoke-koishi-smoke-group",
+              "type": "text"
+            }
+          ],
+          "platform": "onebot.v11",
+          "schema_version": "ligamina/0.1",
+          "target_host": "koishi-smoke",
+          "timestamp": "2026-10-10T00:32:51.786Z",
+          "trace_id": "trace-g1-koishi-smoke-group"
+        },
+        "fingerprint": "204013301659a412d17e13d4a7fd11fb5a055417e59003551ba8ae14c51d85de",
+        "key": {
+          "account_id": "9000",
+          "client_id": "ligamina-smoke-client",
+          "conversation_id": "72",
+          "conversation_kind": "group",
+          "event_id": "g1-koishi-smoke-group",
+          "platform": "onebot.v11"
+        },
+        "status": "completed",
+        "target_host": "koishi-smoke",
+        "trace_id": "trace-g1-koishi-smoke-group",
+        "updated_at_ms": 1791592372023
+      }
+    },
+    {
+      "method": "POST",
+      "path": "/v1/gateways/smoke-gateway/actions/2029a274-c59a-4174-a2cc-000531445427/result",
+      "request": {
+        "credential": {
+          "core_epoch": "3ce095b3-28df-46d5-9b88-7879ca00fe4f",
+          "expires_at_ms": 1791592671784,
+          "lease_epoch": 1,
+          "lease_id": "9ac0074c-2b4c-4e05-bbac-b0c3fd332d9f",
+          "token": "<redacted>"
+        },
+        "result": {
+          "key": {
+            "account_id": "9000",
+            "client_id": "ligamina-smoke-client",
+            "operation": "send_message",
+            "operation_id": "2029a274-c59a-4174-a2cc-000531445427"
+          },
+          "fingerprint": "e94965e1c2d7599650ecc0d9269cc78dd4b05a3482329bffe2bac7a6696d79cc",
+          "status": "succeeded",
+          "platform_message_id": "virtual-message-3",
+          "data": null,
+          "error": null,
+          "observed_at_ms": 1791592372055,
+          "evidence_ref": "ligamina-smoke://gateway/virtual-message-3"
+        }
+      },
+      "status": 200,
+      "response": {
+        "core_epoch_created": "3ce095b3-28df-46d5-9b88-7879ca00fe4f",
+        "created_at_ms": 1791592372015,
+        "dispatched_core_epoch": "3ce095b3-28df-46d5-9b88-7879ca00fe4f",
+        "dispatched_lease_epoch": 1,
+        "dispatched_lease_id": "9ac0074c-2b4c-4e05-bbac-b0c3fd332d9f",
+        "fingerprint": "e94965e1c2d7599650ecc0d9269cc78dd4b05a3482329bffe2bac7a6696d79cc",
+        "grant_id": "koishi-smoke-send-grant",
+        "host_epoch": 2,
+        "key": {
+          "account_id": "9000",
+          "client_id": "ligamina-smoke-client",
+          "operation": "send_message",
+          "operation_id": "2029a274-c59a-4174-a2cc-000531445427"
+        },
+        "operation_payload": {
+          "account_id": "9000",
+          "operation": "send_message",
+          "operation_id": "2029a274-c59a-4174-a2cc-000531445427",
+          "params": {
+            "message": [
+              {
+                "text": "koishi:group:smoke-koishi-smoke-group",
+                "type": "text"
+              }
+            ]
+          },
+          "target": {
+            "id": "72",
+            "kind": "group"
+          },
+          "trace_id": "trace-g1-koishi-smoke-group"
+        },
+        "principal": {
+          "id": "koishi-smoke",
+          "kind": "host"
+        },
+        "result": {
+          "data": null,
+          "error": null,
+          "evidence_ref": "ligamina-smoke://gateway/virtual-message-3",
+          "observed_at_ms": 1791592372055,
+          "platform_message_id": "virtual-message-3",
+          "status": "succeeded"
+        },
+        "status": "succeeded",
+        "trace_id": "trace-g1-koishi-smoke-group",
+        "updated_at_ms": 1791592372056
+      }
+    },
+    {
+      "method": "POST",
+      "path": "/v1/gateways/smoke-gateway/actions/claim",
+      "request": {
+        "core_epoch": "3ce095b3-28df-46d5-9b88-7879ca00fe4f",
+        "expires_at_ms": 1791592671784,
+        "lease_epoch": 1,
+        "lease_id": "9ac0074c-2b4c-4e05-bbac-b0c3fd332d9f",
+        "token": "<redacted>"
+      },
+      "status": 200,
+      "response": null
+    },
+    {
+      "method": "POST",
+      "path": "/v1/events",
+      "request": {
+        "schema_version": "ligamina/0.1",
+        "event_id": "g1-koishi-smoke-private",
+        "trace_id": "trace-g1-koishi-smoke-private",
+        "platform": "onebot.v11",
+        "account_id": "9000",
+        "conversation": {
+          "kind": "private",
+          "id": "24"
+        },
+        "actor_id": "24",
+        "timestamp": "2026-10-10T00:32:51.786Z",
+        "target_host": "koishi-smoke",
+        "message": [
+          {
+            "type": "text",
+            "text": "smoke-koishi-smoke-private"
+          }
+        ],
+        "extensions": {
+          "onebot.v11": {
+            "message_id": "2002",
+            "sender": {
+              "nickname": "Alice"
+            }
+          }
+        }
+      },
+      "status": 202,
+      "response": {
+        "disposition": "accepted",
+        "event": {
+          "created_at_ms": 1791592372057,
+          "error": null,
+          "event": {
+            "account_id": "9000",
+            "actor_id": "24",
+            "conversation": {
+              "id": "24",
+              "kind": "private"
+            },
+            "event_id": "g1-koishi-smoke-private",
+            "extensions": {
+              "onebot.v11": {
+                "message_id": "2002",
+                "sender": {
+                  "nickname": "Alice"
+                }
+              }
+            },
+            "message": [
+              {
+                "text": "smoke-koishi-smoke-private",
+                "type": "text"
+              }
+            ],
+            "platform": "onebot.v11",
+            "schema_version": "ligamina/0.1",
+            "target_host": "koishi-smoke",
+            "timestamp": "2026-10-10T00:32:51.786Z",
+            "trace_id": "trace-g1-koishi-smoke-private"
+          },
+          "fingerprint": "97dea8136238d620a22b76f90721e30ac2fa82447946584f1967ac023d05467e",
+          "key": {
+            "account_id": "9000",
+            "client_id": "ligamina-smoke-client",
+            "conversation_id": "24",
+            "conversation_kind": "private",
+            "event_id": "g1-koishi-smoke-private",
+            "platform": "onebot.v11"
+          },
+          "status": "accepted",
+          "target_host": "koishi-smoke",
+          "trace_id": "trace-g1-koishi-smoke-private",
+          "updated_at_ms": 1791592372057
+        }
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/v1/events/g1-koishi-smoke-private?platform=onebot.v11&account_id=9000&conversation_kind=private&conversation_id=24",
+      "request": null,
+      "status": 200,
+      "response": {
+        "created_at_ms": 1791592372057,
+        "error": null,
+        "event": {
+          "account_id": "9000",
+          "actor_id": "24",
+          "conversation": {
+            "id": "24",
+            "kind": "private"
+          },
+          "event_id": "g1-koishi-smoke-private",
+          "extensions": {
+            "onebot.v11": {
+              "message_id": "2002",
+              "sender": {
+                "nickname": "Alice"
+              }
+            }
+          },
+          "message": [
+            {
+              "text": "smoke-koishi-smoke-private",
+              "type": "text"
+            }
+          ],
+          "platform": "onebot.v11",
+          "schema_version": "ligamina/0.1",
+          "target_host": "koishi-smoke",
+          "timestamp": "2026-10-10T00:32:51.786Z",
+          "trace_id": "trace-g1-koishi-smoke-private"
+        },
+        "fingerprint": "97dea8136238d620a22b76f90721e30ac2fa82447946584f1967ac023d05467e",
+        "key": {
+          "account_id": "9000",
+          "client_id": "ligamina-smoke-client",
+          "conversation_id": "24",
+          "conversation_kind": "private",
+          "event_id": "g1-koishi-smoke-private",
+          "platform": "onebot.v11"
+        },
+        "status": "processing",
+        "target_host": "koishi-smoke",
+        "trace_id": "trace-g1-koishi-smoke-private",
+        "updated_at_ms": 1791592372059
+      }
+    },
+    {
+      "method": "POST",
+      "path": "/v1/gateways/smoke-gateway/actions/claim",
+      "request": {
+        "core_epoch": "3ce095b3-28df-46d5-9b88-7879ca00fe4f",
+        "expires_at_ms": 1791592671784,
+        "lease_epoch": 1,
+        "lease_id": "9ac0074c-2b4c-4e05-bbac-b0c3fd332d9f",
+        "token": "<redacted>"
+      },
+      "status": 200,
+      "response": {
+        "core_epoch_created": "3ce095b3-28df-46d5-9b88-7879ca00fe4f",
+        "created_at_ms": 1791592372062,
+        "dispatched_core_epoch": "3ce095b3-28df-46d5-9b88-7879ca00fe4f",
+        "dispatched_lease_epoch": 1,
+        "dispatched_lease_id": "9ac0074c-2b4c-4e05-bbac-b0c3fd332d9f",
+        "fingerprint": "d887a805f1cbf14059745bd293784e929318d90544e6207c68a4f840f12892b3",
+        "grant_id": "koishi-smoke-send-grant",
+        "host_epoch": 2,
+        "key": {
+          "account_id": "9000",
+          "client_id": "ligamina-smoke-client",
+          "operation": "send_message",
+          "operation_id": "94baed60-5ce5-4062-bc45-1b91dfabf914"
+        },
+        "operation_payload": {
+          "account_id": "9000",
+          "operation": "send_message",
+          "operation_id": "94baed60-5ce5-4062-bc45-1b91dfabf914",
+          "params": {
+            "message": [
+              {
+                "text": "koishi:private:smoke-koishi-smoke-private",
+                "type": "text"
+              }
+            ]
+          },
+          "target": {
+            "id": "24",
+            "kind": "private"
+          },
+          "trace_id": "trace-g1-koishi-smoke-private"
+        },
+        "principal": {
+          "id": "koishi-smoke",
+          "kind": "host"
+        },
+        "result": null,
+        "status": "dispatched",
+        "trace_id": "trace-g1-koishi-smoke-private",
+        "updated_at_ms": 1791592372109
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/v1/events/g1-koishi-smoke-private?platform=onebot.v11&account_id=9000&conversation_kind=private&conversation_id=24",
+      "request": null,
+      "status": 200,
+      "response": {
+        "created_at_ms": 1791592372057,
+        "error": null,
+        "event": {
+          "account_id": "9000",
+          "actor_id": "24",
+          "conversation": {
+            "id": "24",
+            "kind": "private"
+          },
+          "event_id": "g1-koishi-smoke-private",
+          "extensions": {
+            "onebot.v11": {
+              "message_id": "2002",
+              "sender": {
+                "nickname": "Alice"
+              }
+            }
+          },
+          "message": [
+            {
+              "text": "smoke-koishi-smoke-private",
+              "type": "text"
+            }
+          ],
+          "platform": "onebot.v11",
+          "schema_version": "ligamina/0.1",
+          "target_host": "koishi-smoke",
+          "timestamp": "2026-10-10T00:32:51.786Z",
+          "trace_id": "trace-g1-koishi-smoke-private"
+        },
+        "fingerprint": "97dea8136238d620a22b76f90721e30ac2fa82447946584f1967ac023d05467e",
+        "key": {
+          "account_id": "9000",
+          "client_id": "ligamina-smoke-client",
+          "conversation_id": "24",
+          "conversation_kind": "private",
+          "event_id": "g1-koishi-smoke-private",
+          "platform": "onebot.v11"
+        },
+        "status": "completed",
+        "target_host": "koishi-smoke",
+        "trace_id": "trace-g1-koishi-smoke-private",
+        "updated_at_ms": 1791592372066
+      }
+    },
+    {
+      "method": "POST",
+      "path": "/v1/gateways/smoke-gateway/actions/94baed60-5ce5-4062-bc45-1b91dfabf914/result",
+      "request": {
+        "credential": {
+          "core_epoch": "3ce095b3-28df-46d5-9b88-7879ca00fe4f",
+          "expires_at_ms": 1791592671784,
+          "lease_epoch": 1,
+          "lease_id": "9ac0074c-2b4c-4e05-bbac-b0c3fd332d9f",
+          "token": "<redacted>"
+        },
+        "result": {
+          "key": {
+            "account_id": "9000",
+            "client_id": "ligamina-smoke-client",
+            "operation": "send_message",
+            "operation_id": "94baed60-5ce5-4062-bc45-1b91dfabf914"
+          },
+          "fingerprint": "d887a805f1cbf14059745bd293784e929318d90544e6207c68a4f840f12892b3",
+          "status": "succeeded",
+          "platform_message_id": "virtual-message-4",
+          "data": null,
+          "error": null,
+          "observed_at_ms": 1791592372111,
+          "evidence_ref": "ligamina-smoke://gateway/virtual-message-4"
+        }
+      },
+      "status": 200,
+      "response": {
+        "core_epoch_created": "3ce095b3-28df-46d5-9b88-7879ca00fe4f",
+        "created_at_ms": 1791592372062,
+        "dispatched_core_epoch": "3ce095b3-28df-46d5-9b88-7879ca00fe4f",
+        "dispatched_lease_epoch": 1,
+        "dispatched_lease_id": "9ac0074c-2b4c-4e05-bbac-b0c3fd332d9f",
+        "fingerprint": "d887a805f1cbf14059745bd293784e929318d90544e6207c68a4f840f12892b3",
+        "grant_id": "koishi-smoke-send-grant",
+        "host_epoch": 2,
+        "key": {
+          "account_id": "9000",
+          "client_id": "ligamina-smoke-client",
+          "operation": "send_message",
+          "operation_id": "94baed60-5ce5-4062-bc45-1b91dfabf914"
+        },
+        "operation_payload": {
+          "account_id": "9000",
+          "operation": "send_message",
+          "operation_id": "94baed60-5ce5-4062-bc45-1b91dfabf914",
+          "params": {
+            "message": [
+              {
+                "text": "koishi:private:smoke-koishi-smoke-private",
+                "type": "text"
+              }
+            ]
+          },
+          "target": {
+            "id": "24",
+            "kind": "private"
+          },
+          "trace_id": "trace-g1-koishi-smoke-private"
+        },
+        "principal": {
+          "id": "koishi-smoke",
+          "kind": "host"
+        },
+        "result": {
+          "data": null,
+          "error": null,
+          "evidence_ref": "ligamina-smoke://gateway/virtual-message-4",
+          "observed_at_ms": 1791592372111,
+          "platform_message_id": "virtual-message-4",
+          "status": "succeeded"
+        },
+        "status": "succeeded",
+        "trace_id": "trace-g1-koishi-smoke-private",
+        "updated_at_ms": 1791592372111
+      }
+    },
+    {
+      "method": "POST",
+      "path": "/v1/gateways/smoke-gateway/actions/claim",
+      "request": {
+        "core_epoch": "3ce095b3-28df-46d5-9b88-7879ca00fe4f",
+        "expires_at_ms": 1791592671784,
+        "lease_epoch": 1,
+        "lease_id": "9ac0074c-2b4c-4e05-bbac-b0c3fd332d9f",
+        "token": "<redacted>"
+      },
+      "status": 200,
+      "response": null
+    },
+    {
+      "method": "GET",
+      "path": "/v1/operations/f25c5da4-b037-4cdb-a7d3-4bc7cd32b1f3?account_id=9000&operation=send_message",
+      "request": null,
+      "status": 200,
+      "response": {
+        "core_epoch_created": "3ce095b3-28df-46d5-9b88-7879ca00fe4f",
+        "created_at_ms": 1791592371795,
+        "dispatched_core_epoch": "3ce095b3-28df-46d5-9b88-7879ca00fe4f",
+        "dispatched_lease_epoch": 1,
+        "dispatched_lease_id": "9ac0074c-2b4c-4e05-bbac-b0c3fd332d9f",
+        "fingerprint": "77d3db7c09c97aedb086044aafb7f5abb1f15cbdce835b823162558763385270",
+        "grant_id": "nonebot-smoke-send-grant",
+        "host_epoch": 2,
+        "key": {
+          "account_id": "9000",
+          "client_id": "ligamina-smoke-client",
+          "operation": "send_message",
+          "operation_id": "f25c5da4-b037-4cdb-a7d3-4bc7cd32b1f3"
+        },
+        "operation_payload": {
+          "account_id": "9000",
+          "operation": "send_message",
+          "operation_id": "f25c5da4-b037-4cdb-a7d3-4bc7cd32b1f3",
+          "params": {
+            "message": [
+              {
+                "text": "nonebot:group:smoke-nonebot-smoke-group",
+                "type": "text"
+              }
+            ]
+          },
+          "target": {
+            "id": "42",
+            "kind": "group"
+          },
+          "trace_id": "trace-g1-nonebot-smoke-group"
+        },
+        "principal": {
+          "id": "nonebot-smoke",
+          "kind": "host"
+        },
+        "result": {
+          "data": null,
+          "error": null,
+          "evidence_ref": "ligamina-smoke://gateway/virtual-message-1",
+          "observed_at_ms": 1791592371841,
+          "platform_message_id": "virtual-message-1",
+          "status": "succeeded"
+        },
+        "status": "succeeded",
+        "trace_id": "trace-g1-nonebot-smoke-group",
+        "updated_at_ms": 1791592371842
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/v1/operations/19bd5371-adc4-4baf-86b6-dfdc0e7e4a54?account_id=9000&operation=send_message",
+      "request": null,
+      "status": 200,
+      "response": {
+        "core_epoch_created": "3ce095b3-28df-46d5-9b88-7879ca00fe4f",
+        "created_at_ms": 1791592371900,
+        "dispatched_core_epoch": "3ce095b3-28df-46d5-9b88-7879ca00fe4f",
+        "dispatched_lease_epoch": 1,
+        "dispatched_lease_id": "9ac0074c-2b4c-4e05-bbac-b0c3fd332d9f",
+        "fingerprint": "249c6d03cf035101dced281be2b18545905b289e8cb6d5cfb1a417d7a92b89c9",
+        "grant_id": "nonebot-smoke-send-grant",
+        "host_epoch": 2,
+        "key": {
+          "account_id": "9000",
+          "client_id": "ligamina-smoke-client",
+          "operation": "send_message",
+          "operation_id": "19bd5371-adc4-4baf-86b6-dfdc0e7e4a54"
+        },
+        "operation_payload": {
+          "account_id": "9000",
+          "operation": "send_message",
+          "operation_id": "19bd5371-adc4-4baf-86b6-dfdc0e7e4a54",
+          "params": {
+            "message": [
+              {
+                "text": "nonebot:private:smoke-nonebot-smoke-private",
+                "type": "text"
+              }
+            ]
+          },
+          "target": {
+            "id": "23",
+            "kind": "private"
+          },
+          "trace_id": "trace-g1-nonebot-smoke-private"
+        },
+        "principal": {
+          "id": "nonebot-smoke",
+          "kind": "host"
+        },
+        "result": {
+          "data": null,
+          "error": null,
+          "evidence_ref": "ligamina-smoke://gateway/virtual-message-2",
+          "observed_at_ms": 1791592371948,
+          "platform_message_id": "virtual-message-2",
+          "status": "succeeded"
+        },
+        "status": "succeeded",
+        "trace_id": "trace-g1-nonebot-smoke-private",
+        "updated_at_ms": 1791592371949
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/v1/operations/2029a274-c59a-4174-a2cc-000531445427?account_id=9000&operation=send_message",
+      "request": null,
+      "status": 200,
+      "response": {
+        "core_epoch_created": "3ce095b3-28df-46d5-9b88-7879ca00fe4f",
+        "created_at_ms": 1791592372015,
+        "dispatched_core_epoch": "3ce095b3-28df-46d5-9b88-7879ca00fe4f",
+        "dispatched_lease_epoch": 1,
+        "dispatched_lease_id": "9ac0074c-2b4c-4e05-bbac-b0c3fd332d9f",
+        "fingerprint": "e94965e1c2d7599650ecc0d9269cc78dd4b05a3482329bffe2bac7a6696d79cc",
+        "grant_id": "koishi-smoke-send-grant",
+        "host_epoch": 2,
+        "key": {
+          "account_id": "9000",
+          "client_id": "ligamina-smoke-client",
+          "operation": "send_message",
+          "operation_id": "2029a274-c59a-4174-a2cc-000531445427"
+        },
+        "operation_payload": {
+          "account_id": "9000",
+          "operation": "send_message",
+          "operation_id": "2029a274-c59a-4174-a2cc-000531445427",
+          "params": {
+            "message": [
+              {
+                "text": "koishi:group:smoke-koishi-smoke-group",
+                "type": "text"
+              }
+            ]
+          },
+          "target": {
+            "id": "72",
+            "kind": "group"
+          },
+          "trace_id": "trace-g1-koishi-smoke-group"
+        },
+        "principal": {
+          "id": "koishi-smoke",
+          "kind": "host"
+        },
+        "result": {
+          "data": null,
+          "error": null,
+          "evidence_ref": "ligamina-smoke://gateway/virtual-message-3",
+          "observed_at_ms": 1791592372055,
+          "platform_message_id": "virtual-message-3",
+          "status": "succeeded"
+        },
+        "status": "succeeded",
+        "trace_id": "trace-g1-koishi-smoke-group",
+        "updated_at_ms": 1791592372056
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/v1/operations/94baed60-5ce5-4062-bc45-1b91dfabf914?account_id=9000&operation=send_message",
+      "request": null,
+      "status": 200,
+      "response": {
+        "core_epoch_created": "3ce095b3-28df-46d5-9b88-7879ca00fe4f",
+        "created_at_ms": 1791592372062,
+        "dispatched_core_epoch": "3ce095b3-28df-46d5-9b88-7879ca00fe4f",
+        "dispatched_lease_epoch": 1,
+        "dispatched_lease_id": "9ac0074c-2b4c-4e05-bbac-b0c3fd332d9f",
+        "fingerprint": "d887a805f1cbf14059745bd293784e929318d90544e6207c68a4f840f12892b3",
+        "grant_id": "koishi-smoke-send-grant",
+        "host_epoch": 2,
+        "key": {
+          "account_id": "9000",
+          "client_id": "ligamina-smoke-client",
+          "operation": "send_message",
+          "operation_id": "94baed60-5ce5-4062-bc45-1b91dfabf914"
+        },
+        "operation_payload": {
+          "account_id": "9000",
+          "operation": "send_message",
+          "operation_id": "94baed60-5ce5-4062-bc45-1b91dfabf914",
+          "params": {
+            "message": [
+              {
+                "text": "koishi:private:smoke-koishi-smoke-private",
+                "type": "text"
+              }
+            ]
+          },
+          "target": {
+            "id": "24",
+            "kind": "private"
+          },
+          "trace_id": "trace-g1-koishi-smoke-private"
+        },
+        "principal": {
+          "id": "koishi-smoke",
+          "kind": "host"
+        },
+        "result": {
+          "data": null,
+          "error": null,
+          "evidence_ref": "ligamina-smoke://gateway/virtual-message-4",
+          "observed_at_ms": 1791592372111,
+          "platform_message_id": "virtual-message-4",
+          "status": "succeeded"
+        },
+        "status": "succeeded",
+        "trace_id": "trace-g1-koishi-smoke-private",
+        "updated_at_ms": 1791592372111
+      }
+    },
+    {
+      "method": "POST",
+      "path": "/v1/invocations",
+      "request": {
+        "capability_id": "ligamina.nonebot.math.add",
+        "arguments": {
+          "left": 19,
+          "right": 23
+        }
+      },
+      "status": 200,
+      "response": {
+        "result": 42
+      }
+    },
+    {
+      "method": "POST",
+      "path": "/v1/invocations",
+      "request": {
+        "capability_id": "ligamina.koishi.math.add",
+        "arguments": {
+          "left": 19,
+          "right": 23
+        }
+      },
+      "status": 200,
+      "response": {
+        "result": 42
+      }
+    },
+    {
+      "method": "POST",
+      "path": "/v1/gateways/smoke-gateway/actions/claim",
+      "request": {
+        "core_epoch": "3ce095b3-28df-46d5-9b88-7879ca00fe4f",
+        "expires_at_ms": 1791592671784,
+        "lease_epoch": 1,
+        "lease_id": "9ac0074c-2b4c-4e05-bbac-b0c3fd332d9f",
+        "token": "<redacted>"
+      },
+      "status": 200,
+      "response": null
+    },
+    {
+      "method": "POST",
+      "path": "/v1/gateways/smoke-gateway/actions/claim",
+      "request": {
+        "core_epoch": "3ce095b3-28df-46d5-9b88-7879ca00fe4f",
+        "expires_at_ms": 1791592671784,
+        "lease_epoch": 1,
+        "lease_id": "9ac0074c-2b4c-4e05-bbac-b0c3fd332d9f",
+        "token": "<redacted>"
+      },
+      "status": 200,
+      "response": null
+    },
+    {
+      "method": "POST",
+      "path": "/v1/gateways/smoke-gateway/actions/claim",
+      "request": {
+        "core_epoch": "3ce095b3-28df-46d5-9b88-7879ca00fe4f",
+        "expires_at_ms": 1791592671784,
+        "lease_epoch": 1,
+        "lease_id": "9ac0074c-2b4c-4e05-bbac-b0c3fd332d9f",
+        "token": "<redacted>"
+      },
+      "status": 200,
+      "response": null
+    },
+    {
+      "method": "POST",
+      "path": "/v1/gateways/smoke-gateway/actions/claim",
+      "request": {
+        "core_epoch": "3ce095b3-28df-46d5-9b88-7879ca00fe4f",
+        "expires_at_ms": 1791592671784,
+        "lease_epoch": 1,
+        "lease_id": "9ac0074c-2b4c-4e05-bbac-b0c3fd332d9f",
+        "token": "<redacted>"
+      },
+      "status": 200,
+      "response": null
+    },
+    {
+      "method": "POST",
+      "path": "/v1/gateways/smoke-gateway/actions/claim",
+      "request": {
+        "core_epoch": "3ce095b3-28df-46d5-9b88-7879ca00fe4f",
+        "expires_at_ms": 1791592671784,
+        "lease_epoch": 1,
+        "lease_id": "9ac0074c-2b4c-4e05-bbac-b0c3fd332d9f",
+        "token": "<redacted>"
+      },
+      "status": 200,
+      "response": null
+    },
+    {
+      "method": "GET",
+      "path": "/v1/status",
+      "request": null,
+      "status": 200,
+      "response": {
+        "core_epoch": "3ce095b3-28df-46d5-9b88-7879ca00fe4f",
+        "hosts": [
+          {
+            "epoch": 2,
+            "id": "koishi-smoke",
+            "last_error": null,
+            "pid": 537,
+            "restart_count": 0,
+            "state": "active"
+          },
+          {
+            "epoch": 2,
+            "id": "nonebot-smoke",
+            "last_error": null,
+            "pid": 532,
+            "restart_count": 0,
+            "state": "active"
+          }
+        ],
+        "schema_version": 2
+      }
+    },
+    {
+      "method": "POST",
+      "path": "/v1/gateways/smoke-gateway/actions/claim",
+      "request": {
+        "core_epoch": "3ce095b3-28df-46d5-9b88-7879ca00fe4f",
+        "expires_at_ms": 1791592671784,
+        "lease_epoch": 1,
+        "lease_id": "9ac0074c-2b4c-4e05-bbac-b0c3fd332d9f",
+        "token": "<redacted>"
+      },
+      "status": 200,
+      "response": null
+    },
+    {
+      "method": "POST",
+      "path": "/v1/gateways/smoke-gateway/actions/claim",
+      "request": {
+        "core_epoch": "3ce095b3-28df-46d5-9b88-7879ca00fe4f",
+        "expires_at_ms": 1791592671784,
+        "lease_epoch": 1,
+        "lease_id": "9ac0074c-2b4c-4e05-bbac-b0c3fd332d9f",
+        "token": "<redacted>"
+      },
+      "status": 200,
+      "response": null
+    },
+    {
+      "method": "GET",
+      "path": "/v1/status",
+      "request": null,
+      "status": 200,
+      "response": {
+        "core_epoch": "3ce095b3-28df-46d5-9b88-7879ca00fe4f",
+        "hosts": [
+          {
+            "epoch": 2,
+            "id": "koishi-smoke",
+            "last_error": null,
+            "pid": 537,
+            "restart_count": 0,
+            "state": "active"
+          },
+          {
+            "epoch": 3,
+            "id": "nonebot-smoke",
+            "last_error": "process exited without an exit code",
+            "pid": null,
+            "restart_count": 0,
+            "state": "failed"
+          }
+        ],
+        "schema_version": 2
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/v1/capabilities",
+      "request": null,
+      "status": 200,
+      "response": {
+        "capabilities": [
+          {
+            "descriptor": {
+              "capability_id": "ligamina.koishi.math.add",
+              "input_schema": {
+                "additionalProperties": false,
+                "properties": {
+                  "left": {
+                    "maximum": 9007199254740991,
+                    "minimum": -9007199254740991,
+                    "type": "integer"
+                  },
+                  "right": {
+                    "maximum": 9007199254740991,
+                    "minimum": -9007199254740991,
+                    "type": "integer"
+                  }
+                },
+                "required": [
+                  "left",
+                  "right"
+                ],
+                "type": "object"
+              },
+              "output_schema": {
+                "maximum": 9007199254740991,
+                "minimum": -9007199254740991,
+                "type": "integer"
+              },
+              "pure": true
+            },
+            "host_epoch": 2,
+            "host_id": "koishi-smoke"
+          }
+        ]
+      }
+    },
+    {
+      "method": "POST",
+      "path": "/v1/invocations",
+      "request": {
+        "capability_id": "ligamina.nonebot.math.add",
+        "arguments": {
+          "left": 1,
+          "right": 2
+        }
+      },
+      "status": 422,
+      "response": {
+        "error": {
+          "code": "invocation_failed",
+          "message": "capability ligamina.nonebot.math.add is not registered"
+        }
+      },
+      "transport_error": "HTTP Error 422: Unprocessable Entity"
+    },
+    {
+      "method": "POST",
+      "path": "/v1/invocations",
+      "request": {
+        "capability_id": "ligamina.koishi.math.add",
+        "arguments": {
+          "left": 19,
+          "right": 23
+        }
+      },
+      "status": 200,
+      "response": {
+        "result": 42
+      }
+    },
+    {
+      "method": "POST",
+      "path": "/v1/gateways/smoke-gateway/actions/claim",
+      "request": {
+        "core_epoch": "3ce095b3-28df-46d5-9b88-7879ca00fe4f",
+        "expires_at_ms": 1791592671784,
+        "lease_epoch": 1,
+        "lease_id": "9ac0074c-2b4c-4e05-bbac-b0c3fd332d9f",
+        "token": "<redacted>"
+      },
+      "status": 200,
+      "response": null
+    },
+    {
+      "method": "POST",
+      "path": "/v1/shutdown",
+      "request": null,
+      "status": 202,
+      "response": null
+    }
+  ],
+  "events": [
+    {
+      "request": {
+        "schema_version": "ligamina/0.1",
+        "event_id": "g1-nonebot-smoke-group",
+        "trace_id": "trace-g1-nonebot-smoke-group",
+        "platform": "onebot.v11",
+        "account_id": "9000",
+        "conversation": {
+          "kind": "group",
+          "id": "42"
+        },
+        "actor_id": "23",
+        "timestamp": "2026-10-10T00:32:51.786Z",
+        "target_host": "nonebot-smoke",
+        "message": [
+          {
+            "type": "text",
+            "text": "smoke-nonebot-smoke-group"
+          }
+        ],
+        "extensions": {
+          "onebot.v11": {
+            "message_id": "1001",
+            "sender": {
+              "nickname": "Alice"
+            }
+          }
+        }
+      },
+      "accepted": {
+        "disposition": "accepted",
+        "event": {
+          "created_at_ms": 1791592371786,
+          "error": null,
+          "event": {
+            "account_id": "9000",
+            "actor_id": "23",
+            "conversation": {
+              "id": "42",
+              "kind": "group"
+            },
+            "event_id": "g1-nonebot-smoke-group",
+            "extensions": {
+              "onebot.v11": {
+                "message_id": "1001",
+                "sender": {
+                  "nickname": "Alice"
+                }
+              }
+            },
+            "message": [
+              {
+                "text": "smoke-nonebot-smoke-group",
+                "type": "text"
+              }
+            ],
+            "platform": "onebot.v11",
+            "schema_version": "ligamina/0.1",
+            "target_host": "nonebot-smoke",
+            "timestamp": "2026-10-10T00:32:51.786Z",
+            "trace_id": "trace-g1-nonebot-smoke-group"
+          },
+          "fingerprint": "7b475d1a777c5afaa8ce4429729bf5c03383d426aa6f31d0d025ce51c47ed52e",
+          "key": {
+            "account_id": "9000",
+            "client_id": "ligamina-smoke-client",
+            "conversation_id": "42",
+            "conversation_kind": "group",
+            "event_id": "g1-nonebot-smoke-group",
+            "platform": "onebot.v11"
+          },
+          "status": "accepted",
+          "target_host": "nonebot-smoke",
+          "trace_id": "trace-g1-nonebot-smoke-group",
+          "updated_at_ms": 1791592371786
+        }
+      },
+      "final": {
+        "created_at_ms": 1791592371786,
+        "error": null,
+        "event": {
+          "account_id": "9000",
+          "actor_id": "23",
+          "conversation": {
+            "id": "42",
+            "kind": "group"
+          },
+          "event_id": "g1-nonebot-smoke-group",
+          "extensions": {
+            "onebot.v11": {
+              "message_id": "1001",
+              "sender": {
+                "nickname": "Alice"
+              }
+            }
+          },
+          "message": [
+            {
+              "text": "smoke-nonebot-smoke-group",
+              "type": "text"
+            }
+          ],
+          "platform": "onebot.v11",
+          "schema_version": "ligamina/0.1",
+          "target_host": "nonebot-smoke",
+          "timestamp": "2026-10-10T00:32:51.786Z",
+          "trace_id": "trace-g1-nonebot-smoke-group"
+        },
+        "fingerprint": "7b475d1a777c5afaa8ce4429729bf5c03383d426aa6f31d0d025ce51c47ed52e",
+        "key": {
+          "account_id": "9000",
+          "client_id": "ligamina-smoke-client",
+          "conversation_id": "42",
+          "conversation_kind": "group",
+          "event_id": "g1-nonebot-smoke-group",
+          "platform": "onebot.v11"
+        },
+        "status": "completed",
+        "target_host": "nonebot-smoke",
+        "trace_id": "trace-g1-nonebot-smoke-group",
+        "updated_at_ms": 1791592371872
+      }
+    },
+    {
+      "request": {
+        "schema_version": "ligamina/0.1",
+        "event_id": "g1-nonebot-smoke-private",
+        "trace_id": "trace-g1-nonebot-smoke-private",
+        "platform": "onebot.v11",
+        "account_id": "9000",
+        "conversation": {
+          "kind": "private",
+          "id": "23"
+        },
+        "actor_id": "23",
+        "timestamp": "2026-10-10T00:32:51.786Z",
+        "target_host": "nonebot-smoke",
+        "message": [
+          {
+            "type": "text",
+            "text": "smoke-nonebot-smoke-private"
+          }
+        ],
+        "extensions": {
+          "onebot.v11": {
+            "message_id": "1002",
+            "sender": {
+              "nickname": "Alice"
+            }
+          }
+        }
+      },
+      "accepted": {
+        "disposition": "accepted",
+        "event": {
+          "created_at_ms": 1791592371895,
+          "error": null,
+          "event": {
+            "account_id": "9000",
+            "actor_id": "23",
+            "conversation": {
+              "id": "23",
+              "kind": "private"
+            },
+            "event_id": "g1-nonebot-smoke-private",
+            "extensions": {
+              "onebot.v11": {
+                "message_id": "1002",
+                "sender": {
+                  "nickname": "Alice"
+                }
+              }
+            },
+            "message": [
+              {
+                "text": "smoke-nonebot-smoke-private",
+                "type": "text"
+              }
+            ],
+            "platform": "onebot.v11",
+            "schema_version": "ligamina/0.1",
+            "target_host": "nonebot-smoke",
+            "timestamp": "2026-10-10T00:32:51.786Z",
+            "trace_id": "trace-g1-nonebot-smoke-private"
+          },
+          "fingerprint": "9c8e965f109e780674f4c93700263c548fd43392e120b1f04ae2949c2bec0843",
+          "key": {
+            "account_id": "9000",
+            "client_id": "ligamina-smoke-client",
+            "conversation_id": "23",
+            "conversation_kind": "private",
+            "event_id": "g1-nonebot-smoke-private",
+            "platform": "onebot.v11"
+          },
+          "status": "accepted",
+          "target_host": "nonebot-smoke",
+          "trace_id": "trace-g1-nonebot-smoke-private",
+          "updated_at_ms": 1791592371895
+        }
+      },
+      "final": {
+        "created_at_ms": 1791592371895,
+        "error": null,
+        "event": {
+          "account_id": "9000",
+          "actor_id": "23",
+          "conversation": {
+            "id": "23",
+            "kind": "private"
+          },
+          "event_id": "g1-nonebot-smoke-private",
+          "extensions": {
+            "onebot.v11": {
+              "message_id": "1002",
+              "sender": {
+                "nickname": "Alice"
+              }
+            }
+          },
+          "message": [
+            {
+              "text": "smoke-nonebot-smoke-private",
+              "type": "text"
+            }
+          ],
+          "platform": "onebot.v11",
+          "schema_version": "ligamina/0.1",
+          "target_host": "nonebot-smoke",
+          "timestamp": "2026-10-10T00:32:51.786Z",
+          "trace_id": "trace-g1-nonebot-smoke-private"
+        },
+        "fingerprint": "9c8e965f109e780674f4c93700263c548fd43392e120b1f04ae2949c2bec0843",
+        "key": {
+          "account_id": "9000",
+          "client_id": "ligamina-smoke-client",
+          "conversation_id": "23",
+          "conversation_kind": "private",
+          "event_id": "g1-nonebot-smoke-private",
+          "platform": "onebot.v11"
+        },
+        "status": "completed",
+        "target_host": "nonebot-smoke",
+        "trace_id": "trace-g1-nonebot-smoke-private",
+        "updated_at_ms": 1791592371970
+      }
+    },
+    {
+      "request": {
+        "schema_version": "ligamina/0.1",
+        "event_id": "g1-koishi-smoke-group",
+        "trace_id": "trace-g1-koishi-smoke-group",
+        "platform": "onebot.v11",
+        "account_id": "9000",
+        "conversation": {
+          "kind": "group",
+          "id": "72"
+        },
+        "actor_id": "24",
+        "timestamp": "2026-10-10T00:32:51.786Z",
+        "target_host": "koishi-smoke",
+        "message": [
+          {
+            "type": "text",
+            "text": "smoke-koishi-smoke-group"
+          }
+        ],
+        "extensions": {
+          "onebot.v11": {
+            "message_id": "2001",
+            "sender": {
+              "nickname": "Alice"
+            }
+          }
+        }
+      },
+      "accepted": {
+        "disposition": "accepted",
+        "event": {
+          "created_at_ms": 1791592372003,
+          "error": null,
+          "event": {
+            "account_id": "9000",
+            "actor_id": "24",
+            "conversation": {
+              "id": "72",
+              "kind": "group"
+            },
+            "event_id": "g1-koishi-smoke-group",
+            "extensions": {
+              "onebot.v11": {
+                "message_id": "2001",
+                "sender": {
+                  "nickname": "Alice"
+                }
+              }
+            },
+            "message": [
+              {
+                "text": "smoke-koishi-smoke-group",
+                "type": "text"
+              }
+            ],
+            "platform": "onebot.v11",
+            "schema_version": "ligamina/0.1",
+            "target_host": "koishi-smoke",
+            "timestamp": "2026-10-10T00:32:51.786Z",
+            "trace_id": "trace-g1-koishi-smoke-group"
+          },
+          "fingerprint": "204013301659a412d17e13d4a7fd11fb5a055417e59003551ba8ae14c51d85de",
+          "key": {
+            "account_id": "9000",
+            "client_id": "ligamina-smoke-client",
+            "conversation_id": "72",
+            "conversation_kind": "group",
+            "event_id": "g1-koishi-smoke-group",
+            "platform": "onebot.v11"
+          },
+          "status": "accepted",
+          "target_host": "koishi-smoke",
+          "trace_id": "trace-g1-koishi-smoke-group",
+          "updated_at_ms": 1791592372003
+        }
+      },
+      "final": {
+        "created_at_ms": 1791592372003,
+        "error": null,
+        "event": {
+          "account_id": "9000",
+          "actor_id": "24",
+          "conversation": {
+            "id": "72",
+            "kind": "group"
+          },
+          "event_id": "g1-koishi-smoke-group",
+          "extensions": {
+            "onebot.v11": {
+              "message_id": "2001",
+              "sender": {
+                "nickname": "Alice"
+              }
+            }
+          },
+          "message": [
+            {
+              "text": "smoke-koishi-smoke-group",
+              "type": "text"
+            }
+          ],
+          "platform": "onebot.v11",
+          "schema_version": "ligamina/0.1",
+          "target_host": "koishi-smoke",
+          "timestamp": "2026-10-10T00:32:51.786Z",
+          "trace_id": "trace-g1-koishi-smoke-group"
+        },
+        "fingerprint": "204013301659a412d17e13d4a7fd11fb5a055417e59003551ba8ae14c51d85de",
+        "key": {
+          "account_id": "9000",
+          "client_id": "ligamina-smoke-client",
+          "conversation_id": "72",
+          "conversation_kind": "group",
+          "event_id": "g1-koishi-smoke-group",
+          "platform": "onebot.v11"
+        },
+        "status": "completed",
+        "target_host": "koishi-smoke",
+        "trace_id": "trace-g1-koishi-smoke-group",
+        "updated_at_ms": 1791592372023
+      }
+    },
+    {
+      "request": {
+        "schema_version": "ligamina/0.1",
+        "event_id": "g1-koishi-smoke-private",
+        "trace_id": "trace-g1-koishi-smoke-private",
+        "platform": "onebot.v11",
+        "account_id": "9000",
+        "conversation": {
+          "kind": "private",
+          "id": "24"
+        },
+        "actor_id": "24",
+        "timestamp": "2026-10-10T00:32:51.786Z",
+        "target_host": "koishi-smoke",
+        "message": [
+          {
+            "type": "text",
+            "text": "smoke-koishi-smoke-private"
+          }
+        ],
+        "extensions": {
+          "onebot.v11": {
+            "message_id": "2002",
+            "sender": {
+              "nickname": "Alice"
+            }
+          }
+        }
+      },
+      "accepted": {
+        "disposition": "accepted",
+        "event": {
+          "created_at_ms": 1791592372057,
+          "error": null,
+          "event": {
+            "account_id": "9000",
+            "actor_id": "24",
+            "conversation": {
+              "id": "24",
+              "kind": "private"
+            },
+            "event_id": "g1-koishi-smoke-private",
+            "extensions": {
+              "onebot.v11": {
+                "message_id": "2002",
+                "sender": {
+                  "nickname": "Alice"
+                }
+              }
+            },
+            "message": [
+              {
+                "text": "smoke-koishi-smoke-private",
+                "type": "text"
+              }
+            ],
+            "platform": "onebot.v11",
+            "schema_version": "ligamina/0.1",
+            "target_host": "koishi-smoke",
+            "timestamp": "2026-10-10T00:32:51.786Z",
+            "trace_id": "trace-g1-koishi-smoke-private"
+          },
+          "fingerprint": "97dea8136238d620a22b76f90721e30ac2fa82447946584f1967ac023d05467e",
+          "key": {
+            "account_id": "9000",
+            "client_id": "ligamina-smoke-client",
+            "conversation_id": "24",
+            "conversation_kind": "private",
+            "event_id": "g1-koishi-smoke-private",
+            "platform": "onebot.v11"
+          },
+          "status": "accepted",
+          "target_host": "koishi-smoke",
+          "trace_id": "trace-g1-koishi-smoke-private",
+          "updated_at_ms": 1791592372057
+        }
+      },
+      "final": {
+        "created_at_ms": 1791592372057,
+        "error": null,
+        "event": {
+          "account_id": "9000",
+          "actor_id": "24",
+          "conversation": {
+            "id": "24",
+            "kind": "private"
+          },
+          "event_id": "g1-koishi-smoke-private",
+          "extensions": {
+            "onebot.v11": {
+              "message_id": "2002",
+              "sender": {
+                "nickname": "Alice"
+              }
+            }
+          },
+          "message": [
+            {
+              "text": "smoke-koishi-smoke-private",
+              "type": "text"
+            }
+          ],
+          "platform": "onebot.v11",
+          "schema_version": "ligamina/0.1",
+          "target_host": "koishi-smoke",
+          "timestamp": "2026-10-10T00:32:51.786Z",
+          "trace_id": "trace-g1-koishi-smoke-private"
+        },
+        "fingerprint": "97dea8136238d620a22b76f90721e30ac2fa82447946584f1967ac023d05467e",
+        "key": {
+          "account_id": "9000",
+          "client_id": "ligamina-smoke-client",
+          "conversation_id": "24",
+          "conversation_kind": "private",
+          "event_id": "g1-koishi-smoke-private",
+          "platform": "onebot.v11"
+        },
+        "status": "completed",
+        "target_host": "koishi-smoke",
+        "trace_id": "trace-g1-koishi-smoke-private",
+        "updated_at_ms": 1791592372066
+      }
+    }
+  ],
+  "gateway_operations": [
+    {
+      "operation": {
+        "core_epoch_created": "3ce095b3-28df-46d5-9b88-7879ca00fe4f",
+        "created_at_ms": 1791592371795,
+        "dispatched_core_epoch": "3ce095b3-28df-46d5-9b88-7879ca00fe4f",
+        "dispatched_lease_epoch": 1,
+        "dispatched_lease_id": "9ac0074c-2b4c-4e05-bbac-b0c3fd332d9f",
+        "fingerprint": "77d3db7c09c97aedb086044aafb7f5abb1f15cbdce835b823162558763385270",
+        "grant_id": "nonebot-smoke-send-grant",
+        "host_epoch": 2,
+        "key": {
+          "account_id": "9000",
+          "client_id": "ligamina-smoke-client",
+          "operation": "send_message",
+          "operation_id": "f25c5da4-b037-4cdb-a7d3-4bc7cd32b1f3"
+        },
+        "operation_payload": {
+          "account_id": "9000",
+          "operation": "send_message",
+          "operation_id": "f25c5da4-b037-4cdb-a7d3-4bc7cd32b1f3",
+          "params": {
+            "message": [
+              {
+                "text": "nonebot:group:smoke-nonebot-smoke-group",
+                "type": "text"
+              }
+            ]
+          },
+          "target": {
+            "id": "42",
+            "kind": "group"
+          },
+          "trace_id": "trace-g1-nonebot-smoke-group"
+        },
+        "principal": {
+          "id": "nonebot-smoke",
+          "kind": "host"
+        },
+        "result": null,
+        "status": "dispatched",
+        "trace_id": "trace-g1-nonebot-smoke-group",
+        "updated_at_ms": 1791592371839
+      },
+      "outgoing_message": [
+        {
+          "text": "nonebot:group:smoke-nonebot-smoke-group",
+          "type": "text"
+        }
+      ],
+      "receipt_request": {
+        "key": {
+          "account_id": "9000",
+          "client_id": "ligamina-smoke-client",
+          "operation": "send_message",
+          "operation_id": "f25c5da4-b037-4cdb-a7d3-4bc7cd32b1f3"
+        },
+        "fingerprint": "77d3db7c09c97aedb086044aafb7f5abb1f15cbdce835b823162558763385270",
+        "status": "succeeded",
+        "platform_message_id": "virtual-message-1",
+        "data": null,
+        "error": null,
+        "observed_at_ms": 1791592371841,
+        "evidence_ref": "ligamina-smoke://gateway/virtual-message-1"
+      },
+      "receipt_response": {
+        "core_epoch_created": "3ce095b3-28df-46d5-9b88-7879ca00fe4f",
+        "created_at_ms": 1791592371795,
+        "dispatched_core_epoch": "3ce095b3-28df-46d5-9b88-7879ca00fe4f",
+        "dispatched_lease_epoch": 1,
+        "dispatched_lease_id": "9ac0074c-2b4c-4e05-bbac-b0c3fd332d9f",
+        "fingerprint": "77d3db7c09c97aedb086044aafb7f5abb1f15cbdce835b823162558763385270",
+        "grant_id": "nonebot-smoke-send-grant",
+        "host_epoch": 2,
+        "key": {
+          "account_id": "9000",
+          "client_id": "ligamina-smoke-client",
+          "operation": "send_message",
+          "operation_id": "f25c5da4-b037-4cdb-a7d3-4bc7cd32b1f3"
+        },
+        "operation_payload": {
+          "account_id": "9000",
+          "operation": "send_message",
+          "operation_id": "f25c5da4-b037-4cdb-a7d3-4bc7cd32b1f3",
+          "params": {
+            "message": [
+              {
+                "text": "nonebot:group:smoke-nonebot-smoke-group",
+                "type": "text"
+              }
+            ]
+          },
+          "target": {
+            "id": "42",
+            "kind": "group"
+          },
+          "trace_id": "trace-g1-nonebot-smoke-group"
+        },
+        "principal": {
+          "id": "nonebot-smoke",
+          "kind": "host"
+        },
+        "result": {
+          "data": null,
+          "error": null,
+          "evidence_ref": "ligamina-smoke://gateway/virtual-message-1",
+          "observed_at_ms": 1791592371841,
+          "platform_message_id": "virtual-message-1",
+          "status": "succeeded"
+        },
+        "status": "succeeded",
+        "trace_id": "trace-g1-nonebot-smoke-group",
+        "updated_at_ms": 1791592371842
+      }
+    },
+    {
+      "operation": {
+        "core_epoch_created": "3ce095b3-28df-46d5-9b88-7879ca00fe4f",
+        "created_at_ms": 1791592371900,
+        "dispatched_core_epoch": "3ce095b3-28df-46d5-9b88-7879ca00fe4f",
+        "dispatched_lease_epoch": 1,
+        "dispatched_lease_id": "9ac0074c-2b4c-4e05-bbac-b0c3fd332d9f",
+        "fingerprint": "249c6d03cf035101dced281be2b18545905b289e8cb6d5cfb1a417d7a92b89c9",
+        "grant_id": "nonebot-smoke-send-grant",
+        "host_epoch": 2,
+        "key": {
+          "account_id": "9000",
+          "client_id": "ligamina-smoke-client",
+          "operation": "send_message",
+          "operation_id": "19bd5371-adc4-4baf-86b6-dfdc0e7e4a54"
+        },
+        "operation_payload": {
+          "account_id": "9000",
+          "operation": "send_message",
+          "operation_id": "19bd5371-adc4-4baf-86b6-dfdc0e7e4a54",
+          "params": {
+            "message": [
+              {
+                "text": "nonebot:private:smoke-nonebot-smoke-private",
+                "type": "text"
+              }
+            ]
+          },
+          "target": {
+            "id": "23",
+            "kind": "private"
+          },
+          "trace_id": "trace-g1-nonebot-smoke-private"
+        },
+        "principal": {
+          "id": "nonebot-smoke",
+          "kind": "host"
+        },
+        "result": null,
+        "status": "dispatched",
+        "trace_id": "trace-g1-nonebot-smoke-private",
+        "updated_at_ms": 1791592371947
+      },
+      "outgoing_message": [
+        {
+          "text": "nonebot:private:smoke-nonebot-smoke-private",
+          "type": "text"
+        }
+      ],
+      "receipt_request": {
+        "key": {
+          "account_id": "9000",
+          "client_id": "ligamina-smoke-client",
+          "operation": "send_message",
+          "operation_id": "19bd5371-adc4-4baf-86b6-dfdc0e7e4a54"
+        },
+        "fingerprint": "249c6d03cf035101dced281be2b18545905b289e8cb6d5cfb1a417d7a92b89c9",
+        "status": "succeeded",
+        "platform_message_id": "virtual-message-2",
+        "data": null,
+        "error": null,
+        "observed_at_ms": 1791592371948,
+        "evidence_ref": "ligamina-smoke://gateway/virtual-message-2"
+      },
+      "receipt_response": {
+        "core_epoch_created": "3ce095b3-28df-46d5-9b88-7879ca00fe4f",
+        "created_at_ms": 1791592371900,
+        "dispatched_core_epoch": "3ce095b3-28df-46d5-9b88-7879ca00fe4f",
+        "dispatched_lease_epoch": 1,
+        "dispatched_lease_id": "9ac0074c-2b4c-4e05-bbac-b0c3fd332d9f",
+        "fingerprint": "249c6d03cf035101dced281be2b18545905b289e8cb6d5cfb1a417d7a92b89c9",
+        "grant_id": "nonebot-smoke-send-grant",
+        "host_epoch": 2,
+        "key": {
+          "account_id": "9000",
+          "client_id": "ligamina-smoke-client",
+          "operation": "send_message",
+          "operation_id": "19bd5371-adc4-4baf-86b6-dfdc0e7e4a54"
+        },
+        "operation_payload": {
+          "account_id": "9000",
+          "operation": "send_message",
+          "operation_id": "19bd5371-adc4-4baf-86b6-dfdc0e7e4a54",
+          "params": {
+            "message": [
+              {
+                "text": "nonebot:private:smoke-nonebot-smoke-private",
+                "type": "text"
+              }
+            ]
+          },
+          "target": {
+            "id": "23",
+            "kind": "private"
+          },
+          "trace_id": "trace-g1-nonebot-smoke-private"
+        },
+        "principal": {
+          "id": "nonebot-smoke",
+          "kind": "host"
+        },
+        "result": {
+          "data": null,
+          "error": null,
+          "evidence_ref": "ligamina-smoke://gateway/virtual-message-2",
+          "observed_at_ms": 1791592371948,
+          "platform_message_id": "virtual-message-2",
+          "status": "succeeded"
+        },
+        "status": "succeeded",
+        "trace_id": "trace-g1-nonebot-smoke-private",
+        "updated_at_ms": 1791592371949
+      }
+    },
+    {
+      "operation": {
+        "core_epoch_created": "3ce095b3-28df-46d5-9b88-7879ca00fe4f",
+        "created_at_ms": 1791592372015,
+        "dispatched_core_epoch": "3ce095b3-28df-46d5-9b88-7879ca00fe4f",
+        "dispatched_lease_epoch": 1,
+        "dispatched_lease_id": "9ac0074c-2b4c-4e05-bbac-b0c3fd332d9f",
+        "fingerprint": "e94965e1c2d7599650ecc0d9269cc78dd4b05a3482329bffe2bac7a6696d79cc",
+        "grant_id": "koishi-smoke-send-grant",
+        "host_epoch": 2,
+        "key": {
+          "account_id": "9000",
+          "client_id": "ligamina-smoke-client",
+          "operation": "send_message",
+          "operation_id": "2029a274-c59a-4174-a2cc-000531445427"
+        },
+        "operation_payload": {
+          "account_id": "9000",
+          "operation": "send_message",
+          "operation_id": "2029a274-c59a-4174-a2cc-000531445427",
+          "params": {
+            "message": [
+              {
+                "text": "koishi:group:smoke-koishi-smoke-group",
+                "type": "text"
+              }
+            ]
+          },
+          "target": {
+            "id": "72",
+            "kind": "group"
+          },
+          "trace_id": "trace-g1-koishi-smoke-group"
+        },
+        "principal": {
+          "id": "koishi-smoke",
+          "kind": "host"
+        },
+        "result": null,
+        "status": "dispatched",
+        "trace_id": "trace-g1-koishi-smoke-group",
+        "updated_at_ms": 1791592372054
+      },
+      "outgoing_message": [
+        {
+          "text": "koishi:group:smoke-koishi-smoke-group",
+          "type": "text"
+        }
+      ],
+      "receipt_request": {
+        "key": {
+          "account_id": "9000",
+          "client_id": "ligamina-smoke-client",
+          "operation": "send_message",
+          "operation_id": "2029a274-c59a-4174-a2cc-000531445427"
+        },
+        "fingerprint": "e94965e1c2d7599650ecc0d9269cc78dd4b05a3482329bffe2bac7a6696d79cc",
+        "status": "succeeded",
+        "platform_message_id": "virtual-message-3",
+        "data": null,
+        "error": null,
+        "observed_at_ms": 1791592372055,
+        "evidence_ref": "ligamina-smoke://gateway/virtual-message-3"
+      },
+      "receipt_response": {
+        "core_epoch_created": "3ce095b3-28df-46d5-9b88-7879ca00fe4f",
+        "created_at_ms": 1791592372015,
+        "dispatched_core_epoch": "3ce095b3-28df-46d5-9b88-7879ca00fe4f",
+        "dispatched_lease_epoch": 1,
+        "dispatched_lease_id": "9ac0074c-2b4c-4e05-bbac-b0c3fd332d9f",
+        "fingerprint": "e94965e1c2d7599650ecc0d9269cc78dd4b05a3482329bffe2bac7a6696d79cc",
+        "grant_id": "koishi-smoke-send-grant",
+        "host_epoch": 2,
+        "key": {
+          "account_id": "9000",
+          "client_id": "ligamina-smoke-client",
+          "operation": "send_message",
+          "operation_id": "2029a274-c59a-4174-a2cc-000531445427"
+        },
+        "operation_payload": {
+          "account_id": "9000",
+          "operation": "send_message",
+          "operation_id": "2029a274-c59a-4174-a2cc-000531445427",
+          "params": {
+            "message": [
+              {
+                "text": "koishi:group:smoke-koishi-smoke-group",
+                "type": "text"
+              }
+            ]
+          },
+          "target": {
+            "id": "72",
+            "kind": "group"
+          },
+          "trace_id": "trace-g1-koishi-smoke-group"
+        },
+        "principal": {
+          "id": "koishi-smoke",
+          "kind": "host"
+        },
+        "result": {
+          "data": null,
+          "error": null,
+          "evidence_ref": "ligamina-smoke://gateway/virtual-message-3",
+          "observed_at_ms": 1791592372055,
+          "platform_message_id": "virtual-message-3",
+          "status": "succeeded"
+        },
+        "status": "succeeded",
+        "trace_id": "trace-g1-koishi-smoke-group",
+        "updated_at_ms": 1791592372056
+      }
+    },
+    {
+      "operation": {
+        "core_epoch_created": "3ce095b3-28df-46d5-9b88-7879ca00fe4f",
+        "created_at_ms": 1791592372062,
+        "dispatched_core_epoch": "3ce095b3-28df-46d5-9b88-7879ca00fe4f",
+        "dispatched_lease_epoch": 1,
+        "dispatched_lease_id": "9ac0074c-2b4c-4e05-bbac-b0c3fd332d9f",
+        "fingerprint": "d887a805f1cbf14059745bd293784e929318d90544e6207c68a4f840f12892b3",
+        "grant_id": "koishi-smoke-send-grant",
+        "host_epoch": 2,
+        "key": {
+          "account_id": "9000",
+          "client_id": "ligamina-smoke-client",
+          "operation": "send_message",
+          "operation_id": "94baed60-5ce5-4062-bc45-1b91dfabf914"
+        },
+        "operation_payload": {
+          "account_id": "9000",
+          "operation": "send_message",
+          "operation_id": "94baed60-5ce5-4062-bc45-1b91dfabf914",
+          "params": {
+            "message": [
+              {
+                "text": "koishi:private:smoke-koishi-smoke-private",
+                "type": "text"
+              }
+            ]
+          },
+          "target": {
+            "id": "24",
+            "kind": "private"
+          },
+          "trace_id": "trace-g1-koishi-smoke-private"
+        },
+        "principal": {
+          "id": "koishi-smoke",
+          "kind": "host"
+        },
+        "result": null,
+        "status": "dispatched",
+        "trace_id": "trace-g1-koishi-smoke-private",
+        "updated_at_ms": 1791592372109
+      },
+      "outgoing_message": [
+        {
+          "text": "koishi:private:smoke-koishi-smoke-private",
+          "type": "text"
+        }
+      ],
+      "receipt_request": {
+        "key": {
+          "account_id": "9000",
+          "client_id": "ligamina-smoke-client",
+          "operation": "send_message",
+          "operation_id": "94baed60-5ce5-4062-bc45-1b91dfabf914"
+        },
+        "fingerprint": "d887a805f1cbf14059745bd293784e929318d90544e6207c68a4f840f12892b3",
+        "status": "succeeded",
+        "platform_message_id": "virtual-message-4",
+        "data": null,
+        "error": null,
+        "observed_at_ms": 1791592372111,
+        "evidence_ref": "ligamina-smoke://gateway/virtual-message-4"
+      },
+      "receipt_response": {
+        "core_epoch_created": "3ce095b3-28df-46d5-9b88-7879ca00fe4f",
+        "created_at_ms": 1791592372062,
+        "dispatched_core_epoch": "3ce095b3-28df-46d5-9b88-7879ca00fe4f",
+        "dispatched_lease_epoch": 1,
+        "dispatched_lease_id": "9ac0074c-2b4c-4e05-bbac-b0c3fd332d9f",
+        "fingerprint": "d887a805f1cbf14059745bd293784e929318d90544e6207c68a4f840f12892b3",
+        "grant_id": "koishi-smoke-send-grant",
+        "host_epoch": 2,
+        "key": {
+          "account_id": "9000",
+          "client_id": "ligamina-smoke-client",
+          "operation": "send_message",
+          "operation_id": "94baed60-5ce5-4062-bc45-1b91dfabf914"
+        },
+        "operation_payload": {
+          "account_id": "9000",
+          "operation": "send_message",
+          "operation_id": "94baed60-5ce5-4062-bc45-1b91dfabf914",
+          "params": {
+            "message": [
+              {
+                "text": "koishi:private:smoke-koishi-smoke-private",
+                "type": "text"
+              }
+            ]
+          },
+          "target": {
+            "id": "24",
+            "kind": "private"
+          },
+          "trace_id": "trace-g1-koishi-smoke-private"
+        },
+        "principal": {
+          "id": "koishi-smoke",
+          "kind": "host"
+        },
+        "result": {
+          "data": null,
+          "error": null,
+          "evidence_ref": "ligamina-smoke://gateway/virtual-message-4",
+          "observed_at_ms": 1791592372111,
+          "platform_message_id": "virtual-message-4",
+          "status": "succeeded"
+        },
+        "status": "succeeded",
+        "trace_id": "trace-g1-koishi-smoke-private",
+        "updated_at_ms": 1791592372111
+      }
+    }
+  ],
+  "capability_invocations": [
+    {
+      "transport": "http",
+      "capability": "ligamina.nonebot.math.add",
+      "response": {
+        "result": 42
+      }
+    },
+    {
+      "transport": "http",
+      "capability": "ligamina.koishi.math.add",
+      "response": {
+        "result": 42
+      }
+    },
+    {
+      "transport": "http-after-crash",
+      "capability": "ligamina.koishi.math.add",
+      "response": {
+        "result": 42
+      }
+    }
+  ],
+  "mcp_client": {
+    "command": [
+      "node",
+      "clients/reference/tests/mcp-http-smoke.mjs",
+      "<Core URL>",
+      "<redacted>",
+      "ligamina.nonebot.math.add",
+      "ligamina.koishi.math.add"
+    ],
+    "returncode": 0,
+    "stdout": "{\"protocol\":\"2025-11-25\",\"tools\":[\"_ligamina_ping\",\"ligamina.koishi.math.add\",\"ligamina.nonebot.math.add\"],\"invocations\":[{\"capability\":\"ligamina.nonebot.math.add\",\"result\":{\"result\":42}},{\"capability\":\"ligamina.koishi.math.add\",\"result\":{\"result\":42}}]}\n",
+    "stderr": ""
+  },
+  "failure_injection": {
+    "case_id": "single-group-reply-v1",
+    "native": {
+      "status": "completed",
+      "mode": "native",
+      "environment": {
+        "ecosystem": "nonebot",
+        "framework_version": "2.5.0",
+        "runtime_version": "3.12.14",
+        "lockfile_sha256": "d63536ae791dd2bd9e254f3e5d5951d5e8f14bd599056548d55e53126497727a",
+        "profile_sha256": "4b77454753fa5181a90bb3c339de6970bbe1b2f57ff8ff2dc15d63a2bea929a6"
+      },
+      "events": [
+        {
+          "schema_version": "ligamina/0.1",
+          "event_id": "evt-fixture-1",
+          "trace_id": "trace-fixture-1",
+          "platform": "virtual.onebot",
+          "account_id": "account-1",
+          "conversation": {
+            "kind": "group",
+            "id": "room-1"
+          },
+          "actor_id": "user-1",
+          "timestamp": "2026-10-10T00:00:00Z",
+          "target_host": "nonebot-default",
+          "message": [
+            {
+              "type": "mention",
+              "user_id": "bot-1"
+            },
+            {
+              "type": "text",
+              "text": "/echo hello"
+            },
+            {
+              "type": "reply",
+              "message_id": "source-1"
+            }
+          ]
+        }
+      ],
+      "operations": [
+        {
+          "operation_id": "op-fixture-1",
+          "account_id": "account-1",
+          "operation": "send_message",
+          "target": {
+            "kind": "group",
+            "id": "room-1"
+          },
+          "params": {
+            "message": [
+              {
+                "type": "reply",
+                "message_id": "source-1"
+              },
+              {
+                "type": "text",
+                "text": "hello"
+              }
+            ]
+          }
+        }
+      ],
+      "operation_receipts": [
+        {
+          "operation_id": "op-fixture-1",
+          "status": "succeeded",
+          "platform_message_id": "virtual-message-1",
+          "target": {
+            "kind": "group",
+            "id": "room-1"
+          }
+        }
+      ],
+      "cleanup": {
+        "active_capability_count": 0,
+        "live_processes": []
+      }
+    },
+    "federated": {
+      "status": "completed",
+      "mode": "federated",
+      "environment": {
+        "ecosystem": "nonebot",
+        "framework_version": "2.5.0",
+        "runtime_version": "3.12.14",
+        "lockfile_sha256": "d63536ae791dd2bd9e254f3e5d5951d5e8f14bd599056548d55e53126497727a",
+        "profile_sha256": "4b77454753fa5181a90bb3c339de6970bbe1b2f57ff8ff2dc15d63a2bea929a6"
+      },
+      "events": [
+        {
+          "schema_version": "ligamina/0.1",
+          "event_id": "evt-fixture-1",
+          "trace_id": "trace-fixture-1",
+          "platform": "virtual.onebot",
+          "account_id": "account-1",
+          "conversation": {
+            "kind": "group",
+            "id": "room-1"
+          },
+          "actor_id": "user-1",
+          "timestamp": "2026-10-10T00:00:00Z",
+          "target_host": "nonebot-default",
+          "message": [
+            {
+              "type": "mention",
+              "user_id": "bot-1"
+            },
+            {
+              "type": "text",
+              "text": "/echo hello"
+            },
+            {
+              "type": "reply",
+              "message_id": "source-1"
+            }
+          ]
+        }
+      ],
+      "operations": [
+        {
+          "operation_id": "op-fixture-1",
+          "account_id": "account-1",
+          "operation": "send_message",
+          "target": {
+            "kind": "group",
+            "id": "wrong-room"
+          },
+          "params": {
+            "message": [
+              {
+                "type": "reply",
+                "message_id": "source-1"
+              },
+              {
+                "type": "text",
+                "text": "hello"
+              }
+            ]
+          }
+        }
+      ],
+      "operation_receipts": [
+        {
+          "operation_id": "op-fixture-1",
+          "status": "succeeded",
+          "platform_message_id": "virtual-message-1",
+          "target": {
+            "kind": "group",
+            "id": "wrong-room"
+          }
+        }
+      ],
+      "cleanup": {
+        "active_capability_count": 0,
+        "live_processes": []
+      }
+    },
+    "comparison": {
+      "status": "failed",
+      "issues": [
+        {
+          "code": "operation_expectation_failed",
+          "message": "operation count, target, or payload differs from the fixture",
+          "side": "federated"
+        },
+        {
+          "code": "receipt_expectation_failed",
+          "message": "platform result receipts differ from the fixture",
+          "side": "federated"
+        }
+      ],
+      "normalized_native": {
+        "events": [
+          {
+            "account_id": "account-1",
+            "actor_id": "user-1",
+            "conversation": {
+              "id": "room-1",
+              "kind": "group"
+            },
+            "event_id": "evt-fixture-1",
+            "message": [
+              {
+                "type": "mention",
+                "user_id": "bot-1"
+              },
+              {
+                "text": "/echo hello",
+                "type": "text"
+              },
+              {
+                "message_id": "source-1",
+                "type": "reply"
+              }
+            ],
+            "platform": "virtual.onebot",
+            "schema_version": "ligamina/0.1",
+            "target_host": "nonebot-default",
+            "timestamp": "2026-10-10T00:00:00Z"
+          }
+        ],
+        "operations": [
+          {
+            "account_id": "account-1",
+            "operation": "send_message",
+            "operation_id": "op-fixture-1",
+            "params": {
+              "message": [
+                {
+                  "message_id": "source-1",
+                  "type": "reply"
+                },
+                {
+                  "text": "hello",
+                  "type": "text"
+                }
+              ]
+            },
+            "target": {
+              "id": "room-1",
+              "kind": "group"
+            }
+          }
+        ],
+        "operation_receipts": [
+          {
+            "operation_id": "op-fixture-1",
+            "platform_message_id": "virtual-message-1",
+            "status": "succeeded",
+            "target": {
+              "id": "room-1",
+              "kind": "group"
+            }
+          }
+        ],
+        "cleanup": {
+          "active_capability_count": 0,
+          "live_processes": []
+        }
+      },
+      "normalized_federated": null
+    },
+    "runner_exit_code": 1
+  },
+  "cleanup": {
+    "host_pids": [
+      532,
+      537
+    ],
+    "remaining_pids": [],
+    "daemon_exit_code": 0
+  },
+  "error": null,
+  "environment": {
+    "os": "Linux-6.18.33.2-microsoft-standard-WSL2-x86_64-with-glibc2.39",
+    "system": "Linux",
+    "architecture": "x86_64",
+    "python": "3.12.14",
+    "node": "v24.20.0",
+    "npm": "11.19.0",
+    "uv": "uv 0.12.5 (x86_64-unknown-linux-gnu)",
+    "cargo": "cargo 1.97.1 (c980f4866 2026-06-30)",
+    "rustc": "rustc 1.97.1 (8bab26f4f 2026-07-14)",
+    "lockfiles": {
+      "Cargo.lock": "617242b5952384fd6c9ca1413f7101987034d566c338aa51c9bca708c29a8ff6",
+      "hosts/nonebot/uv.lock": "d63536ae791dd2bd9e254f3e5d5951d5e8f14bd599056548d55e53126497727a",
+      "hosts/koishi/package-lock.json": "faedf756729a0764f14c633063225f57507a6b191f40d4e83f83a3097c4a1946",
+      "clients/reference/package-lock.json": "2a6bfd208047b9f18e05c19ab498aabec5f275d44d7b71a3fe9e3d76f6e73f70"
+    },
+    "sanitized_config_sha256": "e8679807bef47960595b6e3a43d988ac7e038893aa541f3fa1feb5b94c6d0118"
+  },
+  "daemon_ready": {
+    "host_count": 2,
+    "listen": "127.0.0.1:34445",
+    "ready": true
+  },
+  "initial_host_status": {
+    "core_epoch": "3ce095b3-28df-46d5-9b88-7879ca00fe4f",
+    "hosts": [
+      {
+        "epoch": 2,
+        "id": "koishi-smoke",
+        "last_error": null,
+        "pid": 537,
+        "restart_count": 0,
+        "state": "active"
+      },
+      {
+        "epoch": 2,
+        "id": "nonebot-smoke",
+        "last_error": null,
+        "pid": 532,
+        "restart_count": 0,
+        "state": "active"
+      }
+    ],
+    "schema_version": 2
+  },
+  "operation_statuses": [
+    {
+      "core_epoch_created": "3ce095b3-28df-46d5-9b88-7879ca00fe4f",
+      "created_at_ms": 1791592371795,
+      "dispatched_core_epoch": "3ce095b3-28df-46d5-9b88-7879ca00fe4f",
+      "dispatched_lease_epoch": 1,
+      "dispatched_lease_id": "9ac0074c-2b4c-4e05-bbac-b0c3fd332d9f",
+      "fingerprint": "77d3db7c09c97aedb086044aafb7f5abb1f15cbdce835b823162558763385270",
+      "grant_id": "nonebot-smoke-send-grant",
+      "host_epoch": 2,
+      "key": {
+        "account_id": "9000",
+        "client_id": "ligamina-smoke-client",
+        "operation": "send_message",
+        "operation_id": "f25c5da4-b037-4cdb-a7d3-4bc7cd32b1f3"
+      },
+      "operation_payload": {
+        "account_id": "9000",
+        "operation": "send_message",
+        "operation_id": "f25c5da4-b037-4cdb-a7d3-4bc7cd32b1f3",
+        "params": {
+          "message": [
+            {
+              "text": "nonebot:group:smoke-nonebot-smoke-group",
+              "type": "text"
+            }
+          ]
+        },
+        "target": {
+          "id": "42",
+          "kind": "group"
+        },
+        "trace_id": "trace-g1-nonebot-smoke-group"
+      },
+      "principal": {
+        "id": "nonebot-smoke",
+        "kind": "host"
+      },
+      "result": {
+        "data": null,
+        "error": null,
+        "evidence_ref": "ligamina-smoke://gateway/virtual-message-1",
+        "observed_at_ms": 1791592371841,
+        "platform_message_id": "virtual-message-1",
+        "status": "succeeded"
+      },
+      "status": "succeeded",
+      "trace_id": "trace-g1-nonebot-smoke-group",
+      "updated_at_ms": 1791592371842
+    },
+    {
+      "core_epoch_created": "3ce095b3-28df-46d5-9b88-7879ca00fe4f",
+      "created_at_ms": 1791592371900,
+      "dispatched_core_epoch": "3ce095b3-28df-46d5-9b88-7879ca00fe4f",
+      "dispatched_lease_epoch": 1,
+      "dispatched_lease_id": "9ac0074c-2b4c-4e05-bbac-b0c3fd332d9f",
+      "fingerprint": "249c6d03cf035101dced281be2b18545905b289e8cb6d5cfb1a417d7a92b89c9",
+      "grant_id": "nonebot-smoke-send-grant",
+      "host_epoch": 2,
+      "key": {
+        "account_id": "9000",
+        "client_id": "ligamina-smoke-client",
+        "operation": "send_message",
+        "operation_id": "19bd5371-adc4-4baf-86b6-dfdc0e7e4a54"
+      },
+      "operation_payload": {
+        "account_id": "9000",
+        "operation": "send_message",
+        "operation_id": "19bd5371-adc4-4baf-86b6-dfdc0e7e4a54",
+        "params": {
+          "message": [
+            {
+              "text": "nonebot:private:smoke-nonebot-smoke-private",
+              "type": "text"
+            }
+          ]
+        },
+        "target": {
+          "id": "23",
+          "kind": "private"
+        },
+        "trace_id": "trace-g1-nonebot-smoke-private"
+      },
+      "principal": {
+        "id": "nonebot-smoke",
+        "kind": "host"
+      },
+      "result": {
+        "data": null,
+        "error": null,
+        "evidence_ref": "ligamina-smoke://gateway/virtual-message-2",
+        "observed_at_ms": 1791592371948,
+        "platform_message_id": "virtual-message-2",
+        "status": "succeeded"
+      },
+      "status": "succeeded",
+      "trace_id": "trace-g1-nonebot-smoke-private",
+      "updated_at_ms": 1791592371949
+    },
+    {
+      "core_epoch_created": "3ce095b3-28df-46d5-9b88-7879ca00fe4f",
+      "created_at_ms": 1791592372015,
+      "dispatched_core_epoch": "3ce095b3-28df-46d5-9b88-7879ca00fe4f",
+      "dispatched_lease_epoch": 1,
+      "dispatched_lease_id": "9ac0074c-2b4c-4e05-bbac-b0c3fd332d9f",
+      "fingerprint": "e94965e1c2d7599650ecc0d9269cc78dd4b05a3482329bffe2bac7a6696d79cc",
+      "grant_id": "koishi-smoke-send-grant",
+      "host_epoch": 2,
+      "key": {
+        "account_id": "9000",
+        "client_id": "ligamina-smoke-client",
+        "operation": "send_message",
+        "operation_id": "2029a274-c59a-4174-a2cc-000531445427"
+      },
+      "operation_payload": {
+        "account_id": "9000",
+        "operation": "send_message",
+        "operation_id": "2029a274-c59a-4174-a2cc-000531445427",
+        "params": {
+          "message": [
+            {
+              "text": "koishi:group:smoke-koishi-smoke-group",
+              "type": "text"
+            }
+          ]
+        },
+        "target": {
+          "id": "72",
+          "kind": "group"
+        },
+        "trace_id": "trace-g1-koishi-smoke-group"
+      },
+      "principal": {
+        "id": "koishi-smoke",
+        "kind": "host"
+      },
+      "result": {
+        "data": null,
+        "error": null,
+        "evidence_ref": "ligamina-smoke://gateway/virtual-message-3",
+        "observed_at_ms": 1791592372055,
+        "platform_message_id": "virtual-message-3",
+        "status": "succeeded"
+      },
+      "status": "succeeded",
+      "trace_id": "trace-g1-koishi-smoke-group",
+      "updated_at_ms": 1791592372056
+    },
+    {
+      "core_epoch_created": "3ce095b3-28df-46d5-9b88-7879ca00fe4f",
+      "created_at_ms": 1791592372062,
+      "dispatched_core_epoch": "3ce095b3-28df-46d5-9b88-7879ca00fe4f",
+      "dispatched_lease_epoch": 1,
+      "dispatched_lease_id": "9ac0074c-2b4c-4e05-bbac-b0c3fd332d9f",
+      "fingerprint": "d887a805f1cbf14059745bd293784e929318d90544e6207c68a4f840f12892b3",
+      "grant_id": "koishi-smoke-send-grant",
+      "host_epoch": 2,
+      "key": {
+        "account_id": "9000",
+        "client_id": "ligamina-smoke-client",
+        "operation": "send_message",
+        "operation_id": "94baed60-5ce5-4062-bc45-1b91dfabf914"
+      },
+      "operation_payload": {
+        "account_id": "9000",
+        "operation": "send_message",
+        "operation_id": "94baed60-5ce5-4062-bc45-1b91dfabf914",
+        "params": {
+          "message": [
+            {
+              "text": "koishi:private:smoke-koishi-smoke-private",
+              "type": "text"
+            }
+          ]
+        },
+        "target": {
+          "id": "24",
+          "kind": "private"
+        },
+        "trace_id": "trace-g1-koishi-smoke-private"
+      },
+      "principal": {
+        "id": "koishi-smoke",
+        "kind": "host"
+      },
+      "result": {
+        "data": null,
+        "error": null,
+        "evidence_ref": "ligamina-smoke://gateway/virtual-message-4",
+        "observed_at_ms": 1791592372111,
+        "platform_message_id": "virtual-message-4",
+        "status": "succeeded"
+      },
+      "status": "succeeded",
+      "trace_id": "trace-g1-koishi-smoke-private",
+      "updated_at_ms": 1791592372111
+    }
+  ],
+  "injected_host_crash": {
+    "signal": "SIGKILL",
+    "pid": 532
+  },
+  "after_crash_status": {
+    "core_epoch": "3ce095b3-28df-46d5-9b88-7879ca00fe4f",
+    "hosts": [
+      {
+        "epoch": 2,
+        "id": "koishi-smoke",
+        "last_error": null,
+        "pid": 537,
+        "restart_count": 0,
+        "state": "active"
+      },
+      {
+        "epoch": 3,
+        "id": "nonebot-smoke",
+        "last_error": "process exited without an exit code",
+        "pid": null,
+        "restart_count": 0,
+        "state": "failed"
+      }
+    ],
+    "schema_version": 2
+  },
+  "revoked_capability_attempt": {
+    "error": {
+      "code": "invocation_failed",
+      "message": "capability ligamina.nonebot.math.add is not registered"
+    }
+  },
+  "ended_at": "2026-10-10T00:33:02.628Z",
+  "duration_seconds": 21.36
+}

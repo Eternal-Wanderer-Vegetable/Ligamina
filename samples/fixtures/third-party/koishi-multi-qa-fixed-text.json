@@ -1,0 +1,20 @@
+{
+  "fixture_id": "koishi-multi-qa-fixed-text-v1",
+  "conversation": {"kind": "group", "id": "4242"},
+  "actor_id": "2323",
+  "input_texts": ["ligamina-probe"],
+  "plugin_config": {
+    "rules": [
+      {
+        "triggers": ["ligamina-probe"],
+        "replies": [{"type": "text", "content": "ligamina-multiqa-ok"}],
+        "useRegex": false,
+        "fuzzy": false
+      }
+    ],
+    "cooldown": 0
+  },
+  "expected_target": {"kind": "group", "id": "4242"},
+  "expected_outgoing_texts": ["ligamina-multiqa-ok"],
+  "notes": "Tests the upstream fixed-text trigger/reply path; image and file paths are outside this fixture."
+}

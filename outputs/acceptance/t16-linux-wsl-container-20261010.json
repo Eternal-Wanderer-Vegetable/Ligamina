@@ -1,0 +1,75 @@
+{
+  "task": "T16",
+  "evidence_date": "2026-10-10",
+  "status": "passed",
+  "gate": "PASS",
+  "scope": "C15 single-container Linux acceptance smoke",
+  "environment": {
+    "wsl_distribution": "Ubuntu 24.04.5",
+    "docker_engine": "Docker Desktop desktop-linux",
+    "docker_client_server": "29.7.2",
+    "platform": "linux/amd64"
+  },
+  "image": {
+    "reference": "ligamina:0.1.0",
+    "manifest_digest": "sha256:7043deaf1a5afac7d0c7b0bc9db35f076179c27fd3ee472a8eec97b31c4dd5bc",
+    "pinned_base_images": {
+      "rust": "sha256:39f68a3e8e3ff425f8945ffa91128e60ff930d53e17fbb5214e95824bdd46f1b",
+      "python": "sha256:1aaa65a85fda306ffb8b910824d4e93bdce61e212c7e87168123ea3073b41a1a",
+      "node": "sha256:6642ef280aebc09c4541bee0b15c9f89f0f3f3c247ddee79ae1d37eddfdcbbaa"
+    }
+  },
+  "checks": [
+    {
+      "id": "wsl-rust-workspace",
+      "status": "passed",
+      "evidence": "cargo fmt --all -- --check and CARGO_NET_OFFLINE=true cargo test --workspace --locked --offline; all workspace tests passed, including the explicit non-loopback listen opt-in test"
+    },
+    {
+      "id": "locked-container-build",
+      "status": "passed",
+      "evidence": "WSL initiated a linux/amd64 Docker build with Rust, CPython, Node, uv, Python and npm dependencies pinned or locked"
+    },
+    {
+      "id": "service-health-and-doctor",
+      "status": "passed",
+      "evidence": "container health became healthy; Core status and doctor returned passed with both Hosts active and restart_count 0"
+    },
+    {
+      "id": "loopback-publication",
+      "status": "passed",
+      "evidence": "Docker inspect showed 127.0.0.1:26789 mapped to container port 26701; a WSL client received HTTP 200 from /v1/status"
+    },
+    {
+      "id": "host_profiles",
+      "status": "passed",
+      "evidence": "Koishi-only run activated Koishi and left NoneBot disabled with no PID; NoneBot-only run activated NoneBot and left Koishi disabled with no PID"
+    },
+    {
+      "id": "container_api_smoke",
+      "status": "passed",
+      "evidence": "published HTTP API invoked both Host math capabilities with result 42; valid OneBot v11 numeric-ID events were accepted and completed on both Hosts"
+    },
+    {
+      "id": "volume_persistence",
+      "status": "passed",
+      "evidence": "the Core SQLite database existed in /var/lib/ligamina; a marker under the Koishi data directory and the SQLite file remained after Compose down/up with the named volume retained"
+    },
+    {
+      "id": "container_security_and_cleanup",
+      "status": "passed",
+      "evidence": "inspect showed a read-only root filesystem, cap_drop ALL, read-only daemon config, and no Docker socket mount; Compose down stopped and removed the container while retaining the volume; the temporary test volume and test credentials were then removed"
+    }
+  ],
+  "implementation_findings_fixed": [
+    "Added a default-false allow_non_loopback_listen setting; container entrypoint opts in because Docker bridge forwarding needs a container-interface listener, while Compose publishes only on host loopback.",
+    "Copied contracts/v0.1 into the runtime image because both Workers read the shared schemas at startup.",
+    "Moved the pinned NoneBot FastAPI driver extra into production dependencies so the locked runtime can start its selected driver.",
+    "Added a valid unconnected example Gateway registration so Core startup validation passes without granting platform operations."
+  ],
+  "limitations": [
+    "The example Gateway is unconnected and has no operation grants; no real chat platform send or receipt was exercised.",
+    "The container ran on Docker Desktop's desktop-linux engine because Docker integration is disabled inside the WSL distribution. The build and Linux-side validation commands were initiated from local WSL.",
+    "This T16 result does not close G2. T13's complete WSL third-party matrix, T14's 24-hour resource run, full T15 clean-VM acceptance, T17 CI, and T18 final acceptance remain open."
+  ]
+}

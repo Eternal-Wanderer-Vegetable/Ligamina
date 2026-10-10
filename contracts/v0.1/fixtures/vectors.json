@@ -1,0 +1,22 @@
+{
+  "event_schema": [
+    { "name": "large decimal identifiers remain strings", "file": "event.large-ids.json", "valid": true, "error_code": null },
+    { "name": "private conversation identity is explicit", "file": "event.private.json", "valid": true, "error_code": null },
+    { "name": "missing required trace id is rejected", "file": "event.missing-trace.json", "valid": false, "error_code": "invalid_request" },
+    { "name": "numeric large identifiers are rejected", "file": "event.numeric-large-id.json", "valid": false, "error_code": "invalid_request" },
+    { "name": "unknown message segment is rejected", "file": "event.bad-segment.json", "valid": false, "error_code": "invalid_request" },
+    { "name": "unknown conversation kind is rejected", "file": "event.bad-conversation-kind.json", "valid": false, "error_code": "invalid_request" },
+    { "name": "incompatible protocol version is rejected", "file": "event.incompatible-version.json", "valid": false, "error_code": "protocol_mismatch" }
+  ],
+  "operation_schema": [
+    { "name": "send message request is structurally valid", "file": "operation.send-message.json", "valid": true },
+    { "name": "same operation id and payload is idempotent", "existing": "operation.send-message.json", "incoming": "operation.same-retry.json", "outcome": "idempotent" },
+    { "name": "same operation id with changed payload conflicts", "existing": "operation.send-message.json", "incoming": "operation.changed-retry.json", "outcome": "operation_conflict" },
+    { "name": "unknown operation is structurally valid but unsupported", "file": "operation.unsupported.json", "valid": true, "outcome": "unsupported_api" }
+  ],
+  "capability_descriptor": [
+    { "name": "NoneBot pure addition capability", "file": "capability.nonebot-add.json", "valid": true },
+    { "name": "Koishi pure addition capability", "file": "capability.koishi-add.json", "valid": true },
+    { "name": "side-effect capability is rejected in T10", "file": "capability.impure.json", "valid": false }
+  ]
+}

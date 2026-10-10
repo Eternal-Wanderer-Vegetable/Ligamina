@@ -1,0 +1,1686 @@
+{
+  "suite": "stability",
+  "platform": "linux",
+  "status": "completed",
+  "gate": "NOT READY",
+  "started_at": "2026-10-10T01:55:26.217Z",
+  "configuration": {
+    "cycles_per_host": 1,
+    "duration_hours": 0.0,
+    "sampling_interval_seconds": 1.0,
+    "warmup_minutes": 30.0,
+    "resource_growth_limit": "max(20 MiB, 10%)",
+    "capability_revocation_seconds": 5,
+    "recovery_seconds": 30,
+    "shutdown_seconds": 10
+  },
+  "build_steps": [],
+  "recovery_cycles": [
+    {
+      "host_id": "nonebot-smoke",
+      "attempt": 1,
+      "status": "passed",
+      "old_pid": 3765,
+      "kill": {
+        "signal": "SIGKILL",
+        "pid": 3765
+      },
+      "revocation_seconds": 0.105,
+      "capabilities_after_revocation": [
+        {
+          "descriptor": {
+            "capability_id": "ligamina.koishi.math.add",
+            "input_schema": {
+              "additionalProperties": false,
+              "properties": {
+                "left": {
+                  "maximum": 9007199254740991,
+                  "minimum": -9007199254740991,
+                  "type": "integer"
+                },
+                "right": {
+                  "maximum": 9007199254740991,
+                  "minimum": -9007199254740991,
+                  "type": "integer"
+                }
+              },
+              "required": [
+                "left",
+                "right"
+              ],
+              "type": "object"
+            },
+            "output_schema": {
+              "maximum": 9007199254740991,
+              "minimum": -9007199254740991,
+              "type": "integer"
+            },
+            "pure": true
+          },
+          "host_epoch": 2,
+          "host_id": "koishi-smoke"
+        }
+      ],
+      "old_process_reaped": true,
+      "new_pid": 3816,
+      "restart_count": 1,
+      "recovery_seconds": 0.417,
+      "restored_capabilities": [
+        "ligamina.nonebot.math.add"
+      ],
+      "sibling_state": "active",
+      "capability_result": 42
+    },
+    {
+      "host_id": "koishi-smoke",
+      "attempt": 1,
+      "status": "passed",
+      "old_pid": 3770,
+      "kill": {
+        "signal": "SIGKILL",
+        "pid": 3770
+      },
+      "revocation_seconds": 0.104,
+      "capabilities_after_revocation": [
+        {
+          "descriptor": {
+            "capability_id": "ligamina.nonebot.math.add",
+            "input_schema": {
+              "additionalProperties": false,
+              "properties": {
+                "left": {
+                  "maximum": 9007199254740991,
+                  "minimum": -9007199254740991,
+                  "type": "integer"
+                },
+                "right": {
+                  "maximum": 9007199254740991,
+                  "minimum": -9007199254740991,
+                  "type": "integer"
+                }
+              },
+              "required": [
+                "left",
+                "right"
+              ],
+              "type": "object"
+            },
+            "output_schema": {
+              "maximum": 9007199254740991,
+              "minimum": -9007199254740991,
+              "type": "integer"
+            },
+            "pure": true
+          },
+          "host_epoch": 3,
+          "host_id": "nonebot-smoke"
+        }
+      ],
+      "old_process_reaped": true,
+      "new_pid": 3821,
+      "restart_count": 1,
+      "recovery_seconds": 0.417,
+      "restored_capabilities": [
+        "ligamina.koishi.math.add"
+      ],
+      "sibling_state": "active",
+      "capability_result": 42
+    }
+  ],
+  "monitor_samples": [
+    {
+      "at": "2026-10-10T01:55:27.867Z",
+      "elapsed_seconds": 0.0,
+      "components": {
+        "core": {
+          "pid": 3745,
+          "rss_bytes": 25993216
+        },
+        "nonebot-smoke": {
+          "pid": 3816,
+          "rss_bytes": 37646336,
+          "state": "active",
+          "restart_count": 1
+        },
+        "koishi-smoke": {
+          "pid": 3821,
+          "rss_bytes": 121491456,
+          "state": "active",
+          "restart_count": 1
+        }
+      },
+      "registered_capability_count": 2,
+      "registered_capabilities": [
+        {
+          "host_id": "koishi-smoke",
+          "capability_id": "ligamina.koishi.math.add"
+        },
+        {
+          "host_id": "nonebot-smoke",
+          "capability_id": "ligamina.nonebot.math.add"
+        }
+      ],
+      "status": "passed",
+      "probe_results": {
+        "nonebot-smoke": 42,
+        "koishi-smoke": 42
+      }
+    }
+  ],
+  "http_requests": [
+    {
+      "method": "GET",
+      "path": "/v1/status",
+      "request": null,
+      "status": 200,
+      "response": {
+        "core_epoch": "2de8b8bd-696a-4cc9-b3ab-68df649f4f3c",
+        "hosts": [
+          {
+            "epoch": 2,
+            "id": "koishi-smoke",
+            "last_error": null,
+            "pid": 3770,
+            "restart_count": 0,
+            "state": "active"
+          },
+          {
+            "epoch": 2,
+            "id": "nonebot-smoke",
+            "last_error": null,
+            "pid": 3765,
+            "restart_count": 0,
+            "state": "active"
+          }
+        ],
+        "schema_version": 2
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/v1/status",
+      "request": null,
+      "status": 200,
+      "response": {
+        "core_epoch": "2de8b8bd-696a-4cc9-b3ab-68df649f4f3c",
+        "hosts": [
+          {
+            "epoch": 2,
+            "id": "koishi-smoke",
+            "last_error": null,
+            "pid": 3770,
+            "restart_count": 0,
+            "state": "active"
+          },
+          {
+            "epoch": 2,
+            "id": "nonebot-smoke",
+            "last_error": null,
+            "pid": 3765,
+            "restart_count": 0,
+            "state": "active"
+          }
+        ],
+        "schema_version": 2
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/v1/capabilities",
+      "request": null,
+      "status": 200,
+      "response": {
+        "capabilities": [
+          {
+            "descriptor": {
+              "capability_id": "ligamina.koishi.math.add",
+              "input_schema": {
+                "additionalProperties": false,
+                "properties": {
+                  "left": {
+                    "maximum": 9007199254740991,
+                    "minimum": -9007199254740991,
+                    "type": "integer"
+                  },
+                  "right": {
+                    "maximum": 9007199254740991,
+                    "minimum": -9007199254740991,
+                    "type": "integer"
+                  }
+                },
+                "required": [
+                  "left",
+                  "right"
+                ],
+                "type": "object"
+              },
+              "output_schema": {
+                "maximum": 9007199254740991,
+                "minimum": -9007199254740991,
+                "type": "integer"
+              },
+              "pure": true
+            },
+            "host_epoch": 2,
+            "host_id": "koishi-smoke"
+          },
+          {
+            "descriptor": {
+              "capability_id": "ligamina.nonebot.math.add",
+              "input_schema": {
+                "additionalProperties": false,
+                "properties": {
+                  "left": {
+                    "maximum": 9007199254740991,
+                    "minimum": -9007199254740991,
+                    "type": "integer"
+                  },
+                  "right": {
+                    "maximum": 9007199254740991,
+                    "minimum": -9007199254740991,
+                    "type": "integer"
+                  }
+                },
+                "required": [
+                  "left",
+                  "right"
+                ],
+                "type": "object"
+              },
+              "output_schema": {
+                "maximum": 9007199254740991,
+                "minimum": -9007199254740991,
+                "type": "integer"
+              },
+              "pure": true
+            },
+            "host_epoch": 2,
+            "host_id": "nonebot-smoke"
+          }
+        ]
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/v1/status",
+      "request": null,
+      "status": 200,
+      "response": {
+        "core_epoch": "2de8b8bd-696a-4cc9-b3ab-68df649f4f3c",
+        "hosts": [
+          {
+            "epoch": 2,
+            "id": "koishi-smoke",
+            "last_error": null,
+            "pid": 3770,
+            "restart_count": 0,
+            "state": "active"
+          },
+          {
+            "epoch": 2,
+            "id": "nonebot-smoke",
+            "last_error": null,
+            "pid": 3765,
+            "restart_count": 0,
+            "state": "active"
+          }
+        ],
+        "schema_version": 2
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/v1/capabilities",
+      "request": null,
+      "status": 200,
+      "response": {
+        "capabilities": [
+          {
+            "descriptor": {
+              "capability_id": "ligamina.koishi.math.add",
+              "input_schema": {
+                "additionalProperties": false,
+                "properties": {
+                  "left": {
+                    "maximum": 9007199254740991,
+                    "minimum": -9007199254740991,
+                    "type": "integer"
+                  },
+                  "right": {
+                    "maximum": 9007199254740991,
+                    "minimum": -9007199254740991,
+                    "type": "integer"
+                  }
+                },
+                "required": [
+                  "left",
+                  "right"
+                ],
+                "type": "object"
+              },
+              "output_schema": {
+                "maximum": 9007199254740991,
+                "minimum": -9007199254740991,
+                "type": "integer"
+              },
+              "pure": true
+            },
+            "host_epoch": 2,
+            "host_id": "koishi-smoke"
+          },
+          {
+            "descriptor": {
+              "capability_id": "ligamina.nonebot.math.add",
+              "input_schema": {
+                "additionalProperties": false,
+                "properties": {
+                  "left": {
+                    "maximum": 9007199254740991,
+                    "minimum": -9007199254740991,
+                    "type": "integer"
+                  },
+                  "right": {
+                    "maximum": 9007199254740991,
+                    "minimum": -9007199254740991,
+                    "type": "integer"
+                  }
+                },
+                "required": [
+                  "left",
+                  "right"
+                ],
+                "type": "object"
+              },
+              "output_schema": {
+                "maximum": 9007199254740991,
+                "minimum": -9007199254740991,
+                "type": "integer"
+              },
+              "pure": true
+            },
+            "host_epoch": 2,
+            "host_id": "nonebot-smoke"
+          }
+        ]
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/v1/capabilities",
+      "request": null,
+      "status": 200,
+      "response": {
+        "capabilities": [
+          {
+            "descriptor": {
+              "capability_id": "ligamina.koishi.math.add",
+              "input_schema": {
+                "additionalProperties": false,
+                "properties": {
+                  "left": {
+                    "maximum": 9007199254740991,
+                    "minimum": -9007199254740991,
+                    "type": "integer"
+                  },
+                  "right": {
+                    "maximum": 9007199254740991,
+                    "minimum": -9007199254740991,
+                    "type": "integer"
+                  }
+                },
+                "required": [
+                  "left",
+                  "right"
+                ],
+                "type": "object"
+              },
+              "output_schema": {
+                "maximum": 9007199254740991,
+                "minimum": -9007199254740991,
+                "type": "integer"
+              },
+              "pure": true
+            },
+            "host_epoch": 2,
+            "host_id": "koishi-smoke"
+          },
+          {
+            "descriptor": {
+              "capability_id": "ligamina.nonebot.math.add",
+              "input_schema": {
+                "additionalProperties": false,
+                "properties": {
+                  "left": {
+                    "maximum": 9007199254740991,
+                    "minimum": -9007199254740991,
+                    "type": "integer"
+                  },
+                  "right": {
+                    "maximum": 9007199254740991,
+                    "minimum": -9007199254740991,
+                    "type": "integer"
+                  }
+                },
+                "required": [
+                  "left",
+                  "right"
+                ],
+                "type": "object"
+              },
+              "output_schema": {
+                "maximum": 9007199254740991,
+                "minimum": -9007199254740991,
+                "type": "integer"
+              },
+              "pure": true
+            },
+            "host_epoch": 2,
+            "host_id": "nonebot-smoke"
+          }
+        ]
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/v1/capabilities",
+      "request": null,
+      "status": 200,
+      "response": {
+        "capabilities": [
+          {
+            "descriptor": {
+              "capability_id": "ligamina.koishi.math.add",
+              "input_schema": {
+                "additionalProperties": false,
+                "properties": {
+                  "left": {
+                    "maximum": 9007199254740991,
+                    "minimum": -9007199254740991,
+                    "type": "integer"
+                  },
+                  "right": {
+                    "maximum": 9007199254740991,
+                    "minimum": -9007199254740991,
+                    "type": "integer"
+                  }
+                },
+                "required": [
+                  "left",
+                  "right"
+                ],
+                "type": "object"
+              },
+              "output_schema": {
+                "maximum": 9007199254740991,
+                "minimum": -9007199254740991,
+                "type": "integer"
+              },
+              "pure": true
+            },
+            "host_epoch": 2,
+            "host_id": "koishi-smoke"
+          }
+        ]
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/v1/status",
+      "request": null,
+      "status": 200,
+      "response": {
+        "core_epoch": "2de8b8bd-696a-4cc9-b3ab-68df649f4f3c",
+        "hosts": [
+          {
+            "epoch": 2,
+            "id": "koishi-smoke",
+            "last_error": null,
+            "pid": 3770,
+            "restart_count": 0,
+            "state": "active"
+          },
+          {
+            "epoch": 3,
+            "id": "nonebot-smoke",
+            "last_error": "process exited without an exit code",
+            "pid": 3816,
+            "restart_count": 1,
+            "state": "starting"
+          }
+        ],
+        "schema_version": 2
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/v1/status",
+      "request": null,
+      "status": 200,
+      "response": {
+        "core_epoch": "2de8b8bd-696a-4cc9-b3ab-68df649f4f3c",
+        "hosts": [
+          {
+            "epoch": 2,
+            "id": "koishi-smoke",
+            "last_error": null,
+            "pid": 3770,
+            "restart_count": 0,
+            "state": "active"
+          },
+          {
+            "epoch": 3,
+            "id": "nonebot-smoke",
+            "last_error": "process exited without an exit code",
+            "pid": 3816,
+            "restart_count": 1,
+            "state": "starting"
+          }
+        ],
+        "schema_version": 2
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/v1/status",
+      "request": null,
+      "status": 200,
+      "response": {
+        "core_epoch": "2de8b8bd-696a-4cc9-b3ab-68df649f4f3c",
+        "hosts": [
+          {
+            "epoch": 2,
+            "id": "koishi-smoke",
+            "last_error": null,
+            "pid": 3770,
+            "restart_count": 0,
+            "state": "active"
+          },
+          {
+            "epoch": 3,
+            "id": "nonebot-smoke",
+            "last_error": "process exited without an exit code",
+            "pid": 3816,
+            "restart_count": 1,
+            "state": "starting"
+          }
+        ],
+        "schema_version": 2
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/v1/status",
+      "request": null,
+      "status": 200,
+      "response": {
+        "core_epoch": "2de8b8bd-696a-4cc9-b3ab-68df649f4f3c",
+        "hosts": [
+          {
+            "epoch": 2,
+            "id": "koishi-smoke",
+            "last_error": null,
+            "pid": 3770,
+            "restart_count": 0,
+            "state": "active"
+          },
+          {
+            "epoch": 3,
+            "id": "nonebot-smoke",
+            "last_error": "process exited without an exit code",
+            "pid": 3816,
+            "restart_count": 1,
+            "state": "starting"
+          }
+        ],
+        "schema_version": 2
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/v1/status",
+      "request": null,
+      "status": 200,
+      "response": {
+        "core_epoch": "2de8b8bd-696a-4cc9-b3ab-68df649f4f3c",
+        "hosts": [
+          {
+            "epoch": 2,
+            "id": "koishi-smoke",
+            "last_error": null,
+            "pid": 3770,
+            "restart_count": 0,
+            "state": "active"
+          },
+          {
+            "epoch": 3,
+            "id": "nonebot-smoke",
+            "last_error": "process exited without an exit code",
+            "pid": 3816,
+            "restart_count": 1,
+            "state": "starting"
+          }
+        ],
+        "schema_version": 2
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/v1/status",
+      "request": null,
+      "status": 200,
+      "response": {
+        "core_epoch": "2de8b8bd-696a-4cc9-b3ab-68df649f4f3c",
+        "hosts": [
+          {
+            "epoch": 2,
+            "id": "koishi-smoke",
+            "last_error": null,
+            "pid": 3770,
+            "restart_count": 0,
+            "state": "active"
+          },
+          {
+            "epoch": 3,
+            "id": "nonebot-smoke",
+            "last_error": "process exited without an exit code",
+            "pid": 3816,
+            "restart_count": 1,
+            "state": "starting"
+          }
+        ],
+        "schema_version": 2
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/v1/status",
+      "request": null,
+      "status": 200,
+      "response": {
+        "core_epoch": "2de8b8bd-696a-4cc9-b3ab-68df649f4f3c",
+        "hosts": [
+          {
+            "epoch": 2,
+            "id": "koishi-smoke",
+            "last_error": null,
+            "pid": 3770,
+            "restart_count": 0,
+            "state": "active"
+          },
+          {
+            "epoch": 3,
+            "id": "nonebot-smoke",
+            "last_error": null,
+            "pid": 3816,
+            "restart_count": 1,
+            "state": "active"
+          }
+        ],
+        "schema_version": 2
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/v1/capabilities",
+      "request": null,
+      "status": 200,
+      "response": {
+        "capabilities": [
+          {
+            "descriptor": {
+              "capability_id": "ligamina.koishi.math.add",
+              "input_schema": {
+                "additionalProperties": false,
+                "properties": {
+                  "left": {
+                    "maximum": 9007199254740991,
+                    "minimum": -9007199254740991,
+                    "type": "integer"
+                  },
+                  "right": {
+                    "maximum": 9007199254740991,
+                    "minimum": -9007199254740991,
+                    "type": "integer"
+                  }
+                },
+                "required": [
+                  "left",
+                  "right"
+                ],
+                "type": "object"
+              },
+              "output_schema": {
+                "maximum": 9007199254740991,
+                "minimum": -9007199254740991,
+                "type": "integer"
+              },
+              "pure": true
+            },
+            "host_epoch": 2,
+            "host_id": "koishi-smoke"
+          },
+          {
+            "descriptor": {
+              "capability_id": "ligamina.nonebot.math.add",
+              "input_schema": {
+                "additionalProperties": false,
+                "properties": {
+                  "left": {
+                    "maximum": 9007199254740991,
+                    "minimum": -9007199254740991,
+                    "type": "integer"
+                  },
+                  "right": {
+                    "maximum": 9007199254740991,
+                    "minimum": -9007199254740991,
+                    "type": "integer"
+                  }
+                },
+                "required": [
+                  "left",
+                  "right"
+                ],
+                "type": "object"
+              },
+              "output_schema": {
+                "maximum": 9007199254740991,
+                "minimum": -9007199254740991,
+                "type": "integer"
+              },
+              "pure": true
+            },
+            "host_epoch": 3,
+            "host_id": "nonebot-smoke"
+          }
+        ]
+      }
+    },
+    {
+      "method": "POST",
+      "path": "/v1/invocations",
+      "request": {
+        "capability_id": "ligamina.nonebot.math.add",
+        "arguments": {
+          "left": 19,
+          "right": 23
+        }
+      },
+      "status": 200,
+      "response": {
+        "result": 42
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/v1/status",
+      "request": null,
+      "status": 200,
+      "response": {
+        "core_epoch": "2de8b8bd-696a-4cc9-b3ab-68df649f4f3c",
+        "hosts": [
+          {
+            "epoch": 2,
+            "id": "koishi-smoke",
+            "last_error": null,
+            "pid": 3770,
+            "restart_count": 0,
+            "state": "active"
+          },
+          {
+            "epoch": 3,
+            "id": "nonebot-smoke",
+            "last_error": null,
+            "pid": 3816,
+            "restart_count": 1,
+            "state": "active"
+          }
+        ],
+        "schema_version": 2
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/v1/capabilities",
+      "request": null,
+      "status": 200,
+      "response": {
+        "capabilities": [
+          {
+            "descriptor": {
+              "capability_id": "ligamina.koishi.math.add",
+              "input_schema": {
+                "additionalProperties": false,
+                "properties": {
+                  "left": {
+                    "maximum": 9007199254740991,
+                    "minimum": -9007199254740991,
+                    "type": "integer"
+                  },
+                  "right": {
+                    "maximum": 9007199254740991,
+                    "minimum": -9007199254740991,
+                    "type": "integer"
+                  }
+                },
+                "required": [
+                  "left",
+                  "right"
+                ],
+                "type": "object"
+              },
+              "output_schema": {
+                "maximum": 9007199254740991,
+                "minimum": -9007199254740991,
+                "type": "integer"
+              },
+              "pure": true
+            },
+            "host_epoch": 2,
+            "host_id": "koishi-smoke"
+          },
+          {
+            "descriptor": {
+              "capability_id": "ligamina.nonebot.math.add",
+              "input_schema": {
+                "additionalProperties": false,
+                "properties": {
+                  "left": {
+                    "maximum": 9007199254740991,
+                    "minimum": -9007199254740991,
+                    "type": "integer"
+                  },
+                  "right": {
+                    "maximum": 9007199254740991,
+                    "minimum": -9007199254740991,
+                    "type": "integer"
+                  }
+                },
+                "required": [
+                  "left",
+                  "right"
+                ],
+                "type": "object"
+              },
+              "output_schema": {
+                "maximum": 9007199254740991,
+                "minimum": -9007199254740991,
+                "type": "integer"
+              },
+              "pure": true
+            },
+            "host_epoch": 3,
+            "host_id": "nonebot-smoke"
+          }
+        ]
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/v1/capabilities",
+      "request": null,
+      "status": 200,
+      "response": {
+        "capabilities": [
+          {
+            "descriptor": {
+              "capability_id": "ligamina.koishi.math.add",
+              "input_schema": {
+                "additionalProperties": false,
+                "properties": {
+                  "left": {
+                    "maximum": 9007199254740991,
+                    "minimum": -9007199254740991,
+                    "type": "integer"
+                  },
+                  "right": {
+                    "maximum": 9007199254740991,
+                    "minimum": -9007199254740991,
+                    "type": "integer"
+                  }
+                },
+                "required": [
+                  "left",
+                  "right"
+                ],
+                "type": "object"
+              },
+              "output_schema": {
+                "maximum": 9007199254740991,
+                "minimum": -9007199254740991,
+                "type": "integer"
+              },
+              "pure": true
+            },
+            "host_epoch": 2,
+            "host_id": "koishi-smoke"
+          },
+          {
+            "descriptor": {
+              "capability_id": "ligamina.nonebot.math.add",
+              "input_schema": {
+                "additionalProperties": false,
+                "properties": {
+                  "left": {
+                    "maximum": 9007199254740991,
+                    "minimum": -9007199254740991,
+                    "type": "integer"
+                  },
+                  "right": {
+                    "maximum": 9007199254740991,
+                    "minimum": -9007199254740991,
+                    "type": "integer"
+                  }
+                },
+                "required": [
+                  "left",
+                  "right"
+                ],
+                "type": "object"
+              },
+              "output_schema": {
+                "maximum": 9007199254740991,
+                "minimum": -9007199254740991,
+                "type": "integer"
+              },
+              "pure": true
+            },
+            "host_epoch": 3,
+            "host_id": "nonebot-smoke"
+          }
+        ]
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/v1/capabilities",
+      "request": null,
+      "status": 200,
+      "response": {
+        "capabilities": [
+          {
+            "descriptor": {
+              "capability_id": "ligamina.nonebot.math.add",
+              "input_schema": {
+                "additionalProperties": false,
+                "properties": {
+                  "left": {
+                    "maximum": 9007199254740991,
+                    "minimum": -9007199254740991,
+                    "type": "integer"
+                  },
+                  "right": {
+                    "maximum": 9007199254740991,
+                    "minimum": -9007199254740991,
+                    "type": "integer"
+                  }
+                },
+                "required": [
+                  "left",
+                  "right"
+                ],
+                "type": "object"
+              },
+              "output_schema": {
+                "maximum": 9007199254740991,
+                "minimum": -9007199254740991,
+                "type": "integer"
+              },
+              "pure": true
+            },
+            "host_epoch": 3,
+            "host_id": "nonebot-smoke"
+          }
+        ]
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/v1/status",
+      "request": null,
+      "status": 200,
+      "response": {
+        "core_epoch": "2de8b8bd-696a-4cc9-b3ab-68df649f4f3c",
+        "hosts": [
+          {
+            "epoch": 3,
+            "id": "koishi-smoke",
+            "last_error": "process exited without an exit code",
+            "pid": null,
+            "restart_count": 1,
+            "state": "backoff"
+          },
+          {
+            "epoch": 3,
+            "id": "nonebot-smoke",
+            "last_error": null,
+            "pid": 3816,
+            "restart_count": 1,
+            "state": "active"
+          }
+        ],
+        "schema_version": 2
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/v1/status",
+      "request": null,
+      "status": 200,
+      "response": {
+        "core_epoch": "2de8b8bd-696a-4cc9-b3ab-68df649f4f3c",
+        "hosts": [
+          {
+            "epoch": 3,
+            "id": "koishi-smoke",
+            "last_error": "process exited without an exit code",
+            "pid": 3821,
+            "restart_count": 1,
+            "state": "starting"
+          },
+          {
+            "epoch": 3,
+            "id": "nonebot-smoke",
+            "last_error": null,
+            "pid": 3816,
+            "restart_count": 1,
+            "state": "active"
+          }
+        ],
+        "schema_version": 2
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/v1/status",
+      "request": null,
+      "status": 200,
+      "response": {
+        "core_epoch": "2de8b8bd-696a-4cc9-b3ab-68df649f4f3c",
+        "hosts": [
+          {
+            "epoch": 3,
+            "id": "koishi-smoke",
+            "last_error": "process exited without an exit code",
+            "pid": 3821,
+            "restart_count": 1,
+            "state": "starting"
+          },
+          {
+            "epoch": 3,
+            "id": "nonebot-smoke",
+            "last_error": null,
+            "pid": 3816,
+            "restart_count": 1,
+            "state": "active"
+          }
+        ],
+        "schema_version": 2
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/v1/status",
+      "request": null,
+      "status": 200,
+      "response": {
+        "core_epoch": "2de8b8bd-696a-4cc9-b3ab-68df649f4f3c",
+        "hosts": [
+          {
+            "epoch": 3,
+            "id": "koishi-smoke",
+            "last_error": "process exited without an exit code",
+            "pid": 3821,
+            "restart_count": 1,
+            "state": "starting"
+          },
+          {
+            "epoch": 3,
+            "id": "nonebot-smoke",
+            "last_error": null,
+            "pid": 3816,
+            "restart_count": 1,
+            "state": "active"
+          }
+        ],
+        "schema_version": 2
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/v1/status",
+      "request": null,
+      "status": 200,
+      "response": {
+        "core_epoch": "2de8b8bd-696a-4cc9-b3ab-68df649f4f3c",
+        "hosts": [
+          {
+            "epoch": 3,
+            "id": "koishi-smoke",
+            "last_error": null,
+            "pid": 3821,
+            "restart_count": 1,
+            "state": "active"
+          },
+          {
+            "epoch": 3,
+            "id": "nonebot-smoke",
+            "last_error": null,
+            "pid": 3816,
+            "restart_count": 1,
+            "state": "active"
+          }
+        ],
+        "schema_version": 2
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/v1/capabilities",
+      "request": null,
+      "status": 200,
+      "response": {
+        "capabilities": [
+          {
+            "descriptor": {
+              "capability_id": "ligamina.nonebot.math.add",
+              "input_schema": {
+                "additionalProperties": false,
+                "properties": {
+                  "left": {
+                    "maximum": 9007199254740991,
+                    "minimum": -9007199254740991,
+                    "type": "integer"
+                  },
+                  "right": {
+                    "maximum": 9007199254740991,
+                    "minimum": -9007199254740991,
+                    "type": "integer"
+                  }
+                },
+                "required": [
+                  "left",
+                  "right"
+                ],
+                "type": "object"
+              },
+              "output_schema": {
+                "maximum": 9007199254740991,
+                "minimum": -9007199254740991,
+                "type": "integer"
+              },
+              "pure": true
+            },
+            "host_epoch": 3,
+            "host_id": "nonebot-smoke"
+          }
+        ]
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/v1/capabilities",
+      "request": null,
+      "status": 200,
+      "response": {
+        "capabilities": [
+          {
+            "descriptor": {
+              "capability_id": "ligamina.nonebot.math.add",
+              "input_schema": {
+                "additionalProperties": false,
+                "properties": {
+                  "left": {
+                    "maximum": 9007199254740991,
+                    "minimum": -9007199254740991,
+                    "type": "integer"
+                  },
+                  "right": {
+                    "maximum": 9007199254740991,
+                    "minimum": -9007199254740991,
+                    "type": "integer"
+                  }
+                },
+                "required": [
+                  "left",
+                  "right"
+                ],
+                "type": "object"
+              },
+              "output_schema": {
+                "maximum": 9007199254740991,
+                "minimum": -9007199254740991,
+                "type": "integer"
+              },
+              "pure": true
+            },
+            "host_epoch": 3,
+            "host_id": "nonebot-smoke"
+          }
+        ]
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/v1/capabilities",
+      "request": null,
+      "status": 200,
+      "response": {
+        "capabilities": [
+          {
+            "descriptor": {
+              "capability_id": "ligamina.koishi.math.add",
+              "input_schema": {
+                "additionalProperties": false,
+                "properties": {
+                  "left": {
+                    "maximum": 9007199254740991,
+                    "minimum": -9007199254740991,
+                    "type": "integer"
+                  },
+                  "right": {
+                    "maximum": 9007199254740991,
+                    "minimum": -9007199254740991,
+                    "type": "integer"
+                  }
+                },
+                "required": [
+                  "left",
+                  "right"
+                ],
+                "type": "object"
+              },
+              "output_schema": {
+                "maximum": 9007199254740991,
+                "minimum": -9007199254740991,
+                "type": "integer"
+              },
+              "pure": true
+            },
+            "host_epoch": 3,
+            "host_id": "koishi-smoke"
+          },
+          {
+            "descriptor": {
+              "capability_id": "ligamina.nonebot.math.add",
+              "input_schema": {
+                "additionalProperties": false,
+                "properties": {
+                  "left": {
+                    "maximum": 9007199254740991,
+                    "minimum": -9007199254740991,
+                    "type": "integer"
+                  },
+                  "right": {
+                    "maximum": 9007199254740991,
+                    "minimum": -9007199254740991,
+                    "type": "integer"
+                  }
+                },
+                "required": [
+                  "left",
+                  "right"
+                ],
+                "type": "object"
+              },
+              "output_schema": {
+                "maximum": 9007199254740991,
+                "minimum": -9007199254740991,
+                "type": "integer"
+              },
+              "pure": true
+            },
+            "host_epoch": 3,
+            "host_id": "nonebot-smoke"
+          }
+        ]
+      }
+    },
+    {
+      "method": "POST",
+      "path": "/v1/invocations",
+      "request": {
+        "capability_id": "ligamina.koishi.math.add",
+        "arguments": {
+          "left": 19,
+          "right": 23
+        }
+      },
+      "status": 200,
+      "response": {
+        "result": 42
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/v1/status",
+      "request": null,
+      "status": 200,
+      "response": {
+        "core_epoch": "2de8b8bd-696a-4cc9-b3ab-68df649f4f3c",
+        "hosts": [
+          {
+            "epoch": 3,
+            "id": "koishi-smoke",
+            "last_error": null,
+            "pid": 3821,
+            "restart_count": 1,
+            "state": "active"
+          },
+          {
+            "epoch": 3,
+            "id": "nonebot-smoke",
+            "last_error": null,
+            "pid": 3816,
+            "restart_count": 1,
+            "state": "active"
+          }
+        ],
+        "schema_version": 2
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/v1/capabilities",
+      "request": null,
+      "status": 200,
+      "response": {
+        "capabilities": [
+          {
+            "descriptor": {
+              "capability_id": "ligamina.koishi.math.add",
+              "input_schema": {
+                "additionalProperties": false,
+                "properties": {
+                  "left": {
+                    "maximum": 9007199254740991,
+                    "minimum": -9007199254740991,
+                    "type": "integer"
+                  },
+                  "right": {
+                    "maximum": 9007199254740991,
+                    "minimum": -9007199254740991,
+                    "type": "integer"
+                  }
+                },
+                "required": [
+                  "left",
+                  "right"
+                ],
+                "type": "object"
+              },
+              "output_schema": {
+                "maximum": 9007199254740991,
+                "minimum": -9007199254740991,
+                "type": "integer"
+              },
+              "pure": true
+            },
+            "host_epoch": 3,
+            "host_id": "koishi-smoke"
+          },
+          {
+            "descriptor": {
+              "capability_id": "ligamina.nonebot.math.add",
+              "input_schema": {
+                "additionalProperties": false,
+                "properties": {
+                  "left": {
+                    "maximum": 9007199254740991,
+                    "minimum": -9007199254740991,
+                    "type": "integer"
+                  },
+                  "right": {
+                    "maximum": 9007199254740991,
+                    "minimum": -9007199254740991,
+                    "type": "integer"
+                  }
+                },
+                "required": [
+                  "left",
+                  "right"
+                ],
+                "type": "object"
+              },
+              "output_schema": {
+                "maximum": 9007199254740991,
+                "minimum": -9007199254740991,
+                "type": "integer"
+              },
+              "pure": true
+            },
+            "host_epoch": 3,
+            "host_id": "nonebot-smoke"
+          }
+        ]
+      }
+    },
+    {
+      "method": "POST",
+      "path": "/v1/invocations",
+      "request": {
+        "capability_id": "ligamina.nonebot.math.add",
+        "arguments": {
+          "left": 19,
+          "right": 23
+        }
+      },
+      "status": 200,
+      "response": {
+        "result": 42
+      }
+    },
+    {
+      "method": "POST",
+      "path": "/v1/invocations",
+      "request": {
+        "capability_id": "ligamina.koishi.math.add",
+        "arguments": {
+          "left": 19,
+          "right": 23
+        }
+      },
+      "status": 200,
+      "response": {
+        "result": 42
+      }
+    },
+    {
+      "method": "POST",
+      "path": "/v1/shutdown",
+      "request": null,
+      "status": 202,
+      "response": null
+    }
+  ],
+  "checks": [
+    {
+      "id": "recovery_budget",
+      "status": "passed"
+    },
+    {
+      "id": "combined_monitor",
+      "status": "passed"
+    },
+    {
+      "id": "resource_budget",
+      "status": "skipped"
+    },
+    {
+      "id": "cli_status_doctor",
+      "status": "passed"
+    }
+  ],
+  "cleanup": {
+    "host_pids": [
+      3765,
+      3770,
+      3816,
+      3821
+    ],
+    "remaining_pids": [],
+    "core_exit_code": 0,
+    "shutdown_request_seconds": 0.001,
+    "daemon_wait_seconds": 0.064,
+    "shutdown_duration_seconds": 0.064,
+    "core_pid": 3745,
+    "status": "passed"
+  },
+  "build_status": "skipped",
+  "build_skip_reason": "the caller confirmed that the T12 build is already available",
+  "environment": {
+    "os": "Linux-6.18.33.2-microsoft-standard-WSL2-x86_64-with-glibc2.39",
+    "system": "Linux",
+    "architecture": "x86_64",
+    "python": "3.12.14",
+    "node": "v24.20.0",
+    "npm": "11.19.0",
+    "uv": "uv 0.12.5 (x86_64-unknown-linux-gnu)",
+    "cargo": "cargo 1.97.1 (c980f4866 2026-06-30)",
+    "rustc": "rustc 1.97.1 (8bab26f4f 2026-07-14)",
+    "lockfiles": {
+      "Cargo.lock": "617242b5952384fd6c9ca1413f7101987034d566c338aa51c9bca708c29a8ff6",
+      "hosts/nonebot/uv.lock": "d63536ae791dd2bd9e254f3e5d5951d5e8f14bd599056548d55e53126497727a",
+      "hosts/koishi/package-lock.json": "faedf756729a0764f14c633063225f57507a6b191f40d4e83f83a3097c4a1946",
+      "clients/reference/package-lock.json": "2a6bfd208047b9f18e05c19ab498aabec5f275d44d7b71a3fe9e3d76f6e73f70"
+    },
+    "sanitized_config_sha256": "3de510fc718ed540d5299899b96d8c4c728ddf92918cfc22c641dc802b550861"
+  },
+  "initial_status": {
+    "core_epoch": "2de8b8bd-696a-4cc9-b3ab-68df649f4f3c",
+    "hosts": [
+      {
+        "epoch": 2,
+        "id": "koishi-smoke",
+        "last_error": null,
+        "pid": 3770,
+        "restart_count": 0,
+        "state": "active"
+      },
+      {
+        "epoch": 2,
+        "id": "nonebot-smoke",
+        "last_error": null,
+        "pid": 3765,
+        "restart_count": 0,
+        "state": "active"
+      }
+    ],
+    "schema_version": 2
+  },
+  "baseline_capabilities": {
+    "nonebot-smoke": [
+      "ligamina.nonebot.math.add"
+    ],
+    "koishi-smoke": [
+      "ligamina.koishi.math.add"
+    ]
+  },
+  "cli_checks": [
+    {
+      "command": "status",
+      "status": "passed",
+      "returncode": 0,
+      "response": {
+        "core_epoch": "2de8b8bd-696a-4cc9-b3ab-68df649f4f3c",
+        "hosts": [
+          {
+            "epoch": 2,
+            "id": "koishi-smoke",
+            "last_error": null,
+            "pid": 3770,
+            "restart_count": 0,
+            "state": "active"
+          },
+          {
+            "epoch": 2,
+            "id": "nonebot-smoke",
+            "last_error": null,
+            "pid": 3765,
+            "restart_count": 0,
+            "state": "active"
+          }
+        ],
+        "schema_version": 2
+      },
+      "stderr": ""
+    },
+    {
+      "command": "doctor",
+      "status": "passed",
+      "returncode": 0,
+      "response": {
+        "checks": [
+          {
+            "id": "core_schema",
+            "observed": 2,
+            "status": "passed"
+          },
+          {
+            "expected_denominator": 2,
+            "id": "managed_hosts",
+            "observed": [
+              {
+                "id": "koishi-smoke",
+                "last_error": null,
+                "pid": 3770,
+                "restart_count": 0,
+                "state": "active",
+                "status": "passed"
+              },
+              {
+                "id": "nonebot-smoke",
+                "last_error": null,
+                "pid": 3765,
+                "restart_count": 0,
+                "state": "active",
+                "status": "passed"
+              }
+            ],
+            "status": "passed"
+          }
+        ],
+        "core_epoch": "2de8b8bd-696a-4cc9-b3ab-68df649f4f3c",
+        "status": "passed",
+        "suite": "doctor"
+      },
+      "stderr": ""
+    }
+  ],
+  "recovery_budget": {
+    "status": "passed",
+    "revoke_limit_seconds": 5,
+    "recovery_limit_seconds": 30,
+    "maximum_revocation_seconds": 0.104679865995422,
+    "maximum_recovery_seconds": 0.4174909469875274
+  },
+  "monitor_duration_seconds": 0.006,
+  "monitor_status": "passed",
+  "resource_budget": {
+    "status": "skipped",
+    "reason": "the run did not include a 30-minute warmup, baseline window, and final window"
+  },
+  "resource_trends_mib_per_hour": {
+    "core": null,
+    "nonebot-smoke": null,
+    "koishi-smoke": null
+  },
+  "ended_at": "2026-10-10T01:55:27.932Z",
+  "expected_cycles": 2,
+  "case_summary": {
+    "expected_denominator": 2,
+    "observed_count": 2,
+    "coverage_count": 2,
+    "coverage_rate": 1.0,
+    "executed_denominator": 2,
+    "pass_rate": 1.0,
+    "passed": 2,
+    "failed": 0,
+    "skipped": 0,
+    "unknown": 0,
+    "missing": 0,
+    "unexpected": 0,
+    "invalid_statuses": [],
+    "gate_passed": true
+  },
+  "report": "/root/ligamina/outputs/acceptance/t14-stability-linux-wsl-quick-20261010.json"
+}

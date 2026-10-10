@@ -1,0 +1,1543 @@
+{
+  "suite": "representative",
+  "status": "completed",
+  "worker": "isolated",
+  "started_at": "2026-10-10T01:08:40.041Z",
+  "platform": "Windows-11-10.0.26200-SP0",
+  "samples": [
+    {
+      "sample_id": "nonebot-repeater",
+      "ecosystem": "nonebot",
+      "package": "nonebot-plugin-repeater",
+      "version": "3.1.4",
+      "license": "GPL-3.0",
+      "category": [
+        "message"
+      ],
+      "source_url": "https://github.com/Utmost-Happiness-Planet/nonebot-plugin-repeater",
+      "artifact_hash_algorithm": "sha256",
+      "artifact_hash": "fe50ad2d4bfc7f1397fcc261ca234d701c4ff02986475ffc5f29647056488d2b",
+      "fixture_path": "E:\\stella\\Ligamina\\samples\\fixtures\\third-party\\nonebot-repeater-group-repeat.json",
+      "reproduction_command": "uv run --project lab python lab/run.py --suite representative --manifest samples/third-party.lock.json --worker isolated --sample-id nonebot-repeater",
+      "levels": {
+        "L0": {
+          "status": "passed",
+          "artifact_url": "https://files.pythonhosted.org/packages/60/4c/2a9539fd7c4e78b94c20dd4aed9d2a10b6f4c44ae5be09d554279c78259c/nonebot_plugin_repeater-3.1.4-py3-none-any.whl",
+          "artifact_hash_algorithm": "sha256",
+          "expected_artifact_hash": "fe50ad2d4bfc7f1397fcc261ca234d701c4ff02986475ffc5f29647056488d2b",
+          "actual_artifact_hash": "fe50ad2d4bfc7f1397fcc261ca234d701c4ff02986475ffc5f29647056488d2b",
+          "actual_sha256": "fe50ad2d4bfc7f1397fcc261ca234d701c4ff02986475ffc5f29647056488d2b",
+          "size_bytes": 15983,
+          "error": null
+        },
+        "L1": {
+          "status": "passed",
+          "steps": [
+            {
+              "label": "resolve exact Python sample profile",
+              "status": "passed",
+              "command": [
+                "C:\\Users\\Vegetable\\AppData\\Local\\FreeToken\\bin\\uv.EXE",
+                "lock"
+              ],
+              "returncode": 0,
+              "stdout_tail": "",
+              "stderr_tail": "Using CPython 3.12.14 interpreter at: C:\\Users\\Vegetable\\AppData\\Roaming\\uv\\python\\cpython-3.12.14-windows-x86_64-none\\python.exe\nResolved 38 packages in 26.93s\n"
+            },
+            {
+              "label": "install locked Python sample profile",
+              "status": "passed",
+              "command": [
+                "C:\\Users\\Vegetable\\AppData\\Local\\FreeToken\\bin\\uv.EXE",
+                "sync",
+                "--locked",
+                "--no-dev",
+                "--no-build",
+                "--python",
+                "3.12.14"
+              ],
+              "returncode": 0,
+              "stdout_tail": "",
+              "stderr_tail": "Using CPython 3.12.14 interpreter at: C:\\Users\\Vegetable\\AppData\\Roaming\\uv\\python\\cpython-3.12.14-windows-x86_64-none\\python.exe\nCreating virtual environment at: .venv\nResolved 38 packages in 3ms\nDownloading pydantic-core (2.1MiB)\n Downloaded pydantic-core\nPrepared 35 packages in 26.77s\nInstalled 36 packages in 298ms\n + annotated-doc==0.0.5\n + annotated-types==0.8.0\n + anyio==4.15.1\n + attrs==26.1.0\n + click==8.5.0\n + colorama==0.4.6\n + exceptiongroup==1.3.1\n + fastapi==0.143.0\n + h11==0.16.0\n + httptools==0.9.0\n + idna==3.20\n + jsonschema==4.25.1\n + jsonschema-specifications==2025.9.1\n + loguru==0.7.3\n + msgpack==1.2.3\n + multidict==7.1.0\n + nonebot-adapter-onebot==2.4.6\n + nonebot-plugin-repeater==3.1.4 (from https://files.pythonhosted.org/packages/60/4c/2a9539fd7c4e78b94c20dd4aed9d2a10b6f4c44ae5be09d554279c78259c/nonebot_plugin_repeater-3.1.4-py3-none-any.whl)\n + nonebot2==2.5.0\n + opentelemetry-api==1.45.1\n + propcache==0.5.4\n + pydantic==2.14.0\n + pydantic-core==2.50.0\n + pygtrie==2.6.2\n + python-dotenv==1.2.4\n + pyyaml==6.0.3\n + referencing==0.37.0\n + rpds-py==2026.9.1\n + starlette==1.7.0\n + typing-extensions==4.16.0\n + typing-inspection==0.4.4\n + uvicorn==0.54.0\n + watchfiles==1.3.0\n + websockets==17.2\n + win32-setctime==1.2.0\n + yarl==1.25.1\n"
+            },
+            {
+              "label": "verify installed Python package metadata",
+              "status": "passed",
+              "command": [
+                "C:\\Users\\VEGETA~1\\AppData\\Local\\Temp\\ligamina-representative-fhkfdvem\\nonebot-repeater\\.venv\\Scripts\\python.exe",
+                "-c",
+                "from importlib.metadata import version; import sys; print(version(sys.argv[1]))",
+                "nonebot-plugin-repeater"
+              ],
+              "returncode": 0,
+              "stdout_tail": "3.1.4\n",
+              "stderr_tail": ""
+            }
+          ],
+          "lock_sha256": "8e4d151decb77f6328928af72d2dca2cb9ef7edcdec52bde923eebc652b4e26b",
+          "reproducibility_artifacts": {
+            "status": "passed",
+            "artifacts": [
+              {
+                "path": "outputs/acceptance/t13-representative-windows-l4-check-20261010-locks/nonebot-repeater/pyproject.toml",
+                "sha256": "f6f2e0ccb5becdd4cefa79a6bca704399fa867fbf5ae7f24e93b096950059b63",
+                "size_bytes": 432
+              },
+              {
+                "path": "outputs/acceptance/t13-representative-windows-l4-check-20261010-locks/nonebot-repeater/uv.lock",
+                "sha256": "8e4d151decb77f6328928af72d2dca2cb9ef7edcdec52bde923eebc652b4e26b",
+                "size_bytes": 83725
+              }
+            ]
+          }
+        },
+        "L2": {
+          "status": "passed",
+          "native_trace": {
+            "initialize": {
+              "jsonrpc": "2.0",
+              "id": "representative-init",
+              "result": {
+                "ready": true,
+                "protocol_version": "0.1",
+                "capabilities": [
+                  {
+                    "capability_id": "ligamina.nonebot.math.add",
+                    "input_schema": {
+                      "type": "object",
+                      "properties": {
+                        "left": {
+                          "type": "integer",
+                          "minimum": -9007199254740991,
+                          "maximum": 9007199254740991
+                        },
+                        "right": {
+                          "type": "integer",
+                          "minimum": -9007199254740991,
+                          "maximum": 9007199254740991
+                        }
+                      },
+                      "required": [
+                        "left",
+                        "right"
+                      ],
+                      "additionalProperties": false
+                    },
+                    "output_schema": {
+                      "type": "integer",
+                      "minimum": -9007199254740991,
+                      "maximum": 9007199254740991
+                    },
+                    "pure": true
+                  }
+                ]
+              }
+            },
+            "dispatches": [
+              {
+                "jsonrpc": "2.0",
+                "id": "representative-event-1",
+                "result": {
+                  "accepted": true,
+                  "event_id": "sample-nonebot-repeater-1"
+                }
+              },
+              {
+                "jsonrpc": "2.0",
+                "id": "representative-event-2",
+                "result": {
+                  "accepted": true,
+                  "event_id": "sample-nonebot-repeater-2"
+                }
+              }
+            ],
+            "outgoing": [],
+            "stderr_tail": "2026-10-10 09:09:38.789 | SUCCESS  | nonebot:init:298 - NoneBot is initializing...\n2026-10-10 09:09:38.789 | INFO     | nonebot:init:313 - Current Env: prod\n2026-10-10 09:09:38.789 | DEBUG    | nonebot:init:316 - Loaded Config: {'driver': '~fastapi', 'host': IPv4Address('127.0.0.1'), 'port': 8080, 'log_level': 'INFO', 'api_timeout': 30.0, 'superusers': set(), 'nickname': set(), 'command_start': {'/'}, 'command_sep': {'.'}, 'session_expire_timeout': datetime.timedelta(seconds=120)}\n2026-10-10 09:09:39.480 | DEBUG    | nonebot:register_adapter:105 - Succeeded to load adapter \"Ligamina OneBot V11 Bridge\"\n2026-10-10 09:09:39.485 | WARNING  | nonebot_plugin_repeater:<module>:6 - [������] δ���������� `repeater_group` , ����Ĭ��ֵ: []\n2026-10-10 09:09:39.485 | WARNING  | nonebot_plugin_repeater:<module>:8 - [������] δ���������� `repeater_min_message_length` , ����Ĭ��ֵ: 1\n2026-10-10 09:09:39.485 | WARNING  | nonebot_plugin_repeater:<module>:10 - [������] δ���������� `repeater_min_message_times` , ����Ĭ��ֵ: 2\n2026-10-10 09:09:39.646 | SUCCESS  | nonebot:load_plugin:187 - Succeeded to load plugin \"nonebot_plugin_repeater\"\n2026-10-10 09:09:39.710 | SUCCESS  | nonebot:handle_event:538 - Ligamina OneBot V11 Bridge 9000 | [message.group.normal]: Message 80000 from 2323@[Ⱥ:4242] 'ligamina-repeat'\n2026-10-10 09:09:39.710 | DEBUG    | nonebot:handle_event:576 - Checking for matchers in priority 10...\n2026-10-10 09:09:39.711 | INFO     | nonebot:_run_matcher:438 - Event will be handled by Matcher(type='message', module=nonebot_plugin_repeater, lineno=9)\n2026-10-10 09:09:39.711 | DEBUG    | nonebot:_run_matcher:458 - Running Matcher(type='message', module=nonebot_plugin_repeater, lineno=9)\n2026-10-10 09:09:39.711 | DEBUG    | nonebot:simple_run:847 - Running handler Dependent(call=repeater)\n2026-10-10 09:09:39.711 | INFO     | nonebot:simple_run:864 - Matcher(type='message', module=nonebot_plugin_repeater, lineno=9) running complete\n2026-10-10 09:09:39.712 | DEBUG    | nonebot:handle_event:604 - Checking for matchers completed\n2026-10-10 09:09:39.712 | SUCCESS  | nonebot:handle_event:538 - Ligamina OneBot V11 Bridge 9000 | [message.group.normal]: Message 80001 from 2323@[Ⱥ:4242] 'ligamina-repeat'\n2026-10-10 09:09:39.713 | DEBUG    | nonebot:handle_event:576 - Checking for matchers in priority 10...\n2026-10-10 09:09:39.713 | INFO     | nonebot:_run_matcher:438 - Event will be handled by Matcher(type='message', module=nonebot_plugin_repeater, lineno=9)\n2026-10-10 09:09:39.713 | DEBUG    | nonebot:_run_matcher:458 - Running Matcher(type='message', module=nonebot_plugin_repeater, lineno=9)\n2026-10-10 09:09:39.713 | DEBUG    | nonebot:simple_run:847 - Running handler Dependent(call=repeater)\n2026-10-10 09:09:39.713 | INFO     | nonebot:simple_run:864 - Matcher(type='message', module=nonebot_plugin_repeater, lineno=9) running complete\n2026-10-10 09:09:39.713 | DEBUG    | nonebot:handle_event:604 - Checking for matchers completed\n"
+          }
+        },
+        "L3": {
+          "status": "passed",
+          "federated_trace": {
+            "event_requests": [
+              {
+                "schema_version": "ligamina/0.1",
+                "event_id": "sample-nonebot-repeater-1",
+                "trace_id": "trace-sample-nonebot-repeater-1",
+                "platform": "onebot.v11",
+                "account_id": "9000",
+                "conversation": {
+                  "kind": "group",
+                  "id": "4242"
+                },
+                "actor_id": "2323",
+                "timestamp": "2026-10-10T01:09:37.486Z",
+                "target_host": "sample-nonebot-repeater",
+                "message": [
+                  {
+                    "type": "text",
+                    "text": "ligamina-repeat"
+                  }
+                ],
+                "extensions": {
+                  "onebot.v11": {
+                    "message_id": "80000",
+                    "sender": {
+                      "nickname": "Ligamina"
+                    }
+                  }
+                }
+              },
+              {
+                "schema_version": "ligamina/0.1",
+                "event_id": "sample-nonebot-repeater-2",
+                "trace_id": "trace-sample-nonebot-repeater-2",
+                "platform": "onebot.v11",
+                "account_id": "9000",
+                "conversation": {
+                  "kind": "group",
+                  "id": "4242"
+                },
+                "actor_id": "2323",
+                "timestamp": "2026-10-10T01:09:37.486Z",
+                "target_host": "sample-nonebot-repeater",
+                "message": [
+                  {
+                    "type": "text",
+                    "text": "ligamina-repeat"
+                  }
+                ],
+                "extensions": {
+                  "onebot.v11": {
+                    "message_id": "80001",
+                    "sender": {
+                      "nickname": "Ligamina"
+                    }
+                  }
+                }
+              }
+            ],
+            "gateway_operations": [],
+            "cleanup": {
+              "host_pid": 20568,
+              "host_alive_after_shutdown": false
+            },
+            "host_status": {
+              "epoch": 2,
+              "id": "sample-nonebot-repeater",
+              "last_error": null,
+              "pid": 20568,
+              "restart_count": 0,
+              "state": "active"
+            },
+            "event_statuses": [
+              {
+                "accepted": {
+                  "disposition": "accepted",
+                  "event": {
+                    "created_at_ms": 1791594582586,
+                    "error": null,
+                    "event": {
+                      "account_id": "9000",
+                      "actor_id": "2323",
+                      "conversation": {
+                        "id": "4242",
+                        "kind": "group"
+                      },
+                      "event_id": "sample-nonebot-repeater-1",
+                      "extensions": {
+                        "onebot.v11": {
+                          "message_id": "80000",
+                          "sender": {
+                            "nickname": "Ligamina"
+                          }
+                        }
+                      },
+                      "message": [
+                        {
+                          "text": "ligamina-repeat",
+                          "type": "text"
+                        }
+                      ],
+                      "platform": "onebot.v11",
+                      "schema_version": "ligamina/0.1",
+                      "target_host": "sample-nonebot-repeater",
+                      "timestamp": "2026-10-10T01:09:37.486Z",
+                      "trace_id": "trace-sample-nonebot-repeater-1"
+                    },
+                    "fingerprint": "59444f7c68c2d9412f7722b54de3782a632504381b74accde0e2cec930339e43",
+                    "key": {
+                      "account_id": "9000",
+                      "client_id": "ligamina-sample-client",
+                      "conversation_id": "4242",
+                      "conversation_kind": "group",
+                      "event_id": "sample-nonebot-repeater-1",
+                      "platform": "onebot.v11"
+                    },
+                    "status": "accepted",
+                    "target_host": "sample-nonebot-repeater",
+                    "trace_id": "trace-sample-nonebot-repeater-1",
+                    "updated_at_ms": 1791594582586
+                  }
+                },
+                "final": {
+                  "created_at_ms": 1791594582586,
+                  "error": null,
+                  "event": {
+                    "account_id": "9000",
+                    "actor_id": "2323",
+                    "conversation": {
+                      "id": "4242",
+                      "kind": "group"
+                    },
+                    "event_id": "sample-nonebot-repeater-1",
+                    "extensions": {
+                      "onebot.v11": {
+                        "message_id": "80000",
+                        "sender": {
+                          "nickname": "Ligamina"
+                        }
+                      }
+                    },
+                    "message": [
+                      {
+                        "text": "ligamina-repeat",
+                        "type": "text"
+                      }
+                    ],
+                    "platform": "onebot.v11",
+                    "schema_version": "ligamina/0.1",
+                    "target_host": "sample-nonebot-repeater",
+                    "timestamp": "2026-10-10T01:09:37.486Z",
+                    "trace_id": "trace-sample-nonebot-repeater-1"
+                  },
+                  "fingerprint": "59444f7c68c2d9412f7722b54de3782a632504381b74accde0e2cec930339e43",
+                  "key": {
+                    "account_id": "9000",
+                    "client_id": "ligamina-sample-client",
+                    "conversation_id": "4242",
+                    "conversation_kind": "group",
+                    "event_id": "sample-nonebot-repeater-1",
+                    "platform": "onebot.v11"
+                  },
+                  "status": "completed",
+                  "target_host": "sample-nonebot-repeater",
+                  "trace_id": "trace-sample-nonebot-repeater-1",
+                  "updated_at_ms": 1791594582592
+                }
+              },
+              {
+                "accepted": {
+                  "disposition": "accepted",
+                  "event": {
+                    "created_at_ms": 1791594582666,
+                    "error": null,
+                    "event": {
+                      "account_id": "9000",
+                      "actor_id": "2323",
+                      "conversation": {
+                        "id": "4242",
+                        "kind": "group"
+                      },
+                      "event_id": "sample-nonebot-repeater-2",
+                      "extensions": {
+                        "onebot.v11": {
+                          "message_id": "80001",
+                          "sender": {
+                            "nickname": "Ligamina"
+                          }
+                        }
+                      },
+                      "message": [
+                        {
+                          "text": "ligamina-repeat",
+                          "type": "text"
+                        }
+                      ],
+                      "platform": "onebot.v11",
+                      "schema_version": "ligamina/0.1",
+                      "target_host": "sample-nonebot-repeater",
+                      "timestamp": "2026-10-10T01:09:37.486Z",
+                      "trace_id": "trace-sample-nonebot-repeater-2"
+                    },
+                    "fingerprint": "8cdd6a2550bd300e3693ee7e8010c4cacca11ae5cb48d83166a5f7b9686f3ef6",
+                    "key": {
+                      "account_id": "9000",
+                      "client_id": "ligamina-sample-client",
+                      "conversation_id": "4242",
+                      "conversation_kind": "group",
+                      "event_id": "sample-nonebot-repeater-2",
+                      "platform": "onebot.v11"
+                    },
+                    "status": "accepted",
+                    "target_host": "sample-nonebot-repeater",
+                    "trace_id": "trace-sample-nonebot-repeater-2",
+                    "updated_at_ms": 1791594582666
+                  }
+                },
+                "final": {
+                  "created_at_ms": 1791594582666,
+                  "error": null,
+                  "event": {
+                    "account_id": "9000",
+                    "actor_id": "2323",
+                    "conversation": {
+                      "id": "4242",
+                      "kind": "group"
+                    },
+                    "event_id": "sample-nonebot-repeater-2",
+                    "extensions": {
+                      "onebot.v11": {
+                        "message_id": "80001",
+                        "sender": {
+                          "nickname": "Ligamina"
+                        }
+                      }
+                    },
+                    "message": [
+                      {
+                        "text": "ligamina-repeat",
+                        "type": "text"
+                      }
+                    ],
+                    "platform": "onebot.v11",
+                    "schema_version": "ligamina/0.1",
+                    "target_host": "sample-nonebot-repeater",
+                    "timestamp": "2026-10-10T01:09:37.486Z",
+                    "trace_id": "trace-sample-nonebot-repeater-2"
+                  },
+                  "fingerprint": "8cdd6a2550bd300e3693ee7e8010c4cacca11ae5cb48d83166a5f7b9686f3ef6",
+                  "key": {
+                    "account_id": "9000",
+                    "client_id": "ligamina-sample-client",
+                    "conversation_id": "4242",
+                    "conversation_kind": "group",
+                    "event_id": "sample-nonebot-repeater-2",
+                    "platform": "onebot.v11"
+                  },
+                  "status": "completed",
+                  "target_host": "sample-nonebot-repeater",
+                  "trace_id": "trace-sample-nonebot-repeater-2",
+                  "updated_at_ms": 1791594582670
+                }
+              }
+            ],
+            "core_exit_code": 0,
+            "stderr_tail": "",
+            "gateway_errors": []
+          }
+        },
+        "L4": {
+          "status": "failed",
+          "expected_outgoing_texts": [
+            "ligamina-repeat"
+          ],
+          "native_messages": [],
+          "federated_messages": [],
+          "expected_target": {
+            "kind": "group",
+            "id": "4242"
+          },
+          "native_baseline": {
+            "text_match": false,
+            "target_match": true
+          },
+          "federated_behavior": {
+            "text_match": false,
+            "target_match": true
+          },
+          "trace_parity": true,
+          "failure_classification": [
+            "native_baseline_output_mismatch",
+            "federated_behavior_output_mismatch"
+          ]
+        },
+        "L5": {
+          "status": "not_run",
+          "reason": "repeated lifecycle/resource stability belongs to T14"
+        }
+      },
+      "entry_module": "nonebot_plugin_repeater",
+      "input_events": [
+        {
+          "schema_version": "ligamina/0.1",
+          "event_id": "sample-nonebot-repeater-1",
+          "trace_id": "trace-sample-nonebot-repeater-1",
+          "platform": "onebot.v11",
+          "account_id": "9000",
+          "conversation": {
+            "kind": "group",
+            "id": "4242"
+          },
+          "actor_id": "2323",
+          "timestamp": "2026-10-10T01:09:37.486Z",
+          "target_host": "sample-nonebot-repeater",
+          "message": [
+            {
+              "type": "text",
+              "text": "ligamina-repeat"
+            }
+          ],
+          "extensions": {
+            "onebot.v11": {
+              "message_id": "80000",
+              "sender": {
+                "nickname": "Ligamina"
+              }
+            }
+          }
+        },
+        {
+          "schema_version": "ligamina/0.1",
+          "event_id": "sample-nonebot-repeater-2",
+          "trace_id": "trace-sample-nonebot-repeater-2",
+          "platform": "onebot.v11",
+          "account_id": "9000",
+          "conversation": {
+            "kind": "group",
+            "id": "4242"
+          },
+          "actor_id": "2323",
+          "timestamp": "2026-10-10T01:09:37.486Z",
+          "target_host": "sample-nonebot-repeater",
+          "message": [
+            {
+              "type": "text",
+              "text": "ligamina-repeat"
+            }
+          ],
+          "extensions": {
+            "onebot.v11": {
+              "message_id": "80001",
+              "sender": {
+                "nickname": "Ligamina"
+              }
+            }
+          }
+        }
+      ],
+      "failure_classification": [
+        "native_baseline_output_mismatch",
+        "federated_behavior_output_mismatch"
+      ]
+    },
+    {
+      "sample_id": "koishi-game-mini",
+      "ecosystem": "koishi",
+      "package": "koishi-plugin-game-mini",
+      "version": "0.4.3",
+      "license": "MIT",
+      "category": [
+        "command",
+        "message",
+        "state"
+      ],
+      "source_url": "https://github.com/Minecraft-1314/koishi-plugin-game-mini",
+      "artifact_hash_algorithm": "sri-sha512",
+      "artifact_hash": "sha512-kTovHhKSP9N8gvk1iVjTfA2tYZRji2roxy1vQrvhzw92xs+Y1zduOUVURVtPe18duxDShchrQyGuILJpEKooqA==",
+      "fixture_path": "E:\\stella\\Ligamina\\samples\\fixtures\\third-party\\koishi-game-mini-number-guess.json",
+      "reproduction_command": "uv run --project lab python lab/run.py --suite representative --manifest samples/third-party.lock.json --worker isolated --sample-id koishi-game-mini",
+      "levels": {
+        "L0": {
+          "status": "passed",
+          "artifact_url": "https://registry.npmjs.org/koishi-plugin-game-mini/-/koishi-plugin-game-mini-0.4.3.tgz",
+          "artifact_hash_algorithm": "sri-sha512",
+          "expected_artifact_hash": "sha512-kTovHhKSP9N8gvk1iVjTfA2tYZRji2roxy1vQrvhzw92xs+Y1zduOUVURVtPe18duxDShchrQyGuILJpEKooqA==",
+          "actual_artifact_hash": "sha512-kTovHhKSP9N8gvk1iVjTfA2tYZRji2roxy1vQrvhzw92xs+Y1zduOUVURVtPe18duxDShchrQyGuILJpEKooqA==",
+          "actual_sha256": "e15d698285ca47c7b1e546173510fae1bb4e865483033e6f358b7aa6ef31939e",
+          "size_bytes": 12672,
+          "error": null
+        },
+        "L1": {
+          "status": "passed",
+          "steps": [
+            {
+              "label": "resolve exact Node sample profile",
+              "status": "passed",
+              "command": [
+                "C:\\windows\\system32\\cmd.exe",
+                "/d",
+                "/c",
+                "C:\\Program Files\\nodejs\\npm.cmd",
+                "install",
+                "--package-lock-only",
+                "--ignore-scripts",
+                "--no-audit",
+                "--fund=false"
+              ],
+              "returncode": 0,
+              "stdout_tail": "\nup to date in 49s\n",
+              "stderr_tail": ""
+            },
+            {
+              "label": "install locked Node sample profile",
+              "status": "passed",
+              "command": [
+                "C:\\windows\\system32\\cmd.exe",
+                "/d",
+                "/c",
+                "C:\\Program Files\\nodejs\\npm.cmd",
+                "ci",
+                "--ignore-scripts",
+                "--no-audit",
+                "--fund=false"
+              ],
+              "returncode": 0,
+              "stdout_tail": "\nadded 240 packages in 24s\n",
+              "stderr_tail": "npm warn deprecated @koa/router@10.1.1: **IMPORTANT 10x+ PERFORMANCE UPGRADE**: Please upgrade to v12.0.1+ as we have fixed an issue with debuglog causing 10x slower router benchmark performance, see https://github.com/koajs/router/pull/173\n"
+            },
+            {
+              "label": "verify installed Node package metadata",
+              "status": "passed",
+              "command": [
+                "C:\\Program Files\\nodejs\\node.EXE",
+                "-e",
+                "console.log(require(\"C:\\\\Users\\\\VEGETA~1\\\\AppData\\\\Local\\\\Temp\\\\ligamina-representative-fhkfdvem\\\\koishi-game-mini\\\\node_modules\\\\koishi-plugin-game-mini\\\\package.json\").version)"
+              ],
+              "returncode": 0,
+              "stdout_tail": "0.4.3\n",
+              "stderr_tail": ""
+            },
+            {
+              "label": "resolve Koishi plugin entry",
+              "status": "passed",
+              "entry_url": "file:///C:/Users/VEGETA%7E1/AppData/Local/Temp/ligamina-representative-fhkfdvem/koishi-game-mini/node_modules/koishi-plugin-game-mini/lib/index.js"
+            }
+          ],
+          "lock_sha256": "421b2fa2324a57a1ad5a5f48a9e998bcead5c3a3354b3ad94d2c0cc5c33c0639",
+          "reproducibility_artifacts": {
+            "status": "passed",
+            "artifacts": [
+              {
+                "path": "outputs/acceptance/t13-representative-windows-l4-check-20261010-locks/koishi-game-mini/package.json",
+                "sha256": "b6dd461d83dca1a91e0a79aa5df535b201f6831cdd5ad9dd5324f7da816890da",
+                "size_bytes": 478
+              },
+              {
+                "path": "outputs/acceptance/t13-representative-windows-l4-check-20261010-locks/koishi-game-mini/package-lock.json",
+                "sha256": "421b2fa2324a57a1ad5a5f48a9e998bcead5c3a3354b3ad94d2c0cc5c33c0639",
+                "size_bytes": 110411
+              }
+            ]
+          }
+        },
+        "L2": {
+          "status": "passed",
+          "native_trace": {
+            "initialize": {
+              "jsonrpc": "2.0",
+              "id": "representative-init",
+              "result": {
+                "ready": true,
+                "protocol_version": "0.1",
+                "capabilities": [
+                  {
+                    "capability_id": "ligamina.koishi.math.add",
+                    "input_schema": {
+                      "type": "object",
+                      "properties": {
+                        "left": {
+                          "type": "integer",
+                          "minimum": -9007199254740991,
+                          "maximum": 9007199254740991
+                        },
+                        "right": {
+                          "type": "integer",
+                          "minimum": -9007199254740991,
+                          "maximum": 9007199254740991
+                        }
+                      },
+                      "required": [
+                        "left",
+                        "right"
+                      ],
+                      "additionalProperties": false
+                    },
+                    "output_schema": {
+                      "type": "integer",
+                      "minimum": -9007199254740991,
+                      "maximum": 9007199254740991
+                    },
+                    "pure": true
+                  }
+                ]
+              }
+            },
+            "dispatches": [
+              {
+                "jsonrpc": "2.0",
+                "id": "representative-event-1",
+                "result": {
+                  "accepted": true,
+                  "event_id": "sample-koishi-game-mini-1"
+                }
+              },
+              {
+                "jsonrpc": "2.0",
+                "id": "representative-event-2",
+                "result": {
+                  "accepted": true,
+                  "event_id": "sample-koishi-game-mini-2"
+                }
+              }
+            ],
+            "outgoing": [
+              {
+                "jsonrpc": "2.0",
+                "id": "platform-56954c6d-b15b-4843-a81b-405e38ff75e6",
+                "method": "platform.execute",
+                "params": {
+                  "operation_id": "3572f683-1314-4303-9ef1-d00f9bfb4824",
+                  "trace_id": "trace-sample-koishi-game-mini-1",
+                  "account_id": "9000",
+                  "operation": "send_message",
+                  "target": {
+                    "kind": "group",
+                    "id": "4242"
+                  },
+                  "params": {
+                    "message": [
+                      {
+                        "type": "text",
+                        "text": "比赛开始！本次共 1 回合～"
+                      }
+                    ]
+                  }
+                }
+              },
+              {
+                "jsonrpc": "2.0",
+                "id": "platform-d8e9addf-7723-4f29-875a-f6002b94c369",
+                "method": "platform.execute",
+                "params": {
+                  "operation_id": "5f060dd3-a4dc-450a-9624-5ecff571178f",
+                  "trace_id": "trace-sample-koishi-game-mini-1",
+                  "account_id": "9000",
+                  "operation": "send_message",
+                  "target": {
+                    "kind": "group",
+                    "id": "4242"
+                  },
+                  "params": {
+                    "message": [
+                      {
+                        "type": "text",
+                        "text": "猜数字范围：0 - 100"
+                      }
+                    ]
+                  }
+                }
+              },
+              {
+                "jsonrpc": "2.0",
+                "id": "platform-b4097da0-e85a-497b-9a74-b7b5b382578f",
+                "method": "platform.execute",
+                "params": {
+                  "operation_id": "df269657-d18b-4b8a-94bc-a8fe55d5d6d7",
+                  "trace_id": "trace-sample-koishi-game-mini-2",
+                  "account_id": "9000",
+                  "operation": "send_message",
+                  "target": {
+                    "kind": "group",
+                    "id": "4242"
+                  },
+                  "params": {
+                    "message": [
+                      {
+                        "type": "text",
+                        "text": "比赛已停止"
+                      }
+                    ]
+                  }
+                }
+              }
+            ],
+            "stderr_tail": "[I] sqlite auto creating table user\n[I] sqlite auto creating table binding\n[I] sqlite auto creating table channel\n[I] sqlite auto creating table game_mini_player\n[I] sqlite auto creating table game_mini_state\n"
+          }
+        },
+        "L3": {
+          "status": "passed",
+          "federated_trace": {
+            "event_requests": [
+              {
+                "schema_version": "ligamina/0.1",
+                "event_id": "sample-koishi-game-mini-1",
+                "trace_id": "trace-sample-koishi-game-mini-1",
+                "platform": "koishi",
+                "account_id": "9000",
+                "conversation": {
+                  "kind": "group",
+                  "id": "4242"
+                },
+                "actor_id": "2323",
+                "timestamp": "2026-10-10T01:11:12.719Z",
+                "target_host": "sample-koishi-game-mini",
+                "message": [
+                  {
+                    "type": "text",
+                    "text": "猜数字 开始"
+                  }
+                ],
+                "extensions": {
+                  "onebot.v11": {
+                    "message_id": "80000",
+                    "sender": {
+                      "nickname": "Ligamina"
+                    }
+                  }
+                }
+              },
+              {
+                "schema_version": "ligamina/0.1",
+                "event_id": "sample-koishi-game-mini-2",
+                "trace_id": "trace-sample-koishi-game-mini-2",
+                "platform": "koishi",
+                "account_id": "9000",
+                "conversation": {
+                  "kind": "group",
+                  "id": "4242"
+                },
+                "actor_id": "2323",
+                "timestamp": "2026-10-10T01:11:12.719Z",
+                "target_host": "sample-koishi-game-mini",
+                "message": [
+                  {
+                    "type": "text",
+                    "text": "猜数字 结束"
+                  }
+                ],
+                "extensions": {
+                  "onebot.v11": {
+                    "message_id": "80001",
+                    "sender": {
+                      "nickname": "Ligamina"
+                    }
+                  }
+                }
+              }
+            ],
+            "gateway_operations": [
+              {
+                "operation": {
+                  "core_epoch_created": "e569c4ca-7889-4749-9013-536f055c4abf",
+                  "created_at_ms": 1791594674701,
+                  "dispatched_core_epoch": "e569c4ca-7889-4749-9013-536f055c4abf",
+                  "dispatched_lease_epoch": 1,
+                  "dispatched_lease_id": "718d2b1e-b296-4dc3-97e3-ae0cde7269f5",
+                  "fingerprint": "010a63fd9d194595e8c1a974df3a76fe75f06ed301f9db6a6febf6d44178c690",
+                  "grant_id": "koishi-game-mini-host-send",
+                  "host_epoch": 2,
+                  "key": {
+                    "account_id": "9000",
+                    "client_id": "ligamina-sample-client",
+                    "operation": "send_message",
+                    "operation_id": "900b973e-03fa-4f90-8a9d-7a686f5ae54d"
+                  },
+                  "operation_payload": {
+                    "account_id": "9000",
+                    "operation": "send_message",
+                    "operation_id": "900b973e-03fa-4f90-8a9d-7a686f5ae54d",
+                    "params": {
+                      "message": [
+                        {
+                          "text": "比赛开始！本次共 1 回合～",
+                          "type": "text"
+                        }
+                      ]
+                    },
+                    "target": {
+                      "id": "4242",
+                      "kind": "group"
+                    },
+                    "trace_id": "trace-sample-koishi-game-mini-1"
+                  },
+                  "principal": {
+                    "id": "sample-koishi-game-mini",
+                    "kind": "host"
+                  },
+                  "result": null,
+                  "status": "dispatched",
+                  "trace_id": "trace-sample-koishi-game-mini-1",
+                  "updated_at_ms": 1791594674753
+                },
+                "message": [
+                  {
+                    "text": "比赛开始！本次共 1 回合～",
+                    "type": "text"
+                  }
+                ],
+                "receipt": {
+                  "core_epoch_created": "e569c4ca-7889-4749-9013-536f055c4abf",
+                  "created_at_ms": 1791594674701,
+                  "dispatched_core_epoch": "e569c4ca-7889-4749-9013-536f055c4abf",
+                  "dispatched_lease_epoch": 1,
+                  "dispatched_lease_id": "718d2b1e-b296-4dc3-97e3-ae0cde7269f5",
+                  "fingerprint": "010a63fd9d194595e8c1a974df3a76fe75f06ed301f9db6a6febf6d44178c690",
+                  "grant_id": "koishi-game-mini-host-send",
+                  "host_epoch": 2,
+                  "key": {
+                    "account_id": "9000",
+                    "client_id": "ligamina-sample-client",
+                    "operation": "send_message",
+                    "operation_id": "900b973e-03fa-4f90-8a9d-7a686f5ae54d"
+                  },
+                  "operation_payload": {
+                    "account_id": "9000",
+                    "operation": "send_message",
+                    "operation_id": "900b973e-03fa-4f90-8a9d-7a686f5ae54d",
+                    "params": {
+                      "message": [
+                        {
+                          "text": "比赛开始！本次共 1 回合～",
+                          "type": "text"
+                        }
+                      ]
+                    },
+                    "target": {
+                      "id": "4242",
+                      "kind": "group"
+                    },
+                    "trace_id": "trace-sample-koishi-game-mini-1"
+                  },
+                  "principal": {
+                    "id": "sample-koishi-game-mini",
+                    "kind": "host"
+                  },
+                  "result": {
+                    "data": null,
+                    "error": null,
+                    "evidence_ref": "ligamina-sample://gateway/800001",
+                    "observed_at_ms": 1791594674754,
+                    "platform_message_id": "800001",
+                    "status": "succeeded"
+                  },
+                  "status": "succeeded",
+                  "trace_id": "trace-sample-koishi-game-mini-1",
+                  "updated_at_ms": 1791594674755
+                }
+              },
+              {
+                "operation": {
+                  "core_epoch_created": "e569c4ca-7889-4749-9013-536f055c4abf",
+                  "created_at_ms": 1791594674787,
+                  "dispatched_core_epoch": "e569c4ca-7889-4749-9013-536f055c4abf",
+                  "dispatched_lease_epoch": 1,
+                  "dispatched_lease_id": "718d2b1e-b296-4dc3-97e3-ae0cde7269f5",
+                  "fingerprint": "deaf96ad94b70980e098cfa7dfb610245aec4d541519ff2389c761e54bc28712",
+                  "grant_id": "koishi-game-mini-host-send",
+                  "host_epoch": 2,
+                  "key": {
+                    "account_id": "9000",
+                    "client_id": "ligamina-sample-client",
+                    "operation": "send_message",
+                    "operation_id": "e68cba2b-726e-453b-9c3e-22c009476054"
+                  },
+                  "operation_payload": {
+                    "account_id": "9000",
+                    "operation": "send_message",
+                    "operation_id": "e68cba2b-726e-453b-9c3e-22c009476054",
+                    "params": {
+                      "message": [
+                        {
+                          "text": "猜数字范围：0 - 100",
+                          "type": "text"
+                        }
+                      ]
+                    },
+                    "target": {
+                      "id": "4242",
+                      "kind": "group"
+                    },
+                    "trace_id": "trace-sample-koishi-game-mini-1"
+                  },
+                  "principal": {
+                    "id": "sample-koishi-game-mini",
+                    "kind": "host"
+                  },
+                  "result": null,
+                  "status": "dispatched",
+                  "trace_id": "trace-sample-koishi-game-mini-1",
+                  "updated_at_ms": 1791594674837
+                },
+                "message": [
+                  {
+                    "text": "猜数字范围：0 - 100",
+                    "type": "text"
+                  }
+                ],
+                "receipt": {
+                  "core_epoch_created": "e569c4ca-7889-4749-9013-536f055c4abf",
+                  "created_at_ms": 1791594674787,
+                  "dispatched_core_epoch": "e569c4ca-7889-4749-9013-536f055c4abf",
+                  "dispatched_lease_epoch": 1,
+                  "dispatched_lease_id": "718d2b1e-b296-4dc3-97e3-ae0cde7269f5",
+                  "fingerprint": "deaf96ad94b70980e098cfa7dfb610245aec4d541519ff2389c761e54bc28712",
+                  "grant_id": "koishi-game-mini-host-send",
+                  "host_epoch": 2,
+                  "key": {
+                    "account_id": "9000",
+                    "client_id": "ligamina-sample-client",
+                    "operation": "send_message",
+                    "operation_id": "e68cba2b-726e-453b-9c3e-22c009476054"
+                  },
+                  "operation_payload": {
+                    "account_id": "9000",
+                    "operation": "send_message",
+                    "operation_id": "e68cba2b-726e-453b-9c3e-22c009476054",
+                    "params": {
+                      "message": [
+                        {
+                          "text": "猜数字范围：0 - 100",
+                          "type": "text"
+                        }
+                      ]
+                    },
+                    "target": {
+                      "id": "4242",
+                      "kind": "group"
+                    },
+                    "trace_id": "trace-sample-koishi-game-mini-1"
+                  },
+                  "principal": {
+                    "id": "sample-koishi-game-mini",
+                    "kind": "host"
+                  },
+                  "result": {
+                    "data": null,
+                    "error": null,
+                    "evidence_ref": "ligamina-sample://gateway/800002",
+                    "observed_at_ms": 1791594674837,
+                    "platform_message_id": "800002",
+                    "status": "succeeded"
+                  },
+                  "status": "succeeded",
+                  "trace_id": "trace-sample-koishi-game-mini-1",
+                  "updated_at_ms": 1791594674853
+                }
+              },
+              {
+                "operation": {
+                  "core_epoch_created": "e569c4ca-7889-4749-9013-536f055c4abf",
+                  "created_at_ms": 1791594674938,
+                  "dispatched_core_epoch": "e569c4ca-7889-4749-9013-536f055c4abf",
+                  "dispatched_lease_epoch": 1,
+                  "dispatched_lease_id": "718d2b1e-b296-4dc3-97e3-ae0cde7269f5",
+                  "fingerprint": "3fb3912f2ad279d067e04d50ff654c429b0398bf448420283a8aac6d37747577",
+                  "grant_id": "koishi-game-mini-host-send",
+                  "host_epoch": 2,
+                  "key": {
+                    "account_id": "9000",
+                    "client_id": "ligamina-sample-client",
+                    "operation": "send_message",
+                    "operation_id": "c5cc55e2-337f-4191-8b23-3e3299357d11"
+                  },
+                  "operation_payload": {
+                    "account_id": "9000",
+                    "operation": "send_message",
+                    "operation_id": "c5cc55e2-337f-4191-8b23-3e3299357d11",
+                    "params": {
+                      "message": [
+                        {
+                          "text": "比赛已停止",
+                          "type": "text"
+                        }
+                      ]
+                    },
+                    "target": {
+                      "id": "4242",
+                      "kind": "group"
+                    },
+                    "trace_id": "trace-sample-koishi-game-mini-2"
+                  },
+                  "principal": {
+                    "id": "sample-koishi-game-mini",
+                    "kind": "host"
+                  },
+                  "result": null,
+                  "status": "dispatched",
+                  "trace_id": "trace-sample-koishi-game-mini-2",
+                  "updated_at_ms": 1791594674942
+                },
+                "message": [
+                  {
+                    "text": "比赛已停止",
+                    "type": "text"
+                  }
+                ],
+                "receipt": {
+                  "core_epoch_created": "e569c4ca-7889-4749-9013-536f055c4abf",
+                  "created_at_ms": 1791594674938,
+                  "dispatched_core_epoch": "e569c4ca-7889-4749-9013-536f055c4abf",
+                  "dispatched_lease_epoch": 1,
+                  "dispatched_lease_id": "718d2b1e-b296-4dc3-97e3-ae0cde7269f5",
+                  "fingerprint": "3fb3912f2ad279d067e04d50ff654c429b0398bf448420283a8aac6d37747577",
+                  "grant_id": "koishi-game-mini-host-send",
+                  "host_epoch": 2,
+                  "key": {
+                    "account_id": "9000",
+                    "client_id": "ligamina-sample-client",
+                    "operation": "send_message",
+                    "operation_id": "c5cc55e2-337f-4191-8b23-3e3299357d11"
+                  },
+                  "operation_payload": {
+                    "account_id": "9000",
+                    "operation": "send_message",
+                    "operation_id": "c5cc55e2-337f-4191-8b23-3e3299357d11",
+                    "params": {
+                      "message": [
+                        {
+                          "text": "比赛已停止",
+                          "type": "text"
+                        }
+                      ]
+                    },
+                    "target": {
+                      "id": "4242",
+                      "kind": "group"
+                    },
+                    "trace_id": "trace-sample-koishi-game-mini-2"
+                  },
+                  "principal": {
+                    "id": "sample-koishi-game-mini",
+                    "kind": "host"
+                  },
+                  "result": {
+                    "data": null,
+                    "error": null,
+                    "evidence_ref": "ligamina-sample://gateway/800003",
+                    "observed_at_ms": 1791594674942,
+                    "platform_message_id": "800003",
+                    "status": "succeeded"
+                  },
+                  "status": "succeeded",
+                  "trace_id": "trace-sample-koishi-game-mini-2",
+                  "updated_at_ms": 1791594674956
+                }
+              }
+            ],
+            "cleanup": {
+              "host_pid": 38016,
+              "host_alive_after_shutdown": false
+            },
+            "host_status": {
+              "epoch": 2,
+              "id": "sample-koishi-game-mini",
+              "last_error": null,
+              "pid": 38016,
+              "restart_count": 0,
+              "state": "active"
+            },
+            "event_statuses": [
+              {
+                "accepted": {
+                  "disposition": "accepted",
+                  "event": {
+                    "created_at_ms": 1791594674675,
+                    "error": null,
+                    "event": {
+                      "account_id": "9000",
+                      "actor_id": "2323",
+                      "conversation": {
+                        "id": "4242",
+                        "kind": "group"
+                      },
+                      "event_id": "sample-koishi-game-mini-1",
+                      "extensions": {
+                        "onebot.v11": {
+                          "message_id": "80000",
+                          "sender": {
+                            "nickname": "Ligamina"
+                          }
+                        }
+                      },
+                      "message": [
+                        {
+                          "text": "猜数字 开始",
+                          "type": "text"
+                        }
+                      ],
+                      "platform": "koishi",
+                      "schema_version": "ligamina/0.1",
+                      "target_host": "sample-koishi-game-mini",
+                      "timestamp": "2026-10-10T01:11:12.719Z",
+                      "trace_id": "trace-sample-koishi-game-mini-1"
+                    },
+                    "fingerprint": "a0aa62f6c772d32ffafe09c175298926f06c79c2894760e61112012e7e6a67a0",
+                    "key": {
+                      "account_id": "9000",
+                      "client_id": "ligamina-sample-client",
+                      "conversation_id": "4242",
+                      "conversation_kind": "group",
+                      "event_id": "sample-koishi-game-mini-1",
+                      "platform": "koishi"
+                    },
+                    "status": "accepted",
+                    "target_host": "sample-koishi-game-mini",
+                    "trace_id": "trace-sample-koishi-game-mini-1",
+                    "updated_at_ms": 1791594674675
+                  }
+                },
+                "final": {
+                  "created_at_ms": 1791594674675,
+                  "error": null,
+                  "event": {
+                    "account_id": "9000",
+                    "actor_id": "2323",
+                    "conversation": {
+                      "id": "4242",
+                      "kind": "group"
+                    },
+                    "event_id": "sample-koishi-game-mini-1",
+                    "extensions": {
+                      "onebot.v11": {
+                        "message_id": "80000",
+                        "sender": {
+                          "nickname": "Ligamina"
+                        }
+                      }
+                    },
+                    "message": [
+                      {
+                        "text": "猜数字 开始",
+                        "type": "text"
+                      }
+                    ],
+                    "platform": "koishi",
+                    "schema_version": "ligamina/0.1",
+                    "target_host": "sample-koishi-game-mini",
+                    "timestamp": "2026-10-10T01:11:12.719Z",
+                    "trace_id": "trace-sample-koishi-game-mini-1"
+                  },
+                  "fingerprint": "a0aa62f6c772d32ffafe09c175298926f06c79c2894760e61112012e7e6a67a0",
+                  "key": {
+                    "account_id": "9000",
+                    "client_id": "ligamina-sample-client",
+                    "conversation_id": "4242",
+                    "conversation_kind": "group",
+                    "event_id": "sample-koishi-game-mini-1",
+                    "platform": "koishi"
+                  },
+                  "status": "completed",
+                  "target_host": "sample-koishi-game-mini",
+                  "trace_id": "trace-sample-koishi-game-mini-1",
+                  "updated_at_ms": 1791594674876
+                }
+              },
+              {
+                "accepted": {
+                  "disposition": "accepted",
+                  "event": {
+                    "created_at_ms": 1791594674930,
+                    "error": null,
+                    "event": {
+                      "account_id": "9000",
+                      "actor_id": "2323",
+                      "conversation": {
+                        "id": "4242",
+                        "kind": "group"
+                      },
+                      "event_id": "sample-koishi-game-mini-2",
+                      "extensions": {
+                        "onebot.v11": {
+                          "message_id": "80001",
+                          "sender": {
+                            "nickname": "Ligamina"
+                          }
+                        }
+                      },
+                      "message": [
+                        {
+                          "text": "猜数字 结束",
+                          "type": "text"
+                        }
+                      ],
+                      "platform": "koishi",
+                      "schema_version": "ligamina/0.1",
+                      "target_host": "sample-koishi-game-mini",
+                      "timestamp": "2026-10-10T01:11:12.719Z",
+                      "trace_id": "trace-sample-koishi-game-mini-2"
+                    },
+                    "fingerprint": "0824b25657ea28f0fa6064b203a94c52c04631c2165239d3ad51e5fa825b8d0d",
+                    "key": {
+                      "account_id": "9000",
+                      "client_id": "ligamina-sample-client",
+                      "conversation_id": "4242",
+                      "conversation_kind": "group",
+                      "event_id": "sample-koishi-game-mini-2",
+                      "platform": "koishi"
+                    },
+                    "status": "accepted",
+                    "target_host": "sample-koishi-game-mini",
+                    "trace_id": "trace-sample-koishi-game-mini-2",
+                    "updated_at_ms": 1791594674930
+                  }
+                },
+                "final": {
+                  "created_at_ms": 1791594674930,
+                  "error": null,
+                  "event": {
+                    "account_id": "9000",
+                    "actor_id": "2323",
+                    "conversation": {
+                      "id": "4242",
+                      "kind": "group"
+                    },
+                    "event_id": "sample-koishi-game-mini-2",
+                    "extensions": {
+                      "onebot.v11": {
+                        "message_id": "80001",
+                        "sender": {
+                          "nickname": "Ligamina"
+                        }
+                      }
+                    },
+                    "message": [
+                      {
+                        "text": "猜数字 结束",
+                        "type": "text"
+                      }
+                    ],
+                    "platform": "koishi",
+                    "schema_version": "ligamina/0.1",
+                    "target_host": "sample-koishi-game-mini",
+                    "timestamp": "2026-10-10T01:11:12.719Z",
+                    "trace_id": "trace-sample-koishi-game-mini-2"
+                  },
+                  "fingerprint": "0824b25657ea28f0fa6064b203a94c52c04631c2165239d3ad51e5fa825b8d0d",
+                  "key": {
+                    "account_id": "9000",
+                    "client_id": "ligamina-sample-client",
+                    "conversation_id": "4242",
+                    "conversation_kind": "group",
+                    "event_id": "sample-koishi-game-mini-2",
+                    "platform": "koishi"
+                  },
+                  "status": "completed",
+                  "target_host": "sample-koishi-game-mini",
+                  "trace_id": "trace-sample-koishi-game-mini-2",
+                  "updated_at_ms": 1791594674969
+                }
+              }
+            ],
+            "core_exit_code": 0,
+            "stderr_tail": "",
+            "gateway_errors": []
+          }
+        },
+        "L4": {
+          "status": "passed",
+          "expected_outgoing_texts": [
+            "比赛开始！本次共 1 回合～",
+            "猜数字范围：0 - 100",
+            "比赛已停止"
+          ],
+          "native_messages": [
+            {
+              "text": "比赛开始！本次共 1 回合～",
+              "target": {
+                "kind": "group",
+                "id": "4242"
+              }
+            },
+            {
+              "text": "猜数字范围：0 - 100",
+              "target": {
+                "kind": "group",
+                "id": "4242"
+              }
+            },
+            {
+              "text": "比赛已停止",
+              "target": {
+                "kind": "group",
+                "id": "4242"
+              }
+            }
+          ],
+          "federated_messages": [
+            {
+              "text": "比赛开始！本次共 1 回合～",
+              "target": {
+                "id": "4242",
+                "kind": "group"
+              }
+            },
+            {
+              "text": "猜数字范围：0 - 100",
+              "target": {
+                "id": "4242",
+                "kind": "group"
+              }
+            },
+            {
+              "text": "比赛已停止",
+              "target": {
+                "id": "4242",
+                "kind": "group"
+              }
+            }
+          ],
+          "expected_target": {
+            "kind": "group",
+            "id": "4242"
+          },
+          "native_baseline": {
+            "text_match": true,
+            "target_match": true
+          },
+          "federated_behavior": {
+            "text_match": true,
+            "target_match": true
+          },
+          "trace_parity": true,
+          "failure_classification": []
+        },
+        "L5": {
+          "status": "not_run",
+          "reason": "repeated lifecycle/resource stability belongs to T14"
+        }
+      },
+      "entry_point": ".",
+      "input_events": [
+        {
+          "schema_version": "ligamina/0.1",
+          "event_id": "sample-koishi-game-mini-1",
+          "trace_id": "trace-sample-koishi-game-mini-1",
+          "platform": "koishi",
+          "account_id": "9000",
+          "conversation": {
+            "kind": "group",
+            "id": "4242"
+          },
+          "actor_id": "2323",
+          "timestamp": "2026-10-10T01:11:12.719Z",
+          "target_host": "sample-koishi-game-mini",
+          "message": [
+            {
+              "type": "text",
+              "text": "猜数字 开始"
+            }
+          ],
+          "extensions": {
+            "onebot.v11": {
+              "message_id": "80000",
+              "sender": {
+                "nickname": "Ligamina"
+              }
+            }
+          }
+        },
+        {
+          "schema_version": "ligamina/0.1",
+          "event_id": "sample-koishi-game-mini-2",
+          "trace_id": "trace-sample-koishi-game-mini-2",
+          "platform": "koishi",
+          "account_id": "9000",
+          "conversation": {
+            "kind": "group",
+            "id": "4242"
+          },
+          "actor_id": "2323",
+          "timestamp": "2026-10-10T01:11:12.719Z",
+          "target_host": "sample-koishi-game-mini",
+          "message": [
+            {
+              "type": "text",
+              "text": "猜数字 结束"
+            }
+          ],
+          "extensions": {
+            "onebot.v11": {
+              "message_id": "80001",
+              "sender": {
+                "nickname": "Ligamina"
+              }
+            }
+          }
+        }
+      ]
+    }
+  ],
+  "error": null,
+  "runtime_versions": {
+    "python": {
+      "version": "3.12.14 (main, Aug 14 2026, 15:40:22) [MSC v.1944 64 bit (AMD64)]",
+      "executable": "E:\\stella\\Ligamina\\lab\\.venv\\Scripts\\python.exe"
+    },
+    "uv": "uv 0.12.5 (210d1f678 2026-08-14 x86_64-pc-windows-msvc)",
+    "node": "v24.20.0",
+    "npm": "12.0.2",
+    "rustc": "rustc 1.97.1 (8bab26f4f 2026-07-14)",
+    "cargo": "cargo 1.97.1 (c980f4866 2026-06-30)"
+  },
+  "definition": {
+    "L0": "source metadata and the registry-declared artifact digest were verified from downloaded bytes",
+    "L1": "exact framework and plugin dependencies resolved and installed in a disposable profile",
+    "L2": "unmodified plugin imported and initialized through its native framework Host; fixture event dispatched",
+    "L3": "plugin receives the same fixture through the production Core federated route",
+    "L4": "expected behavior and native/federated operation traces both match the sample fixture",
+    "L5": "repeated lifecycle/resource stability; belongs to T14",
+    "isolation_boundary": "disposable dependency profile, HOME, caches, credentials, process lifetime and data directory; not an OS security sandbox"
+  },
+  "manifest": {
+    "path": "E:\\stella\\Ligamina\\samples\\third-party.lock.json",
+    "sha256": "a87786aad5fdca8b55405cbde9903b54d9a75671ba995bd19ced1134dd9963cf",
+    "sample_count": 2
+  },
+  "framework_versions": {
+    "nonebot": {
+      "nonebot2[fastapi]": "2.5.0",
+      "nonebot-adapter-onebot": "2.4.6",
+      "jsonschema": "4.25.1"
+    },
+    "koishi": {
+      "@koishijs/core": "4.18.11",
+      "@minatojs/driver-sqlite": "4.7.0"
+    }
+  },
+  "core_build": {
+    "label": "build production Core daemon",
+    "status": "passed",
+    "command": [
+      "C:\\Users\\Vegetable\\.cargo\\bin\\cargo.EXE",
+      "build",
+      "-p",
+      "ligamina-cli",
+      "--locked"
+    ],
+    "returncode": 0,
+    "stdout_tail": "",
+    "stderr_tail": "    Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.16s\n"
+  },
+  "temporary_profile_cleanup": {
+    "status": "passed",
+    "path": "C:\\Users\\VEGETA~1\\AppData\\Local\\Temp\\ligamina-representative-fhkfdvem",
+    "already_removed": true
+  },
+  "l4_pass_count": {
+    "nonebot": 0,
+    "koishi": 1
+  },
+  "l4_message_pass_count": {
+    "nonebot": 0,
+    "koishi": 1
+  },
+  "category_coverage": {
+    "command": true,
+    "dependency": false,
+    "storage": false,
+    "task": false
+  },
+  "sample_failure_count": 1,
+  "gate": "NOT READY",
+  "gate_reason": "C11 requires at least two L4 behavior passes per ecosystem, with at least one passing message plugin per ecosystem. L0-L3 failures remain recorded per exact package version and are not included in the support list.",
+  "support_list": [
+    {
+      "ecosystem": "koishi",
+      "package": "koishi-plugin-game-mini",
+      "version": "0.4.3",
+      "fixture": "E:\\stella\\Ligamina\\samples\\fixtures\\third-party\\koishi-game-mini-number-guess.json"
+    }
+  ],
+  "ended_at": "2026-10-10T01:11:31.532Z",
+  "report": "E:\\stella\\Ligamina\\outputs\\acceptance\\t13-representative-windows-l4-check-20261010.json"
+}

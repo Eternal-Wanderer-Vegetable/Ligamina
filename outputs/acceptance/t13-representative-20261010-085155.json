@@ -1,0 +1,196 @@
+{
+  "suite": "representative",
+  "status": "completed",
+  "worker": "isolated",
+  "started_at": "2026-10-10T00:51:55.859Z",
+  "platform": "Windows-11-10.0.26200-SP0",
+  "samples": [
+    {
+      "sample_id": "nonebot-autohelp",
+      "ecosystem": "nonebot",
+      "package": "nonebot-plugin-autohelp",
+      "version": "0.1.7",
+      "license": "MIT",
+      "category": [
+        "command",
+        "message"
+      ],
+      "source_url": "https://github.com/ffreemt/nonebot-plugin-autohelp",
+      "artifact_hash_algorithm": "sha256",
+      "artifact_hash": "70faef1a7f05a42a448e4d886a4b4a58611d86260df7d6f6e2e2b9deb0e49472",
+      "fixture_path": null,
+      "reproduction_command": "uv run --project lab python lab/run.py --suite representative --manifest samples/third-party.lock.json --worker isolated --sample-id nonebot-autohelp",
+      "levels": {
+        "L0": {
+          "status": "passed",
+          "artifact_url": "https://files.pythonhosted.org/packages/fc/c0/f6e010f1d0ae8bf2e8fe067ea031b0debb3f764f5480022903f5e5179471/nonebot_plugin_autohelp-0.1.7-py3-none-any.whl",
+          "artifact_hash_algorithm": "sha256",
+          "expected_artifact_hash": "70faef1a7f05a42a448e4d886a4b4a58611d86260df7d6f6e2e2b9deb0e49472",
+          "actual_artifact_hash": "70faef1a7f05a42a448e4d886a4b4a58611d86260df7d6f6e2e2b9deb0e49472",
+          "actual_sha256": "70faef1a7f05a42a448e4d886a4b4a58611d86260df7d6f6e2e2b9deb0e49472",
+          "size_bytes": 9152,
+          "error": null
+        },
+        "L1": {
+          "status": "passed",
+          "steps": [
+            {
+              "label": "resolve exact Python sample profile",
+              "status": "passed",
+              "command": [
+                "C:\\Users\\Vegetable\\AppData\\Local\\FreeToken\\bin\\uv.EXE",
+                "lock"
+              ],
+              "returncode": 0,
+              "stdout_tail": "",
+              "stderr_tail": "Using CPython 3.12.14 interpreter at: C:\\Users\\Vegetable\\AppData\\Roaming\\uv\\python\\cpython-3.12.14-windows-x86_64-none\\python.exe\nResolved 22 packages in 8.98s\n"
+            },
+            {
+              "label": "install locked Python sample profile",
+              "status": "passed",
+              "command": [
+                "C:\\Users\\Vegetable\\AppData\\Local\\FreeToken\\bin\\uv.EXE",
+                "sync",
+                "--locked",
+                "--no-dev",
+                "--no-build",
+                "--python",
+                "3.12.14"
+              ],
+              "returncode": 0,
+              "stdout_tail": "",
+              "stderr_tail": "Using CPython 3.12.14 interpreter at: C:\\Users\\Vegetable\\AppData\\Roaming\\uv\\python\\cpython-3.12.14-windows-x86_64-none\\python.exe\nCreating virtual environment at: .venv\nResolved 22 packages in 5ms\nDownloading pydantic-core (2.1MiB)\n Downloaded pydantic-core\nPrepared 20 packages in 8.48s\nInstalled 21 packages in 167ms\n + annotated-types==0.8.0\n + anyio==4.15.1\n + colorama==0.4.6\n + exceptiongroup==1.3.1\n + idna==3.20\n + loguru==0.7.3\n + logzero==1.7.0\n + msgpack==1.2.3\n + multidict==7.1.0\n + nonebot-adapter-onebot==2.4.6\n + nonebot-plugin-autohelp==0.1.7 (from https://files.pythonhosted.org/packages/fc/c0/f6e010f1d0ae8bf2e8fe067ea031b0debb3f764f5480022903f5e5179471/nonebot_plugin_autohelp-0.1.7-py3-none-any.whl)\n + nonebot2==2.5.0\n + propcache==0.5.4\n + pydantic==2.14.0\n + pydantic-core==2.50.0\n + pygtrie==2.6.2\n + python-dotenv==1.2.4\n + typing-extensions==4.16.0\n + typing-inspection==0.4.4\n + win32-setctime==1.2.0\n + yarl==1.25.1\n"
+            },
+            {
+              "label": "verify installed Python package metadata",
+              "status": "passed",
+              "command": [
+                "C:\\Users\\VEGETA~1\\AppData\\Local\\Temp\\ligamina-representative-_6qsdnxi\\nonebot-autohelp\\.venv\\Scripts\\python.exe",
+                "-c",
+                "from importlib.metadata import version; import sys; print(version(sys.argv[1]))",
+                "nonebot-plugin-autohelp"
+              ],
+              "returncode": 0,
+              "stdout_tail": "0.1.7\n",
+              "stderr_tail": ""
+            }
+          ],
+          "lock_sha256": "5c2d17f1a696dac2d0acfb21d4e33e0d362c448a1022c48e159886d5591581ab"
+        },
+        "L2": {
+          "status": "failed",
+          "error": "AttributeError: 'Popen' object has no attribute '_thread'",
+          "traceback": "Traceback (most recent call last):\n  File \"E:\\stella\\Ligamina\\lab\\representative.py\", line 969, in run_samples\n    native = DirectWorker(sample, work, environment).run(events)\n             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"E:\\stella\\Ligamina\\lab\\representative.py\", line 546, in run\n    self.start()\n  File \"E:\\stella\\Ligamina\\lab\\representative.py\", line 432, in start\n    self._attach_windows_job()\n  File \"E:\\stella\\Ligamina\\lab\\representative.py\", line 496, in _attach_windows_job\n    if kernel32.ResumeThread(wintypes.HANDLE(self.process._thread)) == 0xFFFFFFFF:\n                                             ^^^^^^^^^^^^^^^^^^^^\nAttributeError: 'Popen' object has no attribute '_thread'\n"
+        },
+        "L3": {
+          "status": "skipped",
+          "reason": "L2 native baseline did not complete"
+        },
+        "L4": {
+          "status": "not_run",
+          "reason": "no L4 expected-output fixture",
+          "expected_outgoing_texts": null
+        },
+        "L5": {
+          "status": "not_run",
+          "reason": "repeated lifecycle/resource stability belongs to T14"
+        }
+      },
+      "entry_module": "nonebot_plugin_autohelp",
+      "input_events": [
+        {
+          "schema_version": "ligamina/0.1",
+          "event_id": "sample-nonebot-autohelp-1",
+          "trace_id": "trace-sample-nonebot-autohelp-1",
+          "platform": "onebot.v11",
+          "account_id": "9000",
+          "conversation": {
+            "kind": "group",
+            "id": "4242"
+          },
+          "actor_id": "2323",
+          "timestamp": "2026-10-10T00:52:16.256Z",
+          "target_host": "sample-nonebot-autohelp",
+          "message": [
+            {
+              "type": "text",
+              "text": "ligamina sample probe"
+            }
+          ],
+          "extensions": {
+            "onebot.v11": {
+              "message_id": "message-nonebot-autohelp-1",
+              "sender": {
+                "nickname": "Ligamina"
+              }
+            }
+          }
+        }
+      ]
+    }
+  ],
+  "error": null,
+  "definition": {
+    "L0": "source metadata and the registry-declared artifact digest were verified from downloaded bytes",
+    "L1": "exact framework and plugin dependencies resolved and installed in a disposable profile",
+    "L2": "unmodified plugin imported and initialized through its native framework Host; fixture event dispatched",
+    "L3": "plugin receives the same fixture through the production Core federated route",
+    "L4": "expected behavior and native/federated operation traces both match the sample fixture",
+    "L5": "repeated lifecycle/resource stability; belongs to T14",
+    "isolation_boundary": "disposable dependency profile, HOME, caches, credentials, process lifetime and data directory; not an OS security sandbox"
+  },
+  "manifest": {
+    "path": "E:\\stella\\Ligamina\\samples\\third-party.lock.json",
+    "sha256": "111641bf5c0c616a61ba404e445047d68aaab5d9392fd760fa81ed0ac5ba7bad",
+    "sample_count": 1
+  },
+  "framework_versions": {
+    "nonebot": {
+      "nonebot2": "2.5.0",
+      "nonebot-adapter-onebot": "2.4.6"
+    },
+    "koishi": {
+      "@koishijs/core": "4.18.11",
+      "@minatojs/driver-sqlite": "4.7.0"
+    }
+  },
+  "core_build": {
+    "label": "build production Core daemon",
+    "status": "passed",
+    "command": [
+      "C:\\Users\\Vegetable\\.cargo\\bin\\cargo.EXE",
+      "build",
+      "-p",
+      "ligamina-cli",
+      "--locked"
+    ],
+    "returncode": 0,
+    "stdout_tail": "",
+    "stderr_tail": "    Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.46s\n"
+  },
+  "temporary_profile_cleanup": {
+    "status": "passed",
+    "path": "C:\\Users\\VEGETA~1\\AppData\\Local\\Temp\\ligamina-representative-_6qsdnxi",
+    "already_removed": true
+  },
+  "l4_pass_count": {
+    "nonebot": 0,
+    "koishi": 0
+  },
+  "l4_message_pass_count": {
+    "nonebot": 0,
+    "koishi": 0
+  },
+  "category_coverage": {
+    "command": true,
+    "dependency": false,
+    "storage": false,
+    "task": false
+  },
+  "sample_failure_count": 1,
+  "gate": "NOT READY",
+  "gate_reason": "C11 requires at least two L4 behavior passes per ecosystem, with at least one passing message plugin per ecosystem. L0-L3 failures remain recorded per exact package version and are not included in the support list.",
+  "support_list": [],
+  "ended_at": "2026-10-10T00:52:16.654Z",
+  "report": "E:\\stella\\Ligamina\\outputs\\acceptance\\t13-representative-20261010-085155.json"
+}
