@@ -1,0 +1,50 @@
+{
+  "suite": "stability",
+  "platform": "linux",
+  "status": "failed",
+  "gate": "NOT READY",
+  "started_at": "2026-10-10T16:50:16.933Z",
+  "configuration": {
+    "cycles_per_host": 100,
+    "duration_hours": 24.0,
+    "sampling_interval_seconds": 60.0,
+    "warmup_minutes": 30.0,
+    "resource_growth_limit": "max(20 MiB, 10%)",
+    "capability_revocation_seconds": 5,
+    "recovery_seconds": 30,
+    "shutdown_seconds": 10
+  },
+  "build_steps": [],
+  "recovery_cycles": [],
+  "monitor_samples": [],
+  "http_requests": [],
+  "checks": [],
+  "cleanup": {
+    "host_pids": [],
+    "remaining_pids": [],
+    "core_exit_code": null,
+    "core_pid": null,
+    "status": "failed"
+  },
+  "error": "OSError: required tools are missing from PATH: cargo, node",
+  "traceback": "Traceback (most recent call last):\n  File \"/root/ligamina/lab/stability.py\", line 301, in run_stability\n    harness.assert_platform(report[\"platform\"])\n  File \"/root/ligamina/lab/run.py\", line 226, in assert_platform\n    raise EnvironmentError(f\"required tools are missing from PATH: {', '.join(missing)}\")\nOSError: required tools are missing from PATH: cargo, node\n",
+  "ended_at": "2026-10-10T16:50:17.134Z",
+  "expected_cycles": 200,
+  "case_summary": {
+    "expected_denominator": 200,
+    "observed_count": 0,
+    "coverage_count": 0,
+    "coverage_rate": 0.0,
+    "executed_denominator": 0,
+    "pass_rate": null,
+    "passed": 0,
+    "failed": 0,
+    "skipped": 0,
+    "unknown": 0,
+    "missing": 200,
+    "unexpected": 0,
+    "invalid_statuses": [],
+    "gate_passed": false
+  },
+  "report": "/root/ligamina/outputs/acceptance/t14-stability-linux-wsl-100x24h-20261011.json"
+}

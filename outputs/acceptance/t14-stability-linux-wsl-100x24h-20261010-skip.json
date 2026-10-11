@@ -1,0 +1,35 @@
+{
+  "schema_version": 1,
+  "task": "T14",
+  "status": "skipped",
+  "gate": "NOT READY",
+  "platform": "linux-wsl",
+  "requested": {
+    "cycles_per_host": 100,
+    "duration_hours": 24,
+    "interval_seconds": 60,
+    "warmup_minutes": 30
+  },
+  "observed": {
+    "user_reported_continuous_runtime_hours_lower_bound": 10,
+    "last_process_snapshot_elapsed": "05:16:01",
+    "last_process_snapshot_pids": [3845, 3848],
+    "process_found_when_checked_after_skip_request": false,
+    "final_24h_report_generated": false,
+    "completed_cycles_per_host": null
+  },
+  "decision": {
+    "requested_by_user": true,
+    "reason": "The user initially requested skipping the remainder after reporting more than 10 hours of execution. They later clarified that WSL had exited under host overload before completion and requested a fresh full run after restoring the machine.",
+    "termination_signal_sent_by_agent": false,
+    "acceptance_effect": "The partial run is not a 24-hour pass. Resource and full-duration stability gates remain unresolved; skipped is not counted as pass."
+  },
+  "rerun": {
+    "requested_by_user": true,
+    "started_at_utc": "2026-10-10T16:56:41Z",
+    "status_at_launch_record": "running",
+    "report_path": "outputs/acceptance/t14-stability-linux-wsl-100x24h-20261011.json",
+    "launch_record_path": "outputs/acceptance/t14-stability-linux-wsl-100x24h-20261011-launch.json"
+  },
+  "original_report_path": "outputs/acceptance/t14-stability-linux-wsl-100x24h-20261010.json"
+}

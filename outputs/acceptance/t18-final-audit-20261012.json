@@ -1,0 +1,186 @@
+{
+  "schema_version": 1,
+  "task": "T18",
+  "review_date": "2026-10-12",
+  "review_status": "completed",
+  "verdict": "PASS",
+  "repository_base_sha": "dd2b2345e947ff864602f856a20d60752be59b46",
+  "gates": {
+    "G1": "PASS",
+    "G2": "PASS"
+  },
+  "criteria": [
+    {
+      "id": "C01",
+      "status": "pass",
+      "evidence": [
+        "outputs/acceptance/t17-local-ci-checks-20261010.json",
+        "GitHub PR CI run 38032965125 (Windows and Linux checks passed)",
+        "GitHub PR #2 CI run 38060766011 (Windows and Linux jobs passed)"
+      ],
+      "scope_note": "The checks run from clean hosted checkouts with locked toolchains and dependency inputs."
+    },
+    {
+      "id": "C02",
+      "status": "pass",
+      "evidence": [
+        "outputs/acceptance/t12-smoke-windows-corrected-20261010.json",
+        "outputs/acceptance/t12-smoke-linux-corrected-20261010.json"
+      ],
+      "scope_note": "Production Core routes events, abilities, client requests, and shutdown on Windows and local WSL."
+    },
+    {
+      "id": "C03",
+      "status": "pass",
+      "evidence": [
+        "outputs/acceptance/t13-representative-windows-full-20261010.json",
+        "outputs/acceptance/t13-representative-wsl-final-20261010.json"
+      ],
+      "scope_note": "Native host behavior passed for the four exact plugin versions in the support list; unsupported sample states remain recorded."
+    },
+    {
+      "id": "C04",
+      "status": "pass",
+      "evidence": [
+        "outputs/acceptance/t12-smoke-windows-corrected-20261010.json",
+        "outputs/acceptance/t12-smoke-linux-corrected-20261010.json",
+        "hosts/nonebot/tests/native_bridge.py"
+      ],
+      "scope_note": "The accepted profile is bounded to tested text, group/private, reply, mention, and structured-reference cases."
+    },
+    {
+      "id": "C05",
+      "status": "pass",
+      "evidence": [
+        "outputs/acceptance/t12-smoke-windows-corrected-20261010.json",
+        "outputs/acceptance/t15-windows-third-party-plugin-20261010.json"
+      ],
+      "scope_note": "Authorized virtual gateway operations returned receipts. This does not claim real QQ or platform network delivery."
+    },
+    {
+      "id": "C06",
+      "status": "pass",
+      "evidence": [
+        "outputs/acceptance/t12-smoke-windows-corrected-20261010.json",
+        "outputs/acceptance/t12-smoke-linux-corrected-20261010.json"
+      ],
+      "scope_note": "Explicit host routing and rejection of the injected wrong-recipient case were exercised."
+    },
+    {
+      "id": "C07",
+      "status": "pass",
+      "evidence": [
+        "outputs/acceptance/t12-smoke-windows-corrected-20261010.json",
+        "outputs/acceptance/t12-smoke-linux-corrected-20261010.json"
+      ],
+      "scope_note": "Cross-host capability routing and the independent MCP client path passed."
+    },
+    {
+      "id": "C08",
+      "status": "pass",
+      "evidence": [
+        "outputs/acceptance/t12-smoke-windows-corrected-20261010.json",
+        "outputs/acceptance/t14-stability-windows-quick-20261010.json",
+        "outputs/acceptance/t14-stability-linux-wsl-quick-20261010.json"
+      ],
+      "scope_note": "Host crash revocation, surviving-host operation, graceful shutdown, and process cleanup passed; the 24-hour resource gate is tracked separately under C12."
+    },
+    {
+      "id": "C09",
+      "status": "pass",
+      "evidence": [
+        "outputs/acceptance/t12-smoke-windows-corrected-20261010.json",
+        "outputs/acceptance/t12-smoke-linux-corrected-20261010.json",
+        "crates/ligamina-core/tests/platform_store.rs"
+      ],
+      "scope_note": "Operation ledger and unknown-result recovery cases are covered by the shared Core checks and smoke report."
+    },
+    {
+      "id": "C10",
+      "status": "pass",
+      "evidence": [
+        "outputs/acceptance/t12-smoke-windows-corrected-20261010.json",
+        "outputs/acceptance/t12-smoke-linux-corrected-20261010.json"
+      ],
+      "scope_note": "Native and federated paths were compared, and the injected wrong-recipient result was detected."
+    },
+    {
+      "id": "C11",
+      "status": "pass",
+      "evidence": [
+        "outputs/acceptance/t13-representative-windows-full-20261010.json",
+        "outputs/acceptance/t13-representative-wsl-final-20261010.json"
+      ],
+      "scope_note": "Each platform scanned 20 unique samples and passed the L4 gate. Eight WSL samples retain L0/L1/L2 failures; only four L4 plugin versions are supported."
+    },
+    {
+      "id": "C12",
+      "status": "pass",
+      "evidence": [
+        "outputs/acceptance/t14-stability-linux-wsl-100x24h-20261011.json",
+        "outputs/acceptance/t14-stability-linux-wsl-100x24h-20261011-launch.json",
+        "outputs/acceptance/t14-stability-windows-quick-20261010.json",
+        "outputs/acceptance/t14-stability-linux-wsl-quick-20261010.json"
+      ],
+      "scope_note": "Ubuntu 24.04 WSL completed the full 86,400-second monitoring window. All 1,440 samples passed; both Hosts completed 100 recovery cycles (200/200 total); recovery, combined monitor, resource budget, and CLI status/doctor checks passed; shutdown exited with code 0 and no remaining process IDs."
+    },
+    {
+      "id": "C13",
+      "status": "pass",
+      "evidence": [
+        "outputs/acceptance/t13-representative-wsl-final-20261010.json",
+        "outputs/acceptance/t17-local-ci-checks-20261010.json",
+        "outputs/acceptance/t14-stability-linux-wsl-100x24h-20261010-skip.json"
+      ],
+      "scope_note": "Reports preserve pass/fail/skipped distinctions. The interrupted T14 run has an explicit skip record rather than a fabricated completion report."
+    },
+    {
+      "id": "C14",
+      "status": "pass",
+      "evidence": [
+        "outputs/acceptance/t15-windows-sandbox-c14-20261011.json",
+        "outputs/acceptance/t15-windows-sandbox-environment-20261011.json",
+        "outputs/acceptance/t15-windows-third-party-plugin-20261010.json",
+        "GitHub PR #2 Windows job in CI run 38060766011 (bundle install and failed-update rollback passed)"
+      ],
+      "scope_note": "All eight C14 checks passed in a clean Windows 11 Enterprise 10.0.26100 x64 Sandbox with Python, Node, npm, Docker, and uv absent from PATH before installation. Fixed runtime archives and locked dependency caches were prepared on the host and reverified in Sandbox because outbound runtime downloads timed out. HTTP 202, daemon process exit, and Host PID cleanup passed; the daemon exit code was unavailable from the Sandbox process handle."
+    },
+    {
+      "id": "C15",
+      "status": "pass",
+      "evidence": [
+        "outputs/acceptance/t16-linux-wsl-container-20261010.json",
+        "outputs/acceptance/t12-smoke-linux-corrected-20261010.json"
+      ],
+      "scope_note": "Linux container contract and lifecycle smoke passed from local WSL; the container used Docker Desktop's Linux engine."
+    }
+  ],
+  "supported_plugins": [
+    {
+      "ecosystem": "nonebot",
+      "package": "nonebot-plugin-autohelp",
+      "version": "0.1.7"
+    },
+    {
+      "ecosystem": "nonebot",
+      "package": "nonebot-plugin-repeater",
+      "version": "3.1.4"
+    },
+    {
+      "ecosystem": "koishi",
+      "package": "koishi-plugin-game-mini",
+      "version": "0.4.3"
+    },
+    {
+      "ecosystem": "koishi",
+      "package": "koishi-plugin-multi-qa",
+      "version": "1.0.8"
+    }
+  ],
+  "open_g2_blockers": [],
+  "scope_limitations": [
+    "No real QQ or other platform network gateway was connected; virtual gateway receipts do not prove real platform delivery.",
+    "The local WSL container smoke is not a separate clean Linux VM installation test."
+  ],
+  "final_note": "All C01-C15 acceptance criteria pass and G1/G2 are PASS. The supported-plugin list remains limited to the four exact package versions listed here. No real QQ or other platform network gateway was connected, so virtual-gateway receipts do not claim real platform delivery; the Linux container result is a local WSL-launched smoke, not a separate clean Linux VM installation test."
+}

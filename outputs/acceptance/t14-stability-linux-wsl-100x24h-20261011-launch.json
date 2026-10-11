@@ -1,0 +1,56 @@
+{
+  "schema_version": 1,
+  "task": "T14",
+  "record_type": "launch",
+  "platform": "linux-wsl",
+  "status_at_launch": "running",
+  "gate_at_launch": "NOT READY",
+  "started_at_utc": "2026-10-10T16:56:41Z",
+  "distro": "Ubuntu-24.04",
+  "parameters": {
+    "cycles_per_host": 100,
+    "duration_hours": 24,
+    "interval_seconds": 60,
+    "warmup_minutes": 30,
+    "skip_build": true
+  },
+  "toolchain": {
+    "cargo_path": "/root/.cargo/bin/cargo",
+    "cargo_version": "cargo 1.97.1 (c980f4866 2026-06-30)",
+    "node_path": "/opt/node-v24.20.0/bin/node",
+    "node_version": "v24.20.0",
+    "uv_path": "/usr/local/bin/uv",
+    "uv_version": "uv 0.12.5 (x86_64-unknown-linux-gnu)"
+  },
+  "preflight_snapshot": {
+    "captured_at_utc": "2026-10-10T16:45:51Z",
+    "load_average_1_5_15": [0.08, 0.04, 0.01],
+    "memory_total_gib": 30,
+    "memory_available_gib": 29,
+    "swap_total_gib": 8,
+    "swap_used_gib": 0,
+    "root_filesystem_available_gib": 939,
+    "existing_stability_processes": 0
+  },
+  "source": {
+    "path": "lab/stability.py",
+    "sha256": "51edff8b54009e832797e4ba4c8cf807add55861daa8f4c98099b551ce489f46"
+  },
+  "processes": {
+    "host_wsl_pid": 13928,
+    "linux_uv_pid": 2221,
+    "linux_python_pid": 2236,
+    "superseded_duplicate_start": {
+      "started_at_utc": "2026-10-10T16:54:58Z",
+      "linux_pids": [369, 384],
+      "stopped": true,
+      "reason": "A second launcher was retained to bind the WSL lifetime and prevent concurrent writers to the report path."
+    }
+  },
+  "report_path": "outputs/acceptance/t14-stability-linux-wsl-100x24h-20261011.json",
+  "log_path": "outputs/acceptance/t14-stability-linux-wsl-100x24h-20261011.log",
+  "notes": [
+    "The first tool-gate attempt failed before the long-duration run because the root login shell omitted Cargo and Node from PATH; those binaries were already installed and the current run exports their directories without changing system configuration.",
+    "No final 24-hour result exists in this launch record. C12 remains NOT READY until the final report passes all gates."
+  ]
+}

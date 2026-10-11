@@ -4,7 +4,7 @@ Ligamina 的初步定位是：**个人部署优先、独立于具体机器人的
 
 它计划保留 NoneBot、Koishi、AstrBot 等生态的原生插件与宿主机制，通过公共接口连接插件能力、聊天事件与生命周期管理。Stella 将作为首个集成客户端；其他机器人与非 AI 客户端也应能够独立接入。
 
-工程执行已通过 T01–T12 的 G1 技术闭环，并已实现 T13/T14 验收工具。T13 的 Windows 与本机 WSL Ubuntu 24.04.5 20 样本 gate 均通过，每生态有 2 个 L4 通过样本；WSL 最终报告记录 8 个样本有 L0/L1/L2 失败，后续 skipped 状态保留且不计通过，只有 4 个 L4 插件进入支持名单，详见[WSL 全量报告](outputs/acceptance/t13-representative-wsl-final-20261010.json)。T14 在 Windows 和本机 WSL 的短测均验证生产 Core 双 Host 恢复、CLI 检查和进程清理；WSL 100 次/Host、24 小时稳定性长测正在运行，短测资源门槛按设计为 `skipped`。T15 的 Windows bundle 更新安装、交互式首启、Core/双 Host 运行、停机清理与默认卸载数据保留已在本机通过；本机 PATH 隔离环境还完成了锁定第三方 `nonebot-plugin-autohelp==0.1.7` 的 bundle 安装、真实 Host 事件处理及虚拟 gateway 成功回执，详见[第三方插件验收报告](outputs/acceptance/t15-windows-third-party-plugin-20261010.json)、[首启验收报告](outputs/acceptance/t15-windows-first-run-probe-20261010.json)和[PATH 隔离验收](outputs/acceptance/t15-windows-install-path-isolation-20261010.json)。干净 Windows VM 验收仍待完成。GitHub CI #5 已通过双 OS checks、G1 smoke、Linux 镜像构建与 Windows bundle fresh-install 验收；新 CI #9 也通过 Windows bundle 第三方插件验收、双 OS checks、G1 smoke 与 Linux 镜像构建，证据 artifact ID 为 Windows `11662631994`、Linux `11662407118`。T16 Linux 容器 smoke 已通过；GitHub `CI #2`–`CI #5` 及草稿 PR #1 的四次已完成 `pull_request` runs 均通过；手动代表扫描的 Windows 与 Ubuntu jobs 各完成 20 个样本且 gate PASS（每生态 L4 各 2）。T14 长测、C14 干净 VM 与 T18 最终汇总仍未完成，G2 保持 `NOT READY`。
+工程执行已完成 T01–T18 的计划验收。T13 的 Windows 与本机 WSL Ubuntu 24.04.5 20 样本 gate 均通过；8 个 WSL 样本保留 L0/L1/L2 失败与 skipped 结果，不计为支持样本，支持名单仅含 4 个 L4 插件，详见[WSL 全量报告](outputs/acceptance/t13-representative-wsl-final-20261010.json)。此前因主机过载中断的 T14 长测仍作为历史 `skipped` 记录；重跑的 WSL 24 小时稳定性与资源门槛现已通过，记录 200/200 恢复循环和 1,440/1,440 个通过采样点，见[最终报告](outputs/acceptance/t14-stability-linux-wsl-100x24h-20261011.json)。T15 bundle 安装、回滚、双 Host、第三方 `nonebot-plugin-autohelp==0.1.7` 行为及虚拟回执已通过；干净 Windows Sandbox 的 C14 八项检查也全部通过，见[Windows T15 报告](outputs/acceptance/t15-windows-third-party-plugin-20261010.json)和[T15/C14 Sandbox 报告](outputs/acceptance/t15-windows-sandbox-c14-20261011.json)。T16 Linux 容器 smoke、T17 本地和 GitHub CI 检查均通过。T18 于 2026-10-12 完成 C01–C15 复核，G1/G2 均为 `PASS`；最新审阅见[最终报告](outputs/acceptance/t18-final-audit-20261012.json)。支持名单仍限于已通过的四个精确插件版本；未连接真实 QQ 或其他平台网关，因此这些结果不代表真实平台收发。
 
 ## 规划文档
 
@@ -16,7 +16,7 @@ Ligamina 的初步定位是：**个人部署优先、独立于具体机器人的
 
 规划依据：[原始分享讨论](https://chatgpt.com/share/6ac8b4f4-4ad8-83e9-b269-90629f1c7979)。
 
-初步计划已由用户核实通过。执行计划记录 T01–T17 的实现进展及阶段证据；G1 于 2026-10-10 通过。验收报告位于 [acceptance](outputs/acceptance/)。T13 的 Windows 与本机 WSL Linux 完整矩阵均已通过 gate；T14 长测尚未完成；T15 首启向导已实现，但干净 VM 与插件验收仍待完成；T17 GitHub `CI #2`–`CI #5`、手动代表样本扫描和草稿 PR #1 的 Windows/Linux jobs 均已通过；T18 和 C01–C15 总体验收仍待完成，G2 保持 `NOT READY`。
+初步计划已由用户核实通过。验收报告位于 [acceptance](outputs/acceptance/)。G1 于 2026-10-10 通过；完成 T14 长测和 C14 Sandbox 验收后，T18 复核了全部 C01–C15，G2 于 2026-10-12 通过。10 月 10 日的 `NOT READY` 审阅报告保留为历史裁决；当前裁决见[最新 T18 报告](outputs/acceptance/t18-final-audit-20261012.json)，执行记录见[工程计划第 9 节](outputs/2026-10-09-ligamina-engineering-plan.md)。真实平台网关和实际 QQ/平台投递不属于本次已验证范围。
 
 ## 本机运行诊断
 
@@ -49,6 +49,6 @@ pwsh -NoProfile -File scripts/check.ps1
 bash scripts/check.sh
 ```
 
-GitHub Actions 工作流位于 `.github/workflows/ci.yml` 和 `.github/workflows/representative.yml`。本地检查记录见 [T17 报告](outputs/acceptance/t17-local-ci-checks-20261010.json)，Windows 与 WSL smoke 证据分别见 [Windows](outputs/acceptance/ci-smoke-windows.json) 和 [Linux](outputs/acceptance/ci-smoke-linux.json)。首个托管 CI 的 Windows job 发现 Git 默认换行转换改变锁文件与 profile 的 SHA-256。仓库现通过 `.gitattributes` 固定 LF，Windows autocrlf 模拟 checkout 下 Runner 17 项复测通过；GitHub `CI #2`–`CI #5` 的 Windows/Linux jobs（含 Linux 镜像构建）均通过。手动代表样本扫描中，GitHub Windows 与 Linux jobs 均扫完 20 个样本且 gate PASS（每生态 2 个 L4）。草稿 PR #1 的最新 `pull_request` run `38032297005`（提交 `9409d20`）通过 Windows/Linux checks、Windows PATH 隔离 fresh-install 与第三方插件验收、G1 smoke 和 Linux 镜像构建，artifact ID 为 Windows `11662631994`、Linux `11662407118`。先前 runs `38029089731`、`38030943368` 和 `38031645953` 也已通过。 本机 WSL Linux 全量 gate 已完成并通过；报告见[WSL 最终结果](outputs/acceptance/t13-representative-wsl-final-20261010.json)。
+GitHub Actions 工作流位于 `.github/workflows/ci.yml` 和 `.github/workflows/representative.yml`。本地检查记录见 [T17 报告](outputs/acceptance/t17-local-ci-checks-20261010.json)，Windows 与 WSL smoke 证据分别见 [Windows](outputs/acceptance/ci-smoke-windows.json) 和 [Linux](outputs/acceptance/ci-smoke-linux.json)。首个托管 CI 的 Windows job 发现 Git 默认换行转换改变锁文件与 profile 的 SHA-256。仓库现通过 `.gitattributes` 固定 LF，Windows autocrlf 模拟 checkout 下 Runner 17 项复测通过；GitHub `CI #2`–`CI #5` 的 Windows/Linux jobs（含 Linux 镜像构建）均通过。手动代表样本扫描中，GitHub Windows 与 Linux jobs 均扫完 20 个样本且 gate PASS（每生态 2 个 L4）。合并前 PR #1 的 run `38032297005`（提交 `9409d20`）通过 Windows/Linux checks、Windows PATH 隔离 fresh-install 与第三方插件行为验收、G1 smoke 和 Linux 镜像构建，artifact ID 为 Windows `11662631994`、Linux `11662407118`；合并后 run `38032965125` 也通过双平台 checks。PR #2 的 run `38060766011` 通过 Windows/Linux jobs，包含 T15 损坏哈希更新回滚验收和 Linux 镜像构建；artifact ID 为 Windows `11672952328`、Linux `11673007283`。WSL Linux 全量 gate 已完成并通过；报告见[WSL 最终结果](outputs/acceptance/t13-representative-wsl-final-20261010.json)。
 
 仓库：[Eternal-Wanderer-Vegetable/Ligamina](https://github.com/Eternal-Wanderer-Vegetable/Ligamina)。
