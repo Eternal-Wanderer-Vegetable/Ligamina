@@ -1,0 +1,323 @@
+{
+  "schema_version": 1,
+  "suite": "documentation-harness",
+  "date": "2026-10-12",
+  "status": "passed_with_limitations",
+  "scope": "skill installation, documentation routing/state, README evidence rendering, phase-two plan; no full-catalog execution",
+  "base_commit": "3b2a591",
+  "checks": {
+    "windows_docs": {
+      "command": "pwsh -NoProfile -File init.ps1 -Mode docs",
+      "exit_code": 0,
+      "output": {
+        "status": "passed",
+        "documents": 18,
+        "local_links": 130,
+        "indexed_historical_markdown": 9,
+        "features": 14,
+        "failures": []
+      }
+    },
+    "harness": {
+      "command": "node .agents/skills/harness-creator/scripts/validate-harness.mjs --target . --json",
+      "exit_code": 0,
+      "output": {
+        "overall": 100,
+        "bottleneck": null,
+        "subsystems": {
+          "instructions": {
+            "score": 5,
+            "passed": 5,
+            "total": 5,
+            "checks": [
+              {
+                "pass": true,
+                "message": "Agent instruction file exists"
+              },
+              {
+                "pass": true,
+                "message": "Startup workflow documented"
+              },
+              {
+                "pass": true,
+                "message": "Definition of done documented"
+              },
+              {
+                "pass": true,
+                "message": "Verification commands discoverable"
+              },
+              {
+                "pass": true,
+                "message": "State artifacts routed from instructions"
+              }
+            ]
+          },
+          "state": {
+            "score": 5,
+            "passed": 5,
+            "total": 5,
+            "checks": [
+              {
+                "pass": true,
+                "message": "Feature tracker exists"
+              },
+              {
+                "pass": true,
+                "message": "Feature tracker is valid and has feature fields"
+              },
+              {
+                "pass": true,
+                "message": "Progress log exists"
+              },
+              {
+                "pass": true,
+                "message": "Progress log supports restart"
+              },
+              {
+                "pass": true,
+                "message": "Handoff captures blockers/files/next step"
+              }
+            ]
+          },
+          "verification": {
+            "score": 5,
+            "passed": 5,
+            "total": 5,
+            "checks": [
+              {
+                "pass": true,
+                "message": "Verification entrypoint exists"
+              },
+              {
+                "pass": true,
+                "message": "Verification fails fast"
+              },
+              {
+                "pass": true,
+                "message": "Test command documented"
+              },
+              {
+                "pass": true,
+                "message": "Static/build check documented"
+              },
+              {
+                "pass": true,
+                "message": "Verification evidence is recorded"
+              }
+            ]
+          },
+          "scope": {
+            "score": 5,
+            "passed": 5,
+            "total": 5,
+            "checks": [
+              {
+                "pass": true,
+                "message": "One-feature-at-a-time rule exists"
+              },
+              {
+                "pass": true,
+                "message": "Feature dependencies are tracked"
+              },
+              {
+                "pass": true,
+                "message": "Feature status is explicit"
+              },
+              {
+                "pass": true,
+                "message": "Scope boundary documented"
+              },
+              {
+                "pass": true,
+                "message": "Completion gate limits scope closure"
+              }
+            ]
+          },
+          "lifecycle": {
+            "score": 5,
+            "passed": 5,
+            "total": 5,
+            "checks": [
+              {
+                "pass": true,
+                "message": "Startup script exists"
+              },
+              {
+                "pass": true,
+                "message": "End-of-session procedure exists"
+              },
+              {
+                "pass": true,
+                "message": "Session handoff template exists"
+              },
+              {
+                "pass": true,
+                "message": "Session restart markers exist"
+              },
+              {
+                "pass": true,
+                "message": "Clean restart path documented"
+              }
+            ]
+          }
+        }
+      }
+    },
+    "renderer_negative_probes": {
+      "suite": "readme-evidence-negative-probes",
+      "status": "passed",
+      "cases": [
+        {
+          "name": "valid real reports",
+          "status": "passed",
+          "expected_exit": 0,
+          "observed_exit": 0,
+          "observed_output": "README evidence block matches phase-one reports."
+        },
+        {
+          "name": "reject stale or edited README summary",
+          "status": "passed",
+          "expected_exit": 1,
+          "observed_exit": 1,
+          "observed_output": "README evidence block is stale; run node scripts/render-readme.mjs"
+        },
+        {
+          "name": "reject missing marker",
+          "status": "passed",
+          "expected_exit": 1,
+          "observed_exit": 1,
+          "observed_output": "README must contain exactly one ordered phase-one marker pair"
+        },
+        {
+          "name": "reject unsupported plugin claim without L4 evidence",
+          "status": "passed",
+          "expected_exit": 1,
+          "observed_exit": 1,
+          "observed_output": "Support entry lacks Windows L4: fake-unverified-plugin"
+        },
+        {
+          "name": "reject duplicate sample identities",
+          "status": "passed",
+          "expected_exit": 1,
+          "observed_exit": 1,
+          "observed_output": "Duplicate samples in outputs/acceptance/t13-representative-windows-full-20261010.json"
+        },
+        {
+          "name": "reject missing stage evidence",
+          "status": "passed",
+          "expected_exit": 1,
+          "observed_exit": 1,
+          "observed_output": "Unsupported or missing L4 status 'undefined' in outputs/acceptance/t13-representative-windows-full-20261010.json"
+        }
+      ]
+    },
+    "powershell_parser": {
+      "status": "passed",
+      "files": [
+        "init.ps1",
+        "scripts/check.ps1"
+      ]
+    },
+    "node_syntax": {
+      "status": "passed",
+      "files": [
+        "scripts/check-docs.mjs",
+        "scripts/render-readme.mjs"
+      ]
+    },
+    "diff_check": {
+      "status": "passed"
+    },
+    "bash_docs": {
+      "exit_code": 0,
+      "command": "C:/Program Files/Git/bin/bash.exe init.sh docs",
+      "status": "passed"
+    },
+    "bash_syntax": {
+      "exit_code": 0,
+      "command": "bash -n init.sh scripts/check.sh",
+      "status": "passed",
+      "environment": "Git Bash on Windows"
+    },
+    "wsl_docs": {
+      "command": "wsl.exe -d Ubuntu-24.04 -- bash --noprofile --norc -c <docs checks>",
+      "status": "skipped",
+      "reason": "Ubuntu WSL commands did not return within bounded probe; task-owned client processes stopped; distro not terminated"
+    },
+    "cli_report_example": {
+      "observed": {
+        "sample_count": 20,
+        "gate": "PASS",
+        "l4_pass_count": {
+          "koishi": 2,
+          "nonebot": 2
+        },
+        "status": "completed",
+        "suite": "representative"
+      },
+      "exit_code": 0,
+      "command": "target/debug/ligamina-cli.exe report outputs/acceptance/t13-representative-windows-full-20261010.json",
+      "status": "passed"
+    },
+    "installation": {
+      "computed_hash": "99c43ad6e27172aa8951fa33cacc2413ec69bf9040eeeb7f96c3198af13109be",
+      "command": "npx skills add walkinglabs/learn-harness-engineering --skill harness-creator",
+      "exit_code": 0,
+      "source": "walkinglabs/learn-harness-engineering",
+      "destination": ".agents/skills/harness-creator"
+    }
+  },
+  "not_executed": [
+    "phase-two plugin snapshot/artifact/test execution",
+    "new real-platform acceptance",
+    "first-stage full runtime/24h/Sandbox rerun",
+    "online CI for these uncommitted changes"
+  ],
+  "file_fingerprints": [
+    {
+      "path": "AGENTS.md",
+      "sha256": "a6e398ed2b3df97d8e58e61b42b067c000c5a6081734d94026f0f5f7f20eb198"
+    },
+    {
+      "path": "README.md",
+      "sha256": "ad4a624f5ef9f0865ce5a0dfcb124014e32c658a3e36f1d86a7e2f4922d91fa1"
+    },
+    {
+      "path": "feature_list.json",
+      "sha256": "f1dc82662e60323b00a52468e998d27ae06b86d71bb70b98891432964ef48689"
+    },
+    {
+      "path": "progress.md",
+      "sha256": "31f16c77385e0502e912e7c1435e143117594862e6620564158a98f92d0b8904"
+    },
+    {
+      "path": "session-handoff.md",
+      "sha256": "25be35b64f8120a6de1014b2f1c508d73855da8bd6a1f9fb8b683887613c5103"
+    },
+    {
+      "path": "init.ps1",
+      "sha256": "a7b97ed223c17e0047589e905376c95e42287ad17b802feef71c0288673e859f"
+    },
+    {
+      "path": "init.sh",
+      "sha256": "9a93dc56e29337d359c011124e76157263210cc901d79002b3c507f55edcb6c4"
+    },
+    {
+      "path": "scripts/check-docs.mjs",
+      "sha256": "c42b31818fd5391ea6d0d76d1f6ca4c8663f2f7a2c6dcf290ad12c49bc9afbc7"
+    },
+    {
+      "path": "scripts/render-readme.mjs",
+      "sha256": "ef2fc93bb962d6f2ba09a8ab0d936c70d0c53373083b5915e17741fc6f787414"
+    },
+    {
+      "path": "docs/plans/2026-10-12-phase-2-full-catalog.md",
+      "sha256": "216cd650a4b38c34657f68d2d99cc471b272ab1f54a6de380106da3b1342037a"
+    },
+    {
+      "path": "skills-lock.json",
+      "sha256": "f4957f53aabb3ab0b383ab3f80be2dcc6e0f76ae91ecd762ad39d1b153989001"
+    }
+  ],
+  "verified_at": "2026-10-11T23:45:49.4674936Z"
+}

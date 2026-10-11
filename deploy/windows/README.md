@@ -24,7 +24,9 @@ pwsh -File .work/releases/ligamina-win-x64/deploy/windows/run.ps1 `
   -ConfigPath "$env:APPDATA/Ligamina/daemon.json"
 ```
 
-If `daemon.json` does not exist, `run.ps1` starts `configure.ps1`. The wizard lets you select installed Host profiles and creates a loopback-only configuration, per-install random credentials, a user-data database path, and no platform operation grants. It refuses to overwrite an existing configuration. The generated administrator token stays in the configuration file; keep that file private. This first-run flow still needs validation on a clean Windows VM, with a selected third-party plugin, and after an update, so the bundle is not a G2-ready installer yet.
+If `daemon.json` does not exist, `run.ps1` starts `configure.ps1`. The wizard lets you select installed Host profiles and creates a loopback-only configuration, per-install random credentials, a user-data database path, and no platform operation grants. It refuses to overwrite an existing configuration. The generated administrator token stays in the configuration file; keep that file private.
+
+First-stage C14 validation passed in a clean Windows Sandbox, including the selected third-party plugin behavior and virtual receipts; update failure/rollback is covered by separate Windows installation/CI evidence. Fixed archives and locked caches were prepared on the host and reverified inside Sandbox after outbound downloads timed out. The Sandbox daemon exit code was unavailable, while shutdown HTTP 202, process exit and Host cleanup were observed. The [T18 audit](../../outputs/acceptance/t18-final-audit-20261012.json) records G2 PASS within this scope; these results do not prove fresh online downloads or real platform delivery. See the [Sandbox report](../../outputs/acceptance/t15-windows-sandbox-c14-20261011.json).
 
 Uninstall removes application versions and leaves `%APPDATA%/Ligamina` untouched by default. `-RemoveUserData` is required to delete that separate directory.
 

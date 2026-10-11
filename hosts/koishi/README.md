@@ -29,4 +29,4 @@ npm test
 npm run test:mcp
 ```
 
-The native plugin used by the smoke tests is self-authored and only demonstrates Host mechanics. The Core HTTP service, production route binding, and third-party plugin compatibility matrix remain separate work.
+The native plugin used by the Host smoke tests is self-authored and demonstrates Host mechanics. Separate lab smoke tests now exercise the production Core HTTP routes, supervised Hosts, cross-Host capabilities, and virtual gateway receipts. The [T18 audit](../../outputs/acceptance/t18-final-audit-20261012.json) closes first-stage acceptance and limits third-party behavior support to exact tested versions. Full official-catalog coverage, independent native baselines, and broader service/loader profiles are [phase-two work](../../docs/plans/2026-10-12-phase-2-full-catalog.md).

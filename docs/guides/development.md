@@ -1,0 +1,57 @@
+# 开发与验证
+
+适用：构建、运行、诊断、安装、CI。来源：现有 scripts、lockfiles 和 acceptance；命令或工具链变化时复审。
+
+## 启动工作会话
+
+文档检查不安装依赖、不启动 Host、不覆写验收报告：
+
+```powershell
+pwsh -NoProfile -File init.ps1 -Mode docs
+```
+
+```bash
+bash init.sh docs
+```
+
+完整验证复用已有入口，会安装锁定依赖、运行 tests/build 和真实 Core + Host smoke；Windows 还构建 bundle：
+
+```powershell
+pwsh -NoProfile -File init.ps1 -Mode full
+```
+
+```bash
+bash init.sh full
+```
+
+工具链以 [Rust 配置](../../rust-toolchain.toml)、[NoneBot profile](../../hosts/nonebot/pyproject.toml)、[Koishi profile](../../hosts/koishi/package.json)、[检查入口](../../scripts/check.ps1) 为准。基线 Rust 1.97.1、CPython 3.12.14、Node 24.20.0、uv 0.12.5。保持系统默认环境，通过锁文件和项目环境安装。
+
+## 按改动选择检查
+
+| 改动 | 必要验证 |
+| --- | --- |
+| 文档/状态/README 渲染 | docs 入口；bundled validate-harness 验证结构 |
+| Rust Core/CLI | cargo fmt --all -- --check、cargo test --workspace --locked；路由/生命周期改动重跑 smoke |
+| NoneBot Host | uv run --locked --project hosts/nonebot --python 3.12.14 pytest -q hosts/nonebot/tests，以及 Host README 原生/Bridge/worker probes |
+| Koishi Host | npm ci、npm test（在 hosts/koishi）；MCP 改动加 npm run test:mcp |
+| Lab/报告 | uv run --locked --project hosts/nonebot --python 3.12.14 python -m unittest discover -s lab/tests -v，再运行受影响 suite |
+| 跨语言/协议/安装 | 完整入口和双 OS CI；安装改动追加 [Windows 安装验收](../../scripts/windows-install-acceptance.ps1) / Linux容器验收 |
+
+## 运行与诊断
+
+```powershell
+cargo build -p ligamina-cli --locked
+target\debug\ligamina-cli.exe daemon --config <daemon.json>
+$env:LIGAMINA_ADMIN_TOKEN = '<admin token>'
+target\debug\ligamina-cli.exe status --url http://127.0.0.1:<port>
+target\debug\ligamina-cli.exe doctor --url http://127.0.0.1:<port>
+target\debug\ligamina-cli.exe report outputs/acceptance/t13-representative-windows-full-20261010.json
+```
+
+配置结构参考 [Linux example](../../deploy/linux/daemon.example.json)；其中占位凭证使用前替换。status/doctor 只接受 loopback 地址，管理令牌从环境读取。
+
+安装按需读取 [Windows bundle](../../deploy/windows/README.md)、[Linux container](../../deploy/linux/README.md)。持续集成见 [CI](../../.github/workflows/ci.yml)、[代表样本工作流](../../.github/workflows/representative.yml)。
+
+## 记录验证
+
+记录命令、退出码、环境、commit/dirty 和证据路径。区分本机测试、托管 CI、干净安装与真实平台验收。全量 catalog 入口仍待第二阶段实现，现阶段使用 [固定样本实验](compatibility.md)。

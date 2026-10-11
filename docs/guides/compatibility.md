@@ -1,0 +1,48 @@
+# 兼容性实验
+
+适用：插件获取、隔离安装、测试结果与支持声明。依据：T13 runner 与 T18 报告；扩展见 [第二阶段计划](../plans/2026-10-12-phase-2-full-catalog.md)。
+
+## 当前可运行入口
+
+```powershell
+uv run --locked --project lab --python 3.12.14 python lab/run.py --suite representative --manifest samples/third-party.lock.json --worker isolated --report outputs/acceptance/representative-local.json
+```
+
+追加 --sample-id nonebot-autohelp 可复跑一个样本。清单是 [20 个锁定样本](../../samples/third-party.lock.json)，每生态 10 个；它不是官方商店全集。
+
+representative 校验发布物哈希、创建单插件 profile、生成依赖锁、运行 DirectWorker 与生产 Core 联邦路径、保存行为 trace。现有 gate 是 C11 的“每生态至少两个 L4”，不能判定全集扫描完成。
+
+## 已有级别
+
+| 级别 | 当前含义 | 结论 |
+| --- | --- | --- |
+| L0 | 下载发布物并核对来源/摘要 | 已核验发布物 |
+| L1 | 精确依赖在临时 profile 中安装 | 此 profile 可安装 |
+| L2 | 原生 Host 初始化且测试事件被接受 | Host 加载/派发可运行 |
+| L3 | 相同 fixture 进入生产 Core 联邦路径 | 联邦事件路径可运行 |
+| L4 | 独立 expected oracle 与两条路径的行为/操作匹配 | 此版本在此场景行为兼容 |
+| L5 | 生命周期与资源稳定性 | 对应稳定性窗口通过 |
+
+当前 L2 DirectWorker 仍复用 Ligamina Bridge；它不是完全独立的 stock NoneBot/Koishi baseline。S2-05 将添加独立原生基线，保留旧级别报告的含义。
+
+## 当前支持范围
+
+以 [T18](../../outputs/acceptance/t18-final-audit-20261012.json) supported_plugins 和 T13 fixtures 为准：四个精确版本，Windows 与本机 WSL Linux 有证据。L0–L3 失败、未运行与条件缺失不进入支持名单。
+
+Bridge 对复杂平台 API、真实网关、控制台/loader、浏览器、第三方在线凭证的覆盖有限。需要这些能力的插件仍进入全量账本，记录具体限制；不能静默过滤。
+
+## 第二阶段目录口径
+
+- 主集合：冻结时点的 NoneBot 官方商店与 Koishi 官方市场收录插件，包含社区作者插件。
+- 官方维护子集：NoneBot is_official、Koishi 官方插件页与可验证仓库所有权；Koishi verified 单列，不能等同官方维护。
+- 每个 registry entry 独立记账；同包不同模块/入口保留身份，物理下载可去重。
+- 每快照使用一个冻结版本策略，不穷举历史版本；旧支持版本保留回归 profile。框架不适配时保留结果，不自动降级主 profile。
+- Adapter、driver、控制台、数据库和服务型插件使用相应探针和独立 profile，不强行用文本回复判定。
+
+## 隔离与差分
+
+现有 isolated 隔离 HOME、依赖、目录、凭证和进程，但不是 OS 安全沙箱。全量安装与执行迁移到一次性 Linux 容器/VM 和 Windows 沙箱 Worker，限制挂载、网络、资源和存活时间。
+
+Native 与 federated 使用同一发布物、依赖锁、配置和刺激，分开数据目录。两者先满足独立 expected oracle，再比较收件人、操作、消息片段、回执和状态。随机数、时间、外部 HTTP 用注明边界的输入控制；相同错误结果不能通过。
+
+缺少用例写 skipped/missing_fixture，加载结果单列；真实平台收发是独立维度，虚拟回执不代表真实投递。
