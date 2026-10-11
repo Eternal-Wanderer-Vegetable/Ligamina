@@ -31,12 +31,68 @@ function Invoke-Checked([string]$Executable, [string[]]$Arguments, [string]$Desc
 
 function Get-VerifiedArchive($Runtime, [string]$CacheRoot) {
     $archivePath = Join-Path $CacheRoot $Runtime.archive
-    Invoke-WebRequest -UseBasicParsing -Uri $Runtime.url -OutFile $archivePath -TimeoutSec 300
+    $stagedArchive = if ($env:LIGAMINA_RUNTIME_CACHE) { Join-Path $env:LIGAMINA_RUNTIME_CACHE $Runtime.archive } else { $null }
+    if ($stagedArchive -and (Test-Path -LiteralPath $stagedArchive -PathType Leaf)) {
+        Copy-Item -LiteralPath $stagedArchive -Destination $archivePath -Force
+    }
+    else {
+        try {
+            Invoke-WebRequest -UseBasicParsing -Uri $Runtime.url -OutFile $archivePath -TimeoutSec 300
+        }
+        catch {
+            throw "Unable to download pinned runtime archive '$($Runtime.archive)' from '$($Runtime.url)': $($_.Exception.Message)"
+        }
+    }
     $actualHash = (Get-FileHash -LiteralPath $archivePath -Algorithm SHA256).Hash.ToLowerInvariant()
     if ($actualHash -ne $Runtime.sha256) {
         throw "SHA256 mismatch for $($Runtime.archive): expected $($Runtime.sha256), got $actualHash"
     }
     return $archivePath
+}
+
+function Expand-VerifiedZipArchive([string]$ArchivePath, [string]$DestinationPath) {
+    Add-Type -AssemblyName System.IO.Compression
+    Add-Type -AssemblyName System.IO.Compression.FileSystem
+
+    $destinationFull = Get-FullPath $DestinationPath
+    New-Item -ItemType Directory -Force -Path $destinationFull | Out-Null
+    $archive = [System.IO.Compression.ZipFile]::OpenRead($ArchivePath)
+    try {
+        foreach ($entry in $archive.Entries) {
+            $relativePath = $entry.FullName.Replace('/', '\')
+            $parts = @($relativePath.Split([char] '\', [System.StringSplitOptions]::RemoveEmptyEntries))
+            if ($parts.Count -eq 0) { continue }
+            foreach ($part in $parts) {
+                if ($part -in @('.', '..') -or $part.Contains(':')) {
+                    throw "Refusing unsafe ZIP entry path '$($entry.FullName)'"
+                }
+            }
+
+            $normalizedRelativePath = [System.IO.Path]::Combine([string[]]$parts)
+            $targetPath = Get-FullPath (Join-Path $destinationFull $normalizedRelativePath)
+            Assert-ContainedPath $destinationFull $targetPath
+            if ([string]::IsNullOrEmpty($entry.Name)) {
+                New-Item -ItemType Directory -Force -Path $targetPath | Out-Null
+                continue
+            }
+
+            $parentPath = Split-Path -Parent $targetPath
+            New-Item -ItemType Directory -Force -Path $parentPath | Out-Null
+            $sourceStream = $entry.Open()
+            try {
+                $targetStream = [System.IO.File]::Open(
+                    $targetPath,
+                    [System.IO.FileMode]::Create,
+                    [System.IO.FileAccess]::Write,
+                    [System.IO.FileShare]::None
+                )
+                try { $sourceStream.CopyTo($targetStream) }
+                finally { $targetStream.Dispose() }
+            }
+            finally { $sourceStream.Dispose() }
+        }
+    }
+    finally { $archive.Dispose() }
 }
 
 function Write-AtomicJson([string]$Path, $Value) {
@@ -110,7 +166,7 @@ try {
         $uvArchive = Get-VerifiedArchive $uvRuntime $cacheRoot
         $uvRoot = Join-Path $runtimeRoot "uv-$($uvRuntime.version)"
         New-Item -ItemType Directory -Force -Path $uvRoot | Out-Null
-        Expand-Archive -LiteralPath $uvArchive -DestinationPath $uvRoot -Force
+        Expand-VerifiedZipArchive -ArchivePath $uvArchive -DestinationPath $uvRoot
         $uvExe = Join-Path $uvRoot "uv.exe"
         if (-not (Test-Path -LiteralPath $uvExe)) { throw "uv.exe was absent from the verified archive." }
         $uvVersion = (& $uvExe --version | Out-String).Trim()
@@ -118,7 +174,22 @@ try {
 
         $pythonRuntime = $manifest.runtimes.python
         $pythonRoot = Join-Path $runtimeRoot "python-$($pythonRuntime.version)"
-        Invoke-Checked $uvExe @("python", "install", $pythonRuntime.version, "--install-dir", $pythonRoot, "--no-registry", "--no-bin", "--no-progress") "Install managed CPython"
+        $pythonProvisioning = "uv"
+        if ($env:LIGAMINA_PYTHON_RUNTIME_CACHE -and (Test-Path -LiteralPath $env:LIGAMINA_PYTHON_RUNTIME_CACHE -PathType Container)) {
+            $stagedPythonExe = Get-ChildItem -LiteralPath $env:LIGAMINA_PYTHON_RUNTIME_CACHE -Recurse -File -Filter "python.exe" |
+                Where-Object { $_.FullName -notmatch "\\Lib\\" } |
+                Select-Object -First 1 -ExpandProperty FullName
+            if (-not $stagedPythonExe) { throw "The staged managed Python runtime did not contain python.exe." }
+            $stagedPythonVersion = (& $stagedPythonExe --version | Out-String).Trim()
+            if ($stagedPythonVersion -ne "Python $($pythonRuntime.version)") {
+                throw "Unexpected staged Python version '$stagedPythonVersion'."
+            }
+            Copy-Item -LiteralPath $env:LIGAMINA_PYTHON_RUNTIME_CACHE -Destination $pythonRoot -Recurse -Force
+            $pythonProvisioning = "verified_staged_distribution"
+        }
+        else {
+            Invoke-Checked $uvExe @("python", "install", $pythonRuntime.version, "--install-dir", $pythonRoot, "--no-registry", "--no-bin", "--no-progress") "Install managed CPython"
+        }
         $pythonExe = Get-ChildItem -LiteralPath $pythonRoot -Recurse -File -Filter "python.exe" |
             Where-Object { $_.FullName -notmatch "\\Lib\\" } |
             Select-Object -First 1 -ExpandProperty FullName
@@ -156,7 +227,7 @@ try {
         if (-not (Test-Path -LiteralPath $pythonLicense)) { throw "Missing managed Python license file: $pythonLicense" }
         Copy-Item -LiteralPath $pythonLicense -Destination $licensesRoot -Force
         $evidence.runtimes.uv = [ordered]@{ version = $uvRuntime.version; sha256 = $uvRuntime.sha256; license = $uvRuntime.license }
-        $evidence.runtimes.python = [ordered]@{ version = $pythonRuntime.version; distribution = $pythonRuntime.distribution; executable = $pythonExe; executable_sha256 = (Get-FileHash -LiteralPath $pythonExe -Algorithm SHA256).Hash.ToLowerInvariant(); license = $pythonRuntime.license; license_sha256 = (Get-FileHash -LiteralPath $pythonLicense -Algorithm SHA256).Hash.ToLowerInvariant() }
+        $evidence.runtimes.python = [ordered]@{ version = $pythonRuntime.version; distribution = $pythonRuntime.distribution; provisioning = $pythonProvisioning; executable = $pythonExe; executable_sha256 = (Get-FileHash -LiteralPath $pythonExe -Algorithm SHA256).Hash.ToLowerInvariant(); license = $pythonRuntime.license; license_sha256 = (Get-FileHash -LiteralPath $pythonLicense -Algorithm SHA256).Hash.ToLowerInvariant() }
     }
 
     if ($profileNames -contains "koishi") {
@@ -164,7 +235,7 @@ try {
         $nodeArchive = Get-VerifiedArchive $nodeRuntime $cacheRoot
         $nodeExtract = Join-Path $runtimeRoot "node-extract"
         New-Item -ItemType Directory -Force -Path $nodeExtract | Out-Null
-        Expand-Archive -LiteralPath $nodeArchive -DestinationPath $nodeExtract -Force
+        Expand-VerifiedZipArchive -ArchivePath $nodeArchive -DestinationPath $nodeExtract
         $nodeSource = Join-Path $nodeExtract "node-v$($nodeRuntime.version)-win-x64"
         $nodeRoot = Join-Path $runtimeRoot "node-v$($nodeRuntime.version)"
         if (-not (Test-Path -LiteralPath (Join-Path $nodeSource "node.exe"))) { throw "node.exe was absent from the verified archive." }
@@ -197,8 +268,11 @@ try {
 
     $cliTarget = Join-Path $candidate "ligamina-cli.exe"
     Copy-Item -LiteralPath (Join-Path $payloadFull "target\release\ligamina-cli.exe") -Destination $cliTarget -Force
-    $cliVersionOutput = (& $cliTarget --help | Out-String)
-    if ($LASTEXITCODE -ne 0 -or $cliVersionOutput -notmatch "daemon") { throw "Packaged ligamina-cli.exe failed its help check." }
+    $cliVersionOutput = (& $cliTarget --help 2>&1 | Out-String)
+    $cliHelpExitCode = $LASTEXITCODE
+    if ($cliHelpExitCode -ne 0 -or $cliVersionOutput -notmatch "daemon") {
+        throw "Packaged ligamina-cli.exe failed its help check (exit code $cliHelpExitCode): $($cliVersionOutput.Trim())"
+    }
     $evidence.core = [ordered]@{ path = $cliTarget; sha256 = (Get-FileHash -LiteralPath $cliTarget -Algorithm SHA256).Hash.ToLowerInvariant() }
     $evidencePath = Join-Path $candidate "runtime-evidence.json"
     $evidence | ConvertTo-Json -Depth 16 | Set-Content -LiteralPath $evidencePath -Encoding UTF8

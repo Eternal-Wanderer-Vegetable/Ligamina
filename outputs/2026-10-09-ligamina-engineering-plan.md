@@ -1,6 +1,6 @@
 # Ligamina MVP 工程执行计划
 
-日期：2026-10-09。执行状态更新于 2026-10-10：T01–T17 的实现与 Windows/本机 WSL 阶段性验证已推进；G1 技术闭环通过。T13 Windows 与本机 WSL Ubuntu 24.04.5 的 20 样本 gate 均通过，每生态各有 2 个 L4（含消息插件）；WSL 报告保留 8 个样本的 L0/L1/L2 失败与下游跳过，只有 4 个 L4 样本进入支持名单。用户要求跳过已连续运行超过 10 小时的 T14 WSL 24 小时长测；最终进程快照无运行进程且未生成正式报告，本次状态记录为 `skipped`，资源门槛不计通过。T15 的 Windows x64 bundle 更新、首启、双 Host、停机、默认卸载数据保留、损坏哈希候选更新回滚及锁定第三方 NoneBot 插件 `autohelp` 事件/虚拟回执均通过本机 PATH 隔离验收；干净 Windows VM 尚未完成。T16 Linux 容器 C15 smoke 在本机 WSL 环境通过。GitHub `CI #2`–`CI #5`、代表样本扫描 run `38025466166` 及已完成的 PR CI runs `38029089731`、`38030943368`、`38031645953`、`38032297005`、`38032965125`、`38060766011` 均通过 Windows/Linux jobs；run `38032965125` artifacts 为 Windows/Linux `11662338173`、`11662467901`，PR #2 run `38060766011` artifacts 为 `11672952328`、`11673007283`。T18 的 C01–C15 最终证据审阅已完成，但 C12/C14 仍缺门槛证据，G2 保持 `NOT READY`；详情见[最终审阅报告](acceptance/t18-final-audit-20261010.json)。前置依据：用户已核实通过[初步计划](2026-10-09-ligamina-initial-plan.md)。范围以 [C01–C15 清单](2026-10-09-ligamina-mvp-checklist.md)为准；接口草案见[配套文档](2026-10-09-ligamina-mvp-contracts.md)。
+日期：2026-10-09。执行状态更新于 2026-10-11：T01–T17 的实现与 Windows/本机 WSL 阶段性验证已推进；G1 技术闭环通过。T13 Windows 与本机 WSL Ubuntu 24.04.5 的 20 样本 gate 均通过，每生态各有 2 个 L4（含消息插件）；WSL 报告保留 8 个样本的 L0/L1/L2 失败与下游跳过，只有 4 个 L4 样本进入支持名单。此前 T14 WSL 24 小时长测在主机过载期间随 WSL 异常退出，历史记录仍为 `skipped` 且资源门槛不计通过；用户恢复主机后要求重跑，新一轮已于 2026-10-10T16:56:41Z 启动，当前仍运行且无最终报告。T15 的 Windows x64 bundle 安装、首启、双 Host、停机、默认卸载数据保留、损坏哈希候选更新回滚及锁定第三方 NoneBot 插件 `autohelp` 事件/虚拟回执均通过验收；C14 干净 Windows Sandbox 验收现已通过。T16 Linux 容器 C15 smoke 在本机 WSL 环境通过。GitHub `CI #2`–`CI #5`、代表样本扫描 run `38025466166` 及已完成的 PR CI runs `38029089731`、`38030943368`、`38031645953`、`38032297005`、`38032965125`、`38060766011` 均通过 Windows/Linux jobs；run `38032965125` artifacts 为 Windows/Linux `11662338173`、`11662467901`，PR #2 run `38060766011` artifacts 为 `11672952328`、`11673007283`。T18 的历史审阅仍为 `NOT READY`；当前 G2 保持 `NOT READY`，等待 C12 长测完成后裁决。前置依据：用户已核实通过[初步计划](2026-10-09-ligamina-initial-plan.md)。范围以 [C01–C15 清单](2026-10-09-ligamina-mvp-checklist.md)为准；接口草案见[配套文档](2026-10-09-ligamina-mvp-contracts.md)。
 
 ## 1. 技术选择与工程结构
 
@@ -122,7 +122,7 @@ Linux 进程组主要保证正常 stop 的整体清理，单靠它不能保证 C
 
 ## 5. 验证命令与退出条件
 
-下列入口分为已实现验证命令和后续部署命令。T15 的 Windows bundle fresh install、损坏哈希候选更新回滚、锁定第三方 NoneBot `autohelp` 插件事件及虚拟网关回执均由 [T15 报告](acceptance/t15-windows-third-party-plugin-20261010.json)记录。T16 Linux Compose 已由 WSL 实测；T17 的 Windows/WSL 检查入口和 CI 工作流已实现，本地检查及托管 CI 均通过。T18 最终 C01–C15 证据审阅见[最终审阅报告](acceptance/t18-final-audit-20261010.json)，结论为 `NOT READY`，因为 T14 24 小时长测已按用户决定跳过且 C14 干净 Windows VM 尚未完成。
+下列入口分为已实现验证命令和后续部署命令。T15 的 Windows bundle fresh install、损坏哈希候选更新回滚、锁定第三方 NoneBot `autohelp` 插件事件及虚拟网关回执均由 [T15 报告](acceptance/t15-windows-third-party-plugin-20261010.json)记录；C14 干净 Windows Sandbox 验收已通过，见[验收报告](acceptance/t15-windows-sandbox-c14-20261011.json)。T16 Linux Compose 已由 WSL 实测；T17 的 Windows/WSL 检查入口和 CI 工作流已实现，本地检查及托管 CI 均通过。T14 WSL 24 小时长测的 2026-10-11 启动记录和旧 `skipped` 记录均作为历史证据保留；最终结果现见[长测报告](acceptance/t14-stability-linux-wsl-100x24h-20261011.json)。T18 的 2026-10-10 `NOT READY` 也为历史裁决；2026-10-12 的最新裁决见第 9 节和[最终审阅报告](acceptance/t18-final-audit-20261012.json)。
 
 ```powershell
 uv run --project lab python lab/run.py --suite smoke --platform windows
@@ -167,7 +167,7 @@ bash deploy/linux/docker-wsl.sh compose --profile nonebot --profile koishi up --
 
 T01 中三个高风险实验优先：无网络 NoneBot 生命周期与 v11 reply 预处理；Koishi 原生 Bot + 数据存储 + 依赖激活；rmcp/TS SDK固定协议互操作。它们各自失败时，调整对应 Adapter 或版本，不改写初步计划的项目独立性、原生宿主和证据化兼容目标。
 
-当前按依赖推进：T13 Windows 与本机 WSL Ubuntu 24.04.5 的 20 样本 gate 均通过。WSL 最终报告 [`T13 WSL 全量结果`](acceptance/t13-representative-wsl-final-20261010.json)显示 20 个样本、每生态 2 个 L4、类别覆盖齐全、临时 profile 清理通过；8 个失败样本的错误和后续 skipped 状态均保留，未计为支持通过。用户决定跳过已运行超过 10 小时的 T14 WSL 24 小时长测；正式报告缺失且进程快照显示已退出，跳过记录见[T14 WSL 长测状态](acceptance/t14-stability-linux-wsl-100x24h-20261010-skip.json)。T15 已在本机 Windows 完成新 bundle 安装、交互首启、Core/双 Host readiness、失败更新回滚、进程清理、默认卸载数据保留及锁定第三方 `nonebot-plugin-autohelp==0.1.7` 行为/虚拟回执验收，见[Windows T15 报告](acceptance/t15-windows-third-party-plugin-20261010.json)。C14 干净 Windows VM 仍缺。T16 Linux 容器在本机 WSL smoke 通过。T17 本地检查、PR #1 runs `38032297005`/`38032965125` 及 PR #2 run `38060766011` 均通过 Windows/Linux 所需 jobs；PR #2 artifacts 为 Windows `11672952328`、Linux `11673007283`，其中 Windows bundle 更新回滚和 Linux 镜像构建均通过。T18 已完成 C01–C15 证据审阅，见[最终审阅报告](acceptance/t18-final-audit-20261010.json)；结论为 `NOT READY`，C12 的 24 小时资源门槛及 C14 的干净 VM 验收未通过。T12 联邦 smoke 满足 G1 四项闭环；G1 不代替 G2 裁决。用户已确认的初步方向不需要再次询问。待确定事项由实验与记录关闭，只有涉及新增业务范围或具体外部权限的事项才需要用户输入。
+当前按依赖推进：T13 Windows 与本机 WSL Ubuntu 24.04.5 的 20 样本 gate 均通过。WSL 最终报告 [`T13 WSL 全量结果`](acceptance/t13-representative-wsl-final-20261010.json)显示 20 个样本、每生态 2 个 L4、类别覆盖齐全、临时 profile 清理通过；8 个失败样本的错误和后续 skipped 状态均保留，未计为支持通过。此前 T14 WSL 长测在主机过载期间随 WSL 退出，历史记录保留为 `skipped`（[历史状态](acceptance/t14-stability-linux-wsl-100x24h-20261010-skip.json)）；恢复主机后已重新启动完整 24 小时运行，当前状态与参数见[启动记录](acceptance/t14-stability-linux-wsl-100x24h-20261011-launch.json)，尚无最终报告。T15 已完成新 bundle 安装、首启、Core/双 Host readiness、失败更新回滚、进程清理、默认卸载数据保留及锁定第三方 `nonebot-plugin-autohelp==0.1.7` 行为/虚拟回执验收，见[Windows T15 报告](acceptance/t15-windows-third-party-plugin-20261010.json)。C14 干净 Windows Sandbox x64 验收现已通过，见[报告](acceptance/t15-windows-sandbox-c14-20261011.json)。T16 Linux 容器在本机 WSL smoke 通过。T17 本地检查、PR #1 runs `38032297005`/`38032965125` 及 PR #2 run `38060766011` 均通过 Windows/Linux 所需 jobs；PR #2 artifacts 为 Windows `11672952328`、Linux `11673007283`，其中 Windows bundle 更新回滚和 Linux 镜像构建均通过。10 月 10 日 T18 历史审阅见[报告](acceptance/t18-final-audit-20261010.json)，结论为 `NOT READY`；当前 G2 仍为 `NOT READY`，C12 未有正式结果。T12 联邦 smoke 满足 G1 四项闭环；G1 不代替 G2 裁决。用户已确认的初步方向不需要再次询问。待确定事项由实验与记录关闭，只有涉及新增业务范围或具体外部权限的事项才需要用户输入。
 
 ## 7. 执行记录（2026-10-10）
 
@@ -194,4 +194,43 @@ T01 中三个高风险实验优先：无网络 NoneBot 生命周期与 v11 reply
 
 **G1：PASS（2026-10-10，Windows + 本机 WSL）。G2：`NOT READY`**；T13 Windows 与本机 WSL 的 20 样本 gate 已通过，但不代表所有样本都受支持；T14 24 小时长测为用户要求跳过且资源门槛不计通过；C14 干净 Windows VM 尚未完成。T15 bundle 的失败更新回滚、锁定第三方 NoneBot 插件行为、虚拟网关回执、停机和卸载数据保留均有本机验收证据。T18 最终 C01–C15 证据审阅已完成并保留 `NOT READY` 裁决；详见[最终报告](acceptance/t18-final-audit-20261010.json)。T16 的 C15 Linux 单容器 smoke 已通过，但不代替真实平台网关或 C14 干净系统验收。
 
-Windows Rust 命令：`cargo test --workspace --locked --offline`；参考客户端和 Koishi 分别运行 `npm test`。Windows 联邦 smoke：`uv run --project lab python lab/run.py --suite smoke --platform windows`。Linux 使用本机 WSL Ubuntu 24.04.5 `/root/ligamina` 镜像及 `/opt/node-v24.20.0/bin`；运行 `CARGO_NET_OFFLINE=true cargo test --workspace --locked --offline`、Koishi `npm test`、锁定 CPython 3.12.14 的 Runner pytest、NoneBot 原生 Bridge 探针、双 Worker shutdown 探针、生产 Core 短测，以及 `uv run --project lab python lab/run.py --suite smoke --platform linux`。T14 长测命令为 `uv run --project lab python lab/stability.py --cycles-per-host 100 --duration-hours 24 --interval-seconds 60 --warmup-minutes 30 --skip-build --report outputs/acceptance/t14-stability-linux-wsl-100x24h-20261010.json`；本次运行依用户要求跳过，状态报告见 [`T14 WSL skip`](acceptance/t14-stability-linux-wsl-100x24h-20261010-skip.json)。G1 使用自制插件和虚拟网关，不代替真实平台连接；T13 Windows gate 通过不代表 Linux gate 也通过，所有模块、宿主和 smoke 证据也不代替干净系统/G2 验收。
+## 8. 执行记录（2026-10-11）
+
+本节记录本轮重启后的最新状态；第 7 节和 2026-10-10 的 T18 报告保留为历史证据。
+
+| 验收项 | 最新状态与证据 |
+|---|---|
+| C12 / T14 | 旧长测在 WSL 随主机过载退出后没有正式 24 小时报告，历史记录保持 `skipped` 并已补正原因。用户恢复主机后要求重跑；新运行于 `2026-10-10T16:56:41Z` 在 `Ubuntu-24.04` 启动，每 Host 100 次恢复循环、30 分钟预热、24 小时监控、60 秒采样。Cargo/Node/uv 版本、启动资源快照、源文件 SHA-256、运行 PID 与输出路径见[启动记录](acceptance/t14-stability-linux-wsl-100x24h-20261011-launch.json)。本记录时运行仍在进行，最终报告未生成，C12 与 G2 不能计通过。 |
+| C14 / T15 | Windows Sandbox 中的 Windows 11 Enterprise x64 干净环境，安装前 `python.exe`、`python3.exe`、`node.exe`、`npm.cmd`、`docker.exe`、`uv.exe` 均不在 PATH。全新安装、损坏 SHA 候选更新回滚、首次配置、锁定 `nonebot-plugin-autohelp==0.1.7` 安装、Core/双 Host、插件事件与虚拟回执、HTTP 202 停机、进程清理及默认卸载保留数据共 8 项通过。Sandbox 无法直连运行时归档地址，测试从主机准备 SHA-256 固定归档和锁定依赖缓存，再在 Sandbox 内复核；daemon 退出码未从 Sandbox 进程句柄读取到，但 202 响应、进程退出和 Host PID 清理均通过。见[验收报告](acceptance/t15-windows-sandbox-c14-20261011.json)及[环境报告](acceptance/t15-windows-sandbox-environment-20261011.json)。 |
+| T18 / G2 | 2026-10-10 最终审阅保留为历史记录。C14 已通过；C12 仍缺完整报告，因此当前 G2 维持 `NOT READY`。待长测结束后再更新 C01–C15 裁决和支持名单。 |
+
+Windows Rust 命令：`cargo test --workspace --locked --offline`；参考客户端和 Koishi 分别运行 `npm test`。Windows 联邦 smoke：`uv run --project lab python lab/run.py --suite smoke --platform windows`。Linux 使用本机 WSL Ubuntu 24.04.5 `/root/ligamina` 镜像及 `/opt/node-v24.20.0/bin`；运行 `CARGO_NET_OFFLINE=true cargo test --workspace --locked --offline`、Koishi `npm test`、锁定 CPython 3.12.14 的 Runner pytest、NoneBot 原生 Bridge 探针、双 Worker shutdown 探针、生产 Core 短测，以及 `uv run --project lab python lab/run.py --suite smoke --platform linux`。T14 历史长测跳过记录见 [`T14 WSL skip`](acceptance/t14-stability-linux-wsl-100x24h-20261010-skip.json)；2026-10-11 重跑使用 Cargo/Node 显式 PATH 和下列参数，启动证据见[启动记录](acceptance/t14-stability-linux-wsl-100x24h-20261011-launch.json)，最终报告尚未完成：
+
+```bash
+export PATH="/root/.cargo/bin:/opt/node-v24.20.0/bin:$PATH"
+uv run --project lab python lab/stability.py --cycles-per-host 100 --duration-hours 24 --interval-seconds 60 --warmup-minutes 30 --skip-build --report outputs/acceptance/t14-stability-linux-wsl-100x24h-20261011.json
+```
+
+G1 使用自制插件和虚拟网关，不代替真实平台连接；T13 Windows gate 通过不代表 Linux gate 也通过，所有模块、宿主和 smoke 证据也不代替干净系统/G2 验收。
+
+### 8.1 后续状态记录（2026-10-11）
+
+本节反映本轮重启验收的最新状态。2026-10-10 的 T14 skip 报告和 T18 审阅报告保留为历史记录，不能替代本轮正式长测结果。
+
+| 任务 | 实际状态与证据 |
+|---|---|
+| C12 / T14 | 首次长测在 WSL 随主机过载退出后没有正式 24 小时报告，原因已在历史 skip 记录中更正。用户恢复主机并要求重跑；新测试于 `2026-10-10T16:56:41Z` 在 `Ubuntu-24.04` 启动，参数为每 Host 100 次恢复循环、30 分钟预热、24 小时监控、60 秒采样。工具版本及启动资源快照见[启动记录](acceptance/t14-stability-linux-wsl-100x24h-20261011-launch.json)。本记录时进程仍运行，正式报告尚未生成，C12 与 G2 继续为 `NOT READY`。 |
+| C14 / T15 | Windows Sandbox 中的干净 Windows 11 Enterprise x64 环境，安装前 `python.exe`、`python3.exe`、`node.exe`、`npm.cmd`、`docker.exe`、`uv.exe` 均不在 PATH。全新安装、损坏 SHA 候选更新回滚、首次配置、锁定 autohelp 依赖、Core/双 Host、插件事件与虚拟回执、HTTP 202 停机、Host 清理及默认卸载保留数据共 8 项通过。Sandbox 直连 runtime 下载地址超时，因此测试从主机准备 SHA-256 固定的归档和离线依赖缓存，并在 Sandbox 内复核；daemon 进程句柄未提供退出码，但 HTTP 202、进程退出和 Host PID 清理检查通过。详见[T15/C14 报告](acceptance/t15-windows-sandbox-c14-20261011.json)与[环境报告](acceptance/t15-windows-sandbox-environment-20261011.json)。 |
+| T18 | 2026-10-10 的最终审阅仍作为历史记录。C14 已通过；C12 尚在运行且没有 24 小时报告，因此当前 G2 维持 `NOT READY`。待 C12 正式报告完成后更新 C01–C15 裁决和支持名单。 |
+
+## 9. 执行记录（2026-10-12）
+
+本节是当前状态的权威记录，并更新第 7、8 节在 2026-10-10/11 时点作出的临时裁决。旧中断记录和当时的审阅报告保留为历史证据，不覆盖本节的正式完成结果。
+
+| 验收项 | 最新结果与证据 |
+|---|---|
+| C12 / T14 | Ubuntu 24.04 WSL 长测从 `2026-10-10T16:56:41.085Z` 运行至 `2026-10-11T16:58:05.85Z`，完成 86,400 秒监控；1,440/1,440 个采样点通过，双 Host 恢复循环 200/200 通过，恢复预算、组合监控、资源预算和 CLI status/doctor 四项均通过。末段 RSS 中位数未超预算，结束时 `core_exit_code=0`、`remaining_pids=[]`。正式报告 SHA-256：`BE222C6B7D360E8715D96AF3746A4E319AB7478822F28B9DCA3EC36000BD5716`；见[最终报告](acceptance/t14-stability-linux-wsl-100x24h-20261011.json)和[启动记录](acceptance/t14-stability-linux-wsl-100x24h-20261011-launch.json)。此前受主机过载影响的那次运行仍明确记录为 `skipped`，不与本次通过结果混淆。 |
+| C14 / T15 | Windows Sandbox 中的 Windows 11 Enterprise 10.0.26100 x64 环境通过全部 8 项检查；安装前 `python.exe`、`python3.exe`、`node.exe`、`npm.cmd`、`docker.exe`、`uv.exe` 均不在 PATH。Sandbox 无法直连运行时下载地址，测试使用主机准备的固定版本归档与锁定依赖缓存，并在 Sandbox 中重新核验哈希。优雅停机的 daemon 退出码未从 Sandbox 进程句柄取得，但 HTTP 202、进程退出及 Host PID 清理检查通过。见[C14 验收报告](acceptance/t15-windows-sandbox-c14-20261011.json)和[环境报告](acceptance/t15-windows-sandbox-environment-20261011.json)。 |
+| T18 / G2 | 复核 C01–C15：15 项全部 `pass`；G1 与 G2 均为 `PASS`，没有未解决的计划内 G2 阻塞项。最新证据审阅及精确插件支持名单见[T18 最终报告](acceptance/t18-final-audit-20261012.json)。当前支持范围仍只含 NoneBot `autohelp==0.1.7`、`repeater==3.1.4` 和 Koishi `game-mini==0.4.3`、`multi-qa==1.0.8`。 |
+
+本次验收没有连接真实 QQ 或其他平台网关；虚拟网关回执只证明受控接口和账本行为，不证明真实平台投递。T16 证明的是本机 WSL 发起的 Linux 容器交付 smoke，不是独立干净 Linux VM 安装验收。

@@ -4,7 +4,7 @@ Ligamina 的初步定位是：**个人部署优先、独立于具体机器人的
 
 它计划保留 NoneBot、Koishi、AstrBot 等生态的原生插件与宿主机制，通过公共接口连接插件能力、聊天事件与生命周期管理。Stella 将作为首个集成客户端；其他机器人与非 AI 客户端也应能够独立接入。
 
-工程执行已通过 T01–T12 的 G1 技术闭环，并已实现 T13/T14 验收工具。T13 的 Windows 与本机 WSL Ubuntu 24.04.5 20 样本 gate 均通过，每生态有 2 个 L4 通过样本；WSL 最终报告记录 8 个样本有 L0/L1/L2 失败，后续 skipped 状态保留且不计通过，只有 4 个 L4 插件进入支持名单，详见[WSL 全量报告](outputs/acceptance/t13-representative-wsl-final-20261010.json)。T14 Windows/WSL 短测通过恢复、CLI 与进程清理检查；用户要求跳过已运行超过 10 小时的 WSL 24 小时长测，状态记为 `skipped`，没有 24 小时报告，资源门槛不计通过，详见[跳过记录](outputs/acceptance/t14-stability-linux-wsl-100x24h-20261010-skip.json)。T15 的 Windows bundle 安装、首启、双 Host、失败更新回滚、停机、卸载保留数据和锁定第三方 `nonebot-plugin-autohelp==0.1.7` 的真实 Host 行为/虚拟回执均已通过本机 PATH 隔离验收，详见[Windows T15 报告](outputs/acceptance/t15-windows-third-party-plugin-20261010.json)。干净 Windows VM 验收仍未完成。T16 Linux 容器 smoke 已通过。T17 本地与 GitHub CI 两端检查均通过。T18 已完成 C01–C15 证据审阅，最终报告为 `NOT READY`，因为 C12 长测跳过且 C14 干净 Windows VM 缺失，详见[T18 最终审阅报告](outputs/acceptance/t18-final-audit-20261010.json)。
+工程执行已完成 T01–T18 的计划验收。T13 的 Windows 与本机 WSL Ubuntu 24.04.5 20 样本 gate 均通过；8 个 WSL 样本保留 L0/L1/L2 失败与 skipped 结果，不计为支持样本，支持名单仅含 4 个 L4 插件，详见[WSL 全量报告](outputs/acceptance/t13-representative-wsl-final-20261010.json)。此前因主机过载中断的 T14 长测仍作为历史 `skipped` 记录；重跑的 WSL 24 小时稳定性与资源门槛现已通过，记录 200/200 恢复循环和 1,440/1,440 个通过采样点，见[最终报告](outputs/acceptance/t14-stability-linux-wsl-100x24h-20261011.json)。T15 bundle 安装、回滚、双 Host、第三方 `nonebot-plugin-autohelp==0.1.7` 行为及虚拟回执已通过；干净 Windows Sandbox 的 C14 八项检查也全部通过，见[Windows T15 报告](outputs/acceptance/t15-windows-third-party-plugin-20261010.json)和[T15/C14 Sandbox 报告](outputs/acceptance/t15-windows-sandbox-c14-20261011.json)。T16 Linux 容器 smoke、T17 本地和 GitHub CI 检查均通过。T18 于 2026-10-12 完成 C01–C15 复核，G1/G2 均为 `PASS`；最新审阅见[最终报告](outputs/acceptance/t18-final-audit-20261012.json)。支持名单仍限于已通过的四个精确插件版本；未连接真实 QQ 或其他平台网关，因此这些结果不代表真实平台收发。
 
 ## 规划文档
 
@@ -16,7 +16,7 @@ Ligamina 的初步定位是：**个人部署优先、独立于具体机器人的
 
 规划依据：[原始分享讨论](https://chatgpt.com/share/6ac8b4f4-4ad8-83e9-b269-90629f1c7979)。
 
-初步计划已由用户核实通过。执行计划记录 T01–T17 的实现进展及阶段证据；G1 于 2026-10-10 通过。验收报告位于 [acceptance](outputs/acceptance/)。T13 的 Windows 与本机 WSL Linux 完整矩阵均已通过 gate；T14 长测按用户决定跳过并保持未通过；T15 bundle 的本机 PATH 隔离、失败更新回滚和第三方插件行为已验证，干净 VM 未验证；T17 GitHub Windows/Linux jobs 均通过；T18 C01–C15 证据审阅已完成，但 `NOT READY`，具体缺口见[最终审阅报告](outputs/acceptance/t18-final-audit-20261010.json)。
+初步计划已由用户核实通过。验收报告位于 [acceptance](outputs/acceptance/)。G1 于 2026-10-10 通过；完成 T14 长测和 C14 Sandbox 验收后，T18 复核了全部 C01–C15，G2 于 2026-10-12 通过。10 月 10 日的 `NOT READY` 审阅报告保留为历史裁决；当前裁决见[最新 T18 报告](outputs/acceptance/t18-final-audit-20261012.json)，执行记录见[工程计划第 9 节](outputs/2026-10-09-ligamina-engineering-plan.md)。真实平台网关和实际 QQ/平台投递不属于本次已验证范围。
 
 ## 本机运行诊断
 

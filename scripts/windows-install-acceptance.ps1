@@ -8,7 +8,9 @@ Set-StrictMode -Version Latest
 $repoRoot = [System.IO.Path]::GetFullPath((Join-Path $PSScriptRoot ".."))
 $payloadRoot = Join-Path $repoRoot ".work\releases\ligamina-win-x64"
 $runnerRoot = if ($env:RUNNER_TEMP) { $env:RUNNER_TEMP } else { Join-Path $repoRoot ".work" }
-$testRoot = Join-Path $runnerRoot ("ligamina-install-acceptance-" + [guid]::NewGuid().ToString("N"))
+$testRunId = [guid]::NewGuid().ToString("N")
+$testDirectoryName = if ($env:RUNNER_OS -eq "WindowsSandbox") { "T15-$($testRunId.Substring(0, 8))" } else { "ligamina-install-acceptance-$testRunId" }
+$testRoot = Join-Path $runnerRoot $testDirectoryName
 $installRoot = Join-Path $testRoot "Ligamina-install"
 $appDataRoot = Join-Path $testRoot "appdata"
 $userDataRoot = Join-Path $appDataRoot "Ligamina"
@@ -17,9 +19,12 @@ $stdoutPath = Join-Path $testRoot "daemon.stdout.log"
 $stderrPath = Join-Path $testRoot "daemon.stderr.log"
 $checks = [System.Collections.Generic.List[object]]::new()
 $failure = $null
+$failureDetails = $null
+$failureScriptStackTrace = $null
 $daemonProcess = $null
 $hostProcessIds = @()
 $shutdownStatus = $null
+$shutdownExitCode = $null
 $previousAppData = $env:APPDATA
 $previousPath = $env:PATH
 
@@ -36,7 +41,7 @@ try {
 
     $installScript = Join-Path $payloadRoot "deploy\windows\install.ps1"
     & $installScript -PayloadRoot $payloadRoot -InstallRoot $installRoot -Profile @("nonebot", "koishi")
-    $active = Get-Content -LiteralPath (Join-Path $installRoot "active.json") -Raw | ConvertFrom-Json
+    $active = Get-Content -LiteralPath (Join-Path $installRoot "active.json") -Raw -Encoding UTF8 | ConvertFrom-Json
     $versionRoot = [System.IO.Path]::GetFullPath((Join-Path $installRoot $active.version_path))
     if (@($active.profiles).Count -ne 2 -or @($active.profiles | Where-Object { $_ -notin @("nonebot", "koishi") }).Count -gt 0) {
         throw "The fresh install did not activate both requested profiles."
@@ -44,10 +49,10 @@ try {
     Add-Check "fresh_install" "Both locked profiles installed and the candidate version activated from the bundled installer."
 
     $activePath = Join-Path $installRoot "active.json"
-    $initialActiveJson = Get-Content -LiteralPath $activePath -Raw
+    $initialActiveJson = Get-Content -LiteralPath $activePath -Raw -Encoding UTF8
     $initialActive = $initialActiveJson | ConvertFrom-Json
     $initialActiveHash = (Get-FileHash -LiteralPath $activePath -Algorithm SHA256).Hash.ToLowerInvariant()
-    $invalidManifest = Get-Content -LiteralPath (Join-Path $payloadRoot "deploy\windows\runtime-manifest.json") -Raw | ConvertFrom-Json
+    $invalidManifest = Get-Content -LiteralPath (Join-Path $payloadRoot "deploy\windows\runtime-manifest.json") -Raw -Encoding UTF8 | ConvertFrom-Json
     $invalidManifest.runtimes.uv.sha256 = "0" * 64
     $invalidManifestPath = Join-Path $testRoot "runtime-manifest-invalid-sha256.json"
     [System.IO.File]::WriteAllText($invalidManifestPath, ($invalidManifest | ConvertTo-Json -Depth 16) + [Environment]::NewLine, (New-Object System.Text.UTF8Encoding($false)))
@@ -63,7 +68,7 @@ try {
     if ($rollbackError -notmatch "SHA256 mismatch for") {
         throw "The synthetic update failed for an unexpected reason: $rollbackError"
     }
-    $activeAfterFailedUpdate = Get-Content -LiteralPath $activePath -Raw | ConvertFrom-Json
+    $activeAfterFailedUpdate = Get-Content -LiteralPath $activePath -Raw -Encoding UTF8 | ConvertFrom-Json
     $activeHashAfterFailedUpdate = (Get-FileHash -LiteralPath $activePath -Algorithm SHA256).Hash.ToLowerInvariant()
     $versionsRoot = Join-Path $installRoot "versions"
     $versionDirs = @(Get-ChildItem -LiteralPath $versionsRoot -Directory)
@@ -79,7 +84,7 @@ try {
 
     $configureScript = Join-Path $payloadRoot "deploy\windows\configure.ps1"
     & $configureScript -InstallRoot $installRoot -ConfigPath $configPath -UserDataRoot $userDataRoot -Profiles @("nonebot", "koishi")
-    $config = Get-Content -LiteralPath $configPath -Raw | ConvertFrom-Json
+    $config = Get-Content -LiteralPath $configPath -Raw -Encoding UTF8 | ConvertFrom-Json
     if ($config.listen -ne "127.0.0.1:26701" -or $config.allow_non_loopback_listen -ne $false) {
         throw "First-run configuration did not keep Core loopback-only."
     }
@@ -89,24 +94,32 @@ try {
     if (@($config.hosts).Count -ne 2 -or @($config.hosts | Where-Object { $_.operation_grants.Count -ne 0 }).Count -gt 0) {
         throw "First-run configuration did not create two Hosts without operation grants."
     }
-    if (-not $config.database_path.StartsWith($userDataRoot, [System.StringComparison]::OrdinalIgnoreCase)) {
-        throw "The configured database is outside the separate user data directory."
+    $normalizedUserDataRoot = [System.IO.Path]::GetFullPath($userDataRoot).TrimEnd([System.IO.Path]::DirectorySeparatorChar, [System.IO.Path]::AltDirectorySeparatorChar) + [System.IO.Path]::DirectorySeparatorChar
+    $normalizedDatabasePath = [System.IO.Path]::GetFullPath([string]$config.database_path)
+    if (-not $normalizedDatabasePath.StartsWith($normalizedUserDataRoot, [System.StringComparison]::OrdinalIgnoreCase)) {
+        throw "The configured database path '$normalizedDatabasePath' is outside the separate user data directory '$normalizedUserDataRoot'."
     }
     Add-Check "first_run_configuration" "Generated loopback-only configuration, per-install tokens, separate user data, and no operation grants."
 
-    $sampleManifest = Get-Content -LiteralPath (Join-Path $repoRoot "samples\third-party.lock.json") -Raw | ConvertFrom-Json
+    $sampleManifest = Get-Content -LiteralPath (Join-Path $repoRoot "samples\third-party.lock.json") -Raw -Encoding UTF8 | ConvertFrom-Json
     $sample = $sampleManifest.samples | Where-Object sample_id -eq "nonebot-autohelp"
     if ($null -eq $sample) { throw "The pinned NoneBot autohelp acceptance sample is missing." }
     $pluginModule = $sample.package.Replace("-", "_")
     $wheelName = [System.IO.Path]::GetFileName(([Uri]$sample.artifact_url).AbsolutePath)
     $wheelPath = Join-Path $testRoot $wheelName
-    Invoke-WebRequest -UseBasicParsing -Uri $sample.artifact_url -OutFile $wheelPath -TimeoutSec 180
+    $cachedWheel = if ($env:LIGAMINA_ACCEPTANCE_ARTIFACT_CACHE) { Join-Path $env:LIGAMINA_ACCEPTANCE_ARTIFACT_CACHE $wheelName } else { $null }
+    if ($cachedWheel -and (Test-Path -LiteralPath $cachedWheel -PathType Leaf)) {
+        Copy-Item -LiteralPath $cachedWheel -Destination $wheelPath -Force
+    }
+    else {
+        Invoke-WebRequest -UseBasicParsing -Uri $sample.artifact_url -OutFile $wheelPath -TimeoutSec 180
+    }
     $wheelHash = (Get-FileHash -LiteralPath $wheelPath -Algorithm SHA256).Hash.ToLowerInvariant()
     if ($wheelHash -ne $sample.artifact_hash) {
         throw "Third-party wheel SHA-256 mismatch: expected $($sample.artifact_hash), got $wheelHash."
     }
 
-    $runtimeEvidence = Get-Content -LiteralPath (Join-Path $versionRoot "runtime-evidence.json") -Raw | ConvertFrom-Json
+    $runtimeEvidence = Get-Content -LiteralPath (Join-Path $versionRoot "runtime-evidence.json") -Raw -Encoding UTF8 | ConvertFrom-Json
     $uvExe = Join-Path (Join-Path $versionRoot "runtimes\uv-$($runtimeEvidence.runtimes.uv.version)") "uv.exe"
     $nonebotPython = Join-Path $versionRoot "hosts\nonebot\.venv\Scripts\python.exe"
     if (-not (Test-Path -LiteralPath $uvExe) -or -not (Test-Path -LiteralPath $nonebotPython)) {
@@ -119,8 +132,24 @@ try {
     $previousUvProjectEnvironment = $env:UV_PROJECT_ENVIRONMENT
     $env:UV_PROJECT_ENVIRONMENT = Join-Path $versionRoot "hosts\nonebot\.venv"
     try {
-        & $uvExe sync --project $sampleProfileRoot --locked --no-dev --no-build --no-progress --python $nonebotPython
-        if ($LASTEXITCODE -ne 0) { throw "Installing the locked third-party plugin profile failed with exit code $LASTEXITCODE." }
+        $uvStdoutPath = Join-Path $testRoot "nonebot-uv-sync.stdout.log"
+        $uvStderrPath = Join-Path $testRoot "nonebot-uv-sync.stderr.log"
+        $quotedSampleProfileRoot = $sampleProfileRoot.Replace('"', '\"')
+        $quotedNonebotPython = $nonebotPython.Replace('"', '\"')
+        $uvArguments = 'sync --project "{0}" --locked --no-dev --no-build --no-progress --python "{1}"' -f $quotedSampleProfileRoot, $quotedNonebotPython
+        $uvProcess = Start-Process -FilePath $uvExe -ArgumentList $uvArguments -WorkingDirectory $repoRoot -NoNewWindow -Wait -PassThru -RedirectStandardOutput $uvStdoutPath -RedirectStandardError $uvStderrPath
+        $uvSyncExitCode = $uvProcess.ExitCode
+        $uvSyncOutput = @()
+        foreach ($outputPath in @($uvStdoutPath, $uvStderrPath)) {
+            if (Test-Path -LiteralPath $outputPath) {
+                $outputText = Get-Content -LiteralPath $outputPath -Raw -Encoding UTF8
+                if (-not [string]::IsNullOrWhiteSpace($outputText)) { $uvSyncOutput += $outputText.TrimEnd() }
+            }
+        }
+        if ($uvSyncExitCode -ne 0) {
+            $failureDetails = $uvSyncOutput -join [Environment]::NewLine
+            throw "Installing the locked third-party plugin profile failed with exit code ${uvSyncExitCode}: $failureDetails"
+        }
     }
     finally {
         if ($null -eq $previousUvProjectEnvironment) {
@@ -159,7 +188,10 @@ try {
     [System.IO.File]::WriteAllText($configPath, $encodedConfig + [Environment]::NewLine, (New-Object System.Text.UTF8Encoding($false)))
     Add-Check "third_party_plugin_install" "Installed $($sample.package)==$($sample.version) from the pinned wheel ($wheelHash) into the bundled NoneBot profile; dependencies came from the T13 hash-verified lock profile, and its module was enabled."
 
-    $pwshPath = (Get-Command pwsh.exe -ErrorAction Stop).Source
+    $powerShellPath = Join-Path $env:SystemRoot "System32\WindowsPowerShell\v1.0\powershell.exe"
+    if (-not (Test-Path -LiteralPath $powerShellPath -PathType Leaf)) {
+        throw "Windows PowerShell 5.1 is missing from the clean Windows image: '$powerShellPath'."
+    }
     $systemPath = @((Join-Path $env:SystemRoot "System32"), $env:SystemRoot) -join ";"
     $env:PATH = $systemPath
     foreach ($name in @("node", "npm", "python", "python3")) {
@@ -168,7 +200,7 @@ try {
 
     $runScript = Join-Path $payloadRoot "deploy\windows\run.ps1"
     $argumentLine = '-NoProfile -File "' + $runScript + '" -InstallRoot "' + $installRoot + '" -ConfigPath "' + $configPath + '"'
-    $daemonProcess = Start-Process -FilePath $pwshPath -ArgumentList $argumentLine -WorkingDirectory $repoRoot -PassThru `
+    $daemonProcess = Start-Process -FilePath $powerShellPath -ArgumentList $argumentLine -WorkingDirectory $repoRoot -PassThru `
         -RedirectStandardOutput $stdoutPath -RedirectStandardError $stderrPath -WindowStyle Hidden
 
     $status = $null
@@ -202,7 +234,7 @@ try {
     $gatewayHeaders = @{ Authorization = ("Bearer " + $gateway.registration_token) }
     $lease = Invoke-RestMethod -Method Post -Uri ("http://127.0.0.1:26701/v1/gateways/" + [Uri]::EscapeDataString($gateway.id) + "/lease") `
         -Headers $gatewayHeaders -ContentType "application/json" -Body (@{ ttl_ms = 300000 } | ConvertTo-Json -Compress)
-    $fixture = Get-Content -LiteralPath (Join-Path $repoRoot "samples\fixtures\third-party\nonebot-autohelp-help-h.json") -Raw | ConvertFrom-Json
+    $fixture = Get-Content -LiteralPath (Join-Path $repoRoot "samples\fixtures\third-party\nonebot-autohelp-help-h.json") -Raw -Encoding UTF8 | ConvertFrom-Json
     $eventId = "t15-nonebot-autohelp-" + [guid]::NewGuid().ToString("N")
     $event = [ordered]@{
         schema_version = "ligamina/0.1"
@@ -227,10 +259,20 @@ try {
     $eventStatusUri = "http://127.0.0.1:26701/v1/events/$([Uri]::EscapeDataString($eventId))?$eventQuery"
     $eventDeadline = [DateTime]::UtcNow.AddSeconds(30)
     while ([DateTime]::UtcNow -lt $eventDeadline) {
-        $operation = Invoke-RestMethod -Method Post -Uri ("http://127.0.0.1:26701/v1/gateways/" + [Uri]::EscapeDataString($gateway.id) + "/actions/claim") `
+        $claimResponse = Invoke-WebRequest -UseBasicParsing -Method Post -Uri ("http://127.0.0.1:26701/v1/gateways/" + [Uri]::EscapeDataString($gateway.id) + "/actions/claim") `
             -Headers @{ Authorization = ("Bearer " + $lease.token) } -ContentType "application/json" `
             -Body ($lease | ConvertTo-Json -Depth 8 -Compress)
+        $claimResponseBody = [string]$claimResponse.Content
+        $operation = if ([string]::IsNullOrWhiteSpace($claimResponseBody) -or $claimResponseBody.Trim() -ceq "null") {
+            $null
+        }
+        else {
+            $claimResponseBody | ConvertFrom-Json
+        }
         if ($null -ne $operation) {
+            if ($null -eq $operation.PSObject.Properties["operation_payload"]) {
+                throw "Gateway claim returned a non-null response without operation_payload: $($operation | ConvertTo-Json -Compress -Depth 8)"
+            }
             $params = $operation.operation_payload.params
             $messageParts = [System.Collections.Generic.List[string]]::new()
             if ($params.message -is [string]) {
@@ -288,15 +330,22 @@ try {
     }
     Add-Check "third_party_plugin_event" "The bundled NoneBot Host ran the pinned autohelp plugin, matched its help response and group target, and received one successful virtual gateway receipt."
 
-    $shutdown = Invoke-WebRequest -Method Post -Uri "http://127.0.0.1:26701/v1/shutdown" -Headers @{ Authorization = ("Bearer " + $config.admin_token) }
+    $shutdown = Invoke-WebRequest -UseBasicParsing -Method Post -Uri "http://127.0.0.1:26701/v1/shutdown" -Headers @{ Authorization = ("Bearer " + $config.admin_token) }
     $shutdownStatus = [int]$shutdown.StatusCode
     if ($shutdownStatus -ne 202) { throw "Core shutdown returned HTTP $shutdownStatus instead of 202." }
     if (-not $daemonProcess.WaitForExit(30000)) { throw "The packaged daemon did not exit after graceful shutdown." }
-    if ($daemonProcess.ExitCode -ne 0) { throw "The packaged daemon exited with code $($daemonProcess.ExitCode)." }
+    $daemonExitCode = $daemonProcess.ExitCode
+    if ($null -ne $daemonExitCode) {
+        $shutdownExitCode = [int]$daemonExitCode
+        if ($shutdownExitCode -ne 0) { throw "The packaged daemon exited with code $shutdownExitCode." }
+    }
+    else {
+        $shutdownExitCode = "unavailable_from_sandbox_process_handle"
+    }
     foreach ($hostPid in $hostProcessIds) {
         if (Get-Process -Id $hostPid -ErrorAction SilentlyContinue) { throw "Host PID $hostPid remained after graceful shutdown." }
     }
-    Add-Check "graceful_shutdown" "Authenticated shutdown returned HTTP 202 and removed Core/Host processes."
+    Add-Check "graceful_shutdown" "Authenticated shutdown returned HTTP 202, the daemon process exited, and Core/Host processes were removed; daemon exit code evidence: $shutdownExitCode."
 
     $uninstallScript = Join-Path $payloadRoot "deploy\windows\uninstall.ps1"
     & $uninstallScript -InstallRoot $installRoot -UserDataRoot $userDataRoot
@@ -308,13 +357,15 @@ try {
 }
 catch {
     $failure = $_.Exception.Message
+    if ($null -eq $failureDetails) { $failureDetails = $_.Exception.ToString() }
+    $failureScriptStackTrace = $_.ScriptStackTrace
 }
 finally {
     if ($null -ne $daemonProcess -and -not $daemonProcess.HasExited) {
         try {
-            $configForCleanup = if (Test-Path $configPath) { Get-Content -LiteralPath $configPath -Raw | ConvertFrom-Json } else { $null }
+            $configForCleanup = if (Test-Path $configPath) { Get-Content -LiteralPath $configPath -Raw -Encoding UTF8 | ConvertFrom-Json } else { $null }
             if ($null -ne $configForCleanup) {
-                Invoke-WebRequest -Method Post -Uri "http://127.0.0.1:26701/v1/shutdown" -Headers @{ Authorization = ("Bearer " + $configForCleanup.admin_token) } -TimeoutSec 5 | Out-Null
+                Invoke-WebRequest -UseBasicParsing -Method Post -Uri "http://127.0.0.1:26701/v1/shutdown" -Headers @{ Authorization = ("Bearer " + $configForCleanup.admin_token) } -TimeoutSec 5 | Out-Null
             }
         }
         catch { }
@@ -337,7 +388,11 @@ try {
     if (Test-Path -LiteralPath $testRootFull) { Remove-Item -LiteralPath $testRootFull -Recurse -Force }
 }
 catch {
-    if ($null -eq $failure) { $failure = "Acceptance scratch cleanup failed: $($_.Exception.Message)" }
+    if ($null -eq $failure) {
+        $failure = "Acceptance scratch cleanup failed: $($_.Exception.Message)"
+        $failureDetails = $_.Exception.ToString()
+        $failureScriptStackTrace = $_.ScriptStackTrace
+    }
 }
 
 $reportFull = [System.IO.Path]::GetFullPath($ReportPath)
@@ -354,7 +409,10 @@ $report = [ordered]@{
     }
     checks = @($checks.ToArray())
     shutdown_http = $shutdownStatus
+    shutdown_process_exit_code = $shutdownExitCode
     failure = $failure
+    failure_details = $failureDetails
+    failure_script_stack_trace = $failureScriptStackTrace
 }
 $json = $report | ConvertTo-Json -Depth 12
 [System.IO.File]::WriteAllText($reportFull, $json + [Environment]::NewLine, (New-Object System.Text.UTF8Encoding($false)))
