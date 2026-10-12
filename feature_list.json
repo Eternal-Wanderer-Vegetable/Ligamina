@@ -1,8 +1,8 @@
 {
   "schema_version": 1,
   "updated_at": "2026-10-12",
-  "active_feature": "feat-005",
-  "next_feature": "feat-007",
+  "active_feature": "feat-007",
+  "next_feature": "feat-008",
   "features": [
     {
       "id": "feat-001",
@@ -80,10 +80,18 @@
         "feat-004",
         "feat-006"
       ],
-      "status": "in-progress",
+      "status": "done",
       "done_when": "全部 entry 发布物/终态闭合；主 framework 不偷换，依赖锁和缓存 hash 验证通过。",
-      "evidence": "",
-      "evidence_paths": []
+      "evidence": "5,690 entries 的 advertised version、release 元数据、平台归档和终态闭合；6,247 个平台归档引用的缓存摘要校验通过。11,380 个 Windows/Linux profile 单元中 10,332 个完整依赖锁通过缓存与包级完整性校验，其余为预发布、缺失版本、Python/Node 约束、依赖/peer 冲突、缺少发布物、sdist worker-only 或不支持 workspace 协议等显式终态；没有替换主 framework，没有安装或执行目录插件。",
+      "evidence_paths": [
+        "outputs/acceptance/phase2-s203-20261012.json",
+        "catalogs/p2-41649744e057d61031d5/artifacts.lock.json",
+        "catalogs/p2-41649744e057d61031d5/profiles.lock.json",
+        "lab/artifacts.py",
+        "lab/profiles.py",
+        "lab/tests/test_artifacts.py",
+        "lab/tests/test_profiles.py"
+      ]
     },
     {
       "id": "feat-006",
@@ -116,7 +124,7 @@
         "feat-005",
         "feat-006"
       ],
-      "status": "not-started",
+      "status": "in-progress",
       "done_when": "四个支持版本双路径回归及 wrong-recipient/同错反例通过；native 不导入 Ligamina Bridge。",
       "evidence": "",
       "evidence_paths": []

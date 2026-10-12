@@ -9,7 +9,8 @@
 
 - 2026-10-12：S2-01、S2-02 已分阶段提交；S2-04 已在 S2-03 前完成。S2-03 的 sdist 依赖解析可能执行第三方构建后端，因此本次执行依赖已验收的 OS Worker；此执行顺序已写入 `feature_list.json`、`progress.md` 和 `session-handoff.md`。
 - S2-04 Linux 和 Windows benign probes、运行时策略与清理记录见 [双平台验收](../../outputs/acceptance/phase2-workers-20261012.json)。WSL namespace 方案因 namespace root 可重新挂载只读 bind mount 而拒绝，证据见 [WSL boundary probe](../../outputs/acceptance/phase2-wsl-userns-boundary-20261012.json)。没有执行第三方插件。
-- 下一任务为 S2-03：在已通过的隔离 Worker 内冻结 5,690 个 entry 的发布物终态、profile 与锁缓存。
+- S2-03 已完成：为 5,690 个 entry 冻结 6,247 个平台归档引用；11,380 个 Windows/Linux profile 单元中，10,332 个锁定依赖完整并可复核，其他均记录显式终态。报告：[S2-03 验收](../../outputs/acceptance/phase2-s203-20261012.json)。未运行 sdist backend、npm lifecycle 或目录插件。
+- 下一任务为 S2-05：增加独立 stock NoneBot/Koishi native path，与 Ligamina federation path 使用相同插件字节/锁/config/stimulus 并由独立 oracle 比较。
 
 ## 1. 范围与全量定义
 

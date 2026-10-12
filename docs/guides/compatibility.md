@@ -52,6 +52,19 @@ uv run --locked --project lab --python 3.12.14 python -m lab.catalog.snapshot ve
 
 NoneBot 官方维护标记来自 `is_official`；Koishi 官方维护标记来自[官方插件页](https://koishi.chat/zh-CN/plugins/)，与 registry `verified` 分列。快照命令仅读取目录元数据，不下载或执行插件。目录冻结不表示发布物可安装或行为兼容。
 
+## 发布物与依赖锁（S2-03）
+
+对冻结快照运行 `lab.artifacts`，它按 entry 的 `advertised_version` 查询精确版本；不把预发布、撤回或缺包替换成更新版本。Python wheel 和 npm tarball 下载到仓库外的内容寻址缓存，并逐项校验官方 SHA-256 / SRI；sdist 可以固定原始摘要，但构建后端只能在已验收的 OS Worker 内运行。未满足发布物条件的 entry 保留明确终态。
+
+```powershell
+uv run --locked --project lab --python 3.12.14 python -m lab.artifacts resolve catalogs/p2-41649744e057d61031d5 --workers 12
+uv run --locked --project lab --python 3.12.14 python -m lab.artifacts verify catalogs/p2-41649744e057d61031d5
+uv run --locked --project lab --python 3.12.14 python -m lab.profiles resolve catalogs/p2-41649744e057d61031d5 --workers 8
+uv run --locked --project lab --python 3.12.14 python -m lab.profiles verify catalogs/p2-41649744e057d61031d5
+```
+
+`artifacts.lock.json` 固定每个 registry entry 的版本、release 元数据摘要、按平台选择的档案和缓存路径；`profiles.lock.json` 固定 NoneBot 2.5.0 / OneBot adapter 2.4.6 / Python 3.12.14 或 Koishi core 4.18.11 / Node 24.20.0 的完整依赖图和哈希。uv 解析使用 `--no-build`，npm 使用 `--package-lock-only --ignore-scripts --strict-peer-deps --engine-strict`；依赖锁成功只表示可复现解析，不代表插件安装或行为通过。外部缓存默认在仓库的同级目录 `Ligamina-artifact-cache`，可用 `--cache-root` 显式指定。
+
 ## 隔离与差分
 
 现有 `isolated` Worker 仍只隔离 HOME、依赖、目录、凭证和进程，不能替代 OS 沙箱。S2-04 已添加 Docker 容器与 Windows Sandbox CLI Worker：两端都限制输入挂载、网络和资源，采集有上限，超时或 worker 丢失记为 `unknown`，并核验进程树和后端资源清理。实机探针见 [双平台报告](../../outputs/acceptance/phase2-workers-20261012.json)。该验收只运行自有 benign probes，没有执行目录中的第三方插件。

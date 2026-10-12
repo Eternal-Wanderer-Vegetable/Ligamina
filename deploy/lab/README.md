@@ -12,6 +12,10 @@ The Windows backend uses the Windows Sandbox CLI (`wsb.exe`). Networking, vGPU, 
 - Host environment variables are not passed to untrusted processes. No credentials are mounted.
 - Artifact input is read-only. Writable scratch is disposable and scoped to a single run.
 
+## Catalog input preparation
+
+S2-03 resolves each frozen registry entry's exact advertised release before a Worker receives it. `uv pip compile --no-build` creates Python dependency locks; npm uses `--package-lock-only`, `--ignore-scripts`, strict peer checks, and strict Node engine checks. Artifact and dependency lock digests are retained in the snapshot. Content-addressed downloads and lock files live outside the repository in `Ligamina-artifact-cache` by default. Source distributions may be recorded and hashed here, but their build backends are never invoked on the host; a later build must use the OS Worker boundary above.
+
 ## Verification
 
 `lab/tests/test_workers.py` checks generated policy and mount invariants without requiring Docker or launching Windows Sandbox. Runtime acceptance uses dedicated benign probes for read/write boundaries, network denial, resource limits, timeout, output overflow, process-tree cleanup, worker loss, and sibling isolation. Unit policy checks are not runtime isolation evidence; an unavailable engine remains `unknown` and cannot pass an OS gate.
