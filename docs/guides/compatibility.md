@@ -10,6 +10,15 @@ uv run --locked --project lab --python 3.12.14 python lab/run.py --suite represe
 
 追加 --sample-id nonebot-autohelp 可复跑一个样本。清单是 [20 个锁定样本](../../samples/third-party.lock.json)，每生态 10 个；它不是官方商店全集。
 
+S2-05 独立原生配对回归只覆盖四个既有支持版本，可复跑全部或单个样本：
+
+```powershell
+uv run --locked --project lab --python 3.12.14 python -m lab.baselines.run_s205
+uv run --locked --project lab --python 3.12.14 python -m lab.baselines.run_s205 --sample-id koishi-game-mini
+```
+
+它核验原始发布物摘要，在锁定的 Linux profile 中分别执行 stock framework 与生产 Core/Host 路径，并以同一配置、刺激和独立 oracle 比较；完整结果写入 [S2-05 报告](../../outputs/acceptance/phase2-s205-20261012.json)。目录插件只在禁网 Docker Worker 中运行。Windows Sandbox 因 App Control 在插件启动前阻止 CPython；这不替代后续 Windows pilot 验收。虚拟回执仍不代表真实平台投递。
+
 representative 校验发布物哈希、创建单插件 profile、生成依赖锁、运行 DirectWorker 与生产 Core 联邦路径、保存行为 trace。现有 gate 是 C11 的“每生态至少两个 L4”，不能判定全集扫描完成。
 
 ## 已有级别
@@ -23,11 +32,13 @@ representative 校验发布物哈希、创建单插件 profile、生成依赖锁
 | L4 | 独立 expected oracle 与两条路径的行为/操作匹配 | 此版本在此场景行为兼容 |
 | L5 | 生命周期与资源稳定性 | 对应稳定性窗口通过 |
 
-当前 L2 DirectWorker 仍复用 Ligamina Bridge；它不是完全独立的 stock NoneBot/Koishi baseline。S2-05 将添加独立原生基线，保留旧级别报告的含义。
+当前 L2 DirectWorker 仍复用 Ligamina Bridge；它不是完全独立的 stock NoneBot/Koishi baseline。S2-05 已添加独立原生路径及双路径 oracle 比较；旧级别报告仍按其生成时的含义解释。
 
 ## 当前支持范围
 
 以 [T18](../../outputs/acceptance/t18-final-audit-20261012.json) supported_plugins 和 T13 fixtures 为准：四个精确版本，Windows 与本机 WSL Linux 有证据。L0–L3 失败、未运行与条件缺失不进入支持名单。
+
+S2-05 在禁网 Linux Docker Worker 对四个精确版本完成 stock/native 与 federated 双路径复核，四项通过；Windows Sandbox 被本机 App Control 阻止于插件启动前，后续 Windows cohort 仍未验收。
 
 Bridge 对复杂平台 API、真实网关、控制台/loader、浏览器、第三方在线凭证的覆盖有限。需要这些能力的插件仍进入全量账本，记录具体限制；不能静默过滤。
 

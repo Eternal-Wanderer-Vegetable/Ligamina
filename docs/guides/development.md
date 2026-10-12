@@ -35,6 +35,7 @@ bash init.sh full
 | NoneBot Host | uv run --locked --project hosts/nonebot --python 3.12.14 pytest -q hosts/nonebot/tests，以及 Host README 原生/Bridge/worker probes |
 | Koishi Host | npm ci、npm test（在 hosts/koishi）；MCP 改动加 npm run test:mcp |
 | Lab/报告 | uv run --locked --project hosts/nonebot --python 3.12.14 python -m unittest discover -s lab/tests -v，再运行受影响 suite |
+| S2-05 原生/联邦配对 | `uv run --locked --project lab --python 3.12.14 python -m lab.baselines.run_s205`；四个既有支持版本在禁网 Linux Worker 中运行 |
 | Worker 隔离策略 | `uv run --locked --project hosts/nonebot --python 3.12.14 python -m unittest lab.tests.test_workers -v`；Windows runner 另运行 `pwsh -NoProfile -File deploy/lab/check-windows-runner.ps1` |
 | 目录发布物/依赖锁 | `uv run --locked --project lab --python 3.12.14 python -m lab.artifacts verify catalogs/<snapshot>` 与 `python -m lab.profiles verify catalogs/<snapshot>`；缓存根必须与生成时一致 |
 | 跨语言/协议/安装 | 完整入口和双 OS CI；安装改动追加 [Windows 安装验收](../../scripts/windows-install-acceptance.ps1) / Linux容器验收 |
@@ -61,3 +62,5 @@ target\debug\ligamina-cli.exe report outputs/acceptance/t13-representative-windo
 S2-04 双平台运行时探针可复跑：`uv run --locked --project hosts/nonebot --python 3.12.14 python deploy/lab/linux/probes/acceptance.py` 与 `uv run --locked --project hosts/nonebot --python 3.12.14 python deploy/lab/windows/probes/acceptance.py`。它们只运行 benign isolation probes，不下载或执行 catalog 插件；结果写入 `outputs/acceptance/phase2-workers-*-20261012.json`。
 
 S2-03 的发布物和依赖锁可按 [兼容性指南](compatibility.md#发布物与依赖锁s2-03) 重跑并校验。它只读取官方元数据、下载并校验归档、解析依赖；不在宿主机执行 sdist backend 或 npm lifecycle scripts。
+
+S2-05 配对回归见[兼容性指南](compatibility.md#当前可运行入口)。报告保留 artifact/profile/config/stimulus 指纹、每条路径结果、oracle 比较和 Worker 清理。当前 Windows Sandbox 启动前置被 App Control 阻止；不可据此声明 Windows 插件行为通过。

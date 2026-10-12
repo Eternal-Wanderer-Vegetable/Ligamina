@@ -2,46 +2,35 @@
 
 ## Current Objective
 
-- 日期：2026-10-12（Asia/Shanghai）。本次目标：完成 S2-01–S2-12 并分阶段提交。
-- 执行分支：`codex/phase2-full-catalog`。文档前置提交 `2d6399a`、S2-01 `15f468d`、S2-02 `c0be568`、S2-04 `2fa06b0`。
-- 当前任务：S2-05 / feat-007（独立原生基线）；S2-03 已完成。S2-03 的 30 个 sdist build-only 条目仍要求后续在隔离 Worker 中构建。
-- 状态与依赖唯一入口：[feature_list.json](feature_list.json)。
+- 日期：2026-10-12（Asia/Shanghai）。用户要求完成 `docs/plans/2026-10-12-phase-2-full-catalog.md` 的 S2-01–S2-12 并分阶段提交。
+- 分支：`codex/phase2-full-catalog`。仓库新增文档已先提交 `2d6399a`，随后 S2-01 `15f468d`、S2-02 `c0be568`、S2-04 `2fa06b0`、S2-03 `29bc1e5`。
+- 当前：S2-06 / feat-008 已开始；S2-05 实现/验收完成并待阶段提交。S2-06 实施前 `init.ps1 -Mode full` baseline 退出码 0，详见 `outputs/acceptance/phase2-s206-baseline-20261012.json`；S2-06 代码尚未修改。
+- 状态唯一入口：[feature_list.json](feature_list.json)。
 
-## Completed
+## Completed Stages
 
-- H01：短 AGENTS 入口、专题指南、验证命令、harness 与第二阶段计划。
-- S2-01：冻结 NoneBot 943 + Koishi 4,747，共 5,690 个 registry entries；完整快照在 `catalogs/p2-41649744e057d61031d5/`。
-- S2-02：四个 v1 schemas、9 个多语言 golden vectors、旧状态映射和汇总；见 `outputs/acceptance/phase2-contracts-20261012.json`。
-- S2-04：Linux Docker Worker 与 Windows Sandbox CLI Worker；边界、网络、资源、超时、输出、进程树、worker 丢失和兄弟隔离探针通过。综合证据见 `outputs/acceptance/phase2-workers-20261012.json`。
-- WSL user/mount namespace 不接受为 Linux 边界：namespace root 能将只读 bind mount 改为可写，见 `outputs/acceptance/phase2-wsl-userns-boundary-20261012.json`。
-- S2-03：5,690 个 entry 的 advertised version / artifact terminal state，6,247 个平台归档引用和 11,380 个 Windows/Linux profile 单元已冻结；10,332 个 profile lock 可复核，其余终态显式分类。完整证据见 `outputs/acceptance/phase2-s203-20261012.json`。
+- H01：Agent 文档 harness、专题指南、README 摘要与第二阶段计划。
+- S2-01：官方 NoneBot / Koishi 完整目录快照，共 5,690 registry entries。
+- S2-02：lab v1 schemas、状态映射、summary 合同和多语言 vectors。
+- S2-04：Linux Docker 与 Windows Sandbox OS Worker；拒绝把 WSL namespace 当安全边界。
+- S2-03：冻结 artifact 和依赖 profile 终态；5,690 entries、6,247 平台 artifact 引用、11,380 OS profile 单元；10,332 个完整依赖锁。sdist 后端尚未运行。
+- S2-05：独立 stock NoneBot/Koishi runner、同冻结 artifact/lock/config/stimulus 的 Federated 路径、独立 expected oracle 和双路 comparator。四个历史支持版本全通过；Native source 无 Ligamina Bridge import。
 
-## Verification Evidence
+## S2-05 Evidence
 
-- `pwsh -NoProfile -File init.ps1 -Mode docs`：18 文档、148 本地链接、9 历史 Markdown、14 任务通过。
-- Linux Worker：`uv run --locked --project hosts/nonebot --python 3.12.14 python deploy/lab/linux/probes/acceptance.py`，10/10 预期结果与 cleanup 通过；固定镜像为 `python@sha256:f77ac9e44ae96ef2c90b8053ea08c31f8be030f824196b0ae4db6d462c84e51f`。
-- Windows Worker：`uv run --locked --project hosts/nonebot --python 3.12.14 python deploy/lab/windows/probes/acceptance.py`，7/7 预期结果与 cleanup 通过。
-- `pwsh -NoProfile -File deploy/lab/check-windows-runner.ps1`：runner PowerShell 解析和 Job Object C# 源码编译通过。
-- `uv run --locked --project hosts/nonebot --python 3.12.14 python -m unittest discover -s lab/tests -v`：36 项通过。Python worker/probe py_compile 和 `git diff --check` 通过。
-- `wsb.exe list --raw` 返回空环境；Docker 专用 Worker 容器检查无残留。Worker probes 没有下载或执行 catalog 插件。
-- S2-03：`uv run --locked --project lab --python 3.12.14 python -m unittest discover -s lab/tests -v` 47 项通过；`python -m py_compile`、docs 检查及 `lab.artifacts verify` / `lab.profiles verify` 均通过；锁 hash 和详细计数见验收报告。没有执行第三方构建后端、npm lifecycle scripts 或目录插件。
-- 第一阶段 24 小时、全 catalog、pilot、真实平台和字段验收均没有重跑。
+- 报告：[phase2-s205-20261012.json](outputs/acceptance/phase2-s205-20261012.json)。实施前 `pwsh -NoProfile -File init.ps1 -Mode full` 退出码 0；基线摘要/hash：[phase2-s205-baseline-smoke-windows-20261012.json](outputs/acceptance/phase2-s205-baseline-smoke-windows-20261012.json)。
+- 最终执行：`uv run --locked --project lab --python 3.12.14 python -m lab.baselines.run_s205`。autohelp 0.1.7、repeater 3.1.4、game-mini 0.4.3、multi-qa 1.0.8 的 Native/Federated/oracle/pair/cleanup 均通过。
+- 错收件人和“两边都错仍不能通过”用例在 `lab/tests/test_compare.py`；Native Bridge 排除检查在 `lab/tests/test_baselines.py`。
+- `uv run --locked --project lab --python 3.12.14 python -m unittest discover -s lab/tests`：52 项通过。
+- `pwsh -NoProfile -File init.ps1 -Mode docs`：18 文档、152 本地链接、9 历史 Markdown、14 tasks；py_compile、`node --check lab/baselines/koishi/runner.mjs`、`git diff --check` 通过。
+- 实施后 `pwsh -NoProfile -File init.ps1 -Mode full` 退出码 0：NoneBot 3、lab 52、Koishi 7、MCP 1、reference 5、Rust 29；Windows Core smoke 4 events / 4 Gateway ops / 0 PIDs；bundle stage 通过。
+- Windows Sandbox App Control 阻止 unsigned CPython 启动，Win32 error 4551，证据：[phase2-s205-windows-blocker-20261012.json](outputs/acceptance/phase2-s205-windows-blocker-20261012.json)。未绕过策略；四个插件探针在禁网 Linux Docker Worker 中执行。S2-09 Windows pilot 尚未通过。
 
-## Files / Remaining Scope
+## Next: S2-06
 
-- 路由：[AGENTS](AGENTS.md)、[docs](docs/README.md)、[第二阶段计划](docs/plans/2026-10-12-phase-2-full-catalog.md)。
-- 当前代码：`lab/artifacts.py`、`lab/profiles.py` 与 artifact/profile lock；S2-03 证据见 `outputs/acceptance/phase2-s203-20261012.json`。
-- 下一步 S2-05：检查独立 stock native runner 方案和既有四个支持插件案例，先记录 baseline，再实现同输入双路径及独立 oracle。
-- S2-05–S2-12、pilot、全量 census、真实 QQ/平台收发仍未完成；不要将锁定成功或 Worker benign probes 等同插件兼容验收。
+按计划仅启动一个 feature：补分类 recipes 和明确的 missing/skipped 条件。
 
-## Next Session Startup
-
-1. 读取 `AGENTS.md`、`progress.md`、`feature_list.json` 和本交接。
-2. 检查 `git status --short` 和最近提交，运行 `pwsh -NoProfile -File init.ps1 -Mode docs`。
-3. 检查 S2-03 阶段提交与工作树；继续 S2-05，按状态文件记录 baseline、命令、终态、失败和证据，再完成阶段提交。
-
-## Recommended Next Step
-
-- S2-05 为当前任务；当前 DirectWorker 复用 Bridge，不能代表独立原生路径。
-- 不使用既有 20 样本 gate 作为全集完成判定；准备全量执行前先完成 S2-09 双平台 pilot。
-- 保留 `missing/skipped/unknown/failed/flaky` 等状态；真实平台未验证时 README 继续明确标注虚拟范围。
+- 配置/preload、service、loader、消息、存储、定时、adapter、console 分类各有 recipe；检查预期操作、状态/持久化、生命周期/清理。
+- 缺少 fixture、服务或凭证必须记具体 skipped；加载成功不能冒充行为通过。
+- 计划命令：先运行 `pwsh -NoProfile -File init.ps1 -Mode docs`，选择并记录 baseline，再开始 `feat-008`；不要提前启动 census。
+- S2-03 的 30 个 sdist build-only 条目只能在已验收的 OS Worker 构建；全量 census、真实平台投递与第一阶段 24 小时实验仍未执行。

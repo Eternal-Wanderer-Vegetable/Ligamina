@@ -3,6 +3,7 @@ from __future__ import annotations
 import sys
 import unittest
 from pathlib import Path
+from unittest.mock import patch
 
 from lab.native_runner import execute_harness, load_case, run_pair
 
@@ -39,6 +40,20 @@ class NativeRunnerTest(unittest.TestCase):
         self.assertEqual(result["status"], "completed")
         self.assertEqual(result["mode"], "native")
         self.assertEqual(result["diagnostics"], "harness diagnostic\n")
+
+    def test_context_is_passed_but_caller_secrets_are_not_inherited(self) -> None:
+        case = load_case(ROOT / "samples/fixtures/event-routing/single-group-reply.json")
+        case["context"] = {"artifact_hash": "frozen-digest"}
+        script = (
+            "import json, os, sys; payload=json.load(sys.stdin); "
+            "assert payload['context']['artifact_hash']=='frozen-digest'; "
+            "assert 'LIGAMINA_TEST_SECRET' not in os.environ; "
+            "print(json.dumps({'status':'completed','context_seen':True}))"
+        )
+        with patch.dict("os.environ", {"LIGAMINA_TEST_SECRET": "must-not-cross"}):
+            result = execute_harness([sys.executable, "-c", script], case, "native", 5)
+        self.assertEqual(result["status"], "completed")
+        self.assertTrue(result["context_seen"])
 
     def test_missing_harness_is_reported_as_environment_missing(self) -> None:
         case = load_case(ROOT / "samples/fixtures/event-routing/single-group-reply.json")

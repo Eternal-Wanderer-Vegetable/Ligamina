@@ -1,8 +1,8 @@
 {
   "schema_version": 1,
   "updated_at": "2026-10-12",
-  "active_feature": "feat-007",
-  "next_feature": "feat-008",
+  "active_feature": "feat-008",
+  "next_feature": "feat-009",
   "features": [
     {
       "id": "feat-001",
@@ -124,10 +124,19 @@
         "feat-005",
         "feat-006"
       ],
-      "status": "in-progress",
+      "status": "done",
       "done_when": "四个支持版本双路径回归及 wrong-recipient/同错反例通过；native 不导入 Ligamina Bridge。",
-      "evidence": "",
-      "evidence_paths": []
+      "evidence": "S2-05 前置 pwsh -NoProfile -File init.ps1 -Mode full baseline exited 0. Final pinned Linux Docker Worker run passed all four previously supported exact versions: NoneBot autohelp 0.1.7, repeater 3.1.4, Koishi game-mini 0.4.3, and multi-qa 1.0.8. Each Native and Federated path completed against the same artifact/lock/config/stimulus fingerprints, passed the independent expected oracle and pair comparison, and confirmed cleanup. The native sources do not import Ligamina Bridge. Lab tests 52/52 include one-side and both-sides wrong-recipient negatives; pwsh -NoProfile -File init.ps1 -Mode full exited 0. Windows Sandbox was blocked before plugin start (App Control, Win32 4551); no Windows plugin behavior is claimed. Full census and real-platform delivery remain untested.",
+      "evidence_paths": [
+        "outputs/acceptance/phase2-s205-20261012.json",
+        "outputs/acceptance/phase2-s205-baseline-smoke-windows-20261012.json",
+        "outputs/acceptance/phase2-s205-windows-blocker-20261012.json",
+        "lab/baselines/nonebot/runner.py",
+        "lab/baselines/koishi/runner.mjs",
+        "lab/baselines/paired_worker.py",
+        "lab/tests/test_compare.py",
+        "lab/tests/test_baselines.py"
+      ]
     },
     {
       "id": "feat-008",
@@ -137,10 +146,12 @@
       "dependencies": [
         "feat-007"
       ],
-      "status": "not-started",
+      "status": "in-progress",
       "done_when": "分类均有验证 recipe；无 fixture/凭证条目明确 skipped，不能假通过。",
-      "evidence": "",
-      "evidence_paths": []
+      "evidence": "Baseline pwsh -NoProfile -File init.ps1 -Mode full exited 0 after S2-05 changes and before S2-06 implementation; see outputs/acceptance/phase2-s206-baseline-20261012.json.",
+      "evidence_paths": [
+        "outputs/acceptance/phase2-s206-baseline-20261012.json"
+      ]
     },
     {
       "id": "feat-009",

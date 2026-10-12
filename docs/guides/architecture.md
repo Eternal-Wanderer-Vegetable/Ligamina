@@ -18,7 +18,7 @@
 | NoneBot | [Host README](../../hosts/nonebot/README.md)：OneBot v11 转换、Bot.handle_event 与框架生命周期 |
 | Koishi | [Host README](../../hosts/koishi/README.md)：原生 Session/dispatch、插件服务依赖与 SQLite |
 | Reference Client | [说明](../../clients/reference/README.md)：typed HTTP、独立 MCP SDK 与虚拟平台 |
-| 实验室 | [run.py](../../lab/run.py)、[representative.py](../../lab/representative.py)、[compare.py](../../lab/compare.py) |
+| 实验室 | [run.py](../../lab/run.py)、[representative.py](../../lab/representative.py)、[独立原生基线](../../lab/baselines/paired_worker.py)、[比较器](../../lab/compare.py) |
 
 ## 边界与不变量
 
@@ -28,6 +28,7 @@
 - 已派发且失去回执的动作保持 unknown；重启不能证明真实发送成功。
 - Bridge 平台能力有限，未支持 API 返回 unsupported_api；扩展必须补授权、schema、作用域和差分验证。
 - NoneBot 2.5.0、Koishi core 4.18.11 是锁定 profile。Koishi 元包/loader、浏览器/控制台等需求使用独立 profile。
+- S2-05 stock baseline 在不导入 Ligamina Bridge 的独立进程中调用原生 Bot/Session API；配对 Worker 固定 artifact、lock、config、stimulus 指纹后分别验证 Native 与 Federated 输出。
 - 第一阶段验证虚拟 Gateway 收发；真实 QQ/平台网关不在已经通过的验收范围。
 
 旧版本和工具链决策见 [ADR 0001](../adr/0001-baseline.md)，其中 readiness 按记录日期解释；当前裁决使用 progress 指向的最新报告。

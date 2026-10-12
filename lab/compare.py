@@ -69,7 +69,9 @@ def _validate_environment(
     if not isinstance(actual, dict):
         return [Issue("environment_missing", "runner omitted environment fingerprint", side)]
     issues = []
-    for key in ("ecosystem", "framework_version", "runtime_version", "lockfile_sha256", "profile_sha256"):
+    required = ("ecosystem", "framework_version", "runtime_version", "lockfile_sha256", "profile_sha256")
+    keys = tuple(dict.fromkeys((*required, *expected.keys())))
+    for key in keys:
         actual_value = actual.get(key)
         expected_value = expected.get(key)
         same = (
