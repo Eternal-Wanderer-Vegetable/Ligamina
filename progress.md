@@ -5,7 +5,7 @@
 - **Last Updated:** 2026-10-12（Asia/Shanghai）。
 - **Current Objective:** 按 S2-01–S2-12 顺序完成第二阶段目录全量实验能力并分阶段提交。
 - **Active Feature:** S2-10 / feat-012；S2-09 / feat-011 的 pilot 分母、负例/恢复与可达 Worker 资源观测已闭合，验证与阶段提交记录见下文。
-- **Completed stage commits:** H01 `2d6399a`、S2-01 `15f468d`、S2-02 `c0be568`、S2-04 `2fa06b0`、S2-03 `29bc1e5`、S2-05 `854b564`、S2-06 `4e555b3`、S2-07 `7523a83`、S2-08 `cbcbb0a`、S2-09 `20d8f04`；`299d22c` 是 S2-09 baseline/status checkpoint；S2-10 census checkpoints `8f21ead`、`4295831`。
+- **Completed stage commits:** H01 `2d6399a`、S2-01 `15f468d`、S2-02 `c0be568`、S2-04 `2fa06b0`、S2-03 `29bc1e5`、S2-05 `854b564`、S2-06 `4e555b3`、S2-07 `7523a83`、S2-08 `cbcbb0a`、S2-09 `20d8f04`；`299d22c` 是 S2-09 baseline/status checkpoint；S2-10 census checkpoints `8f21ead`、`4295831`、`25cf805`。
 - 第一阶段 T01–T18、C01–C15、G1/G2 以 [T18 报告](outputs/acceptance/t18-final-audit-20261012.json) 为准；四个精确插件版本和虚拟 Gateway，真实平台收发未验证。
 - 第二阶段 S2-01–S2-09 完成；S2-10 正在进行，S2-11–S2-12 尚未开始，状态见 [feature_list.json](feature_list.json)。S2-09 pilot 发现的失败与 unknown 仍是后续 census/兼容性裁决输入，不代表通过。
 
