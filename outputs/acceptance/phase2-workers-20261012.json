@@ -1,0 +1,32 @@
+{
+  "schema_version": 1,
+  "date": "2026-10-12",
+  "task_id": "S2-04",
+  "status": "passed",
+  "linux": {
+    "backend": "Docker Engine",
+    "server": "29.7.2 linux x86_64",
+    "worker_image": "python@sha256:f77ac9e44ae96ef2c90b8053ea08c31f8be030f824196b0ae4db6d462c84e51f",
+    "report": "outputs/acceptance/phase2-workers-linux-20261012.json",
+    "probe_count": 10,
+    "all_expected_results_and_cleanup_passed": true
+  },
+  "windows": {
+    "backend": "Windows Sandbox CLI",
+    "report": "outputs/acceptance/phase2-workers-windows-20261012.json",
+    "probe_count": 7,
+    "all_expected_results_and_cleanup_passed": true
+  },
+  "wsl_candidate": {
+    "accepted": false,
+    "report": "outputs/acceptance/phase2-wsl-userns-boundary-20261012.json",
+    "reason": "Namespace root can remount the read-only bind mount read-write."
+  },
+  "verification_commands": [
+    "uv run --locked --project hosts/nonebot --python 3.12.14 python deploy/lab/linux/probes/acceptance.py",
+    "uv run --locked --project hosts/nonebot --python 3.12.14 python deploy/lab/windows/probes/acceptance.py",
+    "pwsh -NoProfile -File deploy/lab/check-windows-runner.ps1",
+    "uv run --locked --project hosts/nonebot --python 3.12.14 python -m unittest discover -s lab/tests -v",
+    "pwsh -NoProfile -File init.ps1 -Mode docs"
+  ]
+}

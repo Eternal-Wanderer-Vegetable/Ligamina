@@ -1,0 +1,13 @@
+{
+  "schema_version": 1,
+  "date": "2026-10-12",
+  "backend_candidate": "WSL2 Ubuntu-24.04 user/mount/network/pid namespaces",
+  "command": "wsl.exe -d Ubuntu-24.04 -u root -- /bin/bash /mnt/e/stella/Ligamina/deploy/lab/linux/probes/wsl-userns-boundary.sh /mnt/e/stella/Ligamina",
+  "exit_code": 0,
+  "stdout": [
+    "remount_rw_allowed",
+    "repo_hidden"
+  ],
+  "interpretation": "Namespace creation and mount hiding succeeded, but root inside the namespace remounted its read-only bind mount read-write. This existing WSL distro is not accepted as a Linux isolation boundary.",
+  "probe_script": "deploy/lab/linux/probes/wsl-userns-boundary.sh"
+}

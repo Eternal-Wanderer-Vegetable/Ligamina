@@ -1,8 +1,8 @@
 {
   "schema_version": 1,
   "updated_at": "2026-10-12",
-  "active_feature": null,
-  "next_feature": "feat-005",
+  "active_feature": "feat-005",
+  "next_feature": "feat-007",
   "features": [
     {
       "id": "feat-001",
@@ -77,9 +77,10 @@
       "description": "每 entry 冻结版本、完整性和独立依赖 profile；缓存可复核。",
       "dependencies": [
         "feat-003",
-        "feat-004"
+        "feat-004",
+        "feat-006"
       ],
-      "status": "not-started",
+      "status": "in-progress",
       "done_when": "全部 entry 发布物/终态闭合；主 framework 不偷换，依赖锁和缓存 hash 验证通过。",
       "evidence": "",
       "evidence_paths": []
@@ -92,10 +93,18 @@
       "dependencies": [
         "feat-004"
       ],
-      "status": "not-started",
+      "status": "done",
       "done_when": "隔离负例、超时、Worker 丢失、进程树清理和兄弟隔离有可核验证据。",
-      "evidence": "",
-      "evidence_paths": []
+      "evidence": "Docker Linux 10/10 与 Windows Sandbox 7/7 benign runtime probes 均满足预期状态并确认 cleanup；覆盖文件/网络/秘密边界、CPU/内存/PID 限额、超时、输出截断、进程树、worker loss 和兄弟隔离。WSL namespace 因可将只读 bind mount 重挂为可写而明确拒绝。没有执行 catalog 插件。",
+      "evidence_paths": [
+        "outputs/acceptance/phase2-workers-20261012.json",
+        "outputs/acceptance/phase2-workers-linux-20261012.json",
+        "outputs/acceptance/phase2-workers-windows-20261012.json",
+        "outputs/acceptance/phase2-wsl-userns-boundary-20261012.json",
+        "deploy/lab/README.md",
+        "lab/workers/linux.py",
+        "lab/workers/windows.py"
+      ]
     },
     {
       "id": "feat-007",

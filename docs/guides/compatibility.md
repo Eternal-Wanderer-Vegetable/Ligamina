@@ -54,7 +54,9 @@ NoneBot 官方维护标记来自 `is_official`；Koishi 官方维护标记来自
 
 ## 隔离与差分
 
-现有 isolated 隔离 HOME、依赖、目录、凭证和进程，但不是 OS 安全沙箱。全量安装与执行迁移到一次性 Linux 容器/VM 和 Windows 沙箱 Worker，限制挂载、网络、资源和存活时间。
+现有 `isolated` Worker 仍只隔离 HOME、依赖、目录、凭证和进程，不能替代 OS 沙箱。S2-04 已添加 Docker 容器与 Windows Sandbox CLI Worker：两端都限制输入挂载、网络和资源，采集有上限，超时或 worker 丢失记为 `unknown`，并核验进程树和后端资源清理。实机探针见 [双平台报告](../../outputs/acceptance/phase2-workers-20261012.json)。该验收只运行自有 benign probes，没有执行目录中的第三方插件。
+
+WSL user/mount namespace 探针未获准入：namespace root 可以把只读 bind mount 改成可写。不能以现有 WSL 发行版替代 Docker 隔离；证据见 [WSL boundary report](../../outputs/acceptance/phase2-wsl-userns-boundary-20261012.json)。
 
 Native 与 federated 使用同一发布物、依赖锁、配置和刺激，分开数据目录。两者先满足独立 expected oracle，再比较收件人、操作、消息片段、回执和状态。随机数、时间、外部 HTTP 用注明边界的输入控制；相同错误结果不能通过。
 

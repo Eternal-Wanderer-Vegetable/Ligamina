@@ -1,9 +1,15 @@
 # 第二阶段：官方目录全量插件测试与输出规范
 
-- 日期：2026-10-12（Asia/Shanghai）。状态：计划已制定，执行尚未开始。
+- 日期：2026-10-12（Asia/Shanghai）。计划建立时间：S2-01–S2-12 尚未执行；后续进度由本节和 [feature_list.json](../../feature_list.json) 维护。
 - 前置：第一阶段 T01–T18 / C01–C15、G1/G2 已通过；当前验收见 [T18](../../outputs/acceptance/t18-final-audit-20261012.json)。
 - 用户目标：全量调取 NoneBot 和 Koishi 的官方插件，自动观察能否正常运行，并规范输出与 README 展示。
 - 执行状态唯一入口：[feature_list.json](../../feature_list.json)；本计划定义依赖、文件、验证与退出条件。
+
+## 执行状态记录
+
+- 2026-10-12：S2-01、S2-02 已分阶段提交；S2-04 已在 S2-03 前完成。S2-03 的 sdist 依赖解析可能执行第三方构建后端，因此本次执行依赖已验收的 OS Worker；此执行顺序已写入 `feature_list.json`、`progress.md` 和 `session-handoff.md`。
+- S2-04 Linux 和 Windows benign probes、运行时策略与清理记录见 [双平台验收](../../outputs/acceptance/phase2-workers-20261012.json)。WSL namespace 方案因 namespace root 可重新挂载只读 bind mount 而拒绝，证据见 [WSL boundary probe](../../outputs/acceptance/phase2-wsl-userns-boundary-20261012.json)。没有执行第三方插件。
+- 下一任务为 S2-03：在已通过的隔离 Worker 内冻结 5,690 个 entry 的发布物终态、profile 与锁缓存。
 
 ## 1. 范围与全量定义
 
@@ -78,7 +84,7 @@
 | --- | --- | --- | --- |
 | S2-01 | lab/catalog/{nonebot,koishi,snapshot}.py；catalogs/<snapshot>/ raw + normalized + provenance | 第一阶段/harness | 两目录完整快照、来源切换/差异记录、entry 映射、官方子集、分母/哈希可复算 |
 | S2-02 | contracts/lab/v1/{catalog,run,result,summary}.schema.json；lab/result.py；golden fixtures | S2-01 | 新旧状态映射、各分母公式、reason/exit codes、三语言消费者验 schema；不能把 completed 当 passed |
-| S2-03 | lab/artifacts.py、lab/profiles.py；catalogs/<snapshot>/artifacts.lock.json + profiles | S2-01/02 | 全 entry 版本/发布物或明确终态、完整依赖锁、缓存哈希、源代码构建/不可用策略；旧支持版本另组回归 |
+| S2-03 | lab/artifacts.py、lab/profiles.py；catalogs/<snapshot>/artifacts.lock.json + profiles | S2-01/02/04 | 全 entry 版本/发布物或明确终态、完整依赖锁、缓存哈希、源代码构建/不可用策略；旧支持版本另组回归。sdist backend 只能在 S2-04 OS Worker 内执行 |
 | S2-04 | lab/workers/{base,linux,windows}.py；deploy/lab/；Worker probes | S2-02 | 安装与执行 OS 隔离；无宿主 secrets/repo写权/socket；资源/网络/子孙进程与清理证据通过 |
 | S2-05 | lab/baselines/{nonebot,koishi}；native_runner.py 接口扩展 | S2-02/03/04 | stock native 与 Ligamina 路径独立；同 bytes/locks/config/stimulus；四个已有支持插件及反例双路径通过 |
 | S2-06 | recipes/<ecosystem>/；lab/recipes.py、compare.py、Host profile 扩展 | S2-05 | 命令/服务/存储/定时/adapter/console 各有验证 recipe；entry/profile/config/services 绑定，缺 fixture 不假通过 |
