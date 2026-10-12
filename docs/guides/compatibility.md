@@ -39,6 +39,19 @@ Bridge 对复杂平台 API、真实网关、控制台/loader、浏览器、第�
 - 每快照使用一个冻结版本策略，不穷举历史版本；旧支持版本保留回归 profile。框架不适配时保留结果，不自动降级主 profile。
 - Adapter、driver、控制台、数据库和服务型插件使用相应探针和独立 profile，不强行用文本回复判定。
 
+## 已冻结目录（S2-01）
+
+从仓库根目录抓取完整 registry 与 Koishi 官方维护页：
+
+```powershell
+uv run --locked --project lab --python 3.12.14 python -m lab.catalog.snapshot capture --output-root catalogs
+uv run --locked --project lab --python 3.12.14 python -m lab.catalog.snapshot verify catalogs/<snapshot-id>
+```
+
+快照保存各来源原始字节、UTC 获取时间、HTTP validators、SHA-256、上游版本（若来源提供）、规范化 entries 和来源切换差异。Koishi `total` 必须等于实际对象数；NoneBot 目录没有总数域，验证其完整 JSON 数组。重复 package entry 保留独立身份。源失败、空响应、结构异常、计数不符或无效 JSON 均拒绝生成快照。
+
+NoneBot 官方维护标记来自 `is_official`；Koishi 官方维护标记来自[官方插件页](https://koishi.chat/zh-CN/plugins/)，与 registry `verified` 分列。快照命令仅读取目录元数据，不下载或执行插件。目录冻结不表示发布物可安装或行为兼容。
+
 ## 隔离与差分
 
 现有 isolated 隔离 HOME、依赖、目录、凭证和进程，但不是 OS 安全沙箱。全量安装与执行迁移到一次性 Linux 容器/VM 和 Windows 沙箱 Worker，限制挂载、网络、资源和存活时间。

@@ -71,9 +71,11 @@ status/doctor 只接受 loopback HTTP 地址。凭证来自环境或私人配置
 4. 完成双平台 pilot 后扫描完整快照，归因失败并回归。
 5. 从完整报告生成矩阵与 README，分别裁决调查完成、自动化闭合和行为兼容。
 
-第二阶段结果尚未生成。将分别展示目录分母、安装/启动结果、行为覆盖率与支持范围，保留 failed/skipped/unknown/flaky 及原因；目录收录和加载成功不等于行为兼容。
+S2-01 已冻结 snapshot `p2-41649744e057d61031d5`：NoneBot 943 + Koishi 4,747，共 **5,690 entries**；官方维护子集分别为 9 和 46，Koishi 官方页 46 个条目均映射到 registry。NoneBot 一个重复 module/package entry 保留为两条独立记录。可查看[归一目录](catalogs/p2-41649744e057d61031d5/catalog.json)、[raw 来源与 provenance](catalogs/p2-41649744e057d61031d5/provenance.json)、[变化账本](catalogs/p2-41649744e057d61031d5/changes.json)和[验收记录](outputs/acceptance/phase2-catalog-snapshot-20261012.json)。这一步只冻结公开元数据，没有下载或运行插件。
 
-下一任务：**S2-01 官方目录快照**。状态见 [功能清单](feature_list.json)、[当前进展](progress.md) 和 [会话交接](session-handoff.md)。
+后续将分别展示目录分母、安装/启动结果、行为覆盖率与支持范围，保留 failed/skipped/unknown/flaky 及原因；目录收录和加载成功不等于行为兼容。
+
+下一任务：**S2-02 版本化输出合同**。状态见 [功能清单](feature_list.json)、[当前进展](progress.md) 和 [会话交接](session-handoff.md)。
 
 ## 文档与来源
 

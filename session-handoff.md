@@ -3,20 +3,21 @@
 ## Current Objective
 
 - 日期：2026-10-12（Asia/Shanghai）。
-- 本次目标：安装指定 harness skill、规范文档和 README、制定第二阶段计划。
-- 基准提交：3b2a591；本次更改尚未提交。
-- 第一阶段通过；第二阶段实现未启动。H01 已完成，下一任务 S2-01。
+- 本次目标：完成 S2-01–S2-12，分阶段提交。
+- 前置文档提交：`2d6399a docs: establish documentation harness and phase-two plan`；执行分支：`codex/phase2-full-catalog`，基线提交：`2d6399a`。
+- 第一阶段通过；S2-01 已完成，下一任务 S2-02。当前状态在 `feature_list.json`，完整计划见 `docs/plans/2026-10-12-phase-2-full-catalog.md`。
 
 ## Completed This Session
 
-- 项目级 skill 与锁记录、短入口、专题文档、历史索引、功能清单。
-- README 证据生成脚本、文档检查、Windows/Linux init 入口。
-- 全量目录测试/输出计划；目录来源探针。
-- 更新 Host、Reference Client 和 Windows 使用指南中的过时阶段性说明。
+- 前置文档工作已由提交 `2d6399a` 固化，包括项目 harness、专题指南、第二阶段计划和 source probe。
+- S2-01 已完成：冻结 5,690 个 registry entry；完整 raw、归一目录和 provenance 均在 `catalogs/p2-41649744e057d61031d5/`。
 
 ## Verification Evidence
 
-- 安装退出码 0；Windows/Bash docs、100/100 harness、README 正常和五项拒绝负例、语法与 CLI 示例通过，见 [本次验证报告](outputs/acceptance/documentation-harness-20261012.json)。
+- 前置文档验收：`pwsh -NoProfile -File init.ps1 -Mode docs` 通过（18 文档、130 本地链接、14 任务）；harness validate 100/100，见 [本次验证报告](outputs/acceptance/documentation-harness-20261012.json)。
+- 第二阶段代码前 baseline：`pwsh -NoProfile -File init.ps1 -Mode full` 退出码 0；结果摘要及 smoke hash 见 [baseline 证据](outputs/acceptance/phase2-baseline-windows-20261012.json)。
+- S2-01：9 个单元场景通过；官方源快照离线复算通过，见 [目录验收](outputs/acceptance/phase2-catalog-snapshot-20261012.json)。未下载或执行任何插件。
+- 改动后 `pwsh -NoProfile -File init.ps1 -Mode full` 退出码 0；lab 26、Koishi 6、MCP 1、client 5、Rust 28 项通过，Core smoke 与 bundle stage 通过；harness 100/100、README evidence check 通过。
 - Ubuntu WSL docs 超时，保持 skipped；Git Bash docs 通过。任务自己的 WSL 客户端已回收，未终止 distro。
 - 本次验证范围是文档/脚本/计划，第一阶段运行时证据来自原始报告。
 
@@ -30,10 +31,10 @@
 ## Next Session Startup
 
 1. 读取 AGENTS、progress、feature_list 和本交接。
-2. 检查 git status，再运行 pwsh -NoProfile -File init.ps1 -Mode docs（Linux 使用 bash init.sh docs）。
-3. 读取兼容性指南与计划的 S2-01/S2-02，选择一个依赖满足的任务。
+2. 检查 git status，运行 `pwsh -NoProfile -File init.ps1 -Mode docs`。
+3. 推进 S2-02：实现版本化 catalog/run/result/summary contracts 和状态/分母计数。
 
 ## Recommended Next Step
 
-- S2-01：实现目录抓取与快照；先用记录的 registry 来源校验结构，再保存完整 raw 字节/哈希和 entry 分母。
+- S2-02：建立 executable schemas、golden fixtures、旧状态映射和共享计数逻辑。
 - 不使用现有 20 样本 gate 作为全量完成判定；全量准备就绪后先跑 pilot。
