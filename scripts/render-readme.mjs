@@ -171,6 +171,15 @@ export async function phase2Block() {
       throw new Error(`Stale S2-10 Windows attempt evidence: ${previousWindowsAttempt}`);
     }
   }
+  for (const attempt of Object.values(s210Implementation.retry_attempts ?? {})) {
+    const bytes = await readFile(path.join(root, attempt.report));
+    const actual = createHash('sha256').update(bytes).digest('hex');
+    const report = JSON.parse(bytes);
+    if (actual !== attempt.file_sha256 || report.report_sha256 !== attempt.report_sha256
+        || report.status !== attempt.status || report.kind !== 'phase2_s210_census_shard') {
+      throw new Error(`Stale S2-10 retry evidence: ${attempt.report}`);
+    }
+  }
   if (s210Smoke.task_id !== 'S2-10' || s210Smoke.kind !== 'phase2_s210_census_shard'
       || s210Smoke.status !== 'completed' || s210Smoke.snapshot_id !== catalog.snapshot_id
       || s210Smoke.platform !== 'linux' || s210Smoke.shard?.index !== 0 || s210Smoke.shard?.count !== 256
