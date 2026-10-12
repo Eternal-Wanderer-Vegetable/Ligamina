@@ -30,6 +30,7 @@ if sys.path and Path(sys.path[0]).resolve() == SCRIPT_DIR:
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 import queue
+from lab.report import render_summary_output
 
 try:
     from lab.native_runner import load_case, run_pair
@@ -798,6 +799,7 @@ def run_smoke(platform_name: str, report_path: Path, offline: bool) -> tuple[int
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--suite", choices=("smoke", "representative", "catalog"), required=True)
+    parser.add_argument("--format", choices=("json", "text", "ndjson"), default="json")
     parser.add_argument("--platform", choices=("windows", "linux", "both"))
     parser.add_argument("--report", type=Path)
     parser.add_argument("--offline", action="store_true", help="require already cached dependencies")
@@ -842,7 +844,9 @@ def main(argv: list[str] | None = None) -> int:
             report_path = write_plan_report(plan, report_path)
         except (CatalogRunError, QueueError, OSError) as error:
             parser.exit(2, f"catalog plan failed: {error}\n")
-        print(json.dumps({
+        summary = {
+            "schema_version": 1,
+            "event": "catalog_plan",
             "suite": "catalog",
             "status": plan["status"],
             "run_state": plan["run_state"],
@@ -855,7 +859,8 @@ def main(argv: list[str] | None = None) -> int:
             "execution_started": plan["execution_started"],
             "queue_db": plan["queue_path"],
             "report": str(report_path),
-        }, ensure_ascii=False))
+        }
+        print(render_summary_output(summary, options.format))
         return 0
     if options.suite == "representative":
         if options.platform == "both":
@@ -871,11 +876,14 @@ def main(argv: list[str] | None = None) -> int:
         stamp = datetime.now().strftime("%Y%m%d-%H%M%S")
         report_path = options.report or ROOT / "outputs/acceptance" / f"t13-representative-{stamp}.json"
         code, report = run_samples(options.manifest, report_path, set(options.sample_id) or None)
-        print(json.dumps({
+        summary = {
+            "schema_version": 1,
+            "event": "run_summary",
             "suite": report["suite"], "status": report["status"], "report": str(report_path.resolve()),
             "sample_count": len(report.get("samples", [])), "l4_pass_count": report.get("l4_pass_count"),
             "gate": report.get("gate"), "error": report.get("error"),
-        }, ensure_ascii=False))
+        }
+        print(render_summary_output(summary, options.format))
         return code
     if options.platform == "both":
         parser.error("--platform both is only valid for --suite catalog")
@@ -883,7 +891,9 @@ def main(argv: list[str] | None = None) -> int:
     stamp = datetime.now().strftime("%Y%m%d-%H%M%S")
     report_path = options.report or ROOT / "outputs/acceptance" / f"t12-smoke-{platform_option}-{stamp}.json"
     code, report = run_smoke(platform_option, report_path, options.offline or os.environ.get("CARGO_NET_OFFLINE") == "true")
-    print(json.dumps({
+    summary = {
+        "schema_version": 1,
+        "event": "run_summary",
         "suite": report["suite"],
         "status": report["status"],
         "platform": report["platform"],
@@ -893,7 +903,8 @@ def main(argv: list[str] | None = None) -> int:
         "gateway_operations": len(report.get("gateway_operations", [])),
         "mcp_client": report.get("mcp_client", {}).get("returncode") if report.get("mcp_client") else None,
         "remaining_pids": report["cleanup"].get("remaining_pids"),
-    }, ensure_ascii=False))
+    }
+    print(render_summary_output(summary, options.format))
     return code
 
 

@@ -1,3 +1,4 @@
+import { createHash } from 'node:crypto';
 import { readFile, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -5,6 +6,8 @@ import { fileURLToPath } from 'node:url';
 export const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const start = '<!-- ligamina:phase1:start -->';
 const end = '<!-- ligamina:phase1:end -->';
+const phase2Start = '<!-- ligamina:phase2:start -->';
+const phase2End = '<!-- ligamina:phase2:end -->';
 const auditPath = 'outputs/acceptance/t18-final-audit-20261012.json';
 const reports = [
   ['Windows', 'outputs/acceptance/t13-representative-windows-full-20261010.json'],
@@ -70,14 +73,83 @@ export async function phase1Block() {
   ].join('\n');
 }
 
+export async function phase2Block() {
+  const catalogPath = 'outputs/acceptance/phase2-catalog-snapshot-20261012.json';
+  const recipesPath = 'outputs/acceptance/phase2-s206-20261012.json';
+  const schedulerPath = 'outputs/acceptance/phase2-s207-20261012.json';
+  const reportingPath = 'outputs/acceptance/phase2-s208-20261012.json';
+  const planPath = 'outputs/acceptance/phase2-s207-cli-smoke-20261012.json';
+  const [catalog, recipes, scheduler, reporting, plan] = await Promise.all(
+    [catalogPath, recipesPath, schedulerPath, reportingPath, planPath].map(load),
+  );
+  for (const [relative, expected] of Object.entries(reporting.input_reports ?? {})) {
+    const actual = createHash('sha256').update(await readFile(path.join(root, relative))).digest('hex');
+    if (actual !== expected) throw new Error(`Stale phase-two report input: ${relative}`);
+  }
+  const count = catalog.counts?.registry_entries;
+  const official = Object.values(catalog.counts?.official_maintained ?? {}).reduce((sum, value) => sum + value, 0);
+  const suggested = Object.values(recipes.catalog_classification_dry_run?.suggested_entries ?? {}).reduce((sum, value) => sum + value, 0);
+  const unmapped = Object.values(recipes.catalog_classification_dry_run?.unmapped_entries ?? {}).reduce((sum, value) => sum + value, 0);
+  const realPlan = scheduler.verification?.real_snapshot_cli_plan;
+  if (catalog.kind !== 'phase2_catalog_snapshot_acceptance' || count !== 5690 || official !== 55
+      || catalog.integrity?.offline_verify !== 'passed') {
+    throw new Error(`Invalid frozen catalog acceptance report: ${catalogPath}`);
+  }
+  if (recipes.task_id !== 'S2-06' || recipes.status !== 'completed'
+      || recipes.catalog_classification_dry_run?.total_entries !== count || suggested + unmapped !== count) {
+    throw new Error(`Invalid recipe classification report: ${recipesPath}`);
+  }
+  if (scheduler.task_id !== 'S2-07' || scheduler.status !== 'completed'
+      || realPlan?.selected_linux_units !== 3 || realPlan?.stage_jobs !== 18 || realPlan?.execution_started !== false) {
+    throw new Error(`Invalid scheduler acceptance report: ${schedulerPath}`);
+  }
+  if (plan.snapshot_id !== catalog.snapshot_id || plan.selected_units !== 3
+      || plan.expected_stage_jobs !== 18 || plan.execution_started !== false
+      || plan.job_counts?.queued !== 18 || plan.job_counts?.passed !== 0) {
+    throw new Error(`Invalid catalog plan report: ${planPath}`);
+  }
+  const reportingComplete = reporting.status === 'completed';
+  const reportingPending = reporting.status === 'acceptance-pending';
+  if (reporting.task_id !== 'S2-08' || (!reportingComplete && !reportingPending)
+      || reporting.next_task !== (reportingComplete ? 'S2-09' : 'S2-08 acceptance')
+      || reporting.catalog_execution_started !== false) {
+    throw new Error(`Invalid reporting acceptance report: ${reportingPath}`);
+  }
+
+  return [
+    phase2Start,
+    `状态截至 ${escape(reporting.date)}：${reportingComplete ? 'S2-01–S2-08 已完成；当前进入 **S2-09 双平台 pilot**。' : 'S2-01–S2-07 已完成；S2-08 正在进行最终验收。'} 冻结快照 \`${escape(catalog.snapshot_id)}\` 含 **${count.toLocaleString('en-US')} entries**（NoneBot 943、Koishi 4,747；官方维护子集 ${official}）。`,
+    '',
+    '| 任务 | 状态 |',
+    '| --- | --- |',
+    ...[
+      ...(reportingComplete ? [['S2-01–S2-08', '已完成并分别保存验收证据']] : [['S2-01–S2-07', '已完成并分别保存验收证据'], ['S2-08', '最终验收进行中']]),
+      ['S2-09', reportingComplete ? 'pilot 前置验收完成后启动；插件执行尚未启动' : '等待 S2-08 验收完成'],
+      ['S2-10', '未开始：全快照 census 尚未启动'],
+      ['S2-11–S2-12', '未开始'],
+    ].map(([task, status]) => `| ${task} | ${status} |`),
+    '',
+    `分类 dry run 只建议 ${suggested}/${count} entries，${unmapped} 项仍是 \`unmapped_category\`。S2-07 在 Linux shard 规划了 3 个单元、18 个 stage jobs；队列仍为 18 queued，\`execution_started=false\`，**没有派发目录插件**。`,
+    '',
+    'Windows Sandbox 的 CPython 启动仍受 App Control（Win32 4551）阻止；Windows 插件 pilot 需要先解决该运行前置。S2-05 的四个历史精确版本回归不外推到目录全集；真实平台登录、发送与投递验收未执行。',
+    '',
+    `证据：[目录快照](${catalogPath})、[分类 dry run](${recipesPath})、[调度验收](${schedulerPath})、[S2-07 实际 CLI 计划](${planPath})、[S2-08 报告验收](${reportingPath})、[完整实施计划](docs/plans/2026-10-12-phase-2-full-catalog.md)。`,
+    phase2End,
+  ].join('\n');
+}
+
 export async function expectedReadme() {
   const current = await readFile(path.join(root, 'README.md'), 'utf8');
-  if (current.split(start).length !== 2 || current.split(end).length !== 2
-      || current.indexOf(start) > current.indexOf(end)) {
-    throw new Error('README must contain exactly one ordered phase-one marker pair');
-  }
-  const expected = current.slice(0, current.indexOf(start)) + await phase1Block()
-    + current.slice(current.indexOf(end) + end.length);
+  const replace = async (source, blockStart, blockEnd, render, label) => {
+    if (source.split(blockStart).length !== 2 || source.split(blockEnd).length !== 2
+        || source.indexOf(blockStart) > source.indexOf(blockEnd)) {
+      throw new Error(`README must contain exactly one ordered ${label} marker pair`);
+    }
+    return source.slice(0, source.indexOf(blockStart)) + await render()
+      + source.slice(source.indexOf(blockEnd) + blockEnd.length);
+  };
+  let expected = await replace(current, start, end, phase1Block, 'phase-one');
+  expected = await replace(expected, phase2Start, phase2End, phase2Block, 'phase-two');
   return { current, expected };
 }
 
@@ -88,10 +160,10 @@ if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.me
     const { current, expected } = await expectedReadme();
     if (args.includes('--check')) {
       if (current !== expected) throw new Error('README evidence block is stale; run node scripts/render-readme.mjs');
-      console.log('README evidence block matches phase-one reports.');
+      console.log('README evidence blocks match validated phase-one and phase-two reports.');
     } else {
       await writeFile(path.join(root, 'README.md'), expected, 'utf8');
-      console.log('README evidence block rendered from phase-one reports.');
+      console.log('README evidence blocks rendered from phase-one and phase-two reports.');
     }
   } catch (error) {
     console.error(error.message);

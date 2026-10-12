@@ -57,7 +57,7 @@ target\debug\ligamina-cli.exe doctor --url http://127.0.0.1:<port>
 target\debug\ligamina-cli.exe report outputs/acceptance/t13-representative-windows-full-20261010.json
 ```
 
-status/doctor 只接受 loopback HTTP 地址。凭证来自环境或私人配置；CLI 输出 JSON，日志走 stderr。当前 report 命令汇总既有验收字段；S2-02 已建立统一 v1 schemas 和 Python/Rust/TypeScript 验证器，CLI/JSON/text/NDJSON 集成仍待 S2-08，见 [输出规范](docs/guides/reporting.md)。
+status/doctor 只接受 loopback HTTP 地址。凭证来自环境或私人配置；CLI 输出 JSON，日志走 stderr。`report` 与 `lab.report` 支持旧报告摘要及 v1 JSON/text/NDJSON；v1 输入会校验 schema 并重算分母，退出码按所选 gate 返回，见 [输出规范](docs/guides/reporting.md)。
 
 部署见 [Windows bundle](deploy/windows/README.md) 与 [Linux container](deploy/linux/README.md)。Host 配置见 [NoneBot](hosts/nonebot/README.md)、[Koishi](hosts/koishi/README.md)；客户端见 [Reference Client](clients/reference/README.md)。
 
@@ -71,13 +71,26 @@ status/doctor 只接受 loopback HTTP 地址。凭证来自环境或私人配置
 4. 完成双平台 pilot 后扫描完整快照，归因失败并回归。
 5. 从完整报告生成矩阵与 README，分别裁决调查完成、自动化闭合和行为兼容。
 
-S2-01 已冻结 snapshot `p2-41649744e057d61031d5`：NoneBot 943 + Koishi 4,747，共 **5,690 entries**；官方维护子集分别为 9 和 46，Koishi 官方页 46 个条目均映射到 registry。NoneBot 一个重复 module/package entry 保留为两条独立记录。可查看[归一目录](catalogs/p2-41649744e057d61031d5/catalog.json)、[raw 来源与 provenance](catalogs/p2-41649744e057d61031d5/provenance.json)、[变化账本](catalogs/p2-41649744e057d61031d5/changes.json)和[验收记录](outputs/acceptance/phase2-catalog-snapshot-20261012.json)。这一步只冻结公开元数据，没有下载或运行插件。
+以下第二阶段摘要由冻结目录、分类 dry run、调度和报告验收记录生成。目录收录、加载成功和行为兼容分别记账；完整支持声明只按已验证的精确范围给出。
 
-S2-02 建立 [catalog/run/result/summary v1 schemas](contracts/lab/v1/)、共享 golden fixtures、旧状态映射和可复算分母；Python、Rust、TypeScript 消费者使用同一组验证向量。`completed` 仅代表 run 记账生命周期，不是 case 通过状态。该合同尚未接入全量调度或 CLI。
+<!-- ligamina:phase2:start -->
+状态截至 2026-10-12：S2-01–S2-08 已完成；当前进入 **S2-09 双平台 pilot**。 冻结快照 `p2-41649744e057d61031d5` 含 **5,690 entries**（NoneBot 943、Koishi 4,747；官方维护子集 55）。
 
-后续将分别展示目录分母、安装/启动结果、行为覆盖率与支持范围，保留 failed/skipped/unknown/flaky 及原因；目录收录和加载成功不等于行为兼容。
+| 任务 | 状态 |
+| --- | --- |
+| S2-01–S2-08 | 已完成并分别保存验收证据 |
+| S2-09 | pilot 前置验收完成后启动；插件执行尚未启动 |
+| S2-10 | 未开始：全快照 census 尚未启动 |
+| S2-11–S2-12 | 未开始 |
 
-下一任务：**S2-03 发布物与依赖锁**。状态见 [功能清单](feature_list.json)、[当前进展](progress.md) 和 [会话交接](session-handoff.md)。
+分类 dry run 只建议 69/5690 entries，5621 项仍是 `unmapped_category`。S2-07 在 Linux shard 规划了 3 个单元、18 个 stage jobs；队列仍为 18 queued，`execution_started=false`，**没有派发目录插件**。
+
+Windows Sandbox 的 CPython 启动仍受 App Control（Win32 4551）阻止；Windows 插件 pilot 需要先解决该运行前置。S2-05 的四个历史精确版本回归不外推到目录全集；真实平台登录、发送与投递验收未执行。
+
+证据：[目录快照](outputs/acceptance/phase2-catalog-snapshot-20261012.json)、[分类 dry run](outputs/acceptance/phase2-s206-20261012.json)、[调度验收](outputs/acceptance/phase2-s207-20261012.json)、[S2-07 实际 CLI 计划](outputs/acceptance/phase2-s207-cli-smoke-20261012.json)、[S2-08 报告验收](outputs/acceptance/phase2-s208-20261012.json)、[完整实施计划](docs/plans/2026-10-12-phase-2-full-catalog.md)。
+<!-- ligamina:phase2:end -->
+
+状态见 [功能清单](feature_list.json)、[当前进展](progress.md) 和 [会话交接](session-handoff.md)。
 
 ## 文档与来源
 

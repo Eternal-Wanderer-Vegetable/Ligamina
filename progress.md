@@ -4,10 +4,10 @@
 
 - **Last Updated:** 2026-10-12（Asia/Shanghai）。
 - **Current Objective:** 按 S2-01–S2-12 顺序完成第二阶段目录全量实验能力并分阶段提交。
-- **Active Feature:** S2-08 / feat-010；S2-07 已提交 `7523a83`，S2-08 baseline 已在 `16fdf63` 上记录。
+- **Active Feature:** 当前无实施中 feature；S2-08 / feat-010 已验收，下一步先在提交后的干净 HEAD 记录 S2-09 baseline，再开始 pilot。
 - **Completed stage commits:** H01 `2d6399a`、S2-01 `15f468d`、S2-02 `c0be568`、S2-04 `2fa06b0`、S2-03 `29bc1e5`、S2-05 `854b564`、S2-06 `4e555b3`、S2-07 `7523a83`。
 - 第一阶段 T01–T18、C01–C15、G1/G2 以 [T18 报告](outputs/acceptance/t18-final-audit-20261012.json) 为准；四个精确插件版本和虚拟 Gateway，真实平台收发未验证。
-- 第二阶段 S2-01–S2-07 完成；S2-08–S2-12 尚未完成，状态见 [feature_list.json](feature_list.json)。
+- 第二阶段 S2-01–S2-08 完成；S2-09–S2-12 尚未完成，状态见 [feature_list.json](feature_list.json)。
 
 ## What's Done
 
@@ -42,9 +42,18 @@
 
 - 在干净 HEAD `16fdf63d707211622c8045ff96fc092b7391ab12`、无 S2-08 实现改动时运行 `pwsh -NoProfile -File init.ps1 -Mode full`，退出码 0。docs 18/156、NoneBot 3、lab 76、Koishi 7、MCP 1、reference 5、Rust 29；Windows Core smoke 4 events / 4 Gateway ops / 0 PID，bundle stage 通过。详见 [S2-08 baseline](outputs/acceptance/phase2-s208-baseline-20261012.json)。
 
+## S2-08 Verification
+
+- 报告 schema 要求唯一 `expected_result_ids`、所选 gate、gate 结论和退出码；Python/Rust 会校验 schema 并从终态 results 重算 summary。completion 仅要求 run 结束且账目闭合；automation 拒绝 unknown/未调度及未解决 harness/infrastructure 失败；compatibility 要求全通过。中断返回 3，输入/schema 错误返回 2。
+- `uv run --locked --project lab --python 3.12.14 python -m unittest lab.tests.test_report lab.tests.test_result_contract -v`：18 项通过，覆盖三种 gate、部分分母、completed 与兼容分离、未知状态、summary 篡改、JSON/text/NDJSON、脱敏、日志长度和 queued catalog plan。
+- `cargo test -p ligamina-cli -p ligamina-contracts --locked`：CLI 5 项、contracts 4 项通过；`cargo fmt --all -- --check` 通过。Python 与 Rust CLI 使用共享 valid/invalid v1 fixtures 验证 NDJSON 与 0/2 退出码；两 CLI 对 S2-07 队列计划都明确显示 18 个 job queued 且未执行插件。
+- `node scripts/render-readme.mjs --check` 通过；临时篡改 phase-two 输入报告哈希和 README 生成区均被拒绝（退出码 1），恢复原字节后检查通过。`pwsh -NoProfile -File init.ps1 -Mode docs`：18 文档、159 链接通过。
+- 全仓库 `pwsh -NoProfile -File init.ps1 -Mode full` 退出码 0：docs 18/161；NoneBot 3、lab 85、Koishi 7、MCP 1、reference 5、Rust workspace 33；Windows Core smoke 4 events / 4 gateway ops / 0 PID，bundle stage 通过。生成的 `outputs/acceptance/ci-smoke-windows.json` 已恢复；完整结果见 [S2-08 acceptance](outputs/acceptance/phase2-s208-20261012.json)。
+- 没有派发第三方插件。S2-07 实际队列仍为 18 queued；5,621 个 entry 缺少保守 recipe 分类建议。Windows Sandbox CPython 启动受 App Control（Win32 4551）阻止；真实平台登录/投递未验证。
+
 ## Next / Blockers
 
-- 开始 S2-08 实现：统一 JSON/text/NDJSON 与目录矩阵报告，生成并检查 README 漂移；baseline 已固定，可比较变更前后。
+- 下一步是先提交 S2-08 完整阶段，然后在干净 HEAD 运行 S2-09 baseline。pilot 分层仍需保留 5,690 × 2 OS 账本；Windows Sandbox CPython 前置阻止应明确记录，不绕过本机策略。
 - S2-06 recipes 仍是声明式定义和比较合同；S2-07 目前持久化计划和调度状态，未连接插件 worker 执行。5,621 个冻结 entry 尚无保守行为分类建议，必须在后续台账中显式列账。
 - Windows Sandbox 的 CPython 启动阻止仍是 Windows pilot 前置障碍；不绕过本机策略。S2-09 保留 blocker 和完整 Windows 分母。
 - S2-03 的 30 个 sdist build-only 条目只能在 OS 隔离 Worker 构建；全量 census、问题归因和真实平台验收尚未执行。

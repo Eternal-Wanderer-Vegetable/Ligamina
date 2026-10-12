@@ -93,7 +93,7 @@ try {
   assert(lock.skills?.['harness-creator']?.source === 'walkinglabs/learn-harness-engineering', 'Wrong skill source');
   assert(lock.skills?.['harness-creator']?.computedHash?.length === 64, 'Missing skill installation hash');
   const { current, expected } = await expectedReadme();
-  assert(current === expected, 'README phase-one block is stale');
+  assert(current === expected, 'README evidence blocks are stale');
   const summary = { status: failures.length ? 'failed' : 'passed', documents: docs.length, local_links: links,
     indexed_historical_markdown: historical.length, features: tracker.features.length, failures };
   console.log(JSON.stringify(summary, null, 2));

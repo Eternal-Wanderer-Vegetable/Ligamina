@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "updated_at": "2026-10-12",
-  "active_feature": "feat-010",
+  "active_feature": null,
   "next_feature": "feat-011",
   "features": [
     {
@@ -192,11 +192,15 @@
         "feat-004",
         "feat-009"
       ],
-      "status": "in-progress",
+      "status": "done",
       "done_when": "schema、reason/exit codes、计数、脱敏和 README 漂移/部分运行检查通过。",
-      "evidence": "S2-08 pre-implementation baseline recorded on clean committed HEAD 16fdf63 after S2-07; full init.ps1 -Mode full exited 0 (76 lab tests, docs 18/156 links, Windows Core smoke zero remaining PIDs). No reporting or README implementation changes were present.",
+      "evidence": "S2-08 accepted. Python v1 and catalog-plan reporting uses schema validation, expected-result denominator recomputation, status/matrix summaries, completion/automation/compatibility gates, privacy redaction and JSON/text/NDJSON; Rust report CLI consumes the same v1 schema. Partial runs remain visible and completion does not imply compatibility. README phase-one/phase-two regions derive from accepted reports, reject stale source hashes and generated-block drift. Focused checks passed (Python 18; Rust CLI 5 and contracts 4). Full init.ps1 -Mode full exited 0: docs 18/161 links, NoneBot 3, lab 85, Koishi 7, MCP 1, reference 5, Rust 33; Windows Core smoke 4 events / 4 gateway operations / 0 PIDs and bundle stage passed. The generated ci-smoke-windows.json was restored. No catalog plugin worker was dispatched.",
       "evidence_paths": [
-        "outputs/acceptance/phase2-s208-baseline-20261012.json"
+        "outputs/acceptance/phase2-s208-baseline-20261012.json",
+        "outputs/acceptance/phase2-s208-20261012.json",
+        "lab/report.py",
+        "crates/ligamina-cli/src/report.rs",
+        "scripts/render-readme.mjs"
       ]
     },
     {
