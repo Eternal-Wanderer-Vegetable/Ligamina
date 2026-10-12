@@ -3,8 +3,8 @@
 ## Current Objective
 
 - 日期：2026-10-12（Asia/Shanghai）。用户要求完成 `docs/plans/2026-10-12-phase-2-full-catalog.md` 的 S2-01–S2-12 并分阶段提交。
-- 分支：`codex/phase2-full-catalog`。仓库新增文档已先提交 `2d6399a`，随后 S2-01 `15f468d`、S2-02 `c0be568`、S2-04 `2fa06b0`、S2-03 `29bc1e5`。
-- 当前：S2-06 / feat-008 已开始；S2-05 实现/验收完成并待阶段提交。S2-06 实施前 `init.ps1 -Mode full` baseline 退出码 0，详见 `outputs/acceptance/phase2-s206-baseline-20261012.json`；S2-06 代码尚未修改。
+- 分支：`codex/phase2-full-catalog`。仓库新增文档已先提交 `2d6399a`，随后 S2-01 `15f468d`、S2-02 `c0be568`、S2-04 `2fa06b0`、S2-03 `29bc1e5`、S2-05 `854b564`。
+- 当前：S2-06 / feat-008 已开始；S2-05 已完成并提交 `854b564`。S2-06 实施前 `init.ps1 -Mode full` baseline 退出码 0，详见 `outputs/acceptance/phase2-s206-baseline-20261012.json`；S2-06 代码尚未修改。
 - 状态唯一入口：[feature_list.json](feature_list.json)。
 
 ## Completed Stages

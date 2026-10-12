@@ -4,8 +4,8 @@
 
 - **Last Updated:** 2026-10-12（Asia/Shanghai）。
 - **Current Objective:** 按 S2-01–S2-12 顺序完成第二阶段目录全量实验能力并分阶段提交。
-- **Active Feature:** S2-06 / feat-008；S2-05 验收已通过并将与本阶段一同提交，S2-06 baseline 已记录，尚未修改 S2-06 实现。
-- **Completed stage commits:** H01 `2d6399a`、S2-01 `15f468d`、S2-02 `c0be568`、S2-04 `2fa06b0`、S2-03 `29bc1e5`。
+- **Active Feature:** S2-06 / feat-008；S2-05 已提交 `854b564`，S2-06 baseline 已记录，尚未修改 S2-06 实现。
+- **Completed stage commits:** H01 `2d6399a`、S2-01 `15f468d`、S2-02 `c0be568`、S2-04 `2fa06b0`、S2-03 `29bc1e5`、S2-05 `854b564`。
 - 第一阶段 T01–T18、C01–C15、G1/G2 以 [T18 报告](outputs/acceptance/t18-final-audit-20261012.json) 为准；四个精确插件版本和虚拟 Gateway，真实平台收发未验证。
 - 第二阶段 S2-01–S2-05 完成；S2-06–S2-12 尚未完成，状态见 [feature_list.json](feature_list.json)。
 
