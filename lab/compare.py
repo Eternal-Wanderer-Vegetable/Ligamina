@@ -7,6 +7,13 @@ import json
 from dataclasses import asdict, dataclass
 from typing import Any
 
+try:
+    from lab.recipes import missing_fixture_prerequisite, validate_behavior_fixture
+except ModuleNotFoundError as error:  # supports the documented `python lab/run.py` entry point
+    if error.name not in {"lab", "lab.recipes"}:
+        raise
+    from recipes import missing_fixture_prerequisite, validate_behavior_fixture
+
 
 @dataclass(frozen=True)
 class Issue:
@@ -25,6 +32,26 @@ class PairComparison:
     def as_json(self) -> dict[str, Any]:
         return {
             "status": "passed" if self.passed else "failed",
+            "issues": [asdict(issue) for issue in self.issues],
+            "normalized_native": self.normalized_native,
+            "normalized_federated": self.normalized_federated,
+        }
+
+
+@dataclass(frozen=True)
+class RecipeComparison:
+    status: str
+    passed: bool
+    reason_code: str | None
+    issues: tuple[Issue, ...]
+    normalized_native: dict[str, Any] | None
+    normalized_federated: dict[str, Any] | None
+
+    def as_json(self) -> dict[str, Any]:
+        return {
+            "status": self.status,
+            "passed": self.passed,
+            "reason_code": self.reason_code,
             "issues": [asdict(issue) for issue in self.issues],
             "normalized_native": self.normalized_native,
             "normalized_federated": self.normalized_federated,
@@ -60,6 +87,65 @@ def compare_pair(
         issues=tuple(issues),
         normalized_native=normalized.get("native"),
         normalized_federated=normalized.get("federated"),
+    )
+
+
+def compare_recipe_pair(
+    recipe: dict[str, Any],
+    fixture: dict[str, Any] | None,
+    native: dict[str, Any],
+    federated: dict[str, Any],
+    *,
+    expected_binding: dict[str, Any] | None,
+) -> RecipeComparison:
+    """Check both paths against a recipe oracle and the same frozen binding."""
+    if fixture is None:
+        return RecipeComparison("skipped", False, "missing_fixture", (), None, None)
+    fixture_errors = validate_behavior_fixture(recipe, fixture)
+    if fixture_errors:
+        issue = Issue("invalid_fixture", "; ".join(fixture_errors))
+        return RecipeComparison("failed", False, "invalid_fixture", (issue,), None, None)
+    missing_prerequisite = missing_fixture_prerequisite(fixture)
+    if missing_prerequisite:
+        reason_code, _ = missing_prerequisite
+        return RecipeComparison("skipped", False, reason_code, (), None, None)
+    if expected_binding is None:
+        issue = Issue("expected_binding_missing", "comparison requires the binding produced by prepare_recipe")
+        return RecipeComparison("failed", False, "expected_binding_missing", (issue,), None, None)
+
+    issues: list[Issue] = []
+    normalized: dict[str, dict[str, Any]] = {}
+    expected = fixture["expected"]
+    for side, result in (("native", native), ("federated", federated)):
+        if not isinstance(result, dict) or result.get("status") != "completed":
+            issues.append(Issue("run_not_completed", "recipe runner did not complete", side))
+            continue
+        if result.get("binding") != expected_binding:
+            issues.append(Issue("binding_mismatch", "entry/profile/config/services binding differs from frozen inputs", side))
+        observed = result.get("observed")
+        if not isinstance(observed, dict):
+            issues.append(Issue("observations_missing", "runner omitted recipe observations", side))
+            continue
+        side_values: dict[str, Any] = {}
+        for observable in recipe["observables"]:
+            if observable not in observed:
+                issues.append(Issue("observation_missing", f"runner omitted {observable}", side))
+                continue
+            side_values[observable] = observed[observable]
+            if _canonical(observed[observable]) != _canonical(expected[observable]):
+                issues.append(Issue("oracle_mismatch", f"{observable} differs from the independent fixture oracle", side))
+        if all(observable in side_values for observable in recipe["observables"]):
+            normalized[side] = side_values
+
+    if "native" in normalized and "federated" in normalized and normalized["native"] != normalized["federated"]:
+        issues.append(Issue("behavior_mismatch", "native and federated recipe observations differ"))
+    return RecipeComparison(
+        "passed" if not issues else "failed",
+        not issues,
+        None if not issues else "recipe_comparison_failed",
+        tuple(issues),
+        normalized.get("native"),
+        normalized.get("federated"),
     )
 
 

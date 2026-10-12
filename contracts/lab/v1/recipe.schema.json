@@ -1,0 +1,35 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ligamina.dev/contracts/lab/v1/recipe.schema.json",
+  "title": "Ligamina behavior recipe catalog v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "ecosystem", "recipes"],
+  "properties": {
+    "schema_version": { "const": 1 },
+    "ecosystem": { "enum": ["nonebot", "koishi"] },
+    "recipes": {
+      "type": "array",
+      "minItems": 10,
+      "items": { "$ref": "#/$defs/recipe" }
+    }
+  },
+  "$defs": {
+    "recipe": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["recipe_id", "ecosystem", "category", "fixture_kind", "requires_config_fixture", "required_services", "observables", "runner_contract", "delivery_scope"],
+      "properties": {
+        "recipe_id": { "type": "string", "pattern": "^(nonebot|koishi)\\.[a-z][a-z0-9_]*\\.v1$" },
+        "ecosystem": { "enum": ["nonebot", "koishi"] },
+        "category": { "enum": ["config", "preload", "services", "loader", "command", "message", "storage", "scheduler", "adapter", "console"] },
+        "fixture_kind": { "type": "string", "minLength": 1 },
+        "requires_config_fixture": { "type": "boolean" },
+        "required_services": { "type": "array", "uniqueItems": true, "items": { "type": "string", "minLength": 1 } },
+        "observables": { "type": "array", "minItems": 1, "uniqueItems": true, "items": { "type": "string", "minLength": 1 } },
+        "runner_contract": { "type": "array", "minItems": 1, "items": { "type": "string", "minLength": 1 } },
+        "delivery_scope": { "const": "virtual" }
+      }
+    }
+  }
+}

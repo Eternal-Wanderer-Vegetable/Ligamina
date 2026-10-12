@@ -4,10 +4,10 @@
 
 - **Last Updated:** 2026-10-12（Asia/Shanghai）。
 - **Current Objective:** 按 S2-01–S2-12 顺序完成第二阶段目录全量实验能力并分阶段提交。
-- **Active Feature:** S2-06 / feat-008；S2-05 已提交 `854b564`，S2-06 baseline 已记录，尚未修改 S2-06 实现。
+- **Active Feature:** S2-06 / feat-008 已完成；全仓库验收通过，S2-07 尚待独立记录 baseline。
 - **Completed stage commits:** H01 `2d6399a`、S2-01 `15f468d`、S2-02 `c0be568`、S2-04 `2fa06b0`、S2-03 `29bc1e5`、S2-05 `854b564`。
 - 第一阶段 T01–T18、C01–C15、G1/G2 以 [T18 报告](outputs/acceptance/t18-final-audit-20261012.json) 为准；四个精确插件版本和虚拟 Gateway，真实平台收发未验证。
-- 第二阶段 S2-01–S2-05 完成；S2-06–S2-12 尚未完成，状态见 [feature_list.json](feature_list.json)。
+- 第二阶段 S2-01–S2-06 完成；S2-07–S2-12 尚未完成，状态见 [feature_list.json](feature_list.json)。
 
 ## What's Done
 
@@ -17,6 +17,7 @@
 - [S2-04 Worker 验收](outputs/acceptance/phase2-workers-20261012.json)：Linux Docker 10 项、Windows Sandbox 7 项 benign probes 均通过；WSL user/mount namespace 因只读 bind 可被重挂可写而拒绝。
 - [S2-03 发布物与 profile 锁](outputs/acceptance/phase2-s203-20261012.json)：5,690 entries、6,247 artifact references、11,380 Windows/Linux profile 单元；10,332 个完整锁，其余显式终态。没有执行目录插件或 sdist build backend。
 - [S2-05 独立原生基线](outputs/acceptance/phase2-s205-20261012.json)：四个既有支持版本的 Native/Federated 双路径及独立 oracle 均通过，cleanup 确认；Native 不导入 Ligamina Bridge。Windows Sandbox App Control 在插件启动前阻止 CPython（Win32 4551），本阶段插件探针在禁网 Linux Docker Worker 执行。
+- [S2-06 recipes](outputs/acceptance/phase2-s206-20261012.json)：NoneBot/Koishi 各 10 类 schema-validated recipes；绑定 entry、发布物哈希、profile、配置、服务与 fixture，独立 oracle 双路对照。全仓库验证通过（lab 60、NoneBot 3、Koishi 7、MCP 1、reference 5、Rust 29、Windows smoke 清理 0 PID）。冻结目录 dry run 仅为 69/5,690 条 entry 建议了行为分类，其余 5,621 明确留为 unmapped_category；本阶段未执行第三方插件。
 
 ## S2-05 Verification
 
@@ -30,8 +31,9 @@
 
 ## Next / Blockers
 
-- S2-05 验收报告、指南、feature 状态和交接已更新；当前阶段提交后开始 S2-06。
-- S2-06：为配置/preload/services/loader、消息/存储/定时/adapter/console 分类建立 recipe；缺 fixture/凭证必须显式 skipped。
+- S2-06 的验收报告、指南、feature 状态和交接已更新；阶段提交后开始 S2-07。
+- S2-07：实施前记录已提交 S2-06 HEAD 的完整 baseline；实现 catalog stage 持久化、租约、分片与可恢复调度，处理机器重启与重复派发负例。
+- S2-06 recipes 仍是声明式定义和比较合同；S2-07 才接线执行。5,621 个冻结 entry 尚无保守行为分类建议，不能省略，需在调度/全量台账中显式列账。
 - Windows Sandbox 的 CPython 启动阻止仍是 Windows pilot 前置障碍；不绕过本机策略。S2-09 保留 blocker 和完整 Windows 分母。
 - S2-03 的 30 个 sdist build-only 条目只能在 OS 隔离 Worker 构建；全量 census、问题归因和真实平台验收尚未执行。
 - 支持声明继续限定精确版本和行为场景；虚拟回执不能当成真实平台投递成功。

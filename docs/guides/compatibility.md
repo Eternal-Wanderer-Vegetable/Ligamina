@@ -85,3 +85,15 @@ WSL user/mount namespace 探针未获准入：namespace root 可以把只读 bin
 Native 与 federated 使用同一发布物、依赖锁、配置和刺激，分开数据目录。两者先满足独立 expected oracle，再比较收件人、操作、消息片段、回执和状态。随机数、时间、外部 HTTP 用注明边界的输入控制；相同错误结果不能通过。
 
 缺少用例写 skipped/missing_fixture，加载结果单列；真实平台收发是独立维度，虚拟回执不代表真实投递。
+
+## 行为 recipes（S2-06）
+
+`recipes/nonebot/recipes.json` 与 `recipes/koishi/recipes.json` 为两个生态分别声明 config、preload、services、loader、command、message、storage、scheduler、adapter、console 的十类 v1 recipe；定义校验合同在 [`recipe.schema.json`](../../contracts/lab/v1/recipe.schema.json)。旧 `*-group-v0.1.json` 是 S2-05 冻结输入，不修改；新增的 [`nonebot-lab-v1.json`](../../samples/profiles/nonebot-lab-v1.json) 和 [`koishi-lab-v1.json`](../../samples/profiles/koishi-lab-v1.json) 声明 recipe 绑定面，标记 `declarative`，不宣称调度器已执行插件。
+
+`lab.recipes.validate_recipe_catalog()` 校验每生态十类 recipe；`prepare_recipe()` 把 registry entry ID、冻结发布物 SHA-256、Host profile、配置 fixture、service fixture 与行为 fixture ID/摘要绑定。配置和服务值不会写入返回的 binding；包含 token、secret、password、credential 或 API key 字段的 fixture 会拒绝。缺少行为/配置/服务 fixture 分别记 `skipped/missing_fixture`、`skipped/missing_config_fixture`、`skipped/missing_service_fixture`；未提供声明所需随机种子、固定时间或外部凭证时，分别记 `skipped/missing_random_fixture`、`skipped/missing_time_fixture`、`skipped/missing_credentials`。未知 registry 标签会保留在 `unmapped_labels`，不静默强行归类。
+
+`lab.compare.compare_recipe_pair()` 要求 Native 与 Federated 各自符合 fixture 的独立 expected oracle、绑定相同 entry/profile/config/services，之后才比较两边观察值。即使两边同样返回错误，也会分别触发 `oracle_mismatch`。显式期望空列表可以通过；缺少 expected 字段会失败。当前 S2-06 只实现 recipe 定义、绑定和比较合同，真实插件调用由 S2-07 catalog runner 接线，浏览器/真实平台与凭证 profile 仍未验收。
+
+```powershell
+uv run --locked --project lab --python 3.12.14 python -m unittest lab.tests.test_recipes -v
+```

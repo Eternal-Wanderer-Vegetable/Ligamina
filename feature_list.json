@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "updated_at": "2026-10-12",
-  "active_feature": "feat-008",
+  "active_feature": null,
   "next_feature": "feat-009",
   "features": [
     {
@@ -142,15 +142,24 @@
       "id": "feat-008",
       "task_id": "S2-06",
       "name": "插件分类 recipes",
-      "description": "配置/preload/services/loader 及消息/存储/定时/adapter/console 探针。",
+      "description": "配置/preload/services/loader、command/message、存储/定时/adapter/console 探针。",
       "dependencies": [
         "feat-007"
       ],
-      "status": "in-progress",
+      "status": "done",
       "done_when": "分类均有验证 recipe；无 fixture/凭证条目明确 skipped，不能假通过。",
-      "evidence": "Baseline pwsh -NoProfile -File init.ps1 -Mode full exited 0 after S2-05 changes and before S2-06 implementation; see outputs/acceptance/phase2-s206-baseline-20261012.json.",
+      "evidence": "Both ecosystems have ten schema-validated declarative recipes. Binding fingerprints registry entry/version/artifact hash, Host profile, config, services, and behavior fixture. Missing fixture/config/service/random/time/credentials are explicit skipped states; secret-bearing fixtures fail closed. Native and Federated are checked separately against the independent oracle before pair comparison, including the same-wrong-output negative. Full validation exited 0: lab 60, NoneBot 3, Koishi 7, MCP 1, reference 5, Rust 29; Windows Core smoke 4 events / 4 gateway ops / 0 PIDs and bundle stage passed. Category dry run suggests 69/5,690 entries; 5,621 remain explicit unmapped_category. Recipes remain declarative; no catalog plugin was executed.",
       "evidence_paths": [
-        "outputs/acceptance/phase2-s206-baseline-20261012.json"
+        "outputs/acceptance/phase2-s206-baseline-20261012.json",
+        "outputs/acceptance/phase2-s206-20261012.json",
+        "contracts/lab/v1/recipe.schema.json",
+        "recipes/nonebot/recipes.json",
+        "recipes/koishi/recipes.json",
+        "lab/recipes.py",
+        "lab/compare.py",
+        "lab/tests/test_recipes.py",
+        "samples/profiles/nonebot-lab-v1.json",
+        "samples/profiles/koishi-lab-v1.json"
       ]
     },
     {

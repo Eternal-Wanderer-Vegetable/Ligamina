@@ -1,0 +1,106 @@
+{
+  "schema_version": 1,
+  "date": "2026-10-12",
+  "task_id": "S2-06",
+  "status": "completed",
+  "baseline_report": "outputs/acceptance/phase2-s206-baseline-20261012.json",
+  "implementation": {
+    "recipe_schema": "contracts/lab/v1/recipe.schema.json",
+    "recipe_catalogs": {
+      "nonebot": "recipes/nonebot/recipes.json",
+      "koishi": "recipes/koishi/recipes.json"
+    },
+    "recipe_count": {
+      "nonebot": 10,
+      "koishi": 10
+    },
+    "categories": [
+      "config",
+      "preload",
+      "services",
+      "loader",
+      "command",
+      "message",
+      "storage",
+      "scheduler",
+      "adapter",
+      "console"
+    ],
+    "binding": "registry entry ID/version/artifact SHA-256, canonical Host profile, configuration fixture, service fixture IDs and behavior fixture ID/content hashes",
+    "comparison": "Each Native and Federated observation is checked against the independent fixture oracle and the exact same frozen binding before pair equivalence.",
+    "legacy_profile_preservation": "S2-05 group profiles remain unchanged; new lab profiles pin their base-profile SHA-256."
+  },
+  "catalog_classification_dry_run": {
+    "snapshot_id": "p2-41649744e057d61031d5",
+    "total_entries": 5690,
+    "suggested_entries": {
+      "nonebot": 6,
+      "koishi": 63
+    },
+    "unmapped_entries": {
+      "nonebot": 937,
+      "koishi": 4684
+    },
+    "category_suggestions": {
+      "nonebot": {
+        "scheduler": 2,
+        "config": 3,
+        "message": 1,
+        "storage": 1
+      },
+      "koishi": {
+        "console": 1,
+        "adapter": 48,
+        "storage": 11,
+        "scheduler": 3
+      }
+    },
+    "interpretation": "Conservative metadata suggestions only. Unmapped labels remain visible with reason code unmapped_category; no plugin was selected for execution and no category was inferred from topic-only tags."
+  },
+  "verification": {
+    "baseline": {
+      "command": "pwsh -NoProfile -File init.ps1 -Mode full",
+      "exit_code": 0,
+      "implementation_changes_present": false
+    },
+    "recipe_contract_and_lab_tests": {
+      "command": "uv run --locked --project lab --python 3.12.14 python -m unittest discover -s lab/tests -v",
+      "status": "passed",
+      "tests": 60
+    },
+    "documentation": {
+      "command": "pwsh -NoProfile -File init.ps1 -Mode docs",
+      "status": "passed",
+      "documents": 18,
+      "local_links": 151,
+      "historical_markdown": 9,
+      "features": 14
+    },
+    "full_repository": {
+      "command": "pwsh -NoProfile -File init.ps1 -Mode full",
+      "status": "passed",
+      "exit_code": 0,
+      "nonebot_tests": 3,
+      "lab_tests": 60,
+      "koishi_tests": 7,
+      "koishi_mcp_tests": 1,
+      "reference_client_tests": 5,
+      "rust_workspace_tests": 29,
+      "windows_core_smoke": {
+        "events": 4,
+        "gateway_operations": 4,
+        "remaining_pids": 0
+      },
+      "windows_bundle_stage": "passed"
+    },
+    "static_checks": [
+      "Python py_compile passed for lab/recipes.py, lab/compare.py, and lab/tests/test_recipes.py.",
+      "git diff --check passed."
+    ]
+  },
+  "limitations": [
+    "S2-06 recipes and binding/comparison contracts are declarative; catalog plugin execution is not wired until S2-07.",
+    "Only 69 of 5690 entries received conservative category suggestions from existing explicit metadata; remaining entries stay visible as unmapped_category for later classification and accounting.",
+    "No catalog plugins, full census, Windows plugin pilot, browser, external credential, or real-platform delivery were executed."
+  ]
+}
