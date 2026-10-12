@@ -1,18 +1,18 @@
 # 输出规范
 
-适用：CLI、lab、兼容性汇总和 README。当前实现与第二阶段目标分别说明；S2-02 将建立 schema 和共享验证。
+适用：CLI、lab、兼容性汇总和 README。S2-02 已建立 v1 executable schemas、golden fixtures、旧状态映射和 Python/Rust/TypeScript 验证；CLI 与 catalog scheduler 集成仍由 S2-08 完成。
 
 ## 当前已实现
 
 - Core/Host stdout 输出协议帧；CLI status、doctor、report 输出 JSON，日志走 stderr。
 - 现有 lab suite 有 completed、passed、failed、not_run、environment_missing 等格式差异。
 - [lab/report.py](../../lab/report.py) 保留 passed/failed/skipped/unknown，统计 missing 与分母；不能直接充当全集汇总。
-- 当前 CLI report 面向 suite 报告字段；T18 使用 task/verdict/gates，直接汇总会有 null。README 命令使用 T13 报告，T18 用原始 JSON 查看；S2-02 负责明确转换。
+- 当前 CLI report 面向 suite 报告字段；T18 使用 task/verdict/gates，直接汇总会有 null。README 命令使用 T13 报告，T18 用原始 JSON 查看。S2-02 的 `lab.result.normalize_legacy_status` 提供逐状态转换；CLI 报告转换仍待 S2-08。
 - node scripts/render-readme.mjs 从 T18/T13 生成 README 标记区；--check 检查漂移。完整证据保留原始报告。
 
-## 第二阶段目标格式（尚未实现）
+## 第二阶段 v1 格式（合同已实现）
 
-新增 contracts/lab/v1/，保留旧报告并提供显式转换。批次生命周期和断言结果分别表达：
+新增 `contracts/lab/v1/`，保留旧报告并提供显式转换。schema 和 golden fixtures 已提交；批次生命周期和断言结果分别表达：
 
 | 字段 | 约定 |
 | --- | --- |
@@ -35,17 +35,20 @@
 - 旧 not_run 映射 skipped；environment_missing 在原因可证时映射 skipped，否则 unknown；completed 属 run_state。
 - 重试产生新的 attempt；保留首次和最后结果，间歇通过标 flaky，不能擦掉失败。
 
+`run_state` 与 `result.status` 分开校验：run 可以是 `completed`，但 result 只接受 `passed/failed/skipped/unknown`。`normalize_legacy_status` 将 `not_run` 映射为 `skipped + not_scheduled`；`environment_missing` 只有存在明确证据时才映射为 skipped，否则为 unknown；legacy `completed` 映射为 unknown + `completed_is_run_state`。
+
 ### 分母与支持声明
 
 - entry coverage = 有终态账目 entry / 快照全部 entry；有 skipped 仍须披露 execution coverage。
 - stage execution coverage = (passed + failed + unknown) / 该 stage 全部应测单元；missing/unexpected/重复单独列出。
 - executed pass rate = passed / (passed + failed + unknown)，零分母为 null；同时展示 passed / 全部应测单元。
+- `lab.result.summarize_results` 按唯一 `result_id` 计算分母；重复 ID 单独列出且不重复增加通过计数，漏项和意外 ID 均带明细。零分母 rates 为 null，未知 v1 状态直接报错。
 - 行为兼容 = 两路径执行并通过独立 oracle；支持名单要求全部必选场景、清理、可复现和非 flaky。
 - 分别展示 observed cohort 和适用范围分类；native 不可运行时仍记录 federation 未执行及覆盖缺口。
 
 ### CLI 与日志
 
-计划统一 --format json|text，默认 JSON；NDJSON 进度每行一条版本化事件。stdout 不混日志；stderr 使用时间、level、run_id/entry_id/stage/trace_id 和短消息，敏感值统一脱敏。
+S2-08 计划统一 --format json|text，默认 JSON；NDJSON 进度每行一条版本化事件。stdout 不混日志；stderr 使用时间、level、run_id/entry_id/stage/trace_id 和短消息，敏感值统一脱敏。
 
 计划退出码：0=命令成功且所选 gate 达标；1=所选 gate 未达标；2=参数/schema/输入错误；3=基础设施中断。全集扫描记录插件失败并继续，最终退出码由明确选择的 completion 或 compatibility gate 决定。
 

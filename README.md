@@ -2,7 +2,7 @@
 
 Ligamina 是个人部署优先、独立于具体机器人的**插件联邦运行时与自动化兼容性实验室**。它保留 NoneBot 和 Koishi 的原生插件机制，通过 Rust Core 连接事件、插件能力、平台操作和生命周期；客户端可通过本地 HTTP/MCP 接入。
 
-第一阶段已完成。第二阶段目标是冻结两个官方商店的全量插件目录、逐插件隔离测试、比较原生与联邦行为，并以可复现报告展示兼容性。**第二阶段已制定计划，尚未运行全量扫描。**
+第一阶段已完成。第二阶段目标是冻结两个官方商店的全量插件目录、逐插件隔离测试、比较原生与联邦行为，并以可复现报告展示兼容性。**S2-01 目录冻结与 S2-02 输出合同已完成；全量扫描尚未运行。**
 
 ## 第一阶段结果
 
@@ -57,7 +57,7 @@ target\debug\ligamina-cli.exe doctor --url http://127.0.0.1:<port>
 target\debug\ligamina-cli.exe report outputs/acceptance/t13-representative-windows-full-20261010.json
 ```
 
-status/doctor 只接受 loopback HTTP 地址。凭证来自环境或私人配置；CLI 输出 JSON，日志走 stderr。当前 report 命令汇总既有验收字段；统一全量报告合同及 JSON/text/NDJSON 扩展见 [输出规范](docs/guides/reporting.md)，属于第二阶段待实现内容。
+status/doctor 只接受 loopback HTTP 地址。凭证来自环境或私人配置；CLI 输出 JSON，日志走 stderr。当前 report 命令汇总既有验收字段；S2-02 已建立统一 v1 schemas 和 Python/Rust/TypeScript 验证器，CLI/JSON/text/NDJSON 集成仍待 S2-08，见 [输出规范](docs/guides/reporting.md)。
 
 部署见 [Windows bundle](deploy/windows/README.md) 与 [Linux container](deploy/linux/README.md)。Host 配置见 [NoneBot](hosts/nonebot/README.md)、[Koishi](hosts/koishi/README.md)；客户端见 [Reference Client](clients/reference/README.md)。
 
@@ -73,9 +73,11 @@ status/doctor 只接受 loopback HTTP 地址。凭证来自环境或私人配置
 
 S2-01 已冻结 snapshot `p2-41649744e057d61031d5`：NoneBot 943 + Koishi 4,747，共 **5,690 entries**；官方维护子集分别为 9 和 46，Koishi 官方页 46 个条目均映射到 registry。NoneBot 一个重复 module/package entry 保留为两条独立记录。可查看[归一目录](catalogs/p2-41649744e057d61031d5/catalog.json)、[raw 来源与 provenance](catalogs/p2-41649744e057d61031d5/provenance.json)、[变化账本](catalogs/p2-41649744e057d61031d5/changes.json)和[验收记录](outputs/acceptance/phase2-catalog-snapshot-20261012.json)。这一步只冻结公开元数据，没有下载或运行插件。
 
+S2-02 建立 [catalog/run/result/summary v1 schemas](contracts/lab/v1/)、共享 golden fixtures、旧状态映射和可复算分母；Python、Rust、TypeScript 消费者使用同一组验证向量。`completed` 仅代表 run 记账生命周期，不是 case 通过状态。该合同尚未接入全量调度或 CLI。
+
 后续将分别展示目录分母、安装/启动结果、行为覆盖率与支持范围，保留 failed/skipped/unknown/flaky 及原因；目录收录和加载成功不等于行为兼容。
 
-下一任务：**S2-02 版本化输出合同**。状态见 [功能清单](feature_list.json)、[当前进展](progress.md) 和 [会话交接](session-handoff.md)。
+下一任务：**S2-03 发布物与依赖锁**。状态见 [功能清单](feature_list.json)、[当前进展](progress.md) 和 [会话交接](session-handoff.md)。
 
 ## 文档与来源
 

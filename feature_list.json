@@ -2,7 +2,7 @@
   "schema_version": 1,
   "updated_at": "2026-10-12",
   "active_feature": null,
-  "next_feature": "feat-004",
+  "next_feature": "feat-005",
   "features": [
     {
       "id": "feat-001",
@@ -60,10 +60,15 @@
       "dependencies": [
         "feat-003"
       ],
-      "status": "not-started",
+      "status": "done",
       "done_when": "schema/golden fixtures/零分母/重复/未知状态检查通过，completed 不冒充 passed。",
-      "evidence": "",
-      "evidence_paths": []
+      "evidence": "四个 v1 schemas 和 9 个共享 golden vectors 已由 Python/Rust/TypeScript 验证；旧状态映射、completed 分离、零分母 null、duplicate/missing/unexpected 及未知状态拒绝通过。Windows full 退出码 0，CLI 与 catalog scheduler 集成仍在 S2-08。",
+      "evidence_paths": [
+        "outputs/acceptance/phase2-contracts-20261012.json",
+        "contracts/lab/v1/fixtures/vectors.json",
+        "lab/result.py",
+        "lab/tests/test_result_contract.py"
+      ]
     },
     {
       "id": "feat-005",

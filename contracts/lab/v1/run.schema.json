@@ -1,0 +1,48 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ligamina.dev/contracts/lab/v1/run.schema.json",
+  "title": "Ligamina lab run v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "suite", "run_id", "run_state", "created_at_utc", "catalog", "provenance", "results", "summary", "exit_code"],
+  "properties": {
+    "schema_version": { "const": 1 },
+    "suite": { "enum": ["catalog", "representative", "regression", "pilot", "census"] },
+    "run_id": { "type": "string", "minLength": 1 },
+    "run_state": { "enum": ["queued", "running", "completed", "interrupted"] },
+    "created_at_utc": { "type": "string", "format": "date-time", "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}([.][0-9]+)?Z$" },
+    "finished_at_utc": { "type": ["string", "null"], "format": "date-time", "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}([.][0-9]+)?Z$" },
+    "catalog": { "$ref": "https://ligamina.dev/contracts/lab/v1/catalog.schema.json" },
+    "provenance": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["git_commit", "framework", "runtime", "os", "architecture", "profile_id", "dependency_lock_sha256"],
+      "properties": {
+        "git_commit": { "type": "string", "minLength": 7 },
+        "git_dirty": { "type": "boolean" },
+        "framework": { "type": "string", "minLength": 1 },
+        "runtime": { "type": "string", "minLength": 1 },
+        "os": { "enum": ["windows", "linux"] },
+        "architecture": { "type": "string", "minLength": 1 },
+        "profile_id": { "type": "string", "minLength": 1 },
+        "profile_sha256": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+        "dependency_lock_sha256": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+        "artifact_sha256": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+        "worker_image_digest": { "type": "string", "minLength": 1 }
+      }
+    },
+    "results": { "type": "array", "items": { "$ref": "https://ligamina.dev/contracts/lab/v1/result.schema.json" } },
+    "summary": { "$ref": "https://ligamina.dev/contracts/lab/v1/summary.schema.json" },
+    "exit_code": { "type": "integer", "enum": [0, 1, 2, 3] },
+    "reason_code": { "type": "string", "pattern": "^[a-z][a-z0-9_]*$" }
+  },
+  "allOf": [
+    {
+      "if": { "properties": { "run_state": { "const": "completed" } } },
+      "then": {
+        "properties": { "finished_at_utc": { "type": "string", "format": "date-time", "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}([.][0-9]+)?Z$" } },
+        "required": ["finished_at_utc"]
+      }
+    }
+  ]
+}
