@@ -1,8 +1,8 @@
 {
   "schema_version": 1,
   "updated_at": "2026-10-12",
-  "active_feature": "feat-009",
-  "next_feature": "feat-010",
+  "active_feature": "feat-010",
+  "next_feature": "feat-011",
   "features": [
     {
       "id": "feat-001",
@@ -173,11 +173,14 @@
         "feat-007",
         "feat-008"
       ],
-      "status": "in-progress",
+      "status": "done",
       "done_when": "任意 stage 中断可恢复且无重漏；attempt、未知和日志 artifact 完整保留。",
-      "evidence": "S2-07 pre-implementation baseline at committed S2-06 HEAD 4e555b3; full init.ps1 -Mode full exited 0, including 60 lab tests and Windows Core smoke with zero remaining PIDs. See outputs/acceptance/phase2-s207-baseline-20261012.json.",
+      "evidence": "S2-07 scheduler and recovery accepted. Full init.ps1 -Mode full exited 0 (76 lab tests and Windows Core smoke with zero remaining PIDs); focused tests cover interruption/reopen at all six stages, leases, retained unknown attempts/artifact references, retries, concurrency and sharding. Real snapshot CLI planned 3 Linux units/18 jobs and resumed the same manifest from SQLite. No catalog plugin worker was dispatched. See phase2-s207-20261012.json and linked CLI reports.",
       "evidence_paths": [
-        "outputs/acceptance/phase2-s207-baseline-20261012.json"
+        "outputs/acceptance/phase2-s207-baseline-20261012.json",
+        "outputs/acceptance/phase2-s207-20261012.json",
+        "outputs/acceptance/phase2-s207-cli-smoke-20261012.json",
+        "outputs/acceptance/phase2-s207-cli-resume-20261012.json"
       ]
     },
     {
@@ -189,9 +192,9 @@
         "feat-004",
         "feat-009"
       ],
-      "status": "not-started",
+      "status": "in-progress",
       "done_when": "schema、reason/exit codes、计数、脱敏和 README 漂移/部分运行检查通过。",
-      "evidence": "",
+      "evidence": "Activated after S2-07 completion. Record the S2-08 pre-implementation baseline after the S2-07 stage commit and before changing reporting or README code.",
       "evidence_paths": []
     },
     {

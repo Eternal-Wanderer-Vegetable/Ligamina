@@ -1,6 +1,6 @@
 # 第二阶段：官方目录全量插件测试与输出规范
 
-- 日期：2026-10-12（Asia/Shanghai）。计划建立时间：S2-01–S2-12 尚未执行；后续进度由本节和 [feature_list.json](../../feature_list.json) 维护。
+- 日期：2026-10-12（Asia/Shanghai）。计划建立时 S2-01–S2-12 尚未执行；执行状态由本节和 [feature_list.json](../../feature_list.json) 维护。
 - 前置：第一阶段 T01–T18 / C01–C15、G1/G2 已通过；当前验收见 [T18](../../outputs/acceptance/t18-final-audit-20261012.json)。
 - 用户目标：全量调取 NoneBot 和 Koishi 的官方插件，自动观察能否正常运行，并规范输出与 README 展示。
 - 执行状态唯一入口：[feature_list.json](../../feature_list.json)；本计划定义依赖、文件、验证与退出条件。
@@ -12,7 +12,8 @@
 - S2-03 已完成：为 5,690 个 entry 冻结 6,247 个平台归档引用；11,380 个 Windows/Linux profile 单元中，10,332 个锁定依赖完整并可复核，其他均记录显式终态。报告：[S2-03 验收](../../outputs/acceptance/phase2-s203-20261012.json)。未运行 sdist backend、npm lifecycle 或目录插件。
 - S2-05 已完成并分阶段提交 `854b564`；四个既有支持版本在禁网 Linux Docker Worker 中完成 Native/Federated/独立 oracle 配对。
 - S2-06 已完成两生态十类声明式 recipe 和 fail-closed 对照器，验收报告见 [S2-06](../../outputs/acceptance/phase2-s206-20261012.json)；recipe 执行接线留给 S2-07。
-- 当前任务为 S2-07：已在提交 `4e555b3` 上记录完整 baseline（[S2-07 baseline](../../outputs/acceptance/phase2-s207-baseline-20261012.json)），实现全量队列、阶段日志、租约和恢复。
+- S2-07 已完成并提交 `7523a83`：持久 catalog stage queue、六阶段依赖图、租约/attempt journal、分片与 resume 已验收；报告见 [S2-07](../../outputs/acceptance/phase2-s207-20261012.json)。CLI 在真实冻结快照上计划 3 个 Linux 单元共 18 个作业，并从相同 manifest 恢复；未派发插件 Worker。
+- 当前任务为 S2-08：统一报告输出、分母/矩阵与 README 生成。
 
 ## 1. 范围与全量定义
 
