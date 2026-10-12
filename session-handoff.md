@@ -4,7 +4,7 @@
 
 - 日期：2026-10-12（Asia/Shanghai）。用户要求完成 `docs/plans/2026-10-12-phase-2-full-catalog.md` 的 S2-01–S2-12 并分阶段提交。
 - 分支：`codex/phase2-full-catalog`。仓库新增文档先提交 `2d6399a`；已完成 S2-01 `15f468d`、S2-02 `c0be568`、S2-04 `2fa06b0`、S2-03 `29bc1e5`、S2-05 `854b564`、S2-06 `4e555b3`、S2-07 `7523a83`。
-- 当前：S2-07 / feat-009 已提交。S2-08 / feat-010 已登记为 active；请先在干净 HEAD `7523a83` 上运行 `pwsh -NoProfile -File init.ps1 -Mode full` 保存实施前 baseline，再开始 reporting/README 实现。
+- 当前：S2-07 / feat-009 已提交。S2-08 / feat-010 已登记为 active；实施前 baseline 已在干净 HEAD `16fdf63` 上通过 `pwsh -NoProfile -File init.ps1 -Mode full` 完成，见 `outputs/acceptance/phase2-s208-baseline-20261012.json`，可以开始 reporting/README 实现。
 - 下一任务：S2-08 / feat-010。状态唯一入口：[feature_list.json](feature_list.json)。
 
 ## Completed Stages

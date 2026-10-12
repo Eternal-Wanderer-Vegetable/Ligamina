@@ -13,6 +13,7 @@
 - S2-05 已完成并分阶段提交 `854b564`；四个既有支持版本在禁网 Linux Docker Worker 中完成 Native/Federated/独立 oracle 配对。
 - S2-06 已完成两生态十类声明式 recipe 和 fail-closed 对照器，验收报告见 [S2-06](../../outputs/acceptance/phase2-s206-20261012.json)；recipe 执行接线留给 S2-07。
 - S2-07 已完成并提交 `7523a83`：持久 catalog stage queue、六阶段依赖图、租约/attempt journal、分片与 resume 已验收；报告见 [S2-07](../../outputs/acceptance/phase2-s207-20261012.json)。CLI 在真实冻结快照上计划 3 个 Linux 单元共 18 个作业，并从相同 manifest 恢复；未派发插件 Worker。
+- S2-08 实施前基线已在干净提交 `16fdf63` 上完成（[S2-08 baseline](../../outputs/acceptance/phase2-s208-baseline-20261012.json)），全仓库 `init.ps1 -Mode full` 退出码 0。
 - 当前任务为 S2-08：统一报告输出、分母/矩阵与 README 生成。
 
 ## 1. 范围与全量定义

@@ -4,7 +4,7 @@
 
 - **Last Updated:** 2026-10-12（Asia/Shanghai）。
 - **Current Objective:** 按 S2-01–S2-12 顺序完成第二阶段目录全量实验能力并分阶段提交。
-- **Active Feature:** S2-08 / feat-010；S2-07 已提交 `7523a83`，S2-08 基线待运行。
+- **Active Feature:** S2-08 / feat-010；S2-07 已提交 `7523a83`，S2-08 baseline 已在 `16fdf63` 上记录。
 - **Completed stage commits:** H01 `2d6399a`、S2-01 `15f468d`、S2-02 `c0be568`、S2-04 `2fa06b0`、S2-03 `29bc1e5`、S2-05 `854b564`、S2-06 `4e555b3`、S2-07 `7523a83`。
 - 第一阶段 T01–T18、C01–C15、G1/G2 以 [T18 报告](outputs/acceptance/t18-final-audit-20261012.json) 为准；四个精确插件版本和虚拟 Gateway，真实平台收发未验证。
 - 第二阶段 S2-01–S2-07 完成；S2-08–S2-12 尚未完成，状态见 [feature_list.json](feature_list.json)。
@@ -38,9 +38,13 @@
 - 真实快照 `p2-41649744e057d61031d5` CLI plan/resume 报告：[初始计划](outputs/acceptance/phase2-s207-cli-smoke-20261012.json)、[恢复结果](outputs/acceptance/phase2-s207-cli-resume-20261012.json)。恢复前后 manifest SHA-256 相同，SQLite 保存 18 个 queued stage jobs；`execution_started=false`。
 - CLI 每次做原始输入长度/hash、派生 snapshot ID、冻结 catalog/changes 文档哈希、entry denominator 和锁交叉校验；完整 raw→normalized 语义校验由 S2-01 快照验收覆盖，没有在每个 shard 重复执行。
 
+## S2-08 Baseline
+
+- 在干净 HEAD `16fdf63d707211622c8045ff96fc092b7391ab12`、无 S2-08 实现改动时运行 `pwsh -NoProfile -File init.ps1 -Mode full`，退出码 0。docs 18/156、NoneBot 3、lab 76、Koishi 7、MCP 1、reference 5、Rust 29；Windows Core smoke 4 events / 4 Gateway ops / 0 PID，bundle stage 通过。详见 [S2-08 baseline](outputs/acceptance/phase2-s208-baseline-20261012.json)。
+
 ## Next / Blockers
 
-- 下一项是 S2-08：统一 JSON/text/NDJSON 与目录矩阵报告，生成并检查 README 漂移。
+- 开始 S2-08 实现：统一 JSON/text/NDJSON 与目录矩阵报告，生成并检查 README 漂移；baseline 已固定，可比较变更前后。
 - S2-06 recipes 仍是声明式定义和比较合同；S2-07 目前持久化计划和调度状态，未连接插件 worker 执行。5,621 个冻结 entry 尚无保守行为分类建议，必须在后续台账中显式列账。
 - Windows Sandbox 的 CPython 启动阻止仍是 Windows pilot 前置障碍；不绕过本机策略。S2-09 保留 blocker 和完整 Windows 分母。
 - S2-03 的 30 个 sdist build-only 条目只能在 OS 隔离 Worker 构建；全量 census、问题归因和真实平台验收尚未执行。
