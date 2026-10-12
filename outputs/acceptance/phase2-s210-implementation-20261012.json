@@ -1,0 +1,62 @@
+{
+  "schema_version": 1,
+  "date": "2026-10-12",
+  "task_id": "S2-10",
+  "kind": "phase2_s210_implementation_checkpoint",
+  "status": "in_progress",
+  "snapshot_id": "p2-41649744e057d61031d5",
+  "baseline_report": "outputs/acceptance/phase2-s210-baseline-20261012.json",
+  "implementation": {
+    "resumable_sqlite_stage_dispatcher": true,
+    "terminal_projection_stages": ["prepare", "install", "native", "federated", "compare", "cleanup"],
+    "per_entry_evidence_and_cross_shard_aggregation": true,
+    "koishi_platform_independent_artifact_mapping": true,
+    "full_census_closed": false
+  },
+  "validation": {
+    "command": "pwsh -NoProfile -File init.ps1 -Mode full",
+    "exit_code": 0,
+    "documentation": {"status": "passed", "documents": 18, "local_links": 199, "features": 14},
+    "nonebot_pytest": {"status": "passed", "tests": 3},
+    "lab_unittest": {"status": "passed", "tests": 106},
+    "koishi_tests": {"status": "passed", "tests": 7},
+    "koishi_mcp_tests": {"status": "passed", "tests": 1},
+    "reference_client_tests": {"status": "passed", "tests": 5},
+    "rust_workspace_tests": {"status": "passed", "tests": 33},
+    "windows_core_smoke": {"status": "passed", "events": 4, "gateway_operations": 4, "remaining_pids": []},
+    "windows_bundle_stage": {"status": "passed"},
+    "focused_catalog_and_census_tests": {"status": "passed", "tests": 10},
+    "readme_evidence_check": {"status": "passed", "command": "node scripts/render-readme.mjs --check"},
+    "diff_check": {"status": "passed", "command": "git diff --check"}
+  },
+  "windows_smoke_file": {
+    "original_sha256": "033D8EA2534603B880DB2A729B328C3A75C7F4CF0B8F8DEE087C22BEBBCAC752",
+    "generated_sha256": "405882B098D5BA44FB72B94EFCC3A28CDB8393331A43725964FE59A24D941704",
+    "restored_sha256": "033D8EA2534603B880DB2A729B328C3A75C7F4CF0B8F8DEE087C22BEBBCAC752"
+  },
+  "formal_shards": {
+    "linux_0_of_256": {
+      "report": "outputs/acceptance/phase2-s210-census-linux-shard0of256-20261012.json",
+      "status": "completed",
+      "selected_units": 16,
+      "terminal_units": 16,
+      "expected_stage_jobs": 96,
+      "terminal_stage_jobs": 96,
+      "counts": {"passed": 0, "failed": 4, "skipped": 12, "unknown": 0},
+      "report_sha256": "64a0b50a8b9b44f1fb7ce9a225c14b9ae0078fa3cb3c341f958d22ba520f2d67"
+    },
+    "windows_0_of_256": {"status": "running", "queue_db": ".work/catalog-census/phase2-s210.sqlite3"}
+  },
+  "denominator": {
+    "snapshot_entries": 5690,
+    "entry_os_units": 11380,
+    "profile_locked_candidate_units": 10332,
+    "full_census_closed": false
+  },
+  "limitations": [
+    "A profile lock is only an execution candidate and does not establish compatibility.",
+    "Entry-bound behavior fixtures remain unavailable for unmapped categories and those stages are skipped.",
+    "Windows NoneBot CPython blocked by App Control Win32 4551 remains unknown; host policy is not bypassed.",
+    "The resource budget remains provisional until full census measurements are available."
+  ]
+}

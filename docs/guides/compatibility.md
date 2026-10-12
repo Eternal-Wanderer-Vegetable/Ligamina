@@ -98,7 +98,7 @@ Native 与 federated 使用同一发布物、依赖锁、配置和刺激，分�
 uv run --locked --project lab --python 3.12.14 python -m unittest lab.tests.test_recipes -v
 ```
 
-## S2-09 分层 pilot（进行中）
+## S2-09 分层 pilot（已完成）
 
 当前分层清单和汇总入口：
 
@@ -126,3 +126,24 @@ uv run --locked --project lab --python 3.12.14 python -m lab.baselines.run_s205 
 当前 catalog pilot 没有派发 entry-bound behavior fixture；S2-06 recipes 仍是声明式合同。NoneBot Windows 的 23 个选中 catalog 行受 App Control（Win32 4551）阻止并保持 unknown；Windows Koishi native-load pilot 已运行，但行为仍因缺 fixture 跳过。11 个 native-load 失败的观察和源 hash 见[失败复核](../../outputs/acceptance/phase2-s209-failure-review-20261012.json)：NoneBot 三项是冻结 `htmlrender` profile API 不匹配；Koishi 两平台的四项包括配置入口文件缺失和 `koishi-thirdeye` 类型错误。
 
 资源预算见 [S2-09 provisional config](../../config/lab/phase2-pilot-budget-v1.json)：NoneBot Linux 有 Docker RSS、依赖下载和 scratch 测量；Koishi Linux 有 Docker RSS/scratch，Windows 有 Job Object 峰值 commit 内存与 Sandbox Workspace scratch。Koishi Windows Job Object P95 为 6.71 GB，最大 8.57 GB，Worker 限额为 8 GiB；这不是 RSS 指标。NoneBot Windows 没有 Worker 样本，因为 CPython 被 App Control 阻止。预算保持 provisional，不能据此宣称目录全集兼容。报告 attempt 和 checkpoint 保留在 `outputs/acceptance/`，重建汇总前应先复核完整的 30 项平台报告。
+
+## S2-10 全快照 census（进行中）
+
+S2-10 在 S2-09 commit `20d8f04` 上的 clean baseline 已通过，见 [baseline](../../outputs/acceptance/phase2-s210-baseline-20261012.json)。执行器按 `entry×OS` 稳定分 shard，并用 SQLite stage queue 记录 prepare/install/native/federated/compare/cleanup；报告绑定目录、artifact/profile lock、阶段结果和清理证据。相同 queue DB 和 run ID 可加 `--resume` 恢复。隔离 smoke 见 [报告](../../outputs/acceptance/phase2-s210-census-linux-shard0of256-smoke-20261012.json)：16 单元、96 jobs 终态（4 failed、12 skipped），不并入正式汇总。
+
+每个 OS 分 256 shard，逐片保留报告；全部完成前不要聚合：
+```powershell
+$queue = '.work/catalog-census/phase2-s210.sqlite3'
+uv run --locked --project lab --python 3.12.14 python -m lab.census `
+  --snapshot catalogs/p2-41649744e057d61031d5 --queue-db $queue `
+  --platform linux --shard 0/256 --report outputs/acceptance/phase2-s210-census-linux-shard0of256.json
+```
+Windows 使用 `--platform windows`。NoneBot CPython 被 App Control Win32 4551 阻止时记为 `unknown`；缺少 entry-bound fixture 的 federated/compare/behavior 记为 `skipped`，native load 和 cleanup 保留实测状态。
+
+齐备两 OS 的 512 份报告后聚合；校验包含 shard 哈希、归属、重复/遗漏单元和 artifact/profile identity，并输出双 OS per-plugin 报告及 evidence manifest：
+```powershell
+$shards = Get-ChildItem outputs/acceptance -Filter 'phase2-s210-census-*-shard*of256.json' | ForEach-Object FullName
+uv run --locked --project lab --python 3.12.14 python -m lab.census --snapshot catalogs/p2-41649744e057d61031d5 `
+  --aggregate @shards --aggregate-output outputs/acceptance/phase2-s210-20261012.json
+```
+Smoke、report-only、不同 shard count 或未完成报告不能替代 512 份正式报告，`queued` 也不等于 Worker 已执行。全量 census 仍未关闭；S2-09 provisional budget 待用 census 资源数据更新。

@@ -5,7 +5,7 @@
 - **Last Updated:** 2026-10-12（Asia/Shanghai）。
 - **Current Objective:** 按 S2-01–S2-12 顺序完成第二阶段目录全量实验能力并分阶段提交。
 - **Active Feature:** S2-10 / feat-012；S2-09 / feat-011 的 pilot 分母、负例/恢复与可达 Worker 资源观测已闭合，验证与阶段提交记录见下文。
-- **Completed stage commits:** H01 `2d6399a`、S2-01 `15f468d`、S2-02 `c0be568`、S2-04 `2fa06b0`、S2-03 `29bc1e5`、S2-05 `854b564`、S2-06 `4e555b3`、S2-07 `7523a83`、S2-08 `cbcbb0a`；`299d22c` 是 S2-09 baseline/status checkpoint。
+- **Completed stage commits:** H01 `2d6399a`、S2-01 `15f468d`、S2-02 `c0be568`、S2-04 `2fa06b0`、S2-03 `29bc1e5`、S2-05 `854b564`、S2-06 `4e555b3`、S2-07 `7523a83`、S2-08 `cbcbb0a`、S2-09 `20d8f04`；`299d22c` 是 S2-09 baseline/status checkpoint。
 - 第一阶段 T01–T18、C01–C15、G1/G2 以 [T18 报告](outputs/acceptance/t18-final-audit-20261012.json) 为准；四个精确插件版本和虚拟 Gateway，真实平台收发未验证。
 - 第二阶段 S2-01–S2-09 完成；S2-10 正在进行，S2-11–S2-12 尚未开始，状态见 [feature_list.json](feature_list.json)。S2-09 pilot 发现的失败与 unknown 仍是后续 census/兼容性裁决输入，不代表通过。
 
@@ -69,9 +69,16 @@
 - `uv run --locked --project lab --python 3.12.14 python -m lab.pilot ...` 重建 acceptance；`lab.tests.test_pilot_nonebot` 覆盖 checkpoint resume 和 worker-lost 后先记 unknown 再以新 attempt 重试。negative Worker probes 与队列恢复证据见 acceptance 的 `negative_scenarios`。
 - 最终验证：README renderer 与 `--check` 通过；`pwsh -NoProfile -File init.ps1 -Mode docs` 为 18 docs / 191 links。聚焦 S2-09 命令 `uv run --locked --project lab --python 3.12.14 python -m unittest lab.tests.test_pilot lab.tests.test_pilot_nonebot lab.tests.test_pilot_workers lab.tests.test_workers lab.tests.test_baselines -v` 为 25 项通过；完整 `pwsh -NoProfile -File init.ps1 -Mode full` 退出 0，lab 102、NoneBot 3、Koishi 7、MCP 1、reference 5、Rust workspace 全通过，Windows smoke 为 4 events / 4 gateway operations / 0 PIDs，bundle stage 成功。验证生成的 `ci-smoke-windows.json` 已恢复至原 SHA-256 `033D8EA2534603B880DB2A729B328C3A75C7F4CF0B8F8DEE087C22BEBBCAC752`；`git diff --check` 通过。
 
+## S2-10 Implementation and Census Progress
+
+- S2-09 clean HEAD `20d8f04db8c647da1f95336ca576966fccc15abb` 上的 S2-10 baseline 通过：`pwsh -NoProfile -File init.ps1 -Mode full` 退出码 0，docs 18/191、NoneBot 3、lab 102、Koishi 7、MCP 1、reference 5、Rust 33、Windows smoke 4 events / 4 gateway ops / 0 PIDs、bundle 通过。见 [baseline](outputs/acceptance/phase2-s210-baseline-20261012.json)。
+- 已实现 SQLite 可恢复六阶段 shard dispatcher、per-entry evidence、跨 shard/per-plugin 汇总及 Koishi `platform=all` artifact 映射。实现后的 `Mode full` 退出码 0：docs 18/199、NoneBot 3、lab 106、Koishi 7、MCP 1、reference 5、Rust 33、Windows smoke 4/4/0、bundle 通过；10 个 focused catalog/census tests 通过；README 证据检查与 `git diff --check` 通过，详见 [implementation checkpoint](outputs/acceptance/phase2-s210-implementation-20261012.json)。
+- 隔离 Linux smoke shard [报告](outputs/acceptance/phase2-s210-census-linux-shard0of256-smoke-20261012.json) 独立保存、不并入正式结果。正式 Linux `0/256` shard 已闭合 16/16 单元和 96/96 stage jobs，4 failed、12 skipped，见[报告](outputs/acceptance/phase2-s210-census-linux-shard0of256-20261012.json)。正式 Windows `0/256` 正在执行；完整 512 个平台 shard 及 11,380 单元汇总尚未闭合。
+- `ci-smoke-windows.json` 已恢复到原 SHA-256 `033D8EA2534603B880DB2A729B328C3A75C7F4CF0B8F8DEE087C22BEBBCAC752`。10,332 个 locked profile 仍只是执行候选；Windows NoneBot CPython 的 App Control Win32 4551 保持 unknown。
+
 ## Next / Blockers
 
-- S2-10 按冻结分母开始全快照 census；entry-bound fixture 缺失时应记录可达阶段和显式 skip，不得宣称行为通过。失败修复进入 S2-11。
+- S2-10 继续按冻结分母运行其余正式 shard 并生成 aggregator 报告；entry-bound fixture 缺失时显式 skip，不得宣称行为通过。失败归因/修复需等 census 闭合后进入 S2-11。
 - 5,621 个冻结 entry 尚无保守行为分类建议；全量 census、失败修复和真实平台验收未完成。NoneBot Windows CPython 的 App Control unknown 保持原状态，不绕过本机策略。
 - S2-09 budget 以可达平台样本完成测量但保持 provisional；full census 的总耗时、下载、磁盘估计需随 S2-10 分片数据更新。
 - S2-03 的 30 个 sdist build-only 条目只能在 OS 隔离 Worker 构建；虚拟回执不能当成真实平台投递成功。

@@ -124,6 +124,30 @@ class CatalogRunPlanTests(unittest.TestCase):
         self.assertEqual(len({unit["dependency_lock_sha256"] for unit in units}), 2)
         self.assertTrue(all(unit["artifact_sha256"] == "a" * 64 for unit in units))
 
+    def test_platform_independent_koishi_tarball_is_bound_to_both_os_units(self) -> None:
+        self.catalog["entries"][0]["ecosystem"] = "koishi"
+        _write_json(self.root / "catalog.json", self.catalog)
+        self.artifact_lock["entries"][0]["artifacts"] = [
+            {"platform": "all", "status": "locked", "artifact": {
+                "sha256": "a" * 64,
+                "computed_digests": {"sha256": "a" * 64},
+                "build_required": False,
+            }},
+        ]
+        artifact_bytes = _write_json(self.root / "artifacts.lock.json", self.artifact_lock)
+        artifact_sha = hashlib.sha256(artifact_bytes).hexdigest()
+        (self.root / "artifacts.lock.sha256").write_text(artifact_sha + "  artifacts.lock.json\n", encoding="ascii")
+        self.profile_lock["artifacts_lock_sha256"] = artifact_sha
+        profile_bytes = _write_json(self.root / "profiles.lock.json", self.profile_lock)
+        (self.root / "profiles.lock.sha256").write_text(hashlib.sha256(profile_bytes).hexdigest() + "  profiles.lock.json\n", encoding="ascii")
+
+        with patch("lab.catalog_run._verify_snapshot_inputs", return_value={"snapshot_id": "snapshot-fixture"}):
+            _, units = load_catalog_units(self.root, ("windows", "linux"))
+
+        self.assertEqual(len(units), 2)
+        self.assertTrue(all(unit["artifact_status"] == "locked" for unit in units))
+        self.assertTrue(all(unit["artifact_sha256"] == "a" * 64 for unit in units))
+
     def test_catalog_plan_persists_expected_stage_graph_and_resumes_idempotently(self) -> None:
         queue_path = Path(self.temporary.name) / "queue.sqlite3"
         with patch("lab.catalog_run._verify_snapshot_inputs", return_value={"snapshot_id": "snapshot-fixture"}):

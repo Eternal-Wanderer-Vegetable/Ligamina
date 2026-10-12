@@ -235,7 +235,9 @@ def load_catalog_units(snapshot_dir: Path, platforms: Iterable[str]) -> tuple[di
         fixture_state = "missing_fixture" if categories else "unmapped_category"
         for platform in selected_platforms:
             platform_id = PLATFORM_IDS[platform]
-            artifact_record = artifact_by_platform.get(platform_id, {})
+            # Koishi publishes one platform-independent registry tarball while
+            # its dependency profile is still resolved separately per OS.
+            artifact_record = artifact_by_platform.get(platform_id) or artifact_by_platform.get("all", {})
             artifact = artifact_record.get("artifact") or {}
             profile = profile_entry.get("profiles", {}).get(platform_id, {})
             dependency_lock = profile.get("dependency_lock") or {}

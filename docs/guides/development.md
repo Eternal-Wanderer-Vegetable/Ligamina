@@ -34,7 +34,7 @@ bash init.sh full
 | Rust Core/CLI | cargo fmt --all -- --check、cargo test --workspace --locked；路由/生命周期改动重跑 smoke |
 | NoneBot Host | uv run --locked --project hosts/nonebot --python 3.12.14 pytest -q hosts/nonebot/tests，以及 Host README 原生/Bridge/worker probes |
 | Koishi Host | npm ci、npm test（在 hosts/koishi）；MCP 改动加 npm run test:mcp |
-| Lab/报告 | uv run --locked --project hosts/nonebot --python 3.12.14 python -m unittest discover -s lab/tests -v，再运行受影响 suite |
+| Lab/报告 | uv run --locked --project lab --python 3.12.14 python -m unittest discover -s lab/tests -v，再运行受影响 suite；S2-10 census 改动包括 `lab.tests.test_census` |
 | S2-05 原生/联邦配对 | `uv run --locked --project lab --python 3.12.14 python -m lab.baselines.run_s205`；四个既有支持版本在禁网 Linux Worker 中运行 |
 | Worker 隔离策略 | `uv run --locked --project hosts/nonebot --python 3.12.14 python -m unittest lab.tests.test_workers -v`；Windows runner 另运行 `pwsh -NoProfile -File deploy/lab/check-windows-runner.ps1` |
 | 目录发布物/依赖锁 | `uv run --locked --project lab --python 3.12.14 python -m lab.artifacts verify catalogs/<snapshot>` 与 `python -m lab.profiles verify catalogs/<snapshot>`；缓存根必须与生成时一致 |
@@ -57,7 +57,7 @@ target\debug\ligamina-cli.exe report outputs/acceptance/t13-representative-windo
 
 ## 记录验证
 
-记录命令、退出码、环境、commit/dirty 和证据路径。区分本机测试、托管 CI、干净安装与真实平台验收。S2-09 已对 NoneBot Linux 与 Koishi Linux/Windows 的分层 cohort 接通隔离安装和 native-load pilot；行为 fixture 尚未派发，Windows NoneBot 受 App Control 限制而保持 unknown。重建 acceptance 时需传入完整的 NoneBot/Koishi/Linux/Windows 三份平台报告，命令见[兼容性指南](compatibility.md#s2-09-分层-pilot进行中)。
+记录命令、退出码、环境、commit/dirty 和证据路径。区分本机测试、托管 CI、干净安装与真实平台验收。S2-09 已对 NoneBot Linux 与 Koishi Linux/Windows 的分层 cohort 接通隔离安装和 native-load pilot；行为 fixture 尚未派发，Windows NoneBot 受 App Control 限制而保持 unknown。重建 acceptance 时需传入完整的 NoneBot/Koishi/Linux/Windows 三份平台报告，命令见[兼容性指南](compatibility.md#s2-09-分层-pilot已完成)。
 
 S2-04 双平台运行时探针可复跑：`uv run --locked --project hosts/nonebot --python 3.12.14 python deploy/lab/linux/probes/acceptance.py` 与 `uv run --locked --project hosts/nonebot --python 3.12.14 python deploy/lab/windows/probes/acceptance.py`。它们只运行 benign isolation probes，不下载或执行 catalog 插件；结果写入 `outputs/acceptance/phase2-workers-*-20261012.json`。
 

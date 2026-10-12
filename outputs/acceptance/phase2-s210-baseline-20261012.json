@@ -1,0 +1,29 @@
+{
+  "schema_version": 1,
+  "date": "2026-10-12",
+  "task_id": "S2-10",
+  "status": "baseline_completed",
+  "repository_head": "20d8f04db8c647da1f95336ca576966fccc15abb",
+  "working_tree_before_run": "clean",
+  "implementation_changes_present": false,
+  "command": "pwsh -NoProfile -File init.ps1 -Mode full",
+  "exit_code": 0,
+  "summary": {
+    "documentation": {"status": "passed", "documents": 18, "local_links": 191},
+    "nonebot_pytest": {"status": "passed", "tests": 3},
+    "lab_unittest": {"status": "passed", "tests": 102},
+    "koishi_tests": {"status": "passed", "tests": 7},
+    "koishi_mcp_tests": {"status": "passed", "tests": 1},
+    "reference_client_tests": {"status": "passed", "tests": 5},
+    "rust_workspace_tests": {"status": "passed", "tests": 33},
+    "windows_core_smoke": {"status": "passed", "events": 4, "gateway_operations": 4, "remaining_pids": []},
+    "windows_bundle_stage": {"status": "passed"}
+  },
+  "scope": "S2-10 pre-implementation baseline on clean S2-09 commit 20d8f04. The generated outputs/acceptance/ci-smoke-windows.json was restored afterward. No full-census stage jobs were dispatched.",
+  "known_blockers": [
+    "Windows Sandbox CPython startup remains blocked by App Control (Win32 4551); do not bypass host policy.",
+    "The catalog CLI currently plans and resumes durable stage jobs; a full-snapshot worker dispatcher and terminal-state rollup are not yet implemented.",
+    "Full-census resource and download estimates have not been measured; the S2-09 pilot budget remains provisional.",
+    "5,621 frozen entries still lack a conservative recipe category suggestion, so behavior fixtures are unavailable for those rows."
+  ]
+}

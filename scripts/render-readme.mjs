@@ -79,6 +79,10 @@ export async function phase2Block() {
   const schedulerPath = 'outputs/acceptance/phase2-s207-20261012.json';
   const reportingPath = 'outputs/acceptance/phase2-s208-20261012.json';
   const baselinePath = 'outputs/acceptance/phase2-s209-baseline-20261012.json';
+  const s210BaselinePath = 'outputs/acceptance/phase2-s210-baseline-20261012.json';
+  const s210SmokePath = 'outputs/acceptance/phase2-s210-census-linux-shard0of256-smoke-20261012.json';
+  const s210ImplementationPath = 'outputs/acceptance/phase2-s210-implementation-20261012.json';
+  const s210LinuxFormalPath = 'outputs/acceptance/phase2-s210-census-linux-shard0of256-20261012.json';
   const pilotManifestPath = 'outputs/acceptance/phase2-s209-pilot-manifest-20261012.json';
   const pilotAcceptancePath = 'outputs/acceptance/phase2-s209-20261012.json';
   const nonebotLinuxPilotPath = 'outputs/acceptance/phase2-s209-nonebot-linux-pilot-20261012.json';
@@ -86,8 +90,8 @@ export async function phase2Block() {
   const koishiWindowsPilotPath = 'outputs/acceptance/phase2-s209-koishi-windows-pilot-20261012.json';
   const planPath = 'outputs/acceptance/phase2-s207-cli-smoke-20261012.json';
   const featureListPath = 'feature_list.json';
-  const [catalog, recipes, scheduler, reporting, baseline, pilotManifest, pilotAcceptance, nonebotLinuxPilot, koishiLinuxPilot, koishiWindowsPilot, plan, featureList] = await Promise.all(
-    [catalogPath, recipesPath, schedulerPath, reportingPath, baselinePath, pilotManifestPath, pilotAcceptancePath, nonebotLinuxPilotPath, koishiLinuxPilotPath, koishiWindowsPilotPath, planPath, featureListPath].map(load),
+  const [catalog, recipes, scheduler, reporting, baseline, s210Baseline, s210Smoke, s210Implementation, s210LinuxFormal, pilotManifest, pilotAcceptance, nonebotLinuxPilot, koishiLinuxPilot, koishiWindowsPilot, plan, featureList] = await Promise.all(
+    [catalogPath, recipesPath, schedulerPath, reportingPath, baselinePath, s210BaselinePath, s210SmokePath, s210ImplementationPath, s210LinuxFormalPath, pilotManifestPath, pilotAcceptancePath, nonebotLinuxPilotPath, koishiLinuxPilotPath, koishiWindowsPilotPath, planPath, featureListPath].map(load),
   );
   for (const [relative, expected] of Object.entries(reporting.input_reports ?? {})) {
     const actual = createHash('sha256').update(await readFile(path.join(root, relative))).digest('hex');
@@ -113,7 +117,11 @@ export async function phase2Block() {
   if (plan.snapshot_id !== catalog.snapshot_id || plan.selected_units !== 3
       || plan.expected_stage_jobs !== 18 || plan.execution_started !== false
       || plan.job_counts?.queued !== 18 || plan.job_counts?.passed !== 0) {
-    throw new Error(`Invalid catalog plan report: ${planPath}`);
+    throw new Error(`Invalid catalog plan report: ${planPath}: ${JSON.stringify({
+      snapshot_id: plan.snapshot_id, expected_snapshot_id: catalog.snapshot_id,
+      selected_units: plan.selected_units, expected_stage_jobs: plan.expected_stage_jobs,
+      execution_started: plan.execution_started, job_counts: plan.job_counts,
+    })}`);
   }
   const reportingComplete = reporting.status === 'completed';
   const reportingPending = reporting.status === 'acceptance-pending';
@@ -126,6 +134,47 @@ export async function phase2Block() {
       || baseline.exit_code !== 0 || baseline.implementation_changes_present !== false
       || !baseline.repository_head.startsWith('cbcbb0a')) {
     throw new Error(`Invalid S2-09 baseline report: ${baselinePath}`);
+  }
+  if (s210Baseline.task_id !== 'S2-10' || s210Baseline.status !== 'baseline_completed'
+      || s210Baseline.exit_code !== 0 || s210Baseline.working_tree_before_run !== 'clean'
+      || !s210Baseline.repository_head.startsWith('20d8f04')
+      || s210Baseline.summary?.lab_unittest?.tests !== 102) {
+    throw new Error(`Invalid S2-10 baseline report: ${s210BaselinePath}`);
+  }
+  const s210SourceHashes = {
+    catalog_sha256: 'catalogs/p2-41649744e057d61031d5/catalog.json',
+    artifact_lock_sha256: 'catalogs/p2-41649744e057d61031d5/artifacts.lock.json',
+    profile_lock_sha256: 'catalogs/p2-41649744e057d61031d5/profiles.lock.json',
+    s209_blocker_evidence_sha256: pilotAcceptancePath,
+  };
+  for (const [key, relative] of Object.entries(s210SourceHashes)) {
+    const actual = createHash('sha256').update(await readFile(path.join(root, relative))).digest('hex');
+    if (actual !== s210Smoke.source_hashes?.[key]) throw new Error(`Stale S2-10 smoke input: ${relative}`);
+  }
+  if (s210Smoke.task_id !== 'S2-10' || s210Smoke.kind !== 'phase2_s210_census_shard'
+      || s210Smoke.status !== 'completed' || s210Smoke.snapshot_id !== catalog.snapshot_id
+      || s210Smoke.platform !== 'linux' || s210Smoke.shard?.index !== 0 || s210Smoke.shard?.count !== 256
+      || s210Smoke.denominator?.full_entry_os_units !== 11380
+      || s210Smoke.denominator?.selected_units !== 16 || s210Smoke.denominator?.terminal_units !== 16
+      || s210Smoke.denominator?.expected_stage_jobs !== 96 || s210Smoke.denominator?.terminal_stage_jobs !== 96
+      || s210Smoke.denominator?.closed_exactly_once !== true
+      || s210Smoke.denominator?.all_selected_stages_terminal !== true
+      || s210Smoke.denominator?.full_census_closed !== false
+      || ['passed', 'failed', 'skipped', 'unknown'].reduce((sum, status) => sum + (s210Smoke.counts?.[status] ?? 0), 0) !== 16) {
+    throw new Error(`Invalid S2-10 smoke shard evidence: ${s210SmokePath}`);
+  }
+  if (s210Implementation.task_id !== 'S2-10' || s210Implementation.kind !== 'phase2_s210_implementation_checkpoint'
+      || s210Implementation.status !== 'in_progress' || s210Implementation.validation?.exit_code !== 0
+      || s210Implementation.denominator?.entry_os_units !== 11380
+      || s210Implementation.denominator?.full_census_closed !== false
+      || s210Implementation.formal_shards?.linux_0_of_256?.report_sha256 !== s210LinuxFormal.report_sha256
+      || s210LinuxFormal.task_id !== 'S2-10' || s210LinuxFormal.status !== 'completed'
+      || s210LinuxFormal.platform !== 'linux' || s210LinuxFormal.shard?.index !== 0 || s210LinuxFormal.shard?.count !== 256
+      || s210LinuxFormal.denominator?.full_entry_os_units !== 11380
+      || s210LinuxFormal.denominator?.selected_units !== 16 || s210LinuxFormal.denominator?.terminal_units !== 16
+      || s210LinuxFormal.denominator?.expected_stage_jobs !== 96 || s210LinuxFormal.denominator?.terminal_stage_jobs !== 96
+      || s210LinuxFormal.denominator?.full_census_closed !== false) {
+    throw new Error(`Invalid S2-10 implementation or formal shard evidence: ${s210ImplementationPath}, ${s210LinuxFormalPath}`);
   }
   const pilotInputs = {
     legacy_run_sha256: 'outputs/acceptance/phase2-s209-legacy-linux-20261012.json',
@@ -171,8 +220,9 @@ export async function phase2Block() {
   const windowsPilot = pilotAcceptance.worker_readiness.koishi_windows_pilot;
   const featureByTask = new Map((featureList.features ?? []).map((feature) => [feature.task_id, feature]));
   const s210Status = featureByTask.get('S2-10')?.status ?? 'not-started';
+  const windowsShardStatus = s210Implementation.formal_shards?.windows_0_of_256?.status ?? 'not-started';
   const s210Label = s210Status === 'done' ? '已完成'
-    : s210Status === 'in-progress' ? '进行中：baseline 与分片派发准备；全量 Worker 尚未启动'
+    : s210Status === 'in-progress' ? `进行中：实现全仓库验证通过；正式 Linux shard ${s210LinuxFormal.denominator.terminal_units}/${s210LinuxFormal.denominator.selected_units} 闭合；Windows shard ${escape(windowsShardStatus)}；全快照未闭合`
       : '未开始：全快照 census 尚未启动';
   const measurements = pilotAcceptance.resource_measurements;
 
@@ -191,9 +241,9 @@ export async function phase2Block() {
     '',
     `分类 dry run 只建议 ${suggested}/${count} entries，${unmapped} 项仍是 \`unmapped_category\`。S2-09 的 128 个双 OS 结果位置全部闭合：四个历史支持版本和 60 个分层目录 entry 分别保留状态；NoneBot Linux 尝试 ${nonebotPilot.attempted_workers} 个 Docker Worker（L1 ${JSON.stringify(nonebotPilot.dependency_install)}；L2 ${JSON.stringify(nonebotPilot.native_load)}），Koishi Linux 尝试 ${linuxPilot.attempted_workers} 个 Docker Worker（L1 ${JSON.stringify(linuxPilot.dependency_install)}；L2 ${JSON.stringify(linuxPilot.native_load)}），Windows 尝试 ${windowsPilot.attempted_workers} 个 Sandbox Worker（L1 ${JSON.stringify(windowsPilot.dependency_install)}；L2 ${JSON.stringify(windowsPilot.native_load)}）。`,
     '',
-    `Windows Sandbox 的 CPython 启动仍受 App Control（Win32 4551）阻止；Node.js 24.20.0 签名 runtime 已用于 Windows Koishi L1/L2 pilot。Koishi Windows Job Object commit P95 ${(measurements.koishi_windows_peak_worker_memory_bytes.p95 / (1024 ** 3)).toFixed(2)} GiB（8 GiB 限额内），scratch P95 ${(measurements.koishi_windows_peak_writable_scratch_bytes.p95 / (1024 ** 2)).toFixed(1)} MiB；预算仍 provisional，NoneBot Windows 无 Worker 样本。目录 cohort 缺 entry-bound behavior fixture，L4 未评估，不能外推为兼容。S2-10 状态：${s210Status}，pilot 报告标注的全量 census 状态为 ${pilotAcceptance.readiness.full_census}；真实平台登录、发送与投递验收未执行。`,
+    `Windows Sandbox 的 CPython 启动仍受 App Control（Win32 4551）阻止；Node.js 24.20.0 签名 runtime 已用于 Windows Koishi L1/L2 pilot。Koishi Windows Job Object commit P95 ${(measurements.koishi_windows_peak_worker_memory_bytes.p95 / (1024 ** 3)).toFixed(2)} GiB（8 GiB 限额内），scratch P95 ${(measurements.koishi_windows_peak_writable_scratch_bytes.p95 / (1024 ** 2)).toFixed(1)} MiB；预算仍 provisional，NoneBot Windows 无 Worker 样本。目录 cohort 缺 entry-bound behavior fixture，L4 未评估，不能外推为兼容。S2-10 独立 smoke 为 ${s210Smoke.denominator.terminal_units}/${s210Smoke.denominator.selected_units} 单元、${s210Smoke.denominator.terminal_stage_jobs}/${s210Smoke.denominator.expected_stage_jobs} stage jobs；正式 Linux shard 0/256 为 ${s210LinuxFormal.denominator.terminal_units}/${s210LinuxFormal.denominator.selected_units} 单元、${s210LinuxFormal.denominator.terminal_stage_jobs}/${s210LinuxFormal.denominator.expected_stage_jobs} jobs，Windows shard 状态为 ${escape(windowsShardStatus)}。全快照仍未闭合。S2-09 pilot 时记录的全量 census 状态为 ${pilotAcceptance.readiness.full_census}；真实平台登录、发送与投递验收未执行。`,
     '',
-    `证据：[目录快照](${catalogPath})、[分类 dry run](${recipesPath})、[调度验收](${schedulerPath})、[S2-07 实际 CLI 计划](${planPath})、[S2-08 报告验收](${reportingPath})、[S2-09 baseline](${baselinePath})、[S2-09 pilot 清单](${pilotManifestPath})、[S2-09 pilot 结果](${pilotAcceptancePath})、[完整实施计划](docs/plans/2026-10-12-phase-2-full-catalog.md)。`,
+    `证据：[目录快照](${catalogPath})、[分类 dry run](${recipesPath})、[调度验收](${schedulerPath})、[S2-07 实际 CLI 计划](${planPath})、[S2-08 报告验收](${reportingPath})、[S2-09 baseline](${baselinePath})、[S2-09 pilot 清单](${pilotManifestPath})、[S2-09 pilot 结果](${pilotAcceptancePath})、[S2-10 baseline](${s210BaselinePath})、[S2-10 实现验证](${s210ImplementationPath})、[S2-10 smoke shard](${s210SmokePath})、[S2-10 正式 Linux shard](${s210LinuxFormalPath})、[完整实施计划](docs/plans/2026-10-12-phase-2-full-catalog.md)。`,
     phase2End,
   ].join('\n');
 }

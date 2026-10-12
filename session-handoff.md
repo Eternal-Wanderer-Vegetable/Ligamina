@@ -3,9 +3,9 @@
 ## Current Objective
 
 - 日期：2026-10-12（Asia/Shanghai）。用户要求完成 `docs/plans/2026-10-12-phase-2-full-catalog.md` 的 S2-01–S2-12 并分阶段提交。
-- 分支：`codex/phase2-full-catalog`。仓库新增文档先提交 `2d6399a`；已完成 S2-01 `15f468d`、S2-02 `c0be568`、S2-04 `2fa06b0`、S2-03 `29bc1e5`、S2-05 `854b564`、S2-06 `4e555b3`、S2-07 `7523a83`、S2-08 `cbcbb0a`；S2-09 baseline/status checkpoint 是 `299d22c`，不是阶段完成提交。
-- 当前：S2-09 / feat-011 的 pilot 执行已完成，阶段验证与提交正在收尾；S2-10 / feat-012 是下一活动任务。S2-09 实施前 baseline 在干净 HEAD `cbcbb0a2639bcf9c524847c8778bc87b36b80813` 上通过 `pwsh -NoProfile -File init.ps1 -Mode full`，见 `outputs/acceptance/phase2-s209-baseline-20261012.json`。分层 manifest 有 11,380 行 entry×OS 账本；NoneBot Linux 与 Koishi Linux/Windows 三个 pilot 各闭合 30 项，完整汇总 128 个位置为 4 passed、11 failed、88 skipped、25 unknown。
-- 断点：Windows Koishi `random-chooser` 的一次清理 unknown 已在单项 retry 中 cleanup-confirmed，最终分类 missing-fixture skipped。NoneBot Linux 21 个 Worker、Koishi Linux/Windows 各 22 个 Worker 安装与清理通过。Windows NoneBot 23 个目录项受 App Control Win32 4551 阻止，保留 unknown，不绕过策略。entry-bound 行为 fixture 未执行；资源分布已测但预算 provisional。README 与 docs/link 检查已通过；下一步完成全仓库验证、提交 S2-09，再运行 S2-10 的 clean baseline 并分 shard 派发 census。
+- 分支：`codex/phase2-full-catalog`。仓库新增文档先提交 `2d6399a`；已提交 S2-01 `15f468d`、S2-02 `c0be568`、S2-04 `2fa06b0`、S2-03 `29bc1e5`、S2-05 `854b564`、S2-06 `4e555b3`、S2-07 `7523a83`、S2-08 `cbcbb0a`、S2-09 `20d8f04`；`299d22c` 是此前 S2-09 baseline/status checkpoint。
+- 当前：S2-09 pilot 已完成并提交。S2-10 / feat-012 正在进行；clean baseline 在 S2-09 HEAD `20d8f04db8c647da1f95336ca576966fccc15abb` 上通过。已实现可恢复 SQLite 六阶段 dispatcher、per-entry 证据、跨 shard/per-plugin 汇总及 Koishi `platform=all` artifact 映射；实现后的 `Mode full` 退出码 0（lab 106，Windows Core smoke 4 events/4 Gateway ops/0 PIDs，bundle 通过），详见 `outputs/acceptance/phase2-s210-implementation-20261012.json`。
+- 断点：正式分母为 5,690 entries × 2 OS = 11,380 单元；10,332 locked profile 仅为候选。Linux `0/256` 正式 shard 已闭合 16 单元 / 96 stage jobs（4 failed、12 skipped），报告 `outputs/acceptance/phase2-s210-census-linux-shard0of256-20261012.json`；Windows `0/256` 正运行于 `.work/catalog-census/phase2-s210.sqlite3`，完成后检查并继续剩余 shard。隔离 smoke report 不并入正式汇总。S2-09 pilot 的行为 fixture 缺失、预算 provisional 和 Windows NoneBot App Control Win32 4551 unknown 均保留；不绕过策略。全量 512 shard 和 11,380 单元 aggregation 未完成。
 
 ## Completed Stages
 
@@ -41,9 +41,15 @@
 - The entry-bound behavior stage has not run; behavior is not accepted. Windows CPython App Control Win32 4551 leaves 23 NoneBot catalog rows unknown, and two historical Windows rows remain unknown. The budget remains provisional; no full census or field acceptance has started.
 - README renderer and evidence block check passed; `pwsh -NoProfile -File init.ps1 -Mode docs` passed (18 documents, 191 local links). Focused S2-09 suite passed (25 tests); `pwsh -NoProfile -File init.ps1 -Mode full` exited 0 with lab 102, NoneBot 3, Koishi 7, MCP 1, reference 5, Rust workspace green, Windows smoke 4 events / 4 Gateway operations / 0 PIDs, and bundle stage passed. `git diff --check` passed. The generated `ci-smoke-windows.json` was restored to its original SHA-256 `033D8EA2534603B880DB2A729B328C3A75C7F4CF0B8F8DEE087C22BEBBCAC752`. The pilot execution meets S2-09 criteria while higher behavior/automation gates remain open; commit the evidence and start S2-10.
 
+## S2-10 Baseline
+
+- S2-09 stage commit: `20d8f04db8c647da1f95336ca576966fccc15abb`.
+- S2-10 clean baseline: `pwsh -NoProfile -File init.ps1 -Mode full`, exit 0; 18 docs/191 links; NoneBot 3, lab 102, Koishi 7, MCP 1, reference 5, Rust 33; Windows Core smoke 4 events / 4 Gateway operations / 0 PIDs; bundle stage passed. Evidence: `outputs/acceptance/phase2-s210-baseline-20261012.json`. Generated smoke JSON was restored.
+- Profile lock statuses identify 10,332 candidate entry×OS units, not completed executions. The isolated Linux smoke report remains excluded from formal census. Formal Linux shard `0/256` is complete at 16 units / 96 terminal jobs (4 failed, 12 skipped); the Windows `0/256` shard is currently running. Full 11,380-unit census remains open; Windows CPython App Control Win32 4551 remains an evidenced blocker and the resource budget is provisional. Implementation and verification are recorded in `outputs/acceptance/phase2-s210-implementation-20261012.json`.
+
 ## Next: S2-10
 
-- Run a clean S2-10 baseline on the S2-09 phase commit, then inspect the durable catalog queue and worker execution path before starting full-snapshot shards.
+- Finish and verify the active Windows shard, then execute remaining formal shards on the same persistent queue. Resume interrupted work with the same shard inputs and queue DB.
 - Preserve the 11,380 entry×OS denominator and frozen artifact/profile/hash identity. Every inaccessible or unsupported stage needs an evidence-backed terminal state; queue planning alone does not count as execution.
 - Retain S2-09 failure/unknown evidence, resource limits, retries, and checkpoints. Update full-census resource estimates from shard measurements and do not claim behavior compatibility for rows without entry-bound fixtures.
 - 5,621 entries still lack conservative behavior-category suggestions; do not claim plugin-wide compatibility or field acceptance.
