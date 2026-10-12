@@ -5,7 +5,7 @@
 - 日期：2026-10-12（Asia/Shanghai）。用户要求完成 `docs/plans/2026-10-12-phase-2-full-catalog.md` 的 S2-01–S2-12 并分阶段提交。
 - 分支：`codex/phase2-full-catalog`。仓库新增文档先提交 `2d6399a`；已提交 S2-01 `15f468d`、S2-02 `c0be568`、S2-04 `2fa06b0`、S2-03 `29bc1e5`、S2-05 `854b564`、S2-06 `4e555b3`、S2-07 `7523a83`、S2-08 `cbcbb0a`、S2-09 `20d8f04`；`299d22c` 是此前 S2-09 baseline/status checkpoint。
 - 当前：S2-09 pilot 已完成并提交。S2-10 / feat-012 正在进行；clean baseline 在 S2-09 HEAD `20d8f04db8c647da1f95336ca576966fccc15abb` 上通过。已实现可恢复 SQLite 六阶段 dispatcher、per-entry 证据、跨 shard/per-plugin 汇总及 Koishi `platform=all` artifact 映射；实现后的 `Mode full` 退出码 0（lab 106，Windows Core smoke 4 events/4 Gateway ops/0 PIDs，bundle 通过），详见 `outputs/acceptance/phase2-s210-implementation-20261012.json`。
-- 断点：正式分母为 5,690 entries × 2 OS = 11,380 单元；10,332 locked profile 仅为候选。Linux `0/256` 正式 shard 闭合 16 单元 / 96 stage jobs（4 failed、12 skipped）。修正投影后的 Windows `0/256` 闭合 26 单元 / 156 stage jobs（1 failed、22 skipped、3 App Control unknown；cleanup 14 passed、12 skipped、0 unknown），报告哈希已核验；首跑报告保留为 attempt1。实现修正、12 个 focused tests、全仓库复验通过，最新 docs 检查为 18/208。Linux `1/256` 正在运行于 `.work/catalog-census/phase2-s210.sqlite3`，命令和中断恢复参数见下方。行为 fixture 缺失、预算 provisional 和 App Control unknown 均保留；不绕过策略。全量 512 shard 和 11,380 单元 aggregation 未完成。
+- 断点：正式分母为 5,690 entries × 2 OS = 11,380 单元；10,332 locked profile 仅为候选。Linux shards `0–5/256`、Windows shards `0–2/256` 已闭合；当前临时聚合 202/11,380 单元、9/512 shard，缺 11,178 单元和 503 shard。最新 docs 检查 18/211；Linux `6/256` 与 Windows `3/256` 正在运行，由 `.work/catalog-census/run-remaining.ps1` 批次循环推进。行为 fixture 缺失、预算 provisional 和 App Control unknown 均保留；不绕过策略。
 
 ## Completed Stages
 
@@ -49,10 +49,16 @@
 
 ## Next: S2-10
 
-- Continue the formal census with Linux shard `1/256`, then Windows `1/256`; preserve the 11,380 entry×OS denominator and use the persistent queue.
-- If a shard is interrupted after its queue run is created, add `--resume` to the same command. Current next Linux shard command:
+- The runner loops are active and restartable. Linux shards `0–5/256` and Windows shards `0–2/256` are closed. The interim aggregation records 202/11,380 units across 9/512 shards; 11,178 units and 503 shards remain. Linux `6/256` and Windows `3/256` are currently running. Rerun an existing loop after interruption; it skips closed reports and resumes queue runs that were already created:
   ```powershell
-  uv run --locked --project lab --python 3.12.14 python -m lab.census --snapshot catalogs/p2-41649744e057d61031d5 --queue-db .work/catalog-census/phase2-s210.sqlite3 --platform linux --shard 1/256 --report outputs/acceptance/phase2-s210-census-linux-shard1of256-20261012.json --timeout-seconds 240
+  powershell -NoProfile -File .work/catalog-census/run-remaining.ps1 -Platform linux -StartShard 5
+  powershell -NoProfile -File .work/catalog-census/run-remaining.ps1 -Platform windows -StartShard 3
+  ```
+- Once both loops finish, aggregate all closed shard reports. Use basenames from `outputs/acceptance` so the 512 report arguments stay within the Windows command-line limit:
+  ```powershell
+  Set-Location outputs/acceptance
+  $reports = Get-ChildItem 'phase2-s210-census-*-shard*of256-20261012.json' | Where-Object { $_.Name -match '^phase2-s210-census-(linux|windows)-shard\d+of256-20261012\.json$' } | ForEach-Object Name
+  uv run --locked --project ..\..\lab --python 3.12.14 python -m lab.census --snapshot ..\..\catalogs\p2-41649744e057d61031d5 --queue-db ..\..\.work\catalog-census\phase2-s210.sqlite3 --aggregate @reports --aggregate-output phase2-s210-census-interim-20261012.json
   ```
 - Preserve the 11,380 entry×OS denominator and frozen artifact/profile/hash identity. Every inaccessible or unsupported stage needs an evidence-backed terminal state; queue planning alone does not count as execution.
 - Retain S2-09 failure/unknown evidence, resource limits, retries, and checkpoints. Update full-census resource estimates from shard measurements and do not claim behavior compatibility for rows without entry-bound fixtures.

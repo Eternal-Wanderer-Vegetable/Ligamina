@@ -83,8 +83,12 @@ export async function phase2Block() {
   const s210SmokePath = 'outputs/acceptance/phase2-s210-census-linux-shard0of256-smoke-20261012.json';
   const s210ImplementationPath = 'outputs/acceptance/phase2-s210-implementation-20261012.json';
   const s210LinuxFormalPath = 'outputs/acceptance/phase2-s210-census-linux-shard0of256-20261012.json';
+  const s210Linux1FormalPath = 'outputs/acceptance/phase2-s210-census-linux-shard1of256-20261012.json';
+  const s210Linux2FormalPath = 'outputs/acceptance/phase2-s210-census-linux-shard2of256-20261012.json';
   const s210WindowsFormalPath = 'outputs/acceptance/phase2-s210-census-windows-shard0of256-20261012.json';
+  const s210Windows1FormalPath = 'outputs/acceptance/phase2-s210-census-windows-shard1of256-20261012.json';
   const s210WindowsAttempt1Path = 'outputs/acceptance/phase2-s210-census-windows-shard0of256-attempt1-20261012.json';
+  const s210InterimAggregatePath = 'outputs/acceptance/phase2-s210-census-interim-20261012.json';
   const pilotManifestPath = 'outputs/acceptance/phase2-s209-pilot-manifest-20261012.json';
   const pilotAcceptancePath = 'outputs/acceptance/phase2-s209-20261012.json';
   const nonebotLinuxPilotPath = 'outputs/acceptance/phase2-s209-nonebot-linux-pilot-20261012.json';
@@ -92,8 +96,8 @@ export async function phase2Block() {
   const koishiWindowsPilotPath = 'outputs/acceptance/phase2-s209-koishi-windows-pilot-20261012.json';
   const planPath = 'outputs/acceptance/phase2-s207-cli-smoke-20261012.json';
   const featureListPath = 'feature_list.json';
-  const [catalog, recipes, scheduler, reporting, baseline, s210Baseline, s210Smoke, s210Implementation, s210LinuxFormal, s210WindowsFormal, s210WindowsAttempt1, pilotManifest, pilotAcceptance, nonebotLinuxPilot, koishiLinuxPilot, koishiWindowsPilot, plan, featureList] = await Promise.all(
-    [catalogPath, recipesPath, schedulerPath, reportingPath, baselinePath, s210BaselinePath, s210SmokePath, s210ImplementationPath, s210LinuxFormalPath, s210WindowsFormalPath, s210WindowsAttempt1Path, pilotManifestPath, pilotAcceptancePath, nonebotLinuxPilotPath, koishiLinuxPilotPath, koishiWindowsPilotPath, planPath, featureListPath].map(load),
+  const [catalog, recipes, scheduler, reporting, baseline, s210Baseline, s210Smoke, s210Implementation, s210LinuxFormal, s210Linux1Formal, s210Linux2Formal, s210WindowsFormal, s210Windows1Formal, s210WindowsAttempt1, s210InterimAggregate, pilotManifest, pilotAcceptance, nonebotLinuxPilot, koishiLinuxPilot, koishiWindowsPilot, plan, featureList] = await Promise.all(
+    [catalogPath, recipesPath, schedulerPath, reportingPath, baselinePath, s210BaselinePath, s210SmokePath, s210ImplementationPath, s210LinuxFormalPath, s210Linux1FormalPath, s210Linux2FormalPath, s210WindowsFormalPath, s210Windows1FormalPath, s210WindowsAttempt1Path, s210InterimAggregatePath, pilotManifestPath, pilotAcceptancePath, nonebotLinuxPilotPath, koishiLinuxPilotPath, koishiWindowsPilotPath, planPath, featureListPath].map(load),
   );
   for (const [relative, expected] of Object.entries(reporting.input_reports ?? {})) {
     const actual = createHash('sha256').update(await readFile(path.join(root, relative))).digest('hex');
@@ -149,10 +153,14 @@ export async function phase2Block() {
     profile_lock_sha256: 'catalogs/p2-41649744e057d61031d5/profiles.lock.json',
     s209_blocker_evidence_sha256: pilotAcceptancePath,
   };
+  const expectedS210SourceHashes = {};
   for (const [key, relative] of Object.entries(s210SourceHashes)) {
     const actual = createHash('sha256').update(await readFile(path.join(root, relative))).digest('hex');
+    expectedS210SourceHashes[key] = actual;
     if (actual !== s210Smoke.source_hashes?.[key] || actual !== s210LinuxFormal.source_hashes?.[key]
-        || actual !== s210WindowsFormal.source_hashes?.[key] || actual !== s210WindowsAttempt1.source_hashes?.[key]) {
+        || actual !== s210Linux1Formal.source_hashes?.[key] || actual !== s210Linux2Formal.source_hashes?.[key]
+        || actual !== s210WindowsFormal.source_hashes?.[key] || actual !== s210Windows1Formal.source_hashes?.[key]
+        || actual !== s210WindowsAttempt1.source_hashes?.[key]) {
       throw new Error(`Stale S2-10 census input: ${relative}`);
     }
   }
@@ -178,7 +186,8 @@ export async function phase2Block() {
   if (s210Implementation.task_id !== 'S2-10' || s210Implementation.kind !== 'phase2_s210_implementation_checkpoint'
       || s210Implementation.status !== 'in_progress' || s210Implementation.validation?.exit_code !== 0
       || s210Implementation.denominator?.entry_os_units !== 11380
-      || s210Implementation.denominator?.full_census_closed !== false
+      || s210Implementation.denominator?.full_census_closed !== (s210InterimAggregate.status === 'census-closed')
+      || s210Implementation.implementation?.full_census_closed !== (s210InterimAggregate.status === 'census-closed')
       || s210Implementation.formal_shards?.linux_0_of_256?.report_sha256 !== s210LinuxFormal.report_sha256
       || s210LinuxFormal.task_id !== 'S2-10' || s210LinuxFormal.status !== 'completed'
       || s210LinuxFormal.platform !== 'linux' || s210LinuxFormal.shard?.index !== 0 || s210LinuxFormal.shard?.count !== 256
@@ -197,6 +206,71 @@ export async function phase2Block() {
       || s210WindowsFormal.stage_counts?.cleanup?.unknown !== 0
       || s210WindowsAttempt1.report_sha256 !== s210Implementation.formal_shards.windows_0_of_256.previous_attempt_report_sha256) {
     throw new Error(`Invalid S2-10 Windows formal shard evidence: ${s210WindowsFormalPath}`);
+  }
+  if (s210Implementation.formal_shards?.linux_1_of_256?.status !== 'completed'
+      || s210Implementation.formal_shards.linux_1_of_256.report_sha256 !== s210Linux1Formal.report_sha256
+      || s210Linux1Formal.task_id !== 'S2-10' || s210Linux1Formal.status !== 'completed'
+      || s210Linux1Formal.platform !== 'linux' || s210Linux1Formal.shard?.index !== 1 || s210Linux1Formal.shard?.count !== 256
+      || s210Linux1Formal.denominator?.selected_units !== 24 || s210Linux1Formal.denominator?.terminal_units !== 24
+      || s210Linux1Formal.denominator?.expected_stage_jobs !== 144 || s210Linux1Formal.denominator?.terminal_stage_jobs !== 144) {
+    throw new Error(`Invalid S2-10 Linux shard 1 evidence: ${s210Linux1FormalPath}`);
+  }
+  if (s210Implementation.formal_shards?.linux_2_of_256?.status !== 'completed'
+      || s210Implementation.formal_shards.linux_2_of_256.report_sha256 !== s210Linux2Formal.report_sha256
+      || s210Linux2Formal.task_id !== 'S2-10' || s210Linux2Formal.status !== 'completed'
+      || s210Linux2Formal.platform !== 'linux' || s210Linux2Formal.shard?.index !== 2 || s210Linux2Formal.shard?.count !== 256
+      || s210Linux2Formal.denominator?.selected_units !== 28 || s210Linux2Formal.denominator?.terminal_units !== 28
+      || s210Linux2Formal.denominator?.expected_stage_jobs !== 168 || s210Linux2Formal.denominator?.terminal_stage_jobs !== 168) {
+    throw new Error(`Invalid S2-10 Linux shard 2 evidence: ${s210Linux2FormalPath}`);
+  }
+  if (s210Implementation.formal_shards?.windows_1_of_256?.status !== 'completed'
+      || s210Implementation.formal_shards.windows_1_of_256.report_sha256 !== s210Windows1Formal.report_sha256
+      || s210Windows1Formal.task_id !== 'S2-10' || s210Windows1Formal.status !== 'completed'
+      || s210Windows1Formal.platform !== 'windows' || s210Windows1Formal.shard?.index !== 1 || s210Windows1Formal.shard?.count !== 256
+      || s210Windows1Formal.denominator?.selected_units !== 22 || s210Windows1Formal.denominator?.terminal_units !== 22
+      || s210Windows1Formal.denominator?.expected_stage_jobs !== 132 || s210Windows1Formal.denominator?.terminal_stage_jobs !== 132
+      || s210Windows1Formal.stage_counts?.cleanup?.unknown !== 0) {
+    throw new Error(`Invalid S2-10 Windows shard 1 evidence: ${s210Windows1FormalPath}`);
+  }
+  const s210InterimShardReports = s210InterimAggregate.evidence_manifest?.shard_reports ?? [];
+  if (s210InterimAggregate.task_id !== 'S2-10' || s210InterimAggregate.kind !== 'phase2_s210_census_acceptance'
+      || !['census-incomplete', 'census-closed'].includes(s210InterimAggregate.status)
+      || s210InterimAggregate.denominator?.expected_entry_os_units !== 11380
+      || s210InterimAggregate.denominator?.terminal_units + s210InterimAggregate.denominator?.missing_unit_count !== 11380
+      || s210InterimAggregate.denominator?.missing_shard_count !== 512 - s210InterimShardReports.length) {
+    throw new Error(`Invalid S2-10 interim aggregation: ${s210InterimAggregatePath}`);
+  }
+  const observedShardIds = new Set();
+  const aggregateShardCounts = { passed: 0, failed: 0, skipped: 0, unknown: 0 };
+  let aggregateShardUnits = 0;
+  for (const shard of s210InterimShardReports) {
+    const bytes = await readFile(path.join(root, shard.path));
+    const actual = createHash('sha256').update(bytes).digest('hex');
+    if (actual !== shard.sha256) throw new Error(`Stale S2-10 aggregate shard input: ${shard.path}`);
+    const report = JSON.parse(bytes);
+    const { platform, shard: identity, denominator, counts } = report;
+    const shardId = `${platform}:${identity?.index}/${identity?.count}`;
+    if (report.task_id !== 'S2-10' || report.kind !== 'phase2_s210_census_shard'
+        || report.status !== 'completed' || report.snapshot_id !== catalog.snapshot_id
+        || !['linux', 'windows'].includes(platform) || identity?.count !== 256
+        || !Number.isInteger(identity?.index) || identity.index < 0 || identity.index >= 256
+        || observedShardIds.has(shardId) || denominator?.closed_exactly_once !== true
+        || denominator?.all_selected_stages_terminal !== true
+        || denominator?.selected_units !== denominator?.terminal_units
+        || denominator?.full_entry_os_units !== 11380
+        || ['passed', 'failed', 'skipped', 'unknown'].reduce((sum, status) => sum + (counts?.[status] ?? 0), 0) !== denominator.selected_units) {
+      throw new Error(`Invalid S2-10 aggregate shard report: ${shard.path}`);
+    }
+    for (const [key, expected] of Object.entries(expectedS210SourceHashes)) {
+      if (report.source_hashes?.[key] !== expected) throw new Error(`Stale source hash in S2-10 shard: ${shard.path} (${key})`);
+    }
+    observedShardIds.add(shardId);
+    aggregateShardUnits += denominator.selected_units;
+    for (const status of Object.keys(aggregateShardCounts)) aggregateShardCounts[status] += counts[status] ?? 0;
+  }
+  if (aggregateShardUnits !== s210InterimAggregate.denominator.terminal_units
+      || Object.keys(aggregateShardCounts).some((status) => aggregateShardCounts[status] !== s210InterimAggregate.counts?.[status])) {
+    throw new Error(`S2-10 interim totals disagree with verified shard reports: ${s210InterimAggregatePath}`);
   }
   const pilotInputs = {
     legacy_run_sha256: 'outputs/acceptance/phase2-s209-legacy-linux-20261012.json',
@@ -242,13 +316,21 @@ export async function phase2Block() {
   const windowsPilot = pilotAcceptance.worker_readiness.koishi_windows_pilot;
   const featureByTask = new Map((featureList.features ?? []).map((feature) => [feature.task_id, feature]));
   const s210Status = featureByTask.get('S2-10')?.status ?? 'not-started';
-  const windowsShardStatus = s210Implementation.formal_shards?.windows_0_of_256?.status ?? 'not-started';
-  const windowsShardLabel = windowsShardStatus === 'completed' ? '首片已闭合'
-    : windowsShardStatus === 'running' ? '首片执行中'
-      : windowsShardStatus === 'retrying_projection' ? '首片按修正后的 cleanup 投影重跑中'
-        : '首片尚未启动';
+  const s211Status = featureByTask.get('S2-11')?.status ?? 'not-started';
+  const s212Status = featureByTask.get('S2-12')?.status ?? 'not-started';
+  const censusClosed = s210InterimAggregate.status === 'census-closed';
+  const statusLabel = (status) => status === 'done' ? '已完成' : status === 'in-progress' ? '进行中' : '未开始';
+  const activeShards = Object.entries(s210Implementation.formal_shards ?? {})
+    .filter(([, shard]) => shard.status === 'running')
+    .map(([key]) => {
+      const match = /^(linux|windows)_(\d+)_of_(\d+)$/.exec(key);
+      return match ? `${match[1]} ${match[2]}/${match[3]}` : key;
+    });
+  const activeShardLabel = activeShards.length ? activeShards.join('、') : '无';
+  const formalShardCount = s210InterimShardReports.length;
+  const formalUnitCount = s210InterimAggregate.denominator.terminal_units;
   const s210Label = s210Status === 'done' ? '已完成'
-    : s210Status === 'in-progress' ? `进行中：实现全仓库验证通过；正式 Linux shard ${s210LinuxFormal.denominator.terminal_units}/${s210LinuxFormal.denominator.selected_units} 闭合；Windows shard ${windowsShardLabel}；全快照未闭合`
+    : s210Status === 'in-progress' ? `进行中：实现全仓库验证通过；正式 census ${formalUnitCount.toLocaleString('en-US')}/11,380 单元、${formalShardCount}/512 shards 闭合；执行中：${activeShardLabel}；${censusClosed ? '全快照已闭合' : '全快照未闭合'}`
       : '未开始：全快照 census 尚未启动';
   const measurements = pilotAcceptance.resource_measurements;
 
@@ -262,14 +344,15 @@ export async function phase2Block() {
       ...(reportingComplete ? [['S2-01–S2-08', '已完成并分别保存验收证据']] : [['S2-01–S2-07', '已完成并分别保存验收证据'], ['S2-08', '最终验收进行中']]),
       ['S2-09', reportingComplete ? `pilot 执行完成：128/128 位置闭合；通过 / 失败 / 跳过 / 未知 ${pilotCounts}；自动化与行为 gate 保留 blocker` : '等待 S2-08 验收完成'],
       ['S2-10', s210Label],
-      ['S2-11–S2-12', s210Status === 'done' ? '未开始' : '未开始'],
+      ['S2-11', statusLabel(s211Status)],
+      ['S2-12', statusLabel(s212Status)],
     ].map(([task, status]) => `| ${task} | ${status} |`),
     '',
     `分类 dry run 只建议 ${suggested}/${count} entries，${unmapped} 项仍是 \`unmapped_category\`。S2-09 的 128 个双 OS 结果位置全部闭合：四个历史支持版本和 60 个分层目录 entry 分别保留状态；NoneBot Linux 尝试 ${nonebotPilot.attempted_workers} 个 Docker Worker（L1 ${JSON.stringify(nonebotPilot.dependency_install)}；L2 ${JSON.stringify(nonebotPilot.native_load)}），Koishi Linux 尝试 ${linuxPilot.attempted_workers} 个 Docker Worker（L1 ${JSON.stringify(linuxPilot.dependency_install)}；L2 ${JSON.stringify(linuxPilot.native_load)}），Windows 尝试 ${windowsPilot.attempted_workers} 个 Sandbox Worker（L1 ${JSON.stringify(windowsPilot.dependency_install)}；L2 ${JSON.stringify(windowsPilot.native_load)}）。`,
     '',
-    `Windows Sandbox 的 CPython 启动仍受 App Control（Win32 4551）阻止；Node.js 24.20.0 签名 runtime 已用于 Windows Koishi L1/L2 pilot。Koishi Windows Job Object commit P95 ${(measurements.koishi_windows_peak_worker_memory_bytes.p95 / (1024 ** 3)).toFixed(2)} GiB（8 GiB 限额内），scratch P95 ${(measurements.koishi_windows_peak_writable_scratch_bytes.p95 / (1024 ** 2)).toFixed(1)} MiB；预算仍 provisional，NoneBot Windows 无 Worker 样本。目录 cohort 缺 entry-bound behavior fixture，L4 未评估，不能外推为兼容。S2-10 独立 smoke 为 ${s210Smoke.denominator.terminal_units}/${s210Smoke.denominator.selected_units} 单元、${s210Smoke.denominator.terminal_stage_jobs}/${s210Smoke.denominator.expected_stage_jobs} stage jobs；正式 Linux shard 0/256 为 ${s210LinuxFormal.denominator.terminal_units}/${s210LinuxFormal.denominator.selected_units} 单元、${s210LinuxFormal.denominator.terminal_stage_jobs}/${s210LinuxFormal.denominator.expected_stage_jobs} jobs，Windows shard 0/256 为 ${s210WindowsFormal.denominator.terminal_units}/${s210WindowsFormal.denominator.selected_units} 单元（通过 / 失败 / 跳过 / 未知：${['passed', 'failed', 'skipped', 'unknown'].map((status) => s210WindowsFormal.counts[status]).join(' / ')}）。全快照仍未闭合。S2-09 pilot 时记录的全量 census 状态为 ${pilotAcceptance.readiness.full_census}；真实平台登录、发送与投递验收未执行。`,
+    `Windows Sandbox 的 CPython 启动仍受 App Control（Win32 4551）阻止；Node.js 24.20.0 签名 runtime 已用于 Windows Koishi L1/L2 pilot。Koishi Windows Job Object commit P95 ${(measurements.koishi_windows_peak_worker_memory_bytes.p95 / (1024 ** 3)).toFixed(2)} GiB（8 GiB 限额内），scratch P95 ${(measurements.koishi_windows_peak_writable_scratch_bytes.p95 / (1024 ** 2)).toFixed(1)} MiB；预算仍 provisional，NoneBot Windows 无 Worker 样本。目录 cohort 缺 entry-bound behavior fixture，L4 未评估，不能外推为兼容。正式 census 暂时闭合 ${formalUnitCount.toLocaleString('en-US')}/11,380 个 entry×OS 单元，${formalShardCount}/512 个 shard；Linux shard 0/256 为 ${s210LinuxFormal.denominator.terminal_units}/${s210LinuxFormal.denominator.selected_units} 单元、shard 1/256 为 ${s210Linux1Formal.denominator.terminal_units}/${s210Linux1Formal.denominator.selected_units} 单元、shard 2/256 为 ${s210Linux2Formal.denominator.terminal_units}/${s210Linux2Formal.denominator.selected_units} 单元；Windows shard 0/256 为 ${s210WindowsFormal.denominator.terminal_units}/${s210WindowsFormal.denominator.selected_units}（通过 / 失败 / 跳过 / 未知：${['passed', 'failed', 'skipped', 'unknown'].map((status) => s210WindowsFormal.counts[status]).join(' / ')}），shard 1/256 为 ${s210Windows1Formal.denominator.terminal_units}/${s210Windows1Formal.denominator.selected_units}（通过 / 失败 / 跳过 / 未知：${['passed', 'failed', 'skipped', 'unknown'].map((status) => s210Windows1Formal.counts[status]).join(' / ')}）。当前执行 shard：${activeShardLabel}。独立 smoke shard 不计入正式分母。全快照尚未闭合，真实平台登录、发送与投递验收未执行。`,
     '',
-    `证据：[目录快照](${catalogPath})、[分类 dry run](${recipesPath})、[调度验收](${schedulerPath})、[S2-07 实际 CLI 计划](${planPath})、[S2-08 报告验收](${reportingPath})、[S2-09 baseline](${baselinePath})、[S2-09 pilot 清单](${pilotManifestPath})、[S2-09 pilot 结果](${pilotAcceptancePath})、[S2-10 baseline](${s210BaselinePath})、[S2-10 实现验证](${s210ImplementationPath})、[S2-10 smoke shard](${s210SmokePath})、[S2-10 正式 Linux shard](${s210LinuxFormalPath})、[S2-10 正式 Windows shard](${s210WindowsFormalPath})、[Windows 首次投影 attempt](${s210WindowsAttempt1Path})、[完整实施计划](docs/plans/2026-10-12-phase-2-full-catalog.md)。`,
+    `证据：[目录快照](${catalogPath})、[分类 dry run](${recipesPath})、[调度验收](${schedulerPath})、[S2-07 实际 CLI 计划](${planPath})、[S2-08 报告验收](${reportingPath})、[S2-09 baseline](${baselinePath})、[S2-09 pilot 清单](${pilotManifestPath})、[S2-09 pilot 结果](${pilotAcceptancePath})、[S2-10 baseline](${s210BaselinePath})、[S2-10 实现验证](${s210ImplementationPath})、[S2-10 smoke shard](${s210SmokePath})、[S2-10 正式 Linux shard 0](${s210LinuxFormalPath})、[S2-10 正式 Linux shard 1](${s210Linux1FormalPath})、[S2-10 正式 Linux shard 2](${s210Linux2FormalPath})、[S2-10 正式 Windows shard 0](${s210WindowsFormalPath})、[S2-10 正式 Windows shard 1](${s210Windows1FormalPath})、[Windows 首次投影 attempt](${s210WindowsAttempt1Path})、[S2-10 当前未闭合汇总](${s210InterimAggregatePath})、[完整实施计划](docs/plans/2026-10-12-phase-2-full-catalog.md)。`,
     phase2End,
   ].join('\n');
 }
