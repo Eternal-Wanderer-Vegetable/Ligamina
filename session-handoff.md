@@ -5,7 +5,7 @@
 - 日期：2026-10-12（Asia/Shanghai）。用户要求完成 `docs/plans/2026-10-12-phase-2-full-catalog.md` 的 S2-01–S2-12 并分阶段提交。
 - 分支：`codex/phase2-full-catalog`。仓库新增文档先提交 `2d6399a`；已提交 S2-01 `15f468d`、S2-02 `c0be568`、S2-04 `2fa06b0`、S2-03 `29bc1e5`、S2-05 `854b564`、S2-06 `4e555b3`、S2-07 `7523a83`、S2-08 `cbcbb0a`、S2-09 `20d8f04`；`299d22c` 是此前 S2-09 baseline/status checkpoint；S2-10 census checkpoints `8f21ead`、`4295831`、`25cf805`。
 - 当前：S2-09 pilot 已完成并提交。S2-10 / feat-012 正在进行；clean baseline 在 S2-09 HEAD `20d8f04db8c647da1f95336ca576966fccc15abb` 上通过。已实现可恢复 SQLite 六阶段 dispatcher、per-entry 证据、跨 shard/per-plugin 汇总及 Koishi `platform=all` artifact 映射；projection 修复后的 `Mode full` 退出码 0（lab 108，Windows Core smoke 4 events/4 Gateway ops/0 PIDs，bundle 通过），详见 `outputs/acceptance/phase2-s210-implementation-20261012.json`。
-- 断点：正式分母为 5,690 entries × 2 OS = 11,380 单元；10,332 locked profile 仅为候选。Linux shards 0–20/256 和 Windows shards 0–7/256 已闭合。当前临时聚合 600/11,380 单元、29/512 shard，缺 10,780 单元和 483 shard；Linux shard `8/256` 已在旧 install lease 到期后恢复闭合，Linux `21/256` 与 Windows `8/256` 正在运行。最新 docs 检查通过：18 文档、209 本地链接。初次不完整报告保留为 attempt1；行为 fixture 缺失、预算 provisional 和 App Control unknown 均保留；不绕过策略。
+- 断点：正式分母为 5,690 entries × 2 OS = 11,380 单元；10,332 locked profile 仅为候选。Linux shards 0–25/256 和 Windows shards 0–8/256 已闭合。当前临时聚合 724/11,380 单元、35/512 shard，缺 10,656 单元和 477 shard；Linux shard `8/256` 已在旧 install lease 到期后恢复闭合，Linux `26/256` 与 Windows `9/256` 正在运行。最新 docs 检查通过：18 文档、209 本地链接。初次不完整报告保留为 attempt1；行为 fixture 缺失、预算 provisional 和 App Control unknown 均保留；不绕过策略。
 
 ## Completed Stages
 
@@ -49,11 +49,11 @@
 
 ## Next: S2-10
 
-- The runner loops are active and restartable. Linux shards 0–20/256 and Windows shards 0–7/256 are closed. The interim aggregation records 600/11,380 units across 29/512 shards; 10,780 units and 483 shards remain. Linux `8/256` recovered after its stale install lease expired; attempt1 is preserved separately. Linux `21/256` and Windows `8/256` are running. Rerun these loops after interruption; they skip closed reports and resume existing queue runs:
+- The runner loops are active and restartable. Linux shards 0–25/256 and Windows shards 0–8/256 are closed. The interim aggregation records 724/11,380 units across 35/512 shards; 10,656 units and 477 shards remain. Linux `8/256` recovered after its stale install lease expired; attempt1 is preserved separately. Linux `26/256` and Windows `9/256` are running. Rerun these loops after interruption; they skip closed reports and resume existing queue runs:
   ```powershell
   powershell -NoProfile -File .work/catalog-census/run-remaining.ps1 -Platform linux -StartShard 8 -EndShard 8
-  powershell -NoProfile -File .work/catalog-census/run-remaining.ps1 -Platform linux -StartShard 21
-  powershell -NoProfile -File .work/catalog-census/run-remaining.ps1 -Platform windows -StartShard 8
+  powershell -NoProfile -File .work/catalog-census/run-remaining.ps1 -Platform linux -StartShard 26
+  powershell -NoProfile -File .work/catalog-census/run-remaining.ps1 -Platform windows -StartShard 9
   ```
 - Once all loops finish, aggregate all closed shard reports. Use basenames from `outputs/acceptance` so the 512 report arguments stay within the Windows command-line limit:
   ```powershell
