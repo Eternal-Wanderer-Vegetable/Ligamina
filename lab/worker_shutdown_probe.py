@@ -4,9 +4,9 @@ from __future__ import annotations
 
 import json
 import os
-import queue
 import shutil
 import subprocess
+import sys
 import tempfile
 import threading
 import time
@@ -15,6 +15,12 @@ from typing import Any
 
 
 ROOT = Path(__file__).resolve().parents[1]
+SCRIPT_DIR = Path(__file__).resolve().parent
+if sys.path and Path(sys.path[0]).resolve() == SCRIPT_DIR:
+    sys.path.pop(0)
+if str(ROOT) not in sys.path:
+    sys.path.insert(0, str(ROOT))
+import queue
 
 
 def read_lines(stream: Any, target: queue.Queue[str]) -> None:

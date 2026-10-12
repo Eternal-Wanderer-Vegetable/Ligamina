@@ -1,0 +1,91 @@
+{
+  "schema_version": 1,
+  "date": "2026-10-12",
+  "task_id": "S2-07",
+  "status": "completed",
+  "baseline_report": "outputs/acceptance/phase2-s207-baseline-20261012.json",
+  "implementation": {
+    "scheduler": "lab/catalog_run.py",
+    "durable_queue": "lab/queue.py",
+    "cli": "lab/run.py --suite catalog",
+    "stages": [
+      "prepare",
+      "install",
+      "native",
+      "federated",
+      "compare",
+      "cleanup"
+    ],
+    "queue_properties": [
+      "SQLite WAL with synchronous FULL",
+      "atomic concurrent claims and expiring leases",
+      "append-only run, job, and attempt journal",
+      "stable result IDs and idempotent enqueue",
+      "unknown worker-loss attempts retained before retry",
+      "dependency failures skip downstream jobs while cleanup remains runnable",
+      "stable disjoint shard partitioning",
+      "frozen snapshot, artifact-lock, and profile-lock hashes pinned in each run manifest"
+    ]
+  },
+  "catalog": {
+    "snapshot_id": "p2-41649744e057d61031d5",
+    "entry_count": 5690,
+    "windows_units": 5690,
+    "linux_units": 5690,
+    "total_entry_platform_units": 11380,
+    "preflight": "Each run checks raw source lengths and SHA-256, derived snapshot identity, provenance catalog/changes hashes, entry ID uniqueness and denominator, and artifact/profile lock cross-links. Full raw-to-normalized verification remains in the S2-01 snapshot acceptance evidence."
+  },
+  "verification": {
+    "focused_tests": {
+      "command": "uv run --locked --project lab --python 3.12.14 python -m unittest lab.tests.test_queue lab.tests.test_catalog_run -v",
+      "status": "passed",
+      "tests": 16,
+      "coverage": [
+        "interruption and restart at all six stages",
+        "expired lease becomes an unknown attempt before a bounded retry",
+        "attempt artifact references remain attached to historical attempts",
+        "final unknown is not retried",
+        "atomic concurrent claim",
+        "idempotent dispatch and conflicting manifest rejection",
+        "disjoint complete shard partition",
+        "dependency ordering and cleanup after failure",
+        "same run identity cannot reuse changed profile-lock inputs"
+      ]
+    },
+    "full_repository": {
+      "command": "pwsh -NoProfile -File init.ps1 -Mode full",
+      "exit_code": 0,
+      "documentation": {"status": "passed", "documents": 18, "local_links": 156},
+      "nonebot_pytest": {"status": "passed", "tests": 3},
+      "lab_unittest": {"status": "passed", "tests": 76},
+      "koishi_tests": {"status": "passed", "tests": 7},
+      "koishi_mcp_tests": {"status": "passed", "tests": 1},
+      "reference_client_tests": {"status": "passed", "tests": 5},
+      "rust_workspace_tests": {"status": "passed", "tests": 29},
+      "windows_core_smoke": {"status": "passed", "events": 4, "gateway_operations": 4, "remaining_pids": []},
+      "windows_bundle_stage": {"status": "passed"},
+      "generated_ci_smoke_report_restored": true
+    },
+    "real_snapshot_cli_plan": {
+      "plan_report": "outputs/acceptance/phase2-s207-cli-smoke-20261012.json",
+      "resume_report": "outputs/acceptance/phase2-s207-cli-resume-20261012.json",
+      "manifest_sha256": "ecafd5b6f1d7fbcf4e62619d0aba28bc022d6b53c5c9d8d166af8859ac5fbae7",
+      "shard": "288/1000",
+      "selected_linux_units": 3,
+      "stage_jobs": 18,
+      "initial_state": "queued",
+      "resumed_state": "running",
+      "jobs_after_resume": {"queued": 18, "leased": 0, "passed": 0, "failed": 0, "skipped": 0, "unknown": 0},
+      "execution_started": false
+    },
+    "diff_check": "passed"
+  },
+  "limitations": [
+    "The CLI creates and resumes durable plans; it does not dispatch catalog plugin workers in S2-07. Stage recovery tests use simulated stage results and do not claim plugin execution.",
+    "The real snapshot smoke planned three Linux units only; no full-catalog census or cache materialization was run.",
+    "5,621 of 5,690 entries still have no conservative recipe category suggestion and remain explicit missing-fixture/unmapped ledger cases.",
+    "The Windows Sandbox CPython launch blocker recorded in S2-05 remains a prerequisite for the S2-09 Windows pilot.",
+    "No real platform login, send, or delivery acceptance was performed."
+  ],
+  "next": "S2-08 unified report output and README generation"
+}

@@ -7,7 +7,6 @@ import hashlib
 import json
 import os
 import platform
-import queue
 import re
 import shutil
 import signal
@@ -26,6 +25,11 @@ from typing import Any
 
 
 ROOT = Path(__file__).resolve().parents[1]
+SCRIPT_DIR = Path(__file__).resolve().parent
+if sys.path and Path(sys.path[0]).resolve() == SCRIPT_DIR:
+    sys.path.pop(0)
+import queue
+
 HOST_VERSIONS = {
     "nonebot": {"nonebot2[fastapi]": "2.5.0", "nonebot-adapter-onebot": "2.4.6", "jsonschema": "4.25.1"},
     "koishi": {"@koishijs/core": "4.18.11", "@minatojs/driver-sqlite": "4.7.0"},
