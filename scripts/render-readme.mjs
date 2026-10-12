@@ -78,9 +78,10 @@ export async function phase2Block() {
   const recipesPath = 'outputs/acceptance/phase2-s206-20261012.json';
   const schedulerPath = 'outputs/acceptance/phase2-s207-20261012.json';
   const reportingPath = 'outputs/acceptance/phase2-s208-20261012.json';
+  const baselinePath = 'outputs/acceptance/phase2-s209-baseline-20261012.json';
   const planPath = 'outputs/acceptance/phase2-s207-cli-smoke-20261012.json';
-  const [catalog, recipes, scheduler, reporting, plan] = await Promise.all(
-    [catalogPath, recipesPath, schedulerPath, reportingPath, planPath].map(load),
+  const [catalog, recipes, scheduler, reporting, baseline, plan] = await Promise.all(
+    [catalogPath, recipesPath, schedulerPath, reportingPath, baselinePath, planPath].map(load),
   );
   for (const [relative, expected] of Object.entries(reporting.input_reports ?? {})) {
     const actual = createHash('sha256').update(await readFile(path.join(root, relative))).digest('hex');
@@ -115,16 +116,21 @@ export async function phase2Block() {
       || reporting.catalog_execution_started !== false) {
     throw new Error(`Invalid reporting acceptance report: ${reportingPath}`);
   }
+  if (baseline.task_id !== 'S2-09' || baseline.status !== 'baseline_completed'
+      || baseline.exit_code !== 0 || baseline.implementation_changes_present !== false
+      || !baseline.repository_head.startsWith('cbcbb0a')) {
+    throw new Error(`Invalid S2-09 baseline report: ${baselinePath}`);
+  }
 
   return [
     phase2Start,
-    `状态截至 ${escape(reporting.date)}：${reportingComplete ? 'S2-01–S2-08 已完成；当前进入 **S2-09 双平台 pilot**。' : 'S2-01–S2-07 已完成；S2-08 正在进行最终验收。'} 冻结快照 \`${escape(catalog.snapshot_id)}\` 含 **${count.toLocaleString('en-US')} entries**（NoneBot 943、Koishi 4,747；官方维护子集 ${official}）。`,
+    `状态截至 ${escape(reporting.date)}：${reportingComplete ? 'S2-01–S2-08 已完成；S2-09 双平台 pilot 正在进行（实施前 baseline 已通过，插件尚未派发）。' : 'S2-01–S2-07 已完成；S2-08 正在进行最终验收。'} 冻结快照 \`${escape(catalog.snapshot_id)}\` 含 **${count.toLocaleString('en-US')} entries**（NoneBot 943、Koishi 4,747；官方维护子集 ${official}）。`,
     '',
     '| 任务 | 状态 |',
     '| --- | --- |',
     ...[
       ...(reportingComplete ? [['S2-01–S2-08', '已完成并分别保存验收证据']] : [['S2-01–S2-07', '已完成并分别保存验收证据'], ['S2-08', '最终验收进行中']]),
-      ['S2-09', reportingComplete ? 'pilot 前置验收完成后启动；插件执行尚未启动' : '等待 S2-08 验收完成'],
+      ['S2-09', reportingComplete ? '进行中：baseline 通过；pilot 尚未派发' : '等待 S2-08 验收完成'],
       ['S2-10', '未开始：全快照 census 尚未启动'],
       ['S2-11–S2-12', '未开始'],
     ].map(([task, status]) => `| ${task} | ${status} |`),
@@ -133,7 +139,7 @@ export async function phase2Block() {
     '',
     'Windows Sandbox 的 CPython 启动仍受 App Control（Win32 4551）阻止；Windows 插件 pilot 需要先解决该运行前置。S2-05 的四个历史精确版本回归不外推到目录全集；真实平台登录、发送与投递验收未执行。',
     '',
-    `证据：[目录快照](${catalogPath})、[分类 dry run](${recipesPath})、[调度验收](${schedulerPath})、[S2-07 实际 CLI 计划](${planPath})、[S2-08 报告验收](${reportingPath})、[完整实施计划](docs/plans/2026-10-12-phase-2-full-catalog.md)。`,
+    `证据：[目录快照](${catalogPath})、[分类 dry run](${recipesPath})、[调度验收](${schedulerPath})、[S2-07 实际 CLI 计划](${planPath})、[S2-08 报告验收](${reportingPath})、[S2-09 baseline](${baselinePath})、[完整实施计划](docs/plans/2026-10-12-phase-2-full-catalog.md)。`,
     phase2End,
   ].join('\n');
 }

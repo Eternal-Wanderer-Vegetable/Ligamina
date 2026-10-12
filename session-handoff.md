@@ -3,9 +3,9 @@
 ## Current Objective
 
 - 日期：2026-10-12（Asia/Shanghai）。用户要求完成 `docs/plans/2026-10-12-phase-2-full-catalog.md` 的 S2-01–S2-12 并分阶段提交。
-- 分支：`codex/phase2-full-catalog`。仓库新增文档先提交 `2d6399a`；已完成 S2-01 `15f468d`、S2-02 `c0be568`、S2-04 `2fa06b0`、S2-03 `29bc1e5`、S2-05 `854b564`、S2-06 `4e555b3`、S2-07 `7523a83`。
-- 当前：S2-08 / feat-010 已实现并通过验收；状态、报告、README 和验证证据已同步，等待本阶段提交。实施前 baseline 在干净 HEAD `16fdf63` 上通过 `pwsh -NoProfile -File init.ps1 -Mode full`，见 `outputs/acceptance/phase2-s208-baseline-20261012.json`。
-- 下一任务：提交 S2-08 后，在新干净 HEAD 运行 S2-09 baseline，再开始双平台分层 pilot。状态唯一入口：[feature_list.json](feature_list.json)。
+- 分支：`codex/phase2-full-catalog`。仓库新增文档先提交 `2d6399a`；已完成 S2-01 `15f468d`、S2-02 `c0be568`、S2-04 `2fa06b0`、S2-03 `29bc1e5`、S2-05 `854b564`、S2-06 `4e555b3`、S2-07 `7523a83`、S2-08 `cbcbb0a`。
+- 当前：S2-09 / feat-011 正在进行。实施前 baseline 在干净 HEAD `cbcbb0a2639bcf9c524847c8778bc87b36b80813` 上通过 `pwsh -NoProfile -File init.ps1 -Mode full`，见 `outputs/acceptance/phase2-s209-baseline-20261012.json`。未生成/运行 pilot，未派发 catalog plugin Worker。
+- 下一任务：提交 S2-09 baseline 和状态更新；检查 worker dispatch 接口及资源预算，形成至少每生态 30 项 + 4 个既有支持版本的分层 pilot manifest，再处理 Linux/Windows 运行和恢复验收。状态唯一入口：[feature_list.json](feature_list.json)。
 
 ## Completed Stages
 
@@ -33,8 +33,8 @@
 
 ## Next: S2-09
 
-- After committing S2-08, run `pwsh -NoProfile -File init.ps1 -Mode full` on the clean committed head and save the S2-09 pre-implementation baseline.
-- Then build the stratified pilot manifest, at least 30 entries per ecosystem plus the four legacy supported versions, and assess Windows and Linux readiness, failure/recovery behavior, and measured resource budgets.
-- Windows Sandbox CPython startup is still blocked by App Control (Win32 4551); record it and keep the Windows denominator visible without bypassing host policy.
-- S2-07 only persisted/planned queue work; no catalog plugin worker was dispatched. 5,621 entries still lack conservative recipe category suggestions. Do not claim a census, plugin-wide compatibility, real-platform delivery, or completion of the first-stage 24-hour experiment.
+- S2-09 baseline is complete on clean commit `cbcbb0a`; see `outputs/acceptance/phase2-s209-baseline-20261012.json`.
+- Build and lock the stratified pilot manifest, at least 30 entries per ecosystem plus the four legacy supported versions. Inspect worker dispatch, OS-specific profile readiness, failure/recovery, and resource budget before execution.
+- Windows Sandbox CPython startup is blocked by App Control (Win32 4551); retain Windows cohort denominator and do not bypass host policy.
+- S2-07 currently persists/plans queue work but has no catalog plugin worker dispatch. 5,621 entries lack conservative recipe category suggestions. Do not claim a census, plugin-wide compatibility, real-platform delivery, or completion of the first-stage 24-hour experiment.
 - S2-03's 30 sdist build-only entries may only run inside the accepted OS Worker.

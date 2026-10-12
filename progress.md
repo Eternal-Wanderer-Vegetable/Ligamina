@@ -4,10 +4,10 @@
 
 - **Last Updated:** 2026-10-12（Asia/Shanghai）。
 - **Current Objective:** 按 S2-01–S2-12 顺序完成第二阶段目录全量实验能力并分阶段提交。
-- **Active Feature:** 当前无实施中 feature；S2-08 / feat-010 已验收，下一步先在提交后的干净 HEAD 记录 S2-09 baseline，再开始 pilot。
-- **Completed stage commits:** H01 `2d6399a`、S2-01 `15f468d`、S2-02 `c0be568`、S2-04 `2fa06b0`、S2-03 `29bc1e5`、S2-05 `854b564`、S2-06 `4e555b3`、S2-07 `7523a83`。
+- **Active Feature:** S2-09 / feat-011；S2-08 / feat-010 已验收并提交 `cbcbb0a`；S2-09 baseline 已在此干净提交上完成。
+- **Completed stage commits:** H01 `2d6399a`、S2-01 `15f468d`、S2-02 `c0be568`、S2-04 `2fa06b0`、S2-03 `29bc1e5`、S2-05 `854b564`、S2-06 `4e555b3`、S2-07 `7523a83`、S2-08 `cbcbb0a`。
 - 第一阶段 T01–T18、C01–C15、G1/G2 以 [T18 报告](outputs/acceptance/t18-final-audit-20261012.json) 为准；四个精确插件版本和虚拟 Gateway，真实平台收发未验证。
-- 第二阶段 S2-01–S2-08 完成；S2-09–S2-12 尚未完成，状态见 [feature_list.json](feature_list.json)。
+- 第二阶段 S2-01–S2-08 完成；S2-09 正在进行，S2-10–S2-12 尚未完成，状态见 [feature_list.json](feature_list.json)。
 
 ## What's Done
 
@@ -51,9 +51,14 @@
 - 全仓库 `pwsh -NoProfile -File init.ps1 -Mode full` 退出码 0：docs 18/161；NoneBot 3、lab 85、Koishi 7、MCP 1、reference 5、Rust workspace 33；Windows Core smoke 4 events / 4 gateway ops / 0 PID，bundle stage 通过。生成的 `outputs/acceptance/ci-smoke-windows.json` 已恢复；完整结果见 [S2-08 acceptance](outputs/acceptance/phase2-s208-20261012.json)。
 - 没有派发第三方插件。S2-07 实际队列仍为 18 queued；5,621 个 entry 缺少保守 recipe 分类建议。Windows Sandbox CPython 启动受 App Control（Win32 4551）阻止；真实平台登录/投递未验证。
 
+## S2-09 Baseline
+
+- 在提交 `cbcbb0a2639bcf9c524847c8778bc87b36b80813` 的干净工作树上运行 `pwsh -NoProfile -File init.ps1 -Mode full`，退出码 0：docs 18/162、NoneBot 3、lab 85、Koishi 7、MCP 1、reference 5、Rust 33；Windows Core smoke 4 events / 4 gateway ops / 0 PID，bundle stage 通过。见 [S2-09 baseline](outputs/acceptance/phase2-s209-baseline-20261012.json)。生成的 `ci-smoke-windows.json` 已恢复。
+- 这是实施前基线；没有生成或运行 pilot 清单，也没有派发 catalog plugin Worker。
+
 ## Next / Blockers
 
-- 下一步是先提交 S2-08 完整阶段，然后在干净 HEAD 运行 S2-09 baseline。pilot 分层仍需保留 5,690 × 2 OS 账本；Windows Sandbox CPython 前置阻止应明确记录，不绕过本机策略。
+- S2-09 当前需要形成分层 pilot 清单并接通 catalog Worker dispatch；先核对 Linux/Windows 运行路径、失败/恢复语义和资源预算，再按每生态至少 30 entries 加四个旧支持版本执行。pilot 分层仍需保留 5,690 × 2 OS 账本。
 - S2-06 recipes 仍是声明式定义和比较合同；S2-07 目前持久化计划和调度状态，未连接插件 worker 执行。5,621 个冻结 entry 尚无保守行为分类建议，必须在后续台账中显式列账。
 - Windows Sandbox 的 CPython 启动阻止仍是 Windows pilot 前置障碍；不绕过本机策略。S2-09 保留 blocker 和完整 Windows 分母。
 - S2-03 的 30 个 sdist build-only 条目只能在 OS 隔离 Worker 构建；全量 census、问题归因和真实平台验收尚未执行。

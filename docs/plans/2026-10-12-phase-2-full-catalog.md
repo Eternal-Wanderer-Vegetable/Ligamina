@@ -15,7 +15,7 @@
 - S2-07 已完成并提交 `7523a83`：持久 catalog stage queue、六阶段依赖图、租约/attempt journal、分片与 resume 已验收；报告见 [S2-07](../../outputs/acceptance/phase2-s207-20261012.json)。CLI 在真实冻结快照上计划 3 个 Linux 单元共 18 个作业，并从相同 manifest 恢复；未派发插件 Worker。
 - S2-08 实施前基线已在干净提交 `16fdf63` 上完成（[S2-08 baseline](../../outputs/acceptance/phase2-s208-baseline-20261012.json)），全仓库 `init.ps1 -Mode full` 退出码 0。
 - S2-08 已完成：Python/Rust CLI 接入 schema 校验、summary 重算、JSON/text/NDJSON、矩阵与 gate 退出码；README 双阶段区域由带哈希校验的验收输入生成。报告、测试与全仓库结果见 [S2-08 acceptance](../../outputs/acceptance/phase2-s208-20261012.json)。没有派发 catalog 插件。
-- 下一步为 S2-09 实施前 baseline；S2-09 pilot 尚未启动。Windows Sandbox CPython App Control（Win32 4551）阻塞仍需记录并处理；未验证前不声明 Windows 插件行为结果。
+- S2-09 实施前 baseline 已在干净提交 `cbcbb0a` 上通过 `pwsh -NoProfile -File init.ps1 -Mode full`（[S2-09 baseline](../../outputs/acceptance/phase2-s209-baseline-20261012.json)）。pilot 尚未启动；Windows Sandbox CPython App Control（Win32 4551）阻塞与缺少 catalog dispatch path 均需在范围内处理或明确终态。
 
 ## 1. 范围与全量定义
 

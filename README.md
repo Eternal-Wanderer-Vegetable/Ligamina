@@ -74,12 +74,12 @@ status/doctor 只接受 loopback HTTP 地址。凭证来自环境或私人配置
 以下第二阶段摘要由冻结目录、分类 dry run、调度和报告验收记录生成。目录收录、加载成功和行为兼容分别记账；完整支持声明只按已验证的精确范围给出。
 
 <!-- ligamina:phase2:start -->
-状态截至 2026-10-12：S2-01–S2-08 已完成；当前进入 **S2-09 双平台 pilot**。 冻结快照 `p2-41649744e057d61031d5` 含 **5,690 entries**（NoneBot 943、Koishi 4,747；官方维护子集 55）。
+状态截至 2026-10-12：S2-01–S2-08 已完成；S2-09 双平台 pilot 正在进行（实施前 baseline 已通过，插件尚未派发）。 冻结快照 `p2-41649744e057d61031d5` 含 **5,690 entries**（NoneBot 943、Koishi 4,747；官方维护子集 55）。
 
 | 任务 | 状态 |
 | --- | --- |
 | S2-01–S2-08 | 已完成并分别保存验收证据 |
-| S2-09 | pilot 前置验收完成后启动；插件执行尚未启动 |
+| S2-09 | 进行中：baseline 通过；pilot 尚未派发 |
 | S2-10 | 未开始：全快照 census 尚未启动 |
 | S2-11–S2-12 | 未开始 |
 
@@ -87,7 +87,7 @@ status/doctor 只接受 loopback HTTP 地址。凭证来自环境或私人配置
 
 Windows Sandbox 的 CPython 启动仍受 App Control（Win32 4551）阻止；Windows 插件 pilot 需要先解决该运行前置。S2-05 的四个历史精确版本回归不外推到目录全集；真实平台登录、发送与投递验收未执行。
 
-证据：[目录快照](outputs/acceptance/phase2-catalog-snapshot-20261012.json)、[分类 dry run](outputs/acceptance/phase2-s206-20261012.json)、[调度验收](outputs/acceptance/phase2-s207-20261012.json)、[S2-07 实际 CLI 计划](outputs/acceptance/phase2-s207-cli-smoke-20261012.json)、[S2-08 报告验收](outputs/acceptance/phase2-s208-20261012.json)、[完整实施计划](docs/plans/2026-10-12-phase-2-full-catalog.md)。
+证据：[目录快照](outputs/acceptance/phase2-catalog-snapshot-20261012.json)、[分类 dry run](outputs/acceptance/phase2-s206-20261012.json)、[调度验收](outputs/acceptance/phase2-s207-20261012.json)、[S2-07 实际 CLI 计划](outputs/acceptance/phase2-s207-cli-smoke-20261012.json)、[S2-08 报告验收](outputs/acceptance/phase2-s208-20261012.json)、[S2-09 baseline](outputs/acceptance/phase2-s209-baseline-20261012.json)、[完整实施计划](docs/plans/2026-10-12-phase-2-full-catalog.md)。
 <!-- ligamina:phase2:end -->
 
 状态见 [功能清单](feature_list.json)、[当前进展](progress.md) 和 [会话交接](session-handoff.md)。
