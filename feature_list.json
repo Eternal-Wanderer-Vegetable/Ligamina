@@ -1,8 +1,8 @@
 {
   "schema_version": 1,
   "updated_at": "2026-10-12",
-  "active_feature": "feat-011",
-  "next_feature": "feat-012",
+  "active_feature": "feat-012",
+  "next_feature": "feat-013",
   "features": [
     {
       "id": "feat-001",
@@ -213,11 +213,26 @@
         "feat-009",
         "feat-010"
       ],
-      "status": "in-progress",
+      "status": "done",
       "done_when": "Windows/Linux pilot 终态闭合；负例/恢复通过，预算与预估有实测。",
-      "evidence": "S2-09 clean pre-implementation baseline completed on S2-08 commit cbcbb0a via pwsh -NoProfile -File init.ps1 -Mode full (exit 0): docs 18/162; NoneBot 3, lab 85, Koishi 7, MCP 1, reference 5, Rust 33; Windows Core smoke 4 events / 4 gateway operations / 0 PIDs; bundle passed. No pilot manifest or catalog plugin worker ran. The Windows Sandbox CPython App Control blocker (Win32 4551) and absent catalog dispatch path remain explicit S2-09 prerequisites.",
+      "evidence": "S2-09 baseline completed on clean S2-08 commit cbcbb0a with full validation exit 0. A deterministic 30-per-ecosystem cohort plus four exact historical support versions closes a 11,380-row catalog-entry×OS assignment ledger and 128 pilot result positions as 4 passed, 11 failed, 88 skipped, and 25 unknown. All four Linux legacy Native/Federated/oracle pairs pass. NoneBot Linux and Koishi Linux/Windows each close 30 selected entries; 21/22/22 workers respectively install and clean up. NoneBot Linux observed three frozen htmlrender API import failures and corrected two missing config/credential outcomes to skipped. Koishi recorded four native-load failures on each OS. One Windows cleanup unknown was retried successfully and the final full-cohort run closes cleanly. Negative Worker probes and S2-07 plus catalog checkpoint/worker-lost recovery checks pass. Measured resource distributions include NoneBot Linux downloads/RSS/scratch, Koishi Linux RSS/scratch, and Koishi Windows Job Object peak commit/scratch. The S2-09 pilot execution is complete; the higher automation/behavior gates remain pending: 23 NoneBot Windows rows are unknown because App Control Win32 4551 blocks CPython, two legacy Windows rows remain unknown, and entry-bound behavior fixtures were not dispatched. The resource budget remains provisional for those unmeasured Windows NoneBot and full-census workloads.",
       "evidence_paths": [
-        "outputs/acceptance/phase2-s209-baseline-20261012.json"
+        "outputs/acceptance/phase2-s209-baseline-20261012.json",
+        "outputs/acceptance/phase2-s209-pilot-manifest-20261012.json",
+        "outputs/acceptance/phase2-s209-20261012.json",
+        "outputs/acceptance/phase2-s209-nonebot-linux-pilot-20261012.json",
+        "outputs/acceptance/phase2-s209-koishi-linux-pilot-20261012.json",
+        "outputs/acceptance/phase2-s209-koishi-windows-pilot-20261012.json",
+        "outputs/acceptance/phase2-s209-failure-review-20261012.json",
+        "outputs/acceptance/phase2-s209-koishi-linux-pilot-attempt3-20261012.json",
+        "outputs/acceptance/phase2-s209-koishi-windows-pilot-attempt4-20261012.json",
+        "outputs/acceptance/phase2-s209-legacy-linux-20261012.json",
+        "outputs/acceptance/phase2-s209-legacy-linux-attempt1-20261012.json",
+        "outputs/acceptance/phase2-workers-linux-20261012.json",
+        "outputs/acceptance/phase2-workers-windows-20261012.json",
+        "outputs/acceptance/phase2-s207-20261012.json",
+        "config/lab/phase2-pilot-budget-v1.json",
+        "lab/pilot.py"
       ]
     },
     {
@@ -228,10 +243,14 @@
       "dependencies": [
         "feat-011"
       ],
-      "status": "not-started",
+      "status": "in-progress",
       "done_when": "P2-CENSUS 通过；未调度和漏项为零，按政策推进全部可达 stage。",
-      "evidence": "",
-      "evidence_paths": []
+      "evidence": "Started after S2-09 pilot execution closed. The 5,690-entry snapshot, full entry×OS denominator, locked artifacts/profiles, and provisional measured pilot budget are available. S2-10 clean baseline and census dispatch have not yet run.",
+      "evidence_paths": [
+        "outputs/acceptance/phase2-s209-20261012.json",
+        "outputs/acceptance/phase2-s209-pilot-manifest-20261012.json",
+        "config/lab/phase2-pilot-budget-v1.json"
+      ]
     },
     {
       "id": "feat-013",

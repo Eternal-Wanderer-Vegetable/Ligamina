@@ -138,6 +138,19 @@ class DockerWorker:
         for thread in threads:
             thread.start()
 
+        stats_stop = threading.Event()
+        peak_memory: list[int | None] = [None]
+
+        def sample_memory() -> None:
+            while not stats_stop.is_set():
+                usage = self._container_memory_bytes(worker_id)
+                if usage is not None:
+                    peak_memory[0] = max(peak_memory[0] or 0, usage)
+                stats_stop.wait(0.25)
+
+        stats_thread = threading.Thread(target=sample_memory, daemon=True)
+        stats_thread.start()
+
         timed_out = False
         output_overflow = False
         launch_error = False
@@ -180,6 +193,8 @@ class DockerWorker:
 
         if timed_out or exit_code != 0:
             self._docker_cleanup("kill", worker_id)
+        stats_stop.set()
+        stats_thread.join(timeout=3)
         self._docker_cleanup("rm", "--force", worker_id)
         cleanup_confirmed = self._container_gone(worker_id)
         for thread in threads:
@@ -219,6 +234,7 @@ class DockerWorker:
             output_truncated=truncated,
             cleanup_confirmed=cleanup_confirmed,
             worker_id=worker_id,
+            peak_memory_bytes=peak_memory[0],
         )
 
     @staticmethod
@@ -294,6 +310,46 @@ class DockerWorker:
         if output == "false":
             return False
         return None
+
+    def _container_memory_bytes(self, worker_id: str) -> int | None:
+        try:
+            result = subprocess.run(
+                [self.docker, "stats", "--no-stream", "--format", "{{.MemUsage}}", worker_id],
+                stdin=subprocess.DEVNULL,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.DEVNULL,
+                timeout=2,
+                check=False,
+                creationflags=getattr(subprocess, "CREATE_NO_WINDOW", 0),
+                env={
+                    "PATH": os.environ.get("PATH", ""),
+                    "SYSTEMDRIVE": os.environ.get("SYSTEMDRIVE", ""),
+                    "SYSTEMROOT": os.environ.get("SYSTEMROOT", ""),
+                    "WINDIR": os.environ.get("WINDIR", ""),
+                },
+            )
+        except (OSError, subprocess.TimeoutExpired):
+            return None
+        if result.returncode != 0:
+            return None
+        text = result.stdout.decode("utf-8", errors="replace").strip().split("/", 1)[0].strip()
+        match = re.fullmatch(r"([0-9]+(?:\.[0-9]+)?)\s*([kmgt]?i?b)", text, re.IGNORECASE)
+        if not match:
+            return None
+        value = float(match.group(1))
+        unit = match.group(2).casefold()
+        scale = {
+            "b": 1,
+            "kb": 1000,
+            "kib": 1024,
+            "mb": 1000**2,
+            "mib": 1024**2,
+            "gb": 1000**3,
+            "gib": 1024**3,
+            "tb": 1000**4,
+            "tib": 1024**4,
+        }[unit]
+        return int(value * scale)
 
     def _docker_cleanup(self, *arguments: str) -> None:
         try:

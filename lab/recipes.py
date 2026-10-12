@@ -8,9 +8,6 @@ import re
 from pathlib import Path
 from typing import Any
 
-from jsonschema import Draft202012Validator
-
-
 ROOT = Path(__file__).resolve().parents[1]
 RECIPE_ROOT = ROOT / "recipes"
 RECIPE_SCHEMA = ROOT / "contracts/lab/v1/recipe.schema.json"
@@ -59,6 +56,8 @@ def _read_json(path: Path) -> dict[str, Any]:
 
 def validate_recipe_catalog(root: Path = RECIPE_ROOT) -> dict[str, Any]:
     """Validate both ecosystem catalogs and require one recipe per probe category."""
+    from jsonschema import Draft202012Validator
+
     schema = _read_json(RECIPE_SCHEMA)
     Draft202012Validator.check_schema(schema)
     validator = Draft202012Validator(schema)

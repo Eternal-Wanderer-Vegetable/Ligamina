@@ -31,6 +31,7 @@ NATIVE_FILES = (
     "compare.py",
     "native_runner.py",
     "representative.py",
+    "recipes.py",
 )
 
 
@@ -186,6 +187,10 @@ exec python lab/baselines/paired_worker.py --payload sample/payload.json --timeo
         (project / "sample/.env.prod").write_text("\n".join(dotenv) + "\n", encoding="utf-8")
 
 
+def _tree_size_bytes(root: Path) -> int:
+    return sum(path.stat().st_size for path in root.rglob("*") if path.is_file() and not path.is_symlink())
+
+
 def _provision_linux_profile(sample: dict[str, Any], work: Path, images: dict[str, Any]) -> dict[str, Any]:
     docker = shutil.which("docker") or shutil.which("docker.exe")
     if not docker:
@@ -303,6 +308,7 @@ def _run_sample(
     project = input_dir / "project"
     payload = _prepare_payload(sample, fixture, entry, sample_work / "artifact.bin", sample_work)
     _prepare_project(project, sample_work, payload, ecosystem=sample["ecosystem"], runtime_assets=runtime_assets)
+    worker_input_bytes = _tree_size_bytes(input_dir)
 
     worker = DockerWorker(image_digest=images["worker_image"], repository_root=ROOT)
     limits = WorkerLimits(
@@ -348,15 +354,36 @@ def _run_sample(
             "stdout_sha256": result.stdout_sha256,
             "stderr_sha256": result.stderr_sha256,
             "output_truncated": result.output_truncated,
+            "peak_memory_bytes": result.peak_memory_bytes,
             "stderr_tail": result.stderr.decode("utf-8", errors="replace")[-4000:],
+        },
+        "resource_observations": {
+            "worker_input_bytes": worker_input_bytes,
+            "plugin_artifact_bytes": artifact.stat().st_size,
+            "peak_worker_memory_bytes": result.peak_memory_bytes,
+            "worker_elapsed_seconds": round(result.elapsed_seconds, 3),
+            "memory_measurement": "sampled from Docker stats every 250ms; null means no sample was captured",
         },
         "parse_error": parse_error,
         "pair": paired,
     }
 
 
-def run(sample_ids: set[str] | None = None) -> dict[str, Any]:
-    report = json.loads(REPORT_PATH.read_text(encoding="utf-8"))
+def run(sample_ids: set[str] | None = None, report_path: Path = REPORT_PATH) -> dict[str, Any]:
+    report_path = Path(report_path).expanduser().absolute()
+    source_report_bytes = REPORT_PATH.read_bytes()
+    source_report = json.loads(source_report_bytes.decode("utf-8"))
+    if report_path.resolve() == REPORT_PATH.resolve():
+        report = source_report
+    else:
+        report = {
+            "schema_version": 1,
+            "task_id": "S2-09",
+            "kind": "phase2_s209_legacy_support_regression",
+            "status": "in-progress",
+            "source_s205_report": "outputs/acceptance/phase2-s205-20261012.json",
+            "source_s205_report_sha256": hashlib.sha256(source_report_bytes).hexdigest(),
+        }
     manifest_path = ROOT / "samples/third-party.lock.json"
     selected_sample_ids = sample_ids or _supported_sample_ids(manifest_path)
     manifest, samples = validate_manifest(manifest_path, selected_sample_ids)
@@ -369,7 +396,11 @@ def run(sample_ids: set[str] | None = None) -> dict[str, Any]:
         raise ValueError("all four previously supported sample versions are required")
     images = _runtime_images()
 
-    existing = {item["sample_id"]: item for item in report.get("implementation", {}).get("samples", [])}
+    existing = (
+        {item["sample_id"]: item for item in report.get("implementation", {}).get("samples", [])}
+        if report_path.resolve() == REPORT_PATH.resolve()
+        else {}
+    )
     with tempfile.TemporaryDirectory(prefix="ligamina-s205-") as directory:
         temp_root = Path(directory)
         runtime_assets = temp_root / "runtime-assets"
@@ -424,29 +455,33 @@ def run(sample_ids: set[str] | None = None) -> dict[str, Any]:
                     "lab/baselines/federated.py",
                     "lab/baselines/paired_worker.py",
                     "lab/native_runner.py",
+                    "lab/recipes.py",
                 ],
                 "samples": results,
             }
             report["status"] = "in-progress"
-            REPORT_PATH.write_text(json.dumps(report, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+            report_path.parent.mkdir(parents=True, exist_ok=True)
+            report_path.write_text(json.dumps(report, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
     report["implementation"]["samples"] = results
     report["status"] = "completed" if len(results) == 4 and all(item.get("status") == "passed" for item in results) else "in-progress"
-    REPORT_PATH.write_text(json.dumps(report, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+    report_path.parent.mkdir(parents=True, exist_ok=True)
+    report_path.write_text(json.dumps(report, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
     return report
 
 
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--sample-id", action="append", default=[])
+    parser.add_argument("--report", type=Path, default=REPORT_PATH)
     options = parser.parse_args()
-    report = run(set(options.sample_id) or None)
+    report = run(set(options.sample_id) or None, options.report)
     print(json.dumps({
         "status": report["status"],
         "samples": [
         {"sample_id": item["sample_id"], "status": item["status"], "comparison": (item.get("pair") or {}).get("comparison", {}).get("status")}
             for item in report.get("implementation", {}).get("samples", [])
         ],
-        "report": str(REPORT_PATH),
+        "report": str(options.report.expanduser().absolute()),
     }, ensure_ascii=False))
     return 0 if report["status"] == "completed" else 1
 

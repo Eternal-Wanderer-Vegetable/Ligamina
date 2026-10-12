@@ -57,7 +57,7 @@ target\debug\ligamina-cli.exe report outputs/acceptance/t13-representative-windo
 
 ## 记录验证
 
-记录命令、退出码、环境、commit/dirty 和证据路径。区分本机测试、托管 CI、干净安装与真实平台验收。全量 catalog 入口仍待第二阶段实现，现阶段使用 [固定样本实验](compatibility.md)。
+记录命令、退出码、环境、commit/dirty 和证据路径。区分本机测试、托管 CI、干净安装与真实平台验收。S2-09 已对 NoneBot Linux 与 Koishi Linux/Windows 的分层 cohort 接通隔离安装和 native-load pilot；行为 fixture 尚未派发，Windows NoneBot 受 App Control 限制而保持 unknown。重建 acceptance 时需传入完整的 NoneBot/Koishi/Linux/Windows 三份平台报告，命令见[兼容性指南](compatibility.md#s2-09-分层-pilot进行中)。
 
 S2-04 双平台运行时探针可复跑：`uv run --locked --project hosts/nonebot --python 3.12.14 python deploy/lab/linux/probes/acceptance.py` 与 `uv run --locked --project hosts/nonebot --python 3.12.14 python deploy/lab/windows/probes/acceptance.py`。它们只运行 benign isolation probes，不下载或执行 catalog 插件；结果写入 `outputs/acceptance/phase2-workers-*-20261012.json`。
 

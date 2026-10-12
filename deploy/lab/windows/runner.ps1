@@ -12,6 +12,7 @@ public sealed class LabWorkerResult {
     public string reason_code { get; set; }
     public int? exit_code { get; set; }
     public double elapsed_seconds { get; set; }
+    public ulong? peak_memory_bytes { get; set; }
     public string diagnostic { get; set; }
     public bool cleanup_confirmed { get; set; }
     public bool output_truncated { get; set; }
@@ -85,6 +86,7 @@ public static class LabWorkerJob {
     [DllImport("kernel32.dll", SetLastError = true, CharSet = CharSet.Unicode)] private static extern IntPtr CreateFile(string name, uint access, uint share, ref SECURITY_ATTRIBUTES security, uint creation, uint flags, IntPtr template);
     [DllImport("kernel32.dll", SetLastError = true, CharSet = CharSet.Unicode)] private static extern IntPtr CreateJobObject(IntPtr attributes, string name);
     [DllImport("kernel32.dll", SetLastError = true)] private static extern bool SetInformationJobObject(IntPtr job, uint infoClass, IntPtr info, uint length);
+    [DllImport("kernel32.dll", SetLastError = true)] private static extern bool QueryInformationJobObject(IntPtr job, uint infoClass, IntPtr info, uint length, out uint returnLength);
     [DllImport("kernel32.dll", SetLastError = true)] private static extern bool AssignProcessToJobObject(IntPtr job, IntPtr process);
     [DllImport("kernel32.dll", SetLastError = true)] private static extern uint ResumeThread(IntPtr thread);
     [DllImport("kernel32.dll", SetLastError = true)] private static extern uint WaitForSingleObject(IntPtr handle, uint milliseconds);
@@ -102,6 +104,7 @@ public static class LabWorkerJob {
         string status = "unknown", reason = "worker_guest_restriction_failed";
         string diagnostic = null;
         bool outputTruncated = false, cleanupConfirmed = false;
+        ulong? peakMemoryBytes = null;
         string stage = "create_job";
         int? exitCode = null;
         try {
@@ -192,6 +195,7 @@ public static class LabWorkerJob {
                     TerminateJobObject(job, 127);
                     cleanupConfirmed = WaitForSingleObject(job, 5000) == WAIT_OBJECT_0;
                 }
+                peakMemoryBytes = ReadPeakJobMemory(job);
                 CloseHandle(job);
             }
             if (process.hThread != IntPtr.Zero) CloseHandle(process.hThread);
@@ -205,7 +209,18 @@ public static class LabWorkerJob {
             if (token != IntPtr.Zero) CloseHandle(token);
         }
         watch.Stop();
-        return new LabWorkerResult { status = status, reason_code = reason, exit_code = exitCode, elapsed_seconds = watch.Elapsed.TotalSeconds, diagnostic = diagnostic, cleanup_confirmed = cleanupConfirmed, output_truncated = outputTruncated };
+        return new LabWorkerResult { status = status, reason_code = reason, exit_code = exitCode, elapsed_seconds = watch.Elapsed.TotalSeconds, peak_memory_bytes = peakMemoryBytes, diagnostic = diagnostic, cleanup_confirmed = cleanupConfirmed, output_truncated = outputTruncated };
+    }
+
+    private static ulong? ReadPeakJobMemory(IntPtr job) {
+        int size = Marshal.SizeOf(typeof(EXTENDED_LIMIT_INFORMATION));
+        IntPtr buffer = Marshal.AllocHGlobal(size);
+        try {
+            uint returned;
+            if (!QueryInformationJobObject(job, JOB_OBJECT_EXTENDED_LIMIT_INFORMATION_CLASS, buffer, (uint)size, out returned) || returned < size) return null;
+            var limits = (EXTENDED_LIMIT_INFORMATION)Marshal.PtrToStructure(buffer, typeof(EXTENDED_LIMIT_INFORMATION));
+            return limits.PeakJobMemoryUsed.ToUInt64();
+        } finally { Marshal.FreeHGlobal(buffer); }
     }
 
     private static void SetInfo<T>(IntPtr job, uint infoClass, T value) where T : struct {
@@ -259,7 +274,7 @@ try {
   & icacls.exe $guestInput /grant $inputAcl /T | Out-Null
   if ($LASTEXITCODE -ne 0) { throw 'Could not grant read-only input access to the disposable worker account.' }
   $runnerStage = 'integrity_label'
-  & icacls.exe $spec.working_directory /setintegritylevel Low | Out-Null
+  & icacls.exe $spec.working_directory /setintegritylevel Low /T | Out-Null
   if ($LASTEXITCODE -ne 0) { throw 'Could not apply low-integrity workspace label.' }
   $env:TEMP = $workspaceTemp
   $env:TMP = $workspaceTemp

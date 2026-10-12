@@ -4,10 +4,10 @@
 
 - **Last Updated:** 2026-10-12（Asia/Shanghai）。
 - **Current Objective:** 按 S2-01–S2-12 顺序完成第二阶段目录全量实验能力并分阶段提交。
-- **Active Feature:** S2-09 / feat-011；S2-08 / feat-010 已验收并提交 `cbcbb0a`；S2-09 baseline 已在此干净提交上完成。
-- **Completed stage commits:** H01 `2d6399a`、S2-01 `15f468d`、S2-02 `c0be568`、S2-04 `2fa06b0`、S2-03 `29bc1e5`、S2-05 `854b564`、S2-06 `4e555b3`、S2-07 `7523a83`、S2-08 `cbcbb0a`。
+- **Active Feature:** S2-10 / feat-012；S2-09 / feat-011 的 pilot 分母、负例/恢复与可达 Worker 资源观测已闭合，验证与阶段提交记录见下文。
+- **Completed stage commits:** H01 `2d6399a`、S2-01 `15f468d`、S2-02 `c0be568`、S2-04 `2fa06b0`、S2-03 `29bc1e5`、S2-05 `854b564`、S2-06 `4e555b3`、S2-07 `7523a83`、S2-08 `cbcbb0a`；`299d22c` 是 S2-09 baseline/status checkpoint。
 - 第一阶段 T01–T18、C01–C15、G1/G2 以 [T18 报告](outputs/acceptance/t18-final-audit-20261012.json) 为准；四个精确插件版本和虚拟 Gateway，真实平台收发未验证。
-- 第二阶段 S2-01–S2-08 完成；S2-09 正在进行，S2-10–S2-12 尚未完成，状态见 [feature_list.json](feature_list.json)。
+- 第二阶段 S2-01–S2-09 完成；S2-10 正在进行，S2-11–S2-12 尚未开始，状态见 [feature_list.json](feature_list.json)。S2-09 pilot 发现的失败与 unknown 仍是后续 census/兼容性裁决输入，不代表通过。
 
 ## What's Done
 
@@ -54,12 +54,25 @@
 ## S2-09 Baseline
 
 - 在提交 `cbcbb0a2639bcf9c524847c8778bc87b36b80813` 的干净工作树上运行 `pwsh -NoProfile -File init.ps1 -Mode full`，退出码 0：docs 18/162、NoneBot 3、lab 85、Koishi 7、MCP 1、reference 5、Rust 33；Windows Core smoke 4 events / 4 gateway ops / 0 PID，bundle stage 通过。见 [S2-09 baseline](outputs/acceptance/phase2-s209-baseline-20261012.json)。生成的 `ci-smoke-windows.json` 已恢复。
-- 这是实施前基线；没有生成或运行 pilot 清单，也没有派发 catalog plugin Worker。
+- 这是 S2-09 实施前基线；结果仅对应提交 `cbcbb0a`。
+
+## S2-09 Pilot Progress
+
+- [pilot manifest](outputs/acceptance/phase2-s209-pilot-manifest-20261012.json) 固定 NoneBot/Koishi 各 30 个 entry + 四个历史支持版本，并保留 11,380 条目录 entry×OS 分配行；双 OS 试点分母 128。
+- [Linux 历史版本配对](outputs/acceptance/phase2-s209-legacy-linux-20261012.json)：四个 Native/Federated 独立 oracle、比较、cleanup 均通过。每个 Worker 峰值内存 246–272 MB、只读输入 190–210 MB、耗时 17.578–23.625 秒；S2-05 原报告 hash 未变。首次复跑因 `lab/recipes.py` 未被复制进 worker 导致失败，见 [attempt 1](outputs/acceptance/phase2-s209-legacy-linux-attempt1-20261012.json)；补入 module closure 后四项通过。
+- [NoneBot Linux pilot](outputs/acceptance/phase2-s209-nonebot-linux-pilot-20261012.json)：30/30 终态，21 个 Worker 安装与清理通过；3 个 native load 因冻结的 `nonebot_plugin_htmlrender` profile 缺少插件依赖的导出符号而失败，2 个缺配置/凭证情形已分类为 skipped。依赖下载共 24,957,125 bytes；Worker 峰值内存 87–249 MB、scratch 61–160 MB。
+- [Koishi Linux pilot](outputs/acceptance/phase2-s209-koishi-linux-pilot-20261012.json) 与 [Windows pilot](outputs/acceptance/phase2-s209-koishi-windows-pilot-20261012.json)：各 30/30 终态、各 22 个 Worker 安装和清理通过；每平台 4 个 native load failed、26 个 skipped。Windows 清理未知的 `random-chooser` 经独立重试确认清理并改为 `missing_entry_bound_fixture` skipped，初次报告与 retry 均保留。
+- [汇总 acceptance](outputs/acceptance/phase2-s209-20261012.json)：128 个结果位置闭合为 4 passed、11 failed、88 skipped、25 unknown。每生态/OS 的 30 条 catalog 记录均有终态；NoneBot Windows 仍有 23 个 CPython App Control Win32 4551 unknown，另有 2 个历史 Windows 配对不适用/未执行而为 unknown。目录行为 fixture 尚未派发，不能据此宣称行为兼容。
+- [失败复核](outputs/acceptance/phase2-s209-failure-review-20261012.json) 记录 11 个 native-load 错误、阶段/平台和源报告 hash。NoneBot Linux scratch P95 为 102 MB；Koishi Linux scratch P95 34 MB、Docker RSS P95 250 MB；Koishi Windows Sandbox scratch P95 143 MB，Job Object peak commit P95 6.71 GB、最大 8.57 GB（8 GiB 限额内）。这些是隔离 pilot 样本，不是全量资源承诺。
+- 预算仍 provisional：NoneBot Windows CPython 在启动前被 App Control Win32 4551 阻止，因此该生态/OS 没有 Worker 内存或 scratch 样本；5,690-entry census 总下载/磁盘/耗时尚未实测。配置文件保存各平台 pilot P50/P95、样本数和源报告 SHA-256。
+- 汇总 acceptance 的 `pilot_run_status=completed`、分母 128/128；4 passed、11 failed、88 skipped、25 unknown。higher gates 仍分开：自动化受 Windows CPython blocker 阻塞，行为兼容性未评估，完整 census 未开始。
+- `uv run --locked --project lab --python 3.12.14 python -m lab.pilot ...` 重建 acceptance；`lab.tests.test_pilot_nonebot` 覆盖 checkpoint resume 和 worker-lost 后先记 unknown 再以新 attempt 重试。negative Worker probes 与队列恢复证据见 acceptance 的 `negative_scenarios`。
+- 最终验证：README renderer 与 `--check` 通过；`pwsh -NoProfile -File init.ps1 -Mode docs` 为 18 docs / 191 links。聚焦 S2-09 命令 `uv run --locked --project lab --python 3.12.14 python -m unittest lab.tests.test_pilot lab.tests.test_pilot_nonebot lab.tests.test_pilot_workers lab.tests.test_workers lab.tests.test_baselines -v` 为 25 项通过；完整 `pwsh -NoProfile -File init.ps1 -Mode full` 退出 0，lab 102、NoneBot 3、Koishi 7、MCP 1、reference 5、Rust workspace 全通过，Windows smoke 为 4 events / 4 gateway operations / 0 PIDs，bundle stage 成功。验证生成的 `ci-smoke-windows.json` 已恢复至原 SHA-256 `033D8EA2534603B880DB2A729B328C3A75C7F4CF0B8F8DEE087C22BEBBCAC752`；`git diff --check` 通过。
 
 ## Next / Blockers
 
-- S2-09 当前需要形成分层 pilot 清单并接通 catalog Worker dispatch；先核对 Linux/Windows 运行路径、失败/恢复语义和资源预算，再按每生态至少 30 entries 加四个旧支持版本执行。pilot 分层仍需保留 5,690 × 2 OS 账本。
-- S2-06 recipes 仍是声明式定义和比较合同；S2-07 目前持久化计划和调度状态，未连接插件 worker 执行。5,621 个冻结 entry 尚无保守行为分类建议，必须在后续台账中显式列账。
-- Windows Sandbox 的 CPython 启动阻止仍是 Windows pilot 前置障碍；不绕过本机策略。S2-09 保留 blocker 和完整 Windows 分母。
-- S2-03 的 30 个 sdist build-only 条目只能在 OS 隔离 Worker 构建；全量 census、问题归因和真实平台验收尚未执行。
+- S2-10 按冻结分母开始全快照 census；entry-bound fixture 缺失时应记录可达阶段和显式 skip，不得宣称行为通过。失败修复进入 S2-11。
+- 5,621 个冻结 entry 尚无保守行为分类建议；全量 census、失败修复和真实平台验收未完成。NoneBot Windows CPython 的 App Control unknown 保持原状态，不绕过本机策略。
+- S2-09 budget 以可达平台样本完成测量但保持 provisional；full census 的总耗时、下载、磁盘估计需随 S2-10 分片数据更新。
+- S2-03 的 30 个 sdist build-only 条目只能在 OS 隔离 Worker 构建；虚拟回执不能当成真实平台投递成功。
 - 支持声明继续限定精确版本和行为场景；虚拟回执不能当成真实平台投递成功。

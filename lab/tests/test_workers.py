@@ -4,6 +4,7 @@ import tempfile
 import unittest
 import xml.etree.ElementTree as ET
 from pathlib import Path
+from subprocess import CompletedProcess
 from unittest.mock import patch
 
 from lab.workers import DockerWorker, WorkerLimits, WorkerSpec
@@ -54,6 +55,12 @@ class WorkerPolicyTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "must not be the repository"):
             worker.command(spec, worker_id="ligamina-test")
 
+    def test_docker_worker_parses_peak_memory_sample(self) -> None:
+        worker = DockerWorker(image_digest=IMAGE_DIGEST, repository_root=REPOSITORY_ROOT)
+        completed = CompletedProcess([], 0, stdout=b"14.25MiB / 4GiB\n", stderr=b"")
+        with patch("lab.workers.linux.subprocess.run", return_value=completed):
+            self.assertEqual(worker._container_memory_bytes("container"), int(14.25 * 1024 * 1024))
+
     def test_windows_sandbox_disables_host_channels_and_limits_memory(self) -> None:
         config = ET.fromstring(build_wsb_config(memory_mb=2048))
 
@@ -65,6 +72,21 @@ class WorkerPolicyTests(unittest.TestCase):
         self.assertEqual(settings["MemoryInMB"], "2048")
         self.assertIsNone(config.find("MappedFolders"))
         self.assertIsNone(config.find("LogonCommand"))
+
+    def test_windows_worker_marks_existing_workspace_children_low_integrity(self) -> None:
+        source = (REPOSITORY_ROOT / "deploy/lab/windows/runner.ps1").read_text(encoding="utf-8")
+        self.assertIn("$workspaceHome = Join-Path $spec.working_directory 'Home'", source)
+        self.assertIn("/setintegritylevel Low /T", source)
+        self.assertIn("QueryInformationJobObject", source)
+        self.assertIn("PeakJobMemoryUsed", source)
+
+    def test_windows_worker_result_preserves_job_peak_memory(self) -> None:
+        result = WindowsSandboxWorker._make_result(
+            status="passed", reason_code=None, exit_code=0, started=0,
+            stdout=b"", stderr=b"", output_truncated=False,
+            cleanup_confirmed=True, worker_id="worker-test", peak_memory_bytes=123456,
+        )
+        self.assertEqual(result.peak_memory_bytes, 123456)
 
     def test_windows_cli_keeps_system_drive_and_drops_unlisted_environment(self) -> None:
         with patch.dict(

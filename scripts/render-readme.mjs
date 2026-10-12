@@ -79,9 +79,15 @@ export async function phase2Block() {
   const schedulerPath = 'outputs/acceptance/phase2-s207-20261012.json';
   const reportingPath = 'outputs/acceptance/phase2-s208-20261012.json';
   const baselinePath = 'outputs/acceptance/phase2-s209-baseline-20261012.json';
+  const pilotManifestPath = 'outputs/acceptance/phase2-s209-pilot-manifest-20261012.json';
+  const pilotAcceptancePath = 'outputs/acceptance/phase2-s209-20261012.json';
+  const nonebotLinuxPilotPath = 'outputs/acceptance/phase2-s209-nonebot-linux-pilot-20261012.json';
+  const koishiLinuxPilotPath = 'outputs/acceptance/phase2-s209-koishi-linux-pilot-20261012.json';
+  const koishiWindowsPilotPath = 'outputs/acceptance/phase2-s209-koishi-windows-pilot-20261012.json';
   const planPath = 'outputs/acceptance/phase2-s207-cli-smoke-20261012.json';
-  const [catalog, recipes, scheduler, reporting, baseline, plan] = await Promise.all(
-    [catalogPath, recipesPath, schedulerPath, reportingPath, baselinePath, planPath].map(load),
+  const featureListPath = 'feature_list.json';
+  const [catalog, recipes, scheduler, reporting, baseline, pilotManifest, pilotAcceptance, nonebotLinuxPilot, koishiLinuxPilot, koishiWindowsPilot, plan, featureList] = await Promise.all(
+    [catalogPath, recipesPath, schedulerPath, reportingPath, baselinePath, pilotManifestPath, pilotAcceptancePath, nonebotLinuxPilotPath, koishiLinuxPilotPath, koishiWindowsPilotPath, planPath, featureListPath].map(load),
   );
   for (const [relative, expected] of Object.entries(reporting.input_reports ?? {})) {
     const actual = createHash('sha256').update(await readFile(path.join(root, relative))).digest('hex');
@@ -121,25 +127,73 @@ export async function phase2Block() {
       || !baseline.repository_head.startsWith('cbcbb0a')) {
     throw new Error(`Invalid S2-09 baseline report: ${baselinePath}`);
   }
+  const pilotInputs = {
+    legacy_run_sha256: 'outputs/acceptance/phase2-s209-legacy-linux-20261012.json',
+    s205_source_sha256: 'outputs/acceptance/phase2-s205-20261012.json',
+    pilot_manifest_sha256: pilotManifestPath,
+    worker_linux_sha256: 'outputs/acceptance/phase2-workers-linux-20261012.json',
+    worker_windows_sha256: 'outputs/acceptance/phase2-workers-windows-20261012.json',
+    queue_acceptance_sha256: schedulerPath,
+    budget_sha256: 'config/lab/phase2-pilot-budget-v1.json',
+    nonebot_linux_catalog_pilot_sha256: nonebotLinuxPilotPath,
+    koishi_linux_catalog_pilot_sha256: koishiLinuxPilotPath,
+    koishi_windows_catalog_pilot_sha256: koishiWindowsPilotPath,
+  };
+  for (const [key, relative] of Object.entries(pilotInputs)) {
+    const actual = createHash('sha256').update(await readFile(path.join(root, relative))).digest('hex');
+    if (actual !== pilotAcceptance.source_hashes?.[key]) throw new Error(`Stale S2-09 evidence input: ${relative}`);
+  }
+  if (pilotManifest.task_id !== 'S2-09' || pilotManifest.catalog_entry_os_denominator !== 11380
+      || pilotManifest.catalog_assignment_ledger_count !== 11380 || pilotManifest.selected_catalog_entry_count !== 60
+      || pilotManifest.expected_pilot_result_count !== 128 || pilotAcceptance.task_id !== 'S2-09'
+      || pilotAcceptance.kind !== 'phase2_pilot_acceptance'
+      || pilotAcceptance.pilot_manifest_sha256 !== pilotManifest.manifest_sha256
+      || pilotAcceptance.status !== 'acceptance-pending'
+      || pilotAcceptance.pilot_run_status !== 'completed'
+      || pilotAcceptance.readiness?.pilot_denominator !== 'passed'
+      || pilotAcceptance.denominator?.terminal_pilot_results !== 128
+      || pilotAcceptance.denominator?.closed_exactly_once !== true
+      || ['passed', 'failed', 'skipped', 'unknown'].reduce((sum, status) => sum + (pilotAcceptance.counts?.[status] ?? 0), 0) !== 128
+      || nonebotLinuxPilot.task_id !== 'S2-09' || nonebotLinuxPilot.kind !== 'phase2_s209_nonebot_linux_pilot_workers'
+      || nonebotLinuxPilot.selected_nonebot_linux_entries !== 30 || nonebotLinuxPilot.terminal_results !== 30
+      || nonebotLinuxPilot.closed_exactly_once !== true
+      || koishiLinuxPilot.task_id !== 'S2-09' || koishiLinuxPilot.kind !== 'phase2_s209_koishi_linux_pilot_workers'
+      || koishiLinuxPilot.selected_koishi_linux_entries !== 30 || koishiLinuxPilot.terminal_results !== 30
+      || koishiLinuxPilot.closed_exactly_once !== true
+      || koishiWindowsPilot.task_id !== 'S2-09' || koishiWindowsPilot.kind !== 'phase2_s209_koishi_windows_pilot_workers'
+      || koishiWindowsPilot.selected_koishi_windows_entries !== 30 || koishiWindowsPilot.terminal_results !== 30
+      || koishiWindowsPilot.closed_exactly_once !== true) {
+    throw new Error(`Invalid S2-09 pilot evidence: ${pilotManifestPath} / ${pilotAcceptancePath}`);
+  }
+  const pilotCounts = ['passed', 'failed', 'skipped', 'unknown'].map((status) => pilotAcceptance.counts[status]).join(' / ');
+  const nonebotPilot = pilotAcceptance.worker_readiness.nonebot_linux_pilot;
+  const linuxPilot = pilotAcceptance.worker_readiness.koishi_linux_pilot;
+  const windowsPilot = pilotAcceptance.worker_readiness.koishi_windows_pilot;
+  const featureByTask = new Map((featureList.features ?? []).map((feature) => [feature.task_id, feature]));
+  const s210Status = featureByTask.get('S2-10')?.status ?? 'not-started';
+  const s210Label = s210Status === 'done' ? '已完成'
+    : s210Status === 'in-progress' ? '进行中：baseline 与分片派发准备；全量 Worker 尚未启动'
+      : '未开始：全快照 census 尚未启动';
+  const measurements = pilotAcceptance.resource_measurements;
 
   return [
     phase2Start,
-    `状态截至 ${escape(reporting.date)}：${reportingComplete ? 'S2-01–S2-08 已完成；S2-09 双平台 pilot 正在进行（实施前 baseline 已通过，插件尚未派发）。' : 'S2-01–S2-07 已完成；S2-08 正在进行最终验收。'} 冻结快照 \`${escape(catalog.snapshot_id)}\` 含 **${count.toLocaleString('en-US')} entries**（NoneBot 943、Koishi 4,747；官方维护子集 ${official}）。`,
+    `状态截至 ${escape(reporting.date)}：${reportingComplete ? `S2-01–S2-09 pilot 执行已完成；128 个结果位置闭合（通过 / 失败 / 跳过 / 未知：${pilotCounts}）。NoneBot Linux、Koishi Linux 和 Windows 各 30 个目录 entry 已进入 L1/L2 pilot。` : 'S2-01–S2-07 已完成；S2-08 正在进行最终验收。'} 冻结快照 \`${escape(catalog.snapshot_id)}\` 含 **${count.toLocaleString('en-US')} entries**（NoneBot 943、Koishi 4,747；官方维护子集 ${official}）。`,
     '',
     '| 任务 | 状态 |',
     '| --- | --- |',
     ...[
       ...(reportingComplete ? [['S2-01–S2-08', '已完成并分别保存验收证据']] : [['S2-01–S2-07', '已完成并分别保存验收证据'], ['S2-08', '最终验收进行中']]),
-      ['S2-09', reportingComplete ? '进行中：baseline 通过；pilot 尚未派发' : '等待 S2-08 验收完成'],
-      ['S2-10', '未开始：全快照 census 尚未启动'],
-      ['S2-11–S2-12', '未开始'],
+      ['S2-09', reportingComplete ? `pilot 执行完成：128/128 位置闭合；通过 / 失败 / 跳过 / 未知 ${pilotCounts}；自动化与行为 gate 保留 blocker` : '等待 S2-08 验收完成'],
+      ['S2-10', s210Label],
+      ['S2-11–S2-12', s210Status === 'done' ? '未开始' : '未开始'],
     ].map(([task, status]) => `| ${task} | ${status} |`),
     '',
-    `分类 dry run 只建议 ${suggested}/${count} entries，${unmapped} 项仍是 \`unmapped_category\`。S2-07 在 Linux shard 规划了 3 个单元、18 个 stage jobs；队列仍为 18 queued，\`execution_started=false\`，**没有派发目录插件**。`,
+    `分类 dry run 只建议 ${suggested}/${count} entries，${unmapped} 项仍是 \`unmapped_category\`。S2-09 的 128 个双 OS 结果位置全部闭合：四个历史支持版本和 60 个分层目录 entry 分别保留状态；NoneBot Linux 尝试 ${nonebotPilot.attempted_workers} 个 Docker Worker（L1 ${JSON.stringify(nonebotPilot.dependency_install)}；L2 ${JSON.stringify(nonebotPilot.native_load)}），Koishi Linux 尝试 ${linuxPilot.attempted_workers} 个 Docker Worker（L1 ${JSON.stringify(linuxPilot.dependency_install)}；L2 ${JSON.stringify(linuxPilot.native_load)}），Windows 尝试 ${windowsPilot.attempted_workers} 个 Sandbox Worker（L1 ${JSON.stringify(windowsPilot.dependency_install)}；L2 ${JSON.stringify(windowsPilot.native_load)}）。`,
     '',
-    'Windows Sandbox 的 CPython 启动仍受 App Control（Win32 4551）阻止；Windows 插件 pilot 需要先解决该运行前置。S2-05 的四个历史精确版本回归不外推到目录全集；真实平台登录、发送与投递验收未执行。',
+    `Windows Sandbox 的 CPython 启动仍受 App Control（Win32 4551）阻止；Node.js 24.20.0 签名 runtime 已用于 Windows Koishi L1/L2 pilot。Koishi Windows Job Object commit P95 ${(measurements.koishi_windows_peak_worker_memory_bytes.p95 / (1024 ** 3)).toFixed(2)} GiB（8 GiB 限额内），scratch P95 ${(measurements.koishi_windows_peak_writable_scratch_bytes.p95 / (1024 ** 2)).toFixed(1)} MiB；预算仍 provisional，NoneBot Windows 无 Worker 样本。目录 cohort 缺 entry-bound behavior fixture，L4 未评估，不能外推为兼容。S2-10 状态：${s210Status}，pilot 报告标注的全量 census 状态为 ${pilotAcceptance.readiness.full_census}；真实平台登录、发送与投递验收未执行。`,
     '',
-    `证据：[目录快照](${catalogPath})、[分类 dry run](${recipesPath})、[调度验收](${schedulerPath})、[S2-07 实际 CLI 计划](${planPath})、[S2-08 报告验收](${reportingPath})、[S2-09 baseline](${baselinePath})、[完整实施计划](docs/plans/2026-10-12-phase-2-full-catalog.md)。`,
+    `证据：[目录快照](${catalogPath})、[分类 dry run](${recipesPath})、[调度验收](${schedulerPath})、[S2-07 实际 CLI 计划](${planPath})、[S2-08 报告验收](${reportingPath})、[S2-09 baseline](${baselinePath})、[S2-09 pilot 清单](${pilotManifestPath})、[S2-09 pilot 结果](${pilotAcceptancePath})、[完整实施计划](docs/plans/2026-10-12-phase-2-full-catalog.md)。`,
     phase2End,
   ].join('\n');
 }

@@ -100,6 +100,7 @@ class WindowsSandboxWorker:
         reason_code: str | None = "worker_launch_failed"
         exit_code: int | None = None
         result_doc: dict[str, Any] | None = None
+        peak_memory_bytes: int | None = None
         stdout = b""
         stderr = b""
         cleanup_confirmed = False
@@ -230,6 +231,9 @@ class WindowsSandboxWorker:
                 raise _StopWorker
 
             result_doc = self._read_result(result_path)
+            peak_value = result_doc.get("peak_memory_bytes") if isinstance(result_doc, dict) else None
+            if isinstance(peak_value, int) and not isinstance(peak_value, bool) and peak_value >= 0:
+                peak_memory_bytes = peak_value
             stdout = self._read_limited(stdout_path, spec.limits.output_limit_bytes)
             stderr = self._read_limited(stderr_path, spec.limits.output_limit_bytes)
             output_truncated = self._file_exceeds(stdout_path, spec.limits.output_limit_bytes) or self._file_exceeds(
@@ -281,6 +285,7 @@ class WindowsSandboxWorker:
             output_truncated=output_truncated,
             cleanup_confirmed=cleanup_confirmed,
             worker_id=worker_id,
+            peak_memory_bytes=peak_memory_bytes,
         )
 
     def _share_read_only(self, sandbox_id: str, host_path: Path, sandbox_path: Path) -> None:
@@ -450,6 +455,7 @@ class WindowsSandboxWorker:
         output_truncated: bool,
         cleanup_confirmed: bool,
         worker_id: str,
+        peak_memory_bytes: int | None = None,
     ) -> WorkerResult:
         return WorkerResult(
             status=status,  # type: ignore[arg-type]
@@ -463,6 +469,7 @@ class WindowsSandboxWorker:
             output_truncated=output_truncated,
             cleanup_confirmed=cleanup_confirmed,
             worker_id=worker_id,
+            peak_memory_bytes=peak_memory_bytes,
         )
 
 

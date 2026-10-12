@@ -3,9 +3,9 @@
 ## Current Objective
 
 - 日期：2026-10-12（Asia/Shanghai）。用户要求完成 `docs/plans/2026-10-12-phase-2-full-catalog.md` 的 S2-01–S2-12 并分阶段提交。
-- 分支：`codex/phase2-full-catalog`。仓库新增文档先提交 `2d6399a`；已完成 S2-01 `15f468d`、S2-02 `c0be568`、S2-04 `2fa06b0`、S2-03 `29bc1e5`、S2-05 `854b564`、S2-06 `4e555b3`、S2-07 `7523a83`、S2-08 `cbcbb0a`。
-- 当前：S2-09 / feat-011 正在进行。实施前 baseline 在干净 HEAD `cbcbb0a2639bcf9c524847c8778bc87b36b80813` 上通过 `pwsh -NoProfile -File init.ps1 -Mode full`，见 `outputs/acceptance/phase2-s209-baseline-20261012.json`。未生成/运行 pilot，未派发 catalog plugin Worker。
-- 下一任务：提交 S2-09 baseline 和状态更新；检查 worker dispatch 接口及资源预算，形成至少每生态 30 项 + 4 个既有支持版本的分层 pilot manifest，再处理 Linux/Windows 运行和恢复验收。状态唯一入口：[feature_list.json](feature_list.json)。
+- 分支：`codex/phase2-full-catalog`。仓库新增文档先提交 `2d6399a`；已完成 S2-01 `15f468d`、S2-02 `c0be568`、S2-04 `2fa06b0`、S2-03 `29bc1e5`、S2-05 `854b564`、S2-06 `4e555b3`、S2-07 `7523a83`、S2-08 `cbcbb0a`；S2-09 baseline/status checkpoint 是 `299d22c`，不是阶段完成提交。
+- 当前：S2-09 / feat-011 的 pilot 执行已完成，阶段验证与提交正在收尾；S2-10 / feat-012 是下一活动任务。S2-09 实施前 baseline 在干净 HEAD `cbcbb0a2639bcf9c524847c8778bc87b36b80813` 上通过 `pwsh -NoProfile -File init.ps1 -Mode full`，见 `outputs/acceptance/phase2-s209-baseline-20261012.json`。分层 manifest 有 11,380 行 entry×OS 账本；NoneBot Linux 与 Koishi Linux/Windows 三个 pilot 各闭合 30 项，完整汇总 128 个位置为 4 passed、11 failed、88 skipped、25 unknown。
+- 断点：Windows Koishi `random-chooser` 的一次清理 unknown 已在单项 retry 中 cleanup-confirmed，最终分类 missing-fixture skipped。NoneBot Linux 21 个 Worker、Koishi Linux/Windows 各 22 个 Worker 安装与清理通过。Windows NoneBot 23 个目录项受 App Control Win32 4551 阻止，保留 unknown，不绕过策略。entry-bound 行为 fixture 未执行；资源分布已测但预算 provisional。README 与 docs/link 检查已通过；下一步完成全仓库验证、提交 S2-09，再运行 S2-10 的 clean baseline 并分 shard 派发 census。
 
 ## Completed Stages
 
@@ -31,10 +31,20 @@
 - Full `pwsh -NoProfile -File init.ps1 -Mode full` exited 0: docs 18/161; NoneBot 3; lab 85; Koishi 7; MCP 1; reference 5; Rust 33; Windows Core smoke 4 events / 4 gateway operations / 0 PIDs; bundle stage passed. Generated `outputs/acceptance/ci-smoke-windows.json` was restored.
 - Focused verification: Python report/contract 18 tests, Rust CLI 5 tests and contracts 4 tests; valid/invalid CLI fixtures returned 0/2; stale source report and stale README block both rejected with exit 1.
 
-## Next: S2-09
+## S2-09 Evidence
 
-- S2-09 baseline is complete on clean commit `cbcbb0a`; see `outputs/acceptance/phase2-s209-baseline-20261012.json`.
-- Build and lock the stratified pilot manifest, at least 30 entries per ecosystem plus the four legacy supported versions. Inspect worker dispatch, OS-specific profile readiness, failure/recovery, and resource budget before execution.
-- Windows Sandbox CPython startup is blocked by App Control (Win32 4551); retain Windows cohort denominator and do not bypass host policy.
-- S2-07 currently persists/plans queue work but has no catalog plugin worker dispatch. 5,621 entries lack conservative recipe category suggestions. Do not claim a census, plugin-wide compatibility, real-platform delivery, or completion of the first-stage 24-hour experiment.
+- Pilot manifest: [phase2-s209-pilot-manifest-20261012.json](outputs/acceptance/phase2-s209-pilot-manifest-20261012.json) includes 30 NoneBot + 30 Koishi catalog entries, all four legacy support versions, and a full 11,380-entry×OS assignment ledger. The pilot denominator is 128 results.
+- Legacy regression: [phase2-s209-legacy-linux-20261012.json](outputs/acceptance/phase2-s209-legacy-linux-20261012.json) reran all four Native/Federated/oracle pairs in the Linux Docker Worker; all passed and cleanup was confirmed. Peak memory was 246–272 MB, Worker input 190–210 MB, duration 17.578–23.625 seconds. The original S2-05 report hash is unchanged.
+- The first replay found `lab/recipes.py` was missing from the copied worker module closure after the S2-08 comparator import change. The failed attempt is preserved in [attempt1](outputs/acceptance/phase2-s209-legacy-linux-attempt1-20261012.json); after packaging the module and making schema validation import lazy, all four passed.
+- [phase2-s209-20261012.json](outputs/acceptance/phase2-s209-20261012.json) closes 128 positions as 4 passed, 11 failed, 88 skipped, 25 unknown. The three catalog reports are individually 30/30 closed: [NoneBot Linux](outputs/acceptance/phase2-s209-nonebot-linux-pilot-20261012.json), [Koishi Linux](outputs/acceptance/phase2-s209-koishi-linux-pilot-20261012.json), and [Koishi Windows](outputs/acceptance/phase2-s209-koishi-windows-pilot-20261012.json). See [failure review](outputs/acceptance/phase2-s209-failure-review-20261012.json) for eleven native-load errors and the Windows retry evidence.
+- NoneBot Linux: 21 Worker installs/cleanups passed, three native-load failures share the frozen htmlrender API mismatch; dependency downloads total 24,957,125 bytes and Linux RSS/scratch are measured. Koishi Linux and Windows each: 22 installs/cleanups passed and four native-load failures. Koishi Linux/Windows scratch and Windows Job Object peak committed memory are also measured; Windows P95 peak commit is 6.71 GB with an 8 GiB limit. These pilot distributions do not establish a full-census resource budget.
+- The entry-bound behavior stage has not run; behavior is not accepted. Windows CPython App Control Win32 4551 leaves 23 NoneBot catalog rows unknown, and two historical Windows rows remain unknown. The budget remains provisional; no full census or field acceptance has started.
+- README renderer and evidence block check passed; `pwsh -NoProfile -File init.ps1 -Mode docs` passed (18 documents, 191 local links). Focused S2-09 suite passed (25 tests); `pwsh -NoProfile -File init.ps1 -Mode full` exited 0 with lab 102, NoneBot 3, Koishi 7, MCP 1, reference 5, Rust workspace green, Windows smoke 4 events / 4 Gateway operations / 0 PIDs, and bundle stage passed. `git diff --check` passed. The generated `ci-smoke-windows.json` was restored to its original SHA-256 `033D8EA2534603B880DB2A729B328C3A75C7F4CF0B8F8DEE087C22BEBBCAC752`. The pilot execution meets S2-09 criteria while higher behavior/automation gates remain open; commit the evidence and start S2-10.
+
+## Next: S2-10
+
+- Run a clean S2-10 baseline on the S2-09 phase commit, then inspect the durable catalog queue and worker execution path before starting full-snapshot shards.
+- Preserve the 11,380 entry×OS denominator and frozen artifact/profile/hash identity. Every inaccessible or unsupported stage needs an evidence-backed terminal state; queue planning alone does not count as execution.
+- Retain S2-09 failure/unknown evidence, resource limits, retries, and checkpoints. Update full-census resource estimates from shard measurements and do not claim behavior compatibility for rows without entry-bound fixtures.
+- 5,621 entries still lack conservative behavior-category suggestions; do not claim plugin-wide compatibility or field acceptance.
 - S2-03's 30 sdist build-only entries may only run inside the accepted OS Worker.

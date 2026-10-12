@@ -74,20 +74,20 @@ status/doctor 只接受 loopback HTTP 地址。凭证来自环境或私人配置
 以下第二阶段摘要由冻结目录、分类 dry run、调度和报告验收记录生成。目录收录、加载成功和行为兼容分别记账；完整支持声明只按已验证的精确范围给出。
 
 <!-- ligamina:phase2:start -->
-状态截至 2026-10-12：S2-01–S2-08 已完成；S2-09 双平台 pilot 正在进行（实施前 baseline 已通过，插件尚未派发）。 冻结快照 `p2-41649744e057d61031d5` 含 **5,690 entries**（NoneBot 943、Koishi 4,747；官方维护子集 55）。
+状态截至 2026-10-12：S2-01–S2-09 pilot 执行已完成；128 个结果位置闭合（通过 / 失败 / 跳过 / 未知：4 / 11 / 88 / 25）。NoneBot Linux、Koishi Linux 和 Windows 各 30 个目录 entry 已进入 L1/L2 pilot。 冻结快照 `p2-41649744e057d61031d5` 含 **5,690 entries**（NoneBot 943、Koishi 4,747；官方维护子集 55）。
 
 | 任务 | 状态 |
 | --- | --- |
 | S2-01–S2-08 | 已完成并分别保存验收证据 |
-| S2-09 | 进行中：baseline 通过；pilot 尚未派发 |
-| S2-10 | 未开始：全快照 census 尚未启动 |
+| S2-09 | pilot 执行完成：128/128 位置闭合；通过 / 失败 / 跳过 / 未知 4 / 11 / 88 / 25；自动化与行为 gate 保留 blocker |
+| S2-10 | 进行中：baseline 与分片派发准备；全量 Worker 尚未启动 |
 | S2-11–S2-12 | 未开始 |
 
-分类 dry run 只建议 69/5690 entries，5621 项仍是 `unmapped_category`。S2-07 在 Linux shard 规划了 3 个单元、18 个 stage jobs；队列仍为 18 queued，`execution_started=false`，**没有派发目录插件**。
+分类 dry run 只建议 69/5690 entries，5621 项仍是 `unmapped_category`。S2-09 的 128 个双 OS 结果位置全部闭合：四个历史支持版本和 60 个分层目录 entry 分别保留状态；NoneBot Linux 尝试 21 个 Docker Worker（L1 {"passed":21,"failed":0,"skipped":0,"unknown":0}；L2 {"passed":16,"failed":3,"skipped":2,"unknown":0}），Koishi Linux 尝试 22 个 Docker Worker（L1 {"passed":22,"failed":0,"skipped":0,"unknown":0}；L2 {"passed":18,"failed":4,"skipped":0,"unknown":0}），Windows 尝试 22 个 Sandbox Worker（L1 {"passed":22,"failed":0,"skipped":0,"unknown":0}；L2 {"passed":18,"failed":4,"skipped":0,"unknown":0}）。
 
-Windows Sandbox 的 CPython 启动仍受 App Control（Win32 4551）阻止；Windows 插件 pilot 需要先解决该运行前置。S2-05 的四个历史精确版本回归不外推到目录全集；真实平台登录、发送与投递验收未执行。
+Windows Sandbox 的 CPython 启动仍受 App Control（Win32 4551）阻止；Node.js 24.20.0 签名 runtime 已用于 Windows Koishi L1/L2 pilot。Koishi Windows Job Object commit P95 6.25 GiB（8 GiB 限额内），scratch P95 136.0 MiB；预算仍 provisional，NoneBot Windows 无 Worker 样本。目录 cohort 缺 entry-bound behavior fixture，L4 未评估，不能外推为兼容。S2-10 状态：in-progress，pilot 报告标注的全量 census 状态为 not_started；真实平台登录、发送与投递验收未执行。
 
-证据：[目录快照](outputs/acceptance/phase2-catalog-snapshot-20261012.json)、[分类 dry run](outputs/acceptance/phase2-s206-20261012.json)、[调度验收](outputs/acceptance/phase2-s207-20261012.json)、[S2-07 实际 CLI 计划](outputs/acceptance/phase2-s207-cli-smoke-20261012.json)、[S2-08 报告验收](outputs/acceptance/phase2-s208-20261012.json)、[S2-09 baseline](outputs/acceptance/phase2-s209-baseline-20261012.json)、[完整实施计划](docs/plans/2026-10-12-phase-2-full-catalog.md)。
+证据：[目录快照](outputs/acceptance/phase2-catalog-snapshot-20261012.json)、[分类 dry run](outputs/acceptance/phase2-s206-20261012.json)、[调度验收](outputs/acceptance/phase2-s207-20261012.json)、[S2-07 实际 CLI 计划](outputs/acceptance/phase2-s207-cli-smoke-20261012.json)、[S2-08 报告验收](outputs/acceptance/phase2-s208-20261012.json)、[S2-09 baseline](outputs/acceptance/phase2-s209-baseline-20261012.json)、[S2-09 pilot 清单](outputs/acceptance/phase2-s209-pilot-manifest-20261012.json)、[S2-09 pilot 结果](outputs/acceptance/phase2-s209-20261012.json)、[完整实施计划](docs/plans/2026-10-12-phase-2-full-catalog.md)。
 <!-- ligamina:phase2:end -->
 
 状态见 [功能清单](feature_list.json)、[当前进展](progress.md) 和 [会话交接](session-handoff.md)。

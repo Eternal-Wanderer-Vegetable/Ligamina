@@ -92,8 +92,37 @@ Native 与 federated 使用同一发布物、依赖锁、配置和刺激，分�
 
 `lab.recipes.validate_recipe_catalog()` 校验每生态十类 recipe；`prepare_recipe()` 把 registry entry ID、冻结发布物 SHA-256、Host profile、配置 fixture、service fixture 与行为 fixture ID/摘要绑定。配置和服务值不会写入返回的 binding；包含 token、secret、password、credential 或 API key 字段的 fixture 会拒绝。缺少行为/配置/服务 fixture 分别记 `skipped/missing_fixture`、`skipped/missing_config_fixture`、`skipped/missing_service_fixture`；未提供声明所需随机种子、固定时间或外部凭证时，分别记 `skipped/missing_random_fixture`、`skipped/missing_time_fixture`、`skipped/missing_credentials`。未知 registry 标签会保留在 `unmapped_labels`，不静默强行归类。
 
-`lab.compare.compare_recipe_pair()` 要求 Native 与 Federated 各自符合 fixture 的独立 expected oracle、绑定相同 entry/profile/config/services，之后才比较两边观察值。即使两边同样返回错误，也会分别触发 `oracle_mismatch`。显式期望空列表可以通过；缺少 expected 字段会失败。当前 S2-06 只实现 recipe 定义、绑定和比较合同，真实插件调用由 S2-07 catalog runner 接线，浏览器/真实平台与凭证 profile 仍未验收。
+`lab.compare.compare_recipe_pair()` 要求 Native 与 Federated 各自符合 fixture 的独立 expected oracle、绑定相同 entry/profile/config/services，之后才比较两边观察值。即使两边同样返回错误，也会分别触发 `oracle_mismatch`。显式期望空列表可以通过；缺少 expected 字段会失败。S2-06 只实现 recipe 定义、绑定和比较合同；S2-07 持久化调度队列但没有接入 catalog plugin dispatch。浏览器/真实平台与凭证 profile 仍未验收。
 
 ```powershell
 uv run --locked --project lab --python 3.12.14 python -m unittest lab.tests.test_recipes -v
 ```
+
+## S2-09 分层 pilot（进行中）
+
+当前分层清单和汇总入口：
+
+```powershell
+uv run --locked --project lab --python 3.12.14 python -m lab.pilot `
+  --snapshot catalogs/p2-41649744e057d61031d5 `
+  --output outputs/acceptance/phase2-s209-pilot-manifest-20261012.json `
+  --legacy-report outputs/acceptance/phase2-s209-legacy-linux-20261012.json `
+  --failed-attempt outputs/acceptance/phase2-s209-legacy-linux-attempt1-20261012.json `
+  --nonebot-catalog-report outputs/acceptance/phase2-s209-nonebot-linux-pilot-20261012.json `
+  --catalog-report outputs/acceptance/phase2-s209-koishi-linux-pilot-20261012.json `
+  --windows-catalog-report outputs/acceptance/phase2-s209-koishi-windows-pilot-20261012.json `
+  --acceptance-output outputs/acceptance/phase2-s209-20261012.json
+```
+
+这会按 snapshot hash 稳定选取每生态至少 30 entries，加入四个历史精确支持版本，并写出全部 5,690×2 OS 的选取分配账本。当前验收报告中 128 个 pilot 位置终态闭合为 4 passed、11 failed、88 skipped、25 unknown。NoneBot Linux、Koishi Linux/Windows 各自完成 30 项结果闭合；实际有 21/22/22 个 Worker 被派发，其他条目因目录、发布物或 profile 状态而跳过。Koishi Windows 首次清理未知经独立重试闭合。结果只证明发布物依赖安装和 native load 阶段已测，不代表行为兼容。
+
+历史版本配对可用单独输出重跑，避免覆盖 S2-05 原报告：
+
+```powershell
+uv run --locked --project lab --python 3.12.14 python -m lab.baselines.run_s205 `
+  --report outputs/acceptance/phase2-s209-legacy-linux-20261012.json
+```
+
+当前 catalog pilot 没有派发 entry-bound behavior fixture；S2-06 recipes 仍是声明式合同。NoneBot Windows 的 23 个选中 catalog 行受 App Control（Win32 4551）阻止并保持 unknown；Windows Koishi native-load pilot 已运行，但行为仍因缺 fixture 跳过。11 个 native-load 失败的观察和源 hash 见[失败复核](../../outputs/acceptance/phase2-s209-failure-review-20261012.json)：NoneBot 三项是冻结 `htmlrender` profile API 不匹配；Koishi 两平台的四项包括配置入口文件缺失和 `koishi-thirdeye` 类型错误。
+
+资源预算见 [S2-09 provisional config](../../config/lab/phase2-pilot-budget-v1.json)：NoneBot Linux 有 Docker RSS、依赖下载和 scratch 测量；Koishi Linux 有 Docker RSS/scratch，Windows 有 Job Object 峰值 commit 内存与 Sandbox Workspace scratch。Koishi Windows Job Object P95 为 6.71 GB，最大 8.57 GB，Worker 限额为 8 GiB；这不是 RSS 指标。NoneBot Windows 没有 Worker 样本，因为 CPython 被 App Control 阻止。预算保持 provisional，不能据此宣称目录全集兼容。报告 attempt 和 checkpoint 保留在 `outputs/acceptance/`，重建汇总前应先复核完整的 30 项平台报告。

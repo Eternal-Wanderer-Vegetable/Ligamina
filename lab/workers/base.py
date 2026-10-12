@@ -61,6 +61,7 @@ class WorkerResult:
     output_truncated: bool
     cleanup_confirmed: bool
     worker_id: str
+    peak_memory_bytes: int | None = None
 
 
 def digest_bytes(value: bytes) -> str:

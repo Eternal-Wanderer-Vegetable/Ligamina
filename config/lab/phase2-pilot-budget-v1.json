@@ -1,0 +1,225 @@
+{
+  "schema_version": 1,
+  "task_id": "S2-09",
+  "budget_id": "phase2-pilot-v1",
+  "status": "provisional",
+  "scope": "Observed S2-09 pilot measurements; limits remain provisional for S2-10 until the unmeasured Windows NoneBot scope and census workload are resolved.",
+  "dispatch": {
+    "ordinary_workers_per_host": 2,
+    "heavy_build_or_browser_workers_per_host": 1,
+    "stop_dispatch_when_free_disk_below_bytes": 10737418240
+  },
+  "timeouts_seconds": {
+    "install": 1200,
+    "startup": 120,
+    "behavior_case": 60,
+    "cleanup": 30
+  },
+  "linux_worker": {
+    "ordinary_cpu_cores": 2,
+    "ordinary_memory_mb": 4096,
+    "heavy_memory_mb": 8192,
+    "process_limit": 256,
+    "output_limit_bytes": 4194304,
+    "network": "disabled during behavior execution"
+  },
+  "windows_worker": {
+    "ordinary_memory_mb": 4096,
+    "process_limit": 256,
+    "cpu_cores": 2,
+    "output_limit_bytes": 4194304,
+    "status": "Koishi Node pilot measured inside Windows Sandbox; NoneBot CPython is blocked by App Control Win32 4551.",
+    "network": "disabled during behavior execution",
+    "koishi_sandbox_memory_mb": 8192
+  },
+  "legacy_pair_override": {
+    "worker_image": "python@sha256:f77ac9e44ae96ef2c90b8053ea08c31f8be030f824196b0ae4db6d462c84e51f",
+    "cpu_cores": 2,
+    "memory_mb": 6144,
+    "timeout_seconds": 180,
+    "process_limit": 256,
+    "output_limit_bytes": 4194304,
+    "reason": "The existing Core plus stock framework paired harness requires its accepted S2-05 runtime image and limits."
+  },
+  "network_policy": {
+    "artifact_and_dependency_acquisition": "registry allowlist only, outside plugin execution Worker",
+    "plugin_behavior_worker": "network disabled by default",
+    "credentials": "none"
+  },
+  "pilot_measurements": {
+    "date": "2026-10-12",
+    "source_reports": [
+      {
+        "path": "outputs/acceptance/phase2-s209-nonebot-linux-pilot-20261012.json",
+        "sha256": "e811ce1fc455f2387b3feeae59f97d7618caca6213c8fdb7e44175afa1e54a48"
+      },
+      {
+        "path": "outputs/acceptance/phase2-s209-koishi-linux-pilot-20261012.json",
+        "sha256": "b58209e72f090a570833f81e28c62a48ad5a7d8feb85d9b42810d54f0c9c4b10"
+      },
+      {
+        "path": "outputs/acceptance/phase2-s209-koishi-windows-pilot-20261012.json",
+        "sha256": "cb44632163bf8b87e7223c0b86b62e858c43bd7225e4244001ba87d185874877"
+      },
+      {
+        "path": "outputs/acceptance/phase2-s209-legacy-linux-20261012.json",
+        "sha256": "0a79f85a6aaba673eb2a77ff82d19237c65401305187baff074968f01b686848"
+      }
+    ],
+    "legacy_linux": {
+      "worker_samples": 4,
+      "elapsed_seconds": {
+        "sample_count": 4,
+        "units": "seconds",
+        "p50": 20.601,
+        "p95": 23.625,
+        "min": 17.578,
+        "max": 23.625
+      },
+      "peak_memory_bytes": {
+        "sample_count": 4,
+        "units": "bytes; Docker stats sampled every 250ms",
+        "p50": 258054553.0,
+        "p95": 271581184.0,
+        "min": 246205644.0,
+        "max": 271581184.0
+      },
+      "input_bytes": {
+        "sample_count": 4,
+        "units": "bytes",
+        "p50": 199950835.0,
+        "p95": 209596439.0,
+        "min": 190336449.0,
+        "max": 209596439.0
+      }
+    },
+    "nonebot_linux": {
+      "worker_samples": 21,
+      "elapsed_seconds": {
+        "sample_count": 21,
+        "units": "seconds",
+        "p50": 12.39100000000326,
+        "p95": 15.968999999997322,
+        "min": 9.796999999998661,
+        "max": 19.98399999999674
+      },
+      "peak_memory_bytes": {
+        "sample_count": 21,
+        "units": "bytes; Docker stats sampled every 250ms",
+        "p50": 132330291,
+        "p95": 172805324,
+        "min": 87189094,
+        "max": 249036800
+      },
+      "writable_scratch_bytes": {
+        "sample_count": 21,
+        "units": "bytes; sampled every 200ms inside Linux Worker",
+        "p50": 65127464,
+        "p95": 101961464,
+        "min": 61504822,
+        "max": 160216939
+      },
+      "dependency_download_bytes": 24957125,
+      "input_bytes": {
+        "sample_count": 21,
+        "units": "bytes; verified wheelhouse and lock",
+        "p50": 13168768,
+        "p95": 31763101,
+        "min": 12369498,
+        "max": 37678294
+      }
+    },
+    "koishi_linux": {
+      "worker_samples": 22,
+      "elapsed_seconds": {
+        "sample_count": 22,
+        "units": "seconds",
+        "p50": 8.179500000002008,
+        "p95": 11.718999999997322,
+        "min": 8.0,
+        "max": 11.860000000000582
+      },
+      "peak_memory_bytes": {
+        "sample_count": 22,
+        "units": "bytes; Docker stats sampled every 250ms",
+        "p50": 124780543.5,
+        "p95": 249665945,
+        "min": 98094284,
+        "max": 294020710
+      },
+      "writable_scratch_bytes": {
+        "sample_count": 22,
+        "units": "bytes; Worker tmpfs sampled every 500ms inside Node pilot",
+        "p50": 26125165.0,
+        "p95": 34136311,
+        "min": 14233646,
+        "max": 81910531
+      },
+      "input_bytes": {
+        "sample_count": 22,
+        "units": "bytes; localized package-lock and verified tarballs",
+        "p50": 3800469.0,
+        "p95": 5245899,
+        "min": 3796094,
+        "max": 17410750
+      },
+      "dependency_archive_bytes_per_entry": {
+        "sample_count": 22,
+        "units": "bytes; verified lock tarballs staged per entry",
+        "p50": 3697042.5,
+        "p95": 5119475,
+        "min": 3694834,
+        "max": 13450384
+      }
+    },
+    "koishi_windows": {
+      "worker_samples": 22,
+      "elapsed_seconds": {
+        "sample_count": 22,
+        "units": "seconds",
+        "p50": 36.1404999999977,
+        "p95": 39.86000000000058,
+        "min": 34.48500000000058,
+        "max": 43.375
+      },
+      "peak_job_commit_bytes": {
+        "sample_count": 22,
+        "units": "bytes; Windows Job Object peak memory",
+        "p50": 6125854720.0,
+        "p95": 6712242176,
+        "min": 6109114368,
+        "max": 8566063104
+      },
+      "writable_scratch_bytes": {
+        "sample_count": 22,
+        "units": "bytes; Sandbox Workspace sampled every 500ms inside Node pilot",
+        "p50": 131231339.5,
+        "p95": 142651748,
+        "min": 129550698,
+        "max": 189291364
+      },
+      "input_bytes": {
+        "sample_count": 22,
+        "units": "bytes; Node runtime, localized package-lock and verified tarballs",
+        "p50": 109692857.0,
+        "p95": 111138287,
+        "min": 109688482,
+        "max": 123303138
+      },
+      "dependency_archive_bytes_per_entry": {
+        "sample_count": 22,
+        "units": "bytes; verified lock tarballs staged per entry",
+        "p50": 3697042.5,
+        "p95": 5119475,
+        "min": 3694834,
+        "max": 13450384
+      },
+      "job_memory_limit_mb": 8192
+    },
+    "unmeasured_scopes": [
+      "NoneBot Windows worker memory/scratch because App Control blocks CPython before worker start.",
+      "Full-census throughput, cache-hit ratios, and total disk budget."
+    ],
+    "status": "provisional"
+  }
+}
