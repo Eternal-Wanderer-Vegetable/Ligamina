@@ -4,7 +4,7 @@
 
 - 日期：2026-10-12（Asia/Shanghai）。用户要求完成 `docs/plans/2026-10-12-phase-2-full-catalog.md` 的 S2-01–S2-12 并分阶段提交。
 - 分支：`codex/phase2-full-catalog`。仓库新增文档已先提交 `2d6399a`，随后 S2-01 `15f468d`、S2-02 `c0be568`、S2-04 `2fa06b0`、S2-03 `29bc1e5`、S2-05 `854b564`。
-- 当前：S2-06 / feat-008 已实现、验收通过，待提交；S2-05 已提交 `854b564`。S2-06 实施前 baseline 见 `outputs/acceptance/phase2-s206-baseline-20261012.json`，验收见 `outputs/acceptance/phase2-s206-20261012.json`。下一个 feature 是 S2-07，必须在 S2-06 提交后记录 baseline，再动 catalog queue/runner。
+- 当前：S2-07 / feat-009 在实施。S2-06 已提交 `4e555b3` 并通过验收；S2-07 baseline 已在此提交、无 S2-07 代码的状态下完成，见 `outputs/acceptance/phase2-s207-baseline-20261012.json`。
 - 状态唯一入口：[feature_list.json](feature_list.json)。
 
 ## Completed Stages
@@ -29,7 +29,7 @@
 
 ## Next: S2-07
 
-S2-06 已完成实现和验收；提交后，先以干净的 S2-06 HEAD 运行并保存 `pwsh -NoProfile -File init.ps1 -Mode full` baseline，再开始 `feat-009`。
+S2-06 已完成。S2-07 baseline 已在提交 `4e555b3` 上保存，现在只处理 `feat-009`。
 
 - 实现 catalog suite、持久队列与 stage journal，覆盖 prepare/install/native/federated/compare/cleanup 状态；支持 lease、retry、shard 与 checkpoint/resume。
 - 验证机器重启、任意 stage kill、过期租约、重复派发、shard overlap、cache contamination 和部分报告；unknown 不可被重试覆盖。

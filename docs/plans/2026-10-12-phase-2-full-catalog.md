@@ -12,7 +12,7 @@
 - S2-03 已完成：为 5,690 个 entry 冻结 6,247 个平台归档引用；11,380 个 Windows/Linux profile 单元中，10,332 个锁定依赖完整并可复核，其他均记录显式终态。报告：[S2-03 验收](../../outputs/acceptance/phase2-s203-20261012.json)。未运行 sdist backend、npm lifecycle 或目录插件。
 - S2-05 已完成并分阶段提交 `854b564`；四个既有支持版本在禁网 Linux Docker Worker 中完成 Native/Federated/独立 oracle 配对。
 - S2-06 已完成两生态十类声明式 recipe 和 fail-closed 对照器，验收报告见 [S2-06](../../outputs/acceptance/phase2-s206-20261012.json)；recipe 执行接线留给 S2-07。
-- 下一任务为 S2-07：全量队列、阶段日志、租约和恢复；开始实现前以已提交 S2-06 HEAD 记录完整 baseline。
+- 当前任务为 S2-07：已在提交 `4e555b3` 上记录完整 baseline（[S2-07 baseline](../../outputs/acceptance/phase2-s207-baseline-20261012.json)），实现全量队列、阶段日志、租约和恢复。
 
 ## 1. 范围与全量定义
 

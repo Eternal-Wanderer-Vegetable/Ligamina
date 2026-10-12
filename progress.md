@@ -4,10 +4,10 @@
 
 - **Last Updated:** 2026-10-12（Asia/Shanghai）。
 - **Current Objective:** 按 S2-01–S2-12 顺序完成第二阶段目录全量实验能力并分阶段提交。
-- **Active Feature:** S2-06 / feat-008 已完成；全仓库验收通过，S2-07 尚待独立记录 baseline。
-- **Completed stage commits:** H01 `2d6399a`、S2-01 `15f468d`、S2-02 `c0be568`、S2-04 `2fa06b0`、S2-03 `29bc1e5`、S2-05 `854b564`。
+- **Active Feature:** S2-07 / feat-009；S2-06 已提交 `4e555b3`；S2-07 实施前 baseline 已记录。
+- **Completed stage commits:** H01 `2d6399a`、S2-01 `15f468d`、S2-02 `c0be568`、S2-04 `2fa06b0`、S2-03 `29bc1e5`、S2-05 `854b564`、S2-06 `4e555b3`。
 - 第一阶段 T01–T18、C01–C15、G1/G2 以 [T18 报告](outputs/acceptance/t18-final-audit-20261012.json) 为准；四个精确插件版本和虚拟 Gateway，真实平台收发未验证。
-- 第二阶段 S2-01–S2-06 完成；S2-07–S2-12 尚未完成，状态见 [feature_list.json](feature_list.json)。
+- 第二阶段 S2-01–S2-06 完成；S2-07 正在实施，S2-08–S2-12 尚未完成，状态见 [feature_list.json](feature_list.json)。
 
 ## What's Done
 
@@ -31,8 +31,9 @@
 
 ## Next / Blockers
 
-- S2-06 的验收报告、指南、feature 状态和交接已更新；阶段提交后开始 S2-07。
-- S2-07：实施前记录已提交 S2-06 HEAD 的完整 baseline；实现 catalog stage 持久化、租约、分片与可恢复调度，处理机器重启与重复派发负例。
+- S2-06 已提交 `4e555b3`，验收报告、指南和全仓库验证均通过。
+- S2-07 baseline：[phase2-s207-baseline](outputs/acceptance/phase2-s207-baseline-20261012.json)，在提交 `4e555b3` 上运行 `pwsh -NoProfile -File init.ps1 -Mode full`，退出码 0。
+- S2-07 实现 catalog stage 持久化、租约、分片与可恢复调度，处理机器重启与重复派发负例。
 - S2-06 recipes 仍是声明式定义和比较合同；S2-07 才接线执行。5,621 个冻结 entry 尚无保守行为分类建议，不能省略，需在调度/全量台账中显式列账。
 - Windows Sandbox 的 CPython 启动阻止仍是 Windows pilot 前置障碍；不绕过本机策略。S2-09 保留 blocker 和完整 Windows 分母。
 - S2-03 的 30 个 sdist build-only 条目只能在 OS 隔离 Worker 构建；全量 census、问题归因和真实平台验收尚未执行。
