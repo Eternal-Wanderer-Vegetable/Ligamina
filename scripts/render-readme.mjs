@@ -83,6 +83,8 @@ export async function phase2Block() {
   const s210SmokePath = 'outputs/acceptance/phase2-s210-census-linux-shard0of256-smoke-20261012.json';
   const s210ImplementationPath = 'outputs/acceptance/phase2-s210-implementation-20261012.json';
   const s210LinuxFormalPath = 'outputs/acceptance/phase2-s210-census-linux-shard0of256-20261012.json';
+  const s210WindowsFormalPath = 'outputs/acceptance/phase2-s210-census-windows-shard0of256-20261012.json';
+  const s210WindowsAttempt1Path = 'outputs/acceptance/phase2-s210-census-windows-shard0of256-attempt1-20261012.json';
   const pilotManifestPath = 'outputs/acceptance/phase2-s209-pilot-manifest-20261012.json';
   const pilotAcceptancePath = 'outputs/acceptance/phase2-s209-20261012.json';
   const nonebotLinuxPilotPath = 'outputs/acceptance/phase2-s209-nonebot-linux-pilot-20261012.json';
@@ -90,8 +92,8 @@ export async function phase2Block() {
   const koishiWindowsPilotPath = 'outputs/acceptance/phase2-s209-koishi-windows-pilot-20261012.json';
   const planPath = 'outputs/acceptance/phase2-s207-cli-smoke-20261012.json';
   const featureListPath = 'feature_list.json';
-  const [catalog, recipes, scheduler, reporting, baseline, s210Baseline, s210Smoke, s210Implementation, s210LinuxFormal, pilotManifest, pilotAcceptance, nonebotLinuxPilot, koishiLinuxPilot, koishiWindowsPilot, plan, featureList] = await Promise.all(
-    [catalogPath, recipesPath, schedulerPath, reportingPath, baselinePath, s210BaselinePath, s210SmokePath, s210ImplementationPath, s210LinuxFormalPath, pilotManifestPath, pilotAcceptancePath, nonebotLinuxPilotPath, koishiLinuxPilotPath, koishiWindowsPilotPath, planPath, featureListPath].map(load),
+  const [catalog, recipes, scheduler, reporting, baseline, s210Baseline, s210Smoke, s210Implementation, s210LinuxFormal, s210WindowsFormal, s210WindowsAttempt1, pilotManifest, pilotAcceptance, nonebotLinuxPilot, koishiLinuxPilot, koishiWindowsPilot, plan, featureList] = await Promise.all(
+    [catalogPath, recipesPath, schedulerPath, reportingPath, baselinePath, s210BaselinePath, s210SmokePath, s210ImplementationPath, s210LinuxFormalPath, s210WindowsFormalPath, s210WindowsAttempt1Path, pilotManifestPath, pilotAcceptancePath, nonebotLinuxPilotPath, koishiLinuxPilotPath, koishiWindowsPilotPath, planPath, featureListPath].map(load),
   );
   for (const [relative, expected] of Object.entries(reporting.input_reports ?? {})) {
     const actual = createHash('sha256').update(await readFile(path.join(root, relative))).digest('hex');
@@ -149,7 +151,17 @@ export async function phase2Block() {
   };
   for (const [key, relative] of Object.entries(s210SourceHashes)) {
     const actual = createHash('sha256').update(await readFile(path.join(root, relative))).digest('hex');
-    if (actual !== s210Smoke.source_hashes?.[key]) throw new Error(`Stale S2-10 smoke input: ${relative}`);
+    if (actual !== s210Smoke.source_hashes?.[key] || actual !== s210LinuxFormal.source_hashes?.[key]
+        || actual !== s210WindowsFormal.source_hashes?.[key] || actual !== s210WindowsAttempt1.source_hashes?.[key]) {
+      throw new Error(`Stale S2-10 census input: ${relative}`);
+    }
+  }
+  const previousWindowsAttempt = s210Implementation.formal_shards?.windows_0_of_256?.previous_attempt_report;
+  if (previousWindowsAttempt) {
+    const actual = createHash('sha256').update(await readFile(path.join(root, previousWindowsAttempt))).digest('hex');
+    if (actual !== s210Implementation.formal_shards.windows_0_of_256.previous_attempt_file_sha256) {
+      throw new Error(`Stale S2-10 Windows attempt evidence: ${previousWindowsAttempt}`);
+    }
   }
   if (s210Smoke.task_id !== 'S2-10' || s210Smoke.kind !== 'phase2_s210_census_shard'
       || s210Smoke.status !== 'completed' || s210Smoke.snapshot_id !== catalog.snapshot_id
@@ -175,6 +187,16 @@ export async function phase2Block() {
       || s210LinuxFormal.denominator?.expected_stage_jobs !== 96 || s210LinuxFormal.denominator?.terminal_stage_jobs !== 96
       || s210LinuxFormal.denominator?.full_census_closed !== false) {
     throw new Error(`Invalid S2-10 implementation or formal shard evidence: ${s210ImplementationPath}, ${s210LinuxFormalPath}`);
+  }
+  if (s210Implementation.formal_shards?.windows_0_of_256?.status !== 'completed'
+      || s210Implementation.formal_shards.windows_0_of_256.report_sha256 !== s210WindowsFormal.report_sha256
+      || s210WindowsFormal.task_id !== 'S2-10' || s210WindowsFormal.status !== 'completed'
+      || s210WindowsFormal.platform !== 'windows' || s210WindowsFormal.shard?.index !== 0 || s210WindowsFormal.shard?.count !== 256
+      || s210WindowsFormal.denominator?.selected_units !== 26 || s210WindowsFormal.denominator?.terminal_units !== 26
+      || s210WindowsFormal.denominator?.expected_stage_jobs !== 156 || s210WindowsFormal.denominator?.terminal_stage_jobs !== 156
+      || s210WindowsFormal.stage_counts?.cleanup?.unknown !== 0
+      || s210WindowsAttempt1.report_sha256 !== s210Implementation.formal_shards.windows_0_of_256.previous_attempt_report_sha256) {
+    throw new Error(`Invalid S2-10 Windows formal shard evidence: ${s210WindowsFormalPath}`);
   }
   const pilotInputs = {
     legacy_run_sha256: 'outputs/acceptance/phase2-s209-legacy-linux-20261012.json',
@@ -221,8 +243,12 @@ export async function phase2Block() {
   const featureByTask = new Map((featureList.features ?? []).map((feature) => [feature.task_id, feature]));
   const s210Status = featureByTask.get('S2-10')?.status ?? 'not-started';
   const windowsShardStatus = s210Implementation.formal_shards?.windows_0_of_256?.status ?? 'not-started';
+  const windowsShardLabel = windowsShardStatus === 'completed' ? '首片已闭合'
+    : windowsShardStatus === 'running' ? '首片执行中'
+      : windowsShardStatus === 'retrying_projection' ? '首片按修正后的 cleanup 投影重跑中'
+        : '首片尚未启动';
   const s210Label = s210Status === 'done' ? '已完成'
-    : s210Status === 'in-progress' ? `进行中：实现全仓库验证通过；正式 Linux shard ${s210LinuxFormal.denominator.terminal_units}/${s210LinuxFormal.denominator.selected_units} 闭合；Windows shard ${escape(windowsShardStatus)}；全快照未闭合`
+    : s210Status === 'in-progress' ? `进行中：实现全仓库验证通过；正式 Linux shard ${s210LinuxFormal.denominator.terminal_units}/${s210LinuxFormal.denominator.selected_units} 闭合；Windows shard ${windowsShardLabel}；全快照未闭合`
       : '未开始：全快照 census 尚未启动';
   const measurements = pilotAcceptance.resource_measurements;
 
@@ -241,9 +267,9 @@ export async function phase2Block() {
     '',
     `分类 dry run 只建议 ${suggested}/${count} entries，${unmapped} 项仍是 \`unmapped_category\`。S2-09 的 128 个双 OS 结果位置全部闭合：四个历史支持版本和 60 个分层目录 entry 分别保留状态；NoneBot Linux 尝试 ${nonebotPilot.attempted_workers} 个 Docker Worker（L1 ${JSON.stringify(nonebotPilot.dependency_install)}；L2 ${JSON.stringify(nonebotPilot.native_load)}），Koishi Linux 尝试 ${linuxPilot.attempted_workers} 个 Docker Worker（L1 ${JSON.stringify(linuxPilot.dependency_install)}；L2 ${JSON.stringify(linuxPilot.native_load)}），Windows 尝试 ${windowsPilot.attempted_workers} 个 Sandbox Worker（L1 ${JSON.stringify(windowsPilot.dependency_install)}；L2 ${JSON.stringify(windowsPilot.native_load)}）。`,
     '',
-    `Windows Sandbox 的 CPython 启动仍受 App Control（Win32 4551）阻止；Node.js 24.20.0 签名 runtime 已用于 Windows Koishi L1/L2 pilot。Koishi Windows Job Object commit P95 ${(measurements.koishi_windows_peak_worker_memory_bytes.p95 / (1024 ** 3)).toFixed(2)} GiB（8 GiB 限额内），scratch P95 ${(measurements.koishi_windows_peak_writable_scratch_bytes.p95 / (1024 ** 2)).toFixed(1)} MiB；预算仍 provisional，NoneBot Windows 无 Worker 样本。目录 cohort 缺 entry-bound behavior fixture，L4 未评估，不能外推为兼容。S2-10 独立 smoke 为 ${s210Smoke.denominator.terminal_units}/${s210Smoke.denominator.selected_units} 单元、${s210Smoke.denominator.terminal_stage_jobs}/${s210Smoke.denominator.expected_stage_jobs} stage jobs；正式 Linux shard 0/256 为 ${s210LinuxFormal.denominator.terminal_units}/${s210LinuxFormal.denominator.selected_units} 单元、${s210LinuxFormal.denominator.terminal_stage_jobs}/${s210LinuxFormal.denominator.expected_stage_jobs} jobs，Windows shard 状态为 ${escape(windowsShardStatus)}。全快照仍未闭合。S2-09 pilot 时记录的全量 census 状态为 ${pilotAcceptance.readiness.full_census}；真实平台登录、发送与投递验收未执行。`,
+    `Windows Sandbox 的 CPython 启动仍受 App Control（Win32 4551）阻止；Node.js 24.20.0 签名 runtime 已用于 Windows Koishi L1/L2 pilot。Koishi Windows Job Object commit P95 ${(measurements.koishi_windows_peak_worker_memory_bytes.p95 / (1024 ** 3)).toFixed(2)} GiB（8 GiB 限额内），scratch P95 ${(measurements.koishi_windows_peak_writable_scratch_bytes.p95 / (1024 ** 2)).toFixed(1)} MiB；预算仍 provisional，NoneBot Windows 无 Worker 样本。目录 cohort 缺 entry-bound behavior fixture，L4 未评估，不能外推为兼容。S2-10 独立 smoke 为 ${s210Smoke.denominator.terminal_units}/${s210Smoke.denominator.selected_units} 单元、${s210Smoke.denominator.terminal_stage_jobs}/${s210Smoke.denominator.expected_stage_jobs} stage jobs；正式 Linux shard 0/256 为 ${s210LinuxFormal.denominator.terminal_units}/${s210LinuxFormal.denominator.selected_units} 单元、${s210LinuxFormal.denominator.terminal_stage_jobs}/${s210LinuxFormal.denominator.expected_stage_jobs} jobs，Windows shard 0/256 为 ${s210WindowsFormal.denominator.terminal_units}/${s210WindowsFormal.denominator.selected_units} 单元（通过 / 失败 / 跳过 / 未知：${['passed', 'failed', 'skipped', 'unknown'].map((status) => s210WindowsFormal.counts[status]).join(' / ')}）。全快照仍未闭合。S2-09 pilot 时记录的全量 census 状态为 ${pilotAcceptance.readiness.full_census}；真实平台登录、发送与投递验收未执行。`,
     '',
-    `证据：[目录快照](${catalogPath})、[分类 dry run](${recipesPath})、[调度验收](${schedulerPath})、[S2-07 实际 CLI 计划](${planPath})、[S2-08 报告验收](${reportingPath})、[S2-09 baseline](${baselinePath})、[S2-09 pilot 清单](${pilotManifestPath})、[S2-09 pilot 结果](${pilotAcceptancePath})、[S2-10 baseline](${s210BaselinePath})、[S2-10 实现验证](${s210ImplementationPath})、[S2-10 smoke shard](${s210SmokePath})、[S2-10 正式 Linux shard](${s210LinuxFormalPath})、[完整实施计划](docs/plans/2026-10-12-phase-2-full-catalog.md)。`,
+    `证据：[目录快照](${catalogPath})、[分类 dry run](${recipesPath})、[调度验收](${schedulerPath})、[S2-07 实际 CLI 计划](${planPath})、[S2-08 报告验收](${reportingPath})、[S2-09 baseline](${baselinePath})、[S2-09 pilot 清单](${pilotManifestPath})、[S2-09 pilot 结果](${pilotAcceptancePath})、[S2-10 baseline](${s210BaselinePath})、[S2-10 实现验证](${s210ImplementationPath})、[S2-10 smoke shard](${s210SmokePath})、[S2-10 正式 Linux shard](${s210LinuxFormalPath})、[S2-10 正式 Windows shard](${s210WindowsFormalPath})、[Windows 首次投影 attempt](${s210WindowsAttempt1Path})、[完整实施计划](docs/plans/2026-10-12-phase-2-full-catalog.md)。`,
     phase2End,
   ].join('\n');
 }

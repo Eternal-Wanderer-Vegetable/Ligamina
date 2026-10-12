@@ -246,10 +246,13 @@ def _handle_job(
         if not isinstance(probe, dict) or not probe.get("attempted", True):
             outcome = {"status": "skipped", "reason_code": "no_worker_process_started", "attempted": False}
         else:
-            outcome = _worker_stage(probe, "cleanup")
             worker = probe.get("worker")
             if isinstance(worker, dict) and worker.get("cleanup_confirmed") is False:
                 outcome = {"status": "unknown", "reason_code": "worker_cleanup_unconfirmed"}
+            elif not _protocol(probe) and isinstance(worker, dict) and worker.get("cleanup_confirmed") is True:
+                outcome = {"status": "passed", "reason_code": "worker_cleanup_confirmed_without_protocol"}
+            else:
+                outcome = _worker_stage(probe, "cleanup")
             outcome.update({"attempted": True, "probe_result_sha256": install_result.get("probe_result_sha256")})
     else:
         outcome = {"status": "unknown", "reason_code": "unsupported_catalog_stage", "attempted": False}

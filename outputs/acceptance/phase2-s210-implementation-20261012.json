@@ -8,7 +8,14 @@
   "baseline_report": "outputs/acceptance/phase2-s210-baseline-20261012.json",
   "implementation": {
     "resumable_sqlite_stage_dispatcher": true,
-    "terminal_projection_stages": ["prepare", "install", "native", "federated", "compare", "cleanup"],
+    "terminal_projection_stages": [
+      "prepare",
+      "install",
+      "native",
+      "federated",
+      "compare",
+      "cleanup"
+    ],
     "per_entry_evidence_and_cross_shard_aggregation": true,
     "koishi_platform_independent_artifact_mapping": true,
     "full_census_closed": false
@@ -16,22 +23,82 @@
   "validation": {
     "command": "pwsh -NoProfile -File init.ps1 -Mode full",
     "exit_code": 0,
-    "documentation": {"status": "passed", "documents": 18, "local_links": 199, "features": 14},
-    "nonebot_pytest": {"status": "passed", "tests": 3},
-    "lab_unittest": {"status": "passed", "tests": 106},
-    "koishi_tests": {"status": "passed", "tests": 7},
-    "koishi_mcp_tests": {"status": "passed", "tests": 1},
-    "reference_client_tests": {"status": "passed", "tests": 5},
-    "rust_workspace_tests": {"status": "passed", "tests": 33},
-    "windows_core_smoke": {"status": "passed", "events": 4, "gateway_operations": 4, "remaining_pids": []},
-    "windows_bundle_stage": {"status": "passed"},
-    "focused_catalog_and_census_tests": {"status": "passed", "tests": 10},
-    "readme_evidence_check": {"status": "passed", "command": "node scripts/render-readme.mjs --check"},
-    "diff_check": {"status": "passed", "command": "git diff --check"}
+    "documentation": {
+      "status": "passed",
+      "documents": 18,
+      "local_links": 207,
+      "features": 14
+    },
+    "nonebot_pytest": {
+      "status": "passed",
+      "tests": 3
+    },
+    "lab_unittest": {
+      "status": "passed",
+      "tests": 108
+    },
+    "koishi_tests": {
+      "status": "passed",
+      "tests": 7
+    },
+    "koishi_mcp_tests": {
+      "status": "passed",
+      "tests": 1
+    },
+    "reference_client_tests": {
+      "status": "passed",
+      "tests": 5
+    },
+    "rust_workspace_tests": {
+      "status": "passed",
+      "tests": 33
+    },
+    "windows_core_smoke": {
+      "status": "passed",
+      "events": 4,
+      "gateway_operations": 4,
+      "remaining_pids": []
+    },
+    "windows_bundle_stage": {
+      "status": "passed"
+    },
+    "focused_catalog_and_census_tests": {
+      "status": "passed",
+      "tests": 12
+    },
+    "readme_evidence_check": {
+      "status": "passed",
+      "command": "node scripts/render-readme.mjs --check"
+    },
+    "diff_check": {
+      "status": "passed",
+      "command": "git diff --check"
+    },
+    "cleanup_projection_regression": {
+      "status": "passed",
+      "confirmed_without_protocol": "passed",
+      "unconfirmed_without_protocol": "unknown"
+    },
+    "full_repository_revalidation_after_projection_fix": {
+      "status": "passed",
+      "command": "pwsh -NoProfile -File init.ps1 -Mode full",
+      "exit_code": 0
+    },
+    "renderer_syntax": {
+      "status": "passed",
+      "command": "node --check scripts/render-readme.mjs"
+    },
+    "post_documentation_recheck": {
+      "status": "passed",
+      "documents": 18,
+      "local_links": 208,
+      "features": 14,
+      "command": "pwsh -NoProfile -File init.ps1 -Mode docs"
+    }
   },
   "windows_smoke_file": {
     "original_sha256": "033D8EA2534603B880DB2A729B328C3A75C7F4CF0B8F8DEE087C22BEBBCAC752",
-    "generated_sha256": "405882B098D5BA44FB72B94EFCC3A28CDB8393331A43725964FE59A24D941704",
+    "generated_sha256": "0C1B48019A5E1CB822DBA358127DF987070EE11ABF31A210B8ADFF812167D221",
     "restored_sha256": "033D8EA2534603B880DB2A729B328C3A75C7F4CF0B8F8DEE087C22BEBBCAC752"
   },
   "formal_shards": {
@@ -42,10 +109,45 @@
       "terminal_units": 16,
       "expected_stage_jobs": 96,
       "terminal_stage_jobs": 96,
-      "counts": {"passed": 0, "failed": 4, "skipped": 12, "unknown": 0},
+      "counts": {
+        "passed": 0,
+        "failed": 4,
+        "skipped": 12,
+        "unknown": 0
+      },
       "report_sha256": "64a0b50a8b9b44f1fb7ce9a225c14b9ae0078fa3cb3c341f958d22ba520f2d67"
     },
-    "windows_0_of_256": {"status": "running", "queue_db": ".work/catalog-census/phase2-s210.sqlite3"}
+    "windows_0_of_256": {
+      "status": "completed",
+      "report": "outputs/acceptance/phase2-s210-census-windows-shard0of256-20261012.json",
+      "report_sha256": "3935571a6ddad273419e762cffd0fbcfe0f89407a0257cf8347cc2efbe3cb7d7",
+      "selected_units": 26,
+      "terminal_units": 26,
+      "expected_stage_jobs": 156,
+      "terminal_stage_jobs": 156,
+      "counts": {
+        "passed": 0,
+        "failed": 1,
+        "skipped": 22,
+        "unknown": 3
+      },
+      "cleanup_stage_counts": {
+        "passed": 14,
+        "failed": 0,
+        "skipped": 12,
+        "unknown": 0
+      },
+      "previous_attempt_report": "outputs/acceptance/phase2-s210-census-windows-shard0of256-attempt1-20261012.json",
+      "previous_attempt_file_sha256": "c336ea4b3ae9ae9ba4decc47509e13800197e569d4bb7582b37caebd3dc68664",
+      "previous_attempt_report_sha256": "120ce22af405da3a02af45f707e7dc6596c7cd3ec9140c1225c735041a8f7cee",
+      "queue_db": ".work/catalog-census/phase2-s210-windows-reprojection.sqlite3",
+      "projection_adjustment": "Worker cleanup confirmed true closes cleanup when plugin protocol output is absent; worker cleanup false remains unknown."
+    },
+    "linux_1_of_256": {
+      "status": "running",
+      "report": "outputs/acceptance/phase2-s210-census-linux-shard1of256-20261012.json",
+      "queue_db": ".work/catalog-census/phase2-s210.sqlite3"
+    }
   },
   "denominator": {
     "snapshot_entries": 5690,

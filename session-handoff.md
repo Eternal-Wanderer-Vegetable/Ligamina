@@ -5,7 +5,7 @@
 - 日期：2026-10-12（Asia/Shanghai）。用户要求完成 `docs/plans/2026-10-12-phase-2-full-catalog.md` 的 S2-01–S2-12 并分阶段提交。
 - 分支：`codex/phase2-full-catalog`。仓库新增文档先提交 `2d6399a`；已提交 S2-01 `15f468d`、S2-02 `c0be568`、S2-04 `2fa06b0`、S2-03 `29bc1e5`、S2-05 `854b564`、S2-06 `4e555b3`、S2-07 `7523a83`、S2-08 `cbcbb0a`、S2-09 `20d8f04`；`299d22c` 是此前 S2-09 baseline/status checkpoint。
 - 当前：S2-09 pilot 已完成并提交。S2-10 / feat-012 正在进行；clean baseline 在 S2-09 HEAD `20d8f04db8c647da1f95336ca576966fccc15abb` 上通过。已实现可恢复 SQLite 六阶段 dispatcher、per-entry 证据、跨 shard/per-plugin 汇总及 Koishi `platform=all` artifact 映射；实现后的 `Mode full` 退出码 0（lab 106，Windows Core smoke 4 events/4 Gateway ops/0 PIDs，bundle 通过），详见 `outputs/acceptance/phase2-s210-implementation-20261012.json`。
-- 断点：正式分母为 5,690 entries × 2 OS = 11,380 单元；10,332 locked profile 仅为候选。Linux `0/256` 正式 shard 已闭合 16 单元 / 96 stage jobs（4 failed、12 skipped），报告 `outputs/acceptance/phase2-s210-census-linux-shard0of256-20261012.json`；Windows `0/256` 正运行于 `.work/catalog-census/phase2-s210.sqlite3`，完成后检查并继续剩余 shard。隔离 smoke report 不并入正式汇总。S2-09 pilot 的行为 fixture 缺失、预算 provisional 和 Windows NoneBot App Control Win32 4551 unknown 均保留；不绕过策略。全量 512 shard 和 11,380 单元 aggregation 未完成。
+- 断点：正式分母为 5,690 entries × 2 OS = 11,380 单元；10,332 locked profile 仅为候选。Linux `0/256` 正式 shard 闭合 16 单元 / 96 stage jobs（4 failed、12 skipped）。修正投影后的 Windows `0/256` 闭合 26 单元 / 156 stage jobs（1 failed、22 skipped、3 App Control unknown；cleanup 14 passed、12 skipped、0 unknown），报告哈希已核验；首跑报告保留为 attempt1。实现修正、12 个 focused tests、全仓库复验通过，最新 docs 检查为 18/208。Linux `1/256` 正在运行于 `.work/catalog-census/phase2-s210.sqlite3`，命令和中断恢复参数见下方。行为 fixture 缺失、预算 provisional 和 App Control unknown 均保留；不绕过策略。全量 512 shard 和 11,380 单元 aggregation 未完成。
 
 ## Completed Stages
 
@@ -45,11 +45,15 @@
 
 - S2-09 stage commit: `20d8f04db8c647da1f95336ca576966fccc15abb`.
 - S2-10 clean baseline: `pwsh -NoProfile -File init.ps1 -Mode full`, exit 0; 18 docs/191 links; NoneBot 3, lab 102, Koishi 7, MCP 1, reference 5, Rust 33; Windows Core smoke 4 events / 4 Gateway operations / 0 PIDs; bundle stage passed. Evidence: `outputs/acceptance/phase2-s210-baseline-20261012.json`. Generated smoke JSON was restored.
-- Profile lock statuses identify 10,332 candidate entry×OS units, not completed executions. The isolated Linux smoke report remains excluded from formal census. Formal Linux shard `0/256` is complete at 16 units / 96 terminal jobs (4 failed, 12 skipped); the Windows `0/256` shard is currently running. Full 11,380-unit census remains open; Windows CPython App Control Win32 4551 remains an evidenced blocker and the resource budget is provisional. Implementation and verification are recorded in `outputs/acceptance/phase2-s210-implementation-20261012.json`.
+- Profile lock statuses identify 10,332 candidate entry×OS units, not completed executions. The isolated Linux smoke report remains excluded from formal census. Formal Linux shard `0/256` is complete at 16 units / 96 terminal jobs (4 failed, 12 skipped). Windows `0/256` attempt 1 is preserved; a regression now projects confirmed Worker cleanup independently when plugin protocol output is absent, and the shard is being rerun with this correction. Full 11,380-unit census remains open; App Control Win32 4551 remains an evidenced blocker and the resource budget is provisional. Implementation and verification are recorded in `outputs/acceptance/phase2-s210-implementation-20261012.json`.
 
 ## Next: S2-10
 
-- Finish and verify the active Windows shard, then execute remaining formal shards on the same persistent queue. Resume interrupted work with the same shard inputs and queue DB.
+- Continue the formal census with Linux shard `1/256`, then Windows `1/256`; preserve the 11,380 entry×OS denominator and use the persistent queue.
+- If a shard is interrupted after its queue run is created, add `--resume` to the same command. Current next Linux shard command:
+  ```powershell
+  uv run --locked --project lab --python 3.12.14 python -m lab.census --snapshot catalogs/p2-41649744e057d61031d5 --queue-db .work/catalog-census/phase2-s210.sqlite3 --platform linux --shard 1/256 --report outputs/acceptance/phase2-s210-census-linux-shard1of256-20261012.json --timeout-seconds 240
+  ```
 - Preserve the 11,380 entry×OS denominator and frozen artifact/profile/hash identity. Every inaccessible or unsupported stage needs an evidence-backed terminal state; queue planning alone does not count as execution.
 - Retain S2-09 failure/unknown evidence, resource limits, retries, and checkpoints. Update full-census resource estimates from shard measurements and do not claim behavior compatibility for rows without entry-bound fixtures.
 - 5,621 entries still lack conservative behavior-category suggestions; do not claim plugin-wide compatibility or field acceptance.

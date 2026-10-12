@@ -106,6 +106,29 @@ class CensusQueueTests(unittest.TestCase):
         self.assertIsNone(rows[0]["cleanup_confirmed"])
         self.assertEqual(rows[0]["probe_evidence"]["reason_code"], "app_control_win32_4551")
 
+    def test_worker_cleanup_confirmation_closes_cleanup_without_plugin_protocol(self) -> None:
+        probe = {
+            "task_id": "S2-10", "status": "failed", "reason_code": "worker_nonzero_exit",
+            "attempted": True, "worker": {"status": "failed", "cleanup_confirmed": True},
+        }
+        rows, summary = self._run_unit("windows", probe)
+
+        self.assertEqual(rows[0]["unit_status"], "failed")
+        self.assertEqual(rows[0]["stage_statuses"]["install"], "failed")
+        self.assertEqual(rows[0]["stage_statuses"]["cleanup"], "passed")
+        self.assertTrue(rows[0]["cleanup_confirmed"])
+        self.assertEqual(summary["unit_status"]["failed"], 1)
+
+    def test_worker_cleanup_confirmation_false_stays_unknown_without_protocol(self) -> None:
+        probe = {
+            "task_id": "S2-10", "status": "failed", "reason_code": "worker_nonzero_exit",
+            "attempted": True, "worker": {"status": "failed", "cleanup_confirmed": False},
+        }
+        rows, _ = self._run_unit("windows", probe)
+
+        self.assertEqual(rows[0]["stage_statuses"]["cleanup"], "unknown")
+        self.assertIs(rows[0]["cleanup_confirmed"], False)
+
 
 class CensusAggregateTests(unittest.TestCase):
     def test_aggregate_closes_both_os_and_keeps_per_plugin_report(self) -> None:

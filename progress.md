@@ -73,7 +73,7 @@
 
 - S2-09 clean HEAD `20d8f04db8c647da1f95336ca576966fccc15abb` 上的 S2-10 baseline 通过：`pwsh -NoProfile -File init.ps1 -Mode full` 退出码 0，docs 18/191、NoneBot 3、lab 102、Koishi 7、MCP 1、reference 5、Rust 33、Windows smoke 4 events / 4 gateway ops / 0 PIDs、bundle 通过。见 [baseline](outputs/acceptance/phase2-s210-baseline-20261012.json)。
 - 已实现 SQLite 可恢复六阶段 shard dispatcher、per-entry evidence、跨 shard/per-plugin 汇总及 Koishi `platform=all` artifact 映射。实现后的 `Mode full` 退出码 0：docs 18/199、NoneBot 3、lab 106、Koishi 7、MCP 1、reference 5、Rust 33、Windows smoke 4/4/0、bundle 通过；10 个 focused catalog/census tests 通过；README 证据检查与 `git diff --check` 通过，详见 [implementation checkpoint](outputs/acceptance/phase2-s210-implementation-20261012.json)。
-- 隔离 Linux smoke shard [报告](outputs/acceptance/phase2-s210-census-linux-shard0of256-smoke-20261012.json) 独立保存、不并入正式结果。正式 Linux `0/256` shard 已闭合 16/16 单元和 96/96 stage jobs，4 failed、12 skipped，见[报告](outputs/acceptance/phase2-s210-census-linux-shard0of256-20261012.json)。正式 Windows `0/256` 正在执行；完整 512 个平台 shard 及 11,380 单元汇总尚未闭合。
+- 隔离 Linux smoke shard [报告](outputs/acceptance/phase2-s210-census-linux-shard0of256-smoke-20261012.json) 独立保存、不并入正式结果。正式 Linux `0/256` shard 已闭合 16/16 单元和 96/96 stage jobs，4 failed、12 skipped，见[报告](outputs/acceptance/phase2-s210-census-linux-shard0of256-20261012.json)。正式 Windows `0/256` shard 已闭合 26/26 单元、156/156 stage jobs：1 failed、22 skipped、3 unknown；cleanup 14 passed/12 skipped/0 unknown。首跑因 cleanup 证据投影偏严留存为 attempt1，补回归后重跑修正。正式 Linux `1/256` 当前执行中；全量 512 shard 和 11,380 单元汇总尚未闭合。
 - `ci-smoke-windows.json` 已恢复到原 SHA-256 `033D8EA2534603B880DB2A729B328C3A75C7F4CF0B8F8DEE087C22BEBBCAC752`。10,332 个 locked profile 仍只是执行候选；Windows NoneBot CPython 的 App Control Win32 4551 保持 unknown。
 
 ## Next / Blockers
