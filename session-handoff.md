@@ -5,7 +5,7 @@
 - 日期：2026-10-13（Asia/Shanghai）。用户要求完成 `docs/plans/2026-10-12-phase-2-full-catalog.md` 的 S2-01–S2-12 并分阶段提交。
 - 分支：`codex/phase2-full-catalog`。仓库新增文档先提交 `2d6399a`；已提交 S2-01 `15f468d`、S2-02 `c0be568`、S2-04 `2fa06b0`、S2-03 `29bc1e5`、S2-05 `854b564`、S2-06 `4e555b3`、S2-07 `7523a83`、S2-08 `cbcbb0a`、S2-09 `20d8f04`；`299d22c` 是此前 S2-09 baseline/status checkpoint；S2-10 census checkpoints `8f21ead`、`4295831`、`25cf805`、`7ac3f1c`、`6f864bb`、`fb3920e`、`01988bc`、`ee758da`、`36768b5`、`aa25211`、`aa89dbc`、`25a0d41`、`fa9fea8`、`bcb1e73`、`12f6203`、`45ade15`、`75c750c`、`3455a07`、`95909ff`、`498f436`、`a81dc61`、`e35bf26`、`2e44298`、`8e8189d`、`c457043`、`5a89e0f`、`60bfba3`、`466f9ec`、`1ed38d8`、`ac56cf7`、`f295313`、`f625b48`、`e2debcb`、`1455b31`、`f9c2c6b`、`c479f49`、`6356360`、`8a32e8e`、`6c1818f`、`31709fa`、`d071238`、`01d412e`、`5f7be0c`、`ecf4ebe`、`4047c76`、`f41c2f2`、`21d1336`、`0d56ba1`、`4c974f3`、`e491a3e`、`35d8428`、`b6c9237`、`2627109`、`da1322c`、`96350a3`、`084c015`、`1f1c3ae`、`3161907`、`0dfcaef`、`3f9c6ac`、`8b55df4`、`141cfee`、`4b044c7`、`9461053`、`cdb6a10`、`fe21968`、`9d401d6`、`eff6790`、`5213dac`、`1e15788`、`1bb005d`、`92b3f47`。
 - 当前：S2-09 pilot 已完成并提交。S2-10 / feat-012 正在进行；clean baseline 在 S2-09 HEAD `20d8f04db8c647da1f95336ca576966fccc15abb` 上通过。已实现可恢复 SQLite 六阶段 dispatcher、per-entry 证据、跨 shard/per-plugin 汇总及 Koishi `platform=all` artifact 映射；projection 修复后的 `Mode full` 退出码 0（lab 108，Windows Core smoke 4 events/4 Gateway ops/0 PIDs，bundle 通过），详见 `outputs/acceptance/phase2-s210-implementation-20261012.json`。
-- 断点：正式分母为 5,690 entries × 2 OS = 11,380 单元；10,332 locked profile 仅为候选。linux shards 0–255/256、windows shards 0–178/256 已闭合，共 9,635/11,380 单元、435/512 shard；尚缺 1,745 单元、77 shard。当前活动 runner：windows shard 179/256。计数为 0 passed、1046 failed、8,009 skipped、580 unknown，aggregate SHA-256 `ebad3bfc46d14627a6dc4d582139ec823244e63c366758e6f5e2463ba98ca08d`。数据 checkpoint `90ce28d` 已提交；README --check 与 `pwsh -NoProfile -File init.ps1 -Mode docs` 通过（18 文档、210 本地链接）。行为 fixture 缺失、预算 provisional 和 App Control unknown 均保留；不绕过策略。
+- 断点：正式分母为 5,690 entries × 2 OS = 11,380 单元；10,332 locked profile 仅为候选。linux shards 0–255/256、windows shards 0–179/256 已闭合，共 9,658/11,380 单元、436/512 shard；尚缺 1,722 单元、76 shard。当前活动 runner：windows shard 180/256。计数为 0 passed、1050 failed、8,025 skipped、583 unknown，aggregate SHA-256 `b61d539d8bb257a2574b661ec7a327d9483257ebdb03ced8e668319135514395`。数据 checkpoint `460a87c` 已提交；README --check 与 `pwsh -NoProfile -File init.ps1 -Mode docs` 通过（18 文档、210 本地链接）。行为 fixture 缺失、预算 provisional 和 App Control unknown 均保留；不绕过策略。
 
 ## Completed Stages
 
@@ -49,7 +49,7 @@
 
 ## Blockers
 
-- The latest committed aggregate is census-incomplete: 9,635/11,380 units closed; 1,745 units and 77 shards remain. Counts: 0 passed, 1046 failed, 8,009 skipped, 580 unknown. linux shards 0–255/256; windows shards 0–178/256. Active queue runs: windows shard 179/256.
+- The latest committed aggregate is census-incomplete: 9,658/11,380 units closed; 1,722 units and 76 shards remain. Counts: 0 passed, 1050 failed, 8,025 skipped, 583 unknown. linux shards 0–255/256; windows shards 0–179/256. Active queue runs: windows shard 180/256.
 - Windows NoneBot rows blocked by App Control Win32 4551 remain unknown. Missing entry-bound behavior fixtures remain skipped; 10,332 locked profiles are candidates only; the resource budget remains provisional.
 
 ## Files
@@ -64,6 +64,6 @@
 ## Next Session
 
 - First compare current git status with runner logs, Windows processes, and read-only SQLite. If a matching runner is active, let it continue; do not launch a duplicate.
-- Only if a platform runner has stopped and no matching process remains, resume from its first missing shard with windows: `pwsh -NoProfile -File .work/catalog-census/run-remaining.ps1 -Platform windows -StartShard 179 -EndShard 255`. The script skips completed reports and resumes an unfinished durable run.
+- Only if a platform runner has stopped and no matching process remains, resume from its first missing shard with windows: `pwsh -NoProfile -File .work/catalog-census/run-remaining.ps1 -Platform windows -StartShard 180 -EndShard 255`. The script skips completed reports and resumes an unfinished durable run.
 - When all 512 canonical shards close, aggregate complete reports only, refresh checkpoint evidence and README, run the required census/report checks, then commit data evidence separately from status documents.
 - After S2-10 P2-CENSUS and P2-AUTOMATION gates are reviewed, proceed to S2-11 failure attribution, repair, scoped regressions and full rerun; then finish S2-12 audit and compatibility matrix. Preserve failed, skipped, unknown and field-acceptance boundaries.
