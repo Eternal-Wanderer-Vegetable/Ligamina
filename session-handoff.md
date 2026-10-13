@@ -5,7 +5,7 @@
 - 日期：2026-10-13（Asia/Shanghai）。用户要求完成 `docs/plans/2026-10-12-phase-2-full-catalog.md` 的 S2-01–S2-12 并分阶段提交。
 - 分支：`codex/phase2-full-catalog`。仓库新增文档先提交 `2d6399a`；已提交 S2-01 `15f468d`、S2-02 `c0be568`、S2-04 `2fa06b0`、S2-03 `29bc1e5`、S2-05 `854b564`、S2-06 `4e555b3`、S2-07 `7523a83`、S2-08 `cbcbb0a`、S2-09 `20d8f04`；`299d22c` 是此前 S2-09 baseline/status checkpoint；S2-10 census checkpoints `8f21ead`、`4295831`、`25cf805`、`7ac3f1c`、`6f864bb`、`fb3920e`、`01988bc`、`ee758da`、`36768b5`、`aa25211`、`aa89dbc`、`25a0d41`、`fa9fea8`、`bcb1e73`、`12f6203`、`45ade15`、`75c750c`、`3455a07`、`95909ff`、`498f436`、`a81dc61`、`e35bf26`、`2e44298`、`8e8189d`、`c457043`、`5a89e0f`、`60bfba3`、`466f9ec`、`1ed38d8`、`ac56cf7`、`f295313`、`f625b48`、`e2debcb`、`1455b31`、`f9c2c6b`、`c479f49`、`6356360`、`8a32e8e`、`6c1818f`、`31709fa`、`d071238`、`01d412e`、`5f7be0c`、`ecf4ebe`、`4047c76`、`f41c2f2`、`21d1336`、`0d56ba1`、`4c974f3`、`e491a3e`、`35d8428`、`b6c9237`、`2627109`、`da1322c`、`96350a3`、`084c015`、`1f1c3ae`、`3161907`、`0dfcaef`、`3f9c6ac`、`8b55df4`、`141cfee`、`4b044c7`、`9461053`、`cdb6a10`、`fe21968`、`9d401d6`、`eff6790`、`5213dac`、`1e15788`、`1bb005d`、`92b3f47`。
 - 当前：S2-09 pilot 已完成并提交。S2-10 / feat-012 正在进行；clean baseline 在 S2-09 HEAD `20d8f04db8c647da1f95336ca576966fccc15abb` 上通过。已实现可恢复 SQLite 六阶段 dispatcher、per-entry 证据、跨 shard/per-plugin 汇总及 Koishi `platform=all` artifact 映射；projection 修复后的 `Mode full` 退出码 0（lab 108，Windows Core smoke 4 events/4 Gateway ops/0 PIDs，bundle 通过），详见 `outputs/acceptance/phase2-s210-implementation-20261012.json`。
-- 断点：正式分母为 5,690 entries × 2 OS = 11,380 单元；10,332 locked profile 仅为候选。linux shards 0–235/256、windows shards 0–93/256 已闭合，共 7,323/11,380 单元、330/512 shard；尚缺 4,057 单元、182 shard。当前活动 runner：linux shard 236/256, windows shard 94/256。计数为 0 passed、775 failed、6,222 skipped、326 unknown，aggregate SHA-256 `bccccfa21db7606205d6e0c9c061d6fc06eb4f60e6e395bcf996f187cca1be9a`。数据 checkpoint `474286e` 已提交；README --check 与 `pwsh -NoProfile -File init.ps1 -Mode docs` 通过（18 文档、210 本地链接）。行为 fixture 缺失、预算 provisional 和 App Control unknown 均保留；不绕过策略。
+- 断点：正式分母为 5,690 entries × 2 OS = 11,380 单元；10,332 locked profile 仅为候选。linux shards 0–248/256、windows shards 0–98/256 已闭合，共 7,748/11,380 单元、348/512 shard；尚缺 3,632 单元、164 shard。当前活动 runner：windows shard 99/256, linux shard 249/256。计数为 0 passed、818 failed、6,590 skipped、340 unknown，aggregate SHA-256 `d688fbd9c72645b75c55417e03d4b991bab03c2d4d1ae8b23109ede23ce99a1c`。数据 checkpoint `d760961` 已提交；README --check 与 `pwsh -NoProfile -File init.ps1 -Mode docs` 通过（18 文档、210 本地链接）。行为 fixture 缺失、预算 provisional 和 App Control unknown 均保留；不绕过策略。
 
 ## Completed Stages
 
@@ -47,20 +47,23 @@
 - S2-10 clean baseline: `pwsh -NoProfile -File init.ps1 -Mode full`, exit 0; 18 docs/191 links; NoneBot 3, lab 102, Koishi 7, MCP 1, reference 5, Rust 33; Windows Core smoke 4 events / 4 Gateway operations / 0 PIDs; bundle stage passed. Evidence: `outputs/acceptance/phase2-s210-baseline-20261012.json`. Generated smoke JSON was restored.
 - Profile lock statuses identify 10,332 candidate entry×OS units, not completed executions. The isolated Linux smoke report remains excluded from formal census. Formal Linux shard `0/256` is complete at 16 units / 96 terminal jobs (4 failed, 12 skipped). Windows `0/256` attempt 1 is preserved; a regression now projects confirmed Worker cleanup independently when plugin protocol output is absent, and the shard is being rerun with this correction. Full 11,380-unit census remains open; App Control Win32 4551 remains an evidenced blocker and the resource budget is provisional. Implementation and verification are recorded in `outputs/acceptance/phase2-s210-implementation-20261012.json`.
 
-## Next: S2-10
+## Blockers
 
-- The runner loops are active and restartable. Linux shards 0–143/256 and Windows shards 0–57/256 are closed. The interim aggregation records 4,287/11,380 units across 192/512 shards; 7,093 units and 310 shards remain (0 passed, 464 failed, 3,849 skipped, 199 unknown). Linux `8/256` recovered after its stale install lease expired; attempt1 is preserved separately. Linux `144/256` and Windows `58/256` are running. Rerun these loops after interruption; they skip closed reports and resume existing queue runs:
-  ```powershell
-  powershell -NoProfile -File .work/catalog-census/run-remaining.ps1 -Platform linux -StartShard 144
-  powershell -NoProfile -File .work/catalog-census/run-remaining.ps1 -Platform windows -StartShard 58
-  ```
-- Once all loops finish, aggregate all closed shard reports. Use basenames from `outputs/acceptance` so the 512 report arguments stay within the Windows command-line limit:
-  ```powershell
-  Set-Location outputs/acceptance
-  $reports = Get-ChildItem 'phase2-s210-census-*-shard*of256-20261012.json' | Where-Object { $_.Name -match '^phase2-s210-census-(linux|windows)-shard\d+of256-20261012\.json$' } | ForEach-Object Name
-  uv run --locked --project ..\..\lab --python 3.12.14 python -m lab.census --snapshot ..\..\catalogs\p2-41649744e057d61031d5 --queue-db ..\..\.work\catalog-census\phase2-s210.sqlite3 --aggregate @reports --aggregate-output phase2-s210-census-interim-20261012.json
-  ```
-- Preserve the 11,380 entry×OS denominator and frozen artifact/profile/hash identity. Every inaccessible or unsupported stage needs an evidence-backed terminal state; queue planning alone does not count as execution.
-- Retain S2-09 failure/unknown evidence, resource limits, retries, and checkpoints. Update full-census resource estimates from shard measurements and do not claim behavior compatibility for rows without entry-bound fixtures.
-- 5,621 entries still lack conservative behavior-category suggestions; do not claim plugin-wide compatibility or field acceptance.
-- S2-03's 30 sdist build-only entries may only run inside the accepted OS Worker.
+- The latest committed aggregate is census-incomplete: 7,748/11,380 units closed; 3,632 units and 164 shards remain. Counts: 0 passed, 818 failed, 6,590 skipped, 340 unknown. linux shards 0–248/256; windows shards 0–98/256. Active queue runs: windows shard 99/256, linux shard 249/256.
+- Windows NoneBot rows blocked by App Control Win32 4551 remain unknown. Missing entry-bound behavior fixtures remain skipped; 10,332 locked profiles are candidates only; the resource budget remains provisional.
+
+## Files
+
+- Durable queue: `.work/catalog-census/phase2-s210.sqlite3`.
+- Runner logs: `.work/catalog-census/runner-linux.log` and `.work/catalog-census/runner-windows.log`.
+- Runner/resume script: `.work/catalog-census/run-remaining.ps1`.
+- Aggregate: `outputs/acceptance/phase2-s210-census-interim-20261012.json`; shard evidence is in canonical `outputs/acceptance/phase2-s210-census-{linux,windows}-shard*of256-20261012.json` reports.
+- Checkpoint refresher: `.work/catalog-census/refresh_checkpoint.py`; report and README validation uses `node scripts/render-readme.mjs --check`.
+- Status and plan: `progress.md`, `feature_list.json`, `docs/plans/2026-10-12-phase-2-full-catalog.md`.
+
+## Next Session
+
+- First compare current git status with runner logs, Windows processes, and read-only SQLite. If a matching runner is active, let it continue; do not launch a duplicate.
+- Only if a platform runner has stopped and no matching process remains, resume from its first missing shard with linux: `pwsh -NoProfile -File .work/catalog-census/run-remaining.ps1 -Platform linux -StartShard 249 -EndShard 255`；windows: `pwsh -NoProfile -File .work/catalog-census/run-remaining.ps1 -Platform windows -StartShard 99 -EndShard 255`. The script skips completed reports and resumes an unfinished durable run.
+- When all 512 canonical shards close, aggregate complete reports only, refresh checkpoint evidence and README, run the required census/report checks, then commit data evidence separately from status documents.
+- After S2-10 P2-CENSUS and P2-AUTOMATION gates are reviewed, proceed to S2-11 failure attribution, repair, scoped regressions and full rerun; then finish S2-12 audit and compatibility matrix. Preserve failed, skipped, unknown and field-acceptance boundaries.
