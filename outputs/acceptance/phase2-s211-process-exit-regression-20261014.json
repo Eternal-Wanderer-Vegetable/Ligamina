@@ -1,0 +1,198 @@
+{
+  "schema_version": 1,
+  "task_id": "S2-11",
+  "kind": "phase2_s211_process_exit_scoped_regression",
+  "date": "2026-10-14",
+  "status": "scoped-regression-passed",
+  "source_fix_commit": "760a5e1",
+  "failure_ledger_commit": "4136171",
+  "source_snapshot_id": "p2-41649744e057d61031d5",
+  "scope": "Two frozen Koishi artifacts that previously called process.exit(0) without emitting a worker protocol report, executed in Linux Docker and Windows Sandbox.",
+  "commands": [
+    "uv run --locked --project lab --python 3.12.14 python -m unittest discover -s lab/tests -v",
+    "uv run --locked --project lab --python 3.12.14 python -m unittest lab.tests.test_pilot_workers.KoishiPilotWorkerPreparationTests.test_probe_reports_plugin_process_exit_as_native_load_failure -v",
+    "uv run --locked --project lab --python 3.12.14 python - (calls run_koishi_load_probe and run_koishi_windows_load_probe for the two entry IDs below)"
+  ],
+  "verification": {
+    "focused_process_exit_test": {
+      "passed": 1,
+      "failed": 0
+    },
+    "lab_suite": {
+      "passed": 109,
+      "failed": 0
+    }
+  },
+  "expected_semantics": "Each plugin remains a failed native-load result. The Worker exits cleanly, emits a structured protocol report naming PluginProcessExitError and requested exit code 0, and confirms cleanup; no compatibility pass is claimed.",
+  "full_512_shard_rerun": "pending",
+  "results": [
+    {
+      "result_id": "catalog:ko-e16ef546d499f693c3dc7c2a|linux",
+      "registry_entry_id": "ko-e16ef546d499f693c3dc7c2a",
+      "package": "koishi-plugin-boom",
+      "version": "0.0.1",
+      "platform": "linux",
+      "status": "failed",
+      "reason_code": "native_plugin_load_failed",
+      "artifact_sha256": "357b171f4fb9c6460f3ba29497779919232741e17279ce725cb00746d9fa645e",
+      "profile_id": "koishi-core-4.18.11-node-24.20.0-x86_64-portable-lock",
+      "profile_lock_sha256": "46c681ba86ea2731fce30ad45315210a16351a3016abadd4a71b6912944c957e",
+      "worker": {
+        "status": "passed",
+        "exit_code": 0,
+        "cleanup_confirmed": true,
+        "stdout_sha256": "808f3eab3dbd33ad671a4ec942f5a12dcc74e5f826c0532019b74e09df8e489f",
+        "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "output_truncated": false,
+        "peak_memory_bytes": 116391936
+      },
+      "dependency_install": {
+        "status": "passed",
+        "reason_code": null,
+        "exit_code": 0
+      },
+      "native_load": {
+        "status": "failed",
+        "reason_code": "native_plugin_load_failed",
+        "error_name": "PluginProcessExitError",
+        "requested_exit_code": 0,
+        "error_tail": "PluginProcessExitError: Plugin called process.exit(0) during the native-load probe\n    at process.exit (file:///work/project/pilot-probe.mjs:70:17)\n    at Object.<anonymous> (/work/project/node_modules/koishi-plugin-boom/lib/index.js:9:9)\n    at Module._compile (node:internal/modules/cjs/loader:1929:14)\n    at Object..js (node:internal/modules/cjs/loader:2060:10)\n    at Module.load (node:internal/modules/cjs/loader:1651:32)\n    at Module._load (node:internal/modules/cjs/loader:1443:12)\n    at wrapModuleLoad (node:internal/modules/cjs/loader:261:19)\n    at loadCJSModuleWithModuleLoad (node:internal/modules/esm/translators:372:15)\n    at ModuleWrap.<anonymous> (node:internal/modules/esm/translators:244:9)\n    at ModuleJob.run (node:internal/modules/esm/module_job:561:25)"
+      },
+      "cleanup": {
+        "status": "passed",
+        "reason_code": null
+      },
+      "resource_observations": {
+        "peak_writable_scratch_bytes": 24914486,
+        "sample_count": 4
+      },
+      "evidence_sha256": "4457a27b265c3f31d1348f026cd733839111172ea48159e43401d5ac09954a56"
+    },
+    {
+      "result_id": "catalog:ko-e16ef546d499f693c3dc7c2a|windows",
+      "registry_entry_id": "ko-e16ef546d499f693c3dc7c2a",
+      "package": "koishi-plugin-boom",
+      "version": "0.0.1",
+      "platform": "windows",
+      "status": "failed",
+      "reason_code": "native_plugin_load_failed",
+      "artifact_sha256": "357b171f4fb9c6460f3ba29497779919232741e17279ce725cb00746d9fa645e",
+      "profile_id": "koishi-core-4.18.11-node-24.20.0-x86_64-portable-lock",
+      "profile_lock_sha256": "46c681ba86ea2731fce30ad45315210a16351a3016abadd4a71b6912944c957e",
+      "worker": {
+        "status": "passed",
+        "exit_code": 0,
+        "cleanup_confirmed": true,
+        "stdout_sha256": "d4dafcf469291afedb8e153e0e01d85dabdf46dac4cd7065d498a5cb1c8c5185",
+        "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "output_truncated": false,
+        "peak_memory_bytes": 6107951104
+      },
+      "dependency_install": {
+        "status": "passed",
+        "reason_code": null,
+        "exit_code": 0
+      },
+      "native_load": {
+        "status": "failed",
+        "reason_code": "native_plugin_load_failed",
+        "error_name": "PluginProcessExitError",
+        "requested_exit_code": 0,
+        "error_tail": "PluginProcessExitError: Plugin called process.exit(0) during the native-load probe\n    at process.exit (file:///C:/Ligamina/Workspace/project/pilot-probe.mjs:70:17)\n    at Object.<anonymous> (C:\\Ligamina\\Workspace\\project\\node_modules\\koishi-plugin-boom\\lib\\index.js:9:9)\n    at Module._compile (node:internal/modules/cjs/loader:1929:14)\n    at Object..js (node:internal/modules/cjs/loader:2060:10)\n    at Module.load (node:internal/modules/cjs/loader:1651:32)\n    at Module._load (node:internal/modules/cjs/loader:1443:12)\n    at wrapModuleLoad (node:internal/modules/cjs/loader:261:19)\n    at loadCJSModuleWithModuleLoad (node:internal/modules/esm/translators:372:15)\n    at ModuleWrap.<anonymous> (node:internal/modules/esm/translators:244:9)\n    at ModuleJob.run (node:internal/modules/esm/module_job:561:25)"
+      },
+      "cleanup": {
+        "status": "passed",
+        "reason_code": null
+      },
+      "resource_observations": {
+        "peak_writable_scratch_bytes": 129516468,
+        "sample_count": 7
+      },
+      "evidence_sha256": "b6b5ac77c6272fa666224472054a76d36f9aa3c099aace0a7f62160f9968ab5f"
+    },
+    {
+      "result_id": "catalog:ko-da2ad8f2f5780ae39b914fe2|linux",
+      "registry_entry_id": "ko-da2ad8f2f5780ae39b914fe2",
+      "package": "koishi-plugin-boom2",
+      "version": "1.0.1",
+      "platform": "linux",
+      "status": "failed",
+      "reason_code": "native_plugin_load_failed",
+      "artifact_sha256": "045a3208eed955661fc7a518f863930f5737e8b8b89f3a7fcf46429b0b9dd06f",
+      "profile_id": "koishi-core-4.18.11-node-24.20.0-x86_64-portable-lock",
+      "profile_lock_sha256": "a366648212969b9957c10af64c5ca437f7a2d619e3eb73b35137306bebc1932d",
+      "worker": {
+        "status": "passed",
+        "exit_code": 0,
+        "cleanup_confirmed": true,
+        "stdout_sha256": "bae545c1b6be8a4c6462379b3b7f93a5e9136e0bc036955fb83ffbfd5a1d1a9a",
+        "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "output_truncated": false,
+        "peak_memory_bytes": 183920230
+      },
+      "dependency_install": {
+        "status": "passed",
+        "reason_code": null,
+        "exit_code": 0
+      },
+      "native_load": {
+        "status": "failed",
+        "reason_code": "native_plugin_load_failed",
+        "error_name": "PluginProcessExitError",
+        "requested_exit_code": 0,
+        "error_tail": "PluginProcessExitError: Plugin called process.exit(0) during the native-load probe\n    at process.exit (file:///work/project/pilot-probe.mjs:70:17)\n    at Object.<anonymous> (/work/project/node_modules/koishi-plugin-boom2/index.js:1:9)\n    at Module._compile (node:internal/modules/cjs/loader:1929:14)\n    at Object..js (node:internal/modules/cjs/loader:2060:10)\n    at Module.load (node:internal/modules/cjs/loader:1651:32)\n    at Module._load (node:internal/modules/cjs/loader:1443:12)\n    at wrapModuleLoad (node:internal/modules/cjs/loader:261:19)\n    at loadCJSModuleWithModuleLoad (node:internal/modules/esm/translators:372:15)\n    at ModuleWrap.<anonymous> (node:internal/modules/esm/translators:244:9)\n    at ModuleJob.run (node:internal/modules/esm/module_job:561:25)"
+      },
+      "cleanup": {
+        "status": "passed",
+        "reason_code": null
+      },
+      "resource_observations": {
+        "peak_writable_scratch_bytes": 21379170,
+        "sample_count": 4
+      },
+      "evidence_sha256": "4f71b23778bd999f25a1c53bfb97ff81aadba740c86608e64ee7ea4a1a8ffe5b"
+    },
+    {
+      "result_id": "catalog:ko-da2ad8f2f5780ae39b914fe2|windows",
+      "registry_entry_id": "ko-da2ad8f2f5780ae39b914fe2",
+      "package": "koishi-plugin-boom2",
+      "version": "1.0.1",
+      "platform": "windows",
+      "status": "failed",
+      "reason_code": "native_plugin_load_failed",
+      "artifact_sha256": "045a3208eed955661fc7a518f863930f5737e8b8b89f3a7fcf46429b0b9dd06f",
+      "profile_id": "koishi-core-4.18.11-node-24.20.0-x86_64-portable-lock",
+      "profile_lock_sha256": "a366648212969b9957c10af64c5ca437f7a2d619e3eb73b35137306bebc1932d",
+      "worker": {
+        "status": "passed",
+        "exit_code": 0,
+        "cleanup_confirmed": true,
+        "stdout_sha256": "1bda79ba6476f5d41b4f3172986611b83af79b9f941d95f2304587e93473219f",
+        "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "output_truncated": false,
+        "peak_memory_bytes": 6126424064
+      },
+      "dependency_install": {
+        "status": "passed",
+        "reason_code": null,
+        "exit_code": 0
+      },
+      "native_load": {
+        "status": "failed",
+        "reason_code": "native_plugin_load_failed",
+        "error_name": "PluginProcessExitError",
+        "requested_exit_code": 0,
+        "error_tail": "PluginProcessExitError: Plugin called process.exit(0) during the native-load probe\n    at process.exit (file:///C:/Ligamina/Workspace/project/pilot-probe.mjs:70:17)\n    at Object.<anonymous> (C:\\Ligamina\\Workspace\\project\\node_modules\\koishi-plugin-boom2\\index.js:1:9)\n    at Module._compile (node:internal/modules/cjs/loader:1929:14)\n    at Object..js (node:internal/modules/cjs/loader:2060:10)\n    at Module.load (node:internal/modules/cjs/loader:1651:32)\n    at Module._load (node:internal/modules/cjs/loader:1443:12)\n    at wrapModuleLoad (node:internal/modules/cjs/loader:261:19)\n    at loadCJSModuleWithModuleLoad (node:internal/modules/esm/translators:372:15)\n    at ModuleWrap.<anonymous> (node:internal/modules/esm/translators:244:9)\n    at ModuleJob.run (node:internal/modules/esm/module_job:561:25)"
+      },
+      "cleanup": {
+        "status": "passed",
+        "reason_code": null
+      },
+      "resource_observations": {
+        "peak_writable_scratch_bytes": 129430552,
+        "sample_count": 6
+      },
+      "evidence_sha256": "5f4b702980c4cd5efb0c795e4375fa4280140570451cf49ebdf6d5a385677b29"
+    }
+  ]
+}
