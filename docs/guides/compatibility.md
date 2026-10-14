@@ -129,7 +129,7 @@ uv run --locked --project lab --python 3.12.14 python -m lab.baselines.run_s205 
 
 ## S2-10 全快照 census（进行中）
 
-S2-10 在 S2-09 commit `20d8f04` 上的 clean baseline 已通过，见 [baseline](../../outputs/acceptance/phase2-s210-baseline-20261012.json)。执行器按 `entry×OS` 稳定分 shard，并用 SQLite stage queue 记录 prepare/install/native/federated/compare/cleanup；报告绑定目录、artifact/profile lock、阶段结果和清理证据。相同 queue DB 和 run ID 可加 `--resume` 恢复。隔离 smoke 见 [报告](../../outputs/acceptance/phase2-s210-census-linux-shard0of256-smoke-20261012.json)：16 单元、96 jobs 终态（4 failed、12 skipped），不并入正式汇总。正式 census 当前关闭 10,723/11,380 单元、482/512 shard，linux shards 0–255/256、windows shards 0–225/256；缺 657 单元和 30 shard，活动 runner：windows shard 226/256。结果为 0 passed、1167 failed、8,827 skipped、729 unknown；interim aggregate SHA-256 `3aa0e2db2feb1c04fdfb73b31390f9a528569647f3dfde2c824f60f819e750dd`。
+S2-10 在 S2-09 commit `20d8f04` 上的 clean baseline 已通过，见 [baseline](../../outputs/acceptance/phase2-s210-baseline-20261012.json)。执行器按 `entry×OS` 稳定分 shard，并用 SQLite stage queue 记录 prepare/install/native/federated/compare/cleanup；报告绑定目录、artifact/profile lock、阶段结果和清理证据。相同 queue DB 和 run ID 可加 `--resume` 恢复。隔离 smoke 见 [报告](../../outputs/acceptance/phase2-s210-census-linux-shard0of256-smoke-20261012.json)：16 单元、96 jobs 终态（4 failed、12 skipped），不并入正式汇总。正式 census 当前关闭 10,895/11,380 单元、489/512 shard，linux shards 0–255/256、windows shards 0–232/256；缺 485 单元和 23 shard，活动 runner：windows shard 233/256。结果为 0 passed、1186 failed、8,954 skipped、755 unknown；interim aggregate SHA-256 `08609a74ca6728b6ad94e38020528936ed4159dbec89385015913e3bdffe3567`。
 
 每个 OS 分 256 shard，逐片保留报告。执行中可生成显式标记为 incomplete 的 checkpoint aggregate；最终验收必须覆盖全部 512 份正式报告：
 ```powershell
