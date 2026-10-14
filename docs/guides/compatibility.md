@@ -127,7 +127,7 @@ uv run --locked --project lab --python 3.12.14 python -m lab.baselines.run_s205 
 
 资源预算见 [S2-09 provisional config](../../config/lab/phase2-pilot-budget-v1.json)：NoneBot Linux 有 Docker RSS、依赖下载和 scratch 测量；Koishi Linux 有 Docker RSS/scratch，Windows 有 Job Object 峰值 commit 内存与 Sandbox Workspace scratch。Koishi Windows Job Object P95 为 6.71 GB，最大 8.57 GB，Worker 限额为 8 GiB；这不是 RSS 指标。NoneBot Windows 没有 Worker 样本，因为 CPython 被 App Control 阻止。预算保持 provisional，不能据此宣称目录全集兼容。报告 attempt 和 checkpoint 保留在 `outputs/acceptance/`，重建汇总前应先复核完整的 30 项平台报告。
 
-## S2-10 全快照 census（进行中）
+## S2-10 全快照 census（已关闭）
 
 S2-10 在 S2-09 commit `20d8f04` 上的 clean baseline 已通过，见 [baseline](../../outputs/acceptance/phase2-s210-baseline-20261012.json)。执行器按 `entry×OS` 稳定分 shard，并用 SQLite stage queue 记录 prepare/install/native/federated/compare/cleanup；报告绑定目录、artifact/profile lock、阶段结果和清理证据。相同 queue DB 和 run ID 可加 `--resume` 恢复。隔离 smoke 见 [报告](../../outputs/acceptance/phase2-s210-census-linux-shard0of256-smoke-20261012.json)：16 单元、96 jobs 终态（4 failed、12 skipped），不并入正式汇总。正式 census 已关闭 11,380/11,380 单元、512/512 canonical shard，Linux shards 0–255/256、Windows shards 0–255/256，无缺失或重复，当前没有活动 runner。P2-CENSUS 通过；单元结果为 0 passed、1,235 failed、9,324 skipped、821 unknown；aggregate SHA-256 `bef7b141d791a49eafa844b9f792afcb967511ef507a080520d163ab6069f6f2`。P2-AUTOMATION 待 S2-11 归因、修复和复跑后裁决；P2-BEHAVIOR 未评估，P2-FIELD 未执行。68,280 个 SQLite 阶段作业中 822 个 job 为 unknown，与 821 个 unknown unit 是不同分母。
 
@@ -146,4 +146,4 @@ $shards = Get-ChildItem outputs/acceptance -Filter 'phase2-s210-census-*-shard*o
 uv run --locked --project lab --python 3.12.14 python -m lab.census --snapshot catalogs/p2-41649744e057d61031d5 `
   --aggregate @shards --aggregate-output outputs/acceptance/phase2-s210-20261012.json
 ```
-Smoke、report-only、不同 shard count 或未完成报告不能替代 512 份正式报告，`queued` 也不等于 Worker 已执行。全量 census 已关闭；S2-09 provisional budget 可用 census 资源数据复核，但仍需完成 S2-11 的失败归因与完整复跑。分片终态闭合不等于插件兼容通过。
+Smoke、report-only、不同 shard count 或未完成报告不能替代 512 份正式报告，`queued` 也不等于 Worker 已执行。S2-10 全量 census 已关闭，终态分布保留为 0 passed、1,235 failed、9,324 skipped、821 unknown；分片终态闭合不等于插件兼容通过。S2-11 原始失败和未知账本见 [failure ledger](../../outputs/acceptance/phase2-s211-failures-20261014.md) 与 [JSON](../../outputs/acceptance/phase2-s211-failures-20261014.json)：2,056/2,056 单元绑定至源 shard、stage attempt/hash 和 replay 命令，包含 24 个明确的 App Control DLL block 与 107 个触及 8 GiB Job Object 限额的 Windows npm OOM。Koishi `process.exit(0)` probe 修复和四组隔离回归（两个冻结包分别在 Linux Docker、Windows Sandbox）见 [regression](../../outputs/acceptance/phase2-s211-process-exit-regression-20261014.json)；focused 1/1、Lab 109/109，包仍是 failed native-load，Worker/cleanup passed。新 SQLite 下的完整 512 shard rerun 待执行，原 census 保持不变；P2-AUTOMATION 待复跑裁决，缺 fixture 限制下的空 native-success/federation-failure 集合不证明 parity，P2-BEHAVIOR 未评估且 P2-FIELD 未执行。
