@@ -49,8 +49,9 @@
 
 ## Blockers
 
-- P2-CENSUS is passed: 11,380/11,380 units and 512/512 canonical shards closed, with no missing or duplicate units. Unit outcomes: 0 passed, 1,235 failed, 9,324 skipped, 821 unknown. P2-AUTOMATION is pending S2-11 attribution, repairs, regression, and full rerun; behavior was not evaluated and field validation was not run.
-- Windows NoneBot rows blocked by App Control Win32 4551 remain unknown. Missing entry-bound behavior fixtures remain skipped; 10,332 locked profiles are candidates only; the resource budget remains provisional.
+- P2-CENSUS is passed: 11,380/11,380 units and 512/512 canonical shards closed, with no missing or duplicate units. Original unit outcomes remain 0 passed, 1,235 failed, 9,324 skipped, 821 unknown. S2-11 attribution, the evidenced probe fix, and scoped regressions are complete; the required fresh 512-shard rerun remains open, so P2-AUTOMATION has not been adjudicated.
+- The failure ledger attributes all 2,056 failed/unknown units. It includes 24 native-load failures with explicit App Control DLL-block diagnostics and 107 Windows npm OOM failures at the configured 8 GiB Job Object cap. The policy is not bypassed. Four previously report-invalid Koishi cases are now captured as native-load failures by the probe fix; the two frozen packages remain failed, with cleanup confirmed on both Linux Docker and Windows Sandbox.
+- The original S2-10 database and reports remain immutable. The new rerun must use `.work/catalog-census/phase2-s211-rerun.sqlite3` and new `phase2-s211-rerun-census-{linux,windows}-shard*of256-20261014.json` reports. At last check, no runner was active. P2-BEHAVIOR is not evaluated, P2-FIELD is not run, the 5,621-entry behavior classification gap remains, 10,332 locked profiles are candidates only, and the resource budget remains provisional.
 
 ## Files
 
@@ -63,8 +64,8 @@
 
 ## Next Session
 
-- Recheck git status, runner logs, matching worker processes and read-only SQLite before starting anything. No census runner is currently active; the original S2-10 run is closed and must remain immutable.
-- Continue S2-11 from the original aggregate and SQLite stage/attempt records. Attribute every failed and unknown unit with entry/platform, stage, reason, artifact/profile hashes and result hashes; separate plugin failures from harness/infrastructure defects. Preserve the original reports.
-- Inspect native load failures, npm/install failures, nonzero Worker exits, report-invalid cases, preparation/timeouts and App Control unknowns. Review native-success/federation-failure pairs; current federated/compare coverage is skipped because fixtures/loader profiles are missing, so record the observed list as empty with that coverage limitation.
-- Apply only evidenced harness fixes, run focused lab tests and scoped regressions, then perform the planned full rerun from the same frozen snapshot. Aggregate only complete canonical rerun reports and update gates separately. Commit evidence before status documents.
-- After S2-11 exit criteria pass, complete S2-12 audit, README, compatibility matrix and handoff. Preserve failed, skipped, unknown and real-platform boundaries.
+- Recheck `git status`, both runner logs, matching processes, and read-only queue state. Never resume the original S2-10 queue for the rerun; use the new S2-11 DB and output names above. Start only when no S2-11 runner is active.
+- S2-11 evidence already committed: attribution ledger `464470d` (base data `4136171`), probe fix `760a5e1`, and four-worker regression report `ca6f735`. The test evidence is Lab 109/109 and four scoped Worker runs (two frozen `process.exit(0)` packages on Linux Docker and Windows Sandbox); the packages remain native-load failures.
+- Run a complete fresh 512-shard census against the same frozen snapshot and cohort, with a separate SQLite queue and per-platform 0–255 canonical reports. Retain original census, failure ledger, attempts, and all rerun shard hashes. Do not describe 5,621 behavior-unmapped entries, App Control unknowns, or failed native loads as passes.
+- After all 512 reports are terminal and verified, aggregate only those canonical reports, refresh the S2-11 checkpoint and generated README, and separately adjudicate census, automation, behavior, and field gates. Review the observed native-success/federation-failure set alongside the fixture/loader coverage limitation.
+- Once S2-11 exit criteria are met, complete S2-12 audit, README, compatibility matrix, evidence index, and handoff. Keep the task active until required validation and separate documentation commits are complete.
