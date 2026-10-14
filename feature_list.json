@@ -1,8 +1,8 @@
 {
   "schema_version": 1,
   "updated_at": "2026-10-14",
-  "active_feature": "feat-012",
-  "next_feature": "feat-013",
+  "active_feature": "feat-013",
+  "next_feature": "feat-014",
   "features": [
     {
       "id": "feat-001",
@@ -243,9 +243,9 @@
       "dependencies": [
         "feat-011"
       ],
-      "status": "in-progress",
+      "status": "done",
       "done_when": "P2-CENSUS 通过；未调度和漏项为零，按政策推进全部可达 stage。",
-      "evidence": "S2-10 clean baseline passed on clean S2-09 commit 20d8f04 (full init exit 0; lab 102, NoneBot 3, Koishi 7, MCP 1, reference 5, Rust 33, Windows Core smoke 4 events/4 gateway operations/0 PIDs, bundle passed). Implemented resumable SQLite stage dispatcher, six-stage terminal projection, per-entry evidence, Koishi platform=all artifact binding and cross-shard/per-plugin aggregation. Post-projection-fix full init exited 0 (docs 18/207, lab 108, NoneBot 3, Koishi 7, MCP 1, reference 5, Rust 33, Windows smoke 4/4/0, bundle passed); focused catalog/census tests 12/12, README evidence check and diff check passed. Post-run docs check passed at 18/211 links. Formal Linux shard 0/256 closed 16/16 units and 96/96 jobs (4 failed native loads, 12 skipped); formal Linux shard 1/256 closed 24/24 units and 144/144 jobs (2 failed, 22 skipped). Corrected formal Windows shard 0/256 closed 26/26 units and 156/156 jobs (1 failed, 22 skipped, 3 App Control unknown); cleanup is 14 passed/12 skipped/0 unknown. Its pre-fix attempt is retained separately. The current interim aggregation closes 11,310/11,380 units across 509/512 shards; 70 units and 3 shards remain (passed 0, failed 1228, skipped 9268, unknown 814). linux shards 0–255/256 and windows shards 0–252/256 are closed. Active runners: windows shard 253/256. Full census remains open; 10,332 locked profiles are candidates only and the resource budget remains provisional.",
+      "evidence": "S2-10 clean baseline passed on clean S2-09 commit 20d8f04 (full init exit 0; lab 102, NoneBot 3, Koishi 7, MCP 1, reference 5, Rust 33, Windows Core smoke 4 events/4 gateway operations/0 PIDs, bundle passed). Implemented resumable SQLite stage dispatcher, six-stage terminal projection, per-entry evidence, Koishi platform=all artifact binding and cross-shard/per-plugin aggregation. Post-projection-fix full init exited 0 (docs 18/207, lab 108, NoneBot 3, Koishi 7, MCP 1, reference 5, Rust 33, Windows smoke 4/4/0, bundle passed); focused catalog/census tests 12/12, README evidence check and diff check passed. Post-run docs check passed at 18/211 links. Formal Linux shard 0/256 closed 16/16 units and 96/96 jobs (4 failed native loads, 12 skipped); formal Linux shard 1/256 closed 24/24 units and 144/144 jobs (2 failed, 22 skipped). Corrected formal Windows shard 0/256 closed 26/26 units and 156/156 jobs (1 failed, 22 skipped, 3 App Control unknown); cleanup is 14 passed/12 skipped/0 unknown. Its pre-fix attempt is retained separately. The full formal census closes 11,380/11,380 entry×OS units across 512/512 canonical shards; no unit or shard is missing or duplicated, every selected stage is terminal, and the durable queue has no active run. P2-CENSUS passed. The aggregate records passed 0, failed 1235, skipped 9324, unknown 821; P2-AUTOMATION remains pending for S2-11 attribution. linux shards 0–255/256 and windows shards 0–255/256 are closed. No runner is currently active. 10,332 locked profiles remain candidates only and the resource budget remains provisional.",
       "evidence_paths": [
         "config/lab/phase2-pilot-budget-v1.json",
         "outputs/acceptance/phase2-s209-20261012.json",
@@ -681,6 +681,9 @@
         "outputs/acceptance/phase2-s210-census-windows-shard250of256-20261012.json",
         "outputs/acceptance/phase2-s210-census-windows-shard251of256-20261012.json",
         "outputs/acceptance/phase2-s210-census-windows-shard252of256-20261012.json",
+        "outputs/acceptance/phase2-s210-census-windows-shard253of256-20261012.json",
+        "outputs/acceptance/phase2-s210-census-windows-shard254of256-20261012.json",
+        "outputs/acceptance/phase2-s210-census-windows-shard255of256-20261012.json",
         "outputs/acceptance/phase2-s210-census-windows-shard25of256-20261012.json",
         "outputs/acceptance/phase2-s210-census-windows-shard26of256-20261012.json",
         "outputs/acceptance/phase2-s210-census-windows-shard27of256-20261012.json",
@@ -775,10 +778,13 @@
       "dependencies": [
         "feat-012"
       ],
-      "status": "not-started",
+      "status": "in-progress",
       "done_when": "每失败有定位/复现；修复保留原结果，运行时/安装受影响检查通过。",
-      "evidence": "",
-      "evidence_paths": []
+      "evidence": "S2-10 P2-CENSUS closed at 11,380/11,380 units and 512/512 shards. S2-11 started to attribute 1,235 failed and 821 unknown unit outcomes; original census evidence remains immutable. No S2-11 fix or full rerun is claimed yet.",
+      "evidence_paths": [
+        "outputs/acceptance/phase2-s210-census-interim-20261012.json",
+        "outputs/acceptance/phase2-s210-implementation-20261012.json"
+      ]
     },
     {
       "id": "feat-014",
