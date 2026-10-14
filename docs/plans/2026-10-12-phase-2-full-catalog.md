@@ -21,6 +21,9 @@
 - S2-09 done criteria 已满足：三组平台 pilot 与全 128 位置闭合；negative Worker probes、S2-07 队列恢复和本任务 checkpoint/worker-lost 恢复通过；资源预算有可达平台的 P50/P95 实测。11 个 native-load 失败和 25 个 unknown 是 pilot 发现，不会被算作通过。NoneBot Windows 23 个 catalog 行因 App Control Win32 4551 保持 unknown，另有两个历史 Windows 配对 unknown；entry-bound 行为 fixture 未执行，行为兼容性仍未评估。
 - S2-09 资源：[budget config](../../config/lab/phase2-pilot-budget-v1.json) 保持 provisional。Koishi Linux scratch P95 约 34 MB；Koishi Windows Sandbox scratch P95 约 143 MB，Job Object peak commit P95 约 6.71 GB、最大约 8.57 GB（8 GiB limit 内）。NoneBot Windows 因 CPython App Control 没有 Worker RSS/scratch 数据；全快照资源估计仍待 S2-10 分片实测。S2-07 队列中断恢复及本任务 checkpoint/worker-lost 恢复测试提供恢复证据；全量 census 与真实平台验收未启动。
 - S2-10 clean baseline 在 S2-09 阶段提交 `20d8f04` 上通过（[baseline](../../outputs/acceptance/phase2-s210-baseline-20261012.json)）。已实现可恢复 shard dispatcher、六阶段投影、Koishi `platform=all` artifact 映射和 per-plugin/evidence 汇总；实现后的全仓库验证结果见 [checkpoint](../../outputs/acceptance/phase2-s210-implementation-20261012.json)。11,380 entry×OS 中 10,332 个 profile lock 为 `locked`，只代表候选。隔离 smoke shard [报告](../../outputs/acceptance/phase2-s210-census-linux-shard0of256-smoke-20261012.json) 另用 queue DB、不并入正式 census。正式 aggregate 已关闭 11,380/11,380 单元和 512/512 canonical shards；Linux shards 0–255/256、Windows shards 0–255/256，无缺失或重复、活动 runner：none。单元计数为 0 passed、1,235 failed、9,324 skipped、821 unknown，报告 SHA-256 `bef7b141d791a49eafa844b9f792afcb967511ef507a080520d163ab6069f6f2`；数据 checkpoint `f76c99d` 已提交。P2-CENSUS 通过；P2-AUTOMATION 待 S2-11 归因、修复和复跑后裁决，P2-BEHAVIOR 未评估，P2-FIELD 未执行。SQLite 的 68,280 个阶段作业另有 822 个 unknown job。README renderer 与 docs 模式验证通过。终态 closure 不是兼容通过。
+- S2-11 归因账本已覆盖原全量结果的 2,056/2,056 failed/unknown 单元，并对照源 shard、SQLite stage job/result、attempt、artifact/profile hash；明细见 [failure review](../../outputs/acceptance/phase2-s211-failures-20261014.md) 与 [JSON ledger](../../outputs/acceptance/phase2-s211-failures-20261014.json)。其中 24 个 native-load failure 明确观察到 App Control DLL block，107 个 Windows npm OOM 触及配置的 8 GiB Job Object cap。原 census 状态和报告保持不可变。
+- 已修复 Koishi native-load probe 对插件直接 `process.exit(0)` 的捕获：生成结构化 `native_plugin_load_failed` 报告、记录请求退出码、恢复原 `process.exit`，并继续单独验证 Worker cleanup。[Scoped regression](../../outputs/acceptance/phase2-s211-process-exit-regression-20261014.json) 记录 focused test 1/1、Lab 109/109 和两个冻结包在 Linux Docker/Windows Sandbox 的四组隔离回归；包的结果仍为 failed，Worker/cleanup 通过，没有插件兼容通过结论。原始 S2-10 aggregate SHA-256 为 `bef7b141d791a49eafa844b9f792afcb967511ef507a080520d163ab6069f6f2`。
+- S2-11 的 fresh full rerun 尚待执行：使用 `.work/catalog-census/phase2-s211-rerun.sqlite3` 和独立的 `phase2-s211-rerun-census-{linux,windows}-shard*of256-20261014.json` 命名，按相同冻结 snapshot/cohort 完成 512 份 canonical shards，再聚合完整报告。当前执行状态和 blockers 见 [progress](../../progress.md) 与 [session handoff](../../session-handoff.md)。P2-AUTOMATION 需根据复跑结果另行裁决；P2-BEHAVIOR 仍未评估，P2-FIELD 仍未执行。
 
 ## 1. 范围与全量定义
 
@@ -151,6 +154,6 @@ metadata 网络失败最多 3 次指数退避并尊重 Retry-After；行为失�
 
 ## 10. 本次交付与下一步
 
-本次已安装项目级 skill、整理文档与验证入口、定义输出合同、生成第一阶段 README 证据摘要，并建立第二阶段任务清单。尚未执行 S2-01–S2-12。
+本计划最初记录为执行前方案；S2-01–S2-10 已完成并分阶段提交，S2-11 归因、证据化 probe 修复和 scoped regression 已完成，完整复跑待执行，S2-12 尚未开始。当前分阶段状态与门禁边界以 [progress](../../progress.md)、[feature tracker](../../feature_list.json)、[S2-11 ledger](../../outputs/acceptance/phase2-s211-failures-20261014.json) 及各 acceptance reports 为准。
 
-下一任务是 S2-01：以此次 source probe 为起点实现目录抓取、完整快照/哈希、entry 身份与官方维护 cohort；然后实现 S2-02 的 schema，再扩展执行器。第二阶段完成报告放在新路径，不覆盖第一阶段 acceptance。
+下一步使用独立 SQLite checkpoint 对冻结全目录、同一 cohort 做 S2-11 全新的 512 shard rerun，完整聚合并复核 census/automation gates；随后审计失败与行为分类缺口，更新生成的 README、兼容性矩阵和 S2-12 handoff。不得覆盖原始 S2-10 结果，也不得把 failed、skipped、unknown、缺 fixture 或未执行的真实平台验证改写为兼容通过。第二阶段报告保留在新的独立路径，不覆盖第一阶段 acceptance。
