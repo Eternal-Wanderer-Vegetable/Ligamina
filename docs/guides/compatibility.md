@@ -129,7 +129,7 @@ uv run --locked --project lab --python 3.12.14 python -m lab.baselines.run_s205 
 
 ## S2-10 全快照 census（进行中）
 
-S2-10 在 S2-09 commit `20d8f04` 上的 clean baseline 已通过，见 [baseline](../../outputs/acceptance/phase2-s210-baseline-20261012.json)。执行器按 `entry×OS` 稳定分 shard，并用 SQLite stage queue 记录 prepare/install/native/federated/compare/cleanup；报告绑定目录、artifact/profile lock、阶段结果和清理证据。相同 queue DB 和 run ID 可加 `--resume` 恢复。隔离 smoke 见 [报告](../../outputs/acceptance/phase2-s210-census-linux-shard0of256-smoke-20261012.json)：16 单元、96 jobs 终态（4 failed、12 skipped），不并入正式汇总。正式 census 当前关闭 11,310/11,380 单元、509/512 shard，linux shards 0–255/256、windows shards 0–252/256；缺 70 单元和 3 shard，活动 runner：windows shard 253/256。结果为 0 passed、1228 failed、9,268 skipped、814 unknown；interim aggregate SHA-256 `c4d675a7c08fdaea76f1a85401e6cce44b4f9850d7a00a871789f99162a2d3e6`。
+S2-10 在 S2-09 commit `20d8f04` 上的 clean baseline 已通过，见 [baseline](../../outputs/acceptance/phase2-s210-baseline-20261012.json)。执行器按 `entry×OS` 稳定分 shard，并用 SQLite stage queue 记录 prepare/install/native/federated/compare/cleanup；报告绑定目录、artifact/profile lock、阶段结果和清理证据。相同 queue DB 和 run ID 可加 `--resume` 恢复。隔离 smoke 见 [报告](../../outputs/acceptance/phase2-s210-census-linux-shard0of256-smoke-20261012.json)：16 单元、96 jobs 终态（4 failed、12 skipped），不并入正式汇总。正式 census 已关闭 11,380/11,380 单元、512/512 canonical shard，Linux shards 0–255/256、Windows shards 0–255/256，无缺失或重复，当前没有活动 runner。P2-CENSUS 通过；单元结果为 0 passed、1,235 failed、9,324 skipped、821 unknown；aggregate SHA-256 `bef7b141d791a49eafa844b9f792afcb967511ef507a080520d163ab6069f6f2`。P2-AUTOMATION 待 S2-11 归因、修复和复跑后裁决；P2-BEHAVIOR 未评估，P2-FIELD 未执行。68,280 个 SQLite 阶段作业中 822 个 job 为 unknown，与 821 个 unknown unit 是不同分母。
 
 每个 OS 分 256 shard，逐片保留报告。执行中可生成显式标记为 incomplete 的 checkpoint aggregate；最终验收必须覆盖全部 512 份正式报告：
 ```powershell
@@ -146,4 +146,4 @@ $shards = Get-ChildItem outputs/acceptance -Filter 'phase2-s210-census-*-shard*o
 uv run --locked --project lab --python 3.12.14 python -m lab.census --snapshot catalogs/p2-41649744e057d61031d5 `
   --aggregate @shards --aggregate-output outputs/acceptance/phase2-s210-20261012.json
 ```
-Smoke、report-only、不同 shard count 或未完成报告不能替代 512 份正式报告，`queued` 也不等于 Worker 已执行。全量 census 仍未关闭；S2-09 provisional budget 待用 census 资源数据更新。
+Smoke、report-only、不同 shard count 或未完成报告不能替代 512 份正式报告，`queued` 也不等于 Worker 已执行。全量 census 已关闭；S2-09 provisional budget 可用 census 资源数据复核，但仍需完成 S2-11 的失败归因与完整复跑。分片终态闭合不等于插件兼容通过。
