@@ -396,6 +396,14 @@ if (npm.error || npm.status !== 0) {
 }
 
 let app
+const originalProcessExit = process.exit
+process.exit = (code = process.exitCode ?? 0) => {
+  const error = new Error(`Plugin called process.exit(${String(code)}) during the native-load probe`)
+  error.name = 'PluginProcessExitError'
+  error.code = 'LIGAMINA_PLUGIN_PROCESS_EXIT'
+  error.requestedExitCode = code
+  throw error
+}
 try {
   const { Context, version } = await import('@koishijs/core')
   report.environment.framework_version = version
@@ -415,8 +423,10 @@ try {
     reason_code: 'native_plugin_load_failed',
     error_name: error?.name ?? 'Error',
     error_tail: String(error?.stack ?? error).slice(-4096),
+    ...(error?.code === 'LIGAMINA_PLUGIN_PROCESS_EXIT' ? { requested_exit_code: error.requestedExitCode } : {}),
   }
 } finally {
+  process.exit = originalProcessExit
   try { await app?.stop() } catch (error) {
     report.cleanup = { status: 'failed', reason_code: 'native_plugin_cleanup_failed', error_tail: String(error?.stack ?? error).slice(-2048) }
   }
