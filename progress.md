@@ -4,10 +4,10 @@
 
 - **Last Updated:** 2026-10-14（Asia/Shanghai）。
 - **Current Objective:** 按 S2-01–S2-12 顺序完成第二阶段目录全量实验能力并分阶段提交。
-- **Active Feature:** S2-10 / feat-012；S2-09 / feat-011 的 pilot 分母、负例/恢复与可达 Worker 资源观测已闭合，验证与阶段提交记录见下文。
+- **Active Feature:** S2-11 / feat-013；S2-10 / feat-012 的全快照 census 已完成，P2-CENSUS 通过；失败归因与复跑仍在进行。
 - **Completed stage commits:** H01 `2d6399a`、S2-01 `15f468d`、S2-02 `c0be568`、S2-04 `2fa06b0`、S2-03 `29bc1e5`、S2-05 `854b564`、S2-06 `4e555b3`、S2-07 `7523a83`、S2-08 `cbcbb0a`、S2-09 `20d8f04`；`299d22c` 是 S2-09 baseline/status checkpoint；S2-10 census checkpoints `8f21ead`、`4295831`、`25cf805`、`7ac3f1c`、`6f864bb`、`fb3920e`、`01988bc`、`ee758da`、`36768b5`、`aa25211`、`aa89dbc`、`25a0d41`、`fa9fea8`、`bcb1e73`、`12f6203`、`45ade15`、`75c750c`、`3455a07`、`95909ff`、`498f436`、`a81dc61`、`e35bf26`、`2e44298`、`8e8189d`、`c457043`、`5a89e0f`、`60bfba3`、`466f9ec`、`1ed38d8`、`ac56cf7`、`f295313`、`f625b48`、`e2debcb`、`1455b31`、`f9c2c6b`、`c479f49`、`6356360`、`8a32e8e`、`6c1818f`、`31709fa`、`d071238`、`01d412e`、`5f7be0c`、`ecf4ebe`、`4047c76`、`f41c2f2`、`21d1336`、`0d56ba1`、`4c974f3`、`e491a3e`、`35d8428`、`b6c9237`、`2627109`、`da1322c`、`96350a3`、`084c015`、`1f1c3ae`、`3161907`、`0dfcaef`、`3f9c6ac`、`8b55df4`、`141cfee`、`4b044c7`、`9461053`、`cdb6a10`、`fe21968`、`9d401d6`、`eff6790`、`5213dac`、`1e15788`、`1bb005d`、`92b3f47`。
 - 第一阶段 T01–T18、C01–C15、G1/G2 以 [T18 报告](outputs/acceptance/t18-final-audit-20261012.json) 为准；四个精确插件版本和虚拟 Gateway，真实平台收发未验证。
-- 第二阶段 S2-01–S2-09 完成；S2-10 正在进行，S2-11–S2-12 尚未开始，状态见 [feature_list.json](feature_list.json)。S2-09 pilot 发现的失败与 unknown 仍是后续 census/兼容性裁决输入，不代表通过。
+- 第二阶段 S2-01–S2-10 完成；S2-11 正在进行，S2-12 尚未开始，状态见 [feature_list.json](feature_list.json)。S2-10 的 terminal census closure 不是兼容通过：0 passed、1,235 failed、9,324 skipped、821 unknown。
 
 ## What's Done
 
@@ -73,13 +73,14 @@
 
 - S2-09 clean HEAD `20d8f04db8c647da1f95336ca576966fccc15abb` 上的 S2-10 baseline 通过：`pwsh -NoProfile -File init.ps1 -Mode full` 退出码 0，docs 18/191、NoneBot 3、lab 102、Koishi 7、MCP 1、reference 5、Rust 33、Windows smoke 4 events / 4 gateway ops / 0 PIDs、bundle 通过。见 [baseline](outputs/acceptance/phase2-s210-baseline-20261012.json)。
 - 已实现 SQLite 可恢复六阶段 shard dispatcher、per-entry evidence、跨 shard/per-plugin 汇总及 Koishi `platform=all` artifact 映射。实现后的 `Mode full` 退出码 0：docs 18/199、NoneBot 3、lab 106、Koishi 7、MCP 1、reference 5、Rust 33、Windows smoke 4/4/0、bundle 通过；10 个 focused catalog/census tests 通过；README 证据检查与 `git diff --check` 通过，详见 [implementation checkpoint](outputs/acceptance/phase2-s210-implementation-20261012.json)。
-- 隔离 Linux smoke shard [报告](outputs/acceptance/phase2-s210-census-linux-shard0of256-smoke-20261012.json) 独立保存、不并入正式结果。当前 [interim aggregate](outputs/acceptance/phase2-s210-census-interim-20261012.json) 关闭 11,310/11,380 个 entry×OS 单元、509/512 个分片；尚缺 70 个单元和 3 个分片。linux shards 0–255/256、windows shards 0–252/256 已闭合；活动 runner：windows shard 253/256。计数为 0 passed、1228 failed、9,268 skipped、814 unknown；aggregate 报告 SHA-256 `c4d675a7c08fdaea76f1a85401e6cce44b4f9850d7a00a871789f99162a2d3e6`。数据 checkpoint `8e254a3` 已提交；README renderer 检查及 docs 模式验证（18 文档、210 本地链接）通过。完整 census 尚未闭合。
+- 隔离 Linux smoke shard [报告](outputs/acceptance/phase2-s210-census-linux-shard0of256-smoke-20261012.json) 独立保存、不并入正式结果。正式 [aggregate](outputs/acceptance/phase2-s210-census-interim-20261012.json) 已关闭全部 11,380/11,380 个 entry×OS 单元和 512/512 个 canonical shards；Linux、Windows 均为 0–255/256，无缺失或重复，活动 runner：none。P2-CENSUS 通过。单元结果为 0 passed、1,235 failed、9,324 skipped、821 unknown；报告 SHA-256 `bef7b141d791a49eafa844b9f792afcb967511ef507a080520d163ab6069f6f2`，数据 checkpoint `f76c99d` 已提交。P2-AUTOMATION 待 S2-11 归因与修复后复核；P2-BEHAVIOR 未评估，P2-FIELD 未执行。SQLite 的 68,280 个阶段作业中有 822 个 unknown job；这是 job 分母，不能与 821 个 unknown unit 混用。README renderer 与 docs 模式验证已通过（18 文档、210 本地链接）。
 - `ci-smoke-windows.json` 已恢复到原 SHA-256 `033D8EA2534603B880DB2A729B328C3A75C7F4CF0B8F8DEE087C22BEBBCAC752`。10,332 个 locked profile 仍只是执行候选；Windows NoneBot CPython 的 App Control Win32 4551 保持 unknown。
 
 ## Next / Blockers
 
-- S2-10 继续按冻结分母运行其余正式 shard 并生成 aggregator 报告；entry-bound fixture 缺失时显式 skip，不得宣称行为通过。失败归因/修复需等 census 闭合后进入 S2-11。
-- 5,621 个冻结 entry 尚无保守行为分类建议；全量 census、失败修复和真实平台验收未完成。NoneBot Windows CPython 的 App Control unknown 保持原状态，不绕过本机策略。
+- S2-11 正在逐条归因 1,235 个 failed 与 821 个 unknown 单元，并检查 stage result、attempt 与 Worker 证据；原 census 保持不变。当前 reason-code 分组为 native load 944、离线 npm install 162、Worker 非零退出 125、report invalid 4；unknown 为 App Control 796、Worker preparation 18、timeout 6、backend unavailable 1。原因码仍需逐条与底层阶段证据核对，不当作完整根因结论。
+- 全快照的 federated 与 compare 阶段均因 entry-bound fixture / loader profile 缺失而 skipped，因此当前没有 native-success/federation-failure 配对可审阅；5,621 个冻结 entry 仍无保守行为分类建议。Windows NoneBot 的 App Control Win32 4551 继续计为 unknown，不绕过本机策略。真实平台验收尚未执行。
+- 全量执行量级统计已获得，但预算仍 provisional；受 App Control 阻止的平台没有 Worker 样本。行为、安装/启动率与兼容率分别报告，不以分片闭合或安装成功替代行为兼容。
 - S2-09 budget 以可达平台样本完成测量但保持 provisional；full census 的总耗时、下载、磁盘估计需随 S2-10 分片数据更新。
 - S2-03 的 30 个 sdist build-only 条目只能在 OS 隔离 Worker 构建；虚拟回执不能当成真实平台投递成功。
 - 支持声明继续限定精确版本和行为场景；虚拟回执不能当成真实平台投递成功。
