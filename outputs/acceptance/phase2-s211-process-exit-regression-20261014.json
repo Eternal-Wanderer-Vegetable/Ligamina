@@ -5,13 +5,14 @@
   "date": "2026-10-14",
   "status": "scoped-regression-passed",
   "source_fix_commit": "760a5e1",
-  "failure_ledger_commit": "4136171",
+  "failure_ledger_commit": "464470d",
   "source_snapshot_id": "p2-41649744e057d61031d5",
   "scope": "Two frozen Koishi artifacts that previously called process.exit(0) without emitting a worker protocol report, executed in Linux Docker and Windows Sandbox.",
   "commands": [
     "uv run --locked --project lab --python 3.12.14 python -m unittest discover -s lab/tests -v",
     "uv run --locked --project lab --python 3.12.14 python -m unittest lab.tests.test_pilot_workers.KoishiPilotWorkerPreparationTests.test_probe_reports_plugin_process_exit_as_native_load_failure -v",
-    "uv run --locked --project lab --python 3.12.14 python - (calls run_koishi_load_probe and run_koishi_windows_load_probe for the two entry IDs below)"
+    "uv run --locked --project lab --python 3.12.14 python - (calls run_koishi_load_probe and run_koishi_windows_load_probe for the two entry IDs below)",
+    "pwsh -NoProfile -File init.ps1 -Mode full"
   ],
   "verification": {
     "focused_process_exit_test": {
@@ -21,6 +22,55 @@
     "lab_suite": {
       "passed": 109,
       "failed": 0
+    },
+    "post_fix_full_init": {
+      "command": "pwsh -NoProfile -File init.ps1 -Mode full",
+      "exit_code": 0,
+      "docs": {
+        "status": "passed",
+        "documents": 18,
+        "local_links": 228,
+        "indexed_historical_markdown": 10,
+        "features": 14
+      },
+      "lab_unittest": {
+        "passed": 109,
+        "failed": 0
+      },
+      "nonebot": {
+        "passed": 3,
+        "failed": 0
+      },
+      "koishi": {
+        "passed": 7,
+        "failed": 0
+      },
+      "mcp_interoperability": {
+        "passed": 1,
+        "failed": 0
+      },
+      "reference_client": {
+        "passed": 5,
+        "failed": 0
+      },
+      "rust_workspace": {
+        "passed": 33,
+        "failed": 0
+      },
+      "windows_core_smoke": {
+        "events": 4,
+        "gateway_operations": 4,
+        "remaining_pids": 0,
+        "status": "passed"
+      },
+      "windows_bundle_stage": {
+        "status": "passed"
+      },
+      "readme_evidence_check": "passed",
+      "diff_check": "passed",
+      "generated_smoke_report_restored": true,
+      "generated_smoke_report_sha256": "033d8ea2534603b880db2a729b328c3a75c7f4cf0b8f8dee087c22bebbcac752",
+      "transient_docs_failure": "Initial full-init attempt stopped before runtime tests because the newly added historical S2-11 markdown report was not yet in docs/evidence/README.md; after indexing it, the full init passed."
     }
   },
   "expected_semantics": "Each plugin remains a failed native-load result. The Worker exits cleanly, emits a structured protocol report naming PluginProcessExitError and requested exit code 0, and confirms cleanup; no compatibility pass is claimed.",
@@ -194,5 +244,14 @@
       },
       "evidence_sha256": "5f4b702980c4cd5efb0c795e4375fa4280140570451cf49ebdf6d5a385677b29"
     }
-  ]
+  ],
+  "initial_failure_ledger_commit": "4136171",
+  "full_rerun": {
+    "status": "pending",
+    "snapshot_id": "p2-41649744e057d61031d5",
+    "queue_db": ".work/catalog-census/phase2-s211-rerun.sqlite3",
+    "report_pattern": "outputs/acceptance/phase2-s211-rerun-census-{linux,windows}-shard*of256-20261014.json",
+    "expected_canonical_shards": 512,
+    "started": false
+  }
 }
