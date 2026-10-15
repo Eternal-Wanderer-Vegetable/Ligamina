@@ -3,7 +3,7 @@
 ## Current Objective
 
 - 日期：2026-10-15（Asia/Shanghai）。用户要求完成 `docs/plans/2026-10-12-phase-2-full-catalog.md` 的 S2-01–S2-12 并分阶段提交。
-- 分支：`codex/phase2-full-catalog`。仓库新增文档先提交 `2d6399a`；S2-01–S2-10 已按阶段提交，S2-11 归因、修复、scoped regression 与持续复跑证据均已提交。最新复跑数据 checkpoint 为 `395e17f`（shard 81 报告及检查点 `d454e96`），进度与 feature tracker 提交为 `3f3d41c`；当前活跃分片为 Windows shard 82，由 runner PID 28372 执行。兼容指南与计划状态本次会分别提交。
+- 分支：`codex/phase2-full-catalog`。仓库新增文档先提交 `2d6399a`；S2-01–S2-10 已按阶段提交，S2-11 归因、修复、scoped regression 与持续复跑证据均已提交。最新复跑数据 checkpoint 为 `395e17f`（shard 81 报告及检查点 `d454e96`），进度与 feature tracker 提交为 `3f3d41c`；当前活跃分片为 Windows shard 82，由 runner PID 28372 执行。兼容指南 `2e6977f`、实施计划 `5493b8b` 已按阶段分别提交。
 - 当前：S2-10 / feat-012 已完成并提交；S2-11 / feat-013 正在进行。S2-10 clean baseline 在 S2-09 HEAD `20d8f04db8c647da1f95336ca576966fccc15abb` 上通过；完整 census 已关闭，P2-CENSUS 通过。
 - 断点：正式分母为 5,690 entries × 2 OS = 11,380 单元；10,332 locked profile 仅为候选。Linux shards 0–255/256、Windows shards 0–255/256，11,380/11,380 单元和 512/512 canonical shards 终态闭合，无缺失、重复或活动 runner。单元计数为 0 passed、1,235 failed、9,324 skipped、821 unknown；aggregate SHA-256 `bef7b141d791a49eafa844b9f792afcb967511ef507a080520d163ab6069f6f2`。P2-AUTOMATION 待 S2-11 修复和复跑后复核；P2-BEHAVIOR 未评估，P2-FIELD 未执行。SQLite 阶段作业为 30,843 passed、1,235 failed、35,380 skipped、822 unknown，共 68,280；job 分母与 11,380 unit 分母分开。行为 fixture 缺失、预算 provisional 和 App Control unknown 均保留；不绕过策略。
 
