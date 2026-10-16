@@ -33,5 +33,7 @@
 - [S2-10 全快照 census](../../outputs/acceptance/phase2-s210-census-interim-20261012.json)
 - [S2-11 失败与未知归因](../../outputs/acceptance/phase2-s211-failures-20261014.json)
 - [S2-11 定点 Worker 回归](../../outputs/acceptance/phase2-s211-process-exit-regression-20261014.json)
+- [S2-12 最终审计与 gate 裁决](../../outputs/acceptance/phase2-s212-audit-20261017.json)
+- [S2-12 官方目录兼容矩阵](../../outputs/acceptance/phase2-s212-compatibility-matrix-20261017.md)
 
-其他 JSON、锁和 traces 保留在 outputs/acceptance 下，由相应报告和历史文档引用；新全量报告使用独立目录，不能覆盖旧 acceptance。
+其他 JSON、锁和 traces 保留在 outputs/acceptance 下，由相应报告和历史文档引用；S2-11 复跑使用独立文件名和 SQLite 队列，不能覆盖旧 S2-10 acceptance。
