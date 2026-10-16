@@ -1,0 +1,224 @@
+{
+  "schema_version": 1,
+  "task_id": "S2-12",
+  "kind": "phase2_catalog_final_audit",
+  "audited_at": "2026-10-17T02:36:00+08:00",
+  "source_snapshot_id": "p2-41649744e057d61031d5",
+  "source_sha256": {
+    "catalog_snapshot": "9d240d81dae2da32ae3bf7613265efe36a5ba03830807a5d7ee6d46a86450a17",
+    "s210_aggregate": "b8841f28979783b873e7ffb3ff5eb3b748a69b575d85bd4a292424c5176273ba",
+    "s211_failure_ledger": "cb779c711c08899c086e69dbec6b073f3d8670824243c88b8820b32ff2ae8f32",
+    "s211_scoped_regression": "b5307a6248d7165ec576fa7eff8d3847c9a2f266526c37f24950b933d50987b7",
+    "phase1_supported_versions": "44a73bff7f1cdeae53c7051146428b1b58efe7c312cf78325b2cdc8c348c4012"
+  },
+  "scope": {
+    "catalog_entries": 5690,
+    "ecosystems": {
+      "nonebot": 943,
+      "koishi": 4747
+    },
+    "platforms": [
+      "linux",
+      "windows"
+    ],
+    "unit_denominator": 11380
+  },
+  "s211_full_rerun": {
+    "status": "completed",
+    "completed_at": "2026-10-17T01:35:39.1861194+08:00",
+    "queue_db": ".work/catalog-census/phase2-s211-rerun.sqlite3",
+    "runner_command": "pwsh -NoProfile -File .work/catalog-census/run-s211-full.ps1",
+    "shard_replay_command": "uv run --locked --project lab --python 3.12.14 python -m lab.census --snapshot catalogs/p2-41649744e057d61031d5 --queue-db .work/catalog-census/phase2-s211-rerun.sqlite3 --platform <linux|windows> --shard <index>/256 --report outputs/acceptance/phase2-s211-rerun-census-<platform>-shard<index>of256-20261014.json --timeout-seconds 240",
+    "canonical_reports": 512,
+    "expected_reports": 512,
+    "units": 11380,
+    "stage_jobs": 68280,
+    "invalid_reports": 0,
+    "report_file_sha256_manifest_verified": true,
+    "sqlite_run_manifest_job_closure_verified": true,
+    "contiguous_shards": {
+      "linux": 256,
+      "windows": 256
+    },
+    "active_runs": 0,
+    "unit_counts": {
+      "passed": 0,
+      "failed": 880,
+      "skipped": 7530,
+      "unknown": 2970
+    },
+    "unit_outcome_explanation": "The unit reducer returns passed only when all six selected stages pass. Every one of the 11,380 units has federated and compare skipped, so no catalog unit qualifies as passed; 24,914 passed SQLite stage jobs are prepare/install/native/cleanup work and remain a separate denominator.",
+    "stage_job_counts": {
+      "failed": 880,
+      "passed": 24914,
+      "skipped": 37357,
+      "unknown": 5129,
+      "queued": 0,
+      "leased": 0
+    },
+    "by_ecosystem_platform": {
+      "nonebot/linux": {
+        "passed": 0,
+        "failed": 97,
+        "skipped": 433,
+        "unknown": 413
+      },
+      "nonebot/windows": {
+        "passed": 0,
+        "failed": 0,
+        "skipped": 147,
+        "unknown": 796
+      },
+      "koishi/linux": {
+        "passed": 0,
+        "failed": 208,
+        "skipped": 2785,
+        "unknown": 1754
+      },
+      "koishi/windows": {
+        "passed": 0,
+        "failed": 575,
+        "skipped": 4165,
+        "unknown": 7
+      }
+    },
+    "by_stage": {
+      "prepare": {
+        "passed": 10332,
+        "failed": 0,
+        "skipped": 1048,
+        "unknown": 0
+      },
+      "install": {
+        "passed": 5081,
+        "failed": 249,
+        "skipped": 3080,
+        "unknown": 2970
+      },
+      "native": {
+        "passed": 4167,
+        "failed": 631,
+        "skipped": 6582,
+        "unknown": 0
+      },
+      "federated": {
+        "passed": 0,
+        "failed": 0,
+        "skipped": 11380,
+        "unknown": 0
+      },
+      "compare": {
+        "passed": 0,
+        "failed": 0,
+        "skipped": 11380,
+        "unknown": 0
+      },
+      "cleanup": {
+        "passed": 5334,
+        "failed": 0,
+        "skipped": 3887,
+        "unknown": 2159
+      }
+    },
+    "failed_reason_counts": [
+      {
+        "reason_code": "native_plugin_load_failed",
+        "count": 631
+      },
+      {
+        "reason_code": "offline_npm_install_failed",
+        "count": 153
+      },
+      {
+        "reason_code": "worker_nonzero_exit",
+        "count": 96
+      }
+    ],
+    "unknown_reason_counts": [
+      {
+        "reason_code": "worker_cleanup_unconfirmed",
+        "count": 2158
+      },
+      {
+        "reason_code": "app_control_win32_4551",
+        "count": 796
+      },
+      {
+        "reason_code": "worker_preparation_failed",
+        "count": 11
+      },
+      {
+        "reason_code": "worker_timeout",
+        "count": 4
+      },
+      {
+        "reason_code": "worker_backend_unavailable",
+        "count": 1
+      }
+    ],
+    "attribution_ledger_reviewed_original_failed_unknown_units": 2056,
+    "native_pass_federated_fail_pairs": 0
+  },
+  "gates": [
+    {
+      "id": "P2-CATALOG",
+      "status": "passed",
+      "evidence": "Frozen 5,690-entry snapshot and source hashes are retained; NoneBot 943 + Koishi 4,747."
+    },
+    {
+      "id": "P2-CENSUS",
+      "status": "passed",
+      "evidence": "512/512 unique canonical shards, 11,380/11,380 entry×OS units and 68,280/68,280 terminal selected stage jobs; no queued/leased jobs or active runs."
+    },
+    {
+      "id": "P2-AUTOMATION",
+      "status": "blocked",
+      "evidence": "All jobs are terminal, but this completed run has 2,158 Linux worker_cleanup_unconfirmed units whose exact Worker diagnostic is Docker Engine API unavailable, plus 796 Windows App Control Win32 4551 unknown units and 16 other worker/preparation/timeout unknown units. A later local Docker Desktop 29.8.2 availability check was not a rerun and does not rewrite these reports."
+    },
+    {
+      "id": "P2-BEHAVIOR",
+      "status": "not_evaluated",
+      "evidence": "Federated and compare each have 11,380 skipped stages; entry-bound behavior fixtures are absent, and the catalog unit outcomes contain 0 passed."
+    },
+    {
+      "id": "P2-FIELD",
+      "status": "not_run",
+      "evidence": "No real-platform login/action/receipt/recipient evidence was collected."
+    }
+  ],
+  "compatibility_declarations": {
+    "new_catalog_plugin_support_claims": 0,
+    "retained_phase1_exact_supported_versions": [
+      {
+        "ecosystem": "nonebot",
+        "package": "nonebot-plugin-autohelp",
+        "version": "0.1.7"
+      },
+      {
+        "ecosystem": "nonebot",
+        "package": "nonebot-plugin-repeater",
+        "version": "3.1.4"
+      },
+      {
+        "ecosystem": "koishi",
+        "package": "koishi-plugin-game-mini",
+        "version": "0.4.3"
+      },
+      {
+        "ecosystem": "koishi",
+        "package": "koishi-plugin-multi-qa",
+        "version": "1.0.8"
+      }
+    ],
+    "phase1_support_source": "outputs/acceptance/t18-final-audit-20261012.json",
+    "phase1_support_expanded_by_phase2": false,
+    "unit_pass_is_compatibility_claim": false,
+    "stage_job_pass_is_plugin_compatibility_claim": false
+  },
+  "limitations": [
+    "S2-11 is a completed full rerun with terminal census accounting; completion does not make its failed, skipped, or unknown units compatible.",
+    "All 11,380 federated and 11,380 compare stages were skipped; parity is not established.",
+    "5,621 of 5,690 entries remain unmapped by the conservative behavior category dry run.",
+    "The Docker Engine outage was observed in the rerun environment; Docker became available only after the run ended. A corrected replay remains follow-up work if P2-AUTOMATION must pass."
+  ]
+}
