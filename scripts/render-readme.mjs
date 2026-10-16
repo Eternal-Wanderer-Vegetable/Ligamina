@@ -90,6 +90,8 @@ export async function phase2Block() {
   const s210WindowsAttempt1Path = 'outputs/acceptance/phase2-s210-census-windows-shard0of256-attempt1-20261012.json';
   const s210InterimAggregatePath = 'outputs/acceptance/phase2-s210-census-interim-20261012.json';
   const s211RerunPath = 'outputs/acceptance/phase2-s211-process-exit-regression-20261014.json';
+  const s212AuditPath = 'outputs/acceptance/phase2-s212-audit-20261017.json';
+  const s212MatrixPath = 'outputs/acceptance/phase2-s212-compatibility-matrix-20261017.md';
   const pilotManifestPath = 'outputs/acceptance/phase2-s209-pilot-manifest-20261012.json';
   const pilotAcceptancePath = 'outputs/acceptance/phase2-s209-20261012.json';
   const nonebotLinuxPilotPath = 'outputs/acceptance/phase2-s209-nonebot-linux-pilot-20261012.json';
@@ -97,8 +99,8 @@ export async function phase2Block() {
   const koishiWindowsPilotPath = 'outputs/acceptance/phase2-s209-koishi-windows-pilot-20261012.json';
   const planPath = 'outputs/acceptance/phase2-s207-cli-smoke-20261012.json';
   const featureListPath = 'feature_list.json';
-  const [catalog, recipes, scheduler, reporting, baseline, s210Baseline, s210Smoke, s210Implementation, s210LinuxFormal, s210Linux1Formal, s210Linux2Formal, s210WindowsFormal, s210Windows1Formal, s210WindowsAttempt1, s210InterimAggregate, s211Rerun, pilotManifest, pilotAcceptance, nonebotLinuxPilot, koishiLinuxPilot, koishiWindowsPilot, plan, featureList] = await Promise.all(
-    [catalogPath, recipesPath, schedulerPath, reportingPath, baselinePath, s210BaselinePath, s210SmokePath, s210ImplementationPath, s210LinuxFormalPath, s210Linux1FormalPath, s210Linux2FormalPath, s210WindowsFormalPath, s210Windows1FormalPath, s210WindowsAttempt1Path, s210InterimAggregatePath, s211RerunPath, pilotManifestPath, pilotAcceptancePath, nonebotLinuxPilotPath, koishiLinuxPilotPath, koishiWindowsPilotPath, planPath, featureListPath].map(load),
+  const [catalog, recipes, scheduler, reporting, baseline, s210Baseline, s210Smoke, s210Implementation, s210LinuxFormal, s210Linux1Formal, s210Linux2Formal, s210WindowsFormal, s210Windows1Formal, s210WindowsAttempt1, s210InterimAggregate, s211Rerun, s212Audit, pilotManifest, pilotAcceptance, nonebotLinuxPilot, koishiLinuxPilot, koishiWindowsPilot, plan, featureList] = await Promise.all(
+    [catalogPath, recipesPath, schedulerPath, reportingPath, baselinePath, s210BaselinePath, s210SmokePath, s210ImplementationPath, s210LinuxFormalPath, s210Linux1FormalPath, s210Linux2FormalPath, s210WindowsFormalPath, s210Windows1FormalPath, s210WindowsAttempt1Path, s210InterimAggregatePath, s211RerunPath, s212AuditPath, pilotManifestPath, pilotAcceptancePath, nonebotLinuxPilotPath, koishiLinuxPilotPath, koishiWindowsPilotPath, planPath, featureListPath].map(load),
   );
   for (const [relative, expected] of Object.entries(reporting.input_reports ?? {})) {
     const actual = createHash('sha256').update(await readFile(path.join(root, relative))).digest('hex');
@@ -289,13 +291,23 @@ export async function phase2Block() {
   const s211SeenShards = { linux: new Set(), windows: new Set() };
   let s211VerifiedUnits = 0;
   let s211VerifiedJobs = 0;
-  if (s211Rerun.task_id !== 'S2-11' || s211RerunState?.status !== 'running'
+  const s211RerunComplete = s211RerunState?.status === 'completed';
+  const s211ActiveRuns = s211RerunState?.active_runs ?? [];
+  const s211StageJobCounts = s211RerunState?.stage_job_counts ?? {};
+  const s211TerminalJobs = ['passed', 'failed', 'skipped', 'unknown']
+    .reduce((sum, status) => sum + (s211StageJobCounts[status] ?? 0), 0);
+  if (s211Rerun.task_id !== 'S2-11' || !['running', 'completed'].includes(s211RerunState?.status)
       || s211RerunState.expected_canonical_shards !== 512
       || s211RerunState.expected_units !== 11380
       || s211RerunState.completed_canonical_reports !== s211CompletedReports.length
       || s211RerunState.completed_canonical_reports + s211RerunState.remaining_shards !== 512
       || s211RerunState.completed_units + s211RerunState.remaining_units !== 11380
-      || s211RerunState.completed_reports.length !== s211RerunState.completed_canonical_reports) {
+      || s211RerunState.completed_reports.length !== s211RerunState.completed_canonical_reports
+      || s211TerminalJobs !== s211RerunState.completed_stage_jobs
+      || (s211RerunComplete && (s211RerunState.completed_canonical_reports !== 512
+        || s211RerunState.remaining_shards !== 0 || s211RerunState.remaining_units !== 0
+        || s211RerunState.completed_units !== 11380 || s211ActiveRuns.length !== 0
+        || (s211StageJobCounts.queued ?? 0) !== 0 || (s211StageJobCounts.leased ?? 0) !== 0))) {
     throw new Error(`Invalid S2-11 rerun checkpoint: ${s211RerunPath}`);
   }
   for (const item of s211CompletedReports) {
@@ -340,6 +352,26 @@ export async function phase2Block() {
       || Object.keys(s211ExpectedUnitCounts).some((status) => s211ExpectedUnitCounts[status] !== s211UnitCounts[status])
       || Object.values(s211UnitCounts).reduce((sum, value) => sum + value, 0) !== s211VerifiedUnits) {
     throw new Error(`S2-11 rerun checkpoint totals disagree with canonical reports: ${s211RerunPath}`);
+  }
+  const s212Gates = new Map((s212Audit.gates ?? []).map((gate) => [gate.id, gate.status]));
+  const s212Matrix = await readFile(path.join(root, s212MatrixPath), 'utf8');
+  const s212CheckpointSha = createHash('sha256').update(await readFile(path.join(root, s211RerunPath))).digest('hex');
+  if (s212Audit.task_id !== 'S2-12' || s212Audit.kind !== 'phase2_catalog_final_audit'
+      || s212Audit.s211_full_rerun?.status !== 'completed'
+      || s212Audit.s211_full_rerun.canonical_reports !== 512 || s212Audit.s211_full_rerun.units !== 11380
+      || Object.keys(s212Audit.source_sha256 ?? {}).length !== 5
+      || s212Audit.source_sha256.s211_scoped_regression !== s212CheckpointSha
+      || s212Audit.s211_full_rerun.unit_counts?.passed !== 0
+      || s212Audit.s211_full_rerun.unit_counts?.failed !== s211UnitCounts.failed
+      || s212Audit.s211_full_rerun.unit_counts?.skipped !== s211UnitCounts.skipped
+      || s212Audit.s211_full_rerun.unit_counts?.unknown !== s211UnitCounts.unknown
+      || !s212Audit.s211_full_rerun.unit_outcome_explanation?.includes('federated and compare skipped')
+      || s212Gates.get('P2-CATALOG') !== 'passed' || s212Gates.get('P2-CENSUS') !== 'passed'
+      || s212Gates.get('P2-AUTOMATION') !== 'blocked' || s212Gates.get('P2-BEHAVIOR') !== 'not_evaluated'
+      || s212Gates.get('P2-FIELD') !== 'not_run'
+      || !s212Matrix.includes('## Gate decisions') || !s212Matrix.includes('## Catalog unit outcomes by ecosystem and platform')
+      || !s212Matrix.includes('## Why unit-level passed is 0')) {
+    throw new Error(`Invalid S2-12 audit or compatibility matrix: ${s212AuditPath} / ${s212MatrixPath}`);
   }
   const pilotInputs = {
     legacy_run_sha256: 'outputs/acceptance/phase2-s209-legacy-linux-20261012.json',
@@ -402,15 +434,15 @@ export async function phase2Block() {
     : s210Status === 'in-progress' ? `进行中：实现全仓库验证通过；正式 census ${formalUnitCount.toLocaleString('en-US')}/11,380 单元、${formalShardCount}/512 shards 闭合；执行中：${activeShardLabel}；${censusClosed ? '全快照已闭合' : '全快照未闭合'}`
       : '未开始：全快照 census 尚未启动';
   const s211CountsText = ['passed', 'failed', 'skipped', 'unknown'].map((status) => s211UnitCounts[status]).join(' / ');
-  const s211ActiveText = (s211RerunState.active_runs ?? []).map((run) => `${run.platform} ${run.shard}/256`).join('、') || '无';
-  const s211Label = s211Status === 'done' ? '已完成'
+  const s211ActiveText = s211ActiveRuns.map((run) => `${run.platform} ${run.shard}/256`).join('、') || '无';
+  const s211Label = s211RerunComplete ? `已完成：复跑 512/512 shards、11,380/11,380 单元；单元通过 / 失败 / 跳过 / 未知 ${s211CountsText}`
     : s211Status === 'in-progress' ? `进行中：复跑 ${s211RerunState.completed_canonical_reports}/512 shards、${s211RerunState.completed_units.toLocaleString('en-US')}/11,380 单元；单元通过 / 失败 / 跳过 / 未知 ${s211CountsText}；活动 ${s211ActiveText}`
       : '未开始';
   const measurements = pilotAcceptance.resource_measurements;
 
   return [
     phase2Start,
-    `状态截至 ${escape(reporting.date)}：${reportingComplete ? `S2-01–S2-09 pilot 执行已完成；128 个结果位置闭合（通过 / 失败 / 跳过 / 未知：${pilotCounts}）。NoneBot Linux、Koishi Linux 和 Windows 各 30 个目录 entry 已进入 L1/L2 pilot。` : 'S2-01–S2-07 已完成；S2-08 正在进行最终验收。'} 冻结快照 \`${escape(catalog.snapshot_id)}\` 含 **${count.toLocaleString('en-US')} entries**（NoneBot 943、Koishi 4,747；官方维护子集 ${official}）。`,
+    `状态截至 ${escape(s212Audit.audited_at)}：${reportingComplete ? `S2-01–S2-09 pilot 执行已完成；128 个结果位置闭合（通过 / 失败 / 跳过 / 未知：${pilotCounts}）。NoneBot Linux、Koishi Linux 和 Windows 各 30 个目录 entry 已进入 L1/L2 pilot。` : 'S2-01–S2-07 已完成；S2-08 正在进行最终验收。'} 冻结快照 \`${escape(catalog.snapshot_id)}\` 含 **${count.toLocaleString('en-US')} entries**（NoneBot 943、Koishi 4,747；官方维护子集 ${official}）。`,
     '',
     '| 任务 | 状态 |',
     '| --- | --- |',
@@ -424,10 +456,10 @@ export async function phase2Block() {
     '',
     `分类 dry run 只建议 ${suggested}/${count} entries，${unmapped} 项仍是 \`unmapped_category\`。S2-09 的 128 个双 OS 结果位置全部闭合：四个历史支持版本和 60 个分层目录 entry 分别保留状态；NoneBot Linux 尝试 ${nonebotPilot.attempted_workers} 个 Docker Worker（L1 ${JSON.stringify(nonebotPilot.dependency_install)}；L2 ${JSON.stringify(nonebotPilot.native_load)}），Koishi Linux 尝试 ${linuxPilot.attempted_workers} 个 Docker Worker（L1 ${JSON.stringify(linuxPilot.dependency_install)}；L2 ${JSON.stringify(linuxPilot.native_load)}），Windows 尝试 ${windowsPilot.attempted_workers} 个 Sandbox Worker（L1 ${JSON.stringify(windowsPilot.dependency_install)}；L2 ${JSON.stringify(windowsPilot.native_load)}）。`,
     '',
-    `Windows Sandbox 的 CPython 启动仍受 App Control（Win32 4551）阻止；Node.js 24.20.0 签名 runtime 已用于 Windows Koishi L1/L2 pilot。Koishi Windows Job Object commit P95 ${(measurements.koishi_windows_peak_worker_memory_bytes.p95 / (1024 ** 3)).toFixed(2)} GiB（8 GiB 限额内），scratch P95 ${(measurements.koishi_windows_peak_writable_scratch_bytes.p95 / (1024 ** 2)).toFixed(1)} MiB；预算仍 provisional，NoneBot Windows 无 Worker 样本。目录 cohort 缺 entry-bound behavior fixture，L4 未评估，不能外推为兼容。正式 census 暂时闭合 ${formalUnitCount.toLocaleString('en-US')}/11,380 个 entry×OS 单元，${formalShardCount}/512 个 shard；Linux shard 0/256 为 ${s210LinuxFormal.denominator.terminal_units}/${s210LinuxFormal.denominator.selected_units} 单元、shard 1/256 为 ${s210Linux1Formal.denominator.terminal_units}/${s210Linux1Formal.denominator.selected_units} 单元、shard 2/256 为 ${s210Linux2Formal.denominator.terminal_units}/${s210Linux2Formal.denominator.selected_units} 单元；Windows shard 0/256 为 ${s210WindowsFormal.denominator.terminal_units}/${s210WindowsFormal.denominator.selected_units}（通过 / 失败 / 跳过 / 未知：${['passed', 'failed', 'skipped', 'unknown'].map((status) => s210WindowsFormal.counts[status]).join(' / ')}），shard 1/256 为 ${s210Windows1Formal.denominator.terminal_units}/${s210Windows1Formal.denominator.selected_units}（通过 / 失败 / 跳过 / 未知：${['passed', 'failed', 'skipped', 'unknown'].map((status) => s210Windows1Formal.counts[status]).join(' / ')}）。当前执行 shard：${activeShardLabel}。独立 smoke shard 不计入正式分母。全快照尚未闭合，真实平台登录、发送与投递验收未执行。`,
-    `S2-11 同冻结快照复跑截至 ${escape(s211RerunState.observed_at)}：${s211RerunState.completed_canonical_reports}/512 份 canonical 报告、${s211RerunState.completed_units.toLocaleString('en-US')}/11,380 单元；单元通过 / 失败 / 跳过 / 未知 ${s211CountsText}，还剩 ${s211RerunState.remaining_shards} 份报告和 ${s211RerunState.remaining_units.toLocaleString('en-US')} 个单元，当前执行 ${s211ActiveText}。SQLite 阶段作业状态另计（通过 / 失败 / 跳过 / 未知 / queued / leased：${['passed', 'failed', 'skipped', 'unknown', 'queued', 'leased'].map((status) => s211RerunState.stage_job_counts[status] ?? 0).join(' / ')}）；阶段作业通过不代表插件单元兼容通过。此复跑仍在进行，P2-AUTOMATION 待完整复核，行为与真实平台投递未评估。`,
+    `Windows Sandbox 的 CPython 启动仍受 App Control（Win32 4551）阻止；Node.js 24.20.0 签名 runtime 已用于 Windows Koishi L1/L2 pilot。Koishi Windows Job Object commit P95 ${(measurements.koishi_windows_peak_worker_memory_bytes.p95 / (1024 ** 3)).toFixed(2)} GiB（8 GiB 限额内），scratch P95 ${(measurements.koishi_windows_peak_writable_scratch_bytes.p95 / (1024 ** 2)).toFixed(1)} MiB；预算仍 provisional，NoneBot Windows 无 Worker 样本。目录 cohort 缺 entry-bound behavior fixture，L4 未评估，不能外推为兼容。S2-10 正式 census 已记账闭合 ${formalUnitCount.toLocaleString('en-US')}/11,380 个 entry×OS 单元，${formalShardCount}/512 个 shard；Linux shard 0/256 为 ${s210LinuxFormal.denominator.terminal_units}/${s210LinuxFormal.denominator.selected_units} 单元、shard 1/256 为 ${s210Linux1Formal.denominator.terminal_units}/${s210Linux1Formal.denominator.selected_units} 单元、shard 2/256 为 ${s210Linux2Formal.denominator.terminal_units}/${s210Linux2Formal.denominator.selected_units} 单元；Windows shard 0/256 为 ${s210WindowsFormal.denominator.terminal_units}/${s210WindowsFormal.denominator.selected_units}（通过 / 失败 / 跳过 / 未知：${['passed', 'failed', 'skipped', 'unknown'].map((status) => s210WindowsFormal.counts[status]).join(' / ')}），shard 1/256 为 ${s210Windows1Formal.denominator.terminal_units}/${s210Windows1Formal.denominator.selected_units}（通过 / 失败 / 跳过 / 未知：${['passed', 'failed', 'skipped', 'unknown'].map((status) => s210Windows1Formal.counts[status]).join(' / ')}）。当前执行 shard：${activeShardLabel}。独立 smoke shard 不计入正式分母。这仅表示记账完整，不表示兼容通过。真实平台登录、发送与投递验收未执行。`,
+    `S2-11 同冻结快照复跑截至 ${escape(s211RerunState.observed_at)}：${s211RerunState.completed_canonical_reports}/512 份 canonical 报告、${s211RerunState.completed_units.toLocaleString('en-US')}/11,380 单元；单元通过 / 失败 / 跳过 / 未知 ${s211CountsText}，${s211RerunComplete ? '复跑已完成，无剩余报告、单元或活动执行' : `还剩 ${s211RerunState.remaining_shards} 份报告和 ${s211RerunState.remaining_units.toLocaleString('en-US')} 个单元，当前执行 ${s211ActiveText}`}。SQLite 阶段作业状态另计（通过 / 失败 / 跳过 / 未知 / queued / leased：${['passed', 'failed', 'skipped', 'unknown', 'queued', 'leased'].map((status) => s211StageJobCounts[status] ?? 0).join(' / ')}）；阶段作业通过不代表插件单元兼容通过。单元只有六个选定阶段全部 passed 才会记为 passed；本轮所有 11,380 单元的 federated 和 compare 均 skipped，因此单元通过数为 0。${s211RerunComplete ? 'P2-AUTOMATION 受已知 Worker/平台 unknown 阻塞；P2-BEHAVIOR、P2-FIELD 未验证，详见 S2-12 审计和兼容矩阵。' : '此复跑仍在进行，P2-AUTOMATION 待完整复核，行为与真实平台投递未评估。'}`,
     '',
-    `证据：[目录快照](${catalogPath})、[分类 dry run](${recipesPath})、[调度验收](${schedulerPath})、[S2-07 实际 CLI 计划](${planPath})、[S2-08 报告验收](${reportingPath})、[S2-09 baseline](${baselinePath})、[S2-09 pilot 清单](${pilotManifestPath})、[S2-09 pilot 结果](${pilotAcceptancePath})、[S2-10 baseline](${s210BaselinePath})、[S2-10 实现验证](${s210ImplementationPath})、[S2-10 smoke shard](${s210SmokePath})、[S2-10 正式 Linux shard 0](${s210LinuxFormalPath})、[S2-10 正式 Linux shard 1](${s210Linux1FormalPath})、[S2-10 正式 Linux shard 2](${s210Linux2FormalPath})、[S2-10 正式 Windows shard 0](${s210WindowsFormalPath})、[S2-10 正式 Windows shard 1](${s210Windows1FormalPath})、[Windows 首次投影 attempt](${s210WindowsAttempt1Path})、[S2-10 当前未闭合汇总](${s210InterimAggregatePath})、[S2-11 复跑 checkpoint](${s211RerunPath})、[完整实施计划](docs/plans/2026-10-12-phase-2-full-catalog.md)。`,
+    `证据：[目录快照](${catalogPath})、[分类 dry run](${recipesPath})、[调度验收](${schedulerPath})、[S2-07 实际 CLI 计划](${planPath})、[S2-08 报告验收](${reportingPath})、[S2-09 baseline](${baselinePath})、[S2-09 pilot 清单](${pilotManifestPath})、[S2-09 pilot 结果](${pilotAcceptancePath})、[S2-10 baseline](${s210BaselinePath})、[S2-10 实现验证](${s210ImplementationPath})、[S2-10 smoke shard](${s210SmokePath})、[S2-10 正式 Linux shard 0](${s210LinuxFormalPath})、[S2-10 正式 Linux shard 1](${s210Linux1FormalPath})、[S2-10 正式 Linux shard 2](${s210Linux2FormalPath})、[S2-10 正式 Windows shard 0](${s210WindowsFormalPath})、[S2-10 正式 Windows shard 1](${s210Windows1FormalPath})、[Windows 首次投影 attempt](${s210WindowsAttempt1Path})、[S2-10 当前未闭合汇总](${s210InterimAggregatePath})、[S2-11 复跑 checkpoint](${s211RerunPath})、[S2-12 审计](${s212AuditPath})、[兼容矩阵](${s212MatrixPath})、[完整实施计划](docs/plans/2026-10-12-phase-2-full-catalog.md)。`,
     phase2End,
   ].join('\n');
 }

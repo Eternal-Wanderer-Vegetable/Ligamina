@@ -87,8 +87,13 @@ try {
   const active = tracker.features.filter((feature) => feature.status === 'in-progress');
   assert(active.length <= 1, 'More than one active feature');
   assert(tracker.active_feature === (active[0]?.id ?? null), 'active_feature disagrees with feature status');
-  assert(byId.has(tracker.next_feature), 'next_feature missing from tracker');
-  assert(byId.get(tracker.next_feature)?.status === 'not-started', 'next_feature must be not-started');
+  if (tracker.next_feature === null) {
+    assert(!tracker.features.some((feature) => feature.status === 'not-started'),
+      'next_feature may be null only when every feature has started or completed');
+  } else {
+    assert(byId.has(tracker.next_feature), 'next_feature missing from tracker');
+    assert(byId.get(tracker.next_feature)?.status === 'not-started', 'next_feature must be not-started');
+  }
   const lock = JSON.parse(await read('skills-lock.json'));
   assert(lock.skills?.['harness-creator']?.source === 'walkinglabs/learn-harness-engineering', 'Wrong skill source');
   assert(lock.skills?.['harness-creator']?.computedHash?.length === 64, 'Missing skill installation hash');
