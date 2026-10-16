@@ -1,8 +1,8 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-10-16",
-  "active_feature": "feat-013",
-  "next_feature": "feat-014",
+  "updated_at": "2026-10-17",
+  "active_feature": null,
+  "next_feature": null,
   "features": [
     {
       "id": "feat-001",
@@ -778,9 +778,9 @@
       "dependencies": [
         "feat-012"
       ],
-      "status": "in-progress",
+      "status": "done",
       "done_when": "每失败有定位/复现；修复保留原结果，运行时/安装受影响检查通过。",
-      "evidence": "S2-10 P2-CENSUS remains closed at 11,380/11,380 units and 512/512 shards. S2-11 attribution is complete for all 2,056 original failed/unknown units, with source shard/run, platform, artifact/profile identity, stage result/job hashes, attempts, and whole-shard replay command. The ledger records 24 native-load failures with explicit App Control DLL-block diagnostics and 107 Windows offline npm OOM failures at the configured 8 GiB Job Object cap; no policy bypass was attempted. A Koishi native-load probe fix captures plugin process.exit(0) as native_plugin_load_failed while preserving Worker cleanup and restoring process.exit. Focused regression 1/1, Lab suite 109/109, and four isolated Worker regressions passed as harness runs; the frozen packages remain failed native loads. The original census and reports are immutable. At the 2026-10-17 01:24:11 Asia/Shanghai checkpoint, 511/512 canonical reports cover 11,353/11,380 units; Linux shards 0–255 and Windows shards 0–254 are terminal; Windows shard 255 is active under runner PID 7172. Closed unit outcomes are 0 passed, 874 failed, 7,512 skipped, and 2,967 unknown; 1 shard and 27 units remain. The SQLite stage-job status snapshot separately records 24,852 passed, 875 failed, 37,296 skipped, 5,126 unknown, 130 queued, and 1 leased; stage-job passes are not plugin-unit compatibility passes. Completed canonical reports account for 68,118 terminal stage jobs. All 511 included reports passed internal/file SHA, SQLite completed run/manifest/job closure, and contiguous-shard checks; invalid reports=0. Report, queue and README checkpoint cb12e7e includes Windows shard 254 and records shard 255 active; the active report is excluded from the formal denominator. Canonical rerun report paths are listed in evidence_paths. Federated/compare fixtures are absent, so no native-success/federation-failure pair is observed and parity is not established. P2-BEHAVIOR is not evaluated; P2-FIELD is not run; the 5,621-entry behavior-classification gap remains.",
+      "evidence": "S2-11 is complete: attribution reviewed all 2,056 original failed/unknown units with source shard/run, platform, artifact/profile, stage result/job hashes, attempts, and replay commands; recorded 24 native-load failures with explicit App Control DLL blocks and 107 Windows offline npm OOMs at the configured 8 GiB cap. The process.exit(0) probe fix is covered by focused 1/1, Lab 109/109, four isolated Worker regressions, and full init exit 0. The immutable-source full rerun closed 512/512 canonical shards, 11,380/11,380 units and 68,280/68,280 stage jobs with no active/queued/leased runs and invalid_reports=0. Rerun unit outcomes: passed 0, failed 880, skipped 7,530, unknown 2,970; stage-job outcomes: passed 24,914, failed 880, skipped 37,357, unknown 5,129. Audit attributed 2,158 worker_cleanup_unconfirmed outcomes to a Docker Engine named-pipe API outage, 796 Windows NoneBot units to App Control Win32 4551, and 16 other worker/preparation/timeout unknowns. Docker became available only after the rerun; that check is not a rerun. Catalog compatibility and automation gates are not declared passed.",
       "evidence_paths": [
         "outputs/acceptance/phase2-s210-census-interim-20261012.json",
         "outputs/acceptance/phase2-s210-implementation-20261012.json",
@@ -1289,7 +1289,9 @@
         "outputs/acceptance/phase2-s211-rerun-census-windows-shard97of256-20261014.json",
         "outputs/acceptance/phase2-s211-rerun-census-windows-shard98of256-20261014.json",
         "outputs/acceptance/phase2-s211-rerun-census-windows-shard99of256-20261014.json",
-        "outputs/acceptance/phase2-s211-rerun-census-windows-shard9of256-20261014.json"
+        "outputs/acceptance/phase2-s211-rerun-census-windows-shard9of256-20261014.json",
+        "outputs/acceptance/phase2-s212-audit-20261017.json",
+        "outputs/acceptance/phase2-s212-compatibility-matrix-20261017.md"
       ]
     },
     {
@@ -1300,10 +1302,16 @@
       "dependencies": [
         "feat-013"
       ],
-      "status": "not-started",
+      "status": "done",
       "done_when": "目录/调查/自动化/行为/真实平台范围分别裁决，支持列表均有证据，状态准确。",
-      "evidence": "",
-      "evidence_paths": []
+      "evidence": "S2-12 closed after auditing all 512 canonical S2-11 rerun reports, 11,380 units, 68,280 stage jobs, report/file hashes, SQLite run/manifest/job closure, and contiguous Linux/Windows shards; invalid reports=0 and no active/queued/leased work. Unit outcomes: 0 passed, 880 failed, 7,530 skipped, 2,970 unknown. Gate decisions are separate: P2-CATALOG/P2-CENSUS passed; P2-AUTOMATION blocked (2,158 Linux Docker Engine API unavailable unknowns, 796 Windows App Control Win32 4551 unknowns, 16 other worker/preparation/timeout unknowns); P2-BEHAVIOR not evaluated; P2-FIELD not run. No new catalog-wide supported plugin claims; the four exact phase-one T18 versions remain unchanged. Final matrix, README, evidence index, state, plan, and handoff were validated and committed.",
+      "evidence_paths": [
+        "outputs/acceptance/phase2-s212-audit-20261017.json",
+        "outputs/acceptance/phase2-s212-compatibility-matrix-20261017.md",
+        "outputs/acceptance/phase2-s211-process-exit-regression-20261014.json",
+        "outputs/acceptance/phase2-s211-failures-20261014.json",
+        "outputs/acceptance/t18-final-audit-20261012.json"
+      ]
     }
   ]
 }
