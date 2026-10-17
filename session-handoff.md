@@ -21,7 +21,8 @@
 - `scripts/evidence-hash.test.mjs` 覆盖实际 S2-07 失败输入、LF→CRLF 与 CRLF→LF、内容变化拒绝、无效 UTF-8 拒绝；Windows 与 Linux `scripts/check.*` 均在 docs gate 前运行该回归。
 - 修复前 baseline：Windows `pwsh -NoProfile -File init.ps1 -Mode docs` 通过（18 documents / 233 local links）；从 HEAD `git archive` 建立 LF 归档后，`node scripts/check-docs.mjs` 以 stale S2-07 输入错误退出 1。
 - 修复后：`node --test scripts/evidence-hash.test.mjs` 4 项通过；`pwsh -NoProfile -File init.ps1 -Mode docs` 通过；`node --check scripts/evidence-hash.mjs`、`node --check scripts/render-readme.mjs` 与 `git diff --check` 通过。从 LF 归档覆盖本次改动后，再运行回归与 `node scripts/check-docs.mjs` 均通过（18 documents / 233 local links）。
-- 本地完整 `scripts/check.ps1` / `scripts/check.sh` 尚未运行。推送后需确认 Windows/Linux hosted CI：原失败门通过后，后续 pytest、lab、Koishi、Rust、smoke 与 bundle 步骤才会实际执行；这不改变插件兼容性结论。
+- 本地完整 `scripts/check.ps1` / `scripts/check.sh` 未运行；改动已提交并推送，commit `6161346`（`fix(ci): normalize text evidence hash line endings`）。GitHub Actions [run 38989675623](https://github.com/Eternal-Wanderer-Vegetable/Ligamina/actions/runs/38989675623) attempt 2 的 Linux 和 Windows checks 均通过。Linux 的锁定检查、G1 smoke、bundle 与容器镜像构建通过；Windows 的锁定检查、G1 smoke、bundle 与 packaged runtime 验收通过。
+- attempt 1 的 Linux job 通过；Windows 在 docs gate 和前序 Node/NoneBot/lab checks 通过后，Rust `host_session::eof_fails_pending_requests_and_in_flight_limit_is_enforced` 有一次关闭状态断言失败。日志没有保留实际 terminal error。本机该定向测试连续 25 次通过，`cargo test --workspace --locked` 也通过；failed-job rerun attempt 2 未复现且最终通过。未改动 Rust transport 或测试代码；此次间歇现象不影响已通过的双平台最终 run，也不改变插件兼容性结论。
 
 ## Completed Stages
 
