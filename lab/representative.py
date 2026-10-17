@@ -7,7 +7,6 @@ import hashlib
 import json
 import os
 import platform
-import queue
 import re
 import shutil
 import signal
@@ -26,6 +25,11 @@ from typing import Any
 
 
 ROOT = Path(__file__).resolve().parents[1]
+SCRIPT_DIR = Path(__file__).resolve().parent
+if sys.path and Path(sys.path[0]).resolve() == SCRIPT_DIR:
+    sys.path.pop(0)
+import queue
+
 HOST_VERSIONS = {
     "nonebot": {"nonebot2[fastapi]": "2.5.0", "nonebot-adapter-onebot": "2.4.6", "jsonschema": "4.25.1"},
     "koishi": {"@koishijs/core": "4.18.11", "@minatojs/driver-sqlite": "4.7.0"},
@@ -469,11 +473,17 @@ class DirectWorker:
 
     def start(self) -> None:
         if self.sample["ecosystem"] == "nonebot":
-            python_path = self.work / ".venv" / ("Scripts/python.exe" if os.name == "nt" else "bin/python")
+            python_path = Path(self.environment.get(
+                "LIGAMINA_PYTHON_EXECUTABLE",
+                str(self.work / ".venv" / ("Scripts/python.exe" if os.name == "nt" else "bin/python")),
+            ))
             command = [str(python_path), "-m", "ligamina_nonebot.worker"]
             cwd = self.work
         else:
-            command = [shutil.which("node") or "node", str(self.work / "ligamina-koishi-host/dist/worker.js")]
+            command = [
+                self.environment.get("LIGAMINA_NODE_EXECUTABLE", shutil.which("node") or "node"),
+                str(self.work / "ligamina-koishi-host/dist/worker.js"),
+            ]
             cwd = self.work
         creationflags = subprocess.CREATE_NEW_PROCESS_GROUP if os.name == "nt" else 0
         self.process = subprocess.Popen(
@@ -684,7 +694,12 @@ def api_request(base_url: str, method: str, path: str, token: str, body: Any = N
 
 
 def run_federated(sample: dict[str, Any], work: Path, host_environment: dict[str, str], events: list[dict[str, Any]]) -> dict[str, Any]:
-    executable = ROOT / "target/debug/ligamina-cli.exe" if os.name == "nt" else ROOT / "target/debug/ligamina-cli"
+    configured_executable = host_environment.get("LIGAMINA_CORE_EXECUTABLE")
+    executable = (
+        Path(configured_executable)
+        if configured_executable
+        else ROOT / ("target/debug/ligamina-cli.exe" if os.name == "nt" else "target/debug/ligamina-cli")
+    )
     if not executable.is_file():
         raise FileNotFoundError(f"Core daemon binary is missing: {executable}")
     sample_id = sample["sample_id"]
@@ -706,14 +721,19 @@ def run_federated(sample: dict[str, Any], work: Path, host_environment: dict[str
         "LIGAMINA_KOISHI_PLUGIN_CONFIG": host_environment.get("LIGAMINA_KOISHI_PLUGIN_CONFIG", "{}"),
         "LIGAMINA_KOISHI_NICKNAMES": "Bot",
         "LIGAMINA_KOISHI_DATA_DIR": str(work / "koishi-data"),
-        "PYTHONPATH": str(ROOT / "hosts/nonebot"),
+        "PYTHONPATH": host_environment.get("PYTHONPATH", str(ROOT / "hosts/nonebot")),
     }
     if sample["ecosystem"] == "nonebot":
-        program = shutil.which("uv") or "uv"
-        args = ["run", "--locked", "--project", str(work), "--python", "3.12.14", "python", "-m", "ligamina_nonebot.worker"]
+        python_executable = host_environment.get("LIGAMINA_PYTHON_EXECUTABLE")
+        if python_executable:
+            program = python_executable
+            args = ["-m", "ligamina_nonebot.worker"]
+        else:
+            program = shutil.which("uv") or "uv"
+            args = ["run", "--locked", "--project", str(work), "--python", "3.12.14", "python", "-m", "ligamina_nonebot.worker"]
         current_dir = work
     else:
-        program = shutil.which("node") or "node"
+        program = host_environment.get("LIGAMINA_NODE_EXECUTABLE", shutil.which("node") or "node")
         args = [str(work / "ligamina-koishi-host/dist/worker.js")]
         current_dir = work
     config = {

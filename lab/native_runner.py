@@ -23,17 +23,46 @@ def load_case(path: Path) -> dict[str, Any]:
     return value
 
 
+_PROCESS_ENVIRONMENT = {
+    "PATH",
+    "SYSTEMROOT",
+    "SYSTEMDRIVE",
+    "WINDIR",
+    "COMSPEC",
+    "PATHEXT",
+    "TEMP",
+    "TMP",
+    "HOME",
+    "USERPROFILE",
+}
+
+
+def _harness_environment(mode: str) -> dict[str, str]:
+    environment = {
+        key: value
+        for key, value in os.environ.items()
+        if key.upper() in _PROCESS_ENVIRONMENT
+    }
+    environment["LIGAMINA_RUN_MODE"] = mode
+    return environment
+
+
 def execute_harness(
-    command: list[str], case: dict[str, Any], mode: str, timeout_seconds: float
+    command: list[str],
+    case: dict[str, Any],
+    mode: str,
+    timeout_seconds: float,
+    *,
+    cwd: Path | None = None,
 ) -> dict[str, Any]:
     if not command:
         return {"status": "environment_missing", "diagnostic": "harness command is empty"}
-    environment = os.environ.copy()
-    environment["LIGAMINA_RUN_MODE"] = mode
     harness_input = {
         "case_id": case.get("case_id"),
         "stimulus": case["stimulus"],
     }
+    if isinstance(case.get("context"), dict):
+        harness_input["context"] = case["context"]
     try:
         process = subprocess.run(
             command,
@@ -42,7 +71,8 @@ def execute_harness(
             encoding="utf-8",
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,
-            env=environment,
+            env=_harness_environment(mode),
+            cwd=cwd,
             timeout=timeout_seconds,
             check=False,
         )
@@ -77,11 +107,13 @@ def run_pair(
     native_command: list[str],
     federated_command: list[str],
     timeout_seconds: float,
+    *,
+    cwd: Path | None = None,
 ) -> dict[str, Any]:
     if timeout_seconds <= 0:
         raise ValueError("timeout must be greater than zero")
-    native = execute_harness(native_command, case, "native", timeout_seconds)
-    federated = execute_harness(federated_command, case, "federated", timeout_seconds)
+    native = execute_harness(native_command, case, "native", timeout_seconds, cwd=cwd)
+    federated = execute_harness(federated_command, case, "federated", timeout_seconds, cwd=cwd)
     comparison = compare_pair(case, native, federated).as_json()
     return {"case_id": case.get("case_id"), "native": native, "federated": federated, "comparison": comparison}
 
@@ -93,12 +125,14 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--federated-command", required=True, nargs="+")
     parser.add_argument("--timeout", type=float, default=120.0)
     parser.add_argument("--report", type=Path)
+    parser.add_argument("--cwd", type=Path)
     options = parser.parse_args(argv)
     report = run_pair(
         load_case(options.case),
         options.native_command,
         options.federated_command,
         options.timeout,
+        cwd=options.cwd,
     )
     encoded = json.dumps(report, ensure_ascii=False, indent=2) + "\n"
     if options.report:

@@ -1,0 +1,28 @@
+{
+  "schema_version": 1,
+  "date": "2026-10-12",
+  "task_id": "S2-09",
+  "status": "baseline_completed",
+  "repository_head": "cbcbb0a2639bcf9c524847c8778bc87b36b80813",
+  "working_tree_before_run": "clean",
+  "implementation_changes_present": false,
+  "command": "pwsh -NoProfile -File init.ps1 -Mode full",
+  "exit_code": 0,
+  "summary": {
+    "documentation": {"status": "passed", "documents": 18, "local_links": 162},
+    "nonebot_pytest": {"status": "passed", "tests": 3},
+    "lab_unittest": {"status": "passed", "tests": 85},
+    "koishi_tests": {"status": "passed", "tests": 7},
+    "koishi_mcp_tests": {"status": "passed", "tests": 1},
+    "reference_client_tests": {"status": "passed", "tests": 5},
+    "rust_workspace_tests": {"status": "passed", "tests": 33},
+    "windows_core_smoke": {"status": "passed", "events": 4, "gateway_operations": 4, "remaining_pids": []},
+    "windows_bundle_stage": {"status": "passed"}
+  },
+  "scope": "S2-09 pre-implementation baseline after S2-08 commit cbcbb0a. The generated outputs/acceptance/ci-smoke-windows.json was restored afterward. No pilot manifest was executed and no catalog plugin worker was dispatched.",
+  "known_blockers": [
+    "Windows Sandbox CPython startup remains blocked by App Control (Win32 4551); do not bypass host policy.",
+    "S2-07 currently persists and resumes plans but has no catalog plugin worker dispatch path.",
+    "No S2-09 pilot resource budget measurements exist yet."
+  ]
+}

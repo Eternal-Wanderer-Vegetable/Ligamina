@@ -71,6 +71,15 @@ class CompareTest(unittest.TestCase):
         leaked["cleanup"]["live_processes"] = [1234]
         self.assertFalse(self.compare(leaked, leaked).passed)
 
+    def test_extended_environment_fingerprints_are_checked(self) -> None:
+        self.expected["environment"]["artifact_hash"] = "sha256:frozen"
+        self.case["expected"]["environment"]["artifact_hash"] = "sha256:frozen"
+        native = copy.deepcopy(self.good)
+        native["environment"]["artifact_hash"] = "sha256:changed"
+        result = self.compare(native, self.good)
+        self.assertFalse(result.passed)
+        self.assertIn("environment_mismatch", {issue.code for issue in result.issues})
+
 
 if __name__ == "__main__":
     unittest.main()

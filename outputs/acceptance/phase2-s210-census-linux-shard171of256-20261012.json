@@ -1,0 +1,3296 @@
+{
+  "schema_version": 1,
+  "date": "2026-10-12",
+  "task_id": "S2-10",
+  "kind": "phase2_s210_census_shard",
+  "status": "completed",
+  "snapshot_id": "p2-41649744e057d61031d5",
+  "run_id": "catalog-15b989b2d6d0-linux-s171of256",
+  "run_manifest_sha256": "15b989b2d6d0202912c30327717a72e643499e99f68623485ee1b83897bfed19",
+  "source_hashes": {
+    "catalog_sha256": "8c75d69358cd8334d0d311c1e19c642794d7436056d32041f02e6c1de1a06163",
+    "artifact_lock_sha256": "8dcec5da7cd81b9ed7d0f4e8aead8e76ef15cd7e17dfcdc4fa6f7b8944b83d4a",
+    "profile_lock_sha256": "68a7391620a06e7141d949519333a1f4fc5ccee7abd84dc036c46d09fdae8d38",
+    "s209_blocker_evidence_sha256": "7b350f0fbf840013346d9c72355cf951b971668214d8194b534f8ce70ccca287"
+  },
+  "platform": "linux",
+  "shard": {
+    "index": 171,
+    "count": 256
+  },
+  "denominator": {
+    "full_snapshot_entries": 5690,
+    "full_entry_os_units": 11380,
+    "selected_units": 19,
+    "terminal_units": 19,
+    "closed_exactly_once": true,
+    "expected_stage_jobs": 114,
+    "terminal_stage_jobs": 114,
+    "all_selected_stages_terminal": true,
+    "full_census_closed": false
+  },
+  "queue": {
+    "path": "E:\\stella\\Ligamina\\.work\\catalog-census\\phase2-s210.sqlite3",
+    "state": "completed",
+    "counts": {
+      "queued": 0,
+      "leased": 0,
+      "passed": 50,
+      "failed": 1,
+      "skipped": 63,
+      "unknown": 0,
+      "total": 114
+    },
+    "attempt_count": 78,
+    "journal_event_count": 194
+  },
+  "counts": {
+    "passed": 0,
+    "failed": 1,
+    "skipped": 18,
+    "unknown": 0
+  },
+  "stage_counts": {
+    "prepare": {
+      "passed": 16,
+      "failed": 0,
+      "skipped": 3,
+      "unknown": 0
+    },
+    "install": {
+      "passed": 12,
+      "failed": 0,
+      "skipped": 7,
+      "unknown": 0
+    },
+    "native": {
+      "passed": 10,
+      "failed": 1,
+      "skipped": 8,
+      "unknown": 0
+    },
+    "federated": {
+      "passed": 0,
+      "failed": 0,
+      "skipped": 19,
+      "unknown": 0
+    },
+    "compare": {
+      "passed": 0,
+      "failed": 0,
+      "skipped": 19,
+      "unknown": 0
+    },
+    "cleanup": {
+      "passed": 12,
+      "failed": 0,
+      "skipped": 7,
+      "unknown": 0
+    }
+  },
+  "plugin_reports": [
+    {
+      "registry_entry_id": "nb-22d0e79a7923dc50892c170c",
+      "result_id": "catalog:nb-22d0e79a7923dc50892c170c|linux",
+      "ecosystem": "nonebot",
+      "package": "nonebot_plugin_mypower",
+      "version": "0.1.6",
+      "platform": "linux",
+      "unit_status": "skipped",
+      "reason_code": "entry_bound_federated_fixture_missing",
+      "profile_id": "nonebot-2.5.0-onebot-2.4.6-py3.12.14-linux-x86_64",
+      "profile_status": "locked",
+      "profile_reason_code": null,
+      "artifact_status": "locked",
+      "artifact_reason_code": null,
+      "artifact_sha256": "7a641932114dda3cd8d40d4d212629b330a37e946b31d6276ebed974104b9f4b",
+      "dependency_lock_sha256": "b22e2ee242a7773146b164cc641f90fe17d5629969f1895b7d233b94a937906e",
+      "source_snapshot_sha256": "8c75d69358cd8334d0d311c1e19c642794d7436056d32041f02e6c1de1a06163",
+      "artifact_lock_sha256": "8dcec5da7cd81b9ed7d0f4e8aead8e76ef15cd7e17dfcdc4fa6f7b8944b83d4a",
+      "profile_lock_sha256": "68a7391620a06e7141d949519333a1f4fc5ccee7abd84dc036c46d09fdae8d38",
+      "behavior_fixture_status": "unmapped_category",
+      "recipe_categories": [],
+      "stage_statuses": {
+        "prepare": "passed",
+        "install": "passed",
+        "native": "passed",
+        "federated": "skipped",
+        "compare": "skipped",
+        "cleanup": "passed"
+      },
+      "stage_result_sha256": {
+        "prepare": "b656320c36eb7021b0c64531480dea80fc3df338fdaff27ca9059b272970a3a8",
+        "install": "bec94c7a0b1be61b73c0c979e603e5cbdf0d20fa072fa944dd12e4ccb6a17ba3",
+        "native": "c2e6bbd91bcb6f7d4aa760abd11401d680532133594abfab5b7b5e80cca385d5",
+        "federated": "230dde1a123ced7c3670531069da83bed23e51531544b2f0e8571e0dff2d9fa3",
+        "compare": "595504cfbea71ce76a82a1cf0a9a7f3c822dc2c53e4208d329b7cbadc641f5a1",
+        "cleanup": "c2e6bbd91bcb6f7d4aa760abd11401d680532133594abfab5b7b5e80cca385d5"
+      },
+      "attempts": {
+        "prepare": [
+          {
+            "attempt_id": "f74cbf95d89578bb88de9b89c4a7b07f1f53eba79d079a10cfdeac8c3e3a90af:a1",
+            "attempt_number": 1,
+            "worker_id": "s210-linux-shard-171-of-256",
+            "status": "passed",
+            "started_at": 1791854045.6105964,
+            "ended_at": 1791854045.6173801,
+            "result_sha256": "b656320c36eb7021b0c64531480dea80fc3df338fdaff27ca9059b272970a3a8"
+          }
+        ],
+        "install": [
+          {
+            "attempt_id": "0510831795ea921e764b469b51106744fb709459e8453f166d27c23c5ea5253e:a1",
+            "attempt_number": 1,
+            "worker_id": "s210-linux-shard-171-of-256",
+            "status": "passed",
+            "started_at": 1791854045.6233869,
+            "ended_at": 1791854051.8246672,
+            "result_sha256": "bec94c7a0b1be61b73c0c979e603e5cbdf0d20fa072fa944dd12e4ccb6a17ba3"
+          }
+        ],
+        "native": [
+          {
+            "attempt_id": "c37abeb8921da6b9dd132f2a69b1cf822612ebfa537a05889fc3c65cfd9f0ef3:a1",
+            "attempt_number": 1,
+            "worker_id": "s210-linux-shard-171-of-256",
+            "status": "passed",
+            "started_at": 1791854051.8412797,
+            "ended_at": 1791854051.8482912,
+            "result_sha256": "c2e6bbd91bcb6f7d4aa760abd11401d680532133594abfab5b7b5e80cca385d5"
+          }
+        ],
+        "federated": [
+          {
+            "attempt_id": "8c8dec399be75cdbd955ce75de875943477c2e115661f6de192d3bfdf5d02a9c:a1",
+            "attempt_number": 1,
+            "worker_id": "s210-linux-shard-171-of-256",
+            "status": "skipped",
+            "started_at": 1791854051.830174,
+            "ended_at": 1791854051.837691,
+            "result_sha256": "230dde1a123ced7c3670531069da83bed23e51531544b2f0e8571e0dff2d9fa3"
+          }
+        ],
+        "compare": [],
+        "cleanup": [
+          {
+            "attempt_id": "6ff17aa4ffe4bc416cbbc2ee015c8c7038c5f6679422c84e92f43ba042c9efba:a1",
+            "attempt_number": 1,
+            "worker_id": "s210-linux-shard-171-of-256",
+            "status": "passed",
+            "started_at": 1791854051.852298,
+            "ended_at": 1791854051.8594737,
+            "result_sha256": "c2e6bbd91bcb6f7d4aa760abd11401d680532133594abfab5b7b5e80cca385d5"
+          }
+        ]
+      },
+      "probe_evidence": {
+        "artifact_lock_sha256": "8dcec5da7cd81b9ed7d0f4e8aead8e76ef15cd7e17dfcdc4fa6f7b8944b83d4a",
+        "artifact_sha256": "7a641932114dda3cd8d40d4d212629b330a37e946b31d6276ebed974104b9f4b",
+        "attempted": true,
+        "catalog_document_sha256": "8c75d69358cd8334d0d311c1e19c642794d7436056d32041f02e6c1de1a06163",
+        "census_probe": true,
+        "dependency_archives": {
+          "archive_bytes": 15727575,
+          "cache_hits": 35,
+          "downloaded_archives": 0,
+          "downloaded_bytes": 0,
+          "locked_package_count": 35,
+          "metadata_cache_hits": 34,
+          "metadata_download_bytes": 0,
+          "metadata_response_count": 34,
+          "metadata_response_sha256": "a7ad8a882d9809a9b580f69459212f623a9a8227fa1f299ae56d7f125037494f",
+          "profile_lock_sha256": "b22e2ee242a7773146b164cc641f90fe17d5629969f1895b7d233b94a937906e",
+          "unique_archive_count": 35,
+          "wheel_manifest_sha256": "06bb05c4333ccdd693af9936e65b79214d97d254b4e6542d7d6286c90d59f46e"
+        },
+        "detail": "NoneBot locked wheel-only dependency installation and native plugin registration ran in the pinned network-disabled Linux Docker Worker; L4 behavior has no entry-bound fixture.",
+        "ecosystem": "nonebot",
+        "package": "nonebot_plugin_mypower",
+        "platform": "linux",
+        "plugin_archive_bytes": 3486237,
+        "profile_document_sha256": "68a7391620a06e7141d949519333a1f4fc5ccee7abd84dc036c46d09fdae8d38",
+        "profile_id": "nonebot-2.5.0-onebot-2.4.6-py3.12.14-linux-x86_64",
+        "profile_lock_sha256": "b22e2ee242a7773146b164cc641f90fe17d5629969f1895b7d233b94a937906e",
+        "reason_code": "missing_entry_bound_fixture",
+        "registry_entry_id": "nb-22d0e79a7923dc50892c170c",
+        "requirements_lock_sha256": "b22e2ee242a7773146b164cc641f90fe17d5629969f1895b7d233b94a937906e",
+        "resource_observations": {
+          "peak_writable_scratch_bytes": 65127464
+        },
+        "result_id": "catalog:nb-22d0e79a7923dc50892c170c|linux",
+        "schema_version": 1,
+        "source_probe_task_id": "S2-09",
+        "status": "skipped",
+        "task_id": "S2-10",
+        "unit_type": "catalog_entry",
+        "version": "0.1.6",
+        "worker": {
+          "build_backends": "disabled",
+          "cleanup_confirmed": true,
+          "elapsed_seconds": 6.046999999991385,
+          "exit_code": 0,
+          "image_digest": "ligamina-s205-python-profile@sha256:88bc85522c681966347809c702e0ae7fcf6fba4d8860161e77d7aa877a04488e",
+          "input_bytes": 15849215,
+          "network": "none",
+          "output_truncated": false,
+          "package_manager": "pip offline --require-hashes --only-binary",
+          "peak_memory_bytes": 122473676,
+          "protocol_report": {
+            "artifact_sha256": "7a641932114dda3cd8d40d4d212629b330a37e946b31d6276ebed974104b9f4b",
+            "cleanup": {
+              "status": "passed"
+            },
+            "dependency_install": {
+              "elapsed_seconds": 2.758,
+              "exit_code": 0,
+              "output_overflow": false,
+              "reason_code": null,
+              "status": "passed",
+              "stderr_bytes": 0,
+              "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+              "stderr_tail": "",
+              "stdout_bytes": 5572,
+              "stdout_sha256": "411fd2aac75dbf3865d9cf61cdd59a44153e5a0fde09e677f927a8918e15d39f",
+              "stdout_tail": "aml, python-dotenv, pygtrie, propcache, multidict, msgpack, loguru, idna, httptools, h11, click, attrs, annotated-types, annotated-doc, yarl, uvicorn, typing-inspection, referencing, pydantic-core, opentelemetry-api, exceptiongroup, anyio, watchfiles, starlette, pydantic, jsonschema-specifications, nonebot2, jsonschema, fastapi, nonebot-adapter-onebot, nonebot-plugin-mypower\nSuccessfully installed annotated-doc-0.0.5 annotated-types-0.8.0 anyio-4.15.1 attrs-26.1.0 click-8.5.0 exceptiongroup-1.3.1 fastapi-0.143.0 h11-0.16.0 httptools-0.9.0 idna-3.20 jsonschema-4.25.1 jsonschema-specifications-2025.9.1 loguru-0.7.3 msgpack-1.2.3 multidict-7.1.0 nonebot-adapter-onebot-2.4.6 nonebot-plugin-mypower-0.1.6 nonebot2-2.5.0 opentelemetry-api-1.45.1 propcache-0.5.4 pydantic-2.14.1 pydantic-core-2.50.1 pygtrie-2.6.2 python-dotenv-1.2.4 pyyaml-6.0.3 referencing-0.37.0 rpds-py-2026.9.1 starlette-1.7.0 typing-extensions-4.16.0 typing-inspection-0.4.4 uvicorn-0.54.0 uvloop-0.23.0 watchfiles-1.3.0 websockets-17.2 yarl-1.25.1\n",
+              "timed_out": false
+            },
+            "environment_prepare": {
+              "elapsed_seconds": 1.906,
+              "exit_code": 0,
+              "output_overflow": false,
+              "stderr_bytes": 0,
+              "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+              "stderr_tail": "",
+              "stdout_bytes": 0,
+              "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+              "stdout_tail": "",
+              "timed_out": false
+            },
+            "native_load": {
+              "elapsed_seconds": 0.703,
+              "entry_module_imported": true,
+              "entry_point": "nonebot_plugin_mypower",
+              "exit_code": 0,
+              "loaded_plugin_count": 1,
+              "output_overflow": false,
+              "plugin_registered": true,
+              "reason_code": null,
+              "schema_version": 1,
+              "status": "passed",
+              "stderr_bytes": 0,
+              "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+              "stderr_tail": "",
+              "stdout_bytes": 353,
+              "stdout_sha256": "617294472d8c73cc4076d486d346d089cb73f4aa1566c1d69e6ce62209ebe0de",
+              "stdout_tail": "10-13 01:14:11 [SUCCESS] nonebot | NoneBot is initializing...\n10-13 01:14:11 [INFO] nonebot | Current Env: prod\n10-13 01:14:11 [SUCCESS] nonebot | Succeeded to load plugin \"nonebot_plugin_mypower\"\n{\"schema_version\":1,\"task_id\":\"S2-09\",\"entry_point\":\"nonebot_plugin_mypower\",\"entry_module_imported\":true,\"plugin_registered\":true,\"loaded_plugin_count\":1}\n",
+              "task_id": "S2-09",
+              "timed_out": false
+            },
+            "package": "nonebot_plugin_mypower",
+            "profile_id": "nonebot-2.5.0-onebot-2.4.6-py3.12.14-linux-x86_64",
+            "profile_lock_sha256": "b22e2ee242a7773146b164cc641f90fe17d5629969f1895b7d233b94a937906e",
+            "registry_entry_id": "nb-22d0e79a7923dc50892c170c",
+            "resource_observations": {
+              "peak_writable_scratch_bytes": 65127464
+            },
+            "schema_version": 1,
+            "task_id": "S2-09",
+            "version": "0.1.6"
+          },
+          "read_only_input": true,
+          "reason_code": null,
+          "status": "passed",
+          "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "stderr_tail": "",
+          "stdout_sha256": "877ea54ad681a6b78f9a631cfa2c7ee4f10080042f92b6eab5017f62d174d647",
+          "stdout_tail": "n10-13 01:14:11 [INFO] nonebot | Current Env: prod\\n10-13 01:14:11 [SUCCESS] nonebot | Succeeded to load plugin \\\"nonebot_plugin_mypower\\\"\\n{\\\"schema_version\\\":1,\\\"task_id\\\":\\\"S2-09\\\",\\\"entry_point\\\":\\\"nonebot_plugin_mypower\\\",\\\"entry_module_imported\\\":true,\\\"plugin_registered\\\":true,\\\"loaded_plugin_count\\\":1}\\n\",\"stderr_tail\":\"\",\"timed_out\":false,\"output_overflow\":false,\"status\":\"passed\",\"reason_code\":null,\"elapsed_seconds\":0.703,\"schema_version\":1,\"task_id\":\"S2-09\",\"entry_point\":\"nonebot_plugin_mypower\",\"entry_module_imported\":true,\"plugin_registered\":true,\"loaded_plugin_count\":1},\"cleanup\":{\"status\":\"passed\"},\"resource_observations\":{\"peak_writable_scratch_bytes\":65127464},\"environment_prepare\":{\"exit_code\":0,\"stdout_bytes\":0,\"stderr_bytes\":0,\"stdout_sha256\":\"e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855\",\"stderr_sha256\":\"e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855\",\"stdout_tail\":\"\",\"stderr_tail\":\"\",\"timed_out\":false,\"output_overflow\":false,\"elapsed_seconds\":1.906}}\n"
+        }
+      },
+      "cleanup_confirmed": true,
+      "resource_observations": {
+        "peak_writable_scratch_bytes": 65127464
+      }
+    },
+    {
+      "registry_entry_id": "ko-1a52651509a6d4e132918b48",
+      "result_id": "catalog:ko-1a52651509a6d4e132918b48|linux",
+      "ecosystem": "koishi",
+      "package": "@koishijs/plugin-adapter-qq",
+      "version": "4.14.0",
+      "platform": "linux",
+      "unit_status": "skipped",
+      "reason_code": "entry_loader_profile_missing",
+      "profile_id": "koishi-core-4.18.11-node-24.20.0-x86_64-portable-lock",
+      "profile_status": "locked",
+      "profile_reason_code": null,
+      "artifact_status": "locked",
+      "artifact_reason_code": null,
+      "artifact_sha256": "3f913b10a756f4cdc739eae52271abeb91e7dc01f98d237c6bbd5a43f30e7c33",
+      "dependency_lock_sha256": "b21aaf20d6180d17047fb093ac1594811aba837e03177e28e7d3d4f0c6b56daf",
+      "source_snapshot_sha256": "8c75d69358cd8334d0d311c1e19c642794d7436056d32041f02e6c1de1a06163",
+      "artifact_lock_sha256": "8dcec5da7cd81b9ed7d0f4e8aead8e76ef15cd7e17dfcdc4fa6f7b8944b83d4a",
+      "profile_lock_sha256": "68a7391620a06e7141d949519333a1f4fc5ccee7abd84dc036c46d09fdae8d38",
+      "behavior_fixture_status": "missing_fixture",
+      "recipe_categories": [
+        "adapter"
+      ],
+      "stage_statuses": {
+        "prepare": "passed",
+        "install": "skipped",
+        "native": "skipped",
+        "federated": "skipped",
+        "compare": "skipped",
+        "cleanup": "skipped"
+      },
+      "stage_result_sha256": {
+        "prepare": "ba8b48ff6e9cbdbee668a96702fa217477ffcd16891fa7c35694873c02ede1c4",
+        "install": "2fa59894698025d268429b0a09a6ada1a26bb017bf7a11ba731304b871f311f9",
+        "native": "613ed0507313a707c200c42bd45e04c9c6e3bb778d23979d909f52d3d14bd087",
+        "federated": "613ed0507313a707c200c42bd45e04c9c6e3bb778d23979d909f52d3d14bd087",
+        "compare": "09173899d06f7d3d5a706689bb39b26d7544ad3f4e4f7d9f95b844b215c6d52b",
+        "cleanup": "f1392bf40e6422554fe7c05b11a0282e2902106bf95ae7e94b4c67d7d04ce767"
+      },
+      "attempts": {
+        "prepare": [
+          {
+            "attempt_id": "afa6ac77421000d02dd691f8aed6e36b65fb8fc06e7f0f8462e162adefcd4873:a1",
+            "attempt_number": 1,
+            "worker_id": "s210-linux-shard-171-of-256",
+            "status": "passed",
+            "started_at": 1791853930.9956143,
+            "ended_at": 1791853931.0037866,
+            "result_sha256": "ba8b48ff6e9cbdbee668a96702fa217477ffcd16891fa7c35694873c02ede1c4"
+          }
+        ],
+        "install": [
+          {
+            "attempt_id": "b7b4389b980107ccaa3b408c5c00a2b25140db8e095833f0a5a5049a20192fbe:a1",
+            "attempt_number": 1,
+            "worker_id": "s210-linux-shard-171-of-256",
+            "status": "skipped",
+            "started_at": 1791853931.0105848,
+            "ended_at": 1791853931.0179455,
+            "result_sha256": "2fa59894698025d268429b0a09a6ada1a26bb017bf7a11ba731304b871f311f9"
+          }
+        ],
+        "native": [],
+        "federated": [],
+        "compare": [],
+        "cleanup": [
+          {
+            "attempt_id": "4ec8f4557a9a2f09978ba7db1721ddc284168a5869e44fc4f4388d87d752a8b8:a1",
+            "attempt_number": 1,
+            "worker_id": "s210-linux-shard-171-of-256",
+            "status": "skipped",
+            "started_at": 1791853931.026066,
+            "ended_at": 1791853931.0351071,
+            "result_sha256": "f1392bf40e6422554fe7c05b11a0282e2902106bf95ae7e94b4c67d7d04ce767"
+          }
+        ]
+      },
+      "probe_evidence": {
+        "attempted": false,
+        "reason_code": "entry_loader_profile_missing",
+        "required_services": [],
+        "status": "skipped",
+        "task_id": "S2-10"
+      },
+      "cleanup_confirmed": null,
+      "resource_observations": null
+    },
+    {
+      "registry_entry_id": "ko-e9aa359eb776a88735264321",
+      "result_id": "catalog:ko-e9aa359eb776a88735264321|linux",
+      "ecosystem": "koishi",
+      "package": "koishi-plugin-ba-logo",
+      "version": "1.1.8",
+      "platform": "linux",
+      "unit_status": "skipped",
+      "reason_code": "entry_loader_profile_missing",
+      "profile_id": "koishi-core-4.18.11-node-24.20.0-x86_64-portable-lock",
+      "profile_status": "locked",
+      "profile_reason_code": null,
+      "artifact_status": "locked",
+      "artifact_reason_code": null,
+      "artifact_sha256": "ba6407054aeb9a6a720aea76c49f0980a2418dbc509cc65a065c8e2e11a7bd14",
+      "dependency_lock_sha256": "fd5e5742ed2cc9656a3431c27cee87c99af7787cba85823275ef4dfad87c002c",
+      "source_snapshot_sha256": "8c75d69358cd8334d0d311c1e19c642794d7436056d32041f02e6c1de1a06163",
+      "artifact_lock_sha256": "8dcec5da7cd81b9ed7d0f4e8aead8e76ef15cd7e17dfcdc4fa6f7b8944b83d4a",
+      "profile_lock_sha256": "68a7391620a06e7141d949519333a1f4fc5ccee7abd84dc036c46d09fdae8d38",
+      "behavior_fixture_status": "unmapped_category",
+      "recipe_categories": [],
+      "stage_statuses": {
+        "prepare": "passed",
+        "install": "skipped",
+        "native": "skipped",
+        "federated": "skipped",
+        "compare": "skipped",
+        "cleanup": "skipped"
+      },
+      "stage_result_sha256": {
+        "prepare": "aecad4fac97d0af8741e5d559df01cb57d1d39b059db2ccc19f5a9b4d10ffe53",
+        "install": "a456874f83509779c17be842a867e6d7fa0b8ed25f1f591776670a523afa76ad",
+        "native": "5033d8970828188a3ba4fc019e21adbee1b1c9ac8e3afea3ea99236dbd5dec52",
+        "federated": "5033d8970828188a3ba4fc019e21adbee1b1c9ac8e3afea3ea99236dbd5dec52",
+        "compare": "72e6711de7e4c3637e0839a22083f225d4333d5291d23c79807d102d2e0495e5",
+        "cleanup": "f1392bf40e6422554fe7c05b11a0282e2902106bf95ae7e94b4c67d7d04ce767"
+      },
+      "attempts": {
+        "prepare": [
+          {
+            "attempt_id": "d1dc01370b2d50564e5862f3871a5f336ccb7365436b8587265e9dc9ab7657b9:a1",
+            "attempt_number": 1,
+            "worker_id": "s210-linux-shard-171-of-256",
+            "status": "passed",
+            "started_at": 1791854034.9166281,
+            "ended_at": 1791854034.9223537,
+            "result_sha256": "aecad4fac97d0af8741e5d559df01cb57d1d39b059db2ccc19f5a9b4d10ffe53"
+          }
+        ],
+        "install": [
+          {
+            "attempt_id": "62303ad4ad38539d2faa2ff8fd8b7d26b3b2cc6d168767cc98af7ef1ee23d645:a1",
+            "attempt_number": 1,
+            "worker_id": "s210-linux-shard-171-of-256",
+            "status": "skipped",
+            "started_at": 1791854034.9287329,
+            "ended_at": 1791854034.9345086,
+            "result_sha256": "a456874f83509779c17be842a867e6d7fa0b8ed25f1f591776670a523afa76ad"
+          }
+        ],
+        "native": [],
+        "federated": [],
+        "compare": [],
+        "cleanup": [
+          {
+            "attempt_id": "c01842a3a0db7f0a8fe4d560cf8e3c524dc4f281566e272f97ff793f45d59e8c:a1",
+            "attempt_number": 1,
+            "worker_id": "s210-linux-shard-171-of-256",
+            "status": "skipped",
+            "started_at": 1791854034.9408152,
+            "ended_at": 1791854034.9483402,
+            "result_sha256": "f1392bf40e6422554fe7c05b11a0282e2902106bf95ae7e94b4c67d7d04ce767"
+          }
+        ]
+      },
+      "probe_evidence": {
+        "attempted": false,
+        "reason_code": "entry_loader_profile_missing",
+        "required_services": [
+          "puppeteer",
+          "fonts",
+          "fonts4pptr"
+        ],
+        "status": "skipped",
+        "task_id": "S2-10"
+      },
+      "cleanup_confirmed": null,
+      "resource_observations": null
+    },
+    {
+      "registry_entry_id": "ko-18984715cffd1b308d1b4280",
+      "result_id": "catalog:ko-18984715cffd1b308d1b4280|linux",
+      "ecosystem": "koishi",
+      "package": "@yesimbot/koishi-plugin-vision-tools",
+      "version": "1.1.1",
+      "platform": "linux",
+      "unit_status": "skipped",
+      "reason_code": "entry_loader_profile_missing",
+      "profile_id": "koishi-core-4.18.11-node-24.20.0-x86_64-portable-lock",
+      "profile_status": "locked",
+      "profile_reason_code": null,
+      "artifact_status": "locked",
+      "artifact_reason_code": null,
+      "artifact_sha256": "c9c51a94fa05298d87a526f01b9cd9f7b26e0b141ba23abf96dfbfdb98a28dfb",
+      "dependency_lock_sha256": "222497d50e04d3a790466d570567c53ffbcb9796d3879561909f6ea4f9c9464a",
+      "source_snapshot_sha256": "8c75d69358cd8334d0d311c1e19c642794d7436056d32041f02e6c1de1a06163",
+      "artifact_lock_sha256": "8dcec5da7cd81b9ed7d0f4e8aead8e76ef15cd7e17dfcdc4fa6f7b8944b83d4a",
+      "profile_lock_sha256": "68a7391620a06e7141d949519333a1f4fc5ccee7abd84dc036c46d09fdae8d38",
+      "behavior_fixture_status": "unmapped_category",
+      "recipe_categories": [],
+      "stage_statuses": {
+        "prepare": "passed",
+        "install": "skipped",
+        "native": "skipped",
+        "federated": "skipped",
+        "compare": "skipped",
+        "cleanup": "skipped"
+      },
+      "stage_result_sha256": {
+        "prepare": "c95d9ab3973946e2c420a1fa68028af824e80fc010b777c6549f546b7d570b1d",
+        "install": "4e3df55191bc838cb3874c710cc09921cc6518dec7193c3ef9578b7e670a845e",
+        "native": "09aa877fce7edba54d74d1d5ff66be733f37fe180ae3a16748d3ead4b4539d07",
+        "federated": "09aa877fce7edba54d74d1d5ff66be733f37fe180ae3a16748d3ead4b4539d07",
+        "compare": "11ef39d6e8079fa75976cff8d53f98b7e759c897a23b951085e771bcca9c2050",
+        "cleanup": "f1392bf40e6422554fe7c05b11a0282e2902106bf95ae7e94b4c67d7d04ce767"
+      },
+      "attempts": {
+        "prepare": [
+          {
+            "attempt_id": "3dd29dce7cc904b1d3d4a46e825f17c831771a797a62619f1f9bf937a0794392:a1",
+            "attempt_number": 1,
+            "worker_id": "s210-linux-shard-171-of-256",
+            "status": "passed",
+            "started_at": 1791853930.951145,
+            "ended_at": 1791853930.9581683,
+            "result_sha256": "c95d9ab3973946e2c420a1fa68028af824e80fc010b777c6549f546b7d570b1d"
+          }
+        ],
+        "install": [
+          {
+            "attempt_id": "e7e28e05708da420e7674e3c1b23d0c640e32f14ff75b3bfbb9e7e3b512f1fd4:a1",
+            "attempt_number": 1,
+            "worker_id": "s210-linux-shard-171-of-256",
+            "status": "skipped",
+            "started_at": 1791853930.96519,
+            "ended_at": 1791853930.972247,
+            "result_sha256": "4e3df55191bc838cb3874c710cc09921cc6518dec7193c3ef9578b7e670a845e"
+          }
+        ],
+        "native": [],
+        "federated": [],
+        "compare": [],
+        "cleanup": [
+          {
+            "attempt_id": "4788365ee4f6201913e990f30530cd92c8c6208c57be0c4aeae1799b07a57362:a1",
+            "attempt_number": 1,
+            "worker_id": "s210-linux-shard-171-of-256",
+            "status": "skipped",
+            "started_at": 1791853930.981725,
+            "ended_at": 1791853930.9901035,
+            "result_sha256": "f1392bf40e6422554fe7c05b11a0282e2902106bf95ae7e94b4c67d7d04ce767"
+          }
+        ]
+      },
+      "probe_evidence": {
+        "attempted": false,
+        "reason_code": "entry_loader_profile_missing",
+        "required_services": [
+          "yesimbot"
+        ],
+        "status": "skipped",
+        "task_id": "S2-10"
+      },
+      "cleanup_confirmed": null,
+      "resource_observations": null
+    },
+    {
+      "registry_entry_id": "ko-f4189710f8b39932dd71bd3d",
+      "result_id": "catalog:ko-f4189710f8b39932dd71bd3d|linux",
+      "ecosystem": "koishi",
+      "package": "koishi-plugin-free-monetary",
+      "version": "1.0.6",
+      "platform": "linux",
+      "unit_status": "skipped",
+      "reason_code": "entry_loader_profile_missing",
+      "profile_id": "koishi-core-4.18.11-node-24.20.0-x86_64-portable-lock",
+      "profile_status": "locked",
+      "profile_reason_code": null,
+      "artifact_status": "locked",
+      "artifact_reason_code": null,
+      "artifact_sha256": "ba41c210f2b726916b538efc279184c79b8f7b37669bd2c0488b0ad4513996c5",
+      "dependency_lock_sha256": "a5016b82a84cc816de71d36e56d5d6aa77b83c924127bfe6a2d4f87c766ee003",
+      "source_snapshot_sha256": "8c75d69358cd8334d0d311c1e19c642794d7436056d32041f02e6c1de1a06163",
+      "artifact_lock_sha256": "8dcec5da7cd81b9ed7d0f4e8aead8e76ef15cd7e17dfcdc4fa6f7b8944b83d4a",
+      "profile_lock_sha256": "68a7391620a06e7141d949519333a1f4fc5ccee7abd84dc036c46d09fdae8d38",
+      "behavior_fixture_status": "unmapped_category",
+      "recipe_categories": [],
+      "stage_statuses": {
+        "prepare": "passed",
+        "install": "skipped",
+        "native": "skipped",
+        "federated": "skipped",
+        "compare": "skipped",
+        "cleanup": "skipped"
+      },
+      "stage_result_sha256": {
+        "prepare": "d92725af60f6477ccbdf7b3c36795e2cc94354a9a4b271623328a9047fd5bda4",
+        "install": "e4855e8ed8adc102dc89d51fa3c87a2d2d1e15207810538e209e36e486ebd8a3",
+        "native": "af26de3fb171d15b67c92c5d1ddbb4624a68dfb1e4597cfb2eb052f8d020acd2",
+        "federated": "af26de3fb171d15b67c92c5d1ddbb4624a68dfb1e4597cfb2eb052f8d020acd2",
+        "compare": "beadbd42792d18897691668d216e9d0a0bab92e9591c61859d0f68d69db97660",
+        "cleanup": "f1392bf40e6422554fe7c05b11a0282e2902106bf95ae7e94b4c67d7d04ce767"
+      },
+      "attempts": {
+        "prepare": [
+          {
+            "attempt_id": "491cb42b8953ba10d81ef6f6431fb945eac1919ec54442c862a3bc310c784bb4:a1",
+            "attempt_number": 1,
+            "worker_id": "s210-linux-shard-171-of-256",
+            "status": "passed",
+            "started_at": 1791854034.9524474,
+            "ended_at": 1791854034.9586878,
+            "result_sha256": "d92725af60f6477ccbdf7b3c36795e2cc94354a9a4b271623328a9047fd5bda4"
+          }
+        ],
+        "install": [
+          {
+            "attempt_id": "2957f7d8dfe8a9e17d76bebb8d5d69ec6b21eca15bf87cafc07f232a0a3f966e:a1",
+            "attempt_number": 1,
+            "worker_id": "s210-linux-shard-171-of-256",
+            "status": "skipped",
+            "started_at": 1791854034.963405,
+            "ended_at": 1791854034.9693084,
+            "result_sha256": "e4855e8ed8adc102dc89d51fa3c87a2d2d1e15207810538e209e36e486ebd8a3"
+          }
+        ],
+        "native": [],
+        "federated": [],
+        "compare": [],
+        "cleanup": [
+          {
+            "attempt_id": "8920df479c561adab4be00755210e3a35d6e380ae7d4a169c1d45a155475f66c:a1",
+            "attempt_number": 1,
+            "worker_id": "s210-linux-shard-171-of-256",
+            "status": "skipped",
+            "started_at": 1791854034.9766262,
+            "ended_at": 1791854034.983955,
+            "result_sha256": "f1392bf40e6422554fe7c05b11a0282e2902106bf95ae7e94b4c67d7d04ce767"
+          }
+        ]
+      },
+      "probe_evidence": {
+        "attempted": false,
+        "reason_code": "entry_loader_profile_missing",
+        "required_services": [
+          "database"
+        ],
+        "status": "skipped",
+        "task_id": "S2-10"
+      },
+      "cleanup_confirmed": null,
+      "resource_observations": null
+    },
+    {
+      "registry_entry_id": "ko-564a6168f736a04c3b1f847e",
+      "result_id": "catalog:ko-564a6168f736a04c3b1f847e|linux",
+      "ecosystem": "koishi",
+      "package": "@koishijs/plugin-locale-ja-jp",
+      "version": "0.0.2",
+      "platform": "linux",
+      "unit_status": "skipped",
+      "reason_code": "entry_bound_federated_fixture_missing",
+      "profile_id": "koishi-core-4.18.11-node-24.20.0-x86_64-portable-lock",
+      "profile_status": "locked",
+      "profile_reason_code": null,
+      "artifact_status": "locked",
+      "artifact_reason_code": null,
+      "artifact_sha256": "b7a81a50cad06b48deaf69da4258d19e29836537816d1f2446e45e21e5bc3215",
+      "dependency_lock_sha256": "dcc7b2156695f2f88f152c712b799dc84bb92f721faf5c487ffe32877ea08fe7",
+      "source_snapshot_sha256": "8c75d69358cd8334d0d311c1e19c642794d7436056d32041f02e6c1de1a06163",
+      "artifact_lock_sha256": "8dcec5da7cd81b9ed7d0f4e8aead8e76ef15cd7e17dfcdc4fa6f7b8944b83d4a",
+      "profile_lock_sha256": "68a7391620a06e7141d949519333a1f4fc5ccee7abd84dc036c46d09fdae8d38",
+      "behavior_fixture_status": "unmapped_category",
+      "recipe_categories": [],
+      "stage_statuses": {
+        "prepare": "passed",
+        "install": "passed",
+        "native": "passed",
+        "federated": "skipped",
+        "compare": "skipped",
+        "cleanup": "passed"
+      },
+      "stage_result_sha256": {
+        "prepare": "5451b60c680c7a39ba6f5ff04df18494218f052b0170061ae9952f2449bdc939",
+        "install": "2b42f938edc2f037b4a07f53729d2b64da85a7b51ddf2d99230ab69cd2ff3447",
+        "native": "25508a84efcf23f9a5bf5f67977d32744684b615b41225f5369bd57cf6abbbcb",
+        "federated": "230dde1a123ced7c3670531069da83bed23e51531544b2f0e8571e0dff2d9fa3",
+        "compare": "1caea5b9ffc765c61e411d8c6c749182821dd4e211c5a8ad8bb089188ae9eb58",
+        "cleanup": "25508a84efcf23f9a5bf5f67977d32744684b615b41225f5369bd57cf6abbbcb"
+      },
+      "attempts": {
+        "prepare": [
+          {
+            "attempt_id": "aa6aed82c881448407472c955892386641d128d93514e6e0a3e209d05ab8a450:a1",
+            "attempt_number": 1,
+            "worker_id": "s210-linux-shard-171-of-256",
+            "status": "passed",
+            "started_at": 1791853931.0411074,
+            "ended_at": 1791853931.0486138,
+            "result_sha256": "5451b60c680c7a39ba6f5ff04df18494218f052b0170061ae9952f2449bdc939"
+          }
+        ],
+        "install": [
+          {
+            "attempt_id": "0e601ce998ea20ebc54f6cc4546819aee99f58b47b938963244aff1450696878:a1",
+            "attempt_number": 1,
+            "worker_id": "s210-linux-shard-171-of-256",
+            "status": "passed",
+            "started_at": 1791853931.0552208,
+            "ended_at": 1791853941.713697,
+            "result_sha256": "2b42f938edc2f037b4a07f53729d2b64da85a7b51ddf2d99230ab69cd2ff3447"
+          }
+        ],
+        "native": [
+          {
+            "attempt_id": "920343424142a8e80c5cf8162aa29e32639a71aedacd534dcd0b2afcc50c40c0:a1",
+            "attempt_number": 1,
+            "worker_id": "s210-linux-shard-171-of-256",
+            "status": "passed",
+            "started_at": 1791853941.736725,
+            "ended_at": 1791853941.7448096,
+            "result_sha256": "25508a84efcf23f9a5bf5f67977d32744684b615b41225f5369bd57cf6abbbcb"
+          }
+        ],
+        "federated": [
+          {
+            "attempt_id": "5d745f36c4f9d70bef1cadb4567a5117e437ba96c91de885c4dfe3b3947829b1:a1",
+            "attempt_number": 1,
+            "worker_id": "s210-linux-shard-171-of-256",
+            "status": "skipped",
+            "started_at": 1791853941.721702,
+            "ended_at": 1791853941.730211,
+            "result_sha256": "230dde1a123ced7c3670531069da83bed23e51531544b2f0e8571e0dff2d9fa3"
+          }
+        ],
+        "compare": [],
+        "cleanup": [
+          {
+            "attempt_id": "bc8ff865f1228972da1179e63954d99d6f5db2ac0ff134bd75baf195be9fcd40:a1",
+            "attempt_number": 1,
+            "worker_id": "s210-linux-shard-171-of-256",
+            "status": "passed",
+            "started_at": 1791853941.7523737,
+            "ended_at": 1791853941.7607105,
+            "result_sha256": "25508a84efcf23f9a5bf5f67977d32744684b615b41225f5369bd57cf6abbbcb"
+          }
+        ]
+      },
+      "probe_evidence": {
+        "artifact_lock_sha256": "8dcec5da7cd81b9ed7d0f4e8aead8e76ef15cd7e17dfcdc4fa6f7b8944b83d4a",
+        "artifact_sha256": "b7a81a50cad06b48deaf69da4258d19e29836537816d1f2446e45e21e5bc3215",
+        "attempted": true,
+        "census_probe": true,
+        "dependency_archives": {
+          "archive_bytes": 3696585,
+          "cache_hits": 168,
+          "downloaded_archives": 1,
+          "downloaded_bytes": 2147,
+          "locked_package_count": 172,
+          "package_lock_sha256": "055f044bd5ea8563d8f9602f7bddda5cf7d3f831f64670e19b0ddde08c11bb20",
+          "unique_archive_count": 169
+        },
+        "detail": "Koishi dependency installation and native plugin load ran in the pinned network-disabled linux Worker; no entry-bound behavior fixture exists.",
+        "ecosystem": "koishi",
+        "npm_lock_sha256": "dcc7b2156695f2f88f152c712b799dc84bb92f721faf5c487ffe32877ea08fe7",
+        "package": "@koishijs/plugin-locale-ja-jp",
+        "platform": "linux",
+        "plugin_archive_bytes": 2147,
+        "profile_document_sha256": "68a7391620a06e7141d949519333a1f4fc5ccee7abd84dc036c46d09fdae8d38",
+        "profile_id": "koishi-core-4.18.11-node-24.20.0-x86_64-portable-lock",
+        "profile_lock_sha256": "dcc7b2156695f2f88f152c712b799dc84bb92f721faf5c487ffe32877ea08fe7",
+        "reason_code": "missing_entry_bound_fixture",
+        "registry_entry_id": "ko-564a6168f736a04c3b1f847e",
+        "resource_observations": {
+          "peak_writable_scratch_bytes": 24687879,
+          "sample_count": 4
+        },
+        "result_id": "catalog:ko-564a6168f736a04c3b1f847e|linux",
+        "schema_version": 1,
+        "source_probe_task_id": "S2-09",
+        "status": "skipped",
+        "task_id": "S2-10",
+        "unit_type": "catalog_entry",
+        "version": "0.0.2",
+        "worker": {
+          "cleanup_confirmed": true,
+          "elapsed_seconds": 9.656000000002678,
+          "exit_code": 0,
+          "image_digest": "node@sha256:ba849c60be29959425b8734d57b8b4b7d56f98edd9504c9af091d5281095a71e",
+          "input_bytes": 3799539,
+          "network": "none",
+          "npm_scripts": "disabled",
+          "output_truncated": false,
+          "peak_memory_bytes": 102603161,
+          "protocol_report": {
+            "artifact_sha256": "b7a81a50cad06b48deaf69da4258d19e29836537816d1f2446e45e21e5bc3215",
+            "behavior": {
+              "reason_code": "missing_entry_bound_fixture",
+              "status": "skipped"
+            },
+            "cleanup": {
+              "status": "passed"
+            },
+            "dependency_install": {
+              "exit_code": 0,
+              "reason_code": null,
+              "status": "passed",
+              "stderr_bytes": 294,
+              "stderr_sha256": "620cd872bc34cca195862e1face7b2421e4eee9809aba619dadc09f2857a133d",
+              "stderr_tail": "LIGAMINA_NPM_RUNTIME={\"heap_limit_bytes\":2348810240}\nnpm warn deprecated @koa/router@10.1.1: **IMPORTANT 10x+ PERFORMANCE UPGRADE**: Please upgrade to v12.0.1+ as we have fixed an issue with debuglog causing 10x slower router benchmark performance, see https://github.com/koajs/router/pull/173\n",
+              "stdout_bytes": 26,
+              "stdout_sha256": "465505c6c46c19e6115f3c6910b756f1f1b3f9e1aeb2c367b3c4c6e086126e8d",
+              "stdout_tail": "\nadded 172 packages in 2s\n"
+            },
+            "native_load": {
+              "entry_module_imported": true,
+              "plugin_registered": true,
+              "reason_code": null,
+              "status": "passed"
+            },
+            "package": "@koishijs/plugin-locale-ja-jp",
+            "profile_id": "koishi-core-4.18.11-node-24.20.0-x86_64-portable-lock",
+            "profile_lock_sha256": "dcc7b2156695f2f88f152c712b799dc84bb92f721faf5c487ffe32877ea08fe7",
+            "registry_entry_id": "ko-564a6168f736a04c3b1f847e",
+            "resource_observations": {
+              "peak_writable_scratch_bytes": 24687879,
+              "sample_count": 4
+            },
+            "schema_version": 1,
+            "task_id": "S2-09",
+            "version": "0.0.2"
+          },
+          "read_only_input": true,
+          "reason_code": null,
+          "status": "passed",
+          "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "stderr_tail": "",
+          "stdout_sha256": "12f94fef14d6e834252173250ee923ae2b7fe68a7d679e88f4ba793975d321d5",
+          "stdout_tail": "94,\"stdout_sha256\":\"465505c6c46c19e6115f3c6910b756f1f1b3f9e1aeb2c367b3c4c6e086126e8d\",\"stderr_sha256\":\"620cd872bc34cca195862e1face7b2421e4eee9809aba619dadc09f2857a133d\",\"stdout_tail\":\"\\nadded 172 packages in 2s\\n\",\"stderr_tail\":\"LIGAMINA_NPM_RUNTIME={\\\"heap_limit_bytes\\\":2348810240}\\nnpm warn deprecated @koa/router@10.1.1: **IMPORTANT 10x+ PERFORMANCE UPGRADE**: Please upgrade to v12.0.1+ as we have fixed an issue with debuglog causing 10x slower router benchmark performance, see https://github.com/koajs/router/pull/173\\n\"},\"native_load\":{\"status\":\"passed\",\"reason_code\":null,\"entry_module_imported\":true,\"plugin_registered\":true},\"behavior\":{\"status\":\"skipped\",\"reason_code\":\"missing_entry_bound_fixture\"},\"cleanup\":{\"status\":\"passed\"},\"environment\":{\"ecosystem\":\"koishi\",\"runtime_version\":\"24.20.0\",\"v8_heap_limit_bytes\":2348810240,\"host_node_options_ignored\":true,\"npm_v8_heap_limit_bytes\":2348810240,\"framework_version\":\"4.18.11\"},\"resource_observations\":{\"peak_writable_scratch_bytes\":24687879,\"sample_count\":4}}\n"
+        }
+      },
+      "cleanup_confirmed": true,
+      "resource_observations": {
+        "peak_writable_scratch_bytes": 24687879,
+        "sample_count": 4
+      }
+    },
+    {
+      "registry_entry_id": "ko-a2de34f4f50f85e7d66117db",
+      "result_id": "catalog:ko-a2de34f4f50f85e7d66117db|linux",
+      "ecosystem": "koishi",
+      "package": "koishi-plugin-tarkov-game",
+      "version": "1.1.2",
+      "platform": "linux",
+      "unit_status": "skipped",
+      "reason_code": "entry_bound_federated_fixture_missing",
+      "profile_id": "koishi-core-4.18.11-node-24.20.0-x86_64-portable-lock",
+      "profile_status": "locked",
+      "profile_reason_code": null,
+      "artifact_status": "locked",
+      "artifact_reason_code": null,
+      "artifact_sha256": "64c0815f00489464aefc524e0c8f6a16a3643a99c8971593d8e9d67ca9c292ab",
+      "dependency_lock_sha256": "a1fa9c973fcf958ecba0d65c6d4651f4e64bf0217062065854aee20372b61028",
+      "source_snapshot_sha256": "8c75d69358cd8334d0d311c1e19c642794d7436056d32041f02e6c1de1a06163",
+      "artifact_lock_sha256": "8dcec5da7cd81b9ed7d0f4e8aead8e76ef15cd7e17dfcdc4fa6f7b8944b83d4a",
+      "profile_lock_sha256": "68a7391620a06e7141d949519333a1f4fc5ccee7abd84dc036c46d09fdae8d38",
+      "behavior_fixture_status": "unmapped_category",
+      "recipe_categories": [],
+      "stage_statuses": {
+        "prepare": "passed",
+        "install": "passed",
+        "native": "passed",
+        "federated": "skipped",
+        "compare": "skipped",
+        "cleanup": "passed"
+      },
+      "stage_result_sha256": {
+        "prepare": "1d08cc7467c558b701ebea5ff5a3179489451baa562110e2a02e088b882f0ece",
+        "install": "7f975435939aa93811d665cb92203cb445f3bc909e4e84ca5f62b7d35229f8c3",
+        "native": "be79da4175addb6d0b08caa7f4ec41445d312c86d76d4702bbdf835e4b266737",
+        "federated": "230dde1a123ced7c3670531069da83bed23e51531544b2f0e8571e0dff2d9fa3",
+        "compare": "ba2b94acd4e95226d4234d8a485b824fbc992043d59d32245326caef60ca94ee",
+        "cleanup": "be79da4175addb6d0b08caa7f4ec41445d312c86d76d4702bbdf835e4b266737"
+      },
+      "attempts": {
+        "prepare": [
+          {
+            "attempt_id": "64830a65c5d38362a8f73fdc7100f3bd6b37c0729e72ce80958658ac8faab9c2:a1",
+            "attempt_number": 1,
+            "worker_id": "s210-linux-shard-171-of-256",
+            "status": "passed",
+            "started_at": 1791853962.0178514,
+            "ended_at": 1791853962.024376,
+            "result_sha256": "1d08cc7467c558b701ebea5ff5a3179489451baa562110e2a02e088b882f0ece"
+          }
+        ],
+        "install": [
+          {
+            "attempt_id": "2477b5c466cfeea6752b90cb72c68de9e923cff7c6badfc88f9c8d4ea730bbc9:a1",
+            "attempt_number": 1,
+            "worker_id": "s210-linux-shard-171-of-256",
+            "status": "passed",
+            "started_at": 1791853962.0313826,
+            "ended_at": 1791853972.066237,
+            "result_sha256": "7f975435939aa93811d665cb92203cb445f3bc909e4e84ca5f62b7d35229f8c3"
+          }
+        ],
+        "native": [
+          {
+            "attempt_id": "b34c7efc00cb413b06b066c7e60c68b47ff057213b3ab8428ee61ea5609660e4:a1",
+            "attempt_number": 1,
+            "worker_id": "s210-linux-shard-171-of-256",
+            "status": "passed",
+            "started_at": 1791853972.092938,
+            "ended_at": 1791853972.102961,
+            "result_sha256": "be79da4175addb6d0b08caa7f4ec41445d312c86d76d4702bbdf835e4b266737"
+          }
+        ],
+        "federated": [
+          {
+            "attempt_id": "afae4b9e79e3da6374bfe4182aee12e4e8eba13ddd5e741e896570c072020cea:a1",
+            "attempt_number": 1,
+            "worker_id": "s210-linux-shard-171-of-256",
+            "status": "skipped",
+            "started_at": 1791853972.0728579,
+            "ended_at": 1791853972.0833738,
+            "result_sha256": "230dde1a123ced7c3670531069da83bed23e51531544b2f0e8571e0dff2d9fa3"
+          }
+        ],
+        "compare": [],
+        "cleanup": [
+          {
+            "attempt_id": "ebb086782e7767927a929ca825aa5024680f87f75016078bd09d98f00e1a1e8b:a1",
+            "attempt_number": 1,
+            "worker_id": "s210-linux-shard-171-of-256",
+            "status": "passed",
+            "started_at": 1791853972.1147394,
+            "ended_at": 1791853972.1267607,
+            "result_sha256": "be79da4175addb6d0b08caa7f4ec41445d312c86d76d4702bbdf835e4b266737"
+          }
+        ]
+      },
+      "probe_evidence": {
+        "artifact_lock_sha256": "8dcec5da7cd81b9ed7d0f4e8aead8e76ef15cd7e17dfcdc4fa6f7b8944b83d4a",
+        "artifact_sha256": "64c0815f00489464aefc524e0c8f6a16a3643a99c8971593d8e9d67ca9c292ab",
+        "attempted": true,
+        "census_probe": true,
+        "dependency_archives": {
+          "archive_bytes": 3707037,
+          "cache_hits": 169,
+          "downloaded_archives": 0,
+          "downloaded_bytes": 0,
+          "locked_package_count": 172,
+          "package_lock_sha256": "eb92216d05f9aed08173db7c516949450801b73240d37411cffd4061d9a191fd",
+          "unique_archive_count": 169
+        },
+        "detail": "Koishi dependency installation and native plugin load ran in the pinned network-disabled linux Worker; no entry-bound behavior fixture exists.",
+        "ecosystem": "koishi",
+        "npm_lock_sha256": "a1fa9c973fcf958ecba0d65c6d4651f4e64bf0217062065854aee20372b61028",
+        "package": "koishi-plugin-tarkov-game",
+        "platform": "linux",
+        "plugin_archive_bytes": 12599,
+        "profile_document_sha256": "68a7391620a06e7141d949519333a1f4fc5ccee7abd84dc036c46d09fdae8d38",
+        "profile_id": "koishi-core-4.18.11-node-24.20.0-x86_64-portable-lock",
+        "profile_lock_sha256": "a1fa9c973fcf958ecba0d65c6d4651f4e64bf0217062065854aee20372b61028",
+        "reason_code": "missing_entry_bound_fixture",
+        "registry_entry_id": "ko-a2de34f4f50f85e7d66117db",
+        "resource_observations": {
+          "peak_writable_scratch_bytes": 26203089,
+          "sample_count": 4
+        },
+        "result_id": "catalog:ko-a2de34f4f50f85e7d66117db|linux",
+        "schema_version": 1,
+        "source_probe_task_id": "S2-09",
+        "status": "skipped",
+        "task_id": "S2-10",
+        "unit_type": "catalog_entry",
+        "version": "1.1.2",
+        "worker": {
+          "cleanup_confirmed": true,
+          "elapsed_seconds": 9.639999999999418,
+          "exit_code": 0,
+          "image_digest": "node@sha256:ba849c60be29959425b8734d57b8b4b7d56f98edd9504c9af091d5281095a71e",
+          "input_bytes": 3820452,
+          "network": "none",
+          "npm_scripts": "disabled",
+          "output_truncated": false,
+          "peak_memory_bytes": 103473479,
+          "protocol_report": {
+            "artifact_sha256": "64c0815f00489464aefc524e0c8f6a16a3643a99c8971593d8e9d67ca9c292ab",
+            "behavior": {
+              "reason_code": "missing_entry_bound_fixture",
+              "status": "skipped"
+            },
+            "cleanup": {
+              "status": "passed"
+            },
+            "dependency_install": {
+              "exit_code": 0,
+              "reason_code": null,
+              "status": "passed",
+              "stderr_bytes": 294,
+              "stderr_sha256": "620cd872bc34cca195862e1face7b2421e4eee9809aba619dadc09f2857a133d",
+              "stderr_tail": "LIGAMINA_NPM_RUNTIME={\"heap_limit_bytes\":2348810240}\nnpm warn deprecated @koa/router@10.1.1: **IMPORTANT 10x+ PERFORMANCE UPGRADE**: Please upgrade to v12.0.1+ as we have fixed an issue with debuglog causing 10x slower router benchmark performance, see https://github.com/koajs/router/pull/173\n",
+              "stdout_bytes": 26,
+              "stdout_sha256": "465505c6c46c19e6115f3c6910b756f1f1b3f9e1aeb2c367b3c4c6e086126e8d",
+              "stdout_tail": "\nadded 172 packages in 2s\n"
+            },
+            "native_load": {
+              "entry_module_imported": true,
+              "plugin_registered": true,
+              "reason_code": null,
+              "status": "passed"
+            },
+            "package": "koishi-plugin-tarkov-game",
+            "profile_id": "koishi-core-4.18.11-node-24.20.0-x86_64-portable-lock",
+            "profile_lock_sha256": "a1fa9c973fcf958ecba0d65c6d4651f4e64bf0217062065854aee20372b61028",
+            "registry_entry_id": "ko-a2de34f4f50f85e7d66117db",
+            "resource_observations": {
+              "peak_writable_scratch_bytes": 26203089,
+              "sample_count": 4
+            },
+            "schema_version": 1,
+            "task_id": "S2-09",
+            "version": "1.1.2"
+          },
+          "read_only_input": true,
+          "reason_code": null,
+          "status": "passed",
+          "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "stderr_tail": "",
+          "stdout_sha256": "cfc85a3ab3f06d3e9650db34cc7c5ac62902fc42fca06dd5e10b546dc56ef4f6",
+          "stdout_tail": "94,\"stdout_sha256\":\"465505c6c46c19e6115f3c6910b756f1f1b3f9e1aeb2c367b3c4c6e086126e8d\",\"stderr_sha256\":\"620cd872bc34cca195862e1face7b2421e4eee9809aba619dadc09f2857a133d\",\"stdout_tail\":\"\\nadded 172 packages in 2s\\n\",\"stderr_tail\":\"LIGAMINA_NPM_RUNTIME={\\\"heap_limit_bytes\\\":2348810240}\\nnpm warn deprecated @koa/router@10.1.1: **IMPORTANT 10x+ PERFORMANCE UPGRADE**: Please upgrade to v12.0.1+ as we have fixed an issue with debuglog causing 10x slower router benchmark performance, see https://github.com/koajs/router/pull/173\\n\"},\"native_load\":{\"status\":\"passed\",\"reason_code\":null,\"entry_module_imported\":true,\"plugin_registered\":true},\"behavior\":{\"status\":\"skipped\",\"reason_code\":\"missing_entry_bound_fixture\"},\"cleanup\":{\"status\":\"passed\"},\"environment\":{\"ecosystem\":\"koishi\",\"runtime_version\":\"24.20.0\",\"v8_heap_limit_bytes\":2348810240,\"host_node_options_ignored\":true,\"npm_v8_heap_limit_bytes\":2348810240,\"framework_version\":\"4.18.11\"},\"resource_observations\":{\"peak_writable_scratch_bytes\":26203089,\"sample_count\":4}}\n"
+        }
+      },
+      "cleanup_confirmed": true,
+      "resource_observations": {
+        "peak_writable_scratch_bytes": 26203089,
+        "sample_count": 4
+      }
+    },
+    {
+      "registry_entry_id": "ko-e817b69aff01947e7ac28935",
+      "result_id": "catalog:ko-e817b69aff01947e7ac28935|linux",
+      "ecosystem": "koishi",
+      "package": "koishi-plugin-k-report",
+      "version": "0.1.0",
+      "platform": "linux",
+      "unit_status": "skipped",
+      "reason_code": "entry_bound_federated_fixture_missing",
+      "profile_id": "koishi-core-4.18.11-node-24.20.0-x86_64-portable-lock",
+      "profile_status": "locked",
+      "profile_reason_code": null,
+      "artifact_status": "locked",
+      "artifact_reason_code": null,
+      "artifact_sha256": "e093eb23c76256b20e2593beb1cd3ce1ad2a0f9fb3583286af891d0cf8aa5f2f",
+      "dependency_lock_sha256": "a237c4709407c5aaf596d975fa91ebff0cac73ac4fb37b515d6c13835869b367",
+      "source_snapshot_sha256": "8c75d69358cd8334d0d311c1e19c642794d7436056d32041f02e6c1de1a06163",
+      "artifact_lock_sha256": "8dcec5da7cd81b9ed7d0f4e8aead8e76ef15cd7e17dfcdc4fa6f7b8944b83d4a",
+      "profile_lock_sha256": "68a7391620a06e7141d949519333a1f4fc5ccee7abd84dc036c46d09fdae8d38",
+      "behavior_fixture_status": "unmapped_category",
+      "recipe_categories": [],
+      "stage_statuses": {
+        "prepare": "passed",
+        "install": "passed",
+        "native": "passed",
+        "federated": "skipped",
+        "compare": "skipped",
+        "cleanup": "passed"
+      },
+      "stage_result_sha256": {
+        "prepare": "79991944523a4002db8dbf1bb9003a8d14f2c901a31315368f9e8d85dec9ff09",
+        "install": "10e77e6182fe4896eadda22062570e731bb1982b1039637ed67f13a6a96be874",
+        "native": "74392f59baa039df1d8e195c8ec0ce401ee4404f9e4f279a03ca9471a6cd1b59",
+        "federated": "230dde1a123ced7c3670531069da83bed23e51531544b2f0e8571e0dff2d9fa3",
+        "compare": "f7d58ca8d5780d4e7f535ad5f50f43c2a17d5ce59ae22b1954957c92a04ec8eb",
+        "cleanup": "74392f59baa039df1d8e195c8ec0ce401ee4404f9e4f279a03ca9471a6cd1b59"
+      },
+      "attempts": {
+        "prepare": [
+          {
+            "attempt_id": "d04ee36945b6432db91659614dd2a9183313572898f1bbc7df78127d8829418d:a1",
+            "attempt_number": 1,
+            "worker_id": "s210-linux-shard-171-of-256",
+            "status": "passed",
+            "started_at": 1791854014.8513095,
+            "ended_at": 1791854014.856406,
+            "result_sha256": "79991944523a4002db8dbf1bb9003a8d14f2c901a31315368f9e8d85dec9ff09"
+          }
+        ],
+        "install": [
+          {
+            "attempt_id": "994cc0e63c77d56fb774fb390b1e2eff0ce419d5fbbbceb374da80fb802eb232:a1",
+            "attempt_number": 1,
+            "worker_id": "s210-linux-shard-171-of-256",
+            "status": "passed",
+            "started_at": 1791854014.861582,
+            "ended_at": 1791854024.8327374,
+            "result_sha256": "10e77e6182fe4896eadda22062570e731bb1982b1039637ed67f13a6a96be874"
+          }
+        ],
+        "native": [
+          {
+            "attempt_id": "9eb03af9a680e024bfb4a57f62851b78531b2694b99bde3552cee723fe0784a0:a1",
+            "attempt_number": 1,
+            "worker_id": "s210-linux-shard-171-of-256",
+            "status": "passed",
+            "started_at": 1791854024.8523045,
+            "ended_at": 1791854024.8588212,
+            "result_sha256": "74392f59baa039df1d8e195c8ec0ce401ee4404f9e4f279a03ca9471a6cd1b59"
+          }
+        ],
+        "federated": [
+          {
+            "attempt_id": "681cd0fea164eca02459d16b95fc250e2efa8e7e2f68cba0898a2da303d00c85:a1",
+            "attempt_number": 1,
+            "worker_id": "s210-linux-shard-171-of-256",
+            "status": "skipped",
+            "started_at": 1791854024.8399785,
+            "ended_at": 1791854024.8472996,
+            "result_sha256": "230dde1a123ced7c3670531069da83bed23e51531544b2f0e8571e0dff2d9fa3"
+          }
+        ],
+        "compare": [],
+        "cleanup": [
+          {
+            "attempt_id": "d44987b04aded6caeec352f8a00c5d10ee13677356be53eff3e3a284fb884717:a1",
+            "attempt_number": 1,
+            "worker_id": "s210-linux-shard-171-of-256",
+            "status": "passed",
+            "started_at": 1791854024.8644814,
+            "ended_at": 1791854024.8713412,
+            "result_sha256": "74392f59baa039df1d8e195c8ec0ce401ee4404f9e4f279a03ca9471a6cd1b59"
+          }
+        ]
+      },
+      "probe_evidence": {
+        "artifact_lock_sha256": "8dcec5da7cd81b9ed7d0f4e8aead8e76ef15cd7e17dfcdc4fa6f7b8944b83d4a",
+        "artifact_sha256": "e093eb23c76256b20e2593beb1cd3ce1ad2a0f9fb3583286af891d0cf8aa5f2f",
+        "attempted": true,
+        "census_probe": true,
+        "dependency_archives": {
+          "archive_bytes": 3699227,
+          "cache_hits": 169,
+          "downloaded_archives": 0,
+          "downloaded_bytes": 0,
+          "locked_package_count": 172,
+          "package_lock_sha256": "bdd83e390cd5ce345781592935901f020cab517b8add69909be0a45e837a56e7",
+          "unique_archive_count": 169
+        },
+        "detail": "Koishi dependency installation and native plugin load ran in the pinned network-disabled linux Worker; no entry-bound behavior fixture exists.",
+        "ecosystem": "koishi",
+        "npm_lock_sha256": "a237c4709407c5aaf596d975fa91ebff0cac73ac4fb37b515d6c13835869b367",
+        "package": "koishi-plugin-k-report",
+        "platform": "linux",
+        "plugin_archive_bytes": 4789,
+        "profile_document_sha256": "68a7391620a06e7141d949519333a1f4fc5ccee7abd84dc036c46d09fdae8d38",
+        "profile_id": "koishi-core-4.18.11-node-24.20.0-x86_64-portable-lock",
+        "profile_lock_sha256": "a237c4709407c5aaf596d975fa91ebff0cac73ac4fb37b515d6c13835869b367",
+        "reason_code": "missing_entry_bound_fixture",
+        "registry_entry_id": "ko-e817b69aff01947e7ac28935",
+        "resource_observations": {
+          "peak_writable_scratch_bytes": 14792807,
+          "sample_count": 3
+        },
+        "result_id": "catalog:ko-e817b69aff01947e7ac28935|linux",
+        "schema_version": 1,
+        "source_probe_task_id": "S2-09",
+        "status": "skipped",
+        "task_id": "S2-10",
+        "unit_type": "catalog_entry",
+        "version": "0.1.0",
+        "worker": {
+          "cleanup_confirmed": true,
+          "elapsed_seconds": 9.625,
+          "exit_code": 0,
+          "image_digest": "node@sha256:ba849c60be29959425b8734d57b8b4b7d56f98edd9504c9af091d5281095a71e",
+          "input_bytes": 3804818,
+          "network": "none",
+          "npm_scripts": "disabled",
+          "output_truncated": false,
+          "peak_memory_bytes": 83477135,
+          "protocol_report": {
+            "artifact_sha256": "e093eb23c76256b20e2593beb1cd3ce1ad2a0f9fb3583286af891d0cf8aa5f2f",
+            "behavior": {
+              "reason_code": "missing_entry_bound_fixture",
+              "status": "skipped"
+            },
+            "cleanup": {
+              "status": "passed"
+            },
+            "dependency_install": {
+              "exit_code": 0,
+              "reason_code": null,
+              "status": "passed",
+              "stderr_bytes": 294,
+              "stderr_sha256": "620cd872bc34cca195862e1face7b2421e4eee9809aba619dadc09f2857a133d",
+              "stderr_tail": "LIGAMINA_NPM_RUNTIME={\"heap_limit_bytes\":2348810240}\nnpm warn deprecated @koa/router@10.1.1: **IMPORTANT 10x+ PERFORMANCE UPGRADE**: Please upgrade to v12.0.1+ as we have fixed an issue with debuglog causing 10x slower router benchmark performance, see https://github.com/koajs/router/pull/173\n",
+              "stdout_bytes": 26,
+              "stdout_sha256": "465505c6c46c19e6115f3c6910b756f1f1b3f9e1aeb2c367b3c4c6e086126e8d",
+              "stdout_tail": "\nadded 172 packages in 2s\n"
+            },
+            "native_load": {
+              "entry_module_imported": true,
+              "plugin_registered": true,
+              "reason_code": null,
+              "status": "passed"
+            },
+            "package": "koishi-plugin-k-report",
+            "profile_id": "koishi-core-4.18.11-node-24.20.0-x86_64-portable-lock",
+            "profile_lock_sha256": "a237c4709407c5aaf596d975fa91ebff0cac73ac4fb37b515d6c13835869b367",
+            "registry_entry_id": "ko-e817b69aff01947e7ac28935",
+            "resource_observations": {
+              "peak_writable_scratch_bytes": 14792807,
+              "sample_count": 3
+            },
+            "schema_version": 1,
+            "task_id": "S2-09",
+            "version": "0.1.0"
+          },
+          "read_only_input": true,
+          "reason_code": null,
+          "status": "passed",
+          "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "stderr_tail": "",
+          "stdout_sha256": "496348df1e34fa3c9aa9584a2d9379a68b65239ef5c5143b503f899b8f6017e3",
+          "stdout_tail": "94,\"stdout_sha256\":\"465505c6c46c19e6115f3c6910b756f1f1b3f9e1aeb2c367b3c4c6e086126e8d\",\"stderr_sha256\":\"620cd872bc34cca195862e1face7b2421e4eee9809aba619dadc09f2857a133d\",\"stdout_tail\":\"\\nadded 172 packages in 2s\\n\",\"stderr_tail\":\"LIGAMINA_NPM_RUNTIME={\\\"heap_limit_bytes\\\":2348810240}\\nnpm warn deprecated @koa/router@10.1.1: **IMPORTANT 10x+ PERFORMANCE UPGRADE**: Please upgrade to v12.0.1+ as we have fixed an issue with debuglog causing 10x slower router benchmark performance, see https://github.com/koajs/router/pull/173\\n\"},\"native_load\":{\"status\":\"passed\",\"reason_code\":null,\"entry_module_imported\":true,\"plugin_registered\":true},\"behavior\":{\"status\":\"skipped\",\"reason_code\":\"missing_entry_bound_fixture\"},\"cleanup\":{\"status\":\"passed\"},\"environment\":{\"ecosystem\":\"koishi\",\"runtime_version\":\"24.20.0\",\"v8_heap_limit_bytes\":2348810240,\"host_node_options_ignored\":true,\"npm_v8_heap_limit_bytes\":2348810240,\"framework_version\":\"4.18.11\"},\"resource_observations\":{\"peak_writable_scratch_bytes\":14792807,\"sample_count\":3}}\n"
+        }
+      },
+      "cleanup_confirmed": true,
+      "resource_observations": {
+        "peak_writable_scratch_bytes": 14792807,
+        "sample_count": 3
+      }
+    },
+    {
+      "registry_entry_id": "ko-d0e178b0427244e3970e8e22",
+      "result_id": "catalog:ko-d0e178b0427244e3970e8e22|linux",
+      "ecosystem": "koishi",
+      "package": "koishi-plugin-translator-plus",
+      "version": "1.0.5",
+      "platform": "linux",
+      "unit_status": "skipped",
+      "reason_code": "entry_bound_federated_fixture_missing",
+      "profile_id": "koishi-core-4.18.11-node-24.20.0-x86_64-portable-lock",
+      "profile_status": "locked",
+      "profile_reason_code": null,
+      "artifact_status": "locked",
+      "artifact_reason_code": null,
+      "artifact_sha256": "3676347ff6bfddef3cfe4a2cd415f2c407ede14da68f926d18080c9a67c15859",
+      "dependency_lock_sha256": "1c6725115b32a48b12ce1eae86089f4dffc1a7d91971141b12a19774555a5be6",
+      "source_snapshot_sha256": "8c75d69358cd8334d0d311c1e19c642794d7436056d32041f02e6c1de1a06163",
+      "artifact_lock_sha256": "8dcec5da7cd81b9ed7d0f4e8aead8e76ef15cd7e17dfcdc4fa6f7b8944b83d4a",
+      "profile_lock_sha256": "68a7391620a06e7141d949519333a1f4fc5ccee7abd84dc036c46d09fdae8d38",
+      "behavior_fixture_status": "unmapped_category",
+      "recipe_categories": [],
+      "stage_statuses": {
+        "prepare": "passed",
+        "install": "passed",
+        "native": "passed",
+        "federated": "skipped",
+        "compare": "skipped",
+        "cleanup": "passed"
+      },
+      "stage_result_sha256": {
+        "prepare": "a75370f5a80bb80d494d7df7e586eb9453f4fac17675e3ca13b9d493baa83f4b",
+        "install": "aa3592921099680010fdfbf14ed0cbcaabdd566c0bff31ae312c11ad6070fd51",
+        "native": "a5f3d71de649939a74a9349b09cf9615fb1658acf691c1c84adb0ddaf936bd08",
+        "federated": "230dde1a123ced7c3670531069da83bed23e51531544b2f0e8571e0dff2d9fa3",
+        "compare": "e6e10f980693a71348c6ffbf4454ffe3720e87c7d6daa84b0fe790ff9156e7e7",
+        "cleanup": "a5f3d71de649939a74a9349b09cf9615fb1658acf691c1c84adb0ddaf936bd08"
+      },
+      "attempts": {
+        "prepare": [
+          {
+            "attempt_id": "2fe192c89e43c63cbccebdb3516b4eca701124a2c1ded9a08448e8c520a92ee2:a1",
+            "attempt_number": 1,
+            "worker_id": "s210-linux-shard-171-of-256",
+            "status": "passed",
+            "started_at": 1791853994.4898198,
+            "ended_at": 1791853994.4958322,
+            "result_sha256": "a75370f5a80bb80d494d7df7e586eb9453f4fac17675e3ca13b9d493baa83f4b"
+          }
+        ],
+        "install": [
+          {
+            "attempt_id": "bb90312a793bf7ef8fb40763fb9f672528951a9a99e948926dfd0ba44543bb56:a1",
+            "attempt_number": 1,
+            "worker_id": "s210-linux-shard-171-of-256",
+            "status": "passed",
+            "started_at": 1791853994.503328,
+            "ended_at": 1791854004.6224513,
+            "result_sha256": "aa3592921099680010fdfbf14ed0cbcaabdd566c0bff31ae312c11ad6070fd51"
+          }
+        ],
+        "native": [
+          {
+            "attempt_id": "930b7da68a0e7a37e8273dcce450abaa876a780803bfb2599fb347ed97791718:a1",
+            "attempt_number": 1,
+            "worker_id": "s210-linux-shard-171-of-256",
+            "status": "passed",
+            "started_at": 1791854004.6427681,
+            "ended_at": 1791854004.649276,
+            "result_sha256": "a5f3d71de649939a74a9349b09cf9615fb1658acf691c1c84adb0ddaf936bd08"
+          }
+        ],
+        "federated": [
+          {
+            "attempt_id": "c8e4828421b9b415aef99e3810e8c5e55dd8b33a004ec45fb9cb517a134daff2:a1",
+            "attempt_number": 1,
+            "worker_id": "s210-linux-shard-171-of-256",
+            "status": "skipped",
+            "started_at": 1791854004.629343,
+            "ended_at": 1791854004.6374438,
+            "result_sha256": "230dde1a123ced7c3670531069da83bed23e51531544b2f0e8571e0dff2d9fa3"
+          }
+        ],
+        "compare": [],
+        "cleanup": [
+          {
+            "attempt_id": "4e66a13a6c60e423ced5329b7be41ccd6f4abd8142e2815f64fca1456d11d75e:a1",
+            "attempt_number": 1,
+            "worker_id": "s210-linux-shard-171-of-256",
+            "status": "passed",
+            "started_at": 1791854004.6548605,
+            "ended_at": 1791854004.6622808,
+            "result_sha256": "a5f3d71de649939a74a9349b09cf9615fb1658acf691c1c84adb0ddaf936bd08"
+          }
+        ]
+      },
+      "probe_evidence": {
+        "artifact_lock_sha256": "8dcec5da7cd81b9ed7d0f4e8aead8e76ef15cd7e17dfcdc4fa6f7b8944b83d4a",
+        "artifact_sha256": "3676347ff6bfddef3cfe4a2cd415f2c407ede14da68f926d18080c9a67c15859",
+        "attempted": true,
+        "census_probe": true,
+        "dependency_archives": {
+          "archive_bytes": 3516011,
+          "cache_hits": 170,
+          "downloaded_archives": 1,
+          "downloaded_bytes": 2563,
+          "locked_package_count": 178,
+          "package_lock_sha256": "20dd8ed97ff3f6b67645247bd4c2da5eaa695cf8de06de6dac6cc87790eaa36b",
+          "unique_archive_count": 171
+        },
+        "detail": "Koishi dependency installation and native plugin load ran in the pinned network-disabled linux Worker; no entry-bound behavior fixture exists.",
+        "ecosystem": "koishi",
+        "npm_lock_sha256": "1c6725115b32a48b12ce1eae86089f4dffc1a7d91971141b12a19774555a5be6",
+        "package": "koishi-plugin-translator-plus",
+        "platform": "linux",
+        "plugin_archive_bytes": 2563,
+        "profile_document_sha256": "68a7391620a06e7141d949519333a1f4fc5ccee7abd84dc036c46d09fdae8d38",
+        "profile_id": "koishi-core-4.18.11-node-24.20.0-x86_64-portable-lock",
+        "profile_lock_sha256": "1c6725115b32a48b12ce1eae86089f4dffc1a7d91971141b12a19774555a5be6",
+        "reason_code": "missing_entry_bound_fixture",
+        "registry_entry_id": "ko-d0e178b0427244e3970e8e22",
+        "resource_observations": {
+          "peak_writable_scratch_bytes": 13484730,
+          "sample_count": 3
+        },
+        "result_id": "catalog:ko-d0e178b0427244e3970e8e22|linux",
+        "schema_version": 1,
+        "source_probe_task_id": "S2-09",
+        "status": "skipped",
+        "task_id": "S2-10",
+        "unit_type": "catalog_entry",
+        "version": "1.0.5",
+        "worker": {
+          "cleanup_confirmed": true,
+          "elapsed_seconds": 9.610000000000582,
+          "exit_code": 0,
+          "image_digest": "node@sha256:ba849c60be29959425b8734d57b8b4b7d56f98edd9504c9af091d5281095a71e",
+          "input_bytes": 3623285,
+          "network": "none",
+          "npm_scripts": "disabled",
+          "output_truncated": false,
+          "peak_memory_bytes": 81568727,
+          "protocol_report": {
+            "artifact_sha256": "3676347ff6bfddef3cfe4a2cd415f2c407ede14da68f926d18080c9a67c15859",
+            "behavior": {
+              "reason_code": "missing_entry_bound_fixture",
+              "status": "skipped"
+            },
+            "cleanup": {
+              "status": "passed"
+            },
+            "dependency_install": {
+              "exit_code": 0,
+              "reason_code": null,
+              "status": "passed",
+              "stderr_bytes": 294,
+              "stderr_sha256": "620cd872bc34cca195862e1face7b2421e4eee9809aba619dadc09f2857a133d",
+              "stderr_tail": "LIGAMINA_NPM_RUNTIME={\"heap_limit_bytes\":2348810240}\nnpm warn deprecated @koa/router@10.1.1: **IMPORTANT 10x+ PERFORMANCE UPGRADE**: Please upgrade to v12.0.1+ as we have fixed an issue with debuglog causing 10x slower router benchmark performance, see https://github.com/koajs/router/pull/173\n",
+              "stdout_bytes": 26,
+              "stdout_sha256": "33b5dbdf9aba4cd0dae13ac3f8fcfbecb8c8a56e4069f45fd5459e1493354966",
+              "stdout_tail": "\nadded 178 packages in 1s\n"
+            },
+            "native_load": {
+              "entry_module_imported": true,
+              "plugin_registered": true,
+              "reason_code": null,
+              "status": "passed"
+            },
+            "package": "koishi-plugin-translator-plus",
+            "profile_id": "koishi-core-4.18.11-node-24.20.0-x86_64-portable-lock",
+            "profile_lock_sha256": "1c6725115b32a48b12ce1eae86089f4dffc1a7d91971141b12a19774555a5be6",
+            "registry_entry_id": "ko-d0e178b0427244e3970e8e22",
+            "resource_observations": {
+              "peak_writable_scratch_bytes": 13484730,
+              "sample_count": 3
+            },
+            "schema_version": 1,
+            "task_id": "S2-09",
+            "version": "1.0.5"
+          },
+          "read_only_input": true,
+          "reason_code": null,
+          "status": "passed",
+          "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "stderr_tail": "",
+          "stdout_sha256": "a963b6be65d4db5c88f017c5b6c7b5668d06b06842699de6c1831e5f4753029c",
+          "stdout_tail": "94,\"stdout_sha256\":\"33b5dbdf9aba4cd0dae13ac3f8fcfbecb8c8a56e4069f45fd5459e1493354966\",\"stderr_sha256\":\"620cd872bc34cca195862e1face7b2421e4eee9809aba619dadc09f2857a133d\",\"stdout_tail\":\"\\nadded 178 packages in 1s\\n\",\"stderr_tail\":\"LIGAMINA_NPM_RUNTIME={\\\"heap_limit_bytes\\\":2348810240}\\nnpm warn deprecated @koa/router@10.1.1: **IMPORTANT 10x+ PERFORMANCE UPGRADE**: Please upgrade to v12.0.1+ as we have fixed an issue with debuglog causing 10x slower router benchmark performance, see https://github.com/koajs/router/pull/173\\n\"},\"native_load\":{\"status\":\"passed\",\"reason_code\":null,\"entry_module_imported\":true,\"plugin_registered\":true},\"behavior\":{\"status\":\"skipped\",\"reason_code\":\"missing_entry_bound_fixture\"},\"cleanup\":{\"status\":\"passed\"},\"environment\":{\"ecosystem\":\"koishi\",\"runtime_version\":\"24.20.0\",\"v8_heap_limit_bytes\":2348810240,\"host_node_options_ignored\":true,\"npm_v8_heap_limit_bytes\":2348810240,\"framework_version\":\"4.18.11\"},\"resource_observations\":{\"peak_writable_scratch_bytes\":13484730,\"sample_count\":3}}\n"
+        }
+      },
+      "cleanup_confirmed": true,
+      "resource_observations": {
+        "peak_writable_scratch_bytes": 13484730,
+        "sample_count": 3
+      }
+    },
+    {
+      "registry_entry_id": "ko-1413ced793825fc267281348",
+      "result_id": "catalog:ko-1413ced793825fc267281348|linux",
+      "ecosystem": "koishi",
+      "package": "koishi-plugin-database-txtdb",
+      "version": "1.2.0",
+      "platform": "linux",
+      "unit_status": "skipped",
+      "reason_code": "release_unavailable",
+      "profile_id": "koishi-core-4.18.11-node-24.20.0-x86_64-portable-lock",
+      "profile_status": "release_unavailable",
+      "profile_reason_code": "release_unavailable",
+      "artifact_status": "release_unavailable",
+      "artifact_reason_code": "release_unavailable",
+      "artifact_sha256": null,
+      "dependency_lock_sha256": null,
+      "source_snapshot_sha256": "8c75d69358cd8334d0d311c1e19c642794d7436056d32041f02e6c1de1a06163",
+      "artifact_lock_sha256": "8dcec5da7cd81b9ed7d0f4e8aead8e76ef15cd7e17dfcdc4fa6f7b8944b83d4a",
+      "profile_lock_sha256": "68a7391620a06e7141d949519333a1f4fc5ccee7abd84dc036c46d09fdae8d38",
+      "behavior_fixture_status": "missing_fixture",
+      "recipe_categories": [
+        "storage"
+      ],
+      "stage_statuses": {
+        "prepare": "skipped",
+        "install": "skipped",
+        "native": "skipped",
+        "federated": "skipped",
+        "compare": "skipped",
+        "cleanup": "skipped"
+      },
+      "stage_result_sha256": {
+        "prepare": "7931e56135fb8aaae0da24408a99d1da62f559462ce8168bf0bccb00aa6770da",
+        "install": "2bc3861d5eba15fb095e162d2fe929ca172d0c291c307e2e498f1bc6cab99de7",
+        "native": "e5b46275ad10c59b193233697fed34db7eefe715cfa3cb1c9d4ba53ef2ab2bc0",
+        "federated": "e5b46275ad10c59b193233697fed34db7eefe715cfa3cb1c9d4ba53ef2ab2bc0",
+        "compare": "8e4260b04e1ab09fe545e1742641d7ba0f7e5908d0b40448ff6d1af46ef90d8c",
+        "cleanup": "f1392bf40e6422554fe7c05b11a0282e2902106bf95ae7e94b4c67d7d04ce767"
+      },
+      "attempts": {
+        "prepare": [
+          {
+            "attempt_id": "a9cb5e12c26f4d2303b348bbebf8596be5ea9e38a27dc741609961a2c26c7118:a1",
+            "attempt_number": 1,
+            "worker_id": "s210-linux-shard-171-of-256",
+            "status": "skipped",
+            "started_at": 1791853930.9153135,
+            "ended_at": 1791853930.9259968,
+            "result_sha256": "7931e56135fb8aaae0da24408a99d1da62f559462ce8168bf0bccb00aa6770da"
+          }
+        ],
+        "install": [],
+        "native": [],
+        "federated": [],
+        "compare": [],
+        "cleanup": [
+          {
+            "attempt_id": "8f458338c1ae9254ff2e53c1627a3b415ddeca3d3c40084d62f8e13d3e3352d2:a1",
+            "attempt_number": 1,
+            "worker_id": "s210-linux-shard-171-of-256",
+            "status": "skipped",
+            "started_at": 1791853930.9366348,
+            "ended_at": 1791853930.9451435,
+            "result_sha256": "f1392bf40e6422554fe7c05b11a0282e2902106bf95ae7e94b4c67d7d04ce767"
+          }
+        ]
+      },
+      "probe_evidence": null,
+      "cleanup_confirmed": null,
+      "resource_observations": null
+    },
+    {
+      "registry_entry_id": "ko-b3bbf1a52b0b127a50f8d1f2",
+      "result_id": "catalog:ko-b3bbf1a52b0b127a50f8d1f2|linux",
+      "ecosystem": "koishi",
+      "package": "koishi-plugin-magnet-get-lizard",
+      "version": "0.0.2",
+      "platform": "linux",
+      "unit_status": "skipped",
+      "reason_code": "entry_bound_federated_fixture_missing",
+      "profile_id": "koishi-core-4.18.11-node-24.20.0-x86_64-portable-lock",
+      "profile_status": "locked",
+      "profile_reason_code": null,
+      "artifact_status": "locked",
+      "artifact_reason_code": null,
+      "artifact_sha256": "744789b71db73ab794d0d1efc995849b8e3d24188a84e6d1b12ebf4e1d1c9b09",
+      "dependency_lock_sha256": "782a5cd78f2089182d7c2df2aca1bf1cabad8b583a921811f0cbf3de99b7d8cf",
+      "source_snapshot_sha256": "8c75d69358cd8334d0d311c1e19c642794d7436056d32041f02e6c1de1a06163",
+      "artifact_lock_sha256": "8dcec5da7cd81b9ed7d0f4e8aead8e76ef15cd7e17dfcdc4fa6f7b8944b83d4a",
+      "profile_lock_sha256": "68a7391620a06e7141d949519333a1f4fc5ccee7abd84dc036c46d09fdae8d38",
+      "behavior_fixture_status": "unmapped_category",
+      "recipe_categories": [],
+      "stage_statuses": {
+        "prepare": "passed",
+        "install": "passed",
+        "native": "passed",
+        "federated": "skipped",
+        "compare": "skipped",
+        "cleanup": "passed"
+      },
+      "stage_result_sha256": {
+        "prepare": "7521aa5938275dcecc04e8edb2db4c3c2cc7e4c9d80b3d6e34aea30a53091c1f",
+        "install": "04f9883ad1ea70a75baecaa5afb42eee94234fec19836776c156f4dc928c4ce3",
+        "native": "c45a287ac4ade65283b8291208dc8eeff3ac1b0ce0961e3f13a325d2203d24f6",
+        "federated": "230dde1a123ced7c3670531069da83bed23e51531544b2f0e8571e0dff2d9fa3",
+        "compare": "db565b8a229c38c4744d2fa9168a966e1b8f70bd69e2102d6cdf10d5371a247d",
+        "cleanup": "c45a287ac4ade65283b8291208dc8eeff3ac1b0ce0961e3f13a325d2203d24f6"
+      },
+      "attempts": {
+        "prepare": [
+          {
+            "attempt_id": "b5a5650e70f7cf8e3824b47ead728accd0c089c039adcbc2670800a04b1523eb:a1",
+            "attempt_number": 1,
+            "worker_id": "s210-linux-shard-171-of-256",
+            "status": "passed",
+            "started_at": 1791853972.1660042,
+            "ended_at": 1791853972.1736693,
+            "result_sha256": "7521aa5938275dcecc04e8edb2db4c3c2cc7e4c9d80b3d6e34aea30a53091c1f"
+          }
+        ],
+        "install": [
+          {
+            "attempt_id": "6bf6a0a71f738ec553c688097a07a0de591a2d379da43951b4e944c3eb9c235d:a1",
+            "attempt_number": 1,
+            "worker_id": "s210-linux-shard-171-of-256",
+            "status": "passed",
+            "started_at": 1791853972.1797278,
+            "ended_at": 1791853984.3782246,
+            "result_sha256": "04f9883ad1ea70a75baecaa5afb42eee94234fec19836776c156f4dc928c4ce3"
+          }
+        ],
+        "native": [
+          {
+            "attempt_id": "3bac1fe0ca50824f34fc9d1071bda413b48ca6093783235fb62403021eed7679:a1",
+            "attempt_number": 1,
+            "worker_id": "s210-linux-shard-171-of-256",
+            "status": "passed",
+            "started_at": 1791853984.3963547,
+            "ended_at": 1791853984.4033558,
+            "result_sha256": "c45a287ac4ade65283b8291208dc8eeff3ac1b0ce0961e3f13a325d2203d24f6"
+          }
+        ],
+        "federated": [
+          {
+            "attempt_id": "b2448ec87a6c72909a7e9dd368081d66f5b0364f10804996105c96ab84d15573:a1",
+            "attempt_number": 1,
+            "worker_id": "s210-linux-shard-171-of-256",
+            "status": "skipped",
+            "started_at": 1791853984.384423,
+            "ended_at": 1791853984.3913116,
+            "result_sha256": "230dde1a123ced7c3670531069da83bed23e51531544b2f0e8571e0dff2d9fa3"
+          }
+        ],
+        "compare": [],
+        "cleanup": [
+          {
+            "attempt_id": "834e0a7c2cbf7e330de731474a30616e1ba1f8f369916ef101678559cbddad9b:a1",
+            "attempt_number": 1,
+            "worker_id": "s210-linux-shard-171-of-256",
+            "status": "passed",
+            "started_at": 1791853984.4097323,
+            "ended_at": 1791853984.4162846,
+            "result_sha256": "c45a287ac4ade65283b8291208dc8eeff3ac1b0ce0961e3f13a325d2203d24f6"
+          }
+        ]
+      },
+      "probe_evidence": {
+        "artifact_lock_sha256": "8dcec5da7cd81b9ed7d0f4e8aead8e76ef15cd7e17dfcdc4fa6f7b8944b83d4a",
+        "artifact_sha256": "744789b71db73ab794d0d1efc995849b8e3d24188a84e6d1b12ebf4e1d1c9b09",
+        "attempted": true,
+        "census_probe": true,
+        "dependency_archives": {
+          "archive_bytes": 9197841,
+          "cache_hits": 241,
+          "downloaded_archives": 1,
+          "downloaded_bytes": 3195,
+          "locked_package_count": 246,
+          "package_lock_sha256": "c599b24a0ea44202b55dc2342f531824a39cd1c03adcd8d596b3c5cecadbfdae",
+          "unique_archive_count": 242
+        },
+        "detail": "Koishi dependency installation and native plugin load ran in the pinned network-disabled linux Worker; no entry-bound behavior fixture exists.",
+        "ecosystem": "koishi",
+        "npm_lock_sha256": "782a5cd78f2089182d7c2df2aca1bf1cabad8b583a921811f0cbf3de99b7d8cf",
+        "package": "koishi-plugin-magnet-get-lizard",
+        "platform": "linux",
+        "plugin_archive_bytes": 3195,
+        "profile_document_sha256": "68a7391620a06e7141d949519333a1f4fc5ccee7abd84dc036c46d09fdae8d38",
+        "profile_id": "koishi-core-4.18.11-node-24.20.0-x86_64-portable-lock",
+        "profile_lock_sha256": "782a5cd78f2089182d7c2df2aca1bf1cabad8b583a921811f0cbf3de99b7d8cf",
+        "reason_code": "missing_entry_bound_fixture",
+        "registry_entry_id": "ko-b3bbf1a52b0b127a50f8d1f2",
+        "resource_observations": {
+          "peak_writable_scratch_bytes": 64943806,
+          "sample_count": 6
+        },
+        "result_id": "catalog:ko-b3bbf1a52b0b127a50f8d1f2|linux",
+        "schema_version": 1,
+        "source_probe_task_id": "S2-09",
+        "status": "skipped",
+        "task_id": "S2-10",
+        "unit_type": "catalog_entry",
+        "version": "0.0.2",
+        "worker": {
+          "cleanup_confirmed": true,
+          "elapsed_seconds": 11.594000000011874,
+          "exit_code": 0,
+          "image_digest": "node@sha256:ba849c60be29959425b8734d57b8b4b7d56f98edd9504c9af091d5281095a71e",
+          "input_bytes": 9342923,
+          "network": "none",
+          "npm_scripts": "disabled",
+          "output_truncated": false,
+          "peak_memory_bytes": 256167116,
+          "protocol_report": {
+            "artifact_sha256": "744789b71db73ab794d0d1efc995849b8e3d24188a84e6d1b12ebf4e1d1c9b09",
+            "behavior": {
+              "reason_code": "missing_entry_bound_fixture",
+              "status": "skipped"
+            },
+            "cleanup": {
+              "status": "passed"
+            },
+            "dependency_install": {
+              "exit_code": 0,
+              "reason_code": null,
+              "status": "passed",
+              "stderr_bytes": 294,
+              "stderr_sha256": "620cd872bc34cca195862e1face7b2421e4eee9809aba619dadc09f2857a133d",
+              "stderr_tail": "LIGAMINA_NPM_RUNTIME={\"heap_limit_bytes\":2348810240}\nnpm warn deprecated @koa/router@10.1.1: **IMPORTANT 10x+ PERFORMANCE UPGRADE**: Please upgrade to v12.0.1+ as we have fixed an issue with debuglog causing 10x slower router benchmark performance, see https://github.com/koajs/router/pull/173\n",
+              "stdout_bytes": 26,
+              "stdout_sha256": "81ee01f51e398664bfba623db25ce640000e37abebedb63d929c7ef00b41dfa1",
+              "stdout_tail": "\nadded 246 packages in 3s\n"
+            },
+            "native_load": {
+              "entry_module_imported": true,
+              "plugin_registered": true,
+              "reason_code": null,
+              "status": "passed"
+            },
+            "package": "koishi-plugin-magnet-get-lizard",
+            "profile_id": "koishi-core-4.18.11-node-24.20.0-x86_64-portable-lock",
+            "profile_lock_sha256": "782a5cd78f2089182d7c2df2aca1bf1cabad8b583a921811f0cbf3de99b7d8cf",
+            "registry_entry_id": "ko-b3bbf1a52b0b127a50f8d1f2",
+            "resource_observations": {
+              "peak_writable_scratch_bytes": 64943806,
+              "sample_count": 6
+            },
+            "schema_version": 1,
+            "task_id": "S2-09",
+            "version": "0.0.2"
+          },
+          "read_only_input": true,
+          "reason_code": null,
+          "status": "passed",
+          "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "stderr_tail": "",
+          "stdout_sha256": "1eaa81467bbd138d54ad189c0b0353afdc1cea14435b94cbeec5f2d58ff34640",
+          "stdout_tail": "94,\"stdout_sha256\":\"81ee01f51e398664bfba623db25ce640000e37abebedb63d929c7ef00b41dfa1\",\"stderr_sha256\":\"620cd872bc34cca195862e1face7b2421e4eee9809aba619dadc09f2857a133d\",\"stdout_tail\":\"\\nadded 246 packages in 3s\\n\",\"stderr_tail\":\"LIGAMINA_NPM_RUNTIME={\\\"heap_limit_bytes\\\":2348810240}\\nnpm warn deprecated @koa/router@10.1.1: **IMPORTANT 10x+ PERFORMANCE UPGRADE**: Please upgrade to v12.0.1+ as we have fixed an issue with debuglog causing 10x slower router benchmark performance, see https://github.com/koajs/router/pull/173\\n\"},\"native_load\":{\"status\":\"passed\",\"reason_code\":null,\"entry_module_imported\":true,\"plugin_registered\":true},\"behavior\":{\"status\":\"skipped\",\"reason_code\":\"missing_entry_bound_fixture\"},\"cleanup\":{\"status\":\"passed\"},\"environment\":{\"ecosystem\":\"koishi\",\"runtime_version\":\"24.20.0\",\"v8_heap_limit_bytes\":2348810240,\"host_node_options_ignored\":true,\"npm_v8_heap_limit_bytes\":2348810240,\"framework_version\":\"4.18.11\"},\"resource_observations\":{\"peak_writable_scratch_bytes\":64943806,\"sample_count\":6}}\n"
+        }
+      },
+      "cleanup_confirmed": true,
+      "resource_observations": {
+        "peak_writable_scratch_bytes": 64943806,
+        "sample_count": 6
+      }
+    },
+    {
+      "registry_entry_id": "ko-85be5dc629b1d38dbb0aa536",
+      "result_id": "catalog:ko-85be5dc629b1d38dbb0aa536|linux",
+      "ecosystem": "koishi",
+      "package": "koishi-plugin-pangu",
+      "version": "1.0.1",
+      "platform": "linux",
+      "unit_status": "skipped",
+      "reason_code": "entry_bound_federated_fixture_missing",
+      "profile_id": "koishi-core-4.18.11-node-24.20.0-x86_64-portable-lock",
+      "profile_status": "locked",
+      "profile_reason_code": null,
+      "artifact_status": "locked",
+      "artifact_reason_code": null,
+      "artifact_sha256": "f6fa9c2f4f30a4001cac2b38bf2defaf7883ee7d5dc63edbe1190d3fd75cbc77",
+      "dependency_lock_sha256": "6b4141c932f4d2c475a8bfdfe8610a7b8db357e018f6f79d3ece3bca196ae0b3",
+      "source_snapshot_sha256": "8c75d69358cd8334d0d311c1e19c642794d7436056d32041f02e6c1de1a06163",
+      "artifact_lock_sha256": "8dcec5da7cd81b9ed7d0f4e8aead8e76ef15cd7e17dfcdc4fa6f7b8944b83d4a",
+      "profile_lock_sha256": "68a7391620a06e7141d949519333a1f4fc5ccee7abd84dc036c46d09fdae8d38",
+      "behavior_fixture_status": "unmapped_category",
+      "recipe_categories": [],
+      "stage_statuses": {
+        "prepare": "passed",
+        "install": "passed",
+        "native": "passed",
+        "federated": "skipped",
+        "compare": "skipped",
+        "cleanup": "passed"
+      },
+      "stage_result_sha256": {
+        "prepare": "08b3f5f45507af746d0880defb1b1928e7cdb16d755b471f19f8c524532d5dbd",
+        "install": "36fe422d44830599f03a8fd789549c07e68ee9f3e6ab32434e8dba6fc3cc62d6",
+        "native": "b22c333d32f459d90e2f1c3d2402b15fe33d04388266c58d24efbcd78f87f19e",
+        "federated": "230dde1a123ced7c3670531069da83bed23e51531544b2f0e8571e0dff2d9fa3",
+        "compare": "e2751d2451b604b84684e3876bb05f98ad417a0a365df4fdf50ae89d487e9211",
+        "cleanup": "b22c333d32f459d90e2f1c3d2402b15fe33d04388266c58d24efbcd78f87f19e"
+      },
+      "attempts": {
+        "prepare": [
+          {
+            "attempt_id": "a3ba995b55e1a1e17c960a4c7c7d2dacbb03b1631dd8513c4ff2a74195f9a828:a1",
+            "attempt_number": 1,
+            "worker_id": "s210-linux-shard-171-of-256",
+            "status": "passed",
+            "started_at": 1791853941.7672203,
+            "ended_at": 1791853941.7737255,
+            "result_sha256": "08b3f5f45507af746d0880defb1b1928e7cdb16d755b471f19f8c524532d5dbd"
+          }
+        ],
+        "install": [
+          {
+            "attempt_id": "4fe899c9dca800040c2eca677005f875294daa73f33812f70f5cbcd467e34202:a1",
+            "attempt_number": 1,
+            "worker_id": "s210-linux-shard-171-of-256",
+            "status": "passed",
+            "started_at": 1791853941.7804234,
+            "ended_at": 1791853951.9221957,
+            "result_sha256": "36fe422d44830599f03a8fd789549c07e68ee9f3e6ab32434e8dba6fc3cc62d6"
+          }
+        ],
+        "native": [
+          {
+            "attempt_id": "d2abe9cbf3507803a2b7552b59480471d2180aec9c92c0b07aac6253befa235d:a1",
+            "attempt_number": 1,
+            "worker_id": "s210-linux-shard-171-of-256",
+            "status": "passed",
+            "started_at": 1791853951.9447777,
+            "ended_at": 1791853951.9527786,
+            "result_sha256": "b22c333d32f459d90e2f1c3d2402b15fe33d04388266c58d24efbcd78f87f19e"
+          }
+        ],
+        "federated": [
+          {
+            "attempt_id": "dba9e4a65d0a3e84582936d10e150498f10645feab216e7ea5af0ebf8ed51bbc:a1",
+            "attempt_number": 1,
+            "worker_id": "s210-linux-shard-171-of-256",
+            "status": "skipped",
+            "started_at": 1791853951.929708,
+            "ended_at": 1791853951.9381995,
+            "result_sha256": "230dde1a123ced7c3670531069da83bed23e51531544b2f0e8571e0dff2d9fa3"
+          }
+        ],
+        "compare": [],
+        "cleanup": [
+          {
+            "attempt_id": "6f8a6fd4631e6fb7cadbac3565fe68680fcbc90981c86e874d836df250ee3521:a1",
+            "attempt_number": 1,
+            "worker_id": "s210-linux-shard-171-of-256",
+            "status": "passed",
+            "started_at": 1791853951.9598944,
+            "ended_at": 1791853951.9681733,
+            "result_sha256": "b22c333d32f459d90e2f1c3d2402b15fe33d04388266c58d24efbcd78f87f19e"
+          }
+        ]
+      },
+      "probe_evidence": {
+        "artifact_lock_sha256": "8dcec5da7cd81b9ed7d0f4e8aead8e76ef15cd7e17dfcdc4fa6f7b8944b83d4a",
+        "artifact_sha256": "f6fa9c2f4f30a4001cac2b38bf2defaf7883ee7d5dc63edbe1190d3fd75cbc77",
+        "attempted": true,
+        "census_probe": true,
+        "dependency_archives": {
+          "archive_bytes": 3718500,
+          "cache_hits": 169,
+          "downloaded_archives": 1,
+          "downloaded_bytes": 1467,
+          "locked_package_count": 173,
+          "package_lock_sha256": "f5fdc32aedbcebd5aa446056b39676b448c9434a2898d416433e64eaa0347b0b",
+          "unique_archive_count": 170
+        },
+        "detail": "Koishi dependency installation and native plugin load ran in the pinned network-disabled linux Worker; no entry-bound behavior fixture exists.",
+        "ecosystem": "koishi",
+        "npm_lock_sha256": "6b4141c932f4d2c475a8bfdfe8610a7b8db357e018f6f79d3ece3bca196ae0b3",
+        "package": "koishi-plugin-pangu",
+        "platform": "linux",
+        "plugin_archive_bytes": 1467,
+        "profile_document_sha256": "68a7391620a06e7141d949519333a1f4fc5ccee7abd84dc036c46d09fdae8d38",
+        "profile_id": "koishi-core-4.18.11-node-24.20.0-x86_64-portable-lock",
+        "profile_lock_sha256": "6b4141c932f4d2c475a8bfdfe8610a7b8db357e018f6f79d3ece3bca196ae0b3",
+        "reason_code": "missing_entry_bound_fixture",
+        "registry_entry_id": "ko-85be5dc629b1d38dbb0aa536",
+        "resource_observations": {
+          "peak_writable_scratch_bytes": 26170516,
+          "sample_count": 4
+        },
+        "result_id": "catalog:ko-85be5dc629b1d38dbb0aa536|linux",
+        "schema_version": 1,
+        "source_probe_task_id": "S2-09",
+        "status": "skipped",
+        "task_id": "S2-10",
+        "unit_type": "catalog_entry",
+        "version": "1.0.1",
+        "worker": {
+          "cleanup_confirmed": true,
+          "elapsed_seconds": 9.593999999997322,
+          "exit_code": 0,
+          "image_digest": "node@sha256:ba849c60be29959425b8734d57b8b4b7d56f98edd9504c9af091d5281095a71e",
+          "input_bytes": 3821267,
+          "network": "none",
+          "npm_scripts": "disabled",
+          "output_truncated": false,
+          "peak_memory_bytes": 102655590,
+          "protocol_report": {
+            "artifact_sha256": "f6fa9c2f4f30a4001cac2b38bf2defaf7883ee7d5dc63edbe1190d3fd75cbc77",
+            "behavior": {
+              "reason_code": "missing_entry_bound_fixture",
+              "status": "skipped"
+            },
+            "cleanup": {
+              "status": "passed"
+            },
+            "dependency_install": {
+              "exit_code": 0,
+              "reason_code": null,
+              "status": "passed",
+              "stderr_bytes": 294,
+              "stderr_sha256": "620cd872bc34cca195862e1face7b2421e4eee9809aba619dadc09f2857a133d",
+              "stderr_tail": "LIGAMINA_NPM_RUNTIME={\"heap_limit_bytes\":2348810240}\nnpm warn deprecated @koa/router@10.1.1: **IMPORTANT 10x+ PERFORMANCE UPGRADE**: Please upgrade to v12.0.1+ as we have fixed an issue with debuglog causing 10x slower router benchmark performance, see https://github.com/koajs/router/pull/173\n",
+              "stdout_bytes": 26,
+              "stdout_sha256": "48a0dcdbf90b6dcff0319f2d5a73d5a4f0aba9889e7f78389cfbd9f688df1cf1",
+              "stdout_tail": "\nadded 173 packages in 2s\n"
+            },
+            "native_load": {
+              "entry_module_imported": true,
+              "plugin_registered": true,
+              "reason_code": null,
+              "status": "passed"
+            },
+            "package": "koishi-plugin-pangu",
+            "profile_id": "koishi-core-4.18.11-node-24.20.0-x86_64-portable-lock",
+            "profile_lock_sha256": "6b4141c932f4d2c475a8bfdfe8610a7b8db357e018f6f79d3ece3bca196ae0b3",
+            "registry_entry_id": "ko-85be5dc629b1d38dbb0aa536",
+            "resource_observations": {
+              "peak_writable_scratch_bytes": 26170516,
+              "sample_count": 4
+            },
+            "schema_version": 1,
+            "task_id": "S2-09",
+            "version": "1.0.1"
+          },
+          "read_only_input": true,
+          "reason_code": null,
+          "status": "passed",
+          "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "stderr_tail": "",
+          "stdout_sha256": "b17ab0c3260a8387c7b666f19d8df932190da17a539d536d1ba08be838d3297b",
+          "stdout_tail": "94,\"stdout_sha256\":\"48a0dcdbf90b6dcff0319f2d5a73d5a4f0aba9889e7f78389cfbd9f688df1cf1\",\"stderr_sha256\":\"620cd872bc34cca195862e1face7b2421e4eee9809aba619dadc09f2857a133d\",\"stdout_tail\":\"\\nadded 173 packages in 2s\\n\",\"stderr_tail\":\"LIGAMINA_NPM_RUNTIME={\\\"heap_limit_bytes\\\":2348810240}\\nnpm warn deprecated @koa/router@10.1.1: **IMPORTANT 10x+ PERFORMANCE UPGRADE**: Please upgrade to v12.0.1+ as we have fixed an issue with debuglog causing 10x slower router benchmark performance, see https://github.com/koajs/router/pull/173\\n\"},\"native_load\":{\"status\":\"passed\",\"reason_code\":null,\"entry_module_imported\":true,\"plugin_registered\":true},\"behavior\":{\"status\":\"skipped\",\"reason_code\":\"missing_entry_bound_fixture\"},\"cleanup\":{\"status\":\"passed\"},\"environment\":{\"ecosystem\":\"koishi\",\"runtime_version\":\"24.20.0\",\"v8_heap_limit_bytes\":2348810240,\"host_node_options_ignored\":true,\"npm_v8_heap_limit_bytes\":2348810240,\"framework_version\":\"4.18.11\"},\"resource_observations\":{\"peak_writable_scratch_bytes\":26170516,\"sample_count\":4}}\n"
+        }
+      },
+      "cleanup_confirmed": true,
+      "resource_observations": {
+        "peak_writable_scratch_bytes": 26170516,
+        "sample_count": 4
+      }
+    },
+    {
+      "registry_entry_id": "ko-acf75df3ce0e9798b1b92328",
+      "result_id": "catalog:ko-acf75df3ce0e9798b1b92328|linux",
+      "ecosystem": "koishi",
+      "package": "koishi-plugin-kb",
+      "version": "0.0.2",
+      "platform": "linux",
+      "unit_status": "skipped",
+      "reason_code": "peer_dependency_conflict",
+      "profile_id": "koishi-core-4.18.11-node-24.20.0-x86_64-portable-lock",
+      "profile_status": "peer_dependency_conflict",
+      "profile_reason_code": "peer_dependency_conflict",
+      "artifact_status": "locked",
+      "artifact_reason_code": null,
+      "artifact_sha256": "f93ffcf4cbdaf36d22ac2d61c60a87f6e02217a65e7f9e43399725792133e220",
+      "dependency_lock_sha256": null,
+      "source_snapshot_sha256": "8c75d69358cd8334d0d311c1e19c642794d7436056d32041f02e6c1de1a06163",
+      "artifact_lock_sha256": "8dcec5da7cd81b9ed7d0f4e8aead8e76ef15cd7e17dfcdc4fa6f7b8944b83d4a",
+      "profile_lock_sha256": "68a7391620a06e7141d949519333a1f4fc5ccee7abd84dc036c46d09fdae8d38",
+      "behavior_fixture_status": "unmapped_category",
+      "recipe_categories": [],
+      "stage_statuses": {
+        "prepare": "skipped",
+        "install": "skipped",
+        "native": "skipped",
+        "federated": "skipped",
+        "compare": "skipped",
+        "cleanup": "skipped"
+      },
+      "stage_result_sha256": {
+        "prepare": "c72b8e8073fa3ebb1ad17528473b42b48f7e0ad29fd28eb97fad949aaa1124eb",
+        "install": "eacaa8c812a461daac1100ad5f4268f8d4d9e03f18c4c32925245f8e91289ba6",
+        "native": "cfd980d657155e376694179918ceef96f93b2272eb1f9aa9a3ba0f0753c52ed6",
+        "federated": "cfd980d657155e376694179918ceef96f93b2272eb1f9aa9a3ba0f0753c52ed6",
+        "compare": "9dda24cfc8e503b49205584c86c4dc114bebe28ddb537c88cb7f8ea96425afd7",
+        "cleanup": "f1392bf40e6422554fe7c05b11a0282e2902106bf95ae7e94b4c67d7d04ce767"
+      },
+      "attempts": {
+        "prepare": [
+          {
+            "attempt_id": "36333017c54b98773be9728fbc55ca7e60512ae088db125aa493c822d7505e89:a1",
+            "attempt_number": 1,
+            "worker_id": "s210-linux-shard-171-of-256",
+            "status": "skipped",
+            "started_at": 1791853972.1340022,
+            "ended_at": 1791853972.1425986,
+            "result_sha256": "c72b8e8073fa3ebb1ad17528473b42b48f7e0ad29fd28eb97fad949aaa1124eb"
+          }
+        ],
+        "install": [],
+        "native": [],
+        "federated": [],
+        "compare": [],
+        "cleanup": [
+          {
+            "attempt_id": "d66bbd017d12484c15a7f2ab93ea74250de72dceda60ede17700a88041e20768:a1",
+            "attempt_number": 1,
+            "worker_id": "s210-linux-shard-171-of-256",
+            "status": "skipped",
+            "started_at": 1791853972.1518984,
+            "ended_at": 1791853972.1594977,
+            "result_sha256": "f1392bf40e6422554fe7c05b11a0282e2902106bf95ae7e94b4c67d7d04ce767"
+          }
+        ]
+      },
+      "probe_evidence": null,
+      "cleanup_confirmed": null,
+      "resource_observations": null
+    },
+    {
+      "registry_entry_id": "ko-d50dd0552ebf7702af1e2558",
+      "result_id": "catalog:ko-d50dd0552ebf7702af1e2558|linux",
+      "ecosystem": "koishi",
+      "package": "koishi-plugin-hearthstone",
+      "version": "1.0.6",
+      "platform": "linux",
+      "unit_status": "failed",
+      "reason_code": "native_plugin_load_failed",
+      "profile_id": "koishi-core-4.18.11-node-24.20.0-x86_64-portable-lock",
+      "profile_status": "locked",
+      "profile_reason_code": null,
+      "artifact_status": "locked",
+      "artifact_reason_code": null,
+      "artifact_sha256": "ca2e60716594db3a22f914c59507df2dcc011512da250fa6230404b2a8abec7a",
+      "dependency_lock_sha256": "f848fc6437035c1fd6eb9bf9ce8688b086a0fe98ca273c50f960ec9524884cac",
+      "source_snapshot_sha256": "8c75d69358cd8334d0d311c1e19c642794d7436056d32041f02e6c1de1a06163",
+      "artifact_lock_sha256": "8dcec5da7cd81b9ed7d0f4e8aead8e76ef15cd7e17dfcdc4fa6f7b8944b83d4a",
+      "profile_lock_sha256": "68a7391620a06e7141d949519333a1f4fc5ccee7abd84dc036c46d09fdae8d38",
+      "behavior_fixture_status": "unmapped_category",
+      "recipe_categories": [],
+      "stage_statuses": {
+        "prepare": "passed",
+        "install": "passed",
+        "native": "failed",
+        "federated": "skipped",
+        "compare": "skipped",
+        "cleanup": "passed"
+      },
+      "stage_result_sha256": {
+        "prepare": "8616f0b72f6125398fb3a83f8cb339e3fdb092d99eba6d8ae70b6ddf5b829983",
+        "install": "9c50d950c5163c56fa83502fa296e76cf8c5162a03f31a8214962bd5a87fa65b",
+        "native": "d94e0e5b2584b3e3e68b775d14f84f334e2b20fe0a3e7516ae840afa6cf843af",
+        "federated": "230dde1a123ced7c3670531069da83bed23e51531544b2f0e8571e0dff2d9fa3",
+        "compare": "6048cfe450b2e4fe84892f90a12a6be3069746d7d3e4573ed11b2c194a66d536",
+        "cleanup": "7dbe33a8999e32072fc6f400cbfbb935309336748609e7548ad6b5160b1121c8"
+      },
+      "attempts": {
+        "prepare": [
+          {
+            "attempt_id": "9a80c5814d7645e267993ef0de146345e89cbc6354ace0395f2433ecdadff143:a1",
+            "attempt_number": 1,
+            "worker_id": "s210-linux-shard-171-of-256",
+            "status": "passed",
+            "started_at": 1791854004.6667883,
+            "ended_at": 1791854004.6717913,
+            "result_sha256": "8616f0b72f6125398fb3a83f8cb339e3fdb092d99eba6d8ae70b6ddf5b829983"
+          }
+        ],
+        "install": [
+          {
+            "attempt_id": "43869408778861123a84541cb4406e56abcaba3cba0e53c45fc72ebd16a383ff:a1",
+            "attempt_number": 1,
+            "worker_id": "s210-linux-shard-171-of-256",
+            "status": "passed",
+            "started_at": 1791854004.6768465,
+            "ended_at": 1791854014.807332,
+            "result_sha256": "9c50d950c5163c56fa83502fa296e76cf8c5162a03f31a8214962bd5a87fa65b"
+          }
+        ],
+        "native": [
+          {
+            "attempt_id": "0351575ac88620416239c5e64d0b0863b186f8724da8087416e95e733a5e29f4:a1",
+            "attempt_number": 1,
+            "worker_id": "s210-linux-shard-171-of-256",
+            "status": "failed",
+            "started_at": 1791854014.8284152,
+            "ended_at": 1791854014.8355641,
+            "result_sha256": "d94e0e5b2584b3e3e68b775d14f84f334e2b20fe0a3e7516ae840afa6cf843af"
+          }
+        ],
+        "federated": [
+          {
+            "attempt_id": "1bd956246f19db32abd94b31f12b63b1151e495e88a7b65e70ecfdf0455a88f6:a1",
+            "attempt_number": 1,
+            "worker_id": "s210-linux-shard-171-of-256",
+            "status": "skipped",
+            "started_at": 1791854014.816671,
+            "ended_at": 1791854014.823903,
+            "result_sha256": "230dde1a123ced7c3670531069da83bed23e51531544b2f0e8571e0dff2d9fa3"
+          }
+        ],
+        "compare": [],
+        "cleanup": [
+          {
+            "attempt_id": "a8415e6dc142b2f982cc1b8a6deaa180cbf317357381a4022c35c1610aaf7d34:a1",
+            "attempt_number": 1,
+            "worker_id": "s210-linux-shard-171-of-256",
+            "status": "passed",
+            "started_at": 1791854014.8407602,
+            "ended_at": 1791854014.8473098,
+            "result_sha256": "7dbe33a8999e32072fc6f400cbfbb935309336748609e7548ad6b5160b1121c8"
+          }
+        ]
+      },
+      "probe_evidence": {
+        "artifact_lock_sha256": "8dcec5da7cd81b9ed7d0f4e8aead8e76ef15cd7e17dfcdc4fa6f7b8944b83d4a",
+        "artifact_sha256": "ca2e60716594db3a22f914c59507df2dcc011512da250fa6230404b2a8abec7a",
+        "attempted": true,
+        "census_probe": true,
+        "dependency_archives": {
+          "archive_bytes": 6583186,
+          "cache_hits": 199,
+          "downloaded_archives": 1,
+          "downloaded_bytes": 7431,
+          "locked_package_count": 204,
+          "package_lock_sha256": "3821ed63114ade3e933887492cf7bec7068c508dcd26cbbbd406ef46d7fc1ed0",
+          "unique_archive_count": 200
+        },
+        "detail": "Koishi dependency installation and native plugin load ran in the pinned network-disabled linux Worker; no entry-bound behavior fixture exists.",
+        "ecosystem": "koishi",
+        "npm_lock_sha256": "f848fc6437035c1fd6eb9bf9ce8688b086a0fe98ca273c50f960ec9524884cac",
+        "package": "koishi-plugin-hearthstone",
+        "platform": "linux",
+        "plugin_archive_bytes": 7431,
+        "profile_document_sha256": "68a7391620a06e7141d949519333a1f4fc5ccee7abd84dc036c46d09fdae8d38",
+        "profile_id": "koishi-core-4.18.11-node-24.20.0-x86_64-portable-lock",
+        "profile_lock_sha256": "f848fc6437035c1fd6eb9bf9ce8688b086a0fe98ca273c50f960ec9524884cac",
+        "reason_code": "native_plugin_load_failed",
+        "registry_entry_id": "ko-d50dd0552ebf7702af1e2558",
+        "resource_observations": {
+          "peak_writable_scratch_bytes": 38461048,
+          "sample_count": 4
+        },
+        "result_id": "catalog:ko-d50dd0552ebf7702af1e2558|linux",
+        "schema_version": 1,
+        "source_probe_task_id": "S2-09",
+        "status": "failed",
+        "task_id": "S2-10",
+        "unit_type": "catalog_entry",
+        "version": "1.0.6",
+        "worker": {
+          "cleanup_confirmed": true,
+          "elapsed_seconds": 9.577999999994063,
+          "exit_code": 0,
+          "image_digest": "node@sha256:ba849c60be29959425b8734d57b8b4b7d56f98edd9504c9af091d5281095a71e",
+          "input_bytes": 6708578,
+          "network": "none",
+          "npm_scripts": "disabled",
+          "output_truncated": false,
+          "peak_memory_bytes": 226597273,
+          "protocol_report": {
+            "artifact_sha256": "ca2e60716594db3a22f914c59507df2dcc011512da250fa6230404b2a8abec7a",
+            "behavior": {
+              "reason_code": "missing_entry_bound_fixture",
+              "status": "skipped"
+            },
+            "cleanup": {
+              "status": "passed"
+            },
+            "dependency_install": {
+              "exit_code": 0,
+              "reason_code": null,
+              "status": "passed",
+              "stderr_bytes": 444,
+              "stderr_sha256": "fdff63cc7cdb28a2064fa526da72f81407195654b96f71856a10ac510127f2de",
+              "stderr_tail": "LIGAMINA_NPM_RUNTIME={\"heap_limit_bytes\":2348810240}\nnpm warn deprecated prebuild-install@7.1.3: No longer maintained. Please contact the author of the relevant native addon; alternatives are available.\nnpm warn deprecated @koa/router@10.1.1: **IMPORTANT 10x+ PERFORMANCE UPGRADE**: Please upgrade to v12.0.1+ as we have fixed an issue with debuglog causing 10x slower router benchmark performance, see https://github.com/koajs/router/pull/173\n",
+              "stdout_bytes": 26,
+              "stdout_sha256": "c3d5525b9b2d5e97d17c5f752f28eebcd9e5e142c3250fb9a2093451cd9a1b64",
+              "stdout_tail": "\nadded 204 packages in 2s\n"
+            },
+            "native_load": {
+              "error_name": "Error",
+              "error_tail": "Error: Could not locate the bindings file. Tried:\n → /work/project/node_modules/better-sqlite3/build/better_sqlite3.node\n → /work/project/node_modules/better-sqlite3/build/Debug/better_sqlite3.node\n → /work/project/node_modules/better-sqlite3/build/Release/better_sqlite3.node\n → /work/project/node_modules/better-sqlite3/out/Debug/better_sqlite3.node\n → /work/project/node_modules/better-sqlite3/Debug/better_sqlite3.node\n → /work/project/node_modules/better-sqlite3/out/Release/better_sqlite3.node\n → /work/project/node_modules/better-sqlite3/Release/better_sqlite3.node\n → /work/project/node_modules/better-sqlite3/build/default/better_sqlite3.node\n → /work/project/node_modules/better-sqlite3/compiled/24.20.0/linux/x64/better_sqlite3.node\n → /work/project/node_modules/better-sqlite3/addon-build/release/install-root/better_sqlite3.node\n → /work/project/node_modules/better-sqlite3/addon-build/debug/install-root/better_sqlite3.node\n → /work/project/node_modules/better-sqlite3/addon-build/default/install-root/better_sqlite3.node\n → /work/project/node_modules/better-sqlite3/lib/binding/node-v137-linux-x64/better_sqlite3.node\n    at bindings (/work/project/node_modules/bindings/bindings.js:126:9)\n    at new Database (/work/project/node_modules/better-sqlite3/lib/database.js:48:64)\n    at Object.<anonymous> (/work/project/node_modules/koishi-plugin-hearthstone/lib/db.js:21:12)\n    at Module._compile (node:internal/modules/cjs/loader:1929:14)\n    at Object..js (node:internal/modules/cjs/loader:2060:10)\n    at Module.load (node:internal/modules/cjs/loader:1651:32)\n    at Module._load (node:internal/modules/cjs/loader:1443:12)\n    at wrapModuleLoad (node:internal/modules/cjs/loader:261:19)\n    at Module.require (node:internal/modules/cjs/loader:1674:12)\n    at require (node:internal/modules/helpers:157:16)",
+              "reason_code": "native_plugin_load_failed",
+              "status": "failed"
+            },
+            "package": "koishi-plugin-hearthstone",
+            "profile_id": "koishi-core-4.18.11-node-24.20.0-x86_64-portable-lock",
+            "profile_lock_sha256": "f848fc6437035c1fd6eb9bf9ce8688b086a0fe98ca273c50f960ec9524884cac",
+            "registry_entry_id": "ko-d50dd0552ebf7702af1e2558",
+            "resource_observations": {
+              "peak_writable_scratch_bytes": 38461048,
+              "sample_count": 4
+            },
+            "schema_version": 1,
+            "task_id": "S2-09",
+            "version": "1.0.6"
+          },
+          "read_only_input": true,
+          "reason_code": null,
+          "status": "passed",
+          "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "stderr_tail": "",
+          "stdout_sha256": "4e8d1eb3a656513db91fd082ae0887e48dc3180e80de803f5619295937a7122f",
+          "stdout_tail": ":126:9)\\n    at new Database (/work/project/node_modules/better-sqlite3/lib/database.js:48:64)\\n    at Object.<anonymous> (/work/project/node_modules/koishi-plugin-hearthstone/lib/db.js:21:12)\\n    at Module._compile (node:internal/modules/cjs/loader:1929:14)\\n    at Object..js (node:internal/modules/cjs/loader:2060:10)\\n    at Module.load (node:internal/modules/cjs/loader:1651:32)\\n    at Module._load (node:internal/modules/cjs/loader:1443:12)\\n    at wrapModuleLoad (node:internal/modules/cjs/loader:261:19)\\n    at Module.require (node:internal/modules/cjs/loader:1674:12)\\n    at require (node:internal/modules/helpers:157:16)\"},\"behavior\":{\"status\":\"skipped\",\"reason_code\":\"missing_entry_bound_fixture\"},\"cleanup\":{\"status\":\"passed\"},\"environment\":{\"ecosystem\":\"koishi\",\"runtime_version\":\"24.20.0\",\"v8_heap_limit_bytes\":2348810240,\"host_node_options_ignored\":true,\"npm_v8_heap_limit_bytes\":2348810240,\"framework_version\":\"4.18.11\"},\"resource_observations\":{\"peak_writable_scratch_bytes\":38461048,\"sample_count\":4}}\n"
+        }
+      },
+      "cleanup_confirmed": true,
+      "resource_observations": {
+        "peak_writable_scratch_bytes": 38461048,
+        "sample_count": 4
+      }
+    },
+    {
+      "registry_entry_id": "ko-bede69cde94caf96d45e9768",
+      "result_id": "catalog:ko-bede69cde94caf96d45e9768|linux",
+      "ecosystem": "koishi",
+      "package": "koishi-plugin-migration",
+      "version": "0.1.0",
+      "platform": "linux",
+      "unit_status": "skipped",
+      "reason_code": "entry_loader_profile_unavailable",
+      "profile_id": "koishi-core-4.18.11-node-24.20.0-x86_64-portable-lock",
+      "profile_status": "locked",
+      "profile_reason_code": null,
+      "artifact_status": "locked",
+      "artifact_reason_code": null,
+      "artifact_sha256": "ab34cf14411f8f89107562d8a78a7e90acda55add88ce49bdf900dbf589672f8",
+      "dependency_lock_sha256": "2e1e6a05da7368e92c7d2ec4f709bf8a81d9b11d79dc262bf75e3cc08d546561",
+      "source_snapshot_sha256": "8c75d69358cd8334d0d311c1e19c642794d7436056d32041f02e6c1de1a06163",
+      "artifact_lock_sha256": "8dcec5da7cd81b9ed7d0f4e8aead8e76ef15cd7e17dfcdc4fa6f7b8944b83d4a",
+      "profile_lock_sha256": "68a7391620a06e7141d949519333a1f4fc5ccee7abd84dc036c46d09fdae8d38",
+      "behavior_fixture_status": "unmapped_category",
+      "recipe_categories": [],
+      "stage_statuses": {
+        "prepare": "passed",
+        "install": "passed",
+        "native": "skipped",
+        "federated": "skipped",
+        "compare": "skipped",
+        "cleanup": "passed"
+      },
+      "stage_result_sha256": {
+        "prepare": "c583702ea8234bec9af4120c842627402182137fb770fccfd963b67c05f9a61a",
+        "install": "963ed748e881bde0be5b635d5ecf65c005666e0037632f5e17f4d5fc011e65b6",
+        "native": "b8c424c866856ef80770c5af17616a204c4384adcbf7aa2e32dc811231d190d3",
+        "federated": "230dde1a123ced7c3670531069da83bed23e51531544b2f0e8571e0dff2d9fa3",
+        "compare": "b9c78a4f714a38ee2fbc8d34d27783f1d066d3527c792db734a61aa70150f511",
+        "cleanup": "c9e3c71f1083b5a0e1c70a9c385bc34162501f21d0fd68c00c5e52ac2fd65ab7"
+      },
+      "attempts": {
+        "prepare": [
+          {
+            "attempt_id": "11a87eeaf12f029a72bb88bd5e24fb0be00772654217071836d955e3b4efdecc:a1",
+            "attempt_number": 1,
+            "worker_id": "s210-linux-shard-171-of-256",
+            "status": "passed",
+            "started_at": 1791853984.4473143,
+            "ended_at": 1791853984.4528234,
+            "result_sha256": "c583702ea8234bec9af4120c842627402182137fb770fccfd963b67c05f9a61a"
+          }
+        ],
+        "install": [
+          {
+            "attempt_id": "8d1d4cc232faa20d8d21f6f4323d531d14eeda005519cfe651ac5b74e0f931c5:a1",
+            "attempt_number": 1,
+            "worker_id": "s210-linux-shard-171-of-256",
+            "status": "passed",
+            "started_at": 1791853984.458331,
+            "ended_at": 1791853994.440305,
+            "result_sha256": "963ed748e881bde0be5b635d5ecf65c005666e0037632f5e17f4d5fc011e65b6"
+          }
+        ],
+        "native": [
+          {
+            "attempt_id": "00515a589ee3f77b07320f487d9cd454941be8f406b9d8da0ac6b92899a11340:a1",
+            "attempt_number": 1,
+            "worker_id": "s210-linux-shard-171-of-256",
+            "status": "skipped",
+            "started_at": 1791853994.4611404,
+            "ended_at": 1791853994.4688404,
+            "result_sha256": "b8c424c866856ef80770c5af17616a204c4384adcbf7aa2e32dc811231d190d3"
+          }
+        ],
+        "federated": [
+          {
+            "attempt_id": "96f802aa866f2608cfa0d01eef3fa4238479b3fe523ebde5b2dba08c94531929:a1",
+            "attempt_number": 1,
+            "worker_id": "s210-linux-shard-171-of-256",
+            "status": "skipped",
+            "started_at": 1791853994.4476,
+            "ended_at": 1791853994.45563,
+            "result_sha256": "230dde1a123ced7c3670531069da83bed23e51531544b2f0e8571e0dff2d9fa3"
+          }
+        ],
+        "compare": [],
+        "cleanup": [
+          {
+            "attempt_id": "643afb0f6bd673f51a8dc6c14a398af8e9c4f403383ada5b9e47d823e31871e4:a1",
+            "attempt_number": 1,
+            "worker_id": "s210-linux-shard-171-of-256",
+            "status": "passed",
+            "started_at": 1791853994.4745786,
+            "ended_at": 1791853994.484155,
+            "result_sha256": "c9e3c71f1083b5a0e1c70a9c385bc34162501f21d0fd68c00c5e52ac2fd65ab7"
+          }
+        ]
+      },
+      "probe_evidence": {
+        "artifact_lock_sha256": "8dcec5da7cd81b9ed7d0f4e8aead8e76ef15cd7e17dfcdc4fa6f7b8944b83d4a",
+        "artifact_sha256": "ab34cf14411f8f89107562d8a78a7e90acda55add88ce49bdf900dbf589672f8",
+        "attempted": true,
+        "census_probe": true,
+        "dependency_archives": {
+          "archive_bytes": 4595418,
+          "cache_hits": 202,
+          "downloaded_archives": 0,
+          "downloaded_bytes": 0,
+          "locked_package_count": 205,
+          "package_lock_sha256": "d5c267d4b497af57ff597fc060901a90d27e69a22c48ee969b7f469a882faf34",
+          "unique_archive_count": 202
+        },
+        "detail": "Koishi dependency installation and native plugin load ran in the pinned network-disabled linux Worker; no entry-bound behavior fixture exists.",
+        "ecosystem": "koishi",
+        "npm_lock_sha256": "2e1e6a05da7368e92c7d2ec4f709bf8a81d9b11d79dc262bf75e3cc08d546561",
+        "package": "koishi-plugin-migration",
+        "platform": "linux",
+        "plugin_archive_bytes": 15862,
+        "profile_document_sha256": "68a7391620a06e7141d949519333a1f4fc5ccee7abd84dc036c46d09fdae8d38",
+        "profile_id": "koishi-core-4.18.11-node-24.20.0-x86_64-portable-lock",
+        "profile_lock_sha256": "2e1e6a05da7368e92c7d2ec4f709bf8a81d9b11d79dc262bf75e3cc08d546561",
+        "reason_code": "entry_loader_profile_unavailable",
+        "registry_entry_id": "ko-bede69cde94caf96d45e9768",
+        "resource_observations": {
+          "peak_writable_scratch_bytes": 29593465,
+          "sample_count": 4
+        },
+        "result_id": "catalog:ko-bede69cde94caf96d45e9768|linux",
+        "schema_version": 1,
+        "source_probe_task_id": "S2-09",
+        "status": "skipped",
+        "task_id": "S2-10",
+        "unit_type": "catalog_entry",
+        "version": "0.1.0",
+        "worker": {
+          "cleanup_confirmed": true,
+          "elapsed_seconds": 9.60899999999674,
+          "exit_code": 0,
+          "image_digest": "node@sha256:ba849c60be29959425b8734d57b8b4b7d56f98edd9504c9af091d5281095a71e",
+          "input_bytes": 4730267,
+          "network": "none",
+          "npm_scripts": "disabled",
+          "output_truncated": false,
+          "peak_memory_bytes": 106954752,
+          "protocol_report": {
+            "artifact_sha256": "ab34cf14411f8f89107562d8a78a7e90acda55add88ce49bdf900dbf589672f8",
+            "behavior": {
+              "reason_code": "missing_entry_bound_fixture",
+              "status": "skipped"
+            },
+            "cleanup": {
+              "status": "passed"
+            },
+            "dependency_install": {
+              "exit_code": 0,
+              "reason_code": null,
+              "status": "passed",
+              "stderr_bytes": 511,
+              "stderr_sha256": "4b991b5d3c52656b3b3a34d11a2ee8ac3593075c030a1b4cb7fa2de8b81c3d81",
+              "stderr_tail": "LIGAMINA_NPM_RUNTIME={\"heap_limit_bytes\":2348810240}\nnpm warn deprecated @koa/router@10.1.1: **IMPORTANT 10x+ PERFORMANCE UPGRADE**: Please upgrade to v12.0.1+ as we have fixed an issue with debuglog causing 10x slower router benchmark performance, see https://github.com/koajs/router/pull/173\nnpm warn deprecated uuid@8.3.2: uuid@10 and below is no longer supported.  For ESM codebases, update to uuid@latest.  For CommonJS codebases, use uuid@11 (but be aware this version will likely be deprecated in 2028).\n",
+              "stdout_bytes": 26,
+              "stdout_sha256": "9a9c6d4d66139becec08aeacc0d1a36aa5a12999b995f895288785c7378575ef",
+              "stdout_tail": "\nadded 205 packages in 2s\n"
+            },
+            "native_load": {
+              "export_kind": "object",
+              "reason_code": "entry_loader_profile_unavailable",
+              "status": "skipped"
+            },
+            "package": "koishi-plugin-migration",
+            "profile_id": "koishi-core-4.18.11-node-24.20.0-x86_64-portable-lock",
+            "profile_lock_sha256": "2e1e6a05da7368e92c7d2ec4f709bf8a81d9b11d79dc262bf75e3cc08d546561",
+            "registry_entry_id": "ko-bede69cde94caf96d45e9768",
+            "resource_observations": {
+              "peak_writable_scratch_bytes": 29593465,
+              "sample_count": 4
+            },
+            "schema_version": 1,
+            "task_id": "S2-09",
+            "version": "0.1.0"
+          },
+          "read_only_input": true,
+          "reason_code": null,
+          "status": "passed",
+          "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "stderr_tail": "",
+          "stdout_sha256": "d95d017aeb1f363b12e813e6624e32e28ada6ee9d7f494d9ae4d95db4c3a736b",
+          "stdout_tail": "err_tail\":\"LIGAMINA_NPM_RUNTIME={\\\"heap_limit_bytes\\\":2348810240}\\nnpm warn deprecated @koa/router@10.1.1: **IMPORTANT 10x+ PERFORMANCE UPGRADE**: Please upgrade to v12.0.1+ as we have fixed an issue with debuglog causing 10x slower router benchmark performance, see https://github.com/koajs/router/pull/173\\nnpm warn deprecated uuid@8.3.2: uuid@10 and below is no longer supported.  For ESM codebases, update to uuid@latest.  For CommonJS codebases, use uuid@11 (but be aware this version will likely be deprecated in 2028).\\n\"},\"native_load\":{\"status\":\"skipped\",\"reason_code\":\"entry_loader_profile_unavailable\",\"export_kind\":\"object\"},\"behavior\":{\"status\":\"skipped\",\"reason_code\":\"missing_entry_bound_fixture\"},\"cleanup\":{\"status\":\"passed\"},\"environment\":{\"ecosystem\":\"koishi\",\"runtime_version\":\"24.20.0\",\"v8_heap_limit_bytes\":2348810240,\"host_node_options_ignored\":true,\"npm_v8_heap_limit_bytes\":2348810240,\"framework_version\":\"4.18.11\"},\"resource_observations\":{\"peak_writable_scratch_bytes\":29593465,\"sample_count\":4}}\n"
+        }
+      },
+      "cleanup_confirmed": true,
+      "resource_observations": {
+        "peak_writable_scratch_bytes": 29593465,
+        "sample_count": 4
+      }
+    },
+    {
+      "registry_entry_id": "ko-f6d7443f611c59c0a8ac6a8c",
+      "result_id": "catalog:ko-f6d7443f611c59c0a8ac6a8c|linux",
+      "ecosystem": "koishi",
+      "package": "@crossrobbery/koishi-plugin-myauto-xy",
+      "version": "0.0.1",
+      "platform": "linux",
+      "unit_status": "skipped",
+      "reason_code": "entry_bound_federated_fixture_missing",
+      "profile_id": "koishi-core-4.18.11-node-24.20.0-x86_64-portable-lock",
+      "profile_status": "locked",
+      "profile_reason_code": null,
+      "artifact_status": "locked",
+      "artifact_reason_code": null,
+      "artifact_sha256": "70f9cd1ab8e4af9ec28b8b74258688b3d3eb27d8fb686e711f11b9981173a054",
+      "dependency_lock_sha256": "a90f3ec787aebeb6ec8eb7463371b7779cb64c44500fabb1e33fee1ab8e56f4a",
+      "source_snapshot_sha256": "8c75d69358cd8334d0d311c1e19c642794d7436056d32041f02e6c1de1a06163",
+      "artifact_lock_sha256": "8dcec5da7cd81b9ed7d0f4e8aead8e76ef15cd7e17dfcdc4fa6f7b8944b83d4a",
+      "profile_lock_sha256": "68a7391620a06e7141d949519333a1f4fc5ccee7abd84dc036c46d09fdae8d38",
+      "behavior_fixture_status": "unmapped_category",
+      "recipe_categories": [],
+      "stage_statuses": {
+        "prepare": "passed",
+        "install": "passed",
+        "native": "passed",
+        "federated": "skipped",
+        "compare": "skipped",
+        "cleanup": "passed"
+      },
+      "stage_result_sha256": {
+        "prepare": "d7f3ca2e3db2811693db8a2005da180849af5cbfdecd987ecedfcd7f69f80681",
+        "install": "3b07ed9826ae491f6ce269c850aec82746631ebacef507956269a66c784fac7d",
+        "native": "a61558a0853866550691f50b7db5cb0c020a9901ae05df805e849ef48a3b6e1e",
+        "federated": "230dde1a123ced7c3670531069da83bed23e51531544b2f0e8571e0dff2d9fa3",
+        "compare": "a0bd0aa9fa4776789fb2324f66a11e97a49682c646227a8e9f13eba45d48a619",
+        "cleanup": "a61558a0853866550691f50b7db5cb0c020a9901ae05df805e849ef48a3b6e1e"
+      },
+      "attempts": {
+        "prepare": [
+          {
+            "attempt_id": "88cf3ebd07a23e9ba55b201d57615dddada49aeaf7dea736ac7399ec57b5a965:a1",
+            "attempt_number": 1,
+            "worker_id": "s210-linux-shard-171-of-256",
+            "status": "passed",
+            "started_at": 1791854034.9889328,
+            "ended_at": 1791854034.9944575,
+            "result_sha256": "d7f3ca2e3db2811693db8a2005da180849af5cbfdecd987ecedfcd7f69f80681"
+          }
+        ],
+        "install": [
+          {
+            "attempt_id": "2af05bd32df290fa28521b2810331c9ccf9079794251f476b9da6ac477408a0b:a1",
+            "attempt_number": 1,
+            "worker_id": "s210-linux-shard-171-of-256",
+            "status": "passed",
+            "started_at": 1791854034.9996662,
+            "ended_at": 1791854045.5698147,
+            "result_sha256": "3b07ed9826ae491f6ce269c850aec82746631ebacef507956269a66c784fac7d"
+          }
+        ],
+        "native": [
+          {
+            "attempt_id": "ace15baddd299b55e0da8b415cfe608992207e5f92a35e38709816f82f39b12e:a1",
+            "attempt_number": 1,
+            "worker_id": "s210-linux-shard-171-of-256",
+            "status": "passed",
+            "started_at": 1791854045.588862,
+            "ended_at": 1791854045.5948615,
+            "result_sha256": "a61558a0853866550691f50b7db5cb0c020a9901ae05df805e849ef48a3b6e1e"
+          }
+        ],
+        "federated": [
+          {
+            "attempt_id": "cab6a7e65f21573d7b341891bfdbdd8815a8e1799e3c4fae593f9efbff545453:a1",
+            "attempt_number": 1,
+            "worker_id": "s210-linux-shard-171-of-256",
+            "status": "skipped",
+            "started_at": 1791854045.5753222,
+            "ended_at": 1791854045.58435,
+            "result_sha256": "230dde1a123ced7c3670531069da83bed23e51531544b2f0e8571e0dff2d9fa3"
+          }
+        ],
+        "compare": [],
+        "cleanup": [
+          {
+            "attempt_id": "deddc48a4113c685e64f63db98dfbb9d32e9a6dd370cf759904e5c5500541a38:a1",
+            "attempt_number": 1,
+            "worker_id": "s210-linux-shard-171-of-256",
+            "status": "passed",
+            "started_at": 1791854045.5993736,
+            "ended_at": 1791854045.6064205,
+            "result_sha256": "a61558a0853866550691f50b7db5cb0c020a9901ae05df805e849ef48a3b6e1e"
+          }
+        ]
+      },
+      "probe_evidence": {
+        "artifact_lock_sha256": "8dcec5da7cd81b9ed7d0f4e8aead8e76ef15cd7e17dfcdc4fa6f7b8944b83d4a",
+        "artifact_sha256": "70f9cd1ab8e4af9ec28b8b74258688b3d3eb27d8fb686e711f11b9981173a054",
+        "attempted": true,
+        "census_probe": true,
+        "dependency_archives": {
+          "archive_bytes": 4329662,
+          "cache_hits": 178,
+          "downloaded_archives": 1,
+          "downloaded_bytes": 1973,
+          "locked_package_count": 184,
+          "package_lock_sha256": "0ac5846f3fc149ba9291b043c3f97720925b00acb269912aa3f91c40ab26c566",
+          "unique_archive_count": 179
+        },
+        "detail": "Koishi dependency installation and native plugin load ran in the pinned network-disabled linux Worker; no entry-bound behavior fixture exists.",
+        "ecosystem": "koishi",
+        "npm_lock_sha256": "a90f3ec787aebeb6ec8eb7463371b7779cb64c44500fabb1e33fee1ab8e56f4a",
+        "package": "@crossrobbery/koishi-plugin-myauto-xy",
+        "platform": "linux",
+        "plugin_archive_bytes": 1973,
+        "profile_document_sha256": "68a7391620a06e7141d949519333a1f4fc5ccee7abd84dc036c46d09fdae8d38",
+        "profile_id": "koishi-core-4.18.11-node-24.20.0-x86_64-portable-lock",
+        "profile_lock_sha256": "a90f3ec787aebeb6ec8eb7463371b7779cb64c44500fabb1e33fee1ab8e56f4a",
+        "reason_code": "missing_entry_bound_fixture",
+        "registry_entry_id": "ko-f6d7443f611c59c0a8ac6a8c",
+        "resource_observations": {
+          "peak_writable_scratch_bytes": 28219426,
+          "sample_count": 4
+        },
+        "result_id": "catalog:ko-f6d7443f611c59c0a8ac6a8c|linux",
+        "schema_version": 1,
+        "source_probe_task_id": "S2-09",
+        "status": "skipped",
+        "task_id": "S2-10",
+        "unit_type": "catalog_entry",
+        "version": "0.0.1",
+        "worker": {
+          "cleanup_confirmed": true,
+          "elapsed_seconds": 9.610000000000582,
+          "exit_code": 0,
+          "image_digest": "node@sha256:ba849c60be29959425b8734d57b8b4b7d56f98edd9504c9af091d5281095a71e",
+          "input_bytes": 4438651,
+          "network": "none",
+          "npm_scripts": "disabled",
+          "output_truncated": false,
+          "peak_memory_bytes": 114189926,
+          "protocol_report": {
+            "artifact_sha256": "70f9cd1ab8e4af9ec28b8b74258688b3d3eb27d8fb686e711f11b9981173a054",
+            "behavior": {
+              "reason_code": "missing_entry_bound_fixture",
+              "status": "skipped"
+            },
+            "cleanup": {
+              "status": "passed"
+            },
+            "dependency_install": {
+              "exit_code": 0,
+              "reason_code": null,
+              "status": "passed",
+              "stderr_bytes": 294,
+              "stderr_sha256": "620cd872bc34cca195862e1face7b2421e4eee9809aba619dadc09f2857a133d",
+              "stderr_tail": "LIGAMINA_NPM_RUNTIME={\"heap_limit_bytes\":2348810240}\nnpm warn deprecated @koa/router@10.1.1: **IMPORTANT 10x+ PERFORMANCE UPGRADE**: Please upgrade to v12.0.1+ as we have fixed an issue with debuglog causing 10x slower router benchmark performance, see https://github.com/koajs/router/pull/173\n",
+              "stdout_bytes": 26,
+              "stdout_sha256": "4838c909e4da64cd022d381f5f5632a0819438cd70c9b83b65e838f3c112dcc8",
+              "stdout_tail": "\nadded 184 packages in 2s\n"
+            },
+            "native_load": {
+              "entry_module_imported": true,
+              "plugin_registered": true,
+              "reason_code": null,
+              "status": "passed"
+            },
+            "package": "@crossrobbery/koishi-plugin-myauto-xy",
+            "profile_id": "koishi-core-4.18.11-node-24.20.0-x86_64-portable-lock",
+            "profile_lock_sha256": "a90f3ec787aebeb6ec8eb7463371b7779cb64c44500fabb1e33fee1ab8e56f4a",
+            "registry_entry_id": "ko-f6d7443f611c59c0a8ac6a8c",
+            "resource_observations": {
+              "peak_writable_scratch_bytes": 28219426,
+              "sample_count": 4
+            },
+            "schema_version": 1,
+            "task_id": "S2-09",
+            "version": "0.0.1"
+          },
+          "read_only_input": true,
+          "reason_code": null,
+          "status": "passed",
+          "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "stderr_tail": "",
+          "stdout_sha256": "5c46c299ef32bd14760974c5427a9c562f0191dd185b6532c9d667f492e2c823",
+          "stdout_tail": "94,\"stdout_sha256\":\"4838c909e4da64cd022d381f5f5632a0819438cd70c9b83b65e838f3c112dcc8\",\"stderr_sha256\":\"620cd872bc34cca195862e1face7b2421e4eee9809aba619dadc09f2857a133d\",\"stdout_tail\":\"\\nadded 184 packages in 2s\\n\",\"stderr_tail\":\"LIGAMINA_NPM_RUNTIME={\\\"heap_limit_bytes\\\":2348810240}\\nnpm warn deprecated @koa/router@10.1.1: **IMPORTANT 10x+ PERFORMANCE UPGRADE**: Please upgrade to v12.0.1+ as we have fixed an issue with debuglog causing 10x slower router benchmark performance, see https://github.com/koajs/router/pull/173\\n\"},\"native_load\":{\"status\":\"passed\",\"reason_code\":null,\"entry_module_imported\":true,\"plugin_registered\":true},\"behavior\":{\"status\":\"skipped\",\"reason_code\":\"missing_entry_bound_fixture\"},\"cleanup\":{\"status\":\"passed\"},\"environment\":{\"ecosystem\":\"koishi\",\"runtime_version\":\"24.20.0\",\"v8_heap_limit_bytes\":2348810240,\"host_node_options_ignored\":true,\"npm_v8_heap_limit_bytes\":2348810240,\"framework_version\":\"4.18.11\"},\"resource_observations\":{\"peak_writable_scratch_bytes\":28219426,\"sample_count\":4}}\n"
+        }
+      },
+      "cleanup_confirmed": true,
+      "resource_observations": {
+        "peak_writable_scratch_bytes": 28219426,
+        "sample_count": 4
+      }
+    },
+    {
+      "registry_entry_id": "ko-a25052ecdbb1445e8bb98719",
+      "result_id": "catalog:ko-a25052ecdbb1445e8bb98719|linux",
+      "ecosystem": "koishi",
+      "package": "koishi-plugin-chatgpt-webui",
+      "version": "0.0.2",
+      "platform": "linux",
+      "unit_status": "skipped",
+      "reason_code": "entry_bound_federated_fixture_missing",
+      "profile_id": "koishi-core-4.18.11-node-24.20.0-x86_64-portable-lock",
+      "profile_status": "locked",
+      "profile_reason_code": null,
+      "artifact_status": "locked",
+      "artifact_reason_code": null,
+      "artifact_sha256": "4cbb0105ee2054b8ad1e213db812c698fd4291051c23b57d43d716f32b1c766d",
+      "dependency_lock_sha256": "fca440458135d5432377878d41a3db3e1b14fdcb546e9f001b898735ec773e5b",
+      "source_snapshot_sha256": "8c75d69358cd8334d0d311c1e19c642794d7436056d32041f02e6c1de1a06163",
+      "artifact_lock_sha256": "8dcec5da7cd81b9ed7d0f4e8aead8e76ef15cd7e17dfcdc4fa6f7b8944b83d4a",
+      "profile_lock_sha256": "68a7391620a06e7141d949519333a1f4fc5ccee7abd84dc036c46d09fdae8d38",
+      "behavior_fixture_status": "unmapped_category",
+      "recipe_categories": [],
+      "stage_statuses": {
+        "prepare": "passed",
+        "install": "passed",
+        "native": "passed",
+        "federated": "skipped",
+        "compare": "skipped",
+        "cleanup": "passed"
+      },
+      "stage_result_sha256": {
+        "prepare": "b42bdc9e479a22456cc11d6f20c95f29e568590fb69b3f9ea47a7665bdcdc318",
+        "install": "2452ae88f8d50985b6cd5462edc07a86f064631ec5b30901df7a74bcbff08841",
+        "native": "e5752331722323a95f92fc357e55dd68ff988767f3bc1ee9eccf7ca9ac7207e8",
+        "federated": "230dde1a123ced7c3670531069da83bed23e51531544b2f0e8571e0dff2d9fa3",
+        "compare": "b0307fcd8157b096bdda1d582922320991a78354924f5ca05f008d470a51de2d",
+        "cleanup": "e5752331722323a95f92fc357e55dd68ff988767f3bc1ee9eccf7ca9ac7207e8"
+      },
+      "attempts": {
+        "prepare": [
+          {
+            "attempt_id": "d7872b9164139d1b32e7087ef1bfd984431dd3347952222c928af568a4915af0:a1",
+            "attempt_number": 1,
+            "worker_id": "s210-linux-shard-171-of-256",
+            "status": "passed",
+            "started_at": 1791853951.9746773,
+            "ended_at": 1791853951.9821727,
+            "result_sha256": "b42bdc9e479a22456cc11d6f20c95f29e568590fb69b3f9ea47a7665bdcdc318"
+          }
+        ],
+        "install": [
+          {
+            "attempt_id": "43d1df3d64f4b986ca1519f41ee5240fb2f76ea6d5b0764460706c0d957184ef:a1",
+            "attempt_number": 1,
+            "worker_id": "s210-linux-shard-171-of-256",
+            "status": "passed",
+            "started_at": 1791853951.988928,
+            "ended_at": 1791853961.958002,
+            "result_sha256": "2452ae88f8d50985b6cd5462edc07a86f064631ec5b30901df7a74bcbff08841"
+          }
+        ],
+        "native": [
+          {
+            "attempt_id": "9cf61f54efa02aa6a85ee3560f53077937f2bdc5109e52311aa66947c297f439:a1",
+            "attempt_number": 1,
+            "worker_id": "s210-linux-shard-171-of-256",
+            "status": "passed",
+            "started_at": 1791853961.985355,
+            "ended_at": 1791853961.9961216,
+            "result_sha256": "e5752331722323a95f92fc357e55dd68ff988767f3bc1ee9eccf7ca9ac7207e8"
+          }
+        ],
+        "federated": [
+          {
+            "attempt_id": "14abcaba5fc16485697f704223ee3594782539b44a4fd9bf604470fbe759dd5f:a1",
+            "attempt_number": 1,
+            "worker_id": "s210-linux-shard-171-of-256",
+            "status": "skipped",
+            "started_at": 1791853961.9690728,
+            "ended_at": 1791853961.9789817,
+            "result_sha256": "230dde1a123ced7c3670531069da83bed23e51531544b2f0e8571e0dff2d9fa3"
+          }
+        ],
+        "compare": [],
+        "cleanup": [
+          {
+            "attempt_id": "d87881b33cc0f2dd878a5bdbde4bfa69ddd62e7996cf782da2e7e99f95a5679b:a1",
+            "attempt_number": 1,
+            "worker_id": "s210-linux-shard-171-of-256",
+            "status": "passed",
+            "started_at": 1791853962.0031238,
+            "ended_at": 1791853962.0122387,
+            "result_sha256": "e5752331722323a95f92fc357e55dd68ff988767f3bc1ee9eccf7ca9ac7207e8"
+          }
+        ]
+      },
+      "probe_evidence": {
+        "artifact_lock_sha256": "8dcec5da7cd81b9ed7d0f4e8aead8e76ef15cd7e17dfcdc4fa6f7b8944b83d4a",
+        "artifact_sha256": "4cbb0105ee2054b8ad1e213db812c698fd4291051c23b57d43d716f32b1c766d",
+        "attempted": true,
+        "census_probe": true,
+        "dependency_archives": {
+          "archive_bytes": 4354101,
+          "cache_hits": 176,
+          "downloaded_archives": 0,
+          "downloaded_bytes": 0,
+          "locked_package_count": 179,
+          "package_lock_sha256": "be64206527d23539dbb8a24137c15039593c53c148c5f0b008f6329d93c02176",
+          "unique_archive_count": 176
+        },
+        "detail": "Koishi dependency installation and native plugin load ran in the pinned network-disabled linux Worker; no entry-bound behavior fixture exists.",
+        "ecosystem": "koishi",
+        "npm_lock_sha256": "fca440458135d5432377878d41a3db3e1b14fdcb546e9f001b898735ec773e5b",
+        "package": "koishi-plugin-chatgpt-webui",
+        "platform": "linux",
+        "plugin_archive_bytes": 2222,
+        "profile_document_sha256": "68a7391620a06e7141d949519333a1f4fc5ccee7abd84dc036c46d09fdae8d38",
+        "profile_id": "koishi-core-4.18.11-node-24.20.0-x86_64-portable-lock",
+        "profile_lock_sha256": "fca440458135d5432377878d41a3db3e1b14fdcb546e9f001b898735ec773e5b",
+        "reason_code": "missing_entry_bound_fixture",
+        "registry_entry_id": "ko-a25052ecdbb1445e8bb98719",
+        "resource_observations": {
+          "peak_writable_scratch_bytes": 28098202,
+          "sample_count": 4
+        },
+        "result_id": "catalog:ko-a25052ecdbb1445e8bb98719|linux",
+        "schema_version": 1,
+        "source_probe_task_id": "S2-09",
+        "status": "skipped",
+        "task_id": "S2-10",
+        "unit_type": "catalog_entry",
+        "version": "0.0.2",
+        "worker": {
+          "cleanup_confirmed": true,
+          "elapsed_seconds": 9.625,
+          "exit_code": 0,
+          "image_digest": "node@sha256:ba849c60be29959425b8734d57b8b4b7d56f98edd9504c9af091d5281095a71e",
+          "input_bytes": 4461442,
+          "network": "none",
+          "npm_scripts": "disabled",
+          "output_truncated": false,
+          "peak_memory_bytes": 106535321,
+          "protocol_report": {
+            "artifact_sha256": "4cbb0105ee2054b8ad1e213db812c698fd4291051c23b57d43d716f32b1c766d",
+            "behavior": {
+              "reason_code": "missing_entry_bound_fixture",
+              "status": "skipped"
+            },
+            "cleanup": {
+              "status": "passed"
+            },
+            "dependency_install": {
+              "exit_code": 0,
+              "reason_code": null,
+              "status": "passed",
+              "stderr_bytes": 659,
+              "stderr_sha256": "49332912c6dfaf1cd512f99de167592a82b29ed2b0a4b13b78bdc01972a0e79e",
+              "stderr_tail": "LIGAMINA_NPM_RUNTIME={\"heap_limit_bytes\":2348810240}\nnpm warn deprecated @koa/router@10.1.1: **IMPORTANT 10x+ PERFORMANCE UPGRADE**: Please upgrade to v12.0.1+ as we have fixed an issue with debuglog causing 10x slower router benchmark performance, see https://github.com/koajs/router/pull/173\nnpm warn deprecated koishi-plugin-chatgpt-webui@0.0.2: Package no longer supported. Contact Support at https://www.npmjs.com/support for more info.\nnpm warn deprecated uuid@8.3.2: uuid@10 and below is no longer supported.  For ESM codebases, update to uuid@latest.  For CommonJS codebases, use uuid@11 (but be aware this version will likely be deprecated in 2028).\n",
+              "stdout_bytes": 26,
+              "stdout_sha256": "38c225e68729f68d005747087773318a92acbdfd7e78f9b6151a8f173e715c0e",
+              "stdout_tail": "\nadded 179 packages in 2s\n"
+            },
+            "native_load": {
+              "entry_module_imported": true,
+              "plugin_registered": true,
+              "reason_code": null,
+              "status": "passed"
+            },
+            "package": "koishi-plugin-chatgpt-webui",
+            "profile_id": "koishi-core-4.18.11-node-24.20.0-x86_64-portable-lock",
+            "profile_lock_sha256": "fca440458135d5432377878d41a3db3e1b14fdcb546e9f001b898735ec773e5b",
+            "registry_entry_id": "ko-a25052ecdbb1445e8bb98719",
+            "resource_observations": {
+              "peak_writable_scratch_bytes": 28098202,
+              "sample_count": 4
+            },
+            "schema_version": 1,
+            "task_id": "S2-09",
+            "version": "0.0.2"
+          },
+          "read_only_input": true,
+          "reason_code": null,
+          "status": "passed",
+          "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "stderr_tail": "",
+          "stdout_sha256": "31ca1ccc00eaed68468b4bee7aa0569ac796a85680e80503dbb761c12a50e13a",
+          "stdout_tail": "ease upgrade to v12.0.1+ as we have fixed an issue with debuglog causing 10x slower router benchmark performance, see https://github.com/koajs/router/pull/173\\nnpm warn deprecated koishi-plugin-chatgpt-webui@0.0.2: Package no longer supported. Contact Support at https://www.npmjs.com/support for more info.\\nnpm warn deprecated uuid@8.3.2: uuid@10 and below is no longer supported.  For ESM codebases, update to uuid@latest.  For CommonJS codebases, use uuid@11 (but be aware this version will likely be deprecated in 2028).\\n\"},\"native_load\":{\"status\":\"passed\",\"reason_code\":null,\"entry_module_imported\":true,\"plugin_registered\":true},\"behavior\":{\"status\":\"skipped\",\"reason_code\":\"missing_entry_bound_fixture\"},\"cleanup\":{\"status\":\"passed\"},\"environment\":{\"ecosystem\":\"koishi\",\"runtime_version\":\"24.20.0\",\"v8_heap_limit_bytes\":2348810240,\"host_node_options_ignored\":true,\"npm_v8_heap_limit_bytes\":2348810240,\"framework_version\":\"4.18.11\"},\"resource_observations\":{\"peak_writable_scratch_bytes\":28098202,\"sample_count\":4}}\n"
+        }
+      },
+      "cleanup_confirmed": true,
+      "resource_observations": {
+        "peak_writable_scratch_bytes": 28098202,
+        "sample_count": 4
+      }
+    },
+    {
+      "registry_entry_id": "ko-b5190f131db6f77ef5a2acb4",
+      "result_id": "catalog:ko-b5190f131db6f77ef5a2acb4|linux",
+      "ecosystem": "koishi",
+      "package": "@dingyi222666/koishi-plugin-chathub-poe-adapter",
+      "version": "1.0.0-beta.11",
+      "platform": "linux",
+      "unit_status": "skipped",
+      "reason_code": "prerelease_advertised",
+      "profile_id": "koishi-core-4.18.11-node-24.20.0-x86_64-portable-lock",
+      "profile_status": "prerelease_advertised",
+      "profile_reason_code": "prerelease_advertised",
+      "artifact_status": "prerelease_advertised",
+      "artifact_reason_code": "prerelease_advertised",
+      "artifact_sha256": null,
+      "dependency_lock_sha256": null,
+      "source_snapshot_sha256": "8c75d69358cd8334d0d311c1e19c642794d7436056d32041f02e6c1de1a06163",
+      "artifact_lock_sha256": "8dcec5da7cd81b9ed7d0f4e8aead8e76ef15cd7e17dfcdc4fa6f7b8944b83d4a",
+      "profile_lock_sha256": "68a7391620a06e7141d949519333a1f4fc5ccee7abd84dc036c46d09fdae8d38",
+      "behavior_fixture_status": "unmapped_category",
+      "recipe_categories": [],
+      "stage_statuses": {
+        "prepare": "skipped",
+        "install": "skipped",
+        "native": "skipped",
+        "federated": "skipped",
+        "compare": "skipped",
+        "cleanup": "skipped"
+      },
+      "stage_result_sha256": {
+        "prepare": "441988efad68381fda9372c266eed1b672df38853ba28287ea413ccae4901cd5",
+        "install": "ddb25f7ac23d998b82e4b172f47169a74ac35d3ec7f31e68e1209a6e218ffed3",
+        "native": "8086751d08b64a7aa853bcb3f45798531296cc9c29534da84a543df53c468efe",
+        "federated": "8086751d08b64a7aa853bcb3f45798531296cc9c29534da84a543df53c468efe",
+        "compare": "61eb4156cbe9846962a4a8e673a8e449e9b1c6b198ec9fb58cf04b52ee55bd9c",
+        "cleanup": "f1392bf40e6422554fe7c05b11a0282e2902106bf95ae7e94b4c67d7d04ce767"
+      },
+      "attempts": {
+        "prepare": [
+          {
+            "attempt_id": "966b972f114362400f8d74edbc9b811a8a394056ff39dc554139c55bf5fe6b04:a1",
+            "attempt_number": 1,
+            "worker_id": "s210-linux-shard-171-of-256",
+            "status": "skipped",
+            "started_at": 1791853984.4217489,
+            "ended_at": 1791853984.4272563,
+            "result_sha256": "441988efad68381fda9372c266eed1b672df38853ba28287ea413ccae4901cd5"
+          }
+        ],
+        "install": [],
+        "native": [],
+        "federated": [],
+        "compare": [],
+        "cleanup": [
+          {
+            "attempt_id": "8ad76a5641b9002044bf75d95f5863b2703f4901bbe61d751adb9c2a13b931dc:a1",
+            "attempt_number": 1,
+            "worker_id": "s210-linux-shard-171-of-256",
+            "status": "skipped",
+            "started_at": 1791853984.4348269,
+            "ended_at": 1791853984.4412825,
+            "result_sha256": "f1392bf40e6422554fe7c05b11a0282e2902106bf95ae7e94b4c67d7d04ce767"
+          }
+        ]
+      },
+      "probe_evidence": null,
+      "cleanup_confirmed": null,
+      "resource_observations": null
+    },
+    {
+      "registry_entry_id": "ko-e9526963f84acd7a1fd906f8",
+      "result_id": "catalog:ko-e9526963f84acd7a1fd906f8|linux",
+      "ecosystem": "koishi",
+      "package": "koishi-plugin-lovesick",
+      "version": "1.0.0",
+      "platform": "linux",
+      "unit_status": "skipped",
+      "reason_code": "entry_bound_federated_fixture_missing",
+      "profile_id": "koishi-core-4.18.11-node-24.20.0-x86_64-portable-lock",
+      "profile_status": "locked",
+      "profile_reason_code": null,
+      "artifact_status": "locked",
+      "artifact_reason_code": null,
+      "artifact_sha256": "4111442d81e928dc09bf21ba8d942d05cafed8d687da786bd8a3c568eedb149a",
+      "dependency_lock_sha256": "993d2088bf83d84695d36bb09c1bc447e3d481a69ea493fba346a19219cf1c30",
+      "source_snapshot_sha256": "8c75d69358cd8334d0d311c1e19c642794d7436056d32041f02e6c1de1a06163",
+      "artifact_lock_sha256": "8dcec5da7cd81b9ed7d0f4e8aead8e76ef15cd7e17dfcdc4fa6f7b8944b83d4a",
+      "profile_lock_sha256": "68a7391620a06e7141d949519333a1f4fc5ccee7abd84dc036c46d09fdae8d38",
+      "behavior_fixture_status": "unmapped_category",
+      "recipe_categories": [],
+      "stage_statuses": {
+        "prepare": "passed",
+        "install": "passed",
+        "native": "passed",
+        "federated": "skipped",
+        "compare": "skipped",
+        "cleanup": "passed"
+      },
+      "stage_result_sha256": {
+        "prepare": "b3aa4a5244afc5dae7258a026d2cc28e2ce79d9d31e8bcfc9377998bca6b726a",
+        "install": "21d04ec84e5233b36a39d411e6d6487f18248ea86bfa8c89a6e0170e043c44ae",
+        "native": "b9955d8fed1b7f5966664a546b4380601287bffb7e4b6b69f1debcddc388c81b",
+        "federated": "230dde1a123ced7c3670531069da83bed23e51531544b2f0e8571e0dff2d9fa3",
+        "compare": "8c4331af959187bb738ed1d3c80bb1748e6894edf94757501cd384ca1bce13da",
+        "cleanup": "b9955d8fed1b7f5966664a546b4380601287bffb7e4b6b69f1debcddc388c81b"
+      },
+      "attempts": {
+        "prepare": [
+          {
+            "attempt_id": "db91fccaff2dcfa1183e8b20459d75e4cf89373adef411c9253cb60dd2fe3fee:a1",
+            "attempt_number": 1,
+            "worker_id": "s210-linux-shard-171-of-256",
+            "status": "passed",
+            "started_at": 1791854024.8755405,
+            "ended_at": 1791854024.879565,
+            "result_sha256": "b3aa4a5244afc5dae7258a026d2cc28e2ce79d9d31e8bcfc9377998bca6b726a"
+          }
+        ],
+        "install": [
+          {
+            "attempt_id": "0d747761496ed2600701d31dd1c2a45a931924a2fd1c8b2aabf49cf241db3736:a1",
+            "attempt_number": 1,
+            "worker_id": "s210-linux-shard-171-of-256",
+            "status": "passed",
+            "started_at": 1791854024.8858232,
+            "ended_at": 1791854034.8681617,
+            "result_sha256": "21d04ec84e5233b36a39d411e6d6487f18248ea86bfa8c89a6e0170e043c44ae"
+          }
+        ],
+        "native": [
+          {
+            "attempt_id": "ef9eb1bf4c2175d5661bb1529ed764949b9ce810e1fe1ec20b829098458e87fc:a1",
+            "attempt_number": 1,
+            "worker_id": "s210-linux-shard-171-of-256",
+            "status": "passed",
+            "started_at": 1791854034.8894317,
+            "ended_at": 1791854034.8984144,
+            "result_sha256": "b9955d8fed1b7f5966664a546b4380601287bffb7e4b6b69f1debcddc388c81b"
+          }
+        ],
+        "federated": [
+          {
+            "attempt_id": "758821bc9116f0bca796845de6de61bca1c75a4e38487e1562f25585970fd217:a1",
+            "attempt_number": 1,
+            "worker_id": "s210-linux-shard-171-of-256",
+            "status": "skipped",
+            "started_at": 1791854034.875312,
+            "ended_at": 1791854034.8839028,
+            "result_sha256": "230dde1a123ced7c3670531069da83bed23e51531544b2f0e8571e0dff2d9fa3"
+          }
+        ],
+        "compare": [],
+        "cleanup": [
+          {
+            "attempt_id": "008f32e77fe885dd061534bbfe6f8c7482c2ce2be760458378fe5c19822625c3:a1",
+            "attempt_number": 1,
+            "worker_id": "s210-linux-shard-171-of-256",
+            "status": "passed",
+            "started_at": 1791854034.903648,
+            "ended_at": 1791854034.9119132,
+            "result_sha256": "b9955d8fed1b7f5966664a546b4380601287bffb7e4b6b69f1debcddc388c81b"
+          }
+        ]
+      },
+      "probe_evidence": {
+        "artifact_lock_sha256": "8dcec5da7cd81b9ed7d0f4e8aead8e76ef15cd7e17dfcdc4fa6f7b8944b83d4a",
+        "artifact_sha256": "4111442d81e928dc09bf21ba8d942d05cafed8d687da786bd8a3c568eedb149a",
+        "attempted": true,
+        "census_probe": true,
+        "dependency_archives": {
+          "archive_bytes": 4380230,
+          "cache_hits": 177,
+          "downloaded_archives": 0,
+          "downloaded_bytes": 0,
+          "locked_package_count": 180,
+          "package_lock_sha256": "ddf4809b5b17ddea2c2c31eafeddb9a0f11ef9e12e52925b9d9437066794986a",
+          "unique_archive_count": 177
+        },
+        "detail": "Koishi dependency installation and native plugin load ran in the pinned network-disabled linux Worker; no entry-bound behavior fixture exists.",
+        "ecosystem": "koishi",
+        "npm_lock_sha256": "993d2088bf83d84695d36bb09c1bc447e3d481a69ea493fba346a19219cf1c30",
+        "package": "koishi-plugin-lovesick",
+        "platform": "linux",
+        "plugin_archive_bytes": 17759,
+        "profile_document_sha256": "68a7391620a06e7141d949519333a1f4fc5ccee7abd84dc036c46d09fdae8d38",
+        "profile_id": "koishi-core-4.18.11-node-24.20.0-x86_64-portable-lock",
+        "profile_lock_sha256": "993d2088bf83d84695d36bb09c1bc447e3d481a69ea493fba346a19219cf1c30",
+        "reason_code": "missing_entry_bound_fixture",
+        "registry_entry_id": "ko-e9526963f84acd7a1fd906f8",
+        "resource_observations": {
+          "peak_writable_scratch_bytes": 28652384,
+          "sample_count": 4
+        },
+        "result_id": "catalog:ko-e9526963f84acd7a1fd906f8|linux",
+        "schema_version": 1,
+        "source_probe_task_id": "S2-09",
+        "status": "skipped",
+        "task_id": "S2-10",
+        "unit_type": "catalog_entry",
+        "version": "1.0.0",
+        "worker": {
+          "cleanup_confirmed": true,
+          "elapsed_seconds": 9.625,
+          "exit_code": 0,
+          "image_digest": "node@sha256:ba849c60be29959425b8734d57b8b4b7d56f98edd9504c9af091d5281095a71e",
+          "input_bytes": 4500962,
+          "network": "none",
+          "npm_scripts": "disabled",
+          "output_truncated": false,
+          "peak_memory_bytes": 109366476,
+          "protocol_report": {
+            "artifact_sha256": "4111442d81e928dc09bf21ba8d942d05cafed8d687da786bd8a3c568eedb149a",
+            "behavior": {
+              "reason_code": "missing_entry_bound_fixture",
+              "status": "skipped"
+            },
+            "cleanup": {
+              "status": "passed"
+            },
+            "dependency_install": {
+              "exit_code": 0,
+              "reason_code": null,
+              "status": "passed",
+              "stderr_bytes": 511,
+              "stderr_sha256": "4b991b5d3c52656b3b3a34d11a2ee8ac3593075c030a1b4cb7fa2de8b81c3d81",
+              "stderr_tail": "LIGAMINA_NPM_RUNTIME={\"heap_limit_bytes\":2348810240}\nnpm warn deprecated @koa/router@10.1.1: **IMPORTANT 10x+ PERFORMANCE UPGRADE**: Please upgrade to v12.0.1+ as we have fixed an issue with debuglog causing 10x slower router benchmark performance, see https://github.com/koajs/router/pull/173\nnpm warn deprecated uuid@8.3.2: uuid@10 and below is no longer supported.  For ESM codebases, update to uuid@latest.  For CommonJS codebases, use uuid@11 (but be aware this version will likely be deprecated in 2028).\n",
+              "stdout_bytes": 26,
+              "stdout_sha256": "28403949704b9fcb218214cc29c5000c119cfd1465cec6dc0bb87e0422b286fc",
+              "stdout_tail": "\nadded 180 packages in 2s\n"
+            },
+            "native_load": {
+              "entry_module_imported": true,
+              "plugin_registered": true,
+              "reason_code": null,
+              "status": "passed"
+            },
+            "package": "koishi-plugin-lovesick",
+            "profile_id": "koishi-core-4.18.11-node-24.20.0-x86_64-portable-lock",
+            "profile_lock_sha256": "993d2088bf83d84695d36bb09c1bc447e3d481a69ea493fba346a19219cf1c30",
+            "registry_entry_id": "ko-e9526963f84acd7a1fd906f8",
+            "resource_observations": {
+              "peak_writable_scratch_bytes": 28652384,
+              "sample_count": 4
+            },
+            "schema_version": 1,
+            "task_id": "S2-09",
+            "version": "1.0.0"
+          },
+          "read_only_input": true,
+          "reason_code": null,
+          "status": "passed",
+          "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "stderr_tail": "",
+          "stdout_sha256": "f8a6d69f7fa423cc10a45505fa29671c9011ecef7e3105836b8a38e85cad7f9b",
+          "stdout_tail": "err_tail\":\"LIGAMINA_NPM_RUNTIME={\\\"heap_limit_bytes\\\":2348810240}\\nnpm warn deprecated @koa/router@10.1.1: **IMPORTANT 10x+ PERFORMANCE UPGRADE**: Please upgrade to v12.0.1+ as we have fixed an issue with debuglog causing 10x slower router benchmark performance, see https://github.com/koajs/router/pull/173\\nnpm warn deprecated uuid@8.3.2: uuid@10 and below is no longer supported.  For ESM codebases, update to uuid@latest.  For CommonJS codebases, use uuid@11 (but be aware this version will likely be deprecated in 2028).\\n\"},\"native_load\":{\"status\":\"passed\",\"reason_code\":null,\"entry_module_imported\":true,\"plugin_registered\":true},\"behavior\":{\"status\":\"skipped\",\"reason_code\":\"missing_entry_bound_fixture\"},\"cleanup\":{\"status\":\"passed\"},\"environment\":{\"ecosystem\":\"koishi\",\"runtime_version\":\"24.20.0\",\"v8_heap_limit_bytes\":2348810240,\"host_node_options_ignored\":true,\"npm_v8_heap_limit_bytes\":2348810240,\"framework_version\":\"4.18.11\"},\"resource_observations\":{\"peak_writable_scratch_bytes\":28652384,\"sample_count\":4}}\n"
+        }
+      },
+      "cleanup_confirmed": true,
+      "resource_observations": {
+        "peak_writable_scratch_bytes": 28652384,
+        "sample_count": 4
+      }
+    }
+  ],
+  "evidence_manifest": [
+    {
+      "result_id": "catalog:nb-22d0e79a7923dc50892c170c|linux",
+      "registry_entry_id": "nb-22d0e79a7923dc50892c170c",
+      "artifact_sha256": "7a641932114dda3cd8d40d4d212629b330a37e946b31d6276ebed974104b9f4b",
+      "profile_lock_sha256": "68a7391620a06e7141d949519333a1f4fc5ccee7abd84dc036c46d09fdae8d38",
+      "stage_result_sha256": {
+        "prepare": "b656320c36eb7021b0c64531480dea80fc3df338fdaff27ca9059b272970a3a8",
+        "install": "bec94c7a0b1be61b73c0c979e603e5cbdf0d20fa072fa944dd12e4ccb6a17ba3",
+        "native": "c2e6bbd91bcb6f7d4aa760abd11401d680532133594abfab5b7b5e80cca385d5",
+        "federated": "230dde1a123ced7c3670531069da83bed23e51531544b2f0e8571e0dff2d9fa3",
+        "compare": "595504cfbea71ce76a82a1cf0a9a7f3c822dc2c53e4208d329b7cbadc641f5a1",
+        "cleanup": "c2e6bbd91bcb6f7d4aa760abd11401d680532133594abfab5b7b5e80cca385d5"
+      },
+      "cleanup_confirmed": true
+    },
+    {
+      "result_id": "catalog:ko-1a52651509a6d4e132918b48|linux",
+      "registry_entry_id": "ko-1a52651509a6d4e132918b48",
+      "artifact_sha256": "3f913b10a756f4cdc739eae52271abeb91e7dc01f98d237c6bbd5a43f30e7c33",
+      "profile_lock_sha256": "68a7391620a06e7141d949519333a1f4fc5ccee7abd84dc036c46d09fdae8d38",
+      "stage_result_sha256": {
+        "prepare": "ba8b48ff6e9cbdbee668a96702fa217477ffcd16891fa7c35694873c02ede1c4",
+        "install": "2fa59894698025d268429b0a09a6ada1a26bb017bf7a11ba731304b871f311f9",
+        "native": "613ed0507313a707c200c42bd45e04c9c6e3bb778d23979d909f52d3d14bd087",
+        "federated": "613ed0507313a707c200c42bd45e04c9c6e3bb778d23979d909f52d3d14bd087",
+        "compare": "09173899d06f7d3d5a706689bb39b26d7544ad3f4e4f7d9f95b844b215c6d52b",
+        "cleanup": "f1392bf40e6422554fe7c05b11a0282e2902106bf95ae7e94b4c67d7d04ce767"
+      },
+      "cleanup_confirmed": null
+    },
+    {
+      "result_id": "catalog:ko-e9aa359eb776a88735264321|linux",
+      "registry_entry_id": "ko-e9aa359eb776a88735264321",
+      "artifact_sha256": "ba6407054aeb9a6a720aea76c49f0980a2418dbc509cc65a065c8e2e11a7bd14",
+      "profile_lock_sha256": "68a7391620a06e7141d949519333a1f4fc5ccee7abd84dc036c46d09fdae8d38",
+      "stage_result_sha256": {
+        "prepare": "aecad4fac97d0af8741e5d559df01cb57d1d39b059db2ccc19f5a9b4d10ffe53",
+        "install": "a456874f83509779c17be842a867e6d7fa0b8ed25f1f591776670a523afa76ad",
+        "native": "5033d8970828188a3ba4fc019e21adbee1b1c9ac8e3afea3ea99236dbd5dec52",
+        "federated": "5033d8970828188a3ba4fc019e21adbee1b1c9ac8e3afea3ea99236dbd5dec52",
+        "compare": "72e6711de7e4c3637e0839a22083f225d4333d5291d23c79807d102d2e0495e5",
+        "cleanup": "f1392bf40e6422554fe7c05b11a0282e2902106bf95ae7e94b4c67d7d04ce767"
+      },
+      "cleanup_confirmed": null
+    },
+    {
+      "result_id": "catalog:ko-18984715cffd1b308d1b4280|linux",
+      "registry_entry_id": "ko-18984715cffd1b308d1b4280",
+      "artifact_sha256": "c9c51a94fa05298d87a526f01b9cd9f7b26e0b141ba23abf96dfbfdb98a28dfb",
+      "profile_lock_sha256": "68a7391620a06e7141d949519333a1f4fc5ccee7abd84dc036c46d09fdae8d38",
+      "stage_result_sha256": {
+        "prepare": "c95d9ab3973946e2c420a1fa68028af824e80fc010b777c6549f546b7d570b1d",
+        "install": "4e3df55191bc838cb3874c710cc09921cc6518dec7193c3ef9578b7e670a845e",
+        "native": "09aa877fce7edba54d74d1d5ff66be733f37fe180ae3a16748d3ead4b4539d07",
+        "federated": "09aa877fce7edba54d74d1d5ff66be733f37fe180ae3a16748d3ead4b4539d07",
+        "compare": "11ef39d6e8079fa75976cff8d53f98b7e759c897a23b951085e771bcca9c2050",
+        "cleanup": "f1392bf40e6422554fe7c05b11a0282e2902106bf95ae7e94b4c67d7d04ce767"
+      },
+      "cleanup_confirmed": null
+    },
+    {
+      "result_id": "catalog:ko-f4189710f8b39932dd71bd3d|linux",
+      "registry_entry_id": "ko-f4189710f8b39932dd71bd3d",
+      "artifact_sha256": "ba41c210f2b726916b538efc279184c79b8f7b37669bd2c0488b0ad4513996c5",
+      "profile_lock_sha256": "68a7391620a06e7141d949519333a1f4fc5ccee7abd84dc036c46d09fdae8d38",
+      "stage_result_sha256": {
+        "prepare": "d92725af60f6477ccbdf7b3c36795e2cc94354a9a4b271623328a9047fd5bda4",
+        "install": "e4855e8ed8adc102dc89d51fa3c87a2d2d1e15207810538e209e36e486ebd8a3",
+        "native": "af26de3fb171d15b67c92c5d1ddbb4624a68dfb1e4597cfb2eb052f8d020acd2",
+        "federated": "af26de3fb171d15b67c92c5d1ddbb4624a68dfb1e4597cfb2eb052f8d020acd2",
+        "compare": "beadbd42792d18897691668d216e9d0a0bab92e9591c61859d0f68d69db97660",
+        "cleanup": "f1392bf40e6422554fe7c05b11a0282e2902106bf95ae7e94b4c67d7d04ce767"
+      },
+      "cleanup_confirmed": null
+    },
+    {
+      "result_id": "catalog:ko-564a6168f736a04c3b1f847e|linux",
+      "registry_entry_id": "ko-564a6168f736a04c3b1f847e",
+      "artifact_sha256": "b7a81a50cad06b48deaf69da4258d19e29836537816d1f2446e45e21e5bc3215",
+      "profile_lock_sha256": "68a7391620a06e7141d949519333a1f4fc5ccee7abd84dc036c46d09fdae8d38",
+      "stage_result_sha256": {
+        "prepare": "5451b60c680c7a39ba6f5ff04df18494218f052b0170061ae9952f2449bdc939",
+        "install": "2b42f938edc2f037b4a07f53729d2b64da85a7b51ddf2d99230ab69cd2ff3447",
+        "native": "25508a84efcf23f9a5bf5f67977d32744684b615b41225f5369bd57cf6abbbcb",
+        "federated": "230dde1a123ced7c3670531069da83bed23e51531544b2f0e8571e0dff2d9fa3",
+        "compare": "1caea5b9ffc765c61e411d8c6c749182821dd4e211c5a8ad8bb089188ae9eb58",
+        "cleanup": "25508a84efcf23f9a5bf5f67977d32744684b615b41225f5369bd57cf6abbbcb"
+      },
+      "cleanup_confirmed": true
+    },
+    {
+      "result_id": "catalog:ko-a2de34f4f50f85e7d66117db|linux",
+      "registry_entry_id": "ko-a2de34f4f50f85e7d66117db",
+      "artifact_sha256": "64c0815f00489464aefc524e0c8f6a16a3643a99c8971593d8e9d67ca9c292ab",
+      "profile_lock_sha256": "68a7391620a06e7141d949519333a1f4fc5ccee7abd84dc036c46d09fdae8d38",
+      "stage_result_sha256": {
+        "prepare": "1d08cc7467c558b701ebea5ff5a3179489451baa562110e2a02e088b882f0ece",
+        "install": "7f975435939aa93811d665cb92203cb445f3bc909e4e84ca5f62b7d35229f8c3",
+        "native": "be79da4175addb6d0b08caa7f4ec41445d312c86d76d4702bbdf835e4b266737",
+        "federated": "230dde1a123ced7c3670531069da83bed23e51531544b2f0e8571e0dff2d9fa3",
+        "compare": "ba2b94acd4e95226d4234d8a485b824fbc992043d59d32245326caef60ca94ee",
+        "cleanup": "be79da4175addb6d0b08caa7f4ec41445d312c86d76d4702bbdf835e4b266737"
+      },
+      "cleanup_confirmed": true
+    },
+    {
+      "result_id": "catalog:ko-e817b69aff01947e7ac28935|linux",
+      "registry_entry_id": "ko-e817b69aff01947e7ac28935",
+      "artifact_sha256": "e093eb23c76256b20e2593beb1cd3ce1ad2a0f9fb3583286af891d0cf8aa5f2f",
+      "profile_lock_sha256": "68a7391620a06e7141d949519333a1f4fc5ccee7abd84dc036c46d09fdae8d38",
+      "stage_result_sha256": {
+        "prepare": "79991944523a4002db8dbf1bb9003a8d14f2c901a31315368f9e8d85dec9ff09",
+        "install": "10e77e6182fe4896eadda22062570e731bb1982b1039637ed67f13a6a96be874",
+        "native": "74392f59baa039df1d8e195c8ec0ce401ee4404f9e4f279a03ca9471a6cd1b59",
+        "federated": "230dde1a123ced7c3670531069da83bed23e51531544b2f0e8571e0dff2d9fa3",
+        "compare": "f7d58ca8d5780d4e7f535ad5f50f43c2a17d5ce59ae22b1954957c92a04ec8eb",
+        "cleanup": "74392f59baa039df1d8e195c8ec0ce401ee4404f9e4f279a03ca9471a6cd1b59"
+      },
+      "cleanup_confirmed": true
+    },
+    {
+      "result_id": "catalog:ko-d0e178b0427244e3970e8e22|linux",
+      "registry_entry_id": "ko-d0e178b0427244e3970e8e22",
+      "artifact_sha256": "3676347ff6bfddef3cfe4a2cd415f2c407ede14da68f926d18080c9a67c15859",
+      "profile_lock_sha256": "68a7391620a06e7141d949519333a1f4fc5ccee7abd84dc036c46d09fdae8d38",
+      "stage_result_sha256": {
+        "prepare": "a75370f5a80bb80d494d7df7e586eb9453f4fac17675e3ca13b9d493baa83f4b",
+        "install": "aa3592921099680010fdfbf14ed0cbcaabdd566c0bff31ae312c11ad6070fd51",
+        "native": "a5f3d71de649939a74a9349b09cf9615fb1658acf691c1c84adb0ddaf936bd08",
+        "federated": "230dde1a123ced7c3670531069da83bed23e51531544b2f0e8571e0dff2d9fa3",
+        "compare": "e6e10f980693a71348c6ffbf4454ffe3720e87c7d6daa84b0fe790ff9156e7e7",
+        "cleanup": "a5f3d71de649939a74a9349b09cf9615fb1658acf691c1c84adb0ddaf936bd08"
+      },
+      "cleanup_confirmed": true
+    },
+    {
+      "result_id": "catalog:ko-1413ced793825fc267281348|linux",
+      "registry_entry_id": "ko-1413ced793825fc267281348",
+      "artifact_sha256": null,
+      "profile_lock_sha256": "68a7391620a06e7141d949519333a1f4fc5ccee7abd84dc036c46d09fdae8d38",
+      "stage_result_sha256": {
+        "prepare": "7931e56135fb8aaae0da24408a99d1da62f559462ce8168bf0bccb00aa6770da",
+        "install": "2bc3861d5eba15fb095e162d2fe929ca172d0c291c307e2e498f1bc6cab99de7",
+        "native": "e5b46275ad10c59b193233697fed34db7eefe715cfa3cb1c9d4ba53ef2ab2bc0",
+        "federated": "e5b46275ad10c59b193233697fed34db7eefe715cfa3cb1c9d4ba53ef2ab2bc0",
+        "compare": "8e4260b04e1ab09fe545e1742641d7ba0f7e5908d0b40448ff6d1af46ef90d8c",
+        "cleanup": "f1392bf40e6422554fe7c05b11a0282e2902106bf95ae7e94b4c67d7d04ce767"
+      },
+      "cleanup_confirmed": null
+    },
+    {
+      "result_id": "catalog:ko-b3bbf1a52b0b127a50f8d1f2|linux",
+      "registry_entry_id": "ko-b3bbf1a52b0b127a50f8d1f2",
+      "artifact_sha256": "744789b71db73ab794d0d1efc995849b8e3d24188a84e6d1b12ebf4e1d1c9b09",
+      "profile_lock_sha256": "68a7391620a06e7141d949519333a1f4fc5ccee7abd84dc036c46d09fdae8d38",
+      "stage_result_sha256": {
+        "prepare": "7521aa5938275dcecc04e8edb2db4c3c2cc7e4c9d80b3d6e34aea30a53091c1f",
+        "install": "04f9883ad1ea70a75baecaa5afb42eee94234fec19836776c156f4dc928c4ce3",
+        "native": "c45a287ac4ade65283b8291208dc8eeff3ac1b0ce0961e3f13a325d2203d24f6",
+        "federated": "230dde1a123ced7c3670531069da83bed23e51531544b2f0e8571e0dff2d9fa3",
+        "compare": "db565b8a229c38c4744d2fa9168a966e1b8f70bd69e2102d6cdf10d5371a247d",
+        "cleanup": "c45a287ac4ade65283b8291208dc8eeff3ac1b0ce0961e3f13a325d2203d24f6"
+      },
+      "cleanup_confirmed": true
+    },
+    {
+      "result_id": "catalog:ko-85be5dc629b1d38dbb0aa536|linux",
+      "registry_entry_id": "ko-85be5dc629b1d38dbb0aa536",
+      "artifact_sha256": "f6fa9c2f4f30a4001cac2b38bf2defaf7883ee7d5dc63edbe1190d3fd75cbc77",
+      "profile_lock_sha256": "68a7391620a06e7141d949519333a1f4fc5ccee7abd84dc036c46d09fdae8d38",
+      "stage_result_sha256": {
+        "prepare": "08b3f5f45507af746d0880defb1b1928e7cdb16d755b471f19f8c524532d5dbd",
+        "install": "36fe422d44830599f03a8fd789549c07e68ee9f3e6ab32434e8dba6fc3cc62d6",
+        "native": "b22c333d32f459d90e2f1c3d2402b15fe33d04388266c58d24efbcd78f87f19e",
+        "federated": "230dde1a123ced7c3670531069da83bed23e51531544b2f0e8571e0dff2d9fa3",
+        "compare": "e2751d2451b604b84684e3876bb05f98ad417a0a365df4fdf50ae89d487e9211",
+        "cleanup": "b22c333d32f459d90e2f1c3d2402b15fe33d04388266c58d24efbcd78f87f19e"
+      },
+      "cleanup_confirmed": true
+    },
+    {
+      "result_id": "catalog:ko-acf75df3ce0e9798b1b92328|linux",
+      "registry_entry_id": "ko-acf75df3ce0e9798b1b92328",
+      "artifact_sha256": "f93ffcf4cbdaf36d22ac2d61c60a87f6e02217a65e7f9e43399725792133e220",
+      "profile_lock_sha256": "68a7391620a06e7141d949519333a1f4fc5ccee7abd84dc036c46d09fdae8d38",
+      "stage_result_sha256": {
+        "prepare": "c72b8e8073fa3ebb1ad17528473b42b48f7e0ad29fd28eb97fad949aaa1124eb",
+        "install": "eacaa8c812a461daac1100ad5f4268f8d4d9e03f18c4c32925245f8e91289ba6",
+        "native": "cfd980d657155e376694179918ceef96f93b2272eb1f9aa9a3ba0f0753c52ed6",
+        "federated": "cfd980d657155e376694179918ceef96f93b2272eb1f9aa9a3ba0f0753c52ed6",
+        "compare": "9dda24cfc8e503b49205584c86c4dc114bebe28ddb537c88cb7f8ea96425afd7",
+        "cleanup": "f1392bf40e6422554fe7c05b11a0282e2902106bf95ae7e94b4c67d7d04ce767"
+      },
+      "cleanup_confirmed": null
+    },
+    {
+      "result_id": "catalog:ko-d50dd0552ebf7702af1e2558|linux",
+      "registry_entry_id": "ko-d50dd0552ebf7702af1e2558",
+      "artifact_sha256": "ca2e60716594db3a22f914c59507df2dcc011512da250fa6230404b2a8abec7a",
+      "profile_lock_sha256": "68a7391620a06e7141d949519333a1f4fc5ccee7abd84dc036c46d09fdae8d38",
+      "stage_result_sha256": {
+        "prepare": "8616f0b72f6125398fb3a83f8cb339e3fdb092d99eba6d8ae70b6ddf5b829983",
+        "install": "9c50d950c5163c56fa83502fa296e76cf8c5162a03f31a8214962bd5a87fa65b",
+        "native": "d94e0e5b2584b3e3e68b775d14f84f334e2b20fe0a3e7516ae840afa6cf843af",
+        "federated": "230dde1a123ced7c3670531069da83bed23e51531544b2f0e8571e0dff2d9fa3",
+        "compare": "6048cfe450b2e4fe84892f90a12a6be3069746d7d3e4573ed11b2c194a66d536",
+        "cleanup": "7dbe33a8999e32072fc6f400cbfbb935309336748609e7548ad6b5160b1121c8"
+      },
+      "cleanup_confirmed": true
+    },
+    {
+      "result_id": "catalog:ko-bede69cde94caf96d45e9768|linux",
+      "registry_entry_id": "ko-bede69cde94caf96d45e9768",
+      "artifact_sha256": "ab34cf14411f8f89107562d8a78a7e90acda55add88ce49bdf900dbf589672f8",
+      "profile_lock_sha256": "68a7391620a06e7141d949519333a1f4fc5ccee7abd84dc036c46d09fdae8d38",
+      "stage_result_sha256": {
+        "prepare": "c583702ea8234bec9af4120c842627402182137fb770fccfd963b67c05f9a61a",
+        "install": "963ed748e881bde0be5b635d5ecf65c005666e0037632f5e17f4d5fc011e65b6",
+        "native": "b8c424c866856ef80770c5af17616a204c4384adcbf7aa2e32dc811231d190d3",
+        "federated": "230dde1a123ced7c3670531069da83bed23e51531544b2f0e8571e0dff2d9fa3",
+        "compare": "b9c78a4f714a38ee2fbc8d34d27783f1d066d3527c792db734a61aa70150f511",
+        "cleanup": "c9e3c71f1083b5a0e1c70a9c385bc34162501f21d0fd68c00c5e52ac2fd65ab7"
+      },
+      "cleanup_confirmed": true
+    },
+    {
+      "result_id": "catalog:ko-f6d7443f611c59c0a8ac6a8c|linux",
+      "registry_entry_id": "ko-f6d7443f611c59c0a8ac6a8c",
+      "artifact_sha256": "70f9cd1ab8e4af9ec28b8b74258688b3d3eb27d8fb686e711f11b9981173a054",
+      "profile_lock_sha256": "68a7391620a06e7141d949519333a1f4fc5ccee7abd84dc036c46d09fdae8d38",
+      "stage_result_sha256": {
+        "prepare": "d7f3ca2e3db2811693db8a2005da180849af5cbfdecd987ecedfcd7f69f80681",
+        "install": "3b07ed9826ae491f6ce269c850aec82746631ebacef507956269a66c784fac7d",
+        "native": "a61558a0853866550691f50b7db5cb0c020a9901ae05df805e849ef48a3b6e1e",
+        "federated": "230dde1a123ced7c3670531069da83bed23e51531544b2f0e8571e0dff2d9fa3",
+        "compare": "a0bd0aa9fa4776789fb2324f66a11e97a49682c646227a8e9f13eba45d48a619",
+        "cleanup": "a61558a0853866550691f50b7db5cb0c020a9901ae05df805e849ef48a3b6e1e"
+      },
+      "cleanup_confirmed": true
+    },
+    {
+      "result_id": "catalog:ko-a25052ecdbb1445e8bb98719|linux",
+      "registry_entry_id": "ko-a25052ecdbb1445e8bb98719",
+      "artifact_sha256": "4cbb0105ee2054b8ad1e213db812c698fd4291051c23b57d43d716f32b1c766d",
+      "profile_lock_sha256": "68a7391620a06e7141d949519333a1f4fc5ccee7abd84dc036c46d09fdae8d38",
+      "stage_result_sha256": {
+        "prepare": "b42bdc9e479a22456cc11d6f20c95f29e568590fb69b3f9ea47a7665bdcdc318",
+        "install": "2452ae88f8d50985b6cd5462edc07a86f064631ec5b30901df7a74bcbff08841",
+        "native": "e5752331722323a95f92fc357e55dd68ff988767f3bc1ee9eccf7ca9ac7207e8",
+        "federated": "230dde1a123ced7c3670531069da83bed23e51531544b2f0e8571e0dff2d9fa3",
+        "compare": "b0307fcd8157b096bdda1d582922320991a78354924f5ca05f008d470a51de2d",
+        "cleanup": "e5752331722323a95f92fc357e55dd68ff988767f3bc1ee9eccf7ca9ac7207e8"
+      },
+      "cleanup_confirmed": true
+    },
+    {
+      "result_id": "catalog:ko-b5190f131db6f77ef5a2acb4|linux",
+      "registry_entry_id": "ko-b5190f131db6f77ef5a2acb4",
+      "artifact_sha256": null,
+      "profile_lock_sha256": "68a7391620a06e7141d949519333a1f4fc5ccee7abd84dc036c46d09fdae8d38",
+      "stage_result_sha256": {
+        "prepare": "441988efad68381fda9372c266eed1b672df38853ba28287ea413ccae4901cd5",
+        "install": "ddb25f7ac23d998b82e4b172f47169a74ac35d3ec7f31e68e1209a6e218ffed3",
+        "native": "8086751d08b64a7aa853bcb3f45798531296cc9c29534da84a543df53c468efe",
+        "federated": "8086751d08b64a7aa853bcb3f45798531296cc9c29534da84a543df53c468efe",
+        "compare": "61eb4156cbe9846962a4a8e673a8e449e9b1c6b198ec9fb58cf04b52ee55bd9c",
+        "cleanup": "f1392bf40e6422554fe7c05b11a0282e2902106bf95ae7e94b4c67d7d04ce767"
+      },
+      "cleanup_confirmed": null
+    },
+    {
+      "result_id": "catalog:ko-e9526963f84acd7a1fd906f8|linux",
+      "registry_entry_id": "ko-e9526963f84acd7a1fd906f8",
+      "artifact_sha256": "4111442d81e928dc09bf21ba8d942d05cafed8d687da786bd8a3c568eedb149a",
+      "profile_lock_sha256": "68a7391620a06e7141d949519333a1f4fc5ccee7abd84dc036c46d09fdae8d38",
+      "stage_result_sha256": {
+        "prepare": "b3aa4a5244afc5dae7258a026d2cc28e2ce79d9d31e8bcfc9377998bca6b726a",
+        "install": "21d04ec84e5233b36a39d411e6d6487f18248ea86bfa8c89a6e0170e043c44ae",
+        "native": "b9955d8fed1b7f5966664a546b4380601287bffb7e4b6b69f1debcddc388c81b",
+        "federated": "230dde1a123ced7c3670531069da83bed23e51531544b2f0e8571e0dff2d9fa3",
+        "compare": "8c4331af959187bb738ed1d3c80bb1748e6894edf94757501cd384ca1bce13da",
+        "cleanup": "b9955d8fed1b7f5966664a546b4380601287bffb7e4b6b69f1debcddc388c81b"
+      },
+      "cleanup_confirmed": true
+    }
+  ],
+  "report_sha256": "91a6b125603e213ec1581d7078a2fcb45700a42b89df0947be7fc49d33fb1fb3"
+}

@@ -6,7 +6,6 @@ import argparse
 import ctypes
 import json
 import os
-import queue
 import shutil
 import subprocess
 import sys
@@ -19,6 +18,14 @@ from pathlib import Path
 from statistics import median
 from typing import Any
 
+ROOT = Path(__file__).resolve().parents[1]
+SCRIPT_DIR = Path(__file__).resolve().parent
+if sys.path and Path(sys.path[0]).resolve() == SCRIPT_DIR:
+    sys.path.pop(0)
+if str(ROOT) not in sys.path:
+    sys.path.insert(0, str(ROOT))
+import queue
+
 try:
     from lab import run as harness
     from lab.report import summarize_cases
@@ -27,7 +34,6 @@ except ModuleNotFoundError:  # supports `python lab/stability.py`
     from report import summarize_cases
 
 
-ROOT = Path(__file__).resolve().parents[1]
 HOSTS = ("nonebot-smoke", "koishi-smoke")
 CAPABILITIES = {
     "nonebot-smoke": harness.NONEBOT_CAPABILITY,

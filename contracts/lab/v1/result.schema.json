@@ -1,0 +1,50 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ligamina.dev/contracts/lab/v1/result.schema.json",
+  "title": "Ligamina lab result unit v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "result_id", "registry_entry_id", "ecosystem", "package", "platform", "profile_id", "stage", "case_id", "attempt_id", "status", "delivery_scope"],
+  "properties": {
+    "schema_version": { "const": 1 },
+    "result_id": { "type": "string", "minLength": 1 },
+    "registry_entry_id": { "type": "string", "minLength": 1 },
+    "ecosystem": { "enum": ["nonebot", "koishi"] },
+    "official_maintained": { "type": "boolean" },
+    "package": { "type": "string", "minLength": 1 },
+    "version": { "type": ["string", "null"] },
+    "platform": { "enum": ["windows", "linux"] },
+    "profile_id": { "type": "string", "minLength": 1 },
+    "stage": { "type": "string", "minLength": 1 },
+    "case_id": { "type": "string", "minLength": 1 },
+    "attempt_id": { "type": "string", "minLength": 1 },
+    "status": { "enum": ["passed", "failed", "skipped", "unknown"] },
+    "reason_code": { "type": "string", "pattern": "^[a-z][a-z0-9_]*$" },
+    "reason": { "type": "string" },
+    "failure_domain": { "enum": ["registry", "package", "profile", "native", "federation", "harness", "infrastructure", "external"] },
+    "delivery_scope": { "enum": ["virtual", "service_fixture", "real_platform"] },
+    "flaky": { "type": "boolean" },
+    "evidence": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["path", "sha256"],
+        "properties": {
+          "path": { "type": "string", "minLength": 1 },
+          "sha256": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+          "media_type": { "type": "string", "minLength": 1 }
+        }
+      }
+    }
+  },
+  "allOf": [
+    {
+      "if": { "properties": { "status": { "enum": ["failed", "skipped", "unknown"] } } },
+      "then": {
+        "properties": { "reason_code": { "type": "string", "pattern": "^[a-z][a-z0-9_]*$" } },
+        "required": ["reason_code"]
+      }
+    }
+  ]
+}

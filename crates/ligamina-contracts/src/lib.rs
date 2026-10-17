@@ -2,7 +2,7 @@
 
 pub const PROTOCOL_VERSION: &str = "ligamina/0.1";
 
-use jsonschema::Validator;
+use jsonschema::{Registry, Resource, Validator};
 use serde_json::Value;
 use std::sync::LazyLock;
 use thiserror::Error;
@@ -13,6 +13,12 @@ const OPERATION_SCHEMA_SOURCE: &str =
     include_str!("../../../contracts/v0.1/platform-operation.schema.json");
 const CAPABILITY_SCHEMA_SOURCE: &str =
     include_str!("../../../contracts/v0.1/capability-descriptor.schema.json");
+const LAB_CATALOG_SCHEMA_SOURCE: &str =
+    include_str!("../../../contracts/lab/v1/catalog.schema.json");
+const LAB_RUN_SCHEMA_SOURCE: &str = include_str!("../../../contracts/lab/v1/run.schema.json");
+const LAB_RESULT_SCHEMA_SOURCE: &str = include_str!("../../../contracts/lab/v1/result.schema.json");
+const LAB_SUMMARY_SCHEMA_SOURCE: &str =
+    include_str!("../../../contracts/lab/v1/summary.schema.json");
 
 static EVENT_VALIDATOR: LazyLock<Validator> = LazyLock::new(|| {
     let schema: Value =
@@ -29,6 +35,39 @@ static CAPABILITY_VALIDATOR: LazyLock<Validator> = LazyLock::new(|| {
     let schema: Value =
         serde_json::from_str(CAPABILITY_SCHEMA_SOURCE).expect("capability schema is valid JSON");
     jsonschema::validator_for(&schema).expect("capability schema is valid JSON Schema")
+});
+
+static LAB_SCHEMA_REGISTRY: LazyLock<Registry> = LazyLock::new(|| {
+    let catalog: Value =
+        serde_json::from_str(LAB_CATALOG_SCHEMA_SOURCE).expect("lab catalog schema is JSON");
+    let run: Value = serde_json::from_str(LAB_RUN_SCHEMA_SOURCE).expect("lab run schema is JSON");
+    let result: Value =
+        serde_json::from_str(LAB_RESULT_SCHEMA_SOURCE).expect("lab result schema is JSON");
+    let summary: Value =
+        serde_json::from_str(LAB_SUMMARY_SCHEMA_SOURCE).expect("lab summary schema is JSON");
+    Registry::new()
+        .add(
+            "https://ligamina.dev/contracts/lab/v1/catalog.schema.json",
+            Resource::from_contents(catalog),
+        )
+        .expect("catalog schema resource is registered")
+        .add(
+            "https://ligamina.dev/contracts/lab/v1/run.schema.json",
+            Resource::from_contents(run),
+        )
+        .expect("run schema resource is registered")
+        .add(
+            "https://ligamina.dev/contracts/lab/v1/result.schema.json",
+            Resource::from_contents(result),
+        )
+        .expect("result schema resource is registered")
+        .add(
+            "https://ligamina.dev/contracts/lab/v1/summary.schema.json",
+            Resource::from_contents(summary),
+        )
+        .expect("summary schema resource is registered")
+        .prepare()
+        .expect("lab schema registry is valid")
 });
 
 #[derive(Debug, Error, PartialEq, Eq)]
@@ -80,6 +119,28 @@ pub fn validate_capability_descriptor(value: &Value) -> Result<(), ContractError
     validate_against(&CAPABILITY_VALIDATOR, value)
 }
 
+pub fn validate_lab_document(kind: &str, value: &Value) -> Result<(), ContractError> {
+    let source = match kind {
+        "catalog" => LAB_CATALOG_SCHEMA_SOURCE,
+        "run" => LAB_RUN_SCHEMA_SOURCE,
+        "result" => LAB_RESULT_SCHEMA_SOURCE,
+        "summary" => LAB_SUMMARY_SCHEMA_SOURCE,
+        _ => {
+            return Err(ContractError::Invalid(format!(
+                "unknown lab document kind: {kind}"
+            )));
+        }
+    };
+    let schema: Value = serde_json::from_str(source)
+        .map_err(|error| ContractError::Invalid(format!("invalid lab schema JSON: {error}")))?;
+    let validator = jsonschema::options()
+        .with_registry(&LAB_SCHEMA_REGISTRY)
+        .should_validate_formats(true)
+        .build(&schema)
+        .map_err(|error| ContractError::Invalid(format!("invalid lab schema: {error}")))?;
+    validate_against(&validator, value)
+}
+
 fn validate_against(validator: &Validator, value: &Value) -> Result<(), ContractError> {
     let errors: Vec<String> = validator
         .iter_errors(value)
@@ -126,6 +187,14 @@ mod tests {
             .join(name);
         serde_json::from_slice(&fs::read(path).expect("fixture is readable"))
             .expect("fixture is JSON")
+    }
+
+    fn lab_fixture(name: &str) -> Value {
+        let path = PathBuf::from(env!("CARGO_MANIFEST_DIR"))
+            .join("../../contracts/lab/v1/fixtures")
+            .join(name);
+        serde_json::from_slice(&fs::read(path).expect("lab fixture is readable"))
+            .expect("lab fixture is JSON")
     }
 
     #[test]
@@ -220,5 +289,26 @@ mod tests {
                 vector["name"]
             );
         }
+    }
+
+    #[test]
+    fn shared_lab_v1_vectors_validate_across_rust_contract_consumer() {
+        let vectors: Value = serde_json::from_str(include_str!(
+            "../../../contracts/lab/v1/fixtures/vectors.json"
+        ))
+        .unwrap();
+        for kind in ["catalog", "run", "result", "summary"] {
+            for vector in vectors[kind].as_array().unwrap() {
+                let value = lab_fixture(vector["file"].as_str().unwrap());
+                let expected = vector["valid"].as_bool().unwrap();
+                assert_eq!(
+                    validate_lab_document(kind, &value).is_ok(),
+                    expected,
+                    "{kind}: {}",
+                    vector["name"]
+                );
+            }
+        }
+        assert!(validate_lab_document("other", &serde_json::json!({})).is_err());
     }
 }

@@ -21,6 +21,8 @@ node_version="$(node --version)"
 [[ "$uv_version" == "uv 0.12.5"* ]] || { echo "expected uv 0.12.5; found: $uv_version" >&2; exit 2; }
 [[ "$node_version" == "v24.20.0" ]] || { echo "expected Node v24.20.0; found: $node_version" >&2; exit 2; }
 
+node --test scripts/evidence-hash.test.mjs
+node scripts/check-docs.mjs
 uv python install 3.12.14
 
 uv run --locked --project hosts/nonebot --python 3.12.14 pytest -q hosts/nonebot/tests

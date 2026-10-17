@@ -16,7 +16,7 @@ Usage:\n\
   ligamina-cli daemon --config <path.json>\n\
   ligamina-cli status --url http://127.0.0.1:<port>\n\
   ligamina-cli doctor --url http://127.0.0.1:<port>\n\
-  ligamina-cli report <report.json>\n\
+  ligamina-cli report <report.json> [--format json|text|ndjson] [--gate completion|automation|compatibility]\n\
 Set LIGAMINA_ADMIN_TOKEN for status and doctor. Only loopback HTTP URLs are accepted.\n";
 
 #[tokio::main]
@@ -113,28 +113,65 @@ async fn main() -> anyhow::Result<()> {
             Ok(())
         }
         "report" => {
-            let path = arguments
-                .next()
-                .context("usage: ligamina-cli report <report.json>")?;
-            if arguments.next().is_some() {
-                bail!("unexpected report arguments");
+            let Some(path) = arguments.next() else {
+                eprintln!("invalid report arguments");
+                std::process::exit(2);
+            };
+            let mut output_format = "json".to_owned();
+            let mut format_seen = false;
+            let mut selected_gate = None;
+            while let Some(option) = arguments.next() {
+                match option.as_str() {
+                    "--format" if !format_seen => {
+                        let Some(value) = arguments.next() else {
+                            eprintln!("invalid report arguments");
+                            std::process::exit(2);
+                        };
+                        output_format = value;
+                        format_seen = true;
+                    }
+                    "--gate" if selected_gate.is_none() => {
+                        let Some(value) = arguments.next() else {
+                            eprintln!("invalid report arguments");
+                            std::process::exit(2);
+                        };
+                        selected_gate = Some(value);
+                    }
+                    _ => {
+                        eprintln!("invalid report arguments");
+                        std::process::exit(2);
+                    }
+                }
             }
-            let contents = std::fs::read(path).context("could not read report JSON")?;
-            let report: Value = serde_json::from_slice(&contents).context("invalid report JSON")?;
-            let summary = json!({
-                "suite": report.get("suite"),
-                "status": report.get("status"),
-                "gate": report.get("gate"),
-                "platform": report.get("platform"),
-                "case_summary": report.get("case_summary"),
-                "sample_count": report.get("samples").and_then(Value::as_array).map(Vec::len),
-                "l4_pass_count": report.get("l4_pass_count"),
-                "resource_budget": report.get("resource_budget"),
-                "recovery_budget": report.get("recovery_budget"),
-                "cleanup": report.get("cleanup"),
-                "error": report.get("error"),
-            });
-            println!("{}", serde_json::to_string_pretty(&summary)?);
+            let contents = match std::fs::read(path) {
+                Ok(contents) => contents,
+                Err(_) => {
+                    eprintln!("could not read report JSON");
+                    std::process::exit(2);
+                }
+            };
+            let report: Value = match serde_json::from_slice(&contents) {
+                Ok(report) => report,
+                Err(_) => {
+                    eprintln!("could not parse report JSON");
+                    std::process::exit(2);
+                }
+            };
+            let (rendered, code) = match ligamina_cli::report::render_report(
+                &report,
+                &output_format,
+                selected_gate.as_deref(),
+            ) {
+                Ok(rendered) => rendered,
+                Err(_) => {
+                    eprintln!("report failed schema, denominator, or gate validation");
+                    std::process::exit(2);
+                }
+            };
+            println!("{rendered}");
+            if code != 0 {
+                std::process::exit(code);
+            }
             Ok(())
         }
         "help" | "--help" | "-h" => {

@@ -1,0 +1,39 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ligamina.dev/contracts/lab/v1/summary.schema.json",
+  "title": "Ligamina lab summary v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "expected_result_count", "accounted_result_count", "missing_count", "missing_result_ids", "unexpected_count", "unexpected_result_ids", "duplicate_count", "duplicate_result_ids", "status_counts", "executed_denominator", "entry_coverage", "stage_execution_coverage", "executed_pass_rate", "passed_over_expected_rate"],
+  "properties": {
+    "schema_version": { "const": 1 },
+    "expected_result_count": { "type": "integer", "minimum": 0 },
+    "accounted_result_count": { "type": "integer", "minimum": 0 },
+    "missing_count": { "type": "integer", "minimum": 0 },
+    "missing_result_ids": { "type": "array", "uniqueItems": true, "items": { "type": "string", "minLength": 1 } },
+    "unexpected_count": { "type": "integer", "minimum": 0 },
+    "unexpected_result_ids": { "type": "array", "uniqueItems": true, "items": { "type": "string", "minLength": 1 } },
+    "duplicate_count": { "type": "integer", "minimum": 0 },
+    "duplicate_result_ids": { "type": "array", "items": { "type": "string", "minLength": 1 } },
+    "status_counts": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["passed", "failed", "skipped", "unknown"],
+      "properties": {
+        "passed": { "type": "integer", "minimum": 0 },
+        "failed": { "type": "integer", "minimum": 0 },
+        "skipped": { "type": "integer", "minimum": 0 },
+        "unknown": { "type": "integer", "minimum": 0 }
+      }
+    },
+    "executed_denominator": { "type": "integer", "minimum": 0 },
+    "entry_coverage": { "$ref": "#/$defs/rate" },
+    "stage_execution_coverage": { "$ref": "#/$defs/rate" },
+    "executed_pass_rate": { "$ref": "#/$defs/rate" },
+    "passed_over_expected_rate": { "$ref": "#/$defs/rate" },
+    "gate_passed": { "type": "boolean" }
+  },
+  "$defs": {
+    "rate": { "type": ["number", "null"], "minimum": 0, "maximum": 1 }
+  }
+}

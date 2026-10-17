@@ -1,0 +1,56 @@
+{
+  "schema_version": 1,
+  "date": "2026-10-12",
+  "task_id": "S2-08",
+  "status": "completed",
+  "next_task": "S2-09",
+  "catalog_execution_started": false,
+  "input_reports": {
+    "outputs/acceptance/phase2-catalog-snapshot-20261012.json": "9d240d81dae2da32ae3bf7613265efe36a5ba03830807a5d7ee6d46a86450a17",
+    "outputs/acceptance/phase2-s206-20261012.json": "d33d36ccb5283a19c4f72866786674a8a998c19b1d5cf9c734c10c400bdf0f21",
+    "outputs/acceptance/phase2-s207-20261012.json": "3e0112297acb25a2fe1d7ddb9ea59c8ab05c5106914cc8a65612e9de7901ff88",
+    "outputs/acceptance/phase2-s207-cli-smoke-20261012.json": "35ba6754590ed3aef560468c544daed7cc1c9e7b71e57441b4fb1ea16a383588"
+  },
+  "reporting_contract": {
+    "formats": ["json", "text", "ndjson"],
+    "gates": ["completion", "automation", "compatibility"],
+    "required_run_fields": ["expected_result_ids", "gate", "gate_passed", "exit_code"],
+    "exit_codes": {"gate_met": 0, "gate_not_met": 1, "input_error": 2, "infrastructure_interruption": 3},
+    "partial_run": "summary is recomputed against the required expected_result_ids denominator",
+    "privacy": "secret fields and common inline credential forms are redacted; strings are bounded at 4096 characters"
+  },
+  "verification": {
+    "python_reporting_and_contract_tests": {"status": "passed", "tests": 18},
+    "rust_cli_and_contract_tests": {"status": "passed", "cli_tests": 5, "contract_tests": 4},
+    "cli_fixture_probe": {"valid_v1_report_exit_code": 0, "invalid_status_exit_code": 2, "ndjson_events": 3},
+    "readme_generator": {
+      "status": "passed",
+      "phase_one_and_two_blocks_match": true,
+      "stale_source_report_rejected": true,
+      "stale_generated_readme_block_rejected": true
+    },
+    "full_repository": {
+      "command": "pwsh -NoProfile -File init.ps1 -Mode full",
+      "status": "passed",
+      "exit_code": 0,
+      "documentation": {"documents": 18, "local_links": 161},
+      "nonebot_tests": 3,
+      "lab_tests": 85,
+      "koishi_tests": 7,
+      "koishi_mcp_tests": 1,
+      "reference_client_tests": 5,
+      "rust_workspace_tests": 33,
+      "windows_core_smoke": {"events": 4, "gateway_operations": 4, "remaining_pids": []},
+      "windows_bundle_stage": "passed",
+      "generated_ci_smoke_report_restored": true
+    },
+    "post_state_documentation_check": {"status": "passed", "documents": 18, "local_links": 162},
+    "diff_check": {"status": "passed"}
+  },
+  "limitations": [
+    "This acceptance record covers reporting and README integration only; the catalog scheduler has not dispatched plugin workers.",
+    "The S2-07 CLI plan has 18 queued jobs for three Linux units and execution_started=false.",
+    "Windows Sandbox CPython startup remains blocked by App Control (Win32 4551); no Windows plugin pilot is claimed.",
+    "No real platform login, send, or delivery acceptance was performed."
+  ]
+}

@@ -1,0 +1,66 @@
+{
+  "schema_version": 1,
+  "task": "S2-02",
+  "status": "passed",
+  "completed_at": "2026-10-12",
+  "contract_version": "contracts/lab/v1",
+  "schemas": [
+    "contracts/lab/v1/catalog.schema.json",
+    "contracts/lab/v1/run.schema.json",
+    "contracts/lab/v1/result.schema.json",
+    "contracts/lab/v1/summary.schema.json"
+  ],
+  "golden_vectors": {
+    "catalog": 2,
+    "run": 2,
+    "result": 3,
+    "summary": 2,
+    "total": 9,
+    "shared_consumers": ["Python", "Rust", "TypeScript"]
+  },
+  "implemented_semantics": {
+    "run_state_completed_is_case_passed": false,
+    "legacy_not_run": "skipped + not_scheduled",
+    "legacy_environment_missing_with_evidence": "skipped + environment_missing",
+    "legacy_environment_missing_without_evidence": "unknown + environment_missing_unproven",
+    "zero_denominator_rates": null,
+    "duplicate_result_ids": "reported and excluded after first occurrence to avoid inflating rates",
+    "unrecognized_v1_status": "rejected"
+  },
+  "verification": [
+    {
+      "command": "pwsh -NoProfile -File init.ps1 -Mode docs",
+      "exit_code": 0,
+      "output_summary": "18 documents, 142 local links, 9 historical Markdown files, 14 features; no failures"
+    },
+    {
+      "command": "uv run --locked --project hosts/nonebot --python 3.12.14 python -m unittest discover -s lab/tests -v",
+      "exit_code": 0,
+      "output_summary": "31 lab tests passed"
+    },
+    {
+      "command": "cargo test -p ligamina-contracts shared_lab_v1_vectors_validate_across_rust_contract_consumer",
+      "exit_code": 0,
+      "output_summary": "1 cross-language golden-vector test passed"
+    },
+    {
+      "command": "npm run build; node --test --test-name-pattern=\"lab v1 vectors\" tests/contracts.test.mjs",
+      "working_directory": "hosts/koishi",
+      "exit_code": 0,
+      "output_summary": "TypeScript build and shared golden-vector test passed"
+    },
+    {
+      "command": "pwsh -NoProfile -File init.ps1 -Mode full",
+      "exit_code": 0,
+      "output_summary": "Docs, NoneBot tests and native/Bridge/worker smoke, lab 31, Koishi 7, MCP 1, reference client 5, Rust tests, release build, Windows Core smoke and bundle stage passed; Core smoke handled 4 events and 4 gateway operations with no remaining PIDs"
+    }
+  ],
+  "recovery_notes": [
+    "An initial full run caught the new Python module in the wrong import location and emitted a transient Windows access-violation message while loading pydantic_core; the module was moved beside lab/report.py and the complete verification was rerun successfully without that message.",
+    "A subsequent full run stopped at cargo fmt --check; cargo fmt --all was applied and the final complete run passed."
+  ],
+  "limits": [
+    "This task establishes schemas and validators; CLI and catalog scheduler integration remain S2-08.",
+    "This task does not install or execute catalog plugins and makes no full-catalog compatibility claim."
+  ]
+}

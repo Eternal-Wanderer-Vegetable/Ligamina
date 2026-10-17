@@ -7,7 +7,6 @@ import hashlib
 import json
 import os
 import platform
-import queue
 import secrets
 import shutil
 import signal
@@ -24,13 +23,21 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
+ROOT = Path(__file__).resolve().parents[1]
+SCRIPT_DIR = Path(__file__).resolve().parent
+if sys.path and Path(sys.path[0]).resolve() == SCRIPT_DIR:
+    sys.path.pop(0)
+if str(ROOT) not in sys.path:
+    sys.path.insert(0, str(ROOT))
+import queue
+from lab.report import render_summary_output
+
 try:
     from lab.native_runner import load_case, run_pair
 except ModuleNotFoundError:  # supports the documented `python lab/run.py` entry point
     from native_runner import load_case, run_pair
 
 
-ROOT = Path(__file__).resolve().parents[1]
 NONEBOT_CAPABILITY = "ligamina.nonebot.math.add"
 KOISHI_CAPABILITY = "ligamina.koishi.math.add"
 CLIENT_ID = "ligamina-smoke-client"
@@ -791,15 +798,73 @@ def run_smoke(platform_name: str, report_path: Path, offline: bool) -> tuple[int
 
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--suite", choices=("smoke", "representative"), required=True)
-    parser.add_argument("--platform", choices=("windows", "linux"), default=available_platform())
+    parser.add_argument("--suite", choices=("smoke", "representative", "catalog"), required=True)
+    parser.add_argument("--format", choices=("json", "text", "ndjson"), default="json")
+    parser.add_argument("--platform", choices=("windows", "linux", "both"))
     parser.add_argument("--report", type=Path)
     parser.add_argument("--offline", action="store_true", help="require already cached dependencies")
     parser.add_argument("--manifest", type=Path)
     parser.add_argument("--worker", choices=("isolated",))
     parser.add_argument("--sample-id", action="append", default=[])
+    parser.add_argument("--snapshot", type=Path, help="verified catalog snapshot directory for --suite catalog")
+    parser.add_argument("--queue-db", type=Path, help="durable catalog queue path (defaults under .work)")
+    parser.add_argument("--run-id", help="reuse an explicit stable catalog run ID")
+    parser.add_argument("--shard", default="0/1", help="stable catalog partition as index/count")
+    parser.add_argument("--resume", action="store_true", help="recover expired leases and reopen a persisted catalog plan")
     options = parser.parse_args(argv)
+    if options.suite == "catalog":
+        if not options.snapshot:
+            parser.error("--suite catalog requires --snapshot")
+        if options.manifest or options.worker or options.sample_id or options.offline:
+            parser.error("--suite catalog does not accept --manifest, --worker, --sample-id, or --offline")
+        try:
+            from lab.catalog_run import CatalogRunError, create_catalog_plan, parse_shard, write_plan_report
+            from lab.queue import QueueError
+        except ModuleNotFoundError as error:
+            if error.name != "lab":
+                raise
+            sys.path.insert(0, str(ROOT))
+            from lab.catalog_run import CatalogRunError, create_catalog_plan, parse_shard, write_plan_report
+            from lab.queue import QueueError
+        try:
+            shard_index, shard_count = parse_shard(options.shard)
+            platform_option = options.platform or "both"
+            platforms = ("windows", "linux") if platform_option == "both" else (platform_option,)
+            queue_db = options.queue_db or ROOT / ".work/catalog-queue.sqlite3"
+            plan = create_catalog_plan(
+                options.snapshot,
+                queue_db,
+                platforms=platforms,
+                shard_index=shard_index,
+                shard_count=shard_count,
+                run_id=options.run_id,
+                resume=options.resume,
+            )
+            report_path = options.report or ROOT / ".work/catalog-runs" / plan["run_id"] / "plan.json"
+            report_path = write_plan_report(plan, report_path)
+        except (CatalogRunError, QueueError, OSError) as error:
+            parser.exit(2, f"catalog plan failed: {error}\n")
+        summary = {
+            "schema_version": 1,
+            "event": "catalog_plan",
+            "suite": "catalog",
+            "status": plan["status"],
+            "run_state": plan["run_state"],
+            "run_id": plan["run_id"],
+            "snapshot_id": plan["snapshot_id"],
+            "expected_units": plan["expected_units"],
+            "selected_units": plan["selected_units"],
+            "expected_stage_jobs": plan["expected_stage_jobs"],
+            "job_counts": plan["job_counts"],
+            "execution_started": plan["execution_started"],
+            "queue_db": plan["queue_path"],
+            "report": str(report_path),
+        }
+        print(render_summary_output(summary, options.format))
+        return 0
     if options.suite == "representative":
+        if options.platform == "both":
+            parser.error("--platform both is only valid for --suite catalog")
         if not options.manifest:
             parser.error("--suite representative requires --manifest")
         if options.worker != "isolated":
@@ -811,16 +876,24 @@ def main(argv: list[str] | None = None) -> int:
         stamp = datetime.now().strftime("%Y%m%d-%H%M%S")
         report_path = options.report or ROOT / "outputs/acceptance" / f"t13-representative-{stamp}.json"
         code, report = run_samples(options.manifest, report_path, set(options.sample_id) or None)
-        print(json.dumps({
+        summary = {
+            "schema_version": 1,
+            "event": "run_summary",
             "suite": report["suite"], "status": report["status"], "report": str(report_path.resolve()),
             "sample_count": len(report.get("samples", [])), "l4_pass_count": report.get("l4_pass_count"),
             "gate": report.get("gate"), "error": report.get("error"),
-        }, ensure_ascii=False))
+        }
+        print(render_summary_output(summary, options.format))
         return code
+    if options.platform == "both":
+        parser.error("--platform both is only valid for --suite catalog")
+    platform_option = options.platform or available_platform()
     stamp = datetime.now().strftime("%Y%m%d-%H%M%S")
-    report_path = options.report or ROOT / "outputs/acceptance" / f"t12-smoke-{options.platform}-{stamp}.json"
-    code, report = run_smoke(options.platform, report_path, options.offline or os.environ.get("CARGO_NET_OFFLINE") == "true")
-    print(json.dumps({
+    report_path = options.report or ROOT / "outputs/acceptance" / f"t12-smoke-{platform_option}-{stamp}.json"
+    code, report = run_smoke(platform_option, report_path, options.offline or os.environ.get("CARGO_NET_OFFLINE") == "true")
+    summary = {
+        "schema_version": 1,
+        "event": "run_summary",
         "suite": report["suite"],
         "status": report["status"],
         "platform": report["platform"],
@@ -830,7 +903,8 @@ def main(argv: list[str] | None = None) -> int:
         "gateway_operations": len(report.get("gateway_operations", [])),
         "mcp_client": report.get("mcp_client", {}).get("returncode") if report.get("mcp_client") else None,
         "remaining_pids": report["cleanup"].get("remaining_pids"),
-    }, ensure_ascii=False))
+    }
+    print(render_summary_output(summary, options.format))
     return code
 
 

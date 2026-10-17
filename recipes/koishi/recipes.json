@@ -1,0 +1,200 @@
+{
+  "schema_version": 1,
+  "ecosystem": "koishi",
+  "recipes": [
+    {
+      "recipe_id": "koishi.config.v1",
+      "ecosystem": "koishi",
+      "category": "config",
+      "fixture_kind": "config",
+      "requires_config_fixture": true,
+      "required_services": [],
+      "observables": [
+        "applied_config",
+        "loaded_config",
+        "cleanup"
+      ],
+      "runner_contract": [
+        "Create the pinned app with a configuration fixture and capture the values visible to the plugin.",
+        "Check each observation against the independent fixture oracle before native/federated equivalence."
+      ],
+      "delivery_scope": "virtual"
+    },
+    {
+      "recipe_id": "koishi.preload.v1",
+      "ecosystem": "koishi",
+      "category": "preload",
+      "fixture_kind": "preload",
+      "requires_config_fixture": false,
+      "required_services": [],
+      "observables": [
+        "preload_order",
+        "loaded_entry",
+        "cleanup"
+      ],
+      "runner_contract": [
+        "Load explicit dependencies in the recorded order, then activate the registry entry.",
+        "Check each observation against the independent fixture oracle before native/federated equivalence."
+      ],
+      "delivery_scope": "virtual"
+    },
+    {
+      "recipe_id": "koishi.services.v1",
+      "ecosystem": "koishi",
+      "category": "services",
+      "fixture_kind": "services",
+      "requires_config_fixture": false,
+      "required_services": [
+        "services"
+      ],
+      "observables": [
+        "registered_services",
+        "injected_services",
+        "service_calls",
+        "cleanup"
+      ],
+      "runner_contract": [
+        "Provide fixture-backed context services, activate the entry, and record injected service calls.",
+        "Check each observation against the independent fixture oracle before native/federated equivalence."
+      ],
+      "delivery_scope": "virtual"
+    },
+    {
+      "recipe_id": "koishi.loader.v1",
+      "ecosystem": "koishi",
+      "category": "loader",
+      "fixture_kind": "loader",
+      "requires_config_fixture": false,
+      "required_services": [
+        "loader"
+      ],
+      "observables": [
+        "activation",
+        "deactivation",
+        "cleanup"
+      ],
+      "runner_contract": [
+        "Activate and dispose the entry through the pinned app lifecycle and capture both transitions.",
+        "Check each observation against the independent fixture oracle before native/federated equivalence."
+      ],
+      "delivery_scope": "virtual"
+    },
+    {
+      "recipe_id": "koishi.command.v1",
+      "ecosystem": "koishi",
+      "category": "command",
+      "fixture_kind": "command",
+      "requires_config_fixture": false,
+      "required_services": [],
+      "observables": ["command_registration", "matches", "operations", "operation_receipts", "cleanup"],
+      "runner_contract": [
+        "Activate the plugin with a frozen command, permission, and argument fixture; assert command matching and scoped actions.",
+        "Check each observation against the independent fixture oracle before native/federated equivalence."
+      ],
+      "delivery_scope": "virtual"
+    },
+    {
+      "recipe_id": "koishi.message.v1",
+      "ecosystem": "koishi",
+      "category": "message",
+      "fixture_kind": "message",
+      "requires_config_fixture": false,
+      "required_services": [],
+      "observables": [
+        "events",
+        "operations",
+        "operation_receipts",
+        "cleanup"
+      ],
+      "runner_contract": [
+        "Dispatch the frozen session through the native Koishi event path and capture scoped actions and receipts.",
+        "Check each observation against the independent fixture oracle before native/federated equivalence."
+      ],
+      "delivery_scope": "virtual"
+    },
+    {
+      "recipe_id": "koishi.storage.v1",
+      "ecosystem": "koishi",
+      "category": "storage",
+      "fixture_kind": "storage",
+      "requires_config_fixture": false,
+      "required_services": [
+        "storage"
+      ],
+      "observables": [
+        "state_before",
+        "state_after",
+        "state_after_restart",
+        "cleanup"
+      ],
+      "runner_contract": [
+        "Use the isolated database fixture, record state before and after the action, restart, and read it back.",
+        "Check each observation against the independent fixture oracle before native/federated equivalence."
+      ],
+      "delivery_scope": "virtual"
+    },
+    {
+      "recipe_id": "koishi.scheduler.v1",
+      "ecosystem": "koishi",
+      "category": "scheduler",
+      "fixture_kind": "scheduler",
+      "requires_config_fixture": false,
+      "required_services": [
+        "clock"
+      ],
+      "observables": [
+        "scheduled_jobs",
+        "fired_jobs",
+        "clock_ms",
+        "cleanup"
+      ],
+      "runner_contract": [
+        "Advance the deterministic test clock and record registered and fired jobs without wall-clock sleeps.",
+        "Check each observation against the independent fixture oracle before native/federated equivalence."
+      ],
+      "delivery_scope": "virtual"
+    },
+    {
+      "recipe_id": "koishi.adapter.v1",
+      "ecosystem": "koishi",
+      "category": "adapter",
+      "fixture_kind": "adapter",
+      "requires_config_fixture": false,
+      "required_services": [
+        "protocol_peer"
+      ],
+      "observables": [
+        "protocol_frames",
+        "operations",
+        "operation_receipts",
+        "cleanup"
+      ],
+      "runner_contract": [
+        "Exchange frozen adapter frames with a local protocol peer and capture resulting scoped actions.",
+        "Check each observation against the independent fixture oracle before native/federated equivalence."
+      ],
+      "delivery_scope": "virtual"
+    },
+    {
+      "recipe_id": "koishi.console.v1",
+      "ecosystem": "koishi",
+      "category": "console",
+      "fixture_kind": "console",
+      "requires_config_fixture": false,
+      "required_services": [
+        "http"
+      ],
+      "observables": [
+        "http_routes",
+        "http_responses",
+        "assets",
+        "cleanup"
+      ],
+      "runner_contract": [
+        "Bind the plugin's local HTTP surface to the fixture server and assert routes, responses, and assets.",
+        "Check each observation against the independent fixture oracle before native/federated equivalence."
+      ],
+      "delivery_scope": "virtual"
+    }
+  ]
+}

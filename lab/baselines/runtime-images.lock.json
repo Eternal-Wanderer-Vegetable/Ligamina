@@ -1,0 +1,14 @@
+{
+  "schema_version": 1,
+  "task_id": "S2-05",
+  "platform": "linux/amd64",
+  "worker_image": "python@sha256:f77ac9e44ae96ef2c90b8053ea08c31f8be030f824196b0ae4db6d462c84e51f",
+  "profile_images": {
+    "nonebot": "ligamina-s205-python-profile@sha256:88bc85522c681966347809c702e0ae7fcf6fba4d8860161e77d7aa877a04488e",
+    "koishi": "node@sha256:ba849c60be29959425b8734d57b8b4b7d56f98edd9504c9af091d5281095a71e"
+  },
+  "runtime_artifact_image": "ligamina-s205-runtime@sha256:3798f5ab1791abbb4fc436e192124a74cac3cdab89374d98a7d6b1ae3a65f45d",
+  "runtime_artifact_build": "docker build --file deploy/linux/Dockerfile --tag ligamina-s205-runtime:20261012 .",
+  "profile_image_build": "docker build --file deploy/linux/Dockerfile --target python-host --tag ligamina-s205-python-profile:20261012 .",
+  "source_dockerfile": "deploy/linux/Dockerfile"
+}

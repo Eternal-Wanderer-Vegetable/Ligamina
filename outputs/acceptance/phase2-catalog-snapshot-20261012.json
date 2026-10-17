@@ -1,0 +1,84 @@
+{
+  "schema_version": 1,
+  "kind": "phase2_catalog_snapshot_acceptance",
+  "date": "2026-10-12",
+  "command": "uv run --locked --project lab --python 3.12.14 python -m lab.catalog.snapshot capture --output-root catalogs",
+  "verify_command": "uv run --locked --project lab --python 3.12.14 python -m lab.catalog.snapshot verify catalogs/p2-41649744e057d61031d5",
+  "snapshot_id": "p2-41649744e057d61031d5",
+  "captured_at_utc": "2026-10-12T00:12:18.622Z",
+  "counts": {
+    "registry_entries": 5690,
+    "by_ecosystem": {"nonebot": 943, "koishi": 4747},
+    "official_maintained": {"nonebot": 9, "koishi": 46},
+    "duplicate_package_entries": {"nonebot": 1, "koishi": 0},
+    "koishi_official_page_packages": 46,
+    "koishi_official_page_packages_missing_from_registry": 0
+  },
+  "sources": [
+    {
+      "source_key": "nonebot_registry",
+      "requested_url": "https://registry.nonebot.dev/plugins.json",
+      "http_status": 200,
+      "fetched_at_utc": "2026-10-12T00:12:16.559Z",
+      "byte_length": 563373,
+      "sha256": "16dbbcfeb23c7543b943df079b21d75c54667bae83836473c4a5f66505629d65",
+      "etag": "\"6f84061de93adee2a63db3feb9a4d6ec-ssl\"",
+      "age_seconds": 1658,
+      "upstream_revision": null,
+      "revision_limitation": "The public registry JSON does not expose an upstream commit or catalog version."
+    },
+    {
+      "source_key": "koishi_registry",
+      "requested_url": "https://registry.koishi.chat/index.json",
+      "final_url": "https://registry.koishi.chat/index.5eed0244fd81dcb84f0cec4101792abde1ae2c0026728213c7620311a75cbcd1.json",
+      "http_status": 200,
+      "fetched_at_utc": "2026-10-12T00:12:17.777Z",
+      "byte_length": 5245035,
+      "sha256": "5eed0244fd81dcb84f0cec4101792abde1ae2c0026728213c7620311a75cbcd1",
+      "etag": "\"cbb255f6d69e36f5a9ef9ab13b3f7d53\"",
+      "upstream_revision": {"version": 6, "time": "Sun, 11 Oct 2026 23:24:51 GMT", "force_time": 1791761091868}
+    },
+    {
+      "source_key": "koishi_official_plugins_page",
+      "requested_url": "https://koishi.chat/zh-CN/plugins/",
+      "http_status": 200,
+      "fetched_at_utc": "2026-10-12T00:12:18.467Z",
+      "byte_length": 184377,
+      "sha256": "d624ad43f81713a5ffcb57c9fad85093fc90a7a837e0dbf9656f16bbfdeb5065"
+    }
+  ],
+  "integrity": {
+    "offline_verify": "passed",
+    "catalog_sha256": "8c75d69358cd8334d0d311c1e19c642794d7436056d32041f02e6c1de1a06163",
+    "changes_sha256": "9c00bbb94a6b36ae334b4b793e12104f4b9432c3ab5a92c5b79cf76cd8be3b4e",
+    "baseline_entry_id_set_sha256": "ee5f936d4eb6a8cda191e2f5a7a8830f0aa68858b8b522e184724f5a40e4cf4b",
+    "total_snapshot_bytes": 19237599
+  },
+  "tests": {
+    "catalog_unit_cases": 9,
+    "status": "passed",
+    "metadata_only": true,
+    "plugin_packages_downloaded_or_executed": 0,
+    "post_change_full_verification": {
+      "command": "pwsh -NoProfile -File init.ps1 -Mode full",
+      "exit_code": 0,
+      "documentation": {"documents": 18, "local_links": 139, "failures": 0},
+      "lab_unittest_cases": 26,
+      "koishi_host_tests": 6,
+      "mcp_interoperability_cases": 1,
+      "reference_client_tests": 5,
+      "rust_workspace_tests": 28,
+      "release_build": "passed",
+      "core_smoke": {
+        "status": "passed",
+        "events": 4,
+        "gateway_operations": 4,
+        "remaining_pids": []
+      },
+      "windows_bundle_stage": "passed"
+    },
+    "harness_score": "100/100",
+    "readme_evidence_check": "passed"
+  },
+  "scope": "Directory snapshot and source provenance only. This is not a plugin install, runtime, behavior, OS-isolation, pilot, census, or real-platform result."
+}
