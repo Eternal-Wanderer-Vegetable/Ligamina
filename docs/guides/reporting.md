@@ -8,7 +8,7 @@
 - 现有 lab suite 有 completed、passed、failed、not_run、environment_missing 等格式差异。
 - [lab/report.py](../../lab/report.py) 对 v1 run 校验 schema、预期 ID、状态和计数；summary 必须能由 results 重算。旧 T13/T18 等报告仍保留兼容摘要路径，不伪装成 v1。
 - Rust `ligamina-cli report` 与 Python `python -m lab.report` 接受同一 v1 JSON，输出 JSON/text/NDJSON；默认 JSON。`lab.run --format` 输出 schema-versioned 的短命令摘要，完整证据继续保留在报告文件。
-- `node scripts/render-readme.mjs` 更新 T18/T13 与第二阶段的独立标记区；`--check` 验证源报告、固定快照身份、输入哈希和 README 漂移。部分运行及尚未派发会直接显示。
+- `node scripts/render-readme.mjs` 更新 T18/T13 与第二阶段的独立标记区；`--check` 验证源报告、固定快照身份、输入哈希和 README 漂移。文本证据保留原始 SHA-256；校验仅接受 UTF-8 文本的 LF/CRLF 等价字节，其他内容变更仍失败。部分运行及尚未派发会直接显示。
 
 ## 第二阶段 v1 格式（合同已实现）
 

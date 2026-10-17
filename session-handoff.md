@@ -8,6 +8,21 @@
 - 单元终态：0 passed、880 failed、7,530 skipped、2,970 unknown。SQLite stage-job 终态另为 24,914 passed、880 failed、37,357 skipped、5,129 unknown；这两个分母不同，stage-job passed 不等于 plugin compatibility。
 - Gate 状态：P2-CATALOG/P2-CENSUS passed；P2-AUTOMATION blocked（2,158 Linux Docker API unavailable unknown、796 Windows App Control Win32 4551 unknown、16 其他 worker/preparation/timeout unknown）；P2-BEHAVIOR not evaluated；P2-FIELD not run。没有 catalog-wide compatibility pass 或新增 support claim；四个精确 T18 版本维持原范围。
 
+## CI Diagnosis (2026-10-17)
+
+- PR #3 当前 HEAD `b0615548d65fd0b04a3bb00a5a00db304cc32f20` 的 [GitHub Actions run #18](https://github.com/Eternal-Wanderer-Vegetable/Ligamina/actions/runs/38988173249) 失败；前一次 [run #17](https://github.com/Eternal-Wanderer-Vegetable/Ligamina/actions/runs/38915036215) 有相同失败。两个 run 的 Linux 和 Windows job 都在第一道 `node scripts/check-docs.mjs` 失败，错误为 `Stale phase-two report input: outputs/acceptance/phase2-s207-cli-smoke-20261012.json`。`scripts/check.sh:24` 与 `scripts/check.ps1:26` 均先运行该 gate，因此 pytest、lab、Koishi、Rust、smoke 和 bundle 后续步骤没有运行。
+- 根因是证据文件哈希绑定了工作树换行字节：`.gitattributes` 要求 LF，renderer 在 [scripts/render-readme.mjs](scripts/render-readme.mjs) 对原始 `readFile` 字节计算 SHA-256，而 [S2-08 报告](outputs/acceptance/phase2-s208-20261012.json) 为 S2-07 输入记录了 Windows CRLF 字节哈希 `35ba6754590ed3aef560468c544daed7cc1c9e7b71e57441b4fb1ea16a383588`。当前 Windows 工作树哈希与该值相同；Git blob/干净归档 checkout 是 LF，哈希为 `2a5efbd5461ebbb9277f845fb199cf3404916e44f0c004a61c9900c27aeac159`。
+- 复现证据：本地 `node scripts/check-docs.mjs` 退出码 0；从 HEAD 建立临时 `git archive` checkout 后运行同一命令，退出码 1 并出现 CI 的相同错误。只在临时归档副本中把 stale `throw` 改为记录，进一步发现 9 个 S2-09 source hash、1 个 S2-10 全局 source hash 和 512 个 S2-10 shard source hash 也依赖 CRLF 版本的同一 S2-09 证据文件。该诊断没有改动仓库中的 checker 或报告。
+- 本节为根因诊断记录；修复与验证结果见下节。
+
+## CI Fix (2026-10-17)
+
+- `scripts/evidence-hash.mjs` 保留并校验历史 SHA-256：先比较原始字节，再对有效 UTF-8 文本比较 LF 与 CRLF 等价字节；孤立 CR 或无效 UTF-8 不会触发归一化。renderer 的所有原始文件哈希验证均改用该函数，覆盖 S2-08 input reports、S2-09 source inputs、S2-10 sources/shards/retry evidence、S2-11 shard files 与 S2-12 checkpoint。报告中的历史哈希与源证据文件都未重写。
+- `scripts/evidence-hash.test.mjs` 覆盖实际 S2-07 失败输入、LF→CRLF 与 CRLF→LF、内容变化拒绝、无效 UTF-8 拒绝；Windows 与 Linux `scripts/check.*` 均在 docs gate 前运行该回归。
+- 修复前 baseline：Windows `pwsh -NoProfile -File init.ps1 -Mode docs` 通过（18 documents / 233 local links）；从 HEAD `git archive` 建立 LF 归档后，`node scripts/check-docs.mjs` 以 stale S2-07 输入错误退出 1。
+- 修复后：`node --test scripts/evidence-hash.test.mjs` 4 项通过；`pwsh -NoProfile -File init.ps1 -Mode docs` 通过；`node --check scripts/evidence-hash.mjs`、`node --check scripts/render-readme.mjs` 与 `git diff --check` 通过。从 LF 归档覆盖本次改动后，再运行回归与 `node scripts/check-docs.mjs` 均通过（18 documents / 233 local links）。
+- 本地完整 `scripts/check.ps1` / `scripts/check.sh` 尚未运行。推送后需确认 Windows/Linux hosted CI：原失败门通过后，后续 pytest、lab、Koishi、Rust、smoke 与 bundle 步骤才会实际执行；这不改变插件兼容性结论。
+
 ## Completed Stages
 
 - H01：Agent 文档 harness、专题指南、README 摘要与第二阶段计划。

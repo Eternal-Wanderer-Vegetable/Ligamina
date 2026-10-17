@@ -30,7 +30,7 @@ bash init.sh full
 
 | 改动 | 必要验证 |
 | --- | --- |
-| 文档/状态/README 渲染 | docs 入口；bundled validate-harness 验证结构 |
+| 文档/状态/README 渲染 | `node --test scripts/evidence-hash.test.mjs`；docs 入口；bundled validate-harness 验证结构 |
 | Rust Core/CLI | cargo fmt --all -- --check、cargo test --workspace --locked；路由/生命周期改动重跑 smoke |
 | NoneBot Host | uv run --locked --project hosts/nonebot --python 3.12.14 pytest -q hosts/nonebot/tests，以及 Host README 原生/Bridge/worker probes |
 | Koishi Host | npm ci、npm test（在 hosts/koishi）；MCP 改动加 npm run test:mcp |

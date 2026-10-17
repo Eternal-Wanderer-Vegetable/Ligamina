@@ -1,7 +1,7 @@
-import { createHash } from 'node:crypto';
 import { readFile, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { matchesTextSha256 } from './evidence-hash.mjs';
 
 export const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const start = '<!-- ligamina:phase1:start -->';
@@ -103,8 +103,8 @@ export async function phase2Block() {
     [catalogPath, recipesPath, schedulerPath, reportingPath, baselinePath, s210BaselinePath, s210SmokePath, s210ImplementationPath, s210LinuxFormalPath, s210Linux1FormalPath, s210Linux2FormalPath, s210WindowsFormalPath, s210Windows1FormalPath, s210WindowsAttempt1Path, s210InterimAggregatePath, s211RerunPath, s212AuditPath, pilotManifestPath, pilotAcceptancePath, nonebotLinuxPilotPath, koishiLinuxPilotPath, koishiWindowsPilotPath, planPath, featureListPath].map(load),
   );
   for (const [relative, expected] of Object.entries(reporting.input_reports ?? {})) {
-    const actual = createHash('sha256').update(await readFile(path.join(root, relative))).digest('hex');
-    if (actual !== expected) throw new Error(`Stale phase-two report input: ${relative}`);
+    const bytes = await readFile(path.join(root, relative));
+    if (!matchesTextSha256(bytes, expected)) throw new Error(`Stale phase-two report input: ${relative}`);
   }
   const count = catalog.counts?.registry_entries;
   const official = Object.values(catalog.counts?.official_maintained ?? {}).reduce((sum, value) => sum + value, 0);
@@ -156,29 +156,27 @@ export async function phase2Block() {
     profile_lock_sha256: 'catalogs/p2-41649744e057d61031d5/profiles.lock.json',
     s209_blocker_evidence_sha256: pilotAcceptancePath,
   };
-  const expectedS210SourceHashes = {};
+  const s210SourceBytes = {};
   for (const [key, relative] of Object.entries(s210SourceHashes)) {
-    const actual = createHash('sha256').update(await readFile(path.join(root, relative))).digest('hex');
-    expectedS210SourceHashes[key] = actual;
-    if (actual !== s210Smoke.source_hashes?.[key] || actual !== s210LinuxFormal.source_hashes?.[key]
-        || actual !== s210Linux1Formal.source_hashes?.[key] || actual !== s210Linux2Formal.source_hashes?.[key]
-        || actual !== s210WindowsFormal.source_hashes?.[key] || actual !== s210Windows1Formal.source_hashes?.[key]
-        || actual !== s210WindowsAttempt1.source_hashes?.[key]) {
+    const bytes = await readFile(path.join(root, relative));
+    s210SourceBytes[key] = bytes;
+    const expectedHashes = [s210Smoke, s210LinuxFormal, s210Linux1Formal, s210Linux2Formal,
+      s210WindowsFormal, s210Windows1Formal, s210WindowsAttempt1].map((report) => report.source_hashes?.[key]);
+    if (expectedHashes.some((expected) => !matchesTextSha256(bytes, expected))) {
       throw new Error(`Stale S2-10 census input: ${relative}`);
     }
   }
   const previousWindowsAttempt = s210Implementation.formal_shards?.windows_0_of_256?.previous_attempt_report;
   if (previousWindowsAttempt) {
-    const actual = createHash('sha256').update(await readFile(path.join(root, previousWindowsAttempt))).digest('hex');
-    if (actual !== s210Implementation.formal_shards.windows_0_of_256.previous_attempt_file_sha256) {
+    const bytes = await readFile(path.join(root, previousWindowsAttempt));
+    if (!matchesTextSha256(bytes, s210Implementation.formal_shards.windows_0_of_256.previous_attempt_file_sha256)) {
       throw new Error(`Stale S2-10 Windows attempt evidence: ${previousWindowsAttempt}`);
     }
   }
   for (const attempt of Object.values(s210Implementation.retry_attempts ?? {})) {
     const bytes = await readFile(path.join(root, attempt.report));
-    const actual = createHash('sha256').update(bytes).digest('hex');
     const report = JSON.parse(bytes);
-    if (actual !== attempt.file_sha256 || report.report_sha256 !== attempt.report_sha256
+    if (!matchesTextSha256(bytes, attempt.file_sha256) || report.report_sha256 !== attempt.report_sha256
         || report.status !== attempt.status || report.kind !== 'phase2_s210_census_shard') {
       throw new Error(`Stale S2-10 retry evidence: ${attempt.report}`);
     }
@@ -257,8 +255,7 @@ export async function phase2Block() {
   let aggregateShardUnits = 0;
   for (const shard of s210InterimShardReports) {
     const bytes = await readFile(path.join(root, shard.path));
-    const actual = createHash('sha256').update(bytes).digest('hex');
-    if (actual !== shard.sha256) throw new Error(`Stale S2-10 aggregate shard input: ${shard.path}`);
+    if (!matchesTextSha256(bytes, shard.sha256)) throw new Error(`Stale S2-10 aggregate shard input: ${shard.path}`);
     const report = JSON.parse(bytes);
     const { platform, shard: identity, denominator, counts } = report;
     const shardId = `${platform}:${identity?.index}/${identity?.count}`;
@@ -273,8 +270,10 @@ export async function phase2Block() {
         || ['passed', 'failed', 'skipped', 'unknown'].reduce((sum, status) => sum + (counts?.[status] ?? 0), 0) !== denominator.selected_units) {
       throw new Error(`Invalid S2-10 aggregate shard report: ${shard.path}`);
     }
-    for (const [key, expected] of Object.entries(expectedS210SourceHashes)) {
-      if (report.source_hashes?.[key] !== expected) throw new Error(`Stale source hash in S2-10 shard: ${shard.path} (${key})`);
+    for (const [key, bytes] of Object.entries(s210SourceBytes)) {
+      if (!matchesTextSha256(bytes, report.source_hashes?.[key])) {
+        throw new Error(`Stale source hash in S2-10 shard: ${shard.path} (${key})`);
+      }
     }
     observedShardIds.add(shardId);
     aggregateShardUnits += denominator.selected_units;
@@ -317,10 +316,9 @@ export async function phase2Block() {
       throw new Error(`Invalid S2-11 canonical shard index: ${item.path}`);
     }
     const bytes = await readFile(path.join(root, item.path));
-    const actualFileSha = createHash('sha256').update(bytes).digest('hex');
     const shard = JSON.parse(bytes);
     const denominator = shard.denominator ?? {};
-    if (actualFileSha !== item.file_sha256 || shard.report_sha256 !== item.report_sha256
+    if (!matchesTextSha256(bytes, item.file_sha256) || shard.report_sha256 !== item.report_sha256
         || shard.status !== 'completed' || shard.task_id !== 'S2-10'
         || shard.kind !== 'phase2_s210_census_shard'
         || shard.snapshot_id !== catalog.snapshot_id || shard.platform !== item.platform
@@ -355,12 +353,12 @@ export async function phase2Block() {
   }
   const s212Gates = new Map((s212Audit.gates ?? []).map((gate) => [gate.id, gate.status]));
   const s212Matrix = await readFile(path.join(root, s212MatrixPath), 'utf8');
-  const s212CheckpointSha = createHash('sha256').update(await readFile(path.join(root, s211RerunPath))).digest('hex');
+  const s212CheckpointBytes = await readFile(path.join(root, s211RerunPath));
   if (s212Audit.task_id !== 'S2-12' || s212Audit.kind !== 'phase2_catalog_final_audit'
       || s212Audit.s211_full_rerun?.status !== 'completed'
       || s212Audit.s211_full_rerun.canonical_reports !== 512 || s212Audit.s211_full_rerun.units !== 11380
       || Object.keys(s212Audit.source_sha256 ?? {}).length !== 5
-      || s212Audit.source_sha256.s211_scoped_regression !== s212CheckpointSha
+      || !matchesTextSha256(s212CheckpointBytes, s212Audit.source_sha256.s211_scoped_regression)
       || s212Audit.s211_full_rerun.unit_counts?.passed !== 0
       || s212Audit.s211_full_rerun.unit_counts?.failed !== s211UnitCounts.failed
       || s212Audit.s211_full_rerun.unit_counts?.skipped !== s211UnitCounts.skipped
@@ -386,8 +384,10 @@ export async function phase2Block() {
     koishi_windows_catalog_pilot_sha256: koishiWindowsPilotPath,
   };
   for (const [key, relative] of Object.entries(pilotInputs)) {
-    const actual = createHash('sha256').update(await readFile(path.join(root, relative))).digest('hex');
-    if (actual !== pilotAcceptance.source_hashes?.[key]) throw new Error(`Stale S2-09 evidence input: ${relative}`);
+    const bytes = await readFile(path.join(root, relative));
+    if (!matchesTextSha256(bytes, pilotAcceptance.source_hashes?.[key])) {
+      throw new Error(`Stale S2-09 evidence input: ${relative}`);
+    }
   }
   if (pilotManifest.task_id !== 'S2-09' || pilotManifest.catalog_entry_os_denominator !== 11380
       || pilotManifest.catalog_assignment_ledger_count !== 11380 || pilotManifest.selected_catalog_entry_count !== 60

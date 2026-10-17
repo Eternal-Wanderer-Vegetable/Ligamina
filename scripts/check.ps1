@@ -23,6 +23,7 @@ try {
     if ($uvVersion -notmatch '^uv 0\.12\.5(?:\s|$)') { throw "Expected uv 0.12.5; found '$uvVersion'." }
     if ($nodeVersion -ne 'v24.20.0') { throw "Expected Node v24.20.0; found '$nodeVersion'." }
 
+    Invoke-Checked node @('--test', 'scripts/evidence-hash.test.mjs')
     Invoke-Checked node @('scripts/check-docs.mjs')
     Invoke-Checked uv @('python', 'install', '3.12.14')
     Invoke-Checked uv @('run', '--locked', '--project', 'hosts/nonebot', '--python', '3.12.14', 'pytest', '-q', 'hosts/nonebot/tests')
