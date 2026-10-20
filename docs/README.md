@@ -9,6 +9,7 @@
 | 判断插件是否兼容 | [兼容性实验](guides/compatibility.md) |
 | 解读状态、日志、实验输出 | [输出规范](guides/reporting.md) |
 | 实施第二阶段 | [全量目录测试计划](plans/2026-10-12-phase-2-full-catalog.md) |
+| 实施下一阶段自动化检测 | [第三阶段工程方案](plans/2026-10-20-phase-3-automation.md)（方案已制定，尚未实施） |
 | 维护入口、指南与状态 | [文档维护](guides/documentation.md) |
 | 查阅旧设计、验收和裁决 | [证据索引](evidence/README.md) |
 

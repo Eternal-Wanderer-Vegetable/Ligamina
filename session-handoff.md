@@ -2,6 +2,15 @@
 
 ## Current Objective
 
+- 日期：2026-10-20（Asia/Shanghai）。本次用户要求制定下一阶段自动化检测方案，方案已写入 [第三阶段计划](docs/plans/2026-10-20-phase-3-automation.md)，尚未授权或开始实施其中的代码/运行任务。
+- 当前代码基线 main `a311ac8`；本次只有计划、导航和状态文档变更，未提交/推送，未启动第三方插件或新 runner。
+- `feature_list.json` 新增 P3-01–P3-10（feat-015–024），全部 not-started；active_feature=null，next_feature=feat-015。下一次获准实施时先选择 P3-01 并记录 runtime baseline。
+- 方案关键项：逐阶段生成恢复集合、新 campaign 身份/DB、实际 Worker 准入、fencing/heartbeat/熔断/reconciliation、Windows 单独准入、20 entries 的独立 oracle 行为 pilot、CI 与 scoped gates。
+- P2 历史裁决不变；Windows 当前主机能力与 P3 参数尚未实测。计划中的模块/命令/阈值属于设计，不可当成现有实现。
+- 本次实际文档验证见 progress 的 2026-10-20 节；无需运行或重建 S2 原始验收工件来继续文档工作。
+
+## Historical S2 Objective (2026-10-17)
+
 - 日期：2026-10-17（Asia/Shanghai）。用户要求的 `docs/plans/2026-10-12-phase-2-full-catalog.md` S2-01–S2-12 均已完成，并已按阶段提交。
 - 分支：`codex/phase2-full-catalog`。S2-12 按阶段提交：renderer/终态跟踪 `d4b35d7`、数据与审计报告 `7f81c70`、progress/feature tracker `c156b2c`、compatibility/证据索引 `1a1627f`、计划 `5f0e407`；本 handoff 为单独的最终 closeout 提交。
 - 最终分母：512/512 canonical reports、11,380/11,380 catalog entry×OS units、68,280/68,280 selected stage jobs；报告与文件 SHA、SQLite run/manifest/job closure、Linux/Windows 连续分片审计通过，invalid reports=0；无活动/queued/leased work。

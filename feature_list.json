@@ -1,8 +1,8 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-10-17",
+  "updated_at": "2026-10-20",
   "active_feature": null,
-  "next_feature": null,
+  "next_feature": "feat-015",
   "features": [
     {
       "id": "feat-001",
@@ -1312,6 +1312,152 @@
         "outputs/acceptance/phase2-s211-failures-20261014.json",
         "outputs/acceptance/t18-final-audit-20261012.json"
       ]
+    },
+    {
+      "id": "feat-015",
+      "task_id": "P3-01",
+      "name": "输入合同与补测账本",
+      "description": "定义 automation manifest、selection ledger、身份与 gate 合同。",
+      "dependencies": [
+        "feat-014"
+      ],
+      "status": "not-started",
+      "done_when": "从逐阶段历史结果精确重算集合；重复/漏项/篡改/身份错配/跨身份合并负例通过，保留静态不适用账本。",
+      "evidence": "尚未实施；2026-10-20 仅制定工程方案，本文档不是运行时或插件验收证据。",
+      "evidence_paths": [],
+      "plan_path": "docs/plans/2026-10-20-phase-3-automation.md"
+    },
+    {
+      "id": "feat-016",
+      "task_id": "P3-02",
+      "name": "Worker 准入与健康检查",
+      "description": "实际隔离环境的 runtime、资源、边界与清理探针，持续健康记录。",
+      "dependencies": [
+        "feat-015"
+      ],
+      "status": "not-started",
+      "done_when": "Linux 实机 benign probes 通过；Windows 探针与 blocker 采集入口可运行；未准入 backend 不 claim，环境变化使准入失效。",
+      "evidence": "尚未实施；2026-10-20 仅制定工程方案，本文档不是运行时或插件验收证据。",
+      "evidence_paths": [],
+      "plan_path": "docs/plans/2026-10-20-phase-3-automation.md"
+    },
+    {
+      "id": "feat-017",
+      "task_id": "P3-03",
+      "name": "熔断、fencing 与恢复",
+      "description": "接入 heartbeat、attempt generation、backend 熔断、资源 reconciliation 和 Windows 主机互斥。",
+      "dependencies": [
+        "feat-016"
+      ],
+      "status": "not-started",
+      "done_when": "同名 owner/过期租约迟到提交拒绝；API 失联停派发；重启先确认旧资源清理后重试；Linux 真 Worker 故障注入通过。",
+      "evidence": "尚未实施；2026-10-20 仅制定工程方案，本文档不是运行时或插件验收证据。",
+      "evidence_paths": [],
+      "plan_path": "docs/plans/2026-10-20-phase-3-automation.md"
+    },
+    {
+      "id": "feat-018",
+      "task_id": "P3-04",
+      "name": "Windows runtime 准入",
+      "description": "在专用 Windows 主机的实际 Sandbox 低权限环境验证锁定解释器和 Worker。",
+      "dependencies": [
+        "feat-016"
+      ],
+      "status": "not-started",
+      "done_when": "同锁定 runtime 实际启动、隔离/限额/进程树清理全部有实机证据；身份改变独立记账；无可用组合保持 blocked。",
+      "evidence": "尚未实施；2026-10-20 仅制定工程方案，本文档不是运行时或插件验收证据。",
+      "evidence_paths": [],
+      "plan_path": "docs/plans/2026-10-20-phase-3-automation.md"
+    },
+    {
+      "id": "feat-019",
+      "task_id": "P3-05",
+      "name": "受影响集合补测与归因",
+      "description": "新 campaign 分层 pilot、受影响集合执行与 old→new ledger。",
+      "dependencies": [
+        "feat-017"
+      ],
+      "status": "not-started",
+      "done_when": "Linux 完成 pilot 和选中集合执行/归因；Windows 仅 P3-04 通过后执行，否则明确剩余范围与 blocked gate；每 OS 独立裁决，原报告不改写。",
+      "evidence": "尚未实施；2026-10-20 仅制定工程方案，本文档不是运行时或插件验收证据。",
+      "evidence_paths": [],
+      "plan_path": "docs/plans/2026-10-20-phase-3-automation.md"
+    },
+    {
+      "id": "feat-020",
+      "task_id": "P3-06",
+      "name": "entry-bound 行为集合",
+      "description": "冻结目录 NoneBot/Koishi 各十个 entry 的 fixture、独立 oracle 与平台适用性。",
+      "dependencies": [
+        "feat-015"
+      ],
+      "status": "not-started",
+      "done_when": "20 个目录 entry 每项至少三必选 case，source/oracle 审阅与所有身份摘要齐全；四个历史版本单列，缺项不得以标签凑数。",
+      "evidence": "尚未实施；2026-10-20 仅制定工程方案，本文档不是运行时或插件验收证据。",
+      "evidence_paths": [],
+      "plan_path": "docs/plans/2026-10-20-phase-3-automation.md"
+    },
+    {
+      "id": "feat-021",
+      "task_id": "P3-07",
+      "name": "通用 Native/Federated 执行",
+      "description": "接通目录场景的 stock native 与生产 Core/Host 双路径。",
+      "dependencies": [
+        "feat-017",
+        "feat-020"
+      ],
+      "status": "not-started",
+      "done_when": "独立可写状态与实际 Core trace；同错/错收件人/缺 expected/状态串扰负例拒绝；四个历史版本回归无新增失败。",
+      "evidence": "尚未实施；2026-10-20 仅制定工程方案，本文档不是运行时或插件验收证据。",
+      "evidence_paths": [],
+      "plan_path": "docs/plans/2026-10-20-phase-3-automation.md"
+    },
+    {
+      "id": "feat-022",
+      "task_id": "P3-08",
+      "name": "双平台行为 pilot",
+      "description": "执行至少 120 个 entry×OS×case 位置并三次干净复跑。",
+      "dependencies": [
+        "feat-018",
+        "feat-019",
+        "feat-021"
+      ],
+      "status": "not-started",
+      "done_when": "至少 120 必选位置完成双路径执行或依赖归因、三次干净复跑记账与完整 trace/清理证据；兼容 gate 按实测独立裁决，确定插件不兼容可交付检测任务但不扩张支持；缺 OS 准入、漏账或清理未知仍为验收缺项。",
+      "evidence": "尚未实施；2026-10-20 仅制定工程方案，本文档不是运行时或插件验收证据。",
+      "evidence_paths": [],
+      "plan_path": "docs/plans/2026-10-20-phase-3-automation.md"
+    },
+    {
+      "id": "feat-023",
+      "task_id": "P3-09",
+      "name": "CI 与定期检测入口",
+      "description": "PR 自测、受控专用实验机执行、失败/中断 artifact 上传与周期配置。",
+      "dependencies": [
+        "feat-017",
+        "feat-021"
+      ],
+      "status": "not-started",
+      "done_when": "干净 checkout 自测通过；实验机不接收 fork PR 工作；同 campaign/Windows 主机不重入；失败和中断仍有完整证据链。",
+      "evidence": "尚未实施；2026-10-20 仅制定工程方案，本文档不是运行时或插件验收证据。",
+      "evidence_paths": [],
+      "plan_path": "docs/plans/2026-10-20-phase-3-automation.md"
+    },
+    {
+      "id": "feat-024",
+      "task_id": "P3-10",
+      "name": "报告、gate 审计与交接",
+      "description": "聚合全量/恢复/行为不同分母并给出有 scope 的 gate 裁决。",
+      "dependencies": [
+        "feat-019",
+        "feat-022",
+        "feat-023"
+      ],
+      "status": "not-started",
+      "done_when": "分母独立复算、哈希/身份/引用校验、五 gate 分开且无越界支持声明；依赖验收完成，README 与交接可复跑。",
+      "evidence": "尚未实施；2026-10-20 仅制定工程方案，本文档不是运行时或插件验收证据。",
+      "evidence_paths": [],
+      "plan_path": "docs/plans/2026-10-20-phase-3-automation.md"
     }
   ]
 }

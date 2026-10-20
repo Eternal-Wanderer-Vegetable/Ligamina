@@ -30,6 +30,7 @@ Ligamina 是独立的插件联邦运行时与兼容性实验室：Rust Core + �
 | 插件来源、全量扫描、差分测试或支持结论 | [兼容性实验](docs/guides/compatibility.md) |
 | CLI/实验报告输出或 README 结果展示 | [输出规范](docs/guides/reporting.md) |
 | 第二阶段实施与任务验收 | [第二阶段计划](docs/plans/2026-10-12-phase-2-full-catalog.md) |
+| 第三阶段自动化、补测与行为检测 | [第三阶段方案](docs/plans/2026-10-20-phase-3-automation.md)；实施前按任务表检查依赖和准入条件 |
 | 修改文档、指令、状态或历史索引 | [文档维护](docs/guides/documentation.md) |
 | 查第一阶段过程与旧裁决 | [证据索引](docs/evidence/README.md)；只加载相关记录 |
 
