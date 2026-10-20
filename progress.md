@@ -105,3 +105,9 @@
 - `uv run --locked --project lab --python 3.12.14 python -m lab.automation plan --output outputs/acceptance/phase3-p301-recovery-manifest-20261020.json` 与 `... validate ...` 均退出 0；测试同时拒绝缺 shard、重复 shard/unit、摘要漏项、报告内容篡改、profile/artifact 身份错配与跨 snapshot 合并。
 - `bash init.sh docs` 退出 0（19 documents / 256 local links / 11 indexed historical Markdown / 24 features）；Node evidence-hash tests 4/4；harness validation 100/100；`git diff --check` 通过。未运行 `Mode full`，因为它会启动 Windows Core smoke/build 测试。
 - 当前 next feature 为 P3-02。先实施并验证 Linux Worker 准入与 recovery；Windows 测试和 Windows/Sandbox gate 留待后续 Windows/WSL 实机阶段。
+
+## P3-06 Entry-bound Behavior Suite (2026-10-20)
+
+- P3-06 工程交付完成：冻结 NoneBot/Koishi 各 10 个目录 entry 的 60 个必选行为 case，绑定 catalog/artifact/profile/dependency-lock/source-member 哈希；四个历史支持版本作为独立 regression identities。详见计划中的 P3-06 实施记录及 [suite validation report](outputs/acceptance/phase3-p306-suite-validation-20261020.json)。
+- Linux `lab.tests.test_automation_behavior lab.tests.test_recipes lab.tests.test_compare` 共 18 项通过；`python -m lab.automation validate-behavior` 输出 20 entries / 60 cases / 40 platform positions / 4 legacy regressions。此为 schema/identity 验证，`behavior_executed=false`，未安装或运行第三方插件，没有兼容性结论。
+- Windows 测试均跳过。feature list 中 P3-06 为 done；P3-02 仍因当前 Linux 主机无 Docker CLI/daemon 而 blocked，依赖其 Worker 的 P3-03/05/07 等任务不能进入真实实验。下一步需在满足锁定 Docker Worker 条件的 Linux 主机恢复 P3-02；Windows gates 留待后续 Windows/WSL 全量实测。

@@ -237,3 +237,11 @@ PR 必跑不依赖实验机的 schema/selection/queue/comparator/fixture 校验�
 - 已新增 Linux health fingerprint、Docker daemon/锁定镜像/资源余量/benign report 校验、失败关闭的 claim admission helper、`preflight` CLI 与初始资源/熔断参数；Linux probe 脚本现可显式指定新报告路径，不会覆盖 S2 evidence。Windows preflight 仅输出 `not_tested`，未运行。
 - Linux 单元检查 7 项通过（3 个 health guard + 4 个 Docker command/policy checks，Windows tests 跳过）。但真实准入无法启动：当前 Linux 执行主机没有 Docker CLI，也没有 `/var/run/docker.sock`。`preflight` 保存 [blocked report](../../outputs/acceptance/phase3-p302-linux-admission-20261020.json)，原因 `docker_cli_unavailable` / `benign_probe_report_missing`，退出 3；没有模拟 Docker passed。
 - 因 P3-02 的 Linux real Worker probes 尚未通过，feature 状态是 blocked，不能声称 Linux backend 已准入。待在有锁定 Docker Worker 的 Linux 主机复跑 benign probes 后恢复；无依赖该 Worker 的 P3-06 可继续。
+
+### P3-06 实施记录（2026-10-20；套件冻结，插件行为未执行）
+
+- 已新增 `contracts/lab/automation/v1/behavior-suite.schema.json` 与 [entry-bound suite](../../contracts/lab/automation/v1/fixtures/behavior-suite.phase3-v1.json)：冻结目录中的 NoneBot/Koishi 各 10 个版本、entry id、artifact digest、Linux/Windows dependency-lock 与 profile id、归档成员 SHA-256、审阅的源码符号，以及每个 entry 的 positive / negative / isolation 三个必选 case。每个用例固定 session 输入结构，并为随机/时间相关输入声明固定种子和时间。
+- 用例由对应锁定发布物中的源码符号独立推导。涉及状态风险的 NoneBot guess 案例将模块级 `idx/city` 作为隔离 oracle 检查项；并没有将潜在状态泄漏当作支持行为。Koishi 插件的数据库、配置、命令和调度情景限定在临时 fixture 状态中。四个历史支持版本单独从 S2-09 manifest 复制为回归 identities，未计入 20 个目录条目。
+- `lab.automation validate-behavior` 校验 JSON schema、20 个唯一目录 id、artifact/profile/dependency-lock identity、各 entry 的三个 case class，以及历史四版本与 S2-09 manifest 一致性。`lab.tests.test_automation_behavior` 覆盖重复 entry、缺失 case、artifact 绑定篡改拒绝。
+- Linux 检查：`uv run --locked --project lab --python 3.12.14 python -m unittest lab.tests.test_automation_behavior lab.tests.test_recipes lab.tests.test_compare -v` 为 18 项通过；CLI validator 通过并输出 20 entries / 60 cases / 40 entry-platform positions / 4 regressions。证据见 [suite validation](../../outputs/acceptance/phase3-p306-suite-validation-20261020.json)。本结果只证明合同与身份账本有效；`behavior_executed=false`，没有派发或执行第三方插件、没有行为兼容结论；Windows 测试按用户要求跳过。
+- P3-06 工程交付完成。P3-07 及后续仍受 P3-02 Linux real Worker 准入阻塞；Windows 相关 gate 继续 not run / blocked。

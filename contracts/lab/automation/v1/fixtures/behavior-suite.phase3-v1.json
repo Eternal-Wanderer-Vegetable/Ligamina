@@ -1,0 +1,2369 @@
+{
+  "schema_version": 1,
+  "suite_id": "phase3-entry-behavior-v1",
+  "catalog_snapshot_id": "p2-41649744e057d61031d5",
+  "reviewed_at_utc": "2026-10-20T12:00:00Z",
+  "entries": [
+    {
+      "registry_entry_id": "nb-4528cf6bfb6a315278ba2dd7",
+      "ecosystem": "nonebot",
+      "package": "nonebot_plugin_strman",
+      "version": "1.2.0",
+      "artifact_sha256": "6adbac521fdf49781c03d0de47107079a3889787ecc89fb25630aefb15328d33",
+      "artifact_upstream_sha512": null,
+      "dependency_locks": {
+        "linux-x86_64": {
+          "status": "eligible_not_run",
+          "profile_id": "nonebot-2.5.0-onebot-2.4.6-py3.12.14-linux-x86_64",
+          "dependency_lock_sha256": "56fc06e74e99731b00e24aa560dd47389f3f339b7094ec69b5e9c0cb112dc079",
+          "artifact_sha256": "6adbac521fdf49781c03d0de47107079a3889787ecc89fb25630aefb15328d33"
+        },
+        "windows-x86_64": {
+          "status": "eligible_not_run",
+          "profile_id": "nonebot-2.5.0-onebot-2.4.6-py3.12.14-windows-x86_64",
+          "dependency_lock_sha256": "3c8d3fc9439f4b6f6b3565312e07eb38100713d195c7e8ac040c10b04e80c0bc",
+          "artifact_sha256": "6adbac521fdf49781c03d0de47107079a3889787ecc89fb25630aefb15328d33"
+        }
+      },
+      "platforms": [
+        "linux-x86_64",
+        "windows-x86_64"
+      ],
+      "source_review": {
+        "archive_member": "nonebot_plugin_strman/parser.py",
+        "symbols": [
+          "Parser.__call__",
+          "Parser._tag_parse"
+        ],
+        "reviewed_artifact_sha256": "6adbac521fdf49781c03d0de47107079a3889787ecc89fb25630aefb15328d33",
+        "review_status": "reviewed",
+        "external_services": [],
+        "archive_member_sha256": "105d42fee3ef2d7b01fd3609169deea2a1b34839318ae8094255c9a921fbfc8d"
+      },
+      "cases": [
+        {
+          "case_id": "nb-nonebot-plugin-strman-positive",
+          "class": "positive",
+          "stimuli": [
+            {
+              "input": "parse known tag and format {name}",
+              "fixture_clock": "2026-10-20T07:00:00Z",
+              "random_seed": 731,
+              "session_scope": "fixture-session"
+            }
+          ],
+          "assertions": [
+            {
+              "path": "plugin_observation.response_or_operation_count",
+              "operator": "in_range",
+              "minimum": 1,
+              "maximum": 1
+            }
+          ],
+          "oracle": {
+            "member": "nonebot_plugin_strman/parser.py",
+            "symbol": "Parser.__call__",
+            "rationale": "Parser resolves dotted tags, formats supplied values, and raises KeyError for unknown tags.",
+            "review_status": "reviewed"
+          }
+        },
+        {
+          "case_id": "nb-nonebot-plugin-strman-negative",
+          "class": "negative",
+          "stimuli": [
+            {
+              "input": "resolve missing tag",
+              "fixture_clock": "2026-10-20T07:00:00Z",
+              "random_seed": 731,
+              "session_scope": "fixture-session"
+            }
+          ],
+          "assertions": [
+            {
+              "path": "plugin_observation.response_or_operation_count",
+              "operator": "equals",
+              "value": 0
+            }
+          ],
+          "oracle": {
+            "member": "nonebot_plugin_strman/parser.py",
+            "symbol": "Parser._tag_parse",
+            "rationale": "Negative boundary derived from Parser resolves dotted tags, formats supplied values, and raises KeyError for unknown tags.",
+            "review_status": "reviewed"
+          }
+        },
+        {
+          "case_id": "nb-nonebot-plugin-strman-isolation",
+          "class": "isolation",
+          "stimuli": [
+            {
+              "input": "explicit profile override result does not mutate default",
+              "fixture_clock": "2026-10-20T07:00:00Z",
+              "random_seed": 731,
+              "session_scope": "fixture-session"
+            }
+          ],
+          "assertions": [
+            {
+              "path": "plugin_observation.scope_leak_count",
+              "operator": "equals",
+              "value": 0
+            }
+          ],
+          "oracle": {
+            "member": "nonebot_plugin_strman/parser.py",
+            "symbol": "Parser._tag_parse",
+            "rationale": "Independent-state oracle derived from Parser resolves dotted tags, formats supplied values, and raises KeyError for unknown tags.",
+            "review_status": "reviewed"
+          }
+        }
+      ]
+    },
+    {
+      "registry_entry_id": "nb-5f9a0398ba3644f4256bbe83",
+      "ecosystem": "nonebot",
+      "package": "nonebot_plugin_guess",
+      "version": "0.1.9",
+      "artifact_sha256": "db6b9bfefdcd80d4e9da03f2b136a0d11c7e1a08cad3c378cac8eda573929957",
+      "artifact_upstream_sha512": null,
+      "dependency_locks": {
+        "linux-x86_64": {
+          "status": "eligible_not_run",
+          "profile_id": "nonebot-2.5.0-onebot-2.4.6-py3.12.14-linux-x86_64",
+          "dependency_lock_sha256": "14cc422be4f8924a83f47e02bb9572dc00b03db62cb4a893a7102aa0e739814a",
+          "artifact_sha256": "db6b9bfefdcd80d4e9da03f2b136a0d11c7e1a08cad3c378cac8eda573929957"
+        },
+        "windows-x86_64": {
+          "status": "eligible_not_run",
+          "profile_id": "nonebot-2.5.0-onebot-2.4.6-py3.12.14-windows-x86_64",
+          "dependency_lock_sha256": "53a9b73a466840d8fde894da1cbf067a77bc1a3d6e06aa3bb96092b752605b47",
+          "artifact_sha256": "db6b9bfefdcd80d4e9da03f2b136a0d11c7e1a08cad3c378cac8eda573929957"
+        }
+      },
+      "platforms": [
+        "linux-x86_64",
+        "windows-x86_64"
+      ],
+      "source_review": {
+        "archive_member": "nonebot_plugin_guess/guess.py",
+        "symbols": [
+          "guess",
+          "process",
+          "handle"
+        ],
+        "reviewed_artifact_sha256": "db6b9bfefdcd80d4e9da03f2b136a0d11c7e1a08cad3c378cac8eda573929957",
+        "review_status": "reviewed",
+        "external_services": [],
+        "archive_member_sha256": "1f0fa1861e8fbb2bf490ae726011d864f59f517fa5dd1eb226a4cf6e4e418c1e"
+      },
+      "cases": [
+        {
+          "case_id": "nb-nonebot-plugin-guess-positive",
+          "class": "positive",
+          "stimuli": [
+            {
+              "input": "invoke /guess with fixed seed",
+              "fixture_clock": "2026-10-20T07:00:00Z",
+              "random_seed": 731,
+              "session_scope": "fixture-session"
+            }
+          ],
+          "assertions": [
+            {
+              "path": "plugin_observation.response_or_operation_count",
+              "operator": "in_range",
+              "minimum": 1,
+              "maximum": 1
+            }
+          ],
+          "oracle": {
+            "member": "nonebot_plugin_guess/guess.py",
+            "symbol": "guess",
+            "rationale": "The source declares /guess and aliases; module globals idx/city create a state leakage risk captured by the isolation oracle.",
+            "review_status": "reviewed"
+          }
+        },
+        {
+          "case_id": "nb-nonebot-plugin-guess-negative",
+          "class": "negative",
+          "stimuli": [
+            {
+              "input": "send unrelated text",
+              "fixture_clock": "2026-10-20T07:00:00Z",
+              "random_seed": 731,
+              "session_scope": "fixture-session"
+            }
+          ],
+          "assertions": [
+            {
+              "path": "plugin_observation.response_or_operation_count",
+              "operator": "equals",
+              "value": 0
+            }
+          ],
+          "oracle": {
+            "member": "nonebot_plugin_guess/guess.py",
+            "symbol": "handle",
+            "rationale": "Negative boundary derived from The source declares /guess and aliases; module globals idx/city create a state leakage risk captured by the isolation oracle.",
+            "review_status": "reviewed"
+          }
+        },
+        {
+          "case_id": "nb-nonebot-plugin-guess-isolation",
+          "class": "isolation",
+          "stimuli": [
+            {
+              "input": "a second session does not inherit active game state",
+              "fixture_clock": "2026-10-20T07:00:00Z",
+              "random_seed": 731,
+              "session_scope": "fixture-session"
+            }
+          ],
+          "assertions": [
+            {
+              "path": "plugin_observation.scope_leak_count",
+              "operator": "equals",
+              "value": 0
+            }
+          ],
+          "oracle": {
+            "member": "nonebot_plugin_guess/guess.py",
+            "symbol": "handle",
+            "rationale": "Independent-state oracle derived from The source declares /guess and aliases; module globals idx/city create a state leakage risk captured by the isolation oracle.",
+            "review_status": "reviewed"
+          }
+        }
+      ]
+    },
+    {
+      "registry_entry_id": "nb-85f9d46ff59c96d65dd652c8",
+      "ecosystem": "nonebot",
+      "package": "nonebot_plugin_abbrreply",
+      "version": "1.1.3",
+      "artifact_sha256": "4f568a33fb5a8284324e50d8c79be96a245e2aebebafdb06c9d6bb15464f9347",
+      "artifact_upstream_sha512": null,
+      "dependency_locks": {
+        "linux-x86_64": {
+          "status": "eligible_not_run",
+          "profile_id": "nonebot-2.5.0-onebot-2.4.6-py3.12.14-linux-x86_64",
+          "dependency_lock_sha256": "c288dd6f781a08409a0b9fe198b09f50c21fc766d67851e3f8f68762e427571c",
+          "artifact_sha256": "4f568a33fb5a8284324e50d8c79be96a245e2aebebafdb06c9d6bb15464f9347"
+        },
+        "windows-x86_64": {
+          "status": "eligible_not_run",
+          "profile_id": "nonebot-2.5.0-onebot-2.4.6-py3.12.14-windows-x86_64",
+          "dependency_lock_sha256": "768aea302cf82cb8e5950fae825cee0afccf19175c243f2a7ec4951939c9ab4c",
+          "artifact_sha256": "4f568a33fb5a8284324e50d8c79be96a245e2aebebafdb06c9d6bb15464f9347"
+        }
+      },
+      "platforms": [
+        "linux-x86_64",
+        "windows-x86_64"
+      ],
+      "source_review": {
+        "archive_member": "nonebot_plugin_abbrreply/__init__.py",
+        "symbols": [
+          "on_regex",
+          "sx"
+        ],
+        "reviewed_artifact_sha256": "4f568a33fb5a8284324e50d8c79be96a245e2aebebafdb06c9d6bb15464f9347",
+        "review_status": "reviewed",
+        "external_services": [],
+        "archive_member_sha256": "fab294f8eab6cb6a6263547c77ff30ac10e12ad14ce8de924711335eae5dd80d"
+      },
+      "cases": [
+        {
+          "case_id": "nb-nonebot-plugin-abbrreply-positive",
+          "class": "positive",
+          "stimuli": [
+            {
+              "input": "invoke 缩写 abc with fixture lookup",
+              "fixture_clock": "2026-10-20T07:00:00Z",
+              "random_seed": 731,
+              "session_scope": "fixture-session"
+            }
+          ],
+          "assertions": [
+            {
+              "path": "plugin_observation.response_or_operation_count",
+              "operator": "in_range",
+              "minimum": 1,
+              "maximum": 1
+            }
+          ],
+          "oracle": {
+            "member": "nonebot_plugin_abbrreply/__init__.py",
+            "symbol": "on_regex",
+            "rationale": "The regex matcher requires sx or 缩写 plus a query; lookup content is supplied by fixture.",
+            "review_status": "reviewed"
+          }
+        },
+        {
+          "case_id": "nb-nonebot-plugin-abbrreply-negative",
+          "class": "negative",
+          "stimuli": [
+            {
+              "input": "send 缩写 without query",
+              "fixture_clock": "2026-10-20T07:00:00Z",
+              "random_seed": 731,
+              "session_scope": "fixture-session"
+            }
+          ],
+          "assertions": [
+            {
+              "path": "plugin_observation.response_or_operation_count",
+              "operator": "equals",
+              "value": 0
+            }
+          ],
+          "oracle": {
+            "member": "nonebot_plugin_abbrreply/__init__.py",
+            "symbol": "sx",
+            "rationale": "Negative boundary derived from The regex matcher requires sx or 缩写 plus a query; lookup content is supplied by fixture.",
+            "review_status": "reviewed"
+          }
+        },
+        {
+          "case_id": "nb-nonebot-plugin-abbrreply-isolation",
+          "class": "isolation",
+          "stimuli": [
+            {
+              "input": "two sessions with distinct query strings return their own lookup",
+              "fixture_clock": "2026-10-20T07:00:00Z",
+              "random_seed": 731,
+              "session_scope": "fixture-session"
+            }
+          ],
+          "assertions": [
+            {
+              "path": "plugin_observation.scope_leak_count",
+              "operator": "equals",
+              "value": 0
+            }
+          ],
+          "oracle": {
+            "member": "nonebot_plugin_abbrreply/__init__.py",
+            "symbol": "sx",
+            "rationale": "Independent-state oracle derived from The regex matcher requires sx or 缩写 plus a query; lookup content is supplied by fixture.",
+            "review_status": "reviewed"
+          }
+        }
+      ]
+    },
+    {
+      "registry_entry_id": "nb-c24c2083f5b189704248845f",
+      "ecosystem": "nonebot",
+      "package": "nonebot_plugin_localstore",
+      "version": "0.7.4",
+      "artifact_sha256": "3b08030878eadcdd8b9ce3d079da0dc2d0e41dc91f0b2d8cf7fa862a27de9090",
+      "artifact_upstream_sha512": null,
+      "dependency_locks": {
+        "linux-x86_64": {
+          "status": "eligible_not_run",
+          "profile_id": "nonebot-2.5.0-onebot-2.4.6-py3.12.14-linux-x86_64",
+          "dependency_lock_sha256": "22890a79e14f21bf5c40128920d0dd97f7c3cb564a4f7c7036f75b42d4fedf81",
+          "artifact_sha256": "3b08030878eadcdd8b9ce3d079da0dc2d0e41dc91f0b2d8cf7fa862a27de9090"
+        },
+        "windows-x86_64": {
+          "status": "eligible_not_run",
+          "profile_id": "nonebot-2.5.0-onebot-2.4.6-py3.12.14-windows-x86_64",
+          "dependency_lock_sha256": "278ad090c9c7376770859989d3bcb9ed362001bdf695c75be40ee2b0c4d11f2b",
+          "artifact_sha256": "3b08030878eadcdd8b9ce3d079da0dc2d0e41dc91f0b2d8cf7fa862a27de9090"
+        }
+      },
+      "platforms": [
+        "linux-x86_64",
+        "windows-x86_64"
+      ],
+      "source_review": {
+        "archive_member": "nonebot_plugin_localstore/__init__.py",
+        "symbols": [
+          "get_plugin_cache_dir",
+          "get_plugin_config_dir",
+          "get_plugin_data_dir"
+        ],
+        "reviewed_artifact_sha256": "3b08030878eadcdd8b9ce3d079da0dc2d0e41dc91f0b2d8cf7fa862a27de9090",
+        "review_status": "reviewed",
+        "external_services": [],
+        "archive_member_sha256": "aa05e75e0ec220042ff800ffcaf3c8ca48efa96ee614ceb5c514ff171576874c"
+      },
+      "cases": [
+        {
+          "case_id": "nb-nonebot-plugin-localstore-positive",
+          "class": "positive",
+          "stimuli": [
+            {
+              "input": "resolve plugin data directory under temporary root",
+              "fixture_clock": "2026-10-20T07:00:00Z",
+              "random_seed": 731,
+              "session_scope": "fixture-session"
+            }
+          ],
+          "assertions": [
+            {
+              "path": "plugin_observation.response_or_operation_count",
+              "operator": "in_range",
+              "minimum": 1,
+              "maximum": 1
+            }
+          ],
+          "oracle": {
+            "member": "nonebot_plugin_localstore/__init__.py",
+            "symbol": "get_plugin_cache_dir",
+            "rationale": "The package exports plugin-scoped cache/config/data roots; destructive clear commands are excluded.",
+            "review_status": "reviewed"
+          }
+        },
+        {
+          "case_id": "nb-nonebot-plugin-localstore-negative",
+          "class": "negative",
+          "stimuli": [
+            {
+              "input": "resolve path with root escape attempt",
+              "fixture_clock": "2026-10-20T07:00:00Z",
+              "random_seed": 731,
+              "session_scope": "fixture-session"
+            }
+          ],
+          "assertions": [
+            {
+              "path": "plugin_observation.response_or_operation_count",
+              "operator": "equals",
+              "value": 0
+            }
+          ],
+          "oracle": {
+            "member": "nonebot_plugin_localstore/__init__.py",
+            "symbol": "get_plugin_data_dir",
+            "rationale": "Negative boundary derived from The package exports plugin-scoped cache/config/data roots; destructive clear commands are excluded.",
+            "review_status": "reviewed"
+          }
+        },
+        {
+          "case_id": "nb-nonebot-plugin-localstore-isolation",
+          "class": "isolation",
+          "stimuli": [
+            {
+              "input": "two plugin names resolve to distinct directories",
+              "fixture_clock": "2026-10-20T07:00:00Z",
+              "random_seed": 731,
+              "session_scope": "fixture-session"
+            }
+          ],
+          "assertions": [
+            {
+              "path": "plugin_observation.scope_leak_count",
+              "operator": "equals",
+              "value": 0
+            }
+          ],
+          "oracle": {
+            "member": "nonebot_plugin_localstore/__init__.py",
+            "symbol": "get_plugin_data_dir",
+            "rationale": "Independent-state oracle derived from The package exports plugin-scoped cache/config/data roots; destructive clear commands are excluded.",
+            "review_status": "reviewed"
+          }
+        }
+      ]
+    },
+    {
+      "registry_entry_id": "nb-0b37b4bb782b82c00e95a87f",
+      "ecosystem": "nonebot",
+      "package": "nonebot_plugin_help",
+      "version": "0.6.1",
+      "artifact_sha256": "b77513077b726406ae32760edac1d41baef7898f14a72b59fbf586ac263d20dc",
+      "artifact_upstream_sha512": null,
+      "dependency_locks": {
+        "linux-x86_64": {
+          "status": "eligible_not_run",
+          "profile_id": "nonebot-2.5.0-onebot-2.4.6-py3.12.14-linux-x86_64",
+          "dependency_lock_sha256": "753a68461eb1d38e98ae7ffaa97b9853a01017c8e2b1f0a6174fea3cc59ce8d6",
+          "artifact_sha256": "b77513077b726406ae32760edac1d41baef7898f14a72b59fbf586ac263d20dc"
+        },
+        "windows-x86_64": {
+          "status": "eligible_not_run",
+          "profile_id": "nonebot-2.5.0-onebot-2.4.6-py3.12.14-windows-x86_64",
+          "dependency_lock_sha256": "0597c19a3a8e17a362f8b67fd7d4ef3d13d3025646c5920aa0918e968898f0ff",
+          "artifact_sha256": "b77513077b726406ae32760edac1d41baef7898f14a72b59fbf586ac263d20dc"
+        }
+      },
+      "platforms": [
+        "linux-x86_64",
+        "windows-x86_64"
+      ],
+      "source_review": {
+        "archive_member": "nonebot_plugin_help/handler.py",
+        "symbols": [
+          "handle_first_receive",
+          "get_result"
+        ],
+        "reviewed_artifact_sha256": "b77513077b726406ae32760edac1d41baef7898f14a72b59fbf586ac263d20dc",
+        "review_status": "reviewed",
+        "external_services": [],
+        "archive_member_sha256": "629e85d736c8e5d9eb7ab9343df5cd1533e576039216104b551670df83fe7b1e"
+      },
+      "cases": [
+        {
+          "case_id": "nb-nonebot-plugin-help-positive",
+          "class": "positive",
+          "stimuli": [
+            {
+              "input": "invoke /help list with fixed loaded plugins",
+              "fixture_clock": "2026-10-20T07:00:00Z",
+              "random_seed": 731,
+              "session_scope": "fixture-session"
+            }
+          ],
+          "assertions": [
+            {
+              "path": "plugin_observation.response_or_operation_count",
+              "operator": "in_range",
+              "minimum": 1,
+              "maximum": 1
+            }
+          ],
+          "oracle": {
+            "member": "nonebot_plugin_help/handler.py",
+            "symbol": "handle_first_receive",
+            "rationale": "The handler implements list, plugin lookup, and a not-found response from loaded plugin metadata.",
+            "review_status": "reviewed"
+          }
+        },
+        {
+          "case_id": "nb-nonebot-plugin-help-negative",
+          "class": "negative",
+          "stimuli": [
+            {
+              "input": "invoke /help unknown-plugin",
+              "fixture_clock": "2026-10-20T07:00:00Z",
+              "random_seed": 731,
+              "session_scope": "fixture-session"
+            }
+          ],
+          "assertions": [
+            {
+              "path": "plugin_observation.response_or_operation_count",
+              "operator": "equals",
+              "value": 0
+            }
+          ],
+          "oracle": {
+            "member": "nonebot_plugin_help/handler.py",
+            "symbol": "get_result",
+            "rationale": "Negative boundary derived from The handler implements list, plugin lookup, and a not-found response from loaded plugin metadata.",
+            "review_status": "reviewed"
+          }
+        },
+        {
+          "case_id": "nb-nonebot-plugin-help-isolation",
+          "class": "isolation",
+          "stimuli": [
+            {
+              "input": "two independent help list sessions see same frozen plugin set",
+              "fixture_clock": "2026-10-20T07:00:00Z",
+              "random_seed": 731,
+              "session_scope": "fixture-session"
+            }
+          ],
+          "assertions": [
+            {
+              "path": "plugin_observation.scope_leak_count",
+              "operator": "equals",
+              "value": 0
+            }
+          ],
+          "oracle": {
+            "member": "nonebot_plugin_help/handler.py",
+            "symbol": "get_result",
+            "rationale": "Independent-state oracle derived from The handler implements list, plugin lookup, and a not-found response from loaded plugin metadata.",
+            "review_status": "reviewed"
+          }
+        }
+      ]
+    },
+    {
+      "registry_entry_id": "nb-da100d12327d862b56c82b1a",
+      "ecosystem": "nonebot",
+      "package": "nonebot_plugin_alias",
+      "version": "0.4.0",
+      "artifact_sha256": "382b65ae96140c0b752420d0e6d2f2c4dbee94b381aa2b1cd5af580d7e3e9a49",
+      "artifact_upstream_sha512": null,
+      "dependency_locks": {
+        "linux-x86_64": {
+          "status": "eligible_not_run",
+          "profile_id": "nonebot-2.5.0-onebot-2.4.6-py3.12.14-linux-x86_64",
+          "dependency_lock_sha256": "a361252c4633d40cc50bad40133844225aa6f7d5e3c5ef093f4115752aa67268",
+          "artifact_sha256": "382b65ae96140c0b752420d0e6d2f2c4dbee94b381aa2b1cd5af580d7e3e9a49"
+        },
+        "windows-x86_64": {
+          "status": "eligible_not_run",
+          "profile_id": "nonebot-2.5.0-onebot-2.4.6-py3.12.14-windows-x86_64",
+          "dependency_lock_sha256": "0cbd743be360fc4cfb1c244ed6e0b227c855794dd265a0d83c4dae980d2d1461",
+          "artifact_sha256": "382b65ae96140c0b752420d0e6d2f2c4dbee94b381aa2b1cd5af580d7e3e9a49"
+        }
+      },
+      "platforms": [
+        "linux-x86_64",
+        "windows-x86_64"
+      ],
+      "source_review": {
+        "archive_member": "nonebot_plugin_alias/__init__.py",
+        "symbols": [
+          "create_alias_matcher",
+          "alias_matcher",
+          "unalias_matcher"
+        ],
+        "reviewed_artifact_sha256": "382b65ae96140c0b752420d0e6d2f2c4dbee94b381aa2b1cd5af580d7e3e9a49",
+        "review_status": "reviewed",
+        "external_services": [],
+        "archive_member_sha256": "c7d5d30f11571ad67bfe6ca3f851212d363c1d9026fe581344d47fe877c45185"
+      },
+      "cases": [
+        {
+          "case_id": "nb-nonebot-plugin-alias-positive",
+          "class": "positive",
+          "stimuli": [
+            {
+              "input": "create alias in session A and resolve it",
+              "fixture_clock": "2026-10-20T07:00:00Z",
+              "random_seed": 731,
+              "session_scope": "fixture-session"
+            }
+          ],
+          "assertions": [
+            {
+              "path": "plugin_observation.response_or_operation_count",
+              "operator": "in_range",
+              "minimum": 1,
+              "maximum": 1
+            }
+          ],
+          "oracle": {
+            "member": "nonebot_plugin_alias/__init__.py",
+            "symbol": "create_alias_matcher",
+            "rationale": "Alias mappings and lookup are keyed by session id.",
+            "review_status": "reviewed"
+          }
+        },
+        {
+          "case_id": "nb-nonebot-plugin-alias-negative",
+          "class": "negative",
+          "stimuli": [
+            {
+              "input": "remove an absent alias",
+              "fixture_clock": "2026-10-20T07:00:00Z",
+              "random_seed": 731,
+              "session_scope": "fixture-session"
+            }
+          ],
+          "assertions": [
+            {
+              "path": "plugin_observation.response_or_operation_count",
+              "operator": "equals",
+              "value": 0
+            }
+          ],
+          "oracle": {
+            "member": "nonebot_plugin_alias/__init__.py",
+            "symbol": "unalias_matcher",
+            "rationale": "Negative boundary derived from Alias mappings and lookup are keyed by session id.",
+            "review_status": "reviewed"
+          }
+        },
+        {
+          "case_id": "nb-nonebot-plugin-alias-isolation",
+          "class": "isolation",
+          "stimuli": [
+            {
+              "input": "alias created in session A is absent from session B",
+              "fixture_clock": "2026-10-20T07:00:00Z",
+              "random_seed": 731,
+              "session_scope": "fixture-session"
+            }
+          ],
+          "assertions": [
+            {
+              "path": "plugin_observation.scope_leak_count",
+              "operator": "equals",
+              "value": 0
+            }
+          ],
+          "oracle": {
+            "member": "nonebot_plugin_alias/__init__.py",
+            "symbol": "unalias_matcher",
+            "rationale": "Independent-state oracle derived from Alias mappings and lookup are keyed by session id.",
+            "review_status": "reviewed"
+          }
+        }
+      ]
+    },
+    {
+      "registry_entry_id": "nb-16c80a826ca035f6c49ad69a",
+      "ecosystem": "nonebot",
+      "package": "nonebot_plugin_roll",
+      "version": "0.2.3",
+      "artifact_sha256": "3a5ead2404f26711c9d41604ddcbb2e141df8a950fc53d32536aa7980fab1a2c",
+      "artifact_upstream_sha512": null,
+      "dependency_locks": {
+        "linux-x86_64": {
+          "status": "eligible_not_run",
+          "profile_id": "nonebot-2.5.0-onebot-2.4.6-py3.12.14-linux-x86_64",
+          "dependency_lock_sha256": "792fe11f2fd3581e888b15a23bc0c49f76b3b0d2399fc728dbfcff3d436214df",
+          "artifact_sha256": "3a5ead2404f26711c9d41604ddcbb2e141df8a950fc53d32536aa7980fab1a2c"
+        },
+        "windows-x86_64": {
+          "status": "eligible_not_run",
+          "profile_id": "nonebot-2.5.0-onebot-2.4.6-py3.12.14-windows-x86_64",
+          "dependency_lock_sha256": "500cfb266d89f49f1cfabf874c0db17ed7e097d2a2eda4c5c51c4c27ad47efca",
+          "artifact_sha256": "3a5ead2404f26711c9d41604ddcbb2e141df8a950fc53d32536aa7980fab1a2c"
+        }
+      },
+      "platforms": [
+        "linux-x86_64",
+        "windows-x86_64"
+      ],
+      "source_review": {
+        "archive_member": "nonebot_plugin_roll/__init__.py",
+        "symbols": [
+          "roll",
+          "get_rd"
+        ],
+        "reviewed_artifact_sha256": "3a5ead2404f26711c9d41604ddcbb2e141df8a950fc53d32536aa7980fab1a2c",
+        "review_status": "reviewed",
+        "external_services": [],
+        "archive_member_sha256": "65835efdf2bfbaeb237df005c459610a068c55a8edd53fcae971e0976d5409d2"
+      },
+      "cases": [
+        {
+          "case_id": "nb-nonebot-plugin-roll-positive",
+          "class": "positive",
+          "stimuli": [
+            {
+              "input": "invoke /rd 2d6 with fixed random seed",
+              "fixture_clock": "2026-10-20T07:00:00Z",
+              "random_seed": 731,
+              "session_scope": "fixture-session"
+            }
+          ],
+          "assertions": [
+            {
+              "path": "plugin_observation.response_or_operation_count",
+              "operator": "in_range",
+              "minimum": 1,
+              "maximum": 1
+            }
+          ],
+          "oracle": {
+            "member": "nonebot_plugin_roll/__init__.py",
+            "symbol": "roll",
+            "rationale": "The command parses xdy and bounds the total; invalid dice parameters produce an error.",
+            "review_status": "reviewed"
+          }
+        },
+        {
+          "case_id": "nb-nonebot-plugin-roll-negative",
+          "class": "negative",
+          "stimuli": [
+            {
+              "input": "invoke /rd with invalid dice syntax",
+              "fixture_clock": "2026-10-20T07:00:00Z",
+              "random_seed": 731,
+              "session_scope": "fixture-session"
+            }
+          ],
+          "assertions": [
+            {
+              "path": "plugin_observation.response_or_operation_count",
+              "operator": "equals",
+              "value": 0
+            }
+          ],
+          "oracle": {
+            "member": "nonebot_plugin_roll/__init__.py",
+            "symbol": "get_rd",
+            "rationale": "Negative boundary derived from The command parses xdy and bounds the total; invalid dice parameters produce an error.",
+            "review_status": "reviewed"
+          }
+        },
+        {
+          "case_id": "nb-nonebot-plugin-roll-isolation",
+          "class": "isolation",
+          "stimuli": [
+            {
+              "input": "two commands parse independent dice expressions",
+              "fixture_clock": "2026-10-20T07:00:00Z",
+              "random_seed": 731,
+              "session_scope": "fixture-session"
+            }
+          ],
+          "assertions": [
+            {
+              "path": "plugin_observation.scope_leak_count",
+              "operator": "equals",
+              "value": 0
+            }
+          ],
+          "oracle": {
+            "member": "nonebot_plugin_roll/__init__.py",
+            "symbol": "get_rd",
+            "rationale": "Independent-state oracle derived from The command parses xdy and bounds the total; invalid dice parameters produce an error.",
+            "review_status": "reviewed"
+          }
+        }
+      ]
+    },
+    {
+      "registry_entry_id": "nb-85b3294c1381385091eb0488",
+      "ecosystem": "nonebot",
+      "package": "nonebot_plugin_chatrecorder",
+      "version": "0.7.0",
+      "artifact_sha256": "56cfb306cc85c602c8c97e7f1a63328d075ac8fd2349ddefcb501600f416d544",
+      "artifact_upstream_sha512": null,
+      "dependency_locks": {
+        "linux-x86_64": {
+          "status": "eligible_not_run",
+          "profile_id": "nonebot-2.5.0-onebot-2.4.6-py3.12.14-linux-x86_64",
+          "dependency_lock_sha256": "4c6c8f7bfda6e82adb7c2a08f00dbe6d8a1a25787aa397c674862a6d128b0034",
+          "artifact_sha256": "56cfb306cc85c602c8c97e7f1a63328d075ac8fd2349ddefcb501600f416d544"
+        },
+        "windows-x86_64": {
+          "status": "eligible_not_run",
+          "profile_id": "nonebot-2.5.0-onebot-2.4.6-py3.12.14-windows-x86_64",
+          "dependency_lock_sha256": "3973fbc08f69fe8d310e863628f2556dc311efe427171601b1ee581ab859b55a",
+          "artifact_sha256": "56cfb306cc85c602c8c97e7f1a63328d075ac8fd2349ddefcb501600f416d544"
+        }
+      },
+      "platforms": [
+        "linux-x86_64",
+        "windows-x86_64"
+      ],
+      "source_review": {
+        "archive_member": "nonebot_plugin_chatrecorder/adapters/onebot_v11.py",
+        "symbols": [
+          "record_recv_msg"
+        ],
+        "reviewed_artifact_sha256": "56cfb306cc85c602c8c97e7f1a63328d075ac8fd2349ddefcb501600f416d544",
+        "review_status": "reviewed",
+        "external_services": [],
+        "archive_member_sha256": "c964b2aa817c3670b162ce959c76fef76bac717e4e7232760b9026386c6e60e3"
+      },
+      "cases": [
+        {
+          "case_id": "nb-nonebot-plugin-chatrecorder-positive",
+          "class": "positive",
+          "stimuli": [
+            {
+              "input": "record one incoming OneBot message event",
+              "fixture_clock": "2026-10-20T07:00:00Z",
+              "random_seed": 731,
+              "session_scope": "fixture-session"
+            }
+          ],
+          "assertions": [
+            {
+              "path": "plugin_observation.response_or_operation_count",
+              "operator": "in_range",
+              "minimum": 1,
+              "maximum": 1
+            }
+          ],
+          "oracle": {
+            "member": "nonebot_plugin_chatrecorder/adapters/onebot_v11.py",
+            "symbol": "record_recv_msg",
+            "rationale": "The adapter records received message events with session scope in the fixture store.",
+            "review_status": "reviewed"
+          }
+        },
+        {
+          "case_id": "nb-nonebot-plugin-chatrecorder-negative",
+          "class": "negative",
+          "stimuli": [
+            {
+              "input": "submit a non-message event",
+              "fixture_clock": "2026-10-20T07:00:00Z",
+              "random_seed": 731,
+              "session_scope": "fixture-session"
+            }
+          ],
+          "assertions": [
+            {
+              "path": "plugin_observation.response_or_operation_count",
+              "operator": "equals",
+              "value": 0
+            }
+          ],
+          "oracle": {
+            "member": "nonebot_plugin_chatrecorder/adapters/onebot_v11.py",
+            "symbol": "record_recv_msg",
+            "rationale": "Negative boundary derived from The adapter records received message events with session scope in the fixture store.",
+            "review_status": "reviewed"
+          }
+        },
+        {
+          "case_id": "nb-nonebot-plugin-chatrecorder-isolation",
+          "class": "isolation",
+          "stimuli": [
+            {
+              "input": "records for two sessions retain distinct session identities",
+              "fixture_clock": "2026-10-20T07:00:00Z",
+              "random_seed": 731,
+              "session_scope": "fixture-session"
+            }
+          ],
+          "assertions": [
+            {
+              "path": "plugin_observation.scope_leak_count",
+              "operator": "equals",
+              "value": 0
+            }
+          ],
+          "oracle": {
+            "member": "nonebot_plugin_chatrecorder/adapters/onebot_v11.py",
+            "symbol": "record_recv_msg",
+            "rationale": "Independent-state oracle derived from The adapter records received message events with session scope in the fixture store.",
+            "review_status": "reviewed"
+          }
+        }
+      ]
+    },
+    {
+      "registry_entry_id": "nb-10a76db9822976efe2679433",
+      "ecosystem": "nonebot",
+      "package": "nonebot_plugin_word_bank2",
+      "version": "0.2.1",
+      "artifact_sha256": "d54fb5892e6d3fbaefc28aa1de7a0d5d46fc1bec448709e0582212ebd2dc603e",
+      "artifact_upstream_sha512": null,
+      "dependency_locks": {
+        "linux-x86_64": {
+          "status": "eligible_not_run",
+          "profile_id": "nonebot-2.5.0-onebot-2.4.6-py3.12.14-linux-x86_64",
+          "dependency_lock_sha256": "2594861762c7c78d4c4679c9b3d6f03cb9f29e0d63d2ed7e7a1857ec16e91611",
+          "artifact_sha256": "d54fb5892e6d3fbaefc28aa1de7a0d5d46fc1bec448709e0582212ebd2dc603e"
+        },
+        "windows-x86_64": {
+          "status": "eligible_not_run",
+          "profile_id": "nonebot-2.5.0-onebot-2.4.6-py3.12.14-windows-x86_64",
+          "dependency_lock_sha256": "763848cbf66ad1cef3a19cc8d02d20938fff9620a2440c09f411d64d4171ae76",
+          "artifact_sha256": "d54fb5892e6d3fbaefc28aa1de7a0d5d46fc1bec448709e0582212ebd2dc603e"
+        }
+      },
+      "platforms": [
+        "linux-x86_64",
+        "windows-x86_64"
+      ],
+      "source_review": {
+        "archive_member": "nonebot_plugin_word_bank2/data_source.py",
+        "symbols": [
+          "WordBank.match",
+          "WordEntry.match"
+        ],
+        "reviewed_artifact_sha256": "d54fb5892e6d3fbaefc28aa1de7a0d5d46fc1bec448709e0582212ebd2dc603e",
+        "review_status": "reviewed",
+        "external_services": [],
+        "archive_member_sha256": "015d37178a4ccc256758c8b9ccb270f28aba1b44e33df2350f277168ee405947"
+      },
+      "cases": [
+        {
+          "case_id": "nb-nonebot-plugin-word-bank2-positive",
+          "class": "positive",
+          "stimuli": [
+            {
+              "input": "match exact per-user bank key",
+              "fixture_clock": "2026-10-20T07:00:00Z",
+              "random_seed": 731,
+              "session_scope": "fixture-session"
+            }
+          ],
+          "assertions": [
+            {
+              "path": "plugin_observation.response_or_operation_count",
+              "operator": "in_range",
+              "minimum": 1,
+              "maximum": 1
+            }
+          ],
+          "oracle": {
+            "member": "nonebot_plugin_word_bank2/data_source.py",
+            "symbol": "WordBank.match",
+            "rationale": "The matcher checks exact/include/regex keys and distinguishes user index from global index.",
+            "review_status": "reviewed"
+          }
+        },
+        {
+          "case_id": "nb-nonebot-plugin-word-bank2-negative",
+          "class": "negative",
+          "stimuli": [
+            {
+              "input": "send a message absent from configured keys",
+              "fixture_clock": "2026-10-20T07:00:00Z",
+              "random_seed": 731,
+              "session_scope": "fixture-session"
+            }
+          ],
+          "assertions": [
+            {
+              "path": "plugin_observation.response_or_operation_count",
+              "operator": "equals",
+              "value": 0
+            }
+          ],
+          "oracle": {
+            "member": "nonebot_plugin_word_bank2/data_source.py",
+            "symbol": "WordEntry.match",
+            "rationale": "Negative boundary derived from The matcher checks exact/include/regex keys and distinguishes user index from global index.",
+            "review_status": "reviewed"
+          }
+        },
+        {
+          "case_id": "nb-nonebot-plugin-word-bank2-isolation",
+          "class": "isolation",
+          "stimuli": [
+            {
+              "input": "user-specific bank entry does not match another user",
+              "fixture_clock": "2026-10-20T07:00:00Z",
+              "random_seed": 731,
+              "session_scope": "fixture-session"
+            }
+          ],
+          "assertions": [
+            {
+              "path": "plugin_observation.scope_leak_count",
+              "operator": "equals",
+              "value": 0
+            }
+          ],
+          "oracle": {
+            "member": "nonebot_plugin_word_bank2/data_source.py",
+            "symbol": "WordEntry.match",
+            "rationale": "Independent-state oracle derived from The matcher checks exact/include/regex keys and distinguishes user index from global index.",
+            "review_status": "reviewed"
+          }
+        }
+      ]
+    },
+    {
+      "registry_entry_id": "nb-7a3163a76a06283efe3bb2c9",
+      "ecosystem": "nonebot",
+      "package": "nonebot_plugin_morning",
+      "version": "0.3.2",
+      "artifact_sha256": "3d3b2b5758255df576ea3621af8fac52e2f1bf397af96efbdd838b2e2d8aa78a",
+      "artifact_upstream_sha512": null,
+      "dependency_locks": {
+        "linux-x86_64": {
+          "status": "eligible_not_run",
+          "profile_id": "nonebot-2.5.0-onebot-2.4.6-py3.12.14-linux-x86_64",
+          "dependency_lock_sha256": "24b2b59fcf995f7b6570b79d6da5b009eb1c2086e5fbb7d69ea2801c6a8a15c6",
+          "artifact_sha256": "3d3b2b5758255df576ea3621af8fac52e2f1bf397af96efbdd838b2e2d8aa78a"
+        },
+        "windows-x86_64": {
+          "status": "eligible_not_run",
+          "profile_id": "nonebot-2.5.0-onebot-2.4.6-py3.12.14-windows-x86_64",
+          "dependency_lock_sha256": "c44a70ece04a043435b56a379065e8a4e2561bc6124af068babc085621d1b1d4",
+          "artifact_sha256": "3d3b2b5758255df576ea3621af8fac52e2f1bf397af96efbdd838b2e2d8aa78a"
+        }
+      },
+      "platforms": [
+        "linux-x86_64",
+        "windows-x86_64"
+      ],
+      "source_review": {
+        "archive_member": "nonebot_plugin_morning/__init__.py",
+        "symbols": [
+          "morning handlers",
+          "morning_config"
+        ],
+        "reviewed_artifact_sha256": "3d3b2b5758255df576ea3621af8fac52e2f1bf397af96efbdd838b2e2d8aa78a",
+        "review_status": "reviewed",
+        "external_services": [],
+        "archive_member_sha256": "188ad091faf60f7a199b57e80dfe036f0649cd65adaebd679a21a4b4487265a0"
+      },
+      "cases": [
+        {
+          "case_id": "nb-nonebot-plugin-morning-positive",
+          "class": "positive",
+          "stimuli": [
+            {
+              "input": "invoke morning behavior at fixed in-range time",
+              "fixture_clock": "2026-10-20T07:00:00Z",
+              "random_seed": 731,
+              "session_scope": "fixture-session"
+            }
+          ],
+          "assertions": [
+            {
+              "path": "plugin_observation.response_or_operation_count",
+              "operator": "in_range",
+              "minimum": 1,
+              "maximum": 1
+            }
+          ],
+          "oracle": {
+            "member": "nonebot_plugin_morning/__init__.py",
+            "symbol": "morning handlers",
+            "rationale": "Startup config defines morning/night windows and greeting handlers; time and randomness are frozen.",
+            "review_status": "reviewed"
+          }
+        },
+        {
+          "case_id": "nb-nonebot-plugin-morning-negative",
+          "class": "negative",
+          "stimuli": [
+            {
+              "input": "invoke at fixed out-of-range time",
+              "fixture_clock": "2026-10-20T07:00:00Z",
+              "random_seed": 731,
+              "session_scope": "fixture-session"
+            }
+          ],
+          "assertions": [
+            {
+              "path": "plugin_observation.response_or_operation_count",
+              "operator": "equals",
+              "value": 0
+            }
+          ],
+          "oracle": {
+            "member": "nonebot_plugin_morning/__init__.py",
+            "symbol": "morning_config",
+            "rationale": "Negative boundary derived from Startup config defines morning/night windows and greeting handlers; time and randomness are frozen.",
+            "review_status": "reviewed"
+          }
+        },
+        {
+          "case_id": "nb-nonebot-plugin-morning-isolation",
+          "class": "isolation",
+          "stimuli": [
+            {
+              "input": "two sessions produce independent responses under same frozen clock",
+              "fixture_clock": "2026-10-20T07:00:00Z",
+              "random_seed": 731,
+              "session_scope": "fixture-session"
+            }
+          ],
+          "assertions": [
+            {
+              "path": "plugin_observation.scope_leak_count",
+              "operator": "equals",
+              "value": 0
+            }
+          ],
+          "oracle": {
+            "member": "nonebot_plugin_morning/__init__.py",
+            "symbol": "morning_config",
+            "rationale": "Independent-state oracle derived from Startup config defines morning/night windows and greeting handlers; time and randomness are frozen.",
+            "review_status": "reviewed"
+          }
+        }
+      ]
+    },
+    {
+      "registry_entry_id": "ko-8be6f0a7682e575c75a4b3e9",
+      "ecosystem": "koishi",
+      "package": "@koishijs/plugin-database-sqlite",
+      "version": "4.7.0",
+      "artifact_sha256": "0febbea51f70d8268e437c81403b5f0c8dffebdc5055c8eea6c729f788b1a592",
+      "artifact_upstream_sha512": "f779e9ea2368d625d6637d8dcd81714159dfd389633c929626a791175e772ef07019a6fac4101d00daa3d925ef3b61632fc56316b1b4b2e11877246b13b675e3",
+      "dependency_locks": {
+        "linux-x86_64": {
+          "status": "eligible_not_run",
+          "profile_id": "koishi-core-4.18.11-node-24.20.0-x86_64-portable-lock",
+          "dependency_lock_sha256": "6816cabd02551f5232d18bc602a99935525527ec83c60bc78393682d2d38b866",
+          "artifact_sha256": "0febbea51f70d8268e437c81403b5f0c8dffebdc5055c8eea6c729f788b1a592"
+        },
+        "windows-x86_64": {
+          "status": "eligible_not_run",
+          "profile_id": "koishi-core-4.18.11-node-24.20.0-x86_64-portable-lock",
+          "dependency_lock_sha256": "6816cabd02551f5232d18bc602a99935525527ec83c60bc78393682d2d38b866",
+          "artifact_sha256": "0febbea51f70d8268e437c81403b5f0c8dffebdc5055c8eea6c729f788b1a592"
+        }
+      },
+      "platforms": [
+        "linux-x86_64",
+        "windows-x86_64"
+      ],
+      "source_review": {
+        "archive_member": "package/lib/index.js",
+        "symbols": [
+          "apply",
+          "SqliteDatabase"
+        ],
+        "reviewed_artifact_sha256": "0febbea51f70d8268e437c81403b5f0c8dffebdc5055c8eea6c729f788b1a592",
+        "review_status": "reviewed",
+        "external_services": [],
+        "archive_member_sha256": "a370cf3224398b6700f3ec05bac020140b5fc0f65b3c89bb64743893261b834b"
+      },
+      "cases": [
+        {
+          "case_id": "ko-koishijs-plugin-database-sqlite-positive",
+          "class": "positive",
+          "stimuli": [
+            {
+              "input": "create then read a row in temporary SQLite database",
+              "fixture_clock": "2026-10-20T07:00:00Z",
+              "random_seed": 731,
+              "session_scope": "fixture-session"
+            }
+          ],
+          "assertions": [
+            {
+              "path": "plugin_observation.response_or_operation_count",
+              "operator": "in_range",
+              "minimum": 1,
+              "maximum": 1
+            }
+          ],
+          "oracle": {
+            "member": "package/lib/index.js",
+            "symbol": "apply",
+            "rationale": "The package provides SQLite-backed database service; each case uses its own temporary database.",
+            "review_status": "reviewed"
+          }
+        },
+        {
+          "case_id": "ko-koishijs-plugin-database-sqlite-negative",
+          "class": "negative",
+          "stimuli": [
+            {
+              "input": "read a missing row",
+              "fixture_clock": "2026-10-20T07:00:00Z",
+              "random_seed": 731,
+              "session_scope": "fixture-session"
+            }
+          ],
+          "assertions": [
+            {
+              "path": "plugin_observation.response_or_operation_count",
+              "operator": "equals",
+              "value": 0
+            }
+          ],
+          "oracle": {
+            "member": "package/lib/index.js",
+            "symbol": "SqliteDatabase",
+            "rationale": "Negative boundary derived from The package provides SQLite-backed database service; each case uses its own temporary database.",
+            "review_status": "reviewed"
+          }
+        },
+        {
+          "case_id": "ko-koishijs-plugin-database-sqlite-isolation",
+          "class": "isolation",
+          "stimuli": [
+            {
+              "input": "two primary keys retain independent values",
+              "fixture_clock": "2026-10-20T07:00:00Z",
+              "random_seed": 731,
+              "session_scope": "fixture-session"
+            }
+          ],
+          "assertions": [
+            {
+              "path": "plugin_observation.scope_leak_count",
+              "operator": "equals",
+              "value": 0
+            }
+          ],
+          "oracle": {
+            "member": "package/lib/index.js",
+            "symbol": "SqliteDatabase",
+            "rationale": "Independent-state oracle derived from The package provides SQLite-backed database service; each case uses its own temporary database.",
+            "review_status": "reviewed"
+          }
+        }
+      ]
+    },
+    {
+      "registry_entry_id": "ko-97f39cf7212bea26b51ea8b3",
+      "ecosystem": "koishi",
+      "package": "@koishijs/plugin-commands",
+      "version": "3.5.5",
+      "artifact_sha256": "255640bbb0c335e9654ab54c7a7d582f184e9666c3cddd4788055ae838608c6a",
+      "artifact_upstream_sha512": "31ca41eb8cbc22dcc72f02b0ad69bd6ae6ae8153b6912276aaaed20af02990fda4852a9d4d3e9b42abfeb972b1a5e9c6fd68c94ff17a64d2996f8c5a480310c3",
+      "dependency_locks": {
+        "linux-x86_64": {
+          "status": "eligible_not_run",
+          "profile_id": "koishi-core-4.18.11-node-24.20.0-x86_64-portable-lock",
+          "dependency_lock_sha256": "e4a95ea9525ebc2217f5c054264f461df333e9771bd89b7d5063b3df9a621721",
+          "artifact_sha256": "255640bbb0c335e9654ab54c7a7d582f184e9666c3cddd4788055ae838608c6a"
+        },
+        "windows-x86_64": {
+          "status": "eligible_not_run",
+          "profile_id": "koishi-core-4.18.11-node-24.20.0-x86_64-portable-lock",
+          "dependency_lock_sha256": "e4a95ea9525ebc2217f5c054264f461df333e9771bd89b7d5063b3df9a621721",
+          "artifact_sha256": "255640bbb0c335e9654ab54c7a7d582f184e9666c3cddd4788055ae838608c6a"
+        }
+      },
+      "platforms": [
+        "linux-x86_64",
+        "windows-x86_64"
+      ],
+      "source_review": {
+        "archive_member": "package/lib/index.js",
+        "symbols": [
+          "command_default",
+          "Context.command"
+        ],
+        "reviewed_artifact_sha256": "255640bbb0c335e9654ab54c7a7d582f184e9666c3cddd4788055ae838608c6a",
+        "review_status": "reviewed",
+        "external_services": [],
+        "archive_member_sha256": "267ec69ef3d2141364e1eb3f7749a4e1533148c416cc8f8552ceb11977236101"
+      },
+      "cases": [
+        {
+          "case_id": "ko-koishijs-plugin-commands-positive",
+          "class": "positive",
+          "stimuli": [
+            {
+              "input": "register and resolve a fixture command",
+              "fixture_clock": "2026-10-20T07:00:00Z",
+              "random_seed": 731,
+              "session_scope": "fixture-session"
+            }
+          ],
+          "assertions": [
+            {
+              "path": "plugin_observation.response_or_operation_count",
+              "operator": "in_range",
+              "minimum": 1,
+              "maximum": 1
+            }
+          ],
+          "oracle": {
+            "member": "package/lib/index.js",
+            "symbol": "command_default",
+            "rationale": "The plugin integrates registration, resolution, aliases, and lifecycle updates with Koishi commander.",
+            "review_status": "reviewed"
+          }
+        },
+        {
+          "case_id": "ko-koishijs-plugin-commands-negative",
+          "class": "negative",
+          "stimuli": [
+            {
+              "input": "resolve an unregistered command",
+              "fixture_clock": "2026-10-20T07:00:00Z",
+              "random_seed": 731,
+              "session_scope": "fixture-session"
+            }
+          ],
+          "assertions": [
+            {
+              "path": "plugin_observation.response_or_operation_count",
+              "operator": "equals",
+              "value": 0
+            }
+          ],
+          "oracle": {
+            "member": "package/lib/index.js",
+            "symbol": "Context.command",
+            "rationale": "Negative boundary derived from The plugin integrates registration, resolution, aliases, and lifecycle updates with Koishi commander.",
+            "review_status": "reviewed"
+          }
+        },
+        {
+          "case_id": "ko-koishijs-plugin-commands-isolation",
+          "class": "isolation",
+          "stimuli": [
+            {
+              "input": "two command names remain independently addressable",
+              "fixture_clock": "2026-10-20T07:00:00Z",
+              "random_seed": 731,
+              "session_scope": "fixture-session"
+            }
+          ],
+          "assertions": [
+            {
+              "path": "plugin_observation.scope_leak_count",
+              "operator": "equals",
+              "value": 0
+            }
+          ],
+          "oracle": {
+            "member": "package/lib/index.js",
+            "symbol": "Context.command",
+            "rationale": "Independent-state oracle derived from The plugin integrates registration, resolution, aliases, and lifecycle updates with Koishi commander.",
+            "review_status": "reviewed"
+          }
+        }
+      ]
+    },
+    {
+      "registry_entry_id": "ko-0a6452b59539c2d91ee57448",
+      "ecosystem": "koishi",
+      "package": "@koishijs/plugin-config",
+      "version": "2.8.7",
+      "artifact_sha256": "4411a1e80368084ad503c9db25db321e7316a61219e652e37bbe453900e58a09",
+      "artifact_upstream_sha512": "77046ff81a2abd54c43f0a564c36cb745e3b393b38d8488e6fb1b5b3c0c8489d4b95820418b444542830a77181a8f46b8332dda4b90d303163d8c04e0ffc7ac0",
+      "dependency_locks": {
+        "linux-x86_64": {
+          "status": "eligible_not_run",
+          "profile_id": "koishi-core-4.18.11-node-24.20.0-x86_64-portable-lock",
+          "dependency_lock_sha256": "18d1e192b9d51074a824cb773003c847ad84a64bf4e2b3d114bec431ecbaeb6e",
+          "artifact_sha256": "4411a1e80368084ad503c9db25db321e7316a61219e652e37bbe453900e58a09"
+        },
+        "windows-x86_64": {
+          "status": "eligible_not_run",
+          "profile_id": "koishi-core-4.18.11-node-24.20.0-x86_64-portable-lock",
+          "dependency_lock_sha256": "18d1e192b9d51074a824cb773003c847ad84a64bf4e2b3d114bec431ecbaeb6e",
+          "artifact_sha256": "4411a1e80368084ad503c9db25db321e7316a61219e652e37bbe453900e58a09"
+        }
+      },
+      "platforms": [
+        "linux-x86_64",
+        "windows-x86_64"
+      ],
+      "source_review": {
+        "archive_member": "package/lib/shared/index.js",
+        "symbols": [
+          "ConfigWriter",
+          "refresh",
+          "config/request-runtime"
+        ],
+        "reviewed_artifact_sha256": "4411a1e80368084ad503c9db25db321e7316a61219e652e37bbe453900e58a09",
+        "review_status": "reviewed",
+        "external_services": [],
+        "archive_member_sha256": "9998826683d4808d95e38512916d705667ae6cbf4d56bfa9039f104e7cbdf542"
+      },
+      "cases": [
+        {
+          "case_id": "ko-koishijs-plugin-config-positive",
+          "class": "positive",
+          "stimuli": [
+            {
+              "input": "write fixture plugin config and refresh runtime",
+              "fixture_clock": "2026-10-20T07:00:00Z",
+              "random_seed": 731,
+              "session_scope": "fixture-session"
+            }
+          ],
+          "assertions": [
+            {
+              "path": "plugin_observation.response_or_operation_count",
+              "operator": "in_range",
+              "minimum": 1,
+              "maximum": 1
+            }
+          ],
+          "oracle": {
+            "member": "package/lib/shared/index.js",
+            "symbol": "ConfigWriter",
+            "rationale": "The config service listens to runtime/config events and writes plugin-scoped configuration.",
+            "review_status": "reviewed"
+          }
+        },
+        {
+          "case_id": "ko-koishijs-plugin-config-negative",
+          "class": "negative",
+          "stimuli": [
+            {
+              "input": "request config for absent plugin",
+              "fixture_clock": "2026-10-20T07:00:00Z",
+              "random_seed": 731,
+              "session_scope": "fixture-session"
+            }
+          ],
+          "assertions": [
+            {
+              "path": "plugin_observation.response_or_operation_count",
+              "operator": "equals",
+              "value": 0
+            }
+          ],
+          "oracle": {
+            "member": "package/lib/shared/index.js",
+            "symbol": "config/request-runtime",
+            "rationale": "Negative boundary derived from The config service listens to runtime/config events and writes plugin-scoped configuration.",
+            "review_status": "reviewed"
+          }
+        },
+        {
+          "case_id": "ko-koishijs-plugin-config-isolation",
+          "class": "isolation",
+          "stimuli": [
+            {
+              "input": "two plugin configs remain attached to separate plugin identities",
+              "fixture_clock": "2026-10-20T07:00:00Z",
+              "random_seed": 731,
+              "session_scope": "fixture-session"
+            }
+          ],
+          "assertions": [
+            {
+              "path": "plugin_observation.scope_leak_count",
+              "operator": "equals",
+              "value": 0
+            }
+          ],
+          "oracle": {
+            "member": "package/lib/shared/index.js",
+            "symbol": "config/request-runtime",
+            "rationale": "Independent-state oracle derived from The config service listens to runtime/config events and writes plugin-scoped configuration.",
+            "review_status": "reviewed"
+          }
+        }
+      ]
+    },
+    {
+      "registry_entry_id": "ko-fb5aa9ada6cacd62ec595c66",
+      "ecosystem": "koishi",
+      "package": "@koishijs/plugin-help",
+      "version": "2.4.6",
+      "artifact_sha256": "d7e17a9d384ec1eaca2cfd588e23af1c1867a57c8d81fae1c71d83c88159c739",
+      "artifact_upstream_sha512": "86a3fae181a1e0b51a8cff9be6315f3b8394c85124d5aa084c34e8048e1703b8554d07f2e3b33ecace44b089ab35dbde15605b55748393585cacaf67a5cbff39",
+      "dependency_locks": {
+        "linux-x86_64": {
+          "status": "eligible_not_run",
+          "profile_id": "koishi-core-4.18.11-node-24.20.0-x86_64-portable-lock",
+          "dependency_lock_sha256": "cd7dce2e2e3e1bdced95faf6c423139f00d250cdd81b6730525d6222edb53d9e",
+          "artifact_sha256": "d7e17a9d384ec1eaca2cfd588e23af1c1867a57c8d81fae1c71d83c88159c739"
+        },
+        "windows-x86_64": {
+          "status": "eligible_not_run",
+          "profile_id": "koishi-core-4.18.11-node-24.20.0-x86_64-portable-lock",
+          "dependency_lock_sha256": "cd7dce2e2e3e1bdced95faf6c423139f00d250cdd81b6730525d6222edb53d9e",
+          "artifact_sha256": "d7e17a9d384ec1eaca2cfd588e23af1c1867a57c8d81fae1c71d83c88159c739"
+        }
+      },
+      "platforms": [
+        "linux-x86_64",
+        "windows-x86_64"
+      ],
+      "source_review": {
+        "archive_member": "package/lib/index.js",
+        "symbols": [
+          "help command action",
+          "enableHelp"
+        ],
+        "reviewed_artifact_sha256": "d7e17a9d384ec1eaca2cfd588e23af1c1867a57c8d81fae1c71d83c88159c739",
+        "review_status": "reviewed",
+        "external_services": [],
+        "archive_member_sha256": "72d3c375cdff5f8013ae2115d78a8a63ee801a6b871c02e41eb87f6ee8ed4d6b"
+      },
+      "cases": [
+        {
+          "case_id": "ko-koishijs-plugin-help-positive",
+          "class": "positive",
+          "stimuli": [
+            {
+              "input": "invoke help for a registered fixture command",
+              "fixture_clock": "2026-10-20T07:00:00Z",
+              "random_seed": 731,
+              "session_scope": "fixture-session"
+            }
+          ],
+          "assertions": [
+            {
+              "path": "plugin_observation.response_or_operation_count",
+              "operator": "in_range",
+              "minimum": 1,
+              "maximum": 1
+            }
+          ],
+          "oracle": {
+            "member": "package/lib/index.js",
+            "symbol": "help command action",
+            "rationale": "The plugin adds help options and resolves help output from commander metadata.",
+            "review_status": "reviewed"
+          }
+        },
+        {
+          "case_id": "ko-koishijs-plugin-help-negative",
+          "class": "negative",
+          "stimuli": [
+            {
+              "input": "invoke help for absent command",
+              "fixture_clock": "2026-10-20T07:00:00Z",
+              "random_seed": 731,
+              "session_scope": "fixture-session"
+            }
+          ],
+          "assertions": [
+            {
+              "path": "plugin_observation.response_or_operation_count",
+              "operator": "equals",
+              "value": 0
+            }
+          ],
+          "oracle": {
+            "member": "package/lib/index.js",
+            "symbol": "enableHelp",
+            "rationale": "Negative boundary derived from The plugin adds help options and resolves help output from commander metadata.",
+            "review_status": "reviewed"
+          }
+        },
+        {
+          "case_id": "ko-koishijs-plugin-help-isolation",
+          "class": "isolation",
+          "stimuli": [
+            {
+              "input": "requests for two command names return corresponding metadata",
+              "fixture_clock": "2026-10-20T07:00:00Z",
+              "random_seed": 731,
+              "session_scope": "fixture-session"
+            }
+          ],
+          "assertions": [
+            {
+              "path": "plugin_observation.scope_leak_count",
+              "operator": "equals",
+              "value": 0
+            }
+          ],
+          "oracle": {
+            "member": "package/lib/index.js",
+            "symbol": "enableHelp",
+            "rationale": "Independent-state oracle derived from The plugin adds help options and resolves help output from commander metadata.",
+            "review_status": "reviewed"
+          }
+        }
+      ]
+    },
+    {
+      "registry_entry_id": "ko-163c3bd4cf87c72c24210251",
+      "ecosystem": "koishi",
+      "package": "@koishijs/plugin-echo",
+      "version": "2.2.5",
+      "artifact_sha256": "79da39692ba8fce04ea597ff85696a0fe193cd89a95a91a0d459ea40ab592265",
+      "artifact_upstream_sha512": "545d7523258c67c85d72b2e831e2e2e9f3c14f51158de0f5635fa607a519abe0f3829cf105c956fe2e5b8343aeaae766d38ed0198084f63d6fedfbd1fb856db3",
+      "dependency_locks": {
+        "linux-x86_64": {
+          "status": "eligible_not_run",
+          "profile_id": "koishi-core-4.18.11-node-24.20.0-x86_64-portable-lock",
+          "dependency_lock_sha256": "33e0897b794134c39215e7824a47edec3eb4acc79fcb9f4df00a03c1455f616b",
+          "artifact_sha256": "79da39692ba8fce04ea597ff85696a0fe193cd89a95a91a0d459ea40ab592265"
+        },
+        "windows-x86_64": {
+          "status": "eligible_not_run",
+          "profile_id": "koishi-core-4.18.11-node-24.20.0-x86_64-portable-lock",
+          "dependency_lock_sha256": "33e0897b794134c39215e7824a47edec3eb4acc79fcb9f4df00a03c1455f616b",
+          "artifact_sha256": "79da39692ba8fce04ea597ff85696a0fe193cd89a95a91a0d459ea40ab592265"
+        }
+      },
+      "platforms": [
+        "linux-x86_64",
+        "windows-x86_64"
+      ],
+      "source_review": {
+        "archive_member": "package/lib/index.js",
+        "symbols": [
+          "echo command action"
+        ],
+        "reviewed_artifact_sha256": "79da39692ba8fce04ea597ff85696a0fe193cd89a95a91a0d459ea40ab592265",
+        "review_status": "reviewed",
+        "external_services": [],
+        "archive_member_sha256": "e9c49b3f9764725cb73ab463b38168500d9aa549f30c46e7ecc92ca46275ca61"
+      },
+      "cases": [
+        {
+          "case_id": "ko-koishijs-plugin-echo-positive",
+          "class": "positive",
+          "stimuli": [
+            {
+              "input": "invoke echo with non-empty text",
+              "fixture_clock": "2026-10-20T07:00:00Z",
+              "random_seed": 731,
+              "session_scope": "fixture-session"
+            }
+          ],
+          "assertions": [
+            {
+              "path": "plugin_observation.response_or_operation_count",
+              "operator": "in_range",
+              "minimum": 1,
+              "maximum": 1
+            }
+          ],
+          "oracle": {
+            "member": "package/lib/index.js",
+            "symbol": "echo command action",
+            "rationale": "The command takes a message argument and sends it to the invoking session or selected recipient.",
+            "review_status": "reviewed"
+          }
+        },
+        {
+          "case_id": "ko-koishijs-plugin-echo-negative",
+          "class": "negative",
+          "stimuli": [
+            {
+              "input": "invoke echo with no required argument",
+              "fixture_clock": "2026-10-20T07:00:00Z",
+              "random_seed": 731,
+              "session_scope": "fixture-session"
+            }
+          ],
+          "assertions": [
+            {
+              "path": "plugin_observation.response_or_operation_count",
+              "operator": "equals",
+              "value": 0
+            }
+          ],
+          "oracle": {
+            "member": "package/lib/index.js",
+            "symbol": "echo command action",
+            "rationale": "Negative boundary derived from The command takes a message argument and sends it to the invoking session or selected recipient.",
+            "review_status": "reviewed"
+          }
+        },
+        {
+          "case_id": "ko-koishijs-plugin-echo-isolation",
+          "class": "isolation",
+          "stimuli": [
+            {
+              "input": "two sessions echo their own input text",
+              "fixture_clock": "2026-10-20T07:00:00Z",
+              "random_seed": 731,
+              "session_scope": "fixture-session"
+            }
+          ],
+          "assertions": [
+            {
+              "path": "plugin_observation.scope_leak_count",
+              "operator": "equals",
+              "value": 0
+            }
+          ],
+          "oracle": {
+            "member": "package/lib/index.js",
+            "symbol": "echo command action",
+            "rationale": "Independent-state oracle derived from The command takes a message argument and sends it to the invoking session or selected recipient.",
+            "review_status": "reviewed"
+          }
+        }
+      ]
+    },
+    {
+      "registry_entry_id": "ko-4fa1f6f3a9cfbddb2c218917",
+      "ecosystem": "koishi",
+      "package": "koishi-plugin-guess-number",
+      "version": "1.2.1",
+      "artifact_sha256": "86ee947638e72a12a992a68c87419e7c7ec87dcfc2cf0b4e90f41e3c11747544",
+      "artifact_upstream_sha512": "9ce71f8819e9302145ba11b3c74bf7a57b6eaff39e0d0837bb62b68580d0d72729cfad14e227ed600a692d5cffb1733c17686c23709e20cde31006befce49881",
+      "dependency_locks": {
+        "linux-x86_64": {
+          "status": "eligible_not_run",
+          "profile_id": "koishi-core-4.18.11-node-24.20.0-x86_64-portable-lock",
+          "dependency_lock_sha256": "d3a722b34852e7a6d6a522e7da3b90b4cd490e6fcb8719171eab4c7dfb7abdae",
+          "artifact_sha256": "86ee947638e72a12a992a68c87419e7c7ec87dcfc2cf0b4e90f41e3c11747544"
+        },
+        "windows-x86_64": {
+          "status": "eligible_not_run",
+          "profile_id": "koishi-core-4.18.11-node-24.20.0-x86_64-portable-lock",
+          "dependency_lock_sha256": "d3a722b34852e7a6d6a522e7da3b90b4cd490e6fcb8719171eab4c7dfb7abdae",
+          "artifact_sha256": "86ee947638e72a12a992a68c87419e7c7ec87dcfc2cf0b4e90f41e3c11747544"
+        }
+      },
+      "platforms": [
+        "linux-x86_64",
+        "windows-x86_64"
+      ],
+      "source_review": {
+        "archive_member": "package/lib/index.js",
+        "symbols": [
+          "guess-number command action",
+          "middleware"
+        ],
+        "reviewed_artifact_sha256": "86ee947638e72a12a992a68c87419e7c7ec87dcfc2cf0b4e90f41e3c11747544",
+        "review_status": "reviewed",
+        "external_services": [],
+        "archive_member_sha256": "fa174825b96567d12a9cd4776fd5e432bfc11578550ef9afbd38c862bc2fe49e"
+      },
+      "cases": [
+        {
+          "case_id": "ko-koishi-plugin-guess-number-positive",
+          "class": "positive",
+          "stimuli": [
+            {
+              "input": "start a game with fixed seed and configuration",
+              "fixture_clock": "2026-10-20T07:00:00Z",
+              "random_seed": 731,
+              "session_scope": "fixture-session"
+            }
+          ],
+          "assertions": [
+            {
+              "path": "plugin_observation.response_or_operation_count",
+              "operator": "in_range",
+              "minimum": 1,
+              "maximum": 1
+            }
+          ],
+          "oracle": {
+            "member": "package/lib/index.js",
+            "symbol": "guess-number command action",
+            "rationale": "The game supports configured submission modes, base, answer length, and chance count.",
+            "review_status": "reviewed"
+          }
+        },
+        {
+          "case_id": "ko-koishi-plugin-guess-number-negative",
+          "class": "negative",
+          "stimuli": [
+            {
+              "input": "send unmentioned direct answer in mention mode",
+              "fixture_clock": "2026-10-20T07:00:00Z",
+              "random_seed": 731,
+              "session_scope": "fixture-session"
+            }
+          ],
+          "assertions": [
+            {
+              "path": "plugin_observation.response_or_operation_count",
+              "operator": "equals",
+              "value": 0
+            }
+          ],
+          "oracle": {
+            "member": "package/lib/index.js",
+            "symbol": "middleware",
+            "rationale": "Negative boundary derived from The game supports configured submission modes, base, answer length, and chance count.",
+            "review_status": "reviewed"
+          }
+        },
+        {
+          "case_id": "ko-koishi-plugin-guess-number-isolation",
+          "class": "isolation",
+          "stimuli": [
+            {
+              "input": "two users hold independent game state",
+              "fixture_clock": "2026-10-20T07:00:00Z",
+              "random_seed": 731,
+              "session_scope": "fixture-session"
+            }
+          ],
+          "assertions": [
+            {
+              "path": "plugin_observation.scope_leak_count",
+              "operator": "equals",
+              "value": 0
+            }
+          ],
+          "oracle": {
+            "member": "package/lib/index.js",
+            "symbol": "middleware",
+            "rationale": "Independent-state oracle derived from The game supports configured submission modes, base, answer length, and chance count.",
+            "review_status": "reviewed"
+          }
+        }
+      ]
+    },
+    {
+      "registry_entry_id": "ko-aa34b6d87f81a7e263607dbc",
+      "ecosystem": "koishi",
+      "package": "koishi-plugin-calculator",
+      "version": "1.2.0",
+      "artifact_sha256": "790a2d77a51c28c9c0fc5a10e62e22b1d18f2d38e4bdefbb536293d170648662",
+      "artifact_upstream_sha512": "74313a62906d76bc2f589032a2b051aa7b033c8df4438142a31857b7b77123a2d796ed947bf2c630792e3546c59870d0f7d2be85519f794abb5260a3dd452517",
+      "dependency_locks": {
+        "linux-x86_64": {
+          "status": "eligible_not_run",
+          "profile_id": "koishi-core-4.18.11-node-24.20.0-x86_64-portable-lock",
+          "dependency_lock_sha256": "883fd07ec53b6f7a8279cba6e3bcb0e06662d767f92cc53132612e4e2e9d7d02",
+          "artifact_sha256": "790a2d77a51c28c9c0fc5a10e62e22b1d18f2d38e4bdefbb536293d170648662"
+        },
+        "windows-x86_64": {
+          "status": "eligible_not_run",
+          "profile_id": "koishi-core-4.18.11-node-24.20.0-x86_64-portable-lock",
+          "dependency_lock_sha256": "883fd07ec53b6f7a8279cba6e3bcb0e06662d767f92cc53132612e4e2e9d7d02",
+          "artifact_sha256": "790a2d77a51c28c9c0fc5a10e62e22b1d18f2d38e4bdefbb536293d170648662"
+        }
+      },
+      "platforms": [
+        "linux-x86_64",
+        "windows-x86_64"
+      ],
+      "source_review": {
+        "archive_member": "package/lib/index.js",
+        "symbols": [
+          "message listener",
+          "calculator_values"
+        ],
+        "reviewed_artifact_sha256": "790a2d77a51c28c9c0fc5a10e62e22b1d18f2d38e4bdefbb536293d170648662",
+        "review_status": "reviewed",
+        "external_services": [],
+        "archive_member_sha256": "151abd6233f34e7eddd9571310111fba1dc4cce40b051ba5463d67ceb4a4db7b"
+      },
+      "cases": [
+        {
+          "case_id": "ko-koishi-plugin-calculator-positive",
+          "class": "positive",
+          "stimuli": [
+            {
+              "input": "submit valid calculation with seeded value",
+              "fixture_clock": "2026-10-20T07:00:00Z",
+              "random_seed": 731,
+              "session_scope": "fixture-session"
+            }
+          ],
+          "assertions": [
+            {
+              "path": "plugin_observation.response_or_operation_count",
+              "operator": "in_range",
+              "minimum": 1,
+              "maximum": 1
+            }
+          ],
+          "oracle": {
+            "member": "package/lib/index.js",
+            "symbol": "message listener",
+            "rationale": "The message listener persists calculator_values and supports independent per-group state.",
+            "review_status": "reviewed"
+          }
+        },
+        {
+          "case_id": "ko-koishi-plugin-calculator-negative",
+          "class": "negative",
+          "stimuli": [
+            {
+              "input": "submit plain text",
+              "fixture_clock": "2026-10-20T07:00:00Z",
+              "random_seed": 731,
+              "session_scope": "fixture-session"
+            }
+          ],
+          "assertions": [
+            {
+              "path": "plugin_observation.response_or_operation_count",
+              "operator": "equals",
+              "value": 0
+            }
+          ],
+          "oracle": {
+            "member": "package/lib/index.js",
+            "symbol": "calculator_values",
+            "rationale": "Negative boundary derived from The message listener persists calculator_values and supports independent per-group state.",
+            "review_status": "reviewed"
+          }
+        },
+        {
+          "case_id": "ko-koishi-plugin-calculator-isolation",
+          "class": "isolation",
+          "stimuli": [
+            {
+              "input": "independentMode separates values by group",
+              "fixture_clock": "2026-10-20T07:00:00Z",
+              "random_seed": 731,
+              "session_scope": "fixture-session"
+            }
+          ],
+          "assertions": [
+            {
+              "path": "plugin_observation.scope_leak_count",
+              "operator": "equals",
+              "value": 0
+            }
+          ],
+          "oracle": {
+            "member": "package/lib/index.js",
+            "symbol": "calculator_values",
+            "rationale": "Independent-state oracle derived from The message listener persists calculator_values and supports independent per-group state.",
+            "review_status": "reviewed"
+          }
+        }
+      ]
+    },
+    {
+      "registry_entry_id": "ko-f106ee0baf0f51431776f698",
+      "ecosystem": "koishi",
+      "package": "koishi-plugin-countdown-clock",
+      "version": "1.0.1",
+      "artifact_sha256": "bb2fe8b0f0119f8a7c7086cfb8d9735314d280a0d7e66b2263b3f1e143b3aca6",
+      "artifact_upstream_sha512": "38a390225e9cb791406d46db02f80800a9fed0f896bc093e87ee19ac7c311cfdb79b4661728bceb5cbcb095d50939a0ed2650afe3e0335edb7cf76d1e99f9806",
+      "dependency_locks": {
+        "linux-x86_64": {
+          "status": "eligible_not_run",
+          "profile_id": "koishi-core-4.18.11-node-24.20.0-x86_64-portable-lock",
+          "dependency_lock_sha256": "b53a824d7ffd7915d3901e31ceb81da745f72c43ba78d51941547bc21e8d8a06",
+          "artifact_sha256": "bb2fe8b0f0119f8a7c7086cfb8d9735314d280a0d7e66b2263b3f1e143b3aca6"
+        },
+        "windows-x86_64": {
+          "status": "eligible_not_run",
+          "profile_id": "koishi-core-4.18.11-node-24.20.0-x86_64-portable-lock",
+          "dependency_lock_sha256": "b53a824d7ffd7915d3901e31ceb81da745f72c43ba78d51941547bc21e8d8a06",
+          "artifact_sha256": "bb2fe8b0f0119f8a7c7086cfb8d9735314d280a0d7e66b2263b3f1e143b3aca6"
+        }
+      },
+      "platforms": [
+        "linux-x86_64",
+        "windows-x86_64"
+      ],
+      "source_review": {
+        "archive_member": "package/lib/index.js",
+        "symbols": [
+          "countdown command",
+          "countdown.cancel",
+          "check"
+        ],
+        "reviewed_artifact_sha256": "bb2fe8b0f0119f8a7c7086cfb8d9735314d280a0d7e66b2263b3f1e143b3aca6",
+        "review_status": "reviewed",
+        "external_services": [],
+        "archive_member_sha256": "cc867a329c3f67d70a026a24ce120519428fd8855f97c50553f7ac5562bd85bd"
+      },
+      "cases": [
+        {
+          "case_id": "ko-koishi-plugin-countdown-clock-positive",
+          "class": "positive",
+          "stimuli": [
+            {
+              "input": "create countdown at fixed time",
+              "fixture_clock": "2026-10-20T07:00:00Z",
+              "random_seed": 731,
+              "session_scope": "fixture-session"
+            }
+          ],
+          "assertions": [
+            {
+              "path": "plugin_observation.response_or_operation_count",
+              "operator": "in_range",
+              "minimum": 1,
+              "maximum": 1
+            }
+          ],
+          "oracle": {
+            "member": "package/lib/index.js",
+            "symbol": "countdown command",
+            "rationale": "The plugin stores countdown rows with user/platform/channel/time and provides create and cancel commands.",
+            "review_status": "reviewed"
+          }
+        },
+        {
+          "case_id": "ko-koishi-plugin-countdown-clock-negative",
+          "class": "negative",
+          "stimuli": [
+            {
+              "input": "cancel when no countdown exists",
+              "fixture_clock": "2026-10-20T07:00:00Z",
+              "random_seed": 731,
+              "session_scope": "fixture-session"
+            }
+          ],
+          "assertions": [
+            {
+              "path": "plugin_observation.response_or_operation_count",
+              "operator": "equals",
+              "value": 0
+            }
+          ],
+          "oracle": {
+            "member": "package/lib/index.js",
+            "symbol": "check",
+            "rationale": "Negative boundary derived from The plugin stores countdown rows with user/platform/channel/time and provides create and cancel commands.",
+            "review_status": "reviewed"
+          }
+        },
+        {
+          "case_id": "ko-koishi-plugin-countdown-clock-isolation",
+          "class": "isolation",
+          "stimuli": [
+            {
+              "input": "scheduled rows preserve distinct channel and session values",
+              "fixture_clock": "2026-10-20T07:00:00Z",
+              "random_seed": 731,
+              "session_scope": "fixture-session"
+            }
+          ],
+          "assertions": [
+            {
+              "path": "plugin_observation.scope_leak_count",
+              "operator": "equals",
+              "value": 0
+            }
+          ],
+          "oracle": {
+            "member": "package/lib/index.js",
+            "symbol": "check",
+            "rationale": "Independent-state oracle derived from The plugin stores countdown rows with user/platform/channel/time and provides create and cancel commands.",
+            "review_status": "reviewed"
+          }
+        }
+      ]
+    },
+    {
+      "registry_entry_id": "ko-f6dfe45f2f1b06768eb14b06",
+      "ecosystem": "koishi",
+      "package": "koishi-plugin-simple-echo",
+      "version": "1.0.4",
+      "artifact_sha256": "81dd9d23b3dce8aaa427de814702a0c428e55b8607bbf89105f4cb28cd6630dd",
+      "artifact_upstream_sha512": "24fc20d62d21d17d97915a9852aca354e2960ab0d92047fed700a59a544223aee6bde9c57e0ee544ebf4c162a5765c838be573103de253b4976612f61b74ac70",
+      "dependency_locks": {
+        "linux-x86_64": {
+          "status": "eligible_not_run",
+          "profile_id": "koishi-core-4.18.11-node-24.20.0-x86_64-portable-lock",
+          "dependency_lock_sha256": "6302a21121fcb9e4cfa1f935a47801cadec32e6c5a509ba7658b42970d6edf12",
+          "artifact_sha256": "81dd9d23b3dce8aaa427de814702a0c428e55b8607bbf89105f4cb28cd6630dd"
+        },
+        "windows-x86_64": {
+          "status": "eligible_not_run",
+          "profile_id": "koishi-core-4.18.11-node-24.20.0-x86_64-portable-lock",
+          "dependency_lock_sha256": "6302a21121fcb9e4cfa1f935a47801cadec32e6c5a509ba7658b42970d6edf12",
+          "artifact_sha256": "81dd9d23b3dce8aaa427de814702a0c428e55b8607bbf89105f4cb28cd6630dd"
+        }
+      },
+      "platforms": [
+        "linux-x86_64",
+        "windows-x86_64"
+      ],
+      "source_review": {
+        "archive_member": "package/lib/index.js",
+        "symbols": [
+          "message middleware",
+          "小艾同学 command"
+        ],
+        "reviewed_artifact_sha256": "81dd9d23b3dce8aaa427de814702a0c428e55b8607bbf89105f4cb28cd6630dd",
+        "review_status": "reviewed",
+        "external_services": [],
+        "archive_member_sha256": "c77001bd4218ca7ad74fe6c734dac4f3363bb7454c3bbf45f1b39d927fa7cbd5"
+      },
+      "cases": [
+        {
+          "case_id": "ko-koishi-plugin-smmcat-guesssong-positive",
+          "class": "positive",
+          "stimuli": [
+            {
+              "input": "invoke template command with fixed message",
+              "fixture_clock": "2026-10-20T07:00:00Z",
+              "random_seed": 731,
+              "session_scope": "fixture-session"
+            }
+          ],
+          "assertions": [
+            {
+              "path": "plugin_observation.response_or_operation_count",
+              "operator": "in_range",
+              "minimum": 1,
+              "maximum": 1
+            }
+          ],
+          "oracle": {
+            "member": "package/lib/index.js",
+            "symbol": "message middleware",
+            "rationale": "The package registers a template-backed command and configured message reaction triggers.",
+            "review_status": "reviewed"
+          }
+        },
+        {
+          "case_id": "ko-koishi-plugin-smmcat-guesssong-negative",
+          "class": "negative",
+          "stimuli": [
+            {
+              "input": "send unrelated message outside configured trigger",
+              "fixture_clock": "2026-10-20T07:00:00Z",
+              "random_seed": 731,
+              "session_scope": "fixture-session"
+            }
+          ],
+          "assertions": [
+            {
+              "path": "plugin_observation.response_or_operation_count",
+              "operator": "equals",
+              "value": 0
+            }
+          ],
+          "oracle": {
+            "member": "package/lib/index.js",
+            "symbol": "小艾同学 command",
+            "rationale": "Negative boundary derived from The package registers a template-backed command and configured message reaction triggers.",
+            "review_status": "reviewed"
+          }
+        },
+        {
+          "case_id": "ko-koishi-plugin-smmcat-guesssong-isolation",
+          "class": "isolation",
+          "stimuli": [
+            {
+              "input": "two sessions substitute their own message in the response",
+              "fixture_clock": "2026-10-20T07:00:00Z",
+              "random_seed": 731,
+              "session_scope": "fixture-session"
+            }
+          ],
+          "assertions": [
+            {
+              "path": "plugin_observation.scope_leak_count",
+              "operator": "equals",
+              "value": 0
+            }
+          ],
+          "oracle": {
+            "member": "package/lib/index.js",
+            "symbol": "小艾同学 command",
+            "rationale": "Independent-state oracle derived from The package registers a template-backed command and configured message reaction triggers.",
+            "review_status": "reviewed"
+          }
+        }
+      ]
+    },
+    {
+      "registry_entry_id": "ko-5076fa7479872fd07f4b4fe9",
+      "ecosystem": "koishi",
+      "package": "koishi-plugin-help-md",
+      "version": "1.2.0",
+      "artifact_sha256": "21de2451ce483428c9a1066c702e8c0109f6d59f84c1934bdbea73424feccb5c",
+      "artifact_upstream_sha512": "a72e4e14226ddee1c7cbfbf430530e315e98327e13b3431bcb22f8c736bc2c955d834064a37ddb91fd3c0f246204afd292cd70ff11974b5cb6729a0d0145d91c",
+      "dependency_locks": {
+        "linux-x86_64": {
+          "status": "eligible_not_run",
+          "profile_id": "koishi-core-4.18.11-node-24.20.0-x86_64-portable-lock",
+          "dependency_lock_sha256": "b1be5314ba8b5caa812863f21e28a7b06ba8b54776b13757cc98070c9cf71cc3",
+          "artifact_sha256": "21de2451ce483428c9a1066c702e8c0109f6d59f84c1934bdbea73424feccb5c"
+        },
+        "windows-x86_64": {
+          "status": "eligible_not_run",
+          "profile_id": "koishi-core-4.18.11-node-24.20.0-x86_64-portable-lock",
+          "dependency_lock_sha256": "b1be5314ba8b5caa812863f21e28a7b06ba8b54776b13757cc98070c9cf71cc3",
+          "artifact_sha256": "21de2451ce483428c9a1066c702e8c0109f6d59f84c1934bdbea73424feccb5c"
+        }
+      },
+      "platforms": [
+        "linux-x86_64",
+        "windows-x86_64"
+      ],
+      "source_review": {
+        "archive_member": "package/lib/index.js",
+        "symbols": [
+          "help-md command action",
+          "help builtin"
+        ],
+        "reviewed_artifact_sha256": "21de2451ce483428c9a1066c702e8c0109f6d59f84c1934bdbea73424feccb5c",
+        "review_status": "reviewed",
+        "external_services": [],
+        "archive_member_sha256": "8365c62b8bd7192a37a9addf9f6f7df80b37689a2c44233f7e37f91c8cac84e4"
+      },
+      "cases": [
+        {
+          "case_id": "ko-koishi-plugin-help-md-positive",
+          "class": "positive",
+          "stimuli": [
+            {
+              "input": "invoke registered Markdown help command",
+              "fixture_clock": "2026-10-20T07:00:00Z",
+              "random_seed": 731,
+              "session_scope": "fixture-session"
+            }
+          ],
+          "assertions": [
+            {
+              "path": "plugin_observation.response_or_operation_count",
+              "operator": "in_range",
+              "minimum": 1,
+              "maximum": 1
+            }
+          ],
+          "oracle": {
+            "member": "package/lib/index.js",
+            "symbol": "help-md command action",
+            "rationale": "The plugin adds Markdown-backed custom help commands and a paged built-in help command.",
+            "review_status": "reviewed"
+          }
+        },
+        {
+          "case_id": "ko-koishi-plugin-help-md-negative",
+          "class": "negative",
+          "stimuli": [
+            {
+              "input": "invoke display-only entry as a command",
+              "fixture_clock": "2026-10-20T07:00:00Z",
+              "random_seed": 731,
+              "session_scope": "fixture-session"
+            }
+          ],
+          "assertions": [
+            {
+              "path": "plugin_observation.response_or_operation_count",
+              "operator": "equals",
+              "value": 0
+            }
+          ],
+          "oracle": {
+            "member": "package/lib/index.js",
+            "symbol": "help builtin",
+            "rationale": "Negative boundary derived from The plugin adds Markdown-backed custom help commands and a paged built-in help command.",
+            "review_status": "reviewed"
+          }
+        },
+        {
+          "case_id": "ko-koishi-plugin-help-md-isolation",
+          "class": "isolation",
+          "stimuli": [
+            {
+              "input": "help requests in two sessions render their respective targets",
+              "fixture_clock": "2026-10-20T07:00:00Z",
+              "random_seed": 731,
+              "session_scope": "fixture-session"
+            }
+          ],
+          "assertions": [
+            {
+              "path": "plugin_observation.scope_leak_count",
+              "operator": "equals",
+              "value": 0
+            }
+          ],
+          "oracle": {
+            "member": "package/lib/index.js",
+            "symbol": "help builtin",
+            "rationale": "Independent-state oracle derived from The plugin adds Markdown-backed custom help commands and a paged built-in help command.",
+            "review_status": "reviewed"
+          }
+        }
+      ]
+    }
+  ],
+  "legacy_regressions": [
+    {
+      "sample_id": "koishi-game-mini",
+      "ecosystem": "koishi",
+      "package": "koishi-plugin-game-mini",
+      "version": "0.4.3",
+      "artifact_hash": "sha512-kTovHhKSP9N8gvk1iVjTfA2tYZRji2roxy1vQrvhzw92xs+Y1zduOUVURVtPe18duxDShchrQyGuILJpEKooqA==",
+      "fixture_path": "fixtures/third-party/koishi-game-mini-number-guess.json",
+      "platforms": [
+        "windows",
+        "linux"
+      ],
+      "unit_key": "legacy:koishi-game-mini@0.4.3",
+      "status": "regression_separate_not_run"
+    },
+    {
+      "sample_id": "koishi-multi-qa",
+      "ecosystem": "koishi",
+      "package": "koishi-plugin-multi-qa",
+      "version": "1.0.8",
+      "artifact_hash": "sha512-gdXhFXMUlhkwDJSFRlHDNXG/4NocLS/pYNDKSrQ3quxgwtNzQcjALMbEZrWFFOOYzu9pv8//u23t9Pt6wktLmg==",
+      "fixture_path": "fixtures/third-party/koishi-multi-qa-fixed-text.json",
+      "platforms": [
+        "windows",
+        "linux"
+      ],
+      "unit_key": "legacy:koishi-multi-qa@1.0.8",
+      "status": "regression_separate_not_run"
+    },
+    {
+      "sample_id": "nonebot-autohelp",
+      "ecosystem": "nonebot",
+      "package": "nonebot-plugin-autohelp",
+      "version": "0.1.7",
+      "artifact_hash": "70faef1a7f05a42a448e4d886a4b4a58611d86260df7d6f6e2e2b9deb0e49472",
+      "fixture_path": "fixtures/third-party/nonebot-autohelp-help-h.json",
+      "platforms": [
+        "windows",
+        "linux"
+      ],
+      "unit_key": "legacy:nonebot-autohelp@0.1.7",
+      "status": "regression_separate_not_run"
+    },
+    {
+      "sample_id": "nonebot-repeater",
+      "ecosystem": "nonebot",
+      "package": "nonebot-plugin-repeater",
+      "version": "3.1.4",
+      "artifact_hash": "fe50ad2d4bfc7f1397fcc261ca234d701c4ff02986475ffc5f29647056488d2b",
+      "fixture_path": "fixtures/third-party/nonebot-repeater-group-repeat.json",
+      "platforms": [
+        "windows",
+        "linux"
+      ],
+      "unit_key": "legacy:nonebot-repeater@3.1.4",
+      "status": "regression_separate_not_run"
+    }
+  ]
+}

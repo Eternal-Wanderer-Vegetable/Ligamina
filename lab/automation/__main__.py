@@ -7,6 +7,7 @@ import json
 import sys
 from pathlib import Path
 
+from .behavior import BehaviorSuiteError, validate_behavior_suite
 from .health import collect_linux_health
 from .selection import AutomationContractError, ROOT, build_recovery_manifest, validate_manifest
 
@@ -34,6 +35,8 @@ def main(argv: list[str] | None = None) -> int:
     preflight.add_argument("--platform", choices=("linux", "windows"), required=True)
     preflight.add_argument("--probe-report", type=Path)
     preflight.add_argument("--output", type=Path, required=True)
+    behavior = commands.add_parser("validate-behavior", help="validate the frozen entry-bound behavior suite")
+    behavior.add_argument("--suite", type=Path)
     options = parser.parse_args(argv)
     try:
         if options.command == "plan":
@@ -53,11 +56,15 @@ def main(argv: list[str] | None = None) -> int:
             _write_json(options.output, report)
             print(json.dumps({"status": report["status"], "output": str(options.output.resolve()), "reason_codes": report["reason_codes"], "environment_fingerprint": report["environment_fingerprint"]}, ensure_ascii=False))
             return 0 if report["status"] == "admitted" else 3
+        if options.command == "validate-behavior":
+            result = validate_behavior_suite(options.suite) if options.suite else validate_behavior_suite()
+            print(json.dumps(result, ensure_ascii=False))
+            return 0
         manifest = json.loads(options.manifest.read_text(encoding="utf-8"))
         result = validate_manifest(manifest, verify_source_files=True)
         print(json.dumps(result, ensure_ascii=False))
         return 0
-    except (OSError, json.JSONDecodeError, AutomationContractError) as error:
+    except (OSError, json.JSONDecodeError, AutomationContractError, BehaviorSuiteError) as error:
         print(json.dumps({"status": "invalid", "error": str(error)}, ensure_ascii=False), file=sys.stderr)
         return 2
 
