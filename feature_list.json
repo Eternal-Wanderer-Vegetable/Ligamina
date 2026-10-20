@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "updated_at": "2026-10-20",
-  "active_feature": "feat-023",
+  "active_feature": null,
   "next_feature": "feat-022",
   "features": [
     {
@@ -1488,10 +1488,15 @@
         "feat-017",
         "feat-021"
       ],
-      "status": "in-progress",
+      "status": "done",
       "done_when": "干净 checkout 自测通过；实验机不接收 fork PR 工作；同 campaign/Windows 主机不重入；失败和中断仍有完整证据链。",
-      "evidence": "尚未实施；2026-10-20 仅制定工程方案，本文档不是运行时或插件验收证据。",
-      "evidence_paths": [],
+      "evidence": "2026-10-20: committed P3-09 Linux hosted self-test and guarded controlled-runner workflows (df0705e); clean archive checkout passed Node 8/8, Linux-focused automation 54/54, docs 19/278, and behavior suite validation. Failure injection exit 7 preserved report/log hash. Windows tests and plugin behavior execution were not run.",
+      "evidence_paths": [
+        "outputs/acceptance/phase3-p309-linux-self-test-clean-checkout-20261020.json",
+        "outputs/acceptance/phase3-p309-linux-self-test-clean-checkout-20261020.log",
+        "outputs/acceptance/phase3-p309-linux-controlled-trap-check-20261020.json",
+        "outputs/acceptance/phase3-p309-linux-controlled-trap-check-20261020.log"
+      ],
       "plan_path": "docs/plans/2026-10-20-phase-3-automation.md"
     },
     {

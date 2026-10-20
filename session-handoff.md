@@ -2,9 +2,10 @@
 
 ## Current Objective
 
-- 日期：2026-10-20（Asia/Shanghai）。用户要求完成 [第三阶段计划](docs/plans/2026-10-20-phase-3-automation.md)，分阶段提交；P3-01/02 Linux、P3-03 Linux、P3-06、P3-07 Linux 已完成。P3-05 Linux 执行入口已交付，但 pilot 被精确冻结输入缓存缺失阻塞；当前转进依赖满足的 P3-09。
+- 日期：2026-10-20（Asia/Shanghai）。用户要求完成 [第三阶段计划](docs/plans/2026-10-20-phase-3-automation.md)，分阶段提交；P3-01/02 Linux、P3-03 Linux、P3-06、P3-07 Linux 已完成。P3-05 Linux 执行入口已交付，但 pilot 被精确冻结输入缓存缺失阻塞；P3-09 Linux CI/self-test 已完成并阶段提交 `df0705e`；当前等待后续依赖（P3-05 精确缓存、P3-04 Windows admission）。
 - 计划/导航文档阶段提交 `e510d7c`；P3-01 实施提交 `0ccc0f6`；P3-02 实施提交 `80800a0`。
-- `feature_list.json` 中 P3-01/02/03/06/07（feat-015/016/017/020/021）为 done；P3-02 Linux Worker admission 在 WSL2 Linux Docker 环境 10/10 benign probes 通过。P3-03 queue/dispatcher Linux tests 21 项通过，真实 Docker 标签清理注入通过，报告见 [P3-03 acceptance](outputs/acceptance/phase3-p303-linux-20261020.json)。P3-07 四个历史 Linux Docker 回归 passed，报告见 [P3-07 legacy regression](outputs/acceptance/phase3-p307-linux-legacy-20261020.json)。P3-05（feat-019）标为 blocked，P3-09（feat-023）为 active。P3-04 Windows admission 暂缓；Windows 测试未执行。
+- `feature_list.json` 中 P3-01/02/03/06/07（feat-015/016/017/020/021）为 done；P3-02 Linux Worker admission 在 WSL2 Linux Docker 环境 10/10 benign probes 通过。P3-03 queue/dispatcher Linux tests 21 项通过，真实 Docker 标签清理注入通过，报告见 [P3-03 acceptance](outputs/acceptance/phase3-p303-linux-20261020.json)。P3-07 四个历史 Linux Docker 回归 passed，报告见 [P3-07 legacy regression](outputs/acceptance/phase3-p307-linux-legacy-20261020.json)。P3-05（feat-019）标为 blocked，P3-09（feat-023）已 done；无依赖满足且符合当前跳过 Windows 范围的下一阶段。P3-04 Windows admission 暂缓；Windows 测试未执行。
+- P3-09 Linux hosted self-test 与 guarded controlled runner 已提交 `df0705e`；干净 checkout 证据：[report](outputs/acceptance/phase3-p309-linux-self-test-clean-checkout-20261020.json) + [log](outputs/acceptance/phase3-p309-linux-self-test-clean-checkout-20261020.log)。Node 8/8、focused Linux 54/54、docs 19/278、suite validator passed。失败注入证据：[controlled trap report](outputs/acceptance/phase3-p309-linux-controlled-trap-check-20261020.json)。GitHub 环境变量、Environment 审批保护及专用 runner 仍待部署仓库侧配置；没有声称真实 GitHub workflow 已运行。
 - 方案关键项：逐阶段生成恢复集合、新 campaign 身份/DB、实际 Worker 准入、fencing/heartbeat/熔断/reconciliation、Windows 单独准入、20 entries 的独立 oracle 行为 pilot、CI 与 scoped gates。
 - P2 历史裁决不变；Windows 当前主机能力与 P3 参数尚未实测。计划中的模块/命令/阈值属于设计，不可当成现有实现。
 - 本次用户要求跳过 Windows 测试。所有 Windows runtime/OS 测试均未执行；一次较早 Linux baseline suite 误包含只读取 Windows bootstrap 脚本的静态测试，未启动 Windows/WSL。后续验证已显式排除该静态测试；Windows/Sandbox 实机证据仍待用户之后带到 Windows/WSL 环境进行全量实测。P2 原始结果没有被修改。
@@ -113,6 +114,6 @@
 
 ## Next Session
 
-- Next: implement P3-09 Linux-safe CI/self-test and controlled-runner entrypoints, failure/interruption artifact retention, and fork/credential isolation. Avoid Windows jobs/tests in this phase per the user's instruction. P3-05 can resume only after the frozen selected artifact and dependency-lock bytes are restored; P3-08 remains ineligible until P3-04 and P3-05 are resolved. Preserve the interrupted recovery campaign and all regression attempt evidence; do not reuse S2 queues or rewrite historical reports.
+- Next: P3-09 is complete. Continue P3-05 only if the exact frozen artifact and dependency-lock bytes can be restored; P3-08 remains ineligible until P3-04 and P3-05 are resolved, and P3-10 also depends on P3-05/P3-08. Per user instruction, skip Windows runtime/tests until the Windows/WSL phase. Preserve the interrupted recovery campaign and all regression attempt evidence; do not reuse S2 queues or rewrite historical reports.
 - Do not restart the old S2-10 queue or relabel existing unknowns based on later Docker availability.
 - Behavior and real-platform acceptance require their missing fixtures/mappings and explicit platform evidence; keep those separate from this completed audit until separately performed.
