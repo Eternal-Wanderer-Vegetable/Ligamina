@@ -1,0 +1,70 @@
+{
+  "schema_version": 1,
+  "kind": "phase3_p303_linux_implementation_acceptance",
+  "date": "2026-10-20",
+  "platform": "linux",
+  "scope": "fenced dispatch, backend circuit breaking, host lock, and exact Docker resource reconciliation",
+  "baseline_commit": "1607801",
+  "windows_tests": "skipped_by_user_request",
+  "third_party_plugin_execution": false,
+  "checks": [
+    {
+      "name": "queue and dispatcher unit suite",
+      "command": "uv run --locked --project lab --python 3.12.14 python -m unittest lab.tests.test_queue lab.tests.test_automation_dispatcher -v",
+      "status": "passed",
+      "passed": 21,
+      "failed": 0,
+      "coverage": [
+        "same-owner stale fencing token rejection",
+        "expired fenced lease remains interrupted until cleanup is confirmed",
+        "cleanup=false quarantines the run and blocks claim resumption",
+        "backend unavailable opens the circuit immediately",
+        "three successful half-open sentinels close the circuit",
+        "Linux cross-process host lock excludes a second controller",
+        "Docker reconciliation only removes exact campaign/job/attempt/generation labels"
+      ]
+    },
+    {
+      "name": "live Docker label reconciliation injection",
+      "command": "sg docker -c '<start two benign pinned-image containers; reconcile target labels; verify unrelated remains running; remove both test containers>'",
+      "status": "passed",
+      "docker_server_version": "29.1.3",
+      "worker_image": "python@sha256:f77ac9e44ae96ef2c90b8053ea08c31f8be030f824196b0ae4db6d462c84e51f",
+      "target_resources_removed": 1,
+      "unrelated_resources_untouched_during_verification": 1,
+      "test_containers_removed_after_verification": true
+    },
+    {
+      "name": "documentation validation",
+      "command": "bash init.sh docs",
+      "status": "passed",
+      "documents": 19,
+      "local_links": 269,
+      "features": 24
+    },
+    {
+      "name": "evidence hash helper tests",
+      "command": "/home/vegetable/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node --test scripts/evidence-hash.test.mjs",
+      "status": "passed",
+      "passed": 4,
+      "failed": 0
+    },
+    {
+      "name": "diff whitespace validation",
+      "command": "git diff --check",
+      "status": "passed"
+    }
+  ],
+  "implementation": [
+    "SQLite queue uses per-attempt opaque fencing tokens and generation numbers; fenced lease expiry makes the run interrupted rather than auto-requeueing.",
+    "Lease renewal and result commit validate the active attempt token; retry is enabled only after positive cleanup reconciliation.",
+    "DockerWorker can label resources with campaign, job, attempt, and generation; reconciler verifies exact labels before force-removal and confirms no matching resource remains.",
+    "Backend circuit breaker stops new claims on daemon/API loss, cleanup uncertainty, or configured repeated failures; half-open dispatch is sentinel-only.",
+    "A host-local cross-process lock prevents concurrent controllers."
+  ],
+  "limitations": [
+    "No Windows tests, Sandbox checks, or Windows host-lock execution were run.",
+    "The dispatcher is a callable single-host execution component; the campaign CLI does not yet expose end-to-end execute/resume commands.",
+    "No catalog plugin was installed or executed; this evidence does not change compatibility gates."
+  ]
+}

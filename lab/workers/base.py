@@ -38,6 +38,9 @@ class WorkerSpec:
     command: tuple[str, ...]
     input_dir: Path
     limits: WorkerLimits = WorkerLimits()
+    attempt_id: str | None = None
+    generation: int | None = None
+    job_id: str | None = None
 
     def __post_init__(self) -> None:
         if not self.run_id or not self.entry_id:
@@ -46,6 +49,10 @@ class WorkerSpec:
             raise ValueError("command must be a non-empty string argument list")
         if not self.input_dir.is_dir():
             raise ValueError("input_dir must be an existing directory")
+        if (self.attempt_id is None) != (self.generation is None):
+            raise ValueError("attempt_id and generation must be provided together")
+        if self.generation is not None and self.generation < 1:
+            raise ValueError("generation must be positive")
 
 
 @dataclass(frozen=True)

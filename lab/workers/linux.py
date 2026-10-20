@@ -63,6 +63,7 @@ class DockerWorker:
             "--pull=never",
             "--name",
             worker_id,
+            *self._resource_labels(spec),
             "--init",
             "--network=none",
             "--read-only",
@@ -97,6 +98,18 @@ class DockerWorker:
             self.image_digest,
             *spec.command,
         ]
+
+    @staticmethod
+    def _resource_labels(spec: WorkerSpec) -> list[str]:
+        if spec.attempt_id is None:
+            return []
+        labels = {
+            "io.ligamina.campaign": spec.run_id,
+            "io.ligamina.job": spec.job_id or spec.entry_id,
+            "io.ligamina.attempt": spec.attempt_id,
+            "io.ligamina.generation": str(spec.generation),
+        }
+        return [argument for key, value in labels.items() for argument in ("--label", f"{key}={value}")]
 
     def run(self, spec: WorkerSpec) -> WorkerResult:
         worker_id = f"ligamina-{uuid.uuid4().hex[:16]}"

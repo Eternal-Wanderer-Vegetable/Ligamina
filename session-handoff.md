@@ -2,15 +2,16 @@
 
 ## Current Objective
 
-- 日期：2026-10-20（Asia/Shanghai）。用户要求完成 [第三阶段计划](docs/plans/2026-10-20-phase-3-automation.md)，分阶段提交；P3-01/02/06 已完成，P3-03 正在实施。
+- 日期：2026-10-20（Asia/Shanghai）。用户要求完成 [第三阶段计划](docs/plans/2026-10-20-phase-3-automation.md)，分阶段提交；P3-01/02 Linux、P3-03 Linux 与 P3-06 已完成。
 - 计划/导航文档阶段提交 `e510d7c`；P3-01 实施提交 `0ccc0f6`；P3-02 实施提交 `80800a0`。
-- `feature_list.json` 的 P3-01/02/06（feat-015/016/020）为 done；P3-02 Linux Worker admission 已在 WSL2 Linux 真实 Docker 环境通过：10/10 benign probes 达到预期、10/10 cleanup confirmed。报告见 [probe report](outputs/acceptance/phase3-p302-linux-workers-20261020.json) 与 [admission report](outputs/acceptance/phase3-p302-linux-admission-retry-20261020.json)。P3-03（feat-017）当前 active，Linux baseline 13 项通过；active_feature=feat-017，next_feature=feat-018。Windows 测试未执行。
+- `feature_list.json` 中 P3-01/02/03/06（feat-015/016/017/020）为 done；P3-02 Linux Worker admission 在 WSL2 Linux Docker 环境 10/10 benign probes 通过。P3-03 queue/dispatcher Linux tests 21 项通过，真实 Docker 标签清理注入通过，报告见 [P3-03 acceptance](outputs/acceptance/phase3-p303-linux-20261020.json)。P3-04 Windows admission 暂缓；当前 active_feature=feat-019（P3-05 Linux scoped recovery），next_feature=feat-021（P3-07）。Windows 测试未执行。
 - 方案关键项：逐阶段生成恢复集合、新 campaign 身份/DB、实际 Worker 准入、fencing/heartbeat/熔断/reconciliation、Windows 单独准入、20 entries 的独立 oracle 行为 pilot、CI 与 scoped gates。
 - P2 历史裁决不变；Windows 当前主机能力与 P3 参数尚未实测。计划中的模块/命令/阈值属于设计，不可当成现有实现。
 - 本次用户要求所有涉及 Windows 的测试跳过。当前仅执行 Linux 侧命令；后续 Windows/Sandbox 证据仍待用户之后带到 Windows/WSL 环境进行全量实测。P2 原始结果没有被修改。
 - P3-02 初次 docker-unavailable blocker report 保留：[phase3-p302-linux-admission-20261020.json](outputs/acceptance/phase3-p302-linux-admission-20261020.json)。之后安装 Docker Engine 29.1.3、通过当前代理 pull 锁定镜像并真实运行 10 项 probes。admission fingerprint `3bb6e32bdea454df69571d7e621c3027fe55c0d3992e974cebe1ed09efa47e42`；Windows gate 未测。
 - 可复跑 Linux checks：`uv run --locked --project lab --python 3.12.14 python -m unittest lab.tests.test_automation_health lab.tests.test_workers.WorkerPolicyTests.test_limits_reject_non_positive_and_unbounded_values lab.tests.test_workers.WorkerPolicyTests.test_docker_command_is_digest_pinned_and_has_closed_boundaries lab.tests.test_workers.WorkerPolicyTests.test_docker_backend_rejects_unpinned_image_and_repository_input lab.tests.test_workers.WorkerPolicyTests.test_docker_worker_parses_peak_memory_sample -v`。在有 Docker 的 Linux 主机上先运行 Linux probes 到独立报告，再运行 `python -m lab.automation preflight --platform linux --probe-report <report> --output <health>`。
-- 当前继续 P3-03 Linux fencing / heartbeat / circuit breaker / reconciliation。修改前 baseline：`uv run --locked --project lab --python 3.12.14 python -m unittest lab.tests.test_automation_health lab.tests.test_queue -v`（13 passed）。支持结论与 Windows gates 保持 not-run，直到 Windows 实机证据补齐。
+- P3-03 已交付 fencing / heartbeat / circuit breaker / reconciliation / Linux host lock。cleanup 未确认时 run 必须保持 interrupted。P3-04、Windows/Sandbox gate 暂缓；后续只在用户转到 Windows/WSL 阶段后执行相应测试。
+- P3-05 Linux 尚未执行插件；先检查锁定恢复 manifest 与隔离执行入口，按计划先做每生态 Linux pilot，再决定是否扩大。不得复用 S2 队列或改写历史报告。
 - P3-06 已完成 suite/schema/source/profile 身份冻结：[validation report](outputs/acceptance/phase3-p306-suite-validation-20261020.json)。20 entries / 60 cases / 4 独立历史回归；Linux 验证 18 项通过。没有插件运行，行为兼容仍 not evaluated；运行 `uv run --locked --project lab --python 3.12.14 python -m lab.automation validate-behavior` 可复核。Windows 测试未执行。
 
 ## Historical S2 Objective (2026-10-17)
@@ -112,5 +113,6 @@
 
 ## Next Session
 
-- No S2-12 work remains. If a new task authorizes automation reruns, first inspect the two runner logs, matching processes, and SQLite active/queued/leased jobs; use a new evidence run and preserve the completed S2-11 reports. Do not restart the old S2-10 queue or relabel existing unknowns based on later Docker availability.
+- Next: implement P3-05 Linux scoped recovery on the new phase-three queue and execute only the frozen, dependency-eligible Linux pilot after validating external staging and budget. Preserve every attempt and old→new attribution. P3-04 and any Windows tests remain deferred by the user's explicit Linux-first instruction.
+- Do not restart the old S2-10 queue or relabel existing unknowns based on later Docker availability.
 - Behavior and real-platform acceptance require their missing fixtures/mappings and explicit platform evidence; keep those separate from this completed audit until separately performed.

@@ -1,6 +1,6 @@
 # 第三阶段：可靠自动化检测与行为验证
 
-日期：2026-10-20（Asia/Shanghai）。状态：工程方案，尚未实施。代码基线：`a311ac8`，S2-12 历史裁决保持不变。
+日期：2026-10-20（Asia/Shanghai）。状态：分阶段实施中；P3-01、P3-02 Linux、P3-03 Linux、P3-06 已交付，P3-04 Windows 按用户的 Linux-first 指示暂缓。代码基线：`a311ac8`，S2-12 历史裁决保持不变。
 
 ## 目标与边界
 
@@ -10,7 +10,7 @@
 
 本阶段保留 `p2-41649744e057d61031d5` 的 5,690 entries / 11,380 entry×OS 分母。暂不刷新官方目录，不自动升级插件、framework 或依赖锁，不自动修补第三方源码。真实平台登录、凭证、发送和收件人验收另立任务；重型浏览器、sdist 构建和外部在线服务不进入首批行为集合。
 
-用户此次授权为制定方案；以下模块、配置、命令、测试和门槛均为待实现设计。新增任务在 [feature tracker](../../feature_list.json) 中均为 `not-started`。
+当前用户授权完成本计划并分阶段提交。下方各任务设计仍需以对应实施记录和 acceptance evidence 作为完成依据；新增任务状态见 [feature tracker](../../feature_list.json)。
 
 ## 已核对的工程事实
 
@@ -247,3 +247,11 @@ PR 必跑不依赖实验机的 schema/selection/queue/comparator/fixture 校验�
 - `lab.automation validate-behavior` 校验 JSON schema、20 个唯一目录 id、artifact/profile/dependency-lock identity、各 entry 的三个 case class，以及历史四版本与 S2-09 manifest 一致性。`lab.tests.test_automation_behavior` 覆盖重复 entry、缺失 case、artifact 绑定篡改拒绝。
 - Linux 检查：`uv run --locked --project lab --python 3.12.14 python -m unittest lab.tests.test_automation_behavior lab.tests.test_recipes lab.tests.test_compare -v` 为 18 项通过；CLI validator 通过并输出 20 entries / 60 cases / 40 entry-platform positions / 4 regressions。证据见 [suite validation](../../outputs/acceptance/phase3-p306-suite-validation-20261020.json)。本结果只证明合同与身份账本有效；`behavior_executed=false`，没有派发或执行第三方插件、没有行为兼容结论；Windows 测试按用户要求跳过。
 - P3-06 工程交付完成。P3-07 仍依赖 P3-03 的 fencing/reconciliation；Windows 相关 gate 继续 not run / blocked。
+
+### P3-03 实施记录（2026-10-20；Linux 完成，Windows 跳过）
+
+- 队列为新 run 增加 fenced mode 和随机 attempt token / generation。fenced attempt 租约过期会被记录为 unknown 并中断 run；旧 token 无法 heartbeat 或 finish。清理未确认时 run 保持 quarantine，只有精确 attempt 清理证据 `cleanup_confirmed=true` 后才能重试和恢复派发。legacy queue 不启用 fenced mode，保留原 S2 调度语义。
+- 新增 `lab/automation/dispatcher.py`、`circuit_breaker.py`、`reconcile.py`、`host_lock.py`。Dispatcher 定期 heartbeat 且提交带 attempt token；daemon/API 失联、清理未确认立即打开 circuit，其他失败使用连续/滑窗阈值；半开只允许 sentinel。Linux host lock 验证本机 controller 排他。Docker Worker 支持 campaign/job/attempt/generation 标签；reconciler 仅处理四个标签完全匹配且经 inspect 复核的容器，并确认清理结果。
+- 修改前 baseline：`uv run --locked --project lab --python 3.12.14 python -m unittest lab.tests.test_automation_health lab.tests.test_queue -v`，13 passed（Linux）。修复中首次 focused run 发现 joined SQL 的 `run_id` 歧义；修复后复跑通过。最终 Linux queue/dispatcher suite 21 passed，文档检查 19 documents / 269 links，evidence hash Node tests 4/4，`git diff --check` 通过。
+- 使用 Docker Engine 29.1.3 和锁定 `python@sha256:f77ac9e4…c84e51f` 做真实 Linux 标签清理故障注入：目标旧 attempt 容器被删除，无关容器在核验时仍运行，随后两个测试容器均被清理。详见 [P3-03 acceptance](../../outputs/acceptance/phase3-p303-linux-20261020.json)。未运行第三方插件。
+- Windows/Sandbox 测试按用户要求跳过，P3-04 保持 not-started；不视作 gate 通过。后续先做 P3-05 Linux scoped recovery，再继续依赖已满足的 P3-07；Windows 工作待用户之后在 Windows/WSL 阶段推进。

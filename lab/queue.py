@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+import secrets
 import sqlite3
 import time
 from contextlib import closing
@@ -43,6 +44,7 @@ class StageQueue:
                     manifest_sha256 TEXT NOT NULL,
                     state TEXT NOT NULL CHECK (state IN ('queued','running','interrupted','completed')),
                     manifest_json TEXT NOT NULL,
+                    fencing_required INTEGER NOT NULL DEFAULT 0,
                     created_at REAL NOT NULL,
                     updated_at REAL NOT NULL
                 );
@@ -102,6 +104,9 @@ class StageQueue:
                 PRAGMA foreign_keys=ON;
                 """
             )
+            run_columns = {row["name"] for row in connection.execute("PRAGMA table_info(runs)")}
+            if "fencing_required" not in run_columns:
+                connection.execute("ALTER TABLE runs ADD COLUMN fencing_required INTEGER NOT NULL DEFAULT 0")
 
     def _connect(self) -> sqlite3.Connection:
         connection = sqlite3.connect(self.path, timeout=30, isolation_level=None)
@@ -132,6 +137,7 @@ class StageQueue:
         manifest_sha256: str,
         manifest: dict[str, Any],
         *,
+        fencing_required: bool = False,
         now: float | None = None,
     ) -> bool:
         if (
@@ -153,14 +159,15 @@ class StageQueue:
                         existing["snapshot_id"] != snapshot_id
                         or existing["manifest_sha256"] != manifest_sha256
                         or existing["manifest_json"] != encoded
+                        or bool(existing["fencing_required"]) != fencing_required
                     ):
                         raise QueueError("run_id already exists with a different frozen manifest")
                     connection.commit()
                     return False
                 connection.execute(
-                    "INSERT INTO runs(run_id,snapshot_id,manifest_sha256,state,manifest_json,created_at,updated_at) "
-                    "VALUES(?,?,?,'queued',?,?,?)",
-                    (run_id, snapshot_id, manifest_sha256, encoded, at, at),
+                    "INSERT INTO runs(run_id,snapshot_id,manifest_sha256,state,manifest_json,fencing_required,created_at,updated_at) "
+                    "VALUES(?,?,?,'queued',?,?,?,?)",
+                    (run_id, snapshot_id, manifest_sha256, encoded, int(fencing_required), at, at),
                 )
                 self._journal(connection, run_id, "run_created", {"snapshot_id": snapshot_id, "manifest_sha256": manifest_sha256}, at=at)
                 connection.commit()
@@ -316,10 +323,14 @@ class StageQueue:
         ).fetchall()
 
     def _recover_expired(self, connection: sqlite3.Connection, run_id: str | None, now: float) -> int:
-        query = "SELECT * FROM jobs WHERE status='leased' AND lease_expires_at <= ?"
+        query = (
+            "SELECT jobs.*,runs.fencing_required FROM jobs "
+            "JOIN runs ON runs.run_id=jobs.run_id "
+            "WHERE jobs.status='leased' AND jobs.lease_expires_at <= ?"
+        )
         params: tuple[Any, ...] = (now,)
         if run_id is not None:
-            query += " AND run_id=?"
+            query += " AND jobs.run_id=?"
             params += (run_id,)
         expired = connection.execute(query, params).fetchall()
         for row in expired:
@@ -327,13 +338,18 @@ class StageQueue:
                 "SELECT * FROM attempts WHERE job_id=? AND attempt_number=?",
                 (row["job_id"], row["attempts_used"]),
             ).fetchone()
-            result = {"status": "unknown", "reason_code": "worker_lost", "reason": "lease expired before a terminal result was recorded"}
+            result = {
+                "status": "unknown",
+                "reason_code": "worker_lost",
+                "reason": "lease expired before a terminal result was recorded",
+                "requires_reconciliation": bool(row["fencing_required"]),
+            }
             if attempt:
                 connection.execute(
                     "UPDATE attempts SET status='unknown',ended_at=?,result_json=? WHERE attempt_id=? AND status='leased'",
                     (now, _canonical(result), attempt["attempt_id"]),
                 )
-            final_unknown = row["attempts_used"] >= row["max_attempts"]
+            final_unknown = bool(row["fencing_required"]) or row["attempts_used"] >= row["max_attempts"]
             connection.execute(
                 "UPDATE jobs SET status=?,lease_owner=NULL,lease_expires_at=NULL,result_json=?,updated_at=? WHERE job_id=?",
                 ("unknown" if final_unknown else "queued", _canonical(result) if final_unknown else None, now, row["job_id"]),
@@ -342,10 +358,17 @@ class StageQueue:
                 connection,
                 row["run_id"],
                 "lease_expired",
-                {"unit_id": row["unit_id"], "attempt_id": attempt["attempt_id"] if attempt else None, "retry_queued": not final_unknown},
+                {
+                    "unit_id": row["unit_id"],
+                    "attempt_id": attempt["attempt_id"] if attempt else None,
+                    "retry_queued": not final_unknown,
+                    "reconciliation_required": bool(row["fencing_required"]),
+                },
                 job_id=row["job_id"],
                 at=now,
             )
+            if row["fencing_required"]:
+                connection.execute("UPDATE runs SET state='interrupted',updated_at=? WHERE run_id=?", (now, row["run_id"]))
         return len(expired)
 
     def _skip_blocked(self, connection: sqlite3.Connection, run_id: str, now: float) -> int:
@@ -408,7 +431,7 @@ class StageQueue:
         with closing(self._connect()) as connection:
             connection.execute("BEGIN IMMEDIATE")
             try:
-                run = connection.execute("SELECT state FROM runs WHERE run_id=?", (run_id,)).fetchone()
+                run = connection.execute("SELECT state,fencing_required FROM runs WHERE run_id=?", (run_id,)).fetchone()
                 if run is None:
                     raise QueueError(f"unknown run_id: {run_id}")
                 if run["state"] == "interrupted":
@@ -416,7 +439,10 @@ class StageQueue:
                 if run["state"] == "completed":
                     connection.commit()
                     return None
-                self._recover_expired(connection, run_id, at)
+                recovered = self._recover_expired(connection, run_id, at)
+                if recovered and run["fencing_required"]:
+                    connection.commit()
+                    return None
                 self._skip_blocked(connection, run_id, at)
                 rows = connection.execute(
                     "SELECT * FROM jobs WHERE run_id=? AND status='queued' ORDER BY created_at,unit_id",
@@ -436,7 +462,7 @@ class StageQueue:
                     connection.commit()
                     return None
                 attempt_number = selected["attempts_used"] + 1
-                attempt_id = f"{selected['job_id']}:a{attempt_number}"
+                attempt_id = secrets.token_hex(24)
                 expires = at + float(lease_seconds)
                 connection.execute(
                     "UPDATE jobs SET status='leased',attempts_used=?,lease_owner=?,lease_expires_at=?,updated_at=? WHERE job_id=? AND status='queued'",
@@ -458,6 +484,7 @@ class StageQueue:
                 refreshed = connection.execute("SELECT * FROM jobs WHERE job_id=?", (selected["job_id"],)).fetchone()
                 job = self._decode_job(refreshed, deps)
                 job["attempt_id"] = attempt_id
+                job["generation"] = attempt_number
                 connection.commit()
                 return job
             except BaseException:
@@ -469,6 +496,7 @@ class StageQueue:
         job_id: str,
         worker_id: str,
         *,
+        attempt_id: str | None = None,
         lease_seconds: float = 120,
         now: float | None = None,
     ) -> float:
@@ -478,10 +506,19 @@ class StageQueue:
         expires = at + lease_seconds
         with closing(self._connect()) as connection:
             connection.execute("BEGIN IMMEDIATE")
-            row = connection.execute("SELECT * FROM jobs WHERE job_id=?", (job_id,)).fetchone()
+            row = connection.execute("SELECT jobs.*,runs.fencing_required FROM jobs JOIN runs ON runs.run_id=jobs.run_id WHERE jobs.job_id=?", (job_id,)).fetchone()
             if row is None or row["status"] != "leased" or row["lease_owner"] != worker_id or row["lease_expires_at"] <= at:
                 connection.rollback()
                 raise QueueError("lease is absent, expired, or owned by another worker")
+            current_attempt = connection.execute(
+                "SELECT attempt_id FROM attempts WHERE job_id=? AND attempt_number=? AND status='leased'",
+                (job_id, row["attempts_used"]),
+            ).fetchone()
+            if current_attempt is None or (row["fencing_required"] and attempt_id != current_attempt["attempt_id"]) or (
+                attempt_id is not None and attempt_id != current_attempt["attempt_id"]
+            ):
+                connection.rollback()
+                raise QueueError("attempt fencing token is stale or missing")
             connection.execute("UPDATE jobs SET lease_expires_at=?,updated_at=? WHERE job_id=?", (expires, at, job_id))
             self._journal(connection, row["run_id"], "lease_renewed", {"worker_id": worker_id, "lease_expires_at": expires}, job_id=job_id, at=at)
             connection.commit()
@@ -493,6 +530,7 @@ class StageQueue:
         worker_id: str,
         result: dict[str, Any],
         *,
+        attempt_id: str | None = None,
         retryable: bool = False,
         now: float | None = None,
     ) -> dict[str, Any]:
@@ -503,13 +541,20 @@ class StageQueue:
         with closing(self._connect()) as connection:
             connection.execute("BEGIN IMMEDIATE")
             try:
-                row = connection.execute("SELECT * FROM jobs WHERE job_id=?", (job_id,)).fetchone()
+                row = connection.execute("SELECT jobs.*,runs.fencing_required FROM jobs JOIN runs ON runs.run_id=jobs.run_id WHERE jobs.job_id=?", (job_id,)).fetchone()
                 if row is None or row["status"] != "leased" or row["lease_owner"] != worker_id:
                     raise QueueError("job lease is absent or owned by another worker")
                 if row["lease_expires_at"] <= at:
                     raise QueueError("job lease expired before result commit")
-                attempt_id = f"{job_id}:a{row['attempts_used']}"
-                attempt = connection.execute("SELECT * FROM attempts WHERE attempt_id=?", (attempt_id,)).fetchone()
+                attempt = connection.execute(
+                    "SELECT * FROM attempts WHERE job_id=? AND attempt_number=?",
+                    (job_id, row["attempts_used"]),
+                ).fetchone()
+                if attempt is None or (row["fencing_required"] and attempt_id != attempt["attempt_id"]) or (
+                    attempt_id is not None and attempt_id != attempt["attempt_id"]
+                ):
+                    raise QueueError("attempt fencing token is stale or missing")
+                attempt_id = attempt["attempt_id"]
                 if attempt is None or attempt["status"] != "leased":
                     raise QueueError("current attempt is not leased")
                 connection.execute(
@@ -559,12 +604,100 @@ class StageQueue:
                 connection.rollback()
                 raise QueueError(f"unknown run_id: {run_id}")
             recovered = self._recover_expired(connection, run_id, at)
-            connection.execute("UPDATE runs SET state='running',updated_at=? WHERE run_id=? AND state!='completed'", (at, run_id))
+            fenced = bool(run["fencing_required"])
+            unresolved = False
+            if fenced:
+                unresolved = connection.execute(
+                    "SELECT 1 FROM jobs WHERE run_id=? AND status='unknown' "
+                    "AND json_extract(result_json,'$.requires_reconciliation')=1 "
+                    "AND COALESCE(json_extract(result_json,'$.reconciliation.cleanup_confirmed'),0)!=1 LIMIT 1",
+                    (run_id,),
+                ).fetchone() is not None
+            if not (fenced and unresolved):
+                connection.execute("UPDATE runs SET state='running',updated_at=? WHERE run_id=? AND state!='completed'", (at, run_id))
             self._skip_blocked(connection, run_id, at)
-            state = self._refresh_run_state(connection, run_id, at)
-            self._journal(connection, run_id, "run_resumed", {"expired_leases_recovered": recovered, "state": state}, at=at)
+            state = "interrupted" if fenced and unresolved else self._refresh_run_state(connection, run_id, at)
+            self._journal(connection, run_id, "run_resumed", {"expired_leases_recovered": recovered, "reconciliation_required": bool(fenced and unresolved), "state": state}, at=at)
             connection.commit()
-        return {"run_id": run_id, "state": state, "expired_leases_recovered": recovered}
+        return {"run_id": run_id, "state": state, "expired_leases_recovered": recovered, "reconciliation_required": bool(fenced and unresolved)}
+
+    def record_reconciliation(
+        self,
+        run_id: str,
+        unit_id: str,
+        attempt_id: str,
+        evidence: dict[str, Any],
+        *,
+        now: float | None = None,
+    ) -> dict[str, Any]:
+        """Record cleanup evidence and authorize retry only after a fenced lease is resolved."""
+        at = time.time() if now is None else float(now)
+        if not isinstance(evidence, dict) or not isinstance(evidence.get("cleanup_confirmed"), bool):
+            raise QueueError("reconciliation requires an explicit cleanup_confirmed boolean")
+        with closing(self._connect()) as connection:
+            connection.execute("BEGIN IMMEDIATE")
+            try:
+                run = connection.execute("SELECT fencing_required,state FROM runs WHERE run_id=?", (run_id,)).fetchone()
+                row = connection.execute("SELECT * FROM jobs WHERE run_id=? AND unit_id=?", (run_id, unit_id)).fetchone()
+                if run is None or row is None:
+                    raise QueueError("unknown run or unit during reconciliation")
+                if not run["fencing_required"] or run["state"] != "interrupted":
+                    raise QueueError("reconciliation is only valid for an interrupted fenced run")
+                attempt = connection.execute(
+                    "SELECT * FROM attempts WHERE job_id=? AND attempt_number=?",
+                    (row["job_id"], row["attempts_used"]),
+                ).fetchone()
+                if row["status"] != "unknown" or attempt is None or attempt["attempt_id"] != attempt_id or attempt["status"] != "unknown":
+                    raise QueueError("reconciliation attempt identity is stale")
+                if row["result_json"]:
+                    prior = json.loads(row["result_json"])
+                    if prior.get("reconciliation"):
+                        raise QueueError("attempt has already been reconciled")
+                resolved = {**(json.loads(row["result_json"]) if row["result_json"] else {}), "reconciliation": evidence}
+                connection.execute(
+                    "UPDATE attempts SET result_json=? WHERE attempt_id=?",
+                    (_canonical(resolved), attempt_id),
+                )
+                retry_queued = evidence["cleanup_confirmed"] and row["attempts_used"] < row["max_attempts"]
+                status = "queued" if retry_queued else "unknown"
+                connection.execute(
+                    "UPDATE jobs SET status=?,result_json=?,updated_at=? WHERE job_id=?",
+                    (status, None if retry_queued else _canonical(resolved), at, row["job_id"]),
+                )
+                self._journal(
+                    connection,
+                    run_id,
+                    "attempt_reconciled",
+                    {"unit_id": unit_id, "attempt_id": attempt_id, "cleanup_confirmed": evidence["cleanup_confirmed"], "retry_queued": retry_queued},
+                    job_id=row["job_id"],
+                    at=at,
+                )
+                connection.commit()
+                return {"unit_id": unit_id, "attempt_id": attempt_id, "retry_queued": retry_queued, "job_status": status}
+            except BaseException:
+                connection.rollback()
+                raise
+
+    def complete_reconciliation(self, run_id: str, *, now: float | None = None) -> None:
+        """Resume fenced claims only after every expired attempt has explicit cleanup evidence."""
+        at = time.time() if now is None else float(now)
+        with closing(self._connect()) as connection:
+            connection.execute("BEGIN IMMEDIATE")
+            run = connection.execute("SELECT state,fencing_required FROM runs WHERE run_id=?", (run_id,)).fetchone()
+            if run is None or not run["fencing_required"] or run["state"] != "interrupted":
+                connection.rollback()
+                raise QueueError("run is not awaiting fenced reconciliation")
+            unresolved = connection.execute(
+                "SELECT unit_id FROM jobs WHERE run_id=? AND status='unknown' AND json_extract(result_json,'$.requires_reconciliation')=1 "
+                "AND COALESCE(json_extract(result_json,'$.reconciliation.cleanup_confirmed'),0)!=1",
+                (run_id,),
+            ).fetchall()
+            if unresolved:
+                connection.rollback()
+                raise QueueError("one or more expired attempts have no cleanup reconciliation")
+            connection.execute("UPDATE runs SET state='running',updated_at=? WHERE run_id=?", (at, run_id))
+            self._journal(connection, run_id, "reconciliation_completed", {"unresolved_worker_resources": 0}, at=at)
+            connection.commit()
 
     def run(self, run_id: str) -> dict[str, Any]:
         with closing(self._connect()) as connection:
@@ -577,6 +710,7 @@ class StageQueue:
                 "manifest_sha256": row["manifest_sha256"],
                 "state": row["state"],
                 "manifest": json.loads(row["manifest_json"]),
+                "fencing_required": bool(row["fencing_required"]),
             }
 
     def get_job(self, run_id: str, unit_id: str) -> dict[str, Any]:

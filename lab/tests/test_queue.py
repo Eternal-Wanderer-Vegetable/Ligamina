@@ -99,6 +99,67 @@ class StageQueueTests(unittest.TestCase):
         self.assertEqual(attempts[0]["result"]["artifacts"], artifacts)
         self.assertEqual(self.queue.get_job("run-1", first["unit_id"])["status"], "passed")
 
+    def test_fenced_run_requires_reconciliation_and_rejects_stale_same_owner_token(self) -> None:
+        path = Path(self.temporary.name) / "fenced.sqlite3"
+        queue = StageQueue(path)
+        queue.create_run("fenced", "snapshot-1", "a" * 64, {"schema_version": 1}, fencing_required=True)
+        job = {
+            "unit_id": "fenced-unit", "registry_entry_id": "entry-1", "ecosystem": "nonebot",
+            "platform": "linux", "profile_id": "profile-linux", "stage": "probe", "case_id": "case-1",
+            "payload": {}, "max_attempts": 2,
+        }
+        queue.enqueue_jobs("fenced", [job], now=100)
+        first = queue.claim("fenced", "reused-owner", lease_seconds=5, now=100)
+        self.assertEqual(first["generation"], 1)
+        self.assertTrue(first["attempt_id"])
+        resumed = queue.resume_run("fenced", now=106)
+        self.assertTrue(resumed["reconciliation_required"])
+        self.assertEqual(queue.run("fenced")["state"], "interrupted")
+        with self.assertRaisesRegex(QueueError, "resumed before workers"):
+            queue.claim("fenced", "reused-owner", now=107)
+        with self.assertRaisesRegex(QueueError, "cleanup reconciliation"):
+            queue.complete_reconciliation("fenced", now=107)
+
+        queue.record_reconciliation(
+            "fenced", "fenced-unit", first["attempt_id"],
+            {"cleanup_confirmed": True, "resource_ids": [], "source": "docker_label_scan"}, now=108,
+        )
+        queue.complete_reconciliation("fenced", now=109)
+        second = queue.claim("fenced", "reused-owner", lease_seconds=10, now=110)
+        self.assertEqual(second["generation"], 2)
+        self.assertNotEqual(first["attempt_id"], second["attempt_id"])
+        with self.assertRaisesRegex(QueueError, "fencing token"):
+            queue.heartbeat(second["job_id"], "reused-owner", attempt_id=first["attempt_id"], now=111)
+        with self.assertRaisesRegex(QueueError, "fencing token"):
+            queue.finish(second["job_id"], "reused-owner", {"status": "passed"}, attempt_id=first["attempt_id"], now=111)
+        queue.finish(second["job_id"], "reused-owner", {"status": "passed"}, attempt_id=second["attempt_id"], now=112)
+        attempts = queue.list_attempts("fenced")
+        self.assertEqual([attempt["status"] for attempt in attempts], ["unknown", "passed"])
+        self.assertTrue(attempts[0]["result"]["reconciliation"]["cleanup_confirmed"])
+
+    def test_fenced_cleanup_unknown_is_quarantined_without_retry(self) -> None:
+        path = Path(self.temporary.name) / "fenced-quarantine.sqlite3"
+        queue = StageQueue(path)
+        queue.create_run("quarantine", "snapshot-1", "b" * 64, {"schema_version": 1}, fencing_required=True)
+        job = {
+            "unit_id": "quarantine-unit", "registry_entry_id": "entry-1", "ecosystem": "nonebot",
+            "platform": "linux", "profile_id": "profile-linux", "stage": "probe", "case_id": "case-1",
+            "payload": {}, "max_attempts": 3,
+        }
+        queue.enqueue_jobs("quarantine", [job], now=10)
+        first = queue.claim("quarantine", "worker", lease_seconds=1, now=10)
+        queue.resume_run("quarantine", now=12)
+        result = queue.record_reconciliation(
+            "quarantine", "quarantine-unit", first["attempt_id"],
+            {"cleanup_confirmed": False, "reason_code": "docker_api_unavailable"}, now=13,
+        )
+        self.assertFalse(result["retry_queued"])
+        with self.assertRaisesRegex(QueueError, "no cleanup reconciliation"):
+            queue.complete_reconciliation("quarantine", now=14)
+        self.assertEqual(queue.get_job("quarantine", "quarantine-unit")["status"], "unknown")
+        with self.assertRaisesRegex(QueueError, "resumed before workers"):
+            queue.claim("quarantine", "worker", now=15)
+
     def test_interruption_at_each_stage_reopens_with_unknown_attempt_and_retryable_job(self) -> None:
         for target_stage in STAGES:
             with self.subTest(stage=target_stage):

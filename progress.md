@@ -2,10 +2,10 @@
 
 ## Current State
 
-- **Last Updated:** 2026-10-20（Asia/Shanghai）；第三阶段 P3-01 合同与恢复选择账本已实现并提交，当前进入 P3-02。
-- **Current Objective:** 按 [第三阶段方案](docs/plans/2026-10-20-phase-3-automation.md) 完成 P3 自动化。P3-01 已 done；P3-02 Linux real-worker admission 因当前主机缺少 Docker CLI/daemon 而 blocked；active_feature=null，next_feature=feat-020（P3-06，依赖满足且不需要 Worker）。按用户要求，本轮所有涉及 Windows 的测试跳过；Windows/Sandbox gate 不得标为通过。
+- **Last Updated:** 2026-10-20（Asia/Shanghai）；P3-01、P3-02 Linux、P3-03 Linux 与 P3-06 已完成；继续 P3-05 Linux scoped recovery。Windows 专项按用户要求暂缓。
+- **Current Objective:** 按 [第三阶段方案](docs/plans/2026-10-20-phase-3-automation.md) 完成 Linux 可执行范围。P3-04 Windows runtime admission 暂未开始；active_feature=feat-019（P3-05），next_feature=feat-021（P3-07）。所有 Windows/Sandbox 测试仍跳过，相关 gate 不得标通过。
 - **P3-01:** [恢复 manifest](outputs/acceptance/phase3-p301-recovery-manifest-20261020.json) 从 S2-12 audit、S2-11 归因和 512 个 shard 重新计算 11,380 个单位，选择 3,179 个受影响单位（19,074 stage rows），另外记录 1,048 个静态 artifact/profile skipped。manifest SHA-256 `f084778b6cfee271876ba6493e039fc2a288e0295a7a0fe9353f0d6f2074416e`。这是选择账本，不是重跑结果。
-- **P3-02 blocker:** health/admission 与资源配置已实现；7 个 Linux-focused unit tests 通过，但真实 Worker probe 无法启动，因为当前执行主机没有 Docker CLI，也没有 `/var/run/docker.sock`。详见 [Linux admission report](outputs/acceptance/phase3-p302-linux-admission-20261020.json)。没有 Docker admission 时不得 claim。
+- **P3-02 initial blocker:** 初次健康准入因缺 Docker CLI/daemon 受阻，报告 [保留](outputs/acceptance/phase3-p302-linux-admission-20261020.json)；之后安装 Docker Engine、运行锁定镜像的真实 benign probes 并通过 Linux admission。原 blocker 报告不覆盖重试报告。
 - **Historical S2 status:** S2-01–S2-12 已完成；P2-AUTOMATION blocked、P2-BEHAVIOR not evaluated、P2-FIELD not run。历史 CI 修复与四个精确支持版本结论保持原状。
 - **CI Diagnosis:** PR #3 当前 HEAD `b0615548` 的 [run #18](https://github.com/Eternal-Wanderer-Vegetable/Ligamina/actions/runs/38988173249) 与前次 [run #17](https://github.com/Eternal-Wanderer-Vegetable/Ligamina/actions/runs/38915036215) 均在 Linux/Windows 的 `node scripts/check-docs.mjs` 失败，错误为 `Stale phase-two report input: outputs/acceptance/phase2-s207-cli-smoke-20261012.json`。S2-08 保存的 SHA-256 是 Windows CRLF 工作树字节 `35ba6754…`，Git blob 为 LF 字节 `2a5efbd5…`；renderer 对原始文件字节做哈希，导致 clean checkout 不匹配。本地 docs 检查通过，`git archive HEAD` 临时干净 checkout 稳定复现失败。临时诊断还发现 9 个 S2-09 source hash、1 个 S2-10 全局 source hash 和全部 512 个 S2-10 shard 对同一 Windows 写入证据保存了不匹配哈希。两平台 CI 都在第一道 docs 检查停止，后续测试没有运行。修复已提交推送，当前双平台 CI 复跑通过。
 - **Historical S2 execution:** S2-11 full rerun completed at 2026-10-17 01:35:39 Asia/Shanghai: 512/512 canonical reports, 11,380/11,380 units and 68,280/68,280 stage jobs; no active, queued or leased work; invalid reports=0. Unit outcomes: 0 passed, 880 failed, 7,530 skipped, 2,970 unknown. SQLite stage-job outcomes: 24,914 passed, 880 failed, 37,357 skipped, 5,129 unknown; job pass is not plugin compatibility. Audit linked the 2,158 Linux cleanup unknowns to a Docker named-pipe API outage, 796 Windows NoneBot unknowns to App Control Win32 4551, and 16 other worker/preparation/timeout unknowns. P2-CATALOG/P2-CENSUS pass; P2-AUTOMATION remains blocked, P2-BEHAVIOR not evaluated, P2-FIELD not run. No new catalog support claims are made. See [machine audit](outputs/acceptance/phase2-s212-audit-20261017.json) and [compatibility matrix](outputs/acceptance/phase2-s212-compatibility-matrix-20261017.md).
@@ -122,3 +122,11 @@
 ## P3-03 Baseline (2026-10-20)
 
 - 修改前 Linux baseline：`uv run --locked --project lab --python 3.12.14 python -m unittest lab.tests.test_automation_health lab.tests.test_queue -v`，13 项通过。未运行 Windows 测试。
+
+## P3-03 Linux Implementation (2026-10-20)
+
+- 队列新增 fenced-run migration、随机 attempt token 和 generation；过期租约被记为 unknown 后将 fenced run 保持 interrupted。旧 token 的 heartbeat/finish 被拒绝。只有精确 attempt 的 Docker cleanup evidence 为 true 才能重试和恢复 claims；cleanup=false 或 API 无法查询时继续 quarantine。
+- 新增 dispatcher heartbeat/circuit breaker、Linux 主机跨进程互斥，以及 Docker campaign/job/attempt/generation labels 和精确资源 reconciliation。reconciler 先检查全部标签，再清理目标并查询确认；可接入 queue attempt ledger。
+- 首轮队列回归暴露一处 joined query 的 `run_id` 歧义，已限定为 `jobs.run_id` 并复测通过。收紧 cleanup=false 后再次复测，run 保持 interrupted。
+- Linux 验证：queue + dispatcher 21 tests；`bash init.sh docs` 19 文档 / 269 本地链接；bundled Node `scripts/evidence-hash.test.mjs` 4/4；`git diff --check` 通过。真实 Docker 29.1.3 故障注入使用锁定 Python image：仅清除匹配标签的目标容器，独立无关容器仍运行，测试容器之后全部清理。证据：[P3-03 Linux acceptance](outputs/acceptance/phase3-p303-linux-20261020.json)。
+- Windows/Sandbox tests 均 skipped；未运行 catalog plugins，未改变兼容 gate。P3-04 按用户要求暂缓；当前 active feature 为 P3-05 Linux scoped recovery。
