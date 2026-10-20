@@ -16,6 +16,11 @@ IMAGE_DIGEST = "registry.example/ligamina/worker@sha256:" + "a" * 64
 
 
 class WorkerPolicyTests(unittest.TestCase):
+    def docker_worker(self) -> DockerWorker:
+        # These are policy unit tests; real backend availability is covered by admission probes.
+        with patch("lab.workers.linux.shutil.which", return_value="/usr/bin/docker"):
+            return DockerWorker(image_digest=IMAGE_DIGEST, repository_root=REPOSITORY_ROOT)
+
     def test_limits_reject_non_positive_and_unbounded_values(self) -> None:
         with self.assertRaises(ValueError):
             WorkerLimits(timeout_seconds=0)
@@ -28,7 +33,7 @@ class WorkerPolicyTests(unittest.TestCase):
         with tempfile.TemporaryDirectory(prefix="ligamina-worker-input-") as directory:
             input_dir = Path(directory)
             spec = WorkerSpec("run-1", "entry-1", ("python", "-c", "print('ok')"), input_dir)
-            worker = DockerWorker(image_digest=IMAGE_DIGEST, repository_root=REPOSITORY_ROOT)
+            worker = self.docker_worker()
             command = worker.command(spec, worker_id="ligamina-test")
 
         self.assertIn("--network=none", command)
@@ -50,13 +55,13 @@ class WorkerPolicyTests(unittest.TestCase):
     def test_docker_backend_rejects_unpinned_image_and_repository_input(self) -> None:
         with self.assertRaises(ValueError):
             DockerWorker(image_digest="registry.example/ligamina/worker:latest", repository_root=REPOSITORY_ROOT)
-        worker = DockerWorker(image_digest=IMAGE_DIGEST, repository_root=REPOSITORY_ROOT)
+        worker = self.docker_worker()
         spec = WorkerSpec("run-1", "entry-1", ("echo", "x"), REPOSITORY_ROOT / "lab")
         with self.assertRaisesRegex(ValueError, "must not be the repository"):
             worker.command(spec, worker_id="ligamina-test")
 
     def test_docker_worker_parses_peak_memory_sample(self) -> None:
-        worker = DockerWorker(image_digest=IMAGE_DIGEST, repository_root=REPOSITORY_ROOT)
+        worker = self.docker_worker()
         completed = CompletedProcess([], 0, stdout=b"14.25MiB / 4GiB\n", stderr=b"")
         with patch("lab.workers.linux.subprocess.run", return_value=completed):
             self.assertEqual(worker._container_memory_bytes("container"), int(14.25 * 1024 * 1024))

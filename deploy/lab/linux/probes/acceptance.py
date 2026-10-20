@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import argparse
 import os
 import platform
 import subprocess
@@ -73,7 +74,10 @@ def docker_server_version() -> str:
     return completed.stdout.strip()
 
 
-def main() -> int:
+def main(argv: list[str] | None = None) -> int:
+    parser = argparse.ArgumentParser(description="Run benign Linux Docker Worker admission probes")
+    parser.add_argument("--report", type=Path, default=REPORT_PATH, help="write evidence to this report path")
+    options = parser.parse_args(argv)
     image_lock = json.loads(IMAGE_LOCK.read_text(encoding="utf-8"))
     worker = DockerWorker(image_digest=image_lock["image"], repository_root=REPOSITORY_ROOT)
     records: list[dict[str, Any]] = []
@@ -306,9 +310,9 @@ def main() -> int:
         "results": records,
         "passed": all(record["passed"] for record in records),
     }
-    REPORT_PATH.parent.mkdir(parents=True, exist_ok=True)
-    REPORT_PATH.write_text(json.dumps(report, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
-    print(json.dumps({"report": str(REPORT_PATH), "passed": report["passed"], "results": records}, ensure_ascii=False))
+    options.report.parent.mkdir(parents=True, exist_ok=True)
+    options.report.write_text(json.dumps(report, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+    print(json.dumps({"report": str(options.report), "passed": report["passed"], "results": records}, ensure_ascii=False))
     return 0 if report["passed"] else 1
 
 

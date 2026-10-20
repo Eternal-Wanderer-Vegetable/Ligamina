@@ -7,6 +7,7 @@ import json
 import sys
 from pathlib import Path
 
+from .health import collect_linux_health
 from .selection import AutomationContractError, ROOT, build_recovery_manifest, validate_manifest
 
 
@@ -29,6 +30,10 @@ def main(argv: list[str] | None = None) -> int:
     plan.add_argument("--output", type=Path, required=True)
     validate = commands.add_parser("validate", help="validate a frozen manifest and its source hashes")
     validate.add_argument("manifest", type=Path)
+    preflight = commands.add_parser("preflight", help="collect current Linux Worker admission facts")
+    preflight.add_argument("--platform", choices=("linux", "windows"), required=True)
+    preflight.add_argument("--probe-report", type=Path)
+    preflight.add_argument("--output", type=Path, required=True)
     options = parser.parse_args(argv)
     try:
         if options.command == "plan":
@@ -38,6 +43,16 @@ def main(argv: list[str] | None = None) -> int:
             result = validate_manifest(manifest, verify_source_files=True)
             print(json.dumps({"status": "planned", "output": str(options.output.resolve()), **result}, ensure_ascii=False))
             return 0
+        if options.command == "preflight":
+            if options.platform == "windows":
+                report = {"schema_version": 1, "kind": "phase3_worker_admission", "platform": "windows", "status": "not_tested", "reason_codes": ["windows_runtime_admission_deferred"], "capabilities": {"claim_allowed": False}}
+                _write_json(options.output, report)
+                print(json.dumps({"status": report["status"], "output": str(options.output.resolve()), "reason_codes": report["reason_codes"]}, ensure_ascii=False))
+                return 3
+            report = collect_linux_health(probe_report_path=options.probe_report)
+            _write_json(options.output, report)
+            print(json.dumps({"status": report["status"], "output": str(options.output.resolve()), "reason_codes": report["reason_codes"], "environment_fingerprint": report["environment_fingerprint"]}, ensure_ascii=False))
+            return 0 if report["status"] == "admitted" else 3
         manifest = json.loads(options.manifest.read_text(encoding="utf-8"))
         result = validate_manifest(manifest, verify_source_files=True)
         print(json.dumps(result, ensure_ascii=False))

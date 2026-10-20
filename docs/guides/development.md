@@ -61,6 +61,8 @@ target\debug\ligamina-cli.exe report outputs/acceptance/t13-representative-windo
 
 S2-04 双平台运行时探针可复跑：`uv run --locked --project hosts/nonebot --python 3.12.14 python deploy/lab/linux/probes/acceptance.py` 与 `uv run --locked --project hosts/nonebot --python 3.12.14 python deploy/lab/windows/probes/acceptance.py`。它们只运行 benign isolation probes，不下载或执行 catalog 插件；结果写入 `outputs/acceptance/phase2-workers-*-20261012.json`。
 
+P3 Linux Worker 准入先用 `uv run --locked --project lab --python 3.12.14 python -m lab.automation preflight --platform linux --probe-report <report.json> --output <health.json>`。只有 Docker daemon、锁定镜像、主机资源余量及真实 benign probe（包含逐项 cleanup）都通过时，报告才允许 claim。Docker 不可用、probe 缺失或资源不足会退出 3 并留下 `blocked` 证据；不能用 mock 代替准入。为避免覆盖 S2 历史证据，可将 Linux probe 输出写到新路径：`uv run --locked --project hosts/nonebot --python 3.12.14 python deploy/lab/linux/probes/acceptance.py --report outputs/acceptance/phase3-p302-linux-workers-20261020.json`。Windows preflight 当前仅写 `not_tested` blocker；按用户要求，本轮不执行 Windows 命令。
+
 S2-03 的发布物和依赖锁可按 [兼容性指南](compatibility.md#发布物与依赖锁s2-03) 重跑并校验。它只读取官方元数据、下载并校验归档、解析依赖；不在宿主机执行 sdist backend 或 npm lifecycle scripts。
 
 S2-05 配对回归见[兼容性指南](compatibility.md#当前可运行入口)。报告保留 artifact/profile/config/stimulus 指纹、每条路径结果、oracle 比较和 Worker 清理。当前 Windows Sandbox 启动前置被 App Control 阻止；不可据此声明 Windows 插件行为通过。

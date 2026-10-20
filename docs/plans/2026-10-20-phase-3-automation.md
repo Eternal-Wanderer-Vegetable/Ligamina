@@ -231,3 +231,9 @@ PR 必跑不依赖实验机的 schema/selection/queue/comparator/fixture 校验�
 - 封存 ledger：[phase3-p301-recovery-manifest-20261020.json](../../outputs/acceptance/phase3-p301-recovery-manifest-20261020.json)，manifest SHA-256 `f084778b6cfee271876ba6493e039fc2a288e0295a7a0fe9353f0d6f2074416e`；选中 3,179 units / 19,074 stage rows，静态 skipped 1,048，来源分母 11,380。这里是补测选择范围，不是恢复执行结果或 gate 通过。
 - Linux `lab.tests.test_automation_selection` 4 项通过，覆盖 golden schema、完整数据重算、重复/漏项/篡改/身份错配/跨快照拒绝；`lab.tests.test_queue lab.tests.test_recipes lab.tests.test_compare` 基线 24 项通过。Windows 测试未执行。
 - 下一项 **P3-02**：Worker 健康准入与 Linux 实机 benign probes；Windows 探针只记录可运行入口与 blocker，不进入本次测试。
+
+### P3-02 实施进度（2026-10-20；Linux gate blocked）
+
+- 已新增 Linux health fingerprint、Docker daemon/锁定镜像/资源余量/benign report 校验、失败关闭的 claim admission helper、`preflight` CLI 与初始资源/熔断参数；Linux probe 脚本现可显式指定新报告路径，不会覆盖 S2 evidence。Windows preflight 仅输出 `not_tested`，未运行。
+- Linux 单元检查 7 项通过（3 个 health guard + 4 个 Docker command/policy checks，Windows tests 跳过）。但真实准入无法启动：当前 Linux 执行主机没有 Docker CLI，也没有 `/var/run/docker.sock`。`preflight` 保存 [blocked report](../../outputs/acceptance/phase3-p302-linux-admission-20261020.json)，原因 `docker_cli_unavailable` / `benign_probe_report_missing`，退出 3；没有模拟 Docker passed。
+- 因 P3-02 的 Linux real Worker probes 尚未通过，feature 状态是 blocked，不能声称 Linux backend 已准入。待在有锁定 Docker Worker 的 Linux 主机复跑 benign probes 后恢复；无依赖该 Worker 的 P3-06 可继续。

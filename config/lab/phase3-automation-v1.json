@@ -1,0 +1,28 @@
+{
+  "schema_version": 1,
+  "campaign_policy": {
+    "initial_linux_concurrency": 2,
+    "initial_windows_host_concurrency": 1,
+    "admission_memory_headroom_bytes": 4294967296,
+    "minimum_free_scratch_bytes": 10737418240,
+    "heartbeat_seconds": 20,
+    "lease_seconds": 120,
+    "transient_max_attempts": 3,
+    "retry_backoff_seconds": [30, 120],
+    "circuit_breaker": {"consecutive_failures": 3, "window_size": 20, "window_failures": 4, "cooldown_seconds": 60, "half_open_passes": 3, "failed_recovery_windows_before_exit": 3}
+  },
+  "linux_worker": {
+    "backend": "docker",
+    "image_lock": "deploy/lab/linux/worker-image.lock.json",
+    "default_limits": {"cpu_cores": 2, "memory_bytes": 4294967296, "process_limit": 256},
+    "probe_limits": {"cpu_cores": 1, "memory_bytes": 268435456, "process_limit": 8}
+  },
+  "windows_worker": {
+    "backend": "windows_sandbox",
+    "admission_status": "not_tested",
+    "default_limits": null,
+    "reason_code": "windows_runtime_admission_deferred"
+  },
+  "timeouts_seconds": {"install": 1200, "startup": 120, "behavior_case": 60, "cleanup": 30},
+  "output_limit_bytes_per_stream": 4194304
+}

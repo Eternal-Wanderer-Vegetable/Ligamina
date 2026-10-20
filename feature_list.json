@@ -2,7 +2,7 @@
   "schema_version": 1,
   "updated_at": "2026-10-20",
   "active_feature": null,
-  "next_feature": "feat-016",
+  "next_feature": "feat-020",
   "features": [
     {
       "id": "feat-001",
@@ -1344,11 +1344,16 @@
       "dependencies": [
         "feat-015"
       ],
-      "status": "not-started",
+      "status": "blocked",
       "done_when": "Linux 实机 benign probes 通过；Windows 探针与 blocker 采集入口可运行；未准入 backend 不 claim，环境变化使准入失效。",
-      "evidence": "尚未实施；2026-10-20 仅制定工程方案，本文档不是运行时或插件验收证据。",
-      "evidence_paths": [],
-      "plan_path": "docs/plans/2026-10-20-phase-3-automation.md"
+      "evidence": "Linux health/preflight code implemented, 7 Linux-focused unit tests passed, but real admission is blocked because this execution host has no Docker CLI and no /var/run/docker.sock. No Worker claim is permitted. Windows probes were not run per user instruction.",
+      "evidence_paths": [
+        "outputs/acceptance/phase3-p302-linux-admission-20261020.json",
+        "lab/automation/health.py",
+        "config/lab/phase3-automation-v1.json"
+      ],
+      "plan_path": "docs/plans/2026-10-20-phase-3-automation.md",
+      "blocker": "Docker CLI and daemon are unavailable on the current Linux execution host; benign isolation probes cannot run. Resume P3-02 on a Linux host with the pinned Docker Worker backend available."
     },
     {
       "id": "feat-017",
