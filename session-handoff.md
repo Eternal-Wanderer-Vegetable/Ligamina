@@ -2,12 +2,13 @@
 
 ## Current Objective
 
-- 日期：2026-10-20（Asia/Shanghai）。本次用户要求制定下一阶段自动化检测方案，方案已写入 [第三阶段计划](docs/plans/2026-10-20-phase-3-automation.md)，尚未授权或开始实施其中的代码/运行任务。
-- 当前代码基线 main `a311ac8`；本次只有计划、导航和状态文档变更，未提交/推送，未启动第三方插件或新 runner。
-- `feature_list.json` 新增 P3-01–P3-10（feat-015–024），全部 not-started；active_feature=null，next_feature=feat-015。下一次获准实施时先选择 P3-01 并记录 runtime baseline。
+- 日期：2026-10-20（Asia/Shanghai）。用户要求完成 [第三阶段计划](docs/plans/2026-10-20-phase-3-automation.md)，分阶段提交；当前已完成 P3-01，下一项 P3-02。
+- 计划/导航文档阶段提交 `e510d7c`；P3-01 实施提交待本次验证后写入。
+- `feature_list.json` 的 P3-01（feat-015）为 done，active_feature=null，next_feature=feat-016。P3-01 ledger 在 [phase3-p301-recovery-manifest-20261020.json](outputs/acceptance/phase3-p301-recovery-manifest-20261020.json)，manifest SHA-256 `f084778b6cfee271876ba6493e039fc2a288e0295a7a0fe9353f0d6f2074416e`；3,179 selected / 1,048 static skipped / 19,074 selected stage rows，source denominator 11,380。
 - 方案关键项：逐阶段生成恢复集合、新 campaign 身份/DB、实际 Worker 准入、fencing/heartbeat/熔断/reconciliation、Windows 单独准入、20 entries 的独立 oracle 行为 pilot、CI 与 scoped gates。
 - P2 历史裁决不变；Windows 当前主机能力与 P3 参数尚未实测。计划中的模块/命令/阈值属于设计，不可当成现有实现。
-- 本次实际文档验证见 progress 的 2026-10-20 节；无需运行或重建 S2 原始验收工件来继续文档工作。
+- 本次用户要求所有涉及 Windows 的测试跳过。当前仅执行 Linux 侧命令；后续 Windows/Sandbox 证据仍待用户之后带到 Windows/WSL 环境进行全量实测。P2 原始结果没有被修改。
+- 下一步先验证 Linux benign Worker admission，再做 Linux 故障注入和补测；支持结论与 Windows gates 保持 blocked/not-run，直到实机证据补齐。
 
 ## Historical S2 Objective (2026-10-17)
 

@@ -2,8 +2,9 @@
 
 ## Current State
 
-- **Last Updated:** 2026-10-20（Asia/Shanghai）；第三阶段自动化检测工程方案已制定，实施尚未开始。
-- **Current Objective:** 本次完成 [第三阶段方案](docs/plans/2026-10-20-phase-3-automation.md)，明确 Worker 准入、熔断恢复、受影响集合补测、独立 oracle 行为检测和有 scope 的验收 gates。新增 P3-01–P3-10 均为 not-started；active_feature=null，next_feature=feat-015（P3-01）。不将方案当作实现或实测证据。
+- **Last Updated:** 2026-10-20（Asia/Shanghai）；第三阶段 P3-01 合同与恢复选择账本已实现并提交，当前进入 P3-02。
+- **Current Objective:** 按 [第三阶段方案](docs/plans/2026-10-20-phase-3-automation.md) 完成 P3 自动化。P3-01 已 done；active_feature=null，next_feature=feat-016（P3-02）。按用户要求，本轮所有涉及 Windows 的测试跳过，先做 Linux 验证与问题修复，之后再到 Windows/WSL 环境完成双平台实测。Windows/Sandbox gate 不得在本轮标为通过。
+- **P3-01:** [恢复 manifest](outputs/acceptance/phase3-p301-recovery-manifest-20261020.json) 从 S2-12 audit、S2-11 归因和 512 个 shard 重新计算 11,380 个单位，选择 3,179 个受影响单位（19,074 stage rows），另外记录 1,048 个静态 artifact/profile skipped。manifest SHA-256 `f084778b6cfee271876ba6493e039fc2a288e0295a7a0fe9353f0d6f2074416e`。这是选择账本，不是重跑结果。
 - **Historical S2 status:** S2-01–S2-12 已完成；P2-AUTOMATION blocked、P2-BEHAVIOR not evaluated、P2-FIELD not run。历史 CI 修复与四个精确支持版本结论保持原状。
 - **CI Diagnosis:** PR #3 当前 HEAD `b0615548` 的 [run #18](https://github.com/Eternal-Wanderer-Vegetable/Ligamina/actions/runs/38988173249) 与前次 [run #17](https://github.com/Eternal-Wanderer-Vegetable/Ligamina/actions/runs/38915036215) 均在 Linux/Windows 的 `node scripts/check-docs.mjs` 失败，错误为 `Stale phase-two report input: outputs/acceptance/phase2-s207-cli-smoke-20261012.json`。S2-08 保存的 SHA-256 是 Windows CRLF 工作树字节 `35ba6754…`，Git blob 为 LF 字节 `2a5efbd5…`；renderer 对原始文件字节做哈希，导致 clean checkout 不匹配。本地 docs 检查通过，`git archive HEAD` 临时干净 checkout 稳定复现失败。临时诊断还发现 9 个 S2-09 source hash、1 个 S2-10 全局 source hash 和全部 512 个 S2-10 shard 对同一 Windows 写入证据保存了不匹配哈希。两平台 CI 都在第一道 docs 检查停止，后续测试没有运行。修复已提交推送，当前双平台 CI 复跑通过。
 - **Historical S2 execution:** S2-11 full rerun completed at 2026-10-17 01:35:39 Asia/Shanghai: 512/512 canonical reports, 11,380/11,380 units and 68,280/68,280 stage jobs; no active, queued or leased work; invalid reports=0. Unit outcomes: 0 passed, 880 failed, 7,530 skipped, 2,970 unknown. SQLite stage-job outcomes: 24,914 passed, 880 failed, 37,357 skipped, 5,129 unknown; job pass is not plugin compatibility. Audit linked the 2,158 Linux cleanup unknowns to a Docker named-pipe API outage, 796 Windows NoneBot unknowns to App Control Win32 4551, and 16 other worker/preparation/timeout unknowns. P2-CATALOG/P2-CENSUS pass; P2-AUTOMATION remains blocked, P2-BEHAVIOR not evaluated, P2-FIELD not run. No new catalog support claims are made. See [machine audit](outputs/acceptance/phase2-s212-audit-20261017.json) and [compatibility matrix](outputs/acceptance/phase2-s212-compatibility-matrix-20261017.md).
@@ -91,15 +92,15 @@
 
 - 用户本次要求制定可工程落地的下一阶段自动化检测方案；已核对 census、queue、Worker、recipe/comparator、原生配对 runner、CI 与 S2-12 报告，并在新计划内给出代码落点、合同、资源/重试预算、验收、10 项依赖任务及 24–26 人日初估。
 - 主要决策：新 campaign/DB 保留历史；逐阶段而非单元最终状态生成补测集合；runtime 在实际 guest 中准入；cleanup 未确认即熔断并 quarantine；attempt generation 拒绝迟到提交；20 个目录 entry 的至少 120 个双平台 case 位置与三次独立复跑。
-- 本次未执行任何目录插件、OS 隔离实机探针或完整 runtime build/test。P3 所有实施任务均为 not-started，下一项 P3-01；没有新增支持声明。Windows 主机、相同 runtime 的 Sandbox 准入及全量资源预算仍需实测。
+- 制定方案时未执行任何目录插件、OS 隔离实机探针或完整 runtime build/test。该方案阶段已提交为 `e510d7c`；没有新增支持声明。
 - 文档修改前：`bash init.sh docs` 通过（18 documents / 233 links / 14 features）；bundled Node 执行 `node --test scripts/evidence-hash.test.mjs` 4/4 通过；`validate-harness.mjs --target . --json` 100/100。系统 shell 无默认 node，docs 由 init.sh 选择 /opt Node；独立 Node 命令使用本会话已发现的 bundled Node 路径。
 - 文档修改后验证结果见下方验收记录；仅验证方案/状态文档，不代表 P3 运行时功能已实现。
 
-### 本次文档验收
+### P3-01 合同与补测账本
 
-- `bash init.sh docs`：退出 0，passed；19 documents / 252 local links / 11 indexed historical Markdown / 24 features，failures=[]。
-- bundled Node 执行 `node --test scripts/evidence-hash.test.mjs`：退出 0，4/4 passed。
-- bundled Node 执行 `node .agents/skills/harness-creator/scripts/validate-harness.mjs --target . --json`：退出 0，100/100（仅结构验证）。
-- P3 tracker 解析检查：10 项 not-started、依赖可解析、计划文件存在；active=null、next=P3-01。`git diff --check`：退出 0。
-- 最终复核区分“检测任务完成”和“兼容 gate 通过”；发现确定插件不兼容时仍保留失败报告，不以修补插件或更换样本凑通过。
-- 本次变更未提交或推送；下一步为 P3-01 合同与补测账本的实施，当前仅方案交付。
+- 实施提交待创建。新增 automation manifest schema、严格 source/identity 校验、`python -m lab.automation plan/validate`、正例 fixture 与拒绝负例。
+- 实际 manifest：[phase3-p301-recovery-manifest-20261020.json](outputs/acceptance/phase3-p301-recovery-manifest-20261020.json)，SHA-256 `f084778b6cfee271876ba6493e039fc2a288e0295a7a0fe9353f0d6f2074416e`：11,380 source units，3,179 受影响 units / 19,074 stage rows，1,048 静态 artifact/profile skips。没有派发任何插件或 Worker。
+- 基线提交 `e510d7c` 上，Linux `queue/recipes/compare` 24 项通过。实施后 `uv run --locked --project lab --python 3.12.14 python -m unittest lab.tests.test_automation_selection lab.tests.test_queue lab.tests.test_recipes lab.tests.test_compare -v`：28 项通过。完整 ledger test 从 512 shard 复算并验证输入 SHA、终态分母和六阶段账目。没有运行涉及 Windows 的测试。
+- `uv run --locked --project lab --python 3.12.14 python -m lab.automation plan --output outputs/acceptance/phase3-p301-recovery-manifest-20261020.json` 与 `... validate ...` 均退出 0；测试同时拒绝缺 shard、重复 shard/unit、摘要漏项、报告内容篡改、profile/artifact 身份错配与跨 snapshot 合并。
+- `bash init.sh docs` 退出 0（19 documents / 256 local links / 11 indexed historical Markdown / 24 features）；Node evidence-hash tests 4/4；harness validation 100/100；`git diff --check` 通过。未运行 `Mode full`，因为它会启动 Windows Core smoke/build 测试。
+- 当前 next feature 为 P3-02。先实施并验证 Linux Worker 准入与 recovery；Windows 测试和 Windows/Sandbox gate 留待后续 Windows/WSL 实机阶段。

@@ -58,3 +58,18 @@ v1 run 报告必须给出 `expected_result_ids`、`gate`、`gate_passed` 和 `ex
 ### README 与完整报告
 
 README 展示日期、快照/profile、分母、L0–L5、失败/跳过/未知、行为支持数和范围。完整 per-plugin 矩阵、JSON/CSV、失败详情和复现命令放在报告 artifact 并链接。生成区从已接受报告更新，输入报告哈希变化时检查失败；partial、queued、stale 或尚未派发的批次必须标记，不能显示为完成或支持。
+
+## 第三阶段 automation manifest（P3-01）
+
+第三阶段使用独立的 [`contracts/lab/automation/v1/manifest.schema.json`](../../contracts/lab/automation/v1/manifest.schema.json)，不扩展上面的 run v1。manifest 固定 campaign purpose、S2 审计/归因文件与 512 个 shard 的哈希、entry×OS/profile/artifact 身份、逐阶段旧状态和结果摘要、受影响集合、静态不适用项及外层 gate scope hash。恢复选择由任何阶段 `unknown`、已归因的 Worker/harness/infrastructure 域或确认的检测器缺陷触发；选中单元按全新 attempt 重跑阶段，不把旧阶段投影成新通过。profile/artifact 明确未锁定的条目单独保留为静态 skipped，Worker 不可用不能映射成静态不适用。
+
+对冻结的 S2-11 输入可复算本计划 ledger：
+
+```bash
+uv run --locked --project lab --python 3.12.14 python -m lab.automation plan \
+  --output outputs/acceptance/phase3-p301-recovery-manifest-20261020.json
+uv run --locked --project lab --python 3.12.14 python -m lab.automation validate \
+  outputs/acceptance/phase3-p301-recovery-manifest-20261020.json
+```
+
+`plan` 需要完整 512 份报告、闭合的 11,380 entry×OS 分母及匹配的 S2-12/S2-11 快照身份；漏 shard、重复 unit、阶段缺项、篡改源文件、profile/artifact 身份变化或跨快照合并都会拒绝。生成 manifest 只冻结选择账本，不派发插件或 Worker，也不改变 S2/P2 裁决。

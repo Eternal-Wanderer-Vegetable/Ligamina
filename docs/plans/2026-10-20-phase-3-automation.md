@@ -224,4 +224,10 @@ PR 必跑不依赖实验机的 schema/selection/queue/comparator/fixture 校验�
 
 本次仅修改计划、导航与状态；没有派发第三方插件、刷新目录、改写 S2 原始报告或改变支持结论。文档/结构验证与实际输出记录在 [progress](../../progress.md) 和 [handoff](../../session-handoff.md)。
 
-下一项为 **P3-01**：从 S2-12 逐阶段证据生成补测 ledger，定义 manifest/gate 合同与拒绝负例。完成合同后再接入真实 Worker，避免先启动全量运行再补分母与恢复规则。
+### P3-01 实施记录（2026-10-20）
+
+- 已新增 `contracts/lab/automation/v1/manifest.schema.json`、`lab/automation/selection.py`、`lab/automation` 的 `plan/validate` 入口和正/负例测试。
+- `plan` 校验 S2-12、S2-11、冻结 snapshot 与完整 512 shard 来源，重算全部 11,380 个 entry×OS 单元及六阶段摘要；任何阶段 unknown、归因的 infrastructure/worker 域或已确认检测器缺陷会将整单元选入全阶段新执行 ledger。静态 artifact/profile 不适用单列；跨快照、重复/缺失和源文件哈希变化拒绝。
+- 封存 ledger：[phase3-p301-recovery-manifest-20261020.json](../../outputs/acceptance/phase3-p301-recovery-manifest-20261020.json)，manifest SHA-256 `f084778b6cfee271876ba6493e039fc2a288e0295a7a0fe9353f0d6f2074416e`；选中 3,179 units / 19,074 stage rows，静态 skipped 1,048，来源分母 11,380。这里是补测选择范围，不是恢复执行结果或 gate 通过。
+- Linux `lab.tests.test_automation_selection` 4 项通过，覆盖 golden schema、完整数据重算、重复/漏项/篡改/身份错配/跨快照拒绝；`lab.tests.test_queue lab.tests.test_recipes lab.tests.test_compare` 基线 24 项通过。Windows 测试未执行。
+- 下一项 **P3-02**：Worker 健康准入与 Linux 实机 benign probes；Windows 探针只记录可运行入口与 blocker，不进入本次测试。

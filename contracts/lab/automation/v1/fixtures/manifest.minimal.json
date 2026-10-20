@@ -1,0 +1,27 @@
+{
+  "schema_version": 1,
+  "contract": "ligamina-automation-manifest-v1",
+  "campaign_id": "fixture-recovery",
+  "purpose": "recovery",
+  "snapshot_id": "fixture-snapshot",
+  "source_identity": {
+    "s2_audit_sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+    "s2_attribution_sha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+    "catalog_sha256": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+    "artifact_lock_sha256": "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd",
+    "profile_lock_sha256": "eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee"
+  },
+  "expected": {"source_units": 1, "selected_units": 1, "static_skipped_units": 0, "selected_stage_rows": 6},
+  "selection": [{
+    "result_id": "catalog:entry-1|linux",
+    "identity": {"snapshot_id": "fixture-snapshot", "registry_entry_id": "entry-1", "ecosystem": "nonebot", "package": "example", "version": "1.0", "platform": "linux", "profile_id": "profile-linux", "profile_lock_sha256": "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff", "artifact_sha256": "1111111111111111111111111111111111111111111111111111111111111111", "dependency_lock_sha256": "2222222222222222222222222222222222222222222222222222222222222222"},
+    "identity_sha256": "3333333333333333333333333333333333333333333333333333333333333333",
+    "selection_reasons": ["stage_unknown:cleanup"],
+    "source": {"task_id": "S2-11", "shard_report_path": "fixture.json", "shard_report_sha256": "4444444444444444444444444444444444444444444444444444444444444444", "unit_status": "failed", "attribution_domain": "native-load", "stage_statuses": {"prepare": "passed", "install": "passed", "native": "failed", "federated": "skipped", "compare": "skipped", "cleanup": "unknown"}, "stage_result_sha256": {"prepare": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", "install": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb", "native": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc", "federated": "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd", "compare": "eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee", "cleanup": "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff"}},
+    "required_stages": ["prepare", "install", "native", "federated", "compare", "cleanup"]
+  }],
+  "static_skipped": [],
+  "source_files": [{"path": "fixture.json", "sha256": "5555555555555555555555555555555555555555555555555555555555555555"}],
+  "gate": {"id": "P3-RECOVERY", "required_stages": ["install", "native", "cleanup"], "pass_statuses": ["passed", "failed", "skipped"], "deny_statuses": ["unknown"], "require_cleanup_confirmed": true, "scope_hash": "6666666666666666666666666666666666666666666666666666666666666666"},
+  "manifest_sha256": "7777777777777777777777777777777777777777777777777777777777777777"
+}

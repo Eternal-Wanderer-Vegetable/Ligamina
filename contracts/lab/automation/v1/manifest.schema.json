@@ -1,0 +1,28 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ligamina.local/contracts/lab/automation/v1/manifest.schema.json",
+  "title": "Ligamina Phase 3 Automation Manifest",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "contract", "campaign_id", "purpose", "snapshot_id", "source_identity", "expected", "selection", "static_skipped", "source_files", "gate", "manifest_sha256"],
+  "properties": {
+    "schema_version": {"const": 1},
+    "contract": {"const": "ligamina-automation-manifest-v1"},
+    "campaign_id": {"type": "string", "minLength": 1},
+    "purpose": {"enum": ["recovery", "behavior", "full"]},
+    "snapshot_id": {"type": "string", "minLength": 1},
+    "source_identity": {"type": "object", "required": ["s2_audit_sha256", "s2_attribution_sha256", "catalog_sha256", "artifact_lock_sha256", "profile_lock_sha256"], "properties": {"s2_audit_sha256": {"$ref": "#/$defs/hash"}, "s2_attribution_sha256": {"$ref": "#/$defs/hash"}, "catalog_sha256": {"$ref": "#/$defs/hash"}, "artifact_lock_sha256": {"$ref": "#/$defs/hash"}, "profile_lock_sha256": {"$ref": "#/$defs/hash"}}, "additionalProperties": false},
+    "expected": {"type": "object", "required": ["source_units", "selected_units", "static_skipped_units", "selected_stage_rows"], "properties": {"source_units": {"type": "integer", "minimum": 0}, "selected_units": {"type": "integer", "minimum": 0}, "static_skipped_units": {"type": "integer", "minimum": 0}, "selected_stage_rows": {"type": "integer", "minimum": 0}}, "additionalProperties": false},
+    "selection": {"type": "array", "items": {"$ref": "#/$defs/selection"}},
+    "static_skipped": {"type": "array", "items": {"$ref": "#/$defs/static"}},
+    "source_files": {"type": "array", "items": {"type": "object", "required": ["path", "sha256"], "properties": {"path": {"type": "string", "minLength": 1}, "sha256": {"$ref": "#/$defs/hash"}}, "additionalProperties": false}},
+    "gate": {"type": "object", "required": ["id", "required_stages", "pass_statuses", "deny_statuses", "require_cleanup_confirmed", "scope_hash"], "properties": {"id": {"type": "string"}, "required_stages": {"type": "array", "items": {"type": "string"}}, "pass_statuses": {"type": "array", "items": {"type": "string"}}, "deny_statuses": {"type": "array", "items": {"type": "string"}}, "require_cleanup_confirmed": {"type": "boolean"}, "scope_hash": {"$ref": "#/$defs/hash"}}, "additionalProperties": false},
+    "manifest_sha256": {"$ref": "#/$defs/hash"}
+  },
+  "$defs": {
+    "hash": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "identity": {"type": "object", "required": ["snapshot_id", "registry_entry_id", "ecosystem", "package", "version", "platform", "profile_id", "profile_lock_sha256", "artifact_sha256", "dependency_lock_sha256"], "properties": {"snapshot_id": {"type": "string"}, "registry_entry_id": {"type": "string"}, "ecosystem": {"type": "string"}, "package": {"type": ["string", "null"]}, "version": {"type": ["string", "null"]}, "platform": {"enum": ["linux", "windows"]}, "profile_id": {"type": ["string", "null"]}, "profile_lock_sha256": {"type": ["string", "null"]}, "artifact_sha256": {"type": ["string", "null"]}, "dependency_lock_sha256": {"type": ["string", "null"]}}, "additionalProperties": false},
+    "selection": {"type": "object", "required": ["result_id", "identity", "identity_sha256", "selection_reasons", "source", "required_stages"], "properties": {"result_id": {"type": "string"}, "identity": {"$ref": "#/$defs/identity"}, "identity_sha256": {"$ref": "#/$defs/hash"}, "selection_reasons": {"type": "array", "minItems": 1, "items": {"type": "string"}}, "source": {"type": "object"}, "required_stages": {"type": "array", "items": {"enum": ["prepare", "install", "native", "federated", "compare", "cleanup"]}, "minItems": 1, "uniqueItems": true}}, "additionalProperties": false},
+    "static": {"type": "object", "required": ["result_id", "identity", "identity_sha256", "status", "reason_code", "source_report_path", "source_report_sha256"], "properties": {"result_id": {"type": "string"}, "identity": {"$ref": "#/$defs/identity"}, "identity_sha256": {"$ref": "#/$defs/hash"}, "status": {"const": "skipped"}, "reason_code": {"type": "string"}, "source_report_path": {"type": "string"}, "source_report_sha256": {"$ref": "#/$defs/hash"}}, "additionalProperties": false}
+  }
+}

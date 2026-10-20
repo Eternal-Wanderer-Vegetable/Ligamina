@@ -2,7 +2,7 @@
   "schema_version": 1,
   "updated_at": "2026-10-20",
   "active_feature": null,
-  "next_feature": "feat-015",
+  "next_feature": "feat-016",
   "features": [
     {
       "id": "feat-001",
@@ -1321,11 +1321,20 @@
       "dependencies": [
         "feat-014"
       ],
-      "status": "not-started",
+      "status": "done",
       "done_when": "从逐阶段历史结果精确重算集合；重复/漏项/篡改/身份错配/跨身份合并负例通过，保留静态不适用账本。",
-      "evidence": "尚未实施；2026-10-20 仅制定工程方案，本文档不是运行时或插件验收证据。",
-      "evidence_paths": [],
-      "plan_path": "docs/plans/2026-10-20-phase-3-automation.md"
+      "evidence": "P3-01 implementation complete. Full S2-11 source selection recomputed: 11,380 units, 3,179 selected, 1,048 static skipped, 19,074 selected stage rows; manifest SHA-256 f084778b6cfee271876ba6493e039fc2a288e0295a7a0fe9353f0d6f2074416e. Four focused tests passed on Linux; no Windows tests run.",
+      "evidence_paths": [
+        "contracts/lab/automation/v1/manifest.schema.json",
+        "outputs/acceptance/phase3-p301-recovery-manifest-20261020.json",
+        "lab/tests/test_automation_selection.py"
+      ],
+      "plan_path": "docs/plans/2026-10-20-phase-3-automation.md",
+      "baseline": {
+        "commit": "e510d7c",
+        "command": "uv run --locked --project lab --python 3.12.14 python -m unittest lab.tests.test_queue lab.tests.test_recipes lab.tests.test_compare -v",
+        "result": "24 passed on Linux; Windows-specific checks were not run."
+      }
     },
     {
       "id": "feat-016",
