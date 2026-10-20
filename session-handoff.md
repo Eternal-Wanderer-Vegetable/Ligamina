@@ -2,15 +2,15 @@
 
 ## Current Objective
 
-- 日期：2026-10-20（Asia/Shanghai）。用户要求完成 [第三阶段计划](docs/plans/2026-10-20-phase-3-automation.md)，分阶段提交；P3-01 已完成，P3-02 的 Linux real-worker admission blocked。
+- 日期：2026-10-20（Asia/Shanghai）。用户要求完成 [第三阶段计划](docs/plans/2026-10-20-phase-3-automation.md)，分阶段提交；P3-01/02/06 已完成，P3-03 正在实施。
 - 计划/导航文档阶段提交 `e510d7c`；P3-01 实施提交 `0ccc0f6`；P3-02 实施提交 `80800a0`。
-- `feature_list.json` 的 P3-01（feat-015）与 P3-06（feat-020）为 done，P3-02（feat-016）因 Linux Docker CLI/daemon unavailable 为 blocked；P3-03（feat-017）未开始，等待 P3-02 准入；active_feature=null，next_feature=feat-017。P3-01 ledger 在 [phase3-p301-recovery-manifest-20261020.json](outputs/acceptance/phase3-p301-recovery-manifest-20261020.json)，manifest SHA-256 `f084778b6cfee271876ba6493e039fc2a288e0295a7a0fe9353f0d6f2074416e`；3,179 selected / 1,048 static skipped / 19,074 selected stage rows，source denominator 11,380。
+- `feature_list.json` 的 P3-01/02/06（feat-015/016/020）为 done；P3-02 Linux Worker admission 已在 WSL2 Linux 真实 Docker 环境通过：10/10 benign probes 达到预期、10/10 cleanup confirmed。报告见 [probe report](outputs/acceptance/phase3-p302-linux-workers-20261020.json) 与 [admission report](outputs/acceptance/phase3-p302-linux-admission-retry-20261020.json)。P3-03（feat-017）当前 active，Linux baseline 13 项通过；active_feature=feat-017，next_feature=feat-018。Windows 测试未执行。
 - 方案关键项：逐阶段生成恢复集合、新 campaign 身份/DB、实际 Worker 准入、fencing/heartbeat/熔断/reconciliation、Windows 单独准入、20 entries 的独立 oracle 行为 pilot、CI 与 scoped gates。
 - P2 历史裁决不变；Windows 当前主机能力与 P3 参数尚未实测。计划中的模块/命令/阈值属于设计，不可当成现有实现。
 - 本次用户要求所有涉及 Windows 的测试跳过。当前仅执行 Linux 侧命令；后续 Windows/Sandbox 证据仍待用户之后带到 Windows/WSL 环境进行全量实测。P2 原始结果没有被修改。
-- P3-02 已新增 health fingerprint、资源配置、Linux `preflight` 与可指定输出路径的 benign probe runner；Linux 单元用例通过。阻塞证据：[phase3-p302-linux-admission-20261020.json](outputs/acceptance/phase3-p302-linux-admission-20261020.json)，当前主机没有 Docker CLI/daemon，不能用 mock 补成准入通过。
+- P3-02 初次 docker-unavailable blocker report 保留：[phase3-p302-linux-admission-20261020.json](outputs/acceptance/phase3-p302-linux-admission-20261020.json)。之后安装 Docker Engine 29.1.3、通过当前代理 pull 锁定镜像并真实运行 10 项 probes。admission fingerprint `3bb6e32bdea454df69571d7e621c3027fe55c0d3992e974cebe1ed09efa47e42`；Windows gate 未测。
 - 可复跑 Linux checks：`uv run --locked --project lab --python 3.12.14 python -m unittest lab.tests.test_automation_health lab.tests.test_workers.WorkerPolicyTests.test_limits_reject_non_positive_and_unbounded_values lab.tests.test_workers.WorkerPolicyTests.test_docker_command_is_digest_pinned_and_has_closed_boundaries lab.tests.test_workers.WorkerPolicyTests.test_docker_backend_rejects_unpinned_image_and_repository_input lab.tests.test_workers.WorkerPolicyTests.test_docker_worker_parses_peak_memory_sample -v`。在有 Docker 的 Linux 主机上先运行 Linux probes 到独立报告，再运行 `python -m lab.automation preflight --platform linux --probe-report <report> --output <health>`。
-- 下一步可推进无 Worker 依赖的 P3-06；Docker Linux 主机可用后先恢复 P3-02，再做故障注入与补测。支持结论与 Windows gates 保持 blocked/not-run，直到实机证据补齐。
+- 当前继续 P3-03 Linux fencing / heartbeat / circuit breaker / reconciliation。修改前 baseline：`uv run --locked --project lab --python 3.12.14 python -m unittest lab.tests.test_automation_health lab.tests.test_queue -v`（13 passed）。支持结论与 Windows gates 保持 not-run，直到 Windows 实机证据补齐。
 - P3-06 已完成 suite/schema/source/profile 身份冻结：[validation report](outputs/acceptance/phase3-p306-suite-validation-20261020.json)。20 entries / 60 cases / 4 独立历史回归；Linux 验证 18 项通过。没有插件运行，行为兼容仍 not evaluated；运行 `uv run --locked --project lab --python 3.12.14 python -m lab.automation validate-behavior` 可复核。Windows 测试未执行。
 
 ## Historical S2 Objective (2026-10-17)

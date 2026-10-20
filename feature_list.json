@@ -1,8 +1,8 @@
 {
   "schema_version": 1,
   "updated_at": "2026-10-20",
-  "active_feature": null,
-  "next_feature": "feat-017",
+  "active_feature": "feat-017",
+  "next_feature": "feat-018",
   "features": [
     {
       "id": "feat-001",
@@ -1344,16 +1344,15 @@
       "dependencies": [
         "feat-015"
       ],
-      "status": "blocked",
+      "status": "done",
       "done_when": "Linux 实机 benign probes 通过；Windows 探针与 blocker 采集入口可运行；未准入 backend 不 claim，环境变化使准入失效。",
-      "evidence": "Linux health/preflight code implemented, 7 Linux-focused unit tests passed, but real admission is blocked because this execution host has no Docker CLI and no /var/run/docker.sock. No Worker claim is permitted. Windows probes were not run per user instruction.",
+      "evidence": "Linux real Worker admission passed on WSL2 Linux with the digest-pinned Docker image: 10/10 benign probes reached their expected outcomes and all cleanup was confirmed. Health/preflight plus queue focused baseline passed (13 tests). Windows preflight and runtime were not run per user instruction; Windows admission remains outstanding.",
       "evidence_paths": [
-        "outputs/acceptance/phase3-p302-linux-admission-20261020.json",
-        "lab/automation/health.py",
-        "config/lab/phase3-automation-v1.json"
+        "outputs/acceptance/phase3-p302-linux-workers-20261020.json",
+        "outputs/acceptance/phase3-p302-linux-admission-retry-20261020.json",
+        "lab/automation/health.py"
       ],
-      "plan_path": "docs/plans/2026-10-20-phase-3-automation.md",
-      "blocker": "Docker CLI and daemon are unavailable on the current Linux execution host; benign isolation probes cannot run. Resume P3-02 on a Linux host with the pinned Docker Worker backend available."
+      "plan_path": "docs/plans/2026-10-20-phase-3-automation.md"
     },
     {
       "id": "feat-017",
@@ -1363,13 +1362,18 @@
       "dependencies": [
         "feat-016"
       ],
-      "status": "not-started",
+      "status": "in-progress",
       "done_when": "同名 owner/过期租约迟到提交拒绝；API 失联停派发；重启先确认旧资源清理后重试；Linux 真 Worker 故障注入通过。",
-      "evidence": "Blocked by feat-016: Linux real Worker admission has not passed because Docker CLI/daemon are unavailable on the current host. No P3-03 runtime/fault-injection claim.",
+      "evidence": "Baseline on Linux before implementation: lab.tests.test_automation_health lab.tests.test_queue, 13 passed on commit 0c6a634; Windows tests were not run.",
       "evidence_paths": [
         "outputs/acceptance/phase3-p302-linux-admission-20261020.json"
       ],
-      "plan_path": "docs/plans/2026-10-20-phase-3-automation.md"
+      "plan_path": "docs/plans/2026-10-20-phase-3-automation.md",
+      "baseline": {
+        "commit": "0c6a634",
+        "command": "uv run --locked --project lab --python 3.12.14 python -m unittest lab.tests.test_automation_health lab.tests.test_queue -v",
+        "result": "13 passed on Linux; Windows tests were not run."
+      }
     },
     {
       "id": "feat-018",

@@ -110,4 +110,15 @@
 
 - P3-06 工程交付完成：冻结 NoneBot/Koishi 各 10 个目录 entry 的 60 个必选行为 case，绑定 catalog/artifact/profile/dependency-lock/source-member 哈希；四个历史支持版本作为独立 regression identities。详见计划中的 P3-06 实施记录及 [suite validation report](outputs/acceptance/phase3-p306-suite-validation-20261020.json)。
 - Linux `lab.tests.test_automation_behavior lab.tests.test_recipes lab.tests.test_compare` 共 18 项通过；`python -m lab.automation validate-behavior` 输出 20 entries / 60 cases / 40 platform positions / 4 legacy regressions。此为 schema/identity 验证，`behavior_executed=false`，未安装或运行第三方插件，没有兼容性结论。
-- Windows 测试均跳过。feature list 中 P3-06 为 done；P3-02 仍因当前 Linux 主机无 Docker CLI/daemon 而 blocked，依赖其 Worker 的 P3-03/05/07 等任务不能进入真实实验。下一步需在满足锁定 Docker Worker 条件的 Linux 主机恢复 P3-02；Windows gates 留待后续 Windows/WSL 全量实测。
+- Windows 测试均跳过。feature list 中 P3-06 为 done；P3-02 后续在 WSL2 Linux 上通过 Docker 实机准入，详见本文件后续 P3-02 记录。
+
+## P3-02 Linux Worker Admission (2026-10-20)
+
+- 安装 Ubuntu Docker Engine 29.1.3，拉取锁定镜像 `python@sha256:f77ac9e44ae96ef2c90b8053ea08c31f8be030f824196b0ae4db6d462c84e51f`。Docker daemon 通过当前代理启动，仅用于本次 Linux Worker 验收。
+- 真实 probe 共 10 项，全部达到预期终态且 cleanup confirmed；覆盖 boundary、并发状态隔离、非零退出、cgroup CPU/memory/PID 限额、timeout、输出截断、OOM、进程树清理与 worker-loss。预期异常终态按 `unknown` 保留，不作为插件成功。
+- Probe [report](outputs/acceptance/phase3-p302-linux-workers-20261020.json) SHA-256 `e9f3a5a466680227b86c54c4df2ad8ae6d83ef7244e6b0cedb317c1fb42618b4`；health [admission report](outputs/acceptance/phase3-p302-linux-admission-retry-20261020.json) 为 admitted，fingerprint `3bb6e32bdea454df69571d7e621c3027fe55c0d3992e974cebe1ed09efa47e42`。原始 docker-unavailable blocker report 保留。
+- Windows preflight/runtime 均未执行；Windows admission 待后续 Windows/WSL 专项阶段实测。P3-02 Linux 准入完成；P3-03 已成为 active feature。
+
+## P3-03 Baseline (2026-10-20)
+
+- 修改前 Linux baseline：`uv run --locked --project lab --python 3.12.14 python -m unittest lab.tests.test_automation_health lab.tests.test_queue -v`，13 项通过。未运行 Windows 测试。
