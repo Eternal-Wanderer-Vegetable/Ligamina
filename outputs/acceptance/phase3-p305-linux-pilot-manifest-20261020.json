@@ -1,0 +1,785 @@
+{
+  "campaign_id": "p3-recovery-linux-2f359fb8cca9",
+  "schema_version": 1,
+  "contract": "phase3-linux-recovery-pilot-v1",
+  "purpose": "recovery",
+  "snapshot_id": "p2-41649744e057d61031d5",
+  "platform": "linux",
+  "source_recovery_manifest_sha256": "7df9f31a6f4f921c1c3bfc2fa02cdc43ff83c8476a6652921aa5879838369399",
+  "source_identity": {
+    "s2_audit_sha256": "2f514b48484a59e52fa3d4607219fc2d29b81d34a3cb86ca955057ef85381ace",
+    "s2_attribution_sha256": "66111ae63f6df886b778748f15933e68ade06c6d82b2b28d48e8b8b82af74bcf",
+    "catalog_sha256": "8c75d69358cd8334d0d311c1e19c642794d7436056d32041f02e6c1de1a06163",
+    "artifact_lock_sha256": "8dcec5da7cd81b9ed7d0f4e8aead8e76ef15cd7e17dfcdc4fa6f7b8944b83d4a",
+    "profile_lock_sha256": "68a7391620a06e7141d949519333a1f4fc5ccee7abd84dc036c46d09fdae8d38"
+  },
+  "selection_algorithm": "per-ecosystem: attribution-domain-stratified recovery candidates, then entry-id order; 2 cleanup-confirmed native-failure controls",
+  "expected_units": 20,
+  "recovery_per_ecosystem": 8,
+  "failed_controls_per_ecosystem": 2,
+  "stage_scope": [
+    "prepare",
+    "install",
+    "native",
+    "cleanup"
+  ],
+  "worker_policy": "linux-docker-pinned-image-v1",
+  "selection": [
+    {
+      "selection_kind": "affected_recovery",
+      "identity": {
+        "snapshot_id": "p2-41649744e057d61031d5",
+        "registry_entry_id": "nb-035b83f476df016aad476818",
+        "ecosystem": "nonebot",
+        "package": "nonebot_plugin_wakatime",
+        "version": "0.3.1",
+        "platform": "linux",
+        "profile_id": "nonebot-2.5.0-onebot-2.4.6-py3.12.14-linux-x86_64",
+        "profile_lock_sha256": "68a7391620a06e7141d949519333a1f4fc5ccee7abd84dc036c46d09fdae8d38",
+        "artifact_sha256": "996b4c1b123f900cd765dc2ec03e561824baec9f5ebd6cf59664ff419f9301df",
+        "dependency_lock_sha256": "9bfc4300eb01521d2955c80f2eb230c6e126fa7e2f723b4763d8dfeb5b333110"
+      },
+      "identity_sha256": "2e2fa5da59d66e503a94c04a15b89c637d85dda0c1809067d7831adb264c2eaf",
+      "selection_reason": [
+        "stage_unknown:cleanup",
+        "stage_unknown:install"
+      ],
+      "source": {
+        "task_id": "S2-11",
+        "report_path": "outputs/acceptance/phase2-s211-rerun-census-linux-shard222of256-20261014.json",
+        "report_sha256": "f474655c06f3078c3b768f0338a8d8e68dceacb8b6e0622b1a197a88466d236b",
+        "result_id": "catalog:nb-035b83f476df016aad476818|linux",
+        "unit_status": "unknown",
+        "stage_statuses": {
+          "prepare": "passed",
+          "install": "unknown",
+          "native": "skipped",
+          "federated": "skipped",
+          "compare": "skipped",
+          "cleanup": "unknown"
+        },
+        "reason_code": "worker_cleanup_unconfirmed",
+        "failure_domain": "native-load",
+        "cleanup_confirmed": false
+      }
+    },
+    {
+      "selection_kind": "affected_recovery",
+      "identity": {
+        "snapshot_id": "p2-41649744e057d61031d5",
+        "registry_entry_id": "nb-2decab7efdfc00efed5e3004",
+        "ecosystem": "nonebot",
+        "package": "nonebot_plugin_nailongmagic",
+        "version": "1.0.5.post2",
+        "platform": "linux",
+        "profile_id": "nonebot-2.5.0-onebot-2.4.6-py3.12.14-linux-x86_64",
+        "profile_lock_sha256": "68a7391620a06e7141d949519333a1f4fc5ccee7abd84dc036c46d09fdae8d38",
+        "artifact_sha256": "e2c9c413c1bdb5ed453e2c66adf2fd2be764e26796252bc3bc1e727caa2e9bfa",
+        "dependency_lock_sha256": "09d6909c38efc2a698e56c1499c614abe2b481643ffb33343003065dd9163916"
+      },
+      "identity_sha256": "acffde5757d3c39e1aa4379f65c9d026da72b8f60f395de9a27634c9fd59cc49",
+      "selection_reason": [
+        "failure_domain:preparation",
+        "stage_unknown:install"
+      ],
+      "source": {
+        "task_id": "S2-11",
+        "report_path": "outputs/acceptance/phase2-s211-rerun-census-linux-shard35of256-20261014.json",
+        "report_sha256": "2f4676af9fe8073727ed50ffc5ae86daec1fc9a1e96354ca870df3306e82cf9a",
+        "result_id": "catalog:nb-2decab7efdfc00efed5e3004|linux",
+        "unit_status": "unknown",
+        "stage_statuses": {
+          "prepare": "passed",
+          "install": "unknown",
+          "native": "skipped",
+          "federated": "skipped",
+          "compare": "skipped",
+          "cleanup": "skipped"
+        },
+        "reason_code": "worker_preparation_failed",
+        "failure_domain": "preparation",
+        "cleanup_confirmed": null
+      }
+    },
+    {
+      "selection_kind": "affected_recovery",
+      "identity": {
+        "snapshot_id": "p2-41649744e057d61031d5",
+        "registry_entry_id": "nb-0054dd2d400d0361cd6b0277",
+        "ecosystem": "nonebot",
+        "package": "nonebot_plugin_shiro_web_console",
+        "version": "0.2.2",
+        "platform": "linux",
+        "profile_id": "nonebot-2.5.0-onebot-2.4.6-py3.12.14-linux-x86_64",
+        "profile_lock_sha256": "68a7391620a06e7141d949519333a1f4fc5ccee7abd84dc036c46d09fdae8d38",
+        "artifact_sha256": "cfe054f21c1eece93689facf3b90d7340cc97fd304df5bdd66680c0eefb4913a",
+        "dependency_lock_sha256": "70a4d0bbbab7160a0f1c4976bab59d260513dceb10d5ce4ce5ed64bc6a325d06"
+      },
+      "identity_sha256": "cb85b52cf7d51f78b2b8d932ee3f87022c53138ba816d7e14dbfd87e6c5e3299",
+      "selection_reason": [
+        "stage_unknown:cleanup",
+        "stage_unknown:install"
+      ],
+      "source": {
+        "task_id": "S2-11",
+        "report_path": "outputs/acceptance/phase2-s211-rerun-census-linux-shard210of256-20261014.json",
+        "report_sha256": "8f43dcd6e408b427a382797eab557b3f18c14227ed7f165a0d82099f513980a4",
+        "result_id": "catalog:nb-0054dd2d400d0361cd6b0277|linux",
+        "unit_status": "unknown",
+        "stage_statuses": {
+          "prepare": "passed",
+          "install": "unknown",
+          "native": "skipped",
+          "federated": "skipped",
+          "compare": "skipped",
+          "cleanup": "unknown"
+        },
+        "reason_code": "worker_cleanup_unconfirmed",
+        "failure_domain": null,
+        "cleanup_confirmed": false
+      }
+    },
+    {
+      "selection_kind": "affected_recovery",
+      "identity": {
+        "snapshot_id": "p2-41649744e057d61031d5",
+        "registry_entry_id": "nb-005f1c44fb0a5194b2cef12b",
+        "ecosystem": "nonebot",
+        "package": "nonebot_plugin_dicky_pk",
+        "version": "0.7.1",
+        "platform": "linux",
+        "profile_id": "nonebot-2.5.0-onebot-2.4.6-py3.12.14-linux-x86_64",
+        "profile_lock_sha256": "68a7391620a06e7141d949519333a1f4fc5ccee7abd84dc036c46d09fdae8d38",
+        "artifact_sha256": "adccb7fef70fa8a58fd6c7093f14f000cbfcde1c1a895adcd8597337db8d4697",
+        "dependency_lock_sha256": "64b83f9909b0a5eae05493b1d2e45beacaeb3021a5f6f624d9943cbdac9019a0"
+      },
+      "identity_sha256": "4f4ae4113f3db59941ca2126a61683cceb89642ebac5bcbdb6a1e5cce9ebb88a",
+      "selection_reason": [
+        "stage_unknown:cleanup",
+        "stage_unknown:install"
+      ],
+      "source": {
+        "task_id": "S2-11",
+        "report_path": "outputs/acceptance/phase2-s211-rerun-census-linux-shard248of256-20261014.json",
+        "report_sha256": "9c3caf5ff0bbe08795d21789638d7df41f91d4cedac00a85e24ab16ec08c53fa",
+        "result_id": "catalog:nb-005f1c44fb0a5194b2cef12b|linux",
+        "unit_status": "unknown",
+        "stage_statuses": {
+          "prepare": "passed",
+          "install": "unknown",
+          "native": "skipped",
+          "federated": "skipped",
+          "compare": "skipped",
+          "cleanup": "unknown"
+        },
+        "reason_code": "worker_cleanup_unconfirmed",
+        "failure_domain": null,
+        "cleanup_confirmed": false
+      }
+    },
+    {
+      "selection_kind": "affected_recovery",
+      "identity": {
+        "snapshot_id": "p2-41649744e057d61031d5",
+        "registry_entry_id": "nb-01491b5cc43100c7f4b75a24",
+        "ecosystem": "nonebot",
+        "package": "nonebot_plugin_boardgamehelper",
+        "version": "1.0.0",
+        "platform": "linux",
+        "profile_id": "nonebot-2.5.0-onebot-2.4.6-py3.12.14-linux-x86_64",
+        "profile_lock_sha256": "68a7391620a06e7141d949519333a1f4fc5ccee7abd84dc036c46d09fdae8d38",
+        "artifact_sha256": "9ca64c6eb01a6010bdd60f7972746bcbb31883ae4695a28398295b2043f7fc40",
+        "dependency_lock_sha256": "c8b42359a5d1f639b95d86ee6e68ff0d4f43f6a670a62367bf63ce821529da44"
+      },
+      "identity_sha256": "24e354a50f379f937d8e3da80b4d9d1fca01b0e9d7eefdf3ffb306d16b1dbdf6",
+      "selection_reason": [
+        "stage_unknown:cleanup",
+        "stage_unknown:install"
+      ],
+      "source": {
+        "task_id": "S2-11",
+        "report_path": "outputs/acceptance/phase2-s211-rerun-census-linux-shard230of256-20261014.json",
+        "report_sha256": "aa5835eef0bf5694269cb844cb4219d0d8cbd1bc555fd1db00b636144c2adc9a",
+        "result_id": "catalog:nb-01491b5cc43100c7f4b75a24|linux",
+        "unit_status": "unknown",
+        "stage_statuses": {
+          "prepare": "passed",
+          "install": "unknown",
+          "native": "skipped",
+          "federated": "skipped",
+          "compare": "skipped",
+          "cleanup": "unknown"
+        },
+        "reason_code": "worker_cleanup_unconfirmed",
+        "failure_domain": null,
+        "cleanup_confirmed": false
+      }
+    },
+    {
+      "selection_kind": "affected_recovery",
+      "identity": {
+        "snapshot_id": "p2-41649744e057d61031d5",
+        "registry_entry_id": "nb-022d49a5ee2114b84aac6d20",
+        "ecosystem": "nonebot",
+        "package": "nonebot_plugin_aigf_master",
+        "version": "1.6.2",
+        "platform": "linux",
+        "profile_id": "nonebot-2.5.0-onebot-2.4.6-py3.12.14-linux-x86_64",
+        "profile_lock_sha256": "68a7391620a06e7141d949519333a1f4fc5ccee7abd84dc036c46d09fdae8d38",
+        "artifact_sha256": "87be384b52e909f3862304ce0f06fb85ddfe562c704eeb89ee10ee22aa7dca32",
+        "dependency_lock_sha256": "374e3a3ba846ec35d74868f29b9c8778f626d47b9c0b21c204d0a5831ce699ee"
+      },
+      "identity_sha256": "877fd738b4b442e4ffa726eec1745a69d0d161160ca6811e6196d85529e43208",
+      "selection_reason": [
+        "stage_unknown:cleanup",
+        "stage_unknown:install"
+      ],
+      "source": {
+        "task_id": "S2-11",
+        "report_path": "outputs/acceptance/phase2-s211-rerun-census-linux-shard157of256-20261014.json",
+        "report_sha256": "e0aef823c9b294bdad13f2fbadfa6c0008b1ef46e25727627a9f6ab11759a53d",
+        "result_id": "catalog:nb-022d49a5ee2114b84aac6d20|linux",
+        "unit_status": "unknown",
+        "stage_statuses": {
+          "prepare": "passed",
+          "install": "unknown",
+          "native": "skipped",
+          "federated": "skipped",
+          "compare": "skipped",
+          "cleanup": "unknown"
+        },
+        "reason_code": "worker_cleanup_unconfirmed",
+        "failure_domain": null,
+        "cleanup_confirmed": false
+      }
+    },
+    {
+      "selection_kind": "affected_recovery",
+      "identity": {
+        "snapshot_id": "p2-41649744e057d61031d5",
+        "registry_entry_id": "nb-03a363af5463a6ad1e4b26db",
+        "ecosystem": "nonebot",
+        "package": "nonebot_plugin_open_file",
+        "version": "1.0.0",
+        "platform": "linux",
+        "profile_id": "nonebot-2.5.0-onebot-2.4.6-py3.12.14-linux-x86_64",
+        "profile_lock_sha256": "68a7391620a06e7141d949519333a1f4fc5ccee7abd84dc036c46d09fdae8d38",
+        "artifact_sha256": "c521fbf73de8d86f776d18ba269721e2bddce95fc580b26a5e0fc3ae068a093e",
+        "dependency_lock_sha256": "9f8b8e39327081c86f721586a7cefa3c678bf8472c3cbd89b74244c6550aaaa3"
+      },
+      "identity_sha256": "266ab279a60068421d488e7a174422b8ca1f2297425afd4cfa749963379b93f2",
+      "selection_reason": [
+        "stage_unknown:cleanup",
+        "stage_unknown:install"
+      ],
+      "source": {
+        "task_id": "S2-11",
+        "report_path": "outputs/acceptance/phase2-s211-rerun-census-linux-shard134of256-20261014.json",
+        "report_sha256": "06c4b8c961441fca8ce6c5918d86ae697fc2d85bcaa9d10f4f2abe25b20491a8",
+        "result_id": "catalog:nb-03a363af5463a6ad1e4b26db|linux",
+        "unit_status": "unknown",
+        "stage_statuses": {
+          "prepare": "passed",
+          "install": "unknown",
+          "native": "skipped",
+          "federated": "skipped",
+          "compare": "skipped",
+          "cleanup": "unknown"
+        },
+        "reason_code": "worker_cleanup_unconfirmed",
+        "failure_domain": null,
+        "cleanup_confirmed": false
+      }
+    },
+    {
+      "selection_kind": "affected_recovery",
+      "identity": {
+        "snapshot_id": "p2-41649744e057d61031d5",
+        "registry_entry_id": "nb-04ca02a929c0227d9dc68f81",
+        "ecosystem": "nonebot",
+        "package": "nonebot_plugin_random_stereotypes",
+        "version": "0.5.0",
+        "platform": "linux",
+        "profile_id": "nonebot-2.5.0-onebot-2.4.6-py3.12.14-linux-x86_64",
+        "profile_lock_sha256": "68a7391620a06e7141d949519333a1f4fc5ccee7abd84dc036c46d09fdae8d38",
+        "artifact_sha256": "42d02466207f9dce985d2b19eabc42abf490dc63f9c53df456d4caa0e14fdd5f",
+        "dependency_lock_sha256": "e382c4f02077a326955ab9c3b3aeb8fc415a219911d199c21382d9a5f153361f"
+      },
+      "identity_sha256": "2fee0aa6de52db314482add9905edf692fa9262ab4421b77f42102b20c6aa142",
+      "selection_reason": [
+        "stage_unknown:cleanup",
+        "stage_unknown:install"
+      ],
+      "source": {
+        "task_id": "S2-11",
+        "report_path": "outputs/acceptance/phase2-s211-rerun-census-linux-shard122of256-20261014.json",
+        "report_sha256": "9fe0ab8388506703960d3213c66fffdb6d3e3778501888486baf984064929b18",
+        "result_id": "catalog:nb-04ca02a929c0227d9dc68f81|linux",
+        "unit_status": "unknown",
+        "stage_statuses": {
+          "prepare": "passed",
+          "install": "unknown",
+          "native": "skipped",
+          "federated": "skipped",
+          "compare": "skipped",
+          "cleanup": "unknown"
+        },
+        "reason_code": "worker_cleanup_unconfirmed",
+        "failure_domain": null,
+        "cleanup_confirmed": false
+      }
+    },
+    {
+      "selection_kind": "prior_plugin_failure_control",
+      "identity": {
+        "snapshot_id": "p2-41649744e057d61031d5",
+        "registry_entry_id": "nb-02b4a3862bbae4a686d8a9c3",
+        "ecosystem": "nonebot",
+        "package": "nonebot_plugin_lxns_maimai",
+        "version": "0.1.3",
+        "platform": "linux",
+        "profile_id": "nonebot-2.5.0-onebot-2.4.6-py3.12.14-linux-x86_64",
+        "profile_lock_sha256": "68a7391620a06e7141d949519333a1f4fc5ccee7abd84dc036c46d09fdae8d38",
+        "artifact_sha256": "62e3d7ddd50f708b969cb8dca78586edbeda18a95520951b680103eaa76262c5",
+        "dependency_lock_sha256": "dd1492a8cf97461a82016251f2c826c2adff546866b8c3a170edcdf1837546d1"
+      },
+      "identity_sha256": "93908e67e669e29cf5fe6d6d9491e1f90da4a3a96dff15b4893a3c585e825463",
+      "selection_reason": [
+        "prior_native_failure_control"
+      ],
+      "source": {
+        "task_id": "S2-11",
+        "report_path": "outputs/acceptance/phase2-s211-rerun-census-linux-shard97of256-20261014.json",
+        "report_sha256": "d5d9ddadcea183d5ed3b34f5a9d495c8b921e16395b6a02e3ed41ee56d8748f0",
+        "result_id": "catalog:nb-02b4a3862bbae4a686d8a9c3|linux",
+        "unit_status": "failed",
+        "stage_statuses": {
+          "prepare": "passed",
+          "install": "passed",
+          "native": "failed",
+          "federated": "skipped",
+          "compare": "skipped",
+          "cleanup": "passed"
+        },
+        "reason_code": "native_plugin_load_failed",
+        "failure_domain": null,
+        "cleanup_confirmed": true
+      }
+    },
+    {
+      "selection_kind": "prior_plugin_failure_control",
+      "identity": {
+        "snapshot_id": "p2-41649744e057d61031d5",
+        "registry_entry_id": "nb-04122531ce4379ea1e6b6ba9",
+        "ecosystem": "nonebot",
+        "package": "nonebot_plugin_tsugu_frontend",
+        "version": "0.1.1",
+        "platform": "linux",
+        "profile_id": "nonebot-2.5.0-onebot-2.4.6-py3.12.14-linux-x86_64",
+        "profile_lock_sha256": "68a7391620a06e7141d949519333a1f4fc5ccee7abd84dc036c46d09fdae8d38",
+        "artifact_sha256": "278453594cbc01d4c2a3927db5343e8412ed9b427be804b5505c5cd2fc085241",
+        "dependency_lock_sha256": "b8d7708740fef59dd1efe703957d2a6c4bc30fd0d2d00ab8119fc84ad47a3ea1"
+      },
+      "identity_sha256": "85cc885c1ee699756e477b4dea95793f80480864f05d8e04c8ac5745888eeb4e",
+      "selection_reason": [
+        "prior_native_failure_control"
+      ],
+      "source": {
+        "task_id": "S2-11",
+        "report_path": "outputs/acceptance/phase2-s211-rerun-census-linux-shard116of256-20261014.json",
+        "report_sha256": "4bf39cc49a483b10083c332c06b6135e23fbedd2ec9a6df65fa76ef40dfa1e35",
+        "result_id": "catalog:nb-04122531ce4379ea1e6b6ba9|linux",
+        "unit_status": "failed",
+        "stage_statuses": {
+          "prepare": "passed",
+          "install": "passed",
+          "native": "failed",
+          "federated": "skipped",
+          "compare": "skipped",
+          "cleanup": "passed"
+        },
+        "reason_code": "native_plugin_load_failed",
+        "failure_domain": null,
+        "cleanup_confirmed": true
+      }
+    },
+    {
+      "selection_kind": "affected_recovery",
+      "identity": {
+        "snapshot_id": "p2-41649744e057d61031d5",
+        "registry_entry_id": "ko-015719c9d910e7b0d676bccd",
+        "ecosystem": "koishi",
+        "package": "koishi-plugin-keine",
+        "version": "0.1.0",
+        "platform": "linux",
+        "profile_id": "koishi-core-4.18.11-node-24.20.0-x86_64-portable-lock",
+        "profile_lock_sha256": "68a7391620a06e7141d949519333a1f4fc5ccee7abd84dc036c46d09fdae8d38",
+        "artifact_sha256": "3191633c2c4dad37745e7e10455173e48919cf02d911adcf624345f0bd321219",
+        "dependency_lock_sha256": "530752c16b5e9ed4743db089d85187e90311e56926f5f6e17c63578a4355408d"
+      },
+      "identity_sha256": "86bad0ed5938ae834f7ac941de4ce60066a98bd98b131a95e40d58463d39bbc8",
+      "selection_reason": [
+        "stage_unknown:cleanup",
+        "stage_unknown:install"
+      ],
+      "source": {
+        "task_id": "S2-11",
+        "report_path": "outputs/acceptance/phase2-s211-rerun-census-linux-shard253of256-20261014.json",
+        "report_sha256": "b5457bb3b50352345cbb24b61fffe23b6b1cadada385f40bcb0e9a8525e0a09b",
+        "result_id": "catalog:ko-015719c9d910e7b0d676bccd|linux",
+        "unit_status": "unknown",
+        "stage_statuses": {
+          "prepare": "passed",
+          "install": "unknown",
+          "native": "skipped",
+          "federated": "skipped",
+          "compare": "skipped",
+          "cleanup": "unknown"
+        },
+        "reason_code": "worker_cleanup_unconfirmed",
+        "failure_domain": "native-load",
+        "cleanup_confirmed": false
+      }
+    },
+    {
+      "selection_kind": "affected_recovery",
+      "identity": {
+        "snapshot_id": "p2-41649744e057d61031d5",
+        "registry_entry_id": "ko-3bc85dd539b01190127ef9ab",
+        "ecosystem": "koishi",
+        "package": "koishi-plugin-r6s",
+        "version": "0.3.0",
+        "platform": "linux",
+        "profile_id": "koishi-core-4.18.11-node-24.20.0-x86_64-portable-lock",
+        "profile_lock_sha256": "68a7391620a06e7141d949519333a1f4fc5ccee7abd84dc036c46d09fdae8d38",
+        "artifact_sha256": "1fef9db4d7390ab15e89fd2b3cc87e6fff132a522c167ac8fad9c8ed6d4e2163",
+        "dependency_lock_sha256": "bcabef9f205bcc3663f088dc28902295717ff7e1824e2fb4b59b0025f6e1957d"
+      },
+      "identity_sha256": "09032affc135c6fbabe0490795eb3161964e86e4af1b8ec3d0cc8b16fb38d34f",
+      "selection_reason": [
+        "stage_unknown:cleanup",
+        "stage_unknown:install"
+      ],
+      "source": {
+        "task_id": "S2-11",
+        "report_path": "outputs/acceptance/phase2-s211-rerun-census-linux-shard158of256-20261014.json",
+        "report_sha256": "dbbd248705cbc1a1dedd531d38009966e3435d9fc1e87272d1478da71dc6ea46",
+        "result_id": "catalog:ko-3bc85dd539b01190127ef9ab|linux",
+        "unit_status": "unknown",
+        "stage_statuses": {
+          "prepare": "passed",
+          "install": "unknown",
+          "native": "skipped",
+          "federated": "skipped",
+          "compare": "skipped",
+          "cleanup": "unknown"
+        },
+        "reason_code": "worker_cleanup_unconfirmed",
+        "failure_domain": "offline-npm-install",
+        "cleanup_confirmed": false
+      }
+    },
+    {
+      "selection_kind": "affected_recovery",
+      "identity": {
+        "snapshot_id": "p2-41649744e057d61031d5",
+        "registry_entry_id": "ko-e16ef546d499f693c3dc7c2a",
+        "ecosystem": "koishi",
+        "package": "koishi-plugin-boom",
+        "version": "0.0.1",
+        "platform": "linux",
+        "profile_id": "koishi-core-4.18.11-node-24.20.0-x86_64-portable-lock",
+        "profile_lock_sha256": "68a7391620a06e7141d949519333a1f4fc5ccee7abd84dc036c46d09fdae8d38",
+        "artifact_sha256": "357b171f4fb9c6460f3ba29497779919232741e17279ce725cb00746d9fa645e",
+        "dependency_lock_sha256": "46c681ba86ea2731fce30ad45315210a16351a3016abadd4a71b6912944c957e"
+      },
+      "identity_sha256": "2d04cc2c6207e5a137cc5678d49867d017222ab95898d2287c153b781dd6a150",
+      "selection_reason": [
+        "stage_unknown:cleanup",
+        "stage_unknown:install"
+      ],
+      "source": {
+        "task_id": "S2-11",
+        "report_path": "outputs/acceptance/phase2-s211-rerun-census-linux-shard251of256-20261014.json",
+        "report_sha256": "b1489b330660c01871488520011d9feb1146f05e0bd3938b824cceb4ac065823",
+        "result_id": "catalog:ko-e16ef546d499f693c3dc7c2a|linux",
+        "unit_status": "unknown",
+        "stage_statuses": {
+          "prepare": "passed",
+          "install": "unknown",
+          "native": "skipped",
+          "federated": "skipped",
+          "compare": "skipped",
+          "cleanup": "unknown"
+        },
+        "reason_code": "worker_cleanup_unconfirmed",
+        "failure_domain": "plugin-process-exit/report-capture",
+        "cleanup_confirmed": false
+      }
+    },
+    {
+      "selection_kind": "affected_recovery",
+      "identity": {
+        "snapshot_id": "p2-41649744e057d61031d5",
+        "registry_entry_id": "ko-1d13f13e9b60c34f2076f68d",
+        "ecosystem": "koishi",
+        "package": "koishi-plugin-yu-setu",
+        "version": "1.0.10",
+        "platform": "linux",
+        "profile_id": "koishi-core-4.18.11-node-24.20.0-x86_64-portable-lock",
+        "profile_lock_sha256": "68a7391620a06e7141d949519333a1f4fc5ccee7abd84dc036c46d09fdae8d38",
+        "artifact_sha256": "01c3ca19947c50e17fdacd317a4ee4b1d3db0e48653040b8dd520e99f85fb247",
+        "dependency_lock_sha256": "4e65c2969270a7c2d759291fabcd01f51ab81d50d320171e294d8562e4773efc"
+      },
+      "identity_sha256": "f550d048b3febc0ecd59443c592246f8f9d8ea70817cf77cc54c6681bb44eb7a",
+      "selection_reason": [
+        "failure_domain:preparation"
+      ],
+      "source": {
+        "task_id": "S2-11",
+        "report_path": "outputs/acceptance/phase2-s211-rerun-census-linux-shard32of256-20261014.json",
+        "report_sha256": "c55f0b9edd95b2eb509fe6d377b50a11bc9b630b363f82c983ed08018053d6c8",
+        "result_id": "catalog:ko-1d13f13e9b60c34f2076f68d|linux",
+        "unit_status": "skipped",
+        "stage_statuses": {
+          "prepare": "passed",
+          "install": "passed",
+          "native": "passed",
+          "federated": "skipped",
+          "compare": "skipped",
+          "cleanup": "passed"
+        },
+        "reason_code": "entry_bound_federated_fixture_missing",
+        "failure_domain": "preparation",
+        "cleanup_confirmed": true
+      }
+    },
+    {
+      "selection_kind": "affected_recovery",
+      "identity": {
+        "snapshot_id": "p2-41649744e057d61031d5",
+        "registry_entry_id": "ko-004acfd0fd9ec06842a94761",
+        "ecosystem": "koishi",
+        "package": "koishi-plugin-bt",
+        "version": "0.0.1",
+        "platform": "linux",
+        "profile_id": "koishi-core-4.18.11-node-24.20.0-x86_64-portable-lock",
+        "profile_lock_sha256": "68a7391620a06e7141d949519333a1f4fc5ccee7abd84dc036c46d09fdae8d38",
+        "artifact_sha256": "db0b8f99044386c8ea884abf4862445c324829ec341c40b008602184ec53242b",
+        "dependency_lock_sha256": "0a44b32a983a32b5b662e15769953adcd62fb6e7f93819f8b2df7267626bff7e"
+      },
+      "identity_sha256": "646059b75bcfb7192ca5b6c06ce9f7a51c49ed11b8707ae82561b0fad72071ad",
+      "selection_reason": [
+        "stage_unknown:cleanup",
+        "stage_unknown:install"
+      ],
+      "source": {
+        "task_id": "S2-11",
+        "report_path": "outputs/acceptance/phase2-s211-rerun-census-linux-shard242of256-20261014.json",
+        "report_sha256": "7e5b6db6656461668e9f499c45d6f8ade4e9b408c146c65a28d34f449fff961b",
+        "result_id": "catalog:ko-004acfd0fd9ec06842a94761|linux",
+        "unit_status": "unknown",
+        "stage_statuses": {
+          "prepare": "passed",
+          "install": "unknown",
+          "native": "skipped",
+          "federated": "skipped",
+          "compare": "skipped",
+          "cleanup": "unknown"
+        },
+        "reason_code": "worker_cleanup_unconfirmed",
+        "failure_domain": null,
+        "cleanup_confirmed": false
+      }
+    },
+    {
+      "selection_kind": "affected_recovery",
+      "identity": {
+        "snapshot_id": "p2-41649744e057d61031d5",
+        "registry_entry_id": "ko-03b0d6a048bc907ec5e801fb",
+        "ecosystem": "koishi",
+        "package": "koishi-plugin-smmcat-economy",
+        "version": "0.1.7",
+        "platform": "linux",
+        "profile_id": "koishi-core-4.18.11-node-24.20.0-x86_64-portable-lock",
+        "profile_lock_sha256": "68a7391620a06e7141d949519333a1f4fc5ccee7abd84dc036c46d09fdae8d38",
+        "artifact_sha256": "5d8eb3c2463d6af6e9b2860f785cedd5c9051f156b050a13785dabff965e41a9",
+        "dependency_lock_sha256": "db466d675d42bfa7aee8d2c8672fe51d73ffcf0522d38451abbeec94f22c5172"
+      },
+      "identity_sha256": "bb7bcc6c33ddb2ffdf54dd3d1ed74d60d3803435cfab72a6f91aa8d96a79a8b5",
+      "selection_reason": [
+        "failure_domain:worker-exit"
+      ],
+      "source": {
+        "task_id": "S2-11",
+        "report_path": "outputs/acceptance/phase2-s211-rerun-census-linux-shard41of256-20261014.json",
+        "report_sha256": "c234856cd18f1355aa4b5bbca3c298a775b138ca3b77b5c202534bdc82f1cfc9",
+        "result_id": "catalog:ko-03b0d6a048bc907ec5e801fb|linux",
+        "unit_status": "failed",
+        "stage_statuses": {
+          "prepare": "passed",
+          "install": "failed",
+          "native": "skipped",
+          "federated": "skipped",
+          "compare": "skipped",
+          "cleanup": "passed"
+        },
+        "reason_code": "worker_nonzero_exit",
+        "failure_domain": "worker-exit",
+        "cleanup_confirmed": true
+      }
+    },
+    {
+      "selection_kind": "affected_recovery",
+      "identity": {
+        "snapshot_id": "p2-41649744e057d61031d5",
+        "registry_entry_id": "ko-49faa76157ad072ec5791025",
+        "ecosystem": "koishi",
+        "package": "koishi-plugin-auto-checkin-all",
+        "version": "1.0.3",
+        "platform": "linux",
+        "profile_id": "koishi-core-4.18.11-node-24.20.0-x86_64-portable-lock",
+        "profile_lock_sha256": "68a7391620a06e7141d949519333a1f4fc5ccee7abd84dc036c46d09fdae8d38",
+        "artifact_sha256": "072b340f42aba5d4cc0ddc09a097efc234497f71bf4dbcbdedce9a87def4dff3",
+        "dependency_lock_sha256": "de6a93a4502c3e455a64e84954e990a3cbb270f812879f0c0cdcea44d3ef1804"
+      },
+      "identity_sha256": "041071d716ad61b6231a1259d90694677a85bddcca7ce2d495abd7edea203d27",
+      "selection_reason": [
+        "failure_domain:worker-timeout",
+        "stage_unknown:cleanup",
+        "stage_unknown:install"
+      ],
+      "source": {
+        "task_id": "S2-11",
+        "report_path": "outputs/acceptance/phase2-s211-rerun-census-linux-shard219of256-20261014.json",
+        "report_sha256": "3cac32a1065d5814e0419fa83e4a1d1f9367b724f19c8872628c35bc6949586f",
+        "result_id": "catalog:ko-49faa76157ad072ec5791025|linux",
+        "unit_status": "unknown",
+        "stage_statuses": {
+          "prepare": "passed",
+          "install": "unknown",
+          "native": "skipped",
+          "federated": "skipped",
+          "compare": "skipped",
+          "cleanup": "unknown"
+        },
+        "reason_code": "worker_cleanup_unconfirmed",
+        "failure_domain": "worker-timeout",
+        "cleanup_confirmed": false
+      }
+    },
+    {
+      "selection_kind": "affected_recovery",
+      "identity": {
+        "snapshot_id": "p2-41649744e057d61031d5",
+        "registry_entry_id": "ko-004af3d2669b5ab8d79976db",
+        "ecosystem": "koishi",
+        "package": "koishi-plugin-cloudery-whois",
+        "version": "0.0.11",
+        "platform": "linux",
+        "profile_id": "koishi-core-4.18.11-node-24.20.0-x86_64-portable-lock",
+        "profile_lock_sha256": "68a7391620a06e7141d949519333a1f4fc5ccee7abd84dc036c46d09fdae8d38",
+        "artifact_sha256": "e689f88b4f0c0ee6e5eafbbc71ee96d2235ef1c2e38923719db4cbd3274d4bce",
+        "dependency_lock_sha256": "67a81876ffaa23a76ca7e60ef51e096ad7b8bc12bb9054aa926de46d5fec4b56"
+      },
+      "identity_sha256": "d175d8623637fbb44d3e7ecc518b861bd84a9ba6f45cca35cc6283952011b9f8",
+      "selection_reason": [
+        "stage_unknown:cleanup",
+        "stage_unknown:install"
+      ],
+      "source": {
+        "task_id": "S2-11",
+        "report_path": "outputs/acceptance/phase2-s211-rerun-census-linux-shard181of256-20261014.json",
+        "report_sha256": "9023b45d757458c298b68d03e3dcda6c6b3a61ecb2a85087f98202312eee22e0",
+        "result_id": "catalog:ko-004af3d2669b5ab8d79976db|linux",
+        "unit_status": "unknown",
+        "stage_statuses": {
+          "prepare": "passed",
+          "install": "unknown",
+          "native": "skipped",
+          "federated": "skipped",
+          "compare": "skipped",
+          "cleanup": "unknown"
+        },
+        "reason_code": "worker_cleanup_unconfirmed",
+        "failure_domain": null,
+        "cleanup_confirmed": false
+      }
+    },
+    {
+      "selection_kind": "prior_plugin_failure_control",
+      "identity": {
+        "snapshot_id": "p2-41649744e057d61031d5",
+        "registry_entry_id": "ko-00f8de7f86ebc3f587b2f7aa",
+        "ecosystem": "koishi",
+        "package": "koishi-plugin-picsource-twitter",
+        "version": "2.5.2",
+        "platform": "linux",
+        "profile_id": "koishi-core-4.18.11-node-24.20.0-x86_64-portable-lock",
+        "profile_lock_sha256": "68a7391620a06e7141d949519333a1f4fc5ccee7abd84dc036c46d09fdae8d38",
+        "artifact_sha256": "b22d1f3305abf06c72ab1f670089aaadbde1744971252e192eb9a1cfb15a990e",
+        "dependency_lock_sha256": "9af5abaad6aacd43411eefb350fc5fac6bfb081dff16399f97e39a2558f913dd"
+      },
+      "identity_sha256": "7f7aa6ab88e24711dbe910a5c4e123c52036673c9093bea40f59e386b055f9fb",
+      "selection_reason": [
+        "prior_native_failure_control"
+      ],
+      "source": {
+        "task_id": "S2-11",
+        "report_path": "outputs/acceptance/phase2-s211-rerun-census-linux-shard1of256-20261014.json",
+        "report_sha256": "ab67032ff952e5618e64f8f436c3e2664e9d4d3bad26bcd8cec7df5c4b959eab",
+        "result_id": "catalog:ko-00f8de7f86ebc3f587b2f7aa|linux",
+        "unit_status": "failed",
+        "stage_statuses": {
+          "prepare": "passed",
+          "install": "passed",
+          "native": "failed",
+          "federated": "skipped",
+          "compare": "skipped",
+          "cleanup": "passed"
+        },
+        "reason_code": "native_plugin_load_failed",
+        "failure_domain": null,
+        "cleanup_confirmed": true
+      }
+    },
+    {
+      "selection_kind": "prior_plugin_failure_control",
+      "identity": {
+        "snapshot_id": "p2-41649744e057d61031d5",
+        "registry_entry_id": "ko-0122dde2548a9e93e1a1e911",
+        "ecosystem": "koishi",
+        "package": "koishi-plugin-gy-pay",
+        "version": "0.7.0",
+        "platform": "linux",
+        "profile_id": "koishi-core-4.18.11-node-24.20.0-x86_64-portable-lock",
+        "profile_lock_sha256": "68a7391620a06e7141d949519333a1f4fc5ccee7abd84dc036c46d09fdae8d38",
+        "artifact_sha256": "9bf858cd57eeab03960deb4a0ae42e0a1dc6bca43a18b1d9497bbe1a419707d7",
+        "dependency_lock_sha256": "cca40e5bdb6a330691256174c6470c0490b0e9da8c2192a98dcfe7e795d43ab3"
+      },
+      "identity_sha256": "6f386bf5a2e54555d845bcdeb24a6a6d654ba87aca780154f96efc89bc474807",
+      "selection_reason": [
+        "prior_native_failure_control"
+      ],
+      "source": {
+        "task_id": "S2-11",
+        "report_path": "outputs/acceptance/phase2-s211-rerun-census-linux-shard114of256-20261014.json",
+        "report_sha256": "055cd9af5856c61836d034d1c5d0dcbda8760a29a1214827713debc14a44481d",
+        "result_id": "catalog:ko-0122dde2548a9e93e1a1e911|linux",
+        "unit_status": "failed",
+        "stage_statuses": {
+          "prepare": "passed",
+          "install": "passed",
+          "native": "failed",
+          "federated": "skipped",
+          "compare": "skipped",
+          "cleanup": "passed"
+        },
+        "reason_code": "native_plugin_load_failed",
+        "failure_domain": null,
+        "cleanup_confirmed": true
+      }
+    }
+  ],
+  "manifest_sha256": "2ac45c23f5a7de00a8b004b0f5208a9e8e77cc5382c40fe6aeb60548c3b205ed"
+}

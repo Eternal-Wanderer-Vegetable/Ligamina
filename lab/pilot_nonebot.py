@@ -476,6 +476,8 @@ def run_nonebot_load_probe(
     cache_root: Path = DEFAULT_CACHE_ROOT,
     timeout_seconds: int = 1200,
     context: tuple[dict[str, Any], dict[str, Any], dict[str, Any], dict[str, Any], bytes, bytes, bytes] | None = None,
+    worker_labels: dict[str, Any] | None = None,
+    image_digest: str | None = None,
 ) -> dict[str, Any]:
     """Install one exact locked NoneBot profile and verify native plugin registration offline."""
     snapshot_dir = Path(snapshot_dir).resolve(strict=True)
@@ -516,7 +518,7 @@ def run_nonebot_load_probe(
     images, _ = _read_json(RUNTIME_LOCK_PATH)
     if images.get("task_id") != "S2-05" or images.get("platform") != "linux/amd64":
         raise NoneBotPilotError("pinned Linux Worker image lock has the wrong identity")
-    image = images.get("profile_images", {}).get("nonebot")
+    image = image_digest or images.get("profile_images", {}).get("nonebot")
     if not isinstance(image, str) or "@sha256:" not in image:
         raise NoneBotPilotError("NoneBot Worker image must be pinned by sha256")
 
@@ -540,12 +542,18 @@ def run_nonebot_load_probe(
         _write_runner(bundle)
         worker = DockerWorker(image_digest=image, repository_root=ROOT)
         command = ("python", "/input/runner.py")
+        identity = worker_labels or {}
+        if identity and not all(key in identity for key in ("campaign_id", "job_id", "attempt_id", "generation")):
+            raise NoneBotPilotError("worker labels require campaign_id, job_id, attempt_id, and generation")
         result = worker.run(WorkerSpec(
-            run_id="s209-nonebot-pilot",
+            run_id=identity.get("campaign_id", "s209-nonebot-pilot"),
             entry_id=entry_id,
             command=command,
             input_dir=bundle,
             limits=WorkerLimits(timeout_seconds=timeout_seconds, memory_mb=4096, cpu_cores=2, process_limit=256),
+            attempt_id=identity.get("attempt_id"),
+            generation=identity.get("generation"),
+            job_id=identity.get("job_id"),
         ))
         protocol = None
         for line in reversed(result.stdout.decode("utf-8", errors="replace").splitlines()):

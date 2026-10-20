@@ -205,6 +205,13 @@ def _resolve_python_profile(
                 if key in os.environ
             }
             child_env.update({"UV_CACHE_DIR": str(cache_root / "uv-cache"), "UV_NO_PROGRESS": "1"})
+            # Registry resolution runs on the trusted host; preserve an explicitly
+            # configured outbound proxy without forwarding it to OS Workers.
+            child_env.update({
+                key: os.environ[key]
+                for key in ("HTTP_PROXY", "HTTPS_PROXY", "NO_PROXY", "http_proxy", "https_proxy", "no_proxy")
+                if key in os.environ
+            })
             result = subprocess.run(command, capture_output=True, text=True, timeout=timeout_seconds, check=False, env=child_env)
         except subprocess.TimeoutExpired:
             return {"status": "unknown", "reason_code": "profile_resolution_timeout", "profile_id": f"nonebot-2.5.0-onebot-2.4.6-py3.12.14-{platform_id}", "dependency_lock": None}
@@ -305,6 +312,13 @@ def _resolve_koishi_profile(
                 if key in os.environ
             }
             child_env.update({"NPM_CONFIG_REGISTRY": "https://registry.npmjs.org/", "NPM_CONFIG_CACHE": str(npm_cache)})
+            # Registry resolution runs on the trusted host; preserve an explicitly
+            # configured outbound proxy without forwarding it to OS Workers.
+            child_env.update({
+                key: os.environ[key]
+                for key in ("HTTP_PROXY", "HTTPS_PROXY", "NO_PROXY", "http_proxy", "https_proxy", "no_proxy")
+                if key in os.environ
+            })
             result = subprocess.run(command, cwd=temporary, capture_output=True, text=True, timeout=timeout_seconds, check=False, env=child_env)
         except subprocess.TimeoutExpired:
             return {"status": "unknown", "reason_code": "profile_resolution_timeout", "profile_id": profile_id, "dependency_lock": None}

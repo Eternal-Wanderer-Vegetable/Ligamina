@@ -449,6 +449,7 @@ def run_koishi_load_probe(
     timeout_seconds: int = 240,
     _context: _CatalogContext | None = None,
     platform: str = "linux",
+    worker_labels: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
     """Install one exact locked Koishi profile offline and load its package in Docker."""
     snapshot_dir = Path(snapshot_dir).resolve(strict=True)
@@ -499,13 +500,19 @@ def run_koishi_load_probe(
         worker = DockerWorker(image_digest=selected_image, repository_root=ROOT)
         command = ("sh", "-c", "set -eu; cp -a /input/project /work/project; cp /input/spec.json /work/project/spec.json; cd /work/project; LIGAMINA_SCRATCH_ROOTS='[\"/work\",\"/tmp\"]' LIGAMINA_SCRATCH_SAMPLE_PATH=/work/project/ligamina-scratch-sample.json LIGAMINA_SCRATCH_STOP_PATH=/work/project/ligamina-scratch-stop node pilot-probe.mjs")
         # The spec is passed at /input because the mounted source stays read-only.
+        identity = worker_labels or {}
+        if identity and not all(key in identity for key in ("campaign_id", "job_id", "attempt_id", "generation")):
+            raise PilotWorkerError("worker labels require campaign_id, job_id, attempt_id, and generation")
         result = worker.run(
             WorkerSpec(
-                run_id="s209-koishi-pilot",
+                run_id=identity.get("campaign_id", "s209-koishi-pilot"),
                 entry_id=entry_id,
                 command=command,
                 input_dir=bundle,
                 limits=WorkerLimits(timeout_seconds=timeout_seconds, memory_mb=4096, cpu_cores=2, process_limit=256),
+                attempt_id=identity.get("attempt_id"),
+                generation=identity.get("generation"),
+                job_id=identity.get("job_id"),
             )
         )
         protocol = None

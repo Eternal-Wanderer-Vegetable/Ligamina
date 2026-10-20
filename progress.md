@@ -2,9 +2,10 @@
 
 ## Current State
 
-- **Last Updated:** 2026-10-20（Asia/Shanghai）；P3-01、P3-02 Linux、P3-03 Linux 与 P3-06 已完成；继续 P3-05 Linux scoped recovery。Windows 专项按用户要求暂缓。
-- **Current Objective:** 按 [第三阶段方案](docs/plans/2026-10-20-phase-3-automation.md) 完成 Linux 可执行范围。P3-04 Windows runtime admission 暂未开始；active_feature=feat-019（P3-05），next_feature=feat-021（P3-07）。所有 Windows/Sandbox 测试仍跳过，相关 gate 不得标通过。
+- **Last Updated:** 2026-10-20（Asia/Shanghai）；P3-01、P3-02 Linux、P3-03 Linux 与 P3-06 已完成；P3-05 Linux recovery 工程入口已实现，但试点因冻结输入缓存缺失而 blocked。开始可独立推进的 P3-07。Windows 专项按用户要求暂缓。
+- **Current Objective:** 按 [第三阶段方案](docs/plans/2026-10-20-phase-3-automation.md) 完成 Linux 可执行范围。active_feature=feat-021（P3-07）；feat-019（P3-05）保持 blocked，等待恢复所选条目的精确 artifact 与 dependency-lock 缓存；P3-04 Windows runtime admission 暂未开始。所有 Windows/Sandbox 测试仍跳过，相关 gate 不得标通过。
 - **P3-01:** [恢复 manifest](outputs/acceptance/phase3-p301-recovery-manifest-20261020.json) 从 S2-12 audit、S2-11 归因和 512 个 shard 重新计算 11,380 个单位，选择 3,179 个受影响单位（19,074 stage rows），另外记录 1,048 个静态 artifact/profile skipped。manifest SHA-256 `f084778b6cfee271876ba6493e039fc2a288e0295a7a0fe9353f0d6f2074416e`。这是选择账本，不是重跑结果。
+- **P3-05 Linux checkpoint:** frozen 20-unit pilot 与新 fenced campaign 已建立；artifact/profile-lock cache ready 0/20。1 个 install attempt 在 Worker 启动前因缓存缺失变为 unknown，精确 Docker reconciliation cleanup confirmed；19 个单元未执行，无插件代码运行。checkpoint [报告](outputs/acceptance/phase3-p305-linux-pilot-checkpoint-20261020.json)，SHA-256 `5a35b12ffd323068ebe7152a1fb2a40ed7197f625e2c97a180e5762e082a551e`。Linux scoped P3-05 保持 blocked；P3-07 的依赖 P3-03/P3-06 满足，当前 active。
 - **P3-02 initial blocker:** 初次健康准入因缺 Docker CLI/daemon 受阻，报告 [保留](outputs/acceptance/phase3-p302-linux-admission-20261020.json)；之后安装 Docker Engine、运行锁定镜像的真实 benign probes 并通过 Linux admission。原 blocker 报告不覆盖重试报告。
 - **Historical S2 status:** S2-01–S2-12 已完成；P2-AUTOMATION blocked、P2-BEHAVIOR not evaluated、P2-FIELD not run。历史 CI 修复与四个精确支持版本结论保持原状。
 - **CI Diagnosis:** PR #3 当前 HEAD `b0615548` 的 [run #18](https://github.com/Eternal-Wanderer-Vegetable/Ligamina/actions/runs/38988173249) 与前次 [run #17](https://github.com/Eternal-Wanderer-Vegetable/Ligamina/actions/runs/38915036215) 均在 Linux/Windows 的 `node scripts/check-docs.mjs` 失败，错误为 `Stale phase-two report input: outputs/acceptance/phase2-s207-cli-smoke-20261012.json`。S2-08 保存的 SHA-256 是 Windows CRLF 工作树字节 `35ba6754…`，Git blob 为 LF 字节 `2a5efbd5…`；renderer 对原始文件字节做哈希，导致 clean checkout 不匹配。本地 docs 检查通过，`git archive HEAD` 临时干净 checkout 稳定复现失败。临时诊断还发现 9 个 S2-09 source hash、1 个 S2-10 全局 source hash 和全部 512 个 S2-10 shard 对同一 Windows 写入证据保存了不匹配哈希。两平台 CI 都在第一道 docs 检查停止，后续测试没有运行。修复已提交推送，当前双平台 CI 复跑通过。
@@ -119,6 +120,14 @@
 - Probe [report](outputs/acceptance/phase3-p302-linux-workers-20261020.json) SHA-256 `e9f3a5a466680227b86c54c4df2ad8ae6d83ef7244e6b0cedb317c1fb42618b4`；health [admission report](outputs/acceptance/phase3-p302-linux-admission-retry-20261020.json) 为 admitted，fingerprint `3bb6e32bdea454df69571d7e621c3027fe55c0d3992e974cebe1ed09efa47e42`。原始 docker-unavailable blocker report 保留。
 - Windows preflight/runtime 均未执行；Windows admission 待后续 Windows/WSL 专项阶段实测。P3-02 Linux 准入完成；P3-03 已成为 active feature。
 
+## P3-05 Linux Recovery Blocker (2026-10-20)
+
+- Pilot manifest: `outputs/acceptance/phase3-p305-linux-pilot-rebuilt-worker-manifest-20261020.json` (20 units; campaign `p3-recovery-linux-8c161abc3e6e`; SHA-256 `8e3d931c297cb7e22f9d293f954e908bd9c02383c9e5a6af36c4e8060a0bc668`). The rebuilt Python profile image has a distinct exact digest and is recorded in a separate manifest.
+- Input inventory: frozen artifact and profile-lock cache 0/20 selected units ready. Exact historic profile locks are absent; a regenerated Koishi lock had a different SHA-256 and was not substituted. The local cache also lacks complete inputs across 2,206 Linux recovery units.
+- Attempt checkpoint: `outputs/acceptance/phase3-p305-linux-pilot-checkpoint-20261020.json`, SHA-256 `5a35b12ffd323068ebe7152a1fb2a40ed7197f625e2c97a180e5762e082a551e`. One install attempt failed before Worker startup; no plugin code ran. Exact attempt resources were reconciled cleanup-confirmed. Queue remains interrupted, 19 units not run, compatibility not evaluated.
+- Reproduce the Linux tests with `uv run --locked --project lab --python 3.12.14 python -m unittest lab.tests.test_automation_recovery lab.tests.test_automation_selection lab.tests.test_queue lab.tests.test_automation_dispatcher -v`; docs `bash init.sh docs`; evidence hash tests `/home/vegetable/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node --test scripts/evidence-hash.test.mjs`. Windows tests were skipped.
+- P3-05 needs the exact artifact and dependency-lock bytes restored before same-identity recovery can proceed. P3-07 is active because its declared dependencies P3-03 and P3-06 are complete; P3-08 remains blocked on P3-04 and P3-05.
+
 ## P3-03 Baseline (2026-10-20)
 
 - 修改前 Linux baseline：`uv run --locked --project lab --python 3.12.14 python -m unittest lab.tests.test_automation_health lab.tests.test_queue -v`，13 项通过。未运行 Windows 测试。
@@ -129,4 +138,4 @@
 - 新增 dispatcher heartbeat/circuit breaker、Linux 主机跨进程互斥，以及 Docker campaign/job/attempt/generation labels 和精确资源 reconciliation。reconciler 先检查全部标签，再清理目标并查询确认；可接入 queue attempt ledger。
 - 首轮队列回归暴露一处 joined query 的 `run_id` 歧义，已限定为 `jobs.run_id` 并复测通过。收紧 cleanup=false 后再次复测，run 保持 interrupted。
 - Linux 验证：queue + dispatcher 21 tests；`bash init.sh docs` 19 文档 / 269 本地链接；bundled Node `scripts/evidence-hash.test.mjs` 4/4；`git diff --check` 通过。真实 Docker 29.1.3 故障注入使用锁定 Python image：仅清除匹配标签的目标容器，独立无关容器仍运行，测试容器之后全部清理。证据：[P3-03 Linux acceptance](outputs/acceptance/phase3-p303-linux-20261020.json)。
-- Windows/Sandbox tests 均 skipped；未运行 catalog plugins，未改变兼容 gate。P3-04 按用户要求暂缓；当前 active feature 为 P3-05 Linux scoped recovery。
+- Windows/Sandbox tests 均 skipped；P3-05 的唯一 pilot attempt 在 Worker 启动前失败，未运行 catalog plugins，未改变兼容 gate。P3-04 按用户要求暂缓；当前 active feature 为 P3-07，P3-05 等待恢复精确缓存输入。
