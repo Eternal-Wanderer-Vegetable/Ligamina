@@ -7,6 +7,7 @@ import hashlib
 import json
 import os
 import shutil
+import stat
 import subprocess
 import tempfile
 import time
@@ -120,6 +121,12 @@ def _extract_runtime_assets(destination: Path, runtime_image: str) -> dict[str, 
         raise RuntimeError(f"could not create the locked runtime asset container: {created.stderr[-2000:]}")
     container_id = created.stdout.strip()
     try:
+        inspected = subprocess.run(
+            [docker, "inspect", "--type", "image", "--format", "{{.Id}}", runtime_image],
+            capture_output=True, text=True, encoding="utf-8", errors="replace", timeout=60, check=False,
+        )
+        if inspected.returncode or not inspected.stdout.strip().startswith("sha256:"):
+            raise RuntimeError("could not record the exact runtime artifact image ID")
         for source, target in (("/usr/local/bin/node", node), ("/usr/local/bin/ligamina-cli", core)):
             copied = subprocess.run(
                 [docker, "cp", f"{container_id}:{source}", str(target)],
@@ -130,6 +137,7 @@ def _extract_runtime_assets(destination: Path, runtime_image: str) -> dict[str, 
     finally:
         subprocess.run([docker, "rm", container_id], capture_output=True, timeout=60, check=False)
     return {
+        "runtime_image_id": inspected.stdout.strip(),
         "node_sha256": hashlib.sha256(node.read_bytes()).hexdigest(),
         "core_sha256": hashlib.sha256(core.read_bytes()).hexdigest(),
     }
@@ -191,11 +199,29 @@ def _tree_size_bytes(root: Path) -> int:
     return sum(path.stat().st_size for path in root.rglob("*") if path.is_file() and not path.is_symlink())
 
 
+def _make_user_writable(path: Path) -> None:
+    if not path.exists() and not path.is_symlink():
+        return
+    targets = [path, *path.rglob("*")] if path.is_dir() and not path.is_symlink() else [path]
+    for target in targets:
+        if target.is_symlink():
+            continue
+        mode = target.stat().st_mode
+        # Rootless Docker maps container root to an unprivileged host uid; the
+        # temporary staging tree must therefore be writable across that mapping.
+        mode |= stat.S_IWUSR | stat.S_IWGRP | stat.S_IWOTH
+        if target.is_dir():
+            mode |= stat.S_IRUSR | stat.S_IXUSR | stat.S_IRGRP | stat.S_IXGRP | stat.S_IROTH | stat.S_IXOTH
+        os.chmod(target, mode)
+
+
 def _provision_linux_profile(sample: dict[str, Any], work: Path, images: dict[str, Any]) -> dict[str, Any]:
     docker = shutil.which("docker") or shutil.which("docker.exe")
     if not docker:
         return {"status": "environment_missing", "error": "Docker CLI is unavailable"}
     image = images["profile_images"][sample["ecosystem"]]
+    for name in (".venv", "node_modules"):
+        _make_user_writable(work / name)
     command = (
         ("sh", "-lc", "mkdir -p /tmp/home && rm -rf .venv && uv sync --locked --no-dev --no-build --python 3.12.14")
         if sample["ecosystem"] == "nonebot"
@@ -213,6 +239,8 @@ def _provision_linux_profile(sample: dict[str, Any], work: Path, images: dict[st
         "--env", "HOME=/tmp/home", "--env", "UV_CACHE_DIR=/tmp/uv-cache",
         "--env", "npm_config_cache=/tmp/npm-cache", image, *command,
     ]
+    if os.name != "nt" and hasattr(os, "getuid") and hasattr(os, "getgid"):
+        argv[2:2] = ["--user", f"{os.getuid()}:{os.getgid()}"]
     started = time.monotonic()
     try:
         completed = subprocess.run(
@@ -235,26 +263,28 @@ def _provision_linux_profile(sample: dict[str, Any], work: Path, images: dict[st
 
 
 def _cleanup_linux_profile(sample: dict[str, Any], work: Path, images: dict[str, Any]) -> dict[str, Any]:
-    docker = shutil.which("docker") or shutil.which("docker.exe")
-    if not docker:
-        return {"status": "environment_missing", "error": "Docker CLI is unavailable"}
-    image = images["profile_images"][sample["ecosystem"]]
-    source = str(work.resolve()).replace("\\", "/")
-    command = [
-        docker, "run", "--rm", "--pull=never", "--network", "none", "--read-only", "--cap-drop=ALL",
-        "--security-opt=no-new-privileges:true", "--mount", f"type=bind,src={source},dst=/profile",
-        "--workdir", "/profile", image, "sh", "-lc", "rm -rf .venv node_modules",
-    ]
+    removed = []
     started = time.monotonic()
-    completed = subprocess.run(
-        command, capture_output=True, text=True, encoding="utf-8", errors="replace", timeout=120, check=False,
-    )
+    try:
+        for name in (".venv", "node_modules"):
+            path = work / name
+            if not path.exists() and not path.is_symlink():
+                continue
+            _make_user_writable(path)
+            if path.is_symlink() or path.is_file():
+                path.unlink()
+            else:
+                shutil.rmtree(path)
+            removed.append(name)
+    except OSError as error:
+        return {
+            "status": "failed", "removed": removed, "elapsed_seconds": round(time.monotonic() - started, 3),
+            "error": f"{type(error).__name__}: {error}",
+        }
     return {
-        "status": "passed" if completed.returncode == 0 else "failed",
-        "command": command,
-        "returncode": completed.returncode,
+        "status": "passed",
+        "removed": removed,
         "elapsed_seconds": round(time.monotonic() - started, 3),
-        "stderr_tail": completed.stderr[-2000:],
     }
 
 
@@ -369,7 +399,13 @@ def _run_sample(
     }
 
 
-def run(sample_ids: set[str] | None = None, report_path: Path = REPORT_PATH) -> dict[str, Any]:
+def run(
+    sample_ids: set[str] | None = None,
+    report_path: Path = REPORT_PATH,
+    *,
+    runtime_image_override: str | None = None,
+    profile_image_overrides: dict[str, str] | None = None,
+) -> dict[str, Any]:
     report_path = Path(report_path).expanduser().absolute()
     source_report_bytes = REPORT_PATH.read_bytes()
     source_report = json.loads(source_report_bytes.decode("utf-8"))
@@ -395,6 +431,14 @@ def run(sample_ids: set[str] | None = None, report_path: Path = REPORT_PATH) -> 
     if sample_ids is None and not required.issubset(selected):
         raise ValueError("all four previously supported sample versions are required")
     images = _runtime_images()
+    runtime_image = runtime_image_override or images["runtime_artifact_image"]
+    if runtime_image_override and "sha256:" not in runtime_image_override:
+        raise ValueError("runtime image override must be an exact sha256 image ID or digest")
+    if profile_image_overrides:
+        for ecosystem, image in profile_image_overrides.items():
+            if ecosystem not in {"nonebot", "koishi"} or "@sha256:" not in image:
+                raise ValueError("profile image overrides must use an ecosystem key and digest-pinned image")
+            images["profile_images"][ecosystem] = image
 
     existing = (
         {item["sample_id"]: item for item in report.get("implementation", {}).get("samples", [])}
@@ -404,7 +448,7 @@ def run(sample_ids: set[str] | None = None, report_path: Path = REPORT_PATH) -> 
     with tempfile.TemporaryDirectory(prefix="ligamina-s205-") as directory:
         temp_root = Path(directory)
         runtime_assets = temp_root / "runtime-assets"
-        runtime_hashes = _extract_runtime_assets(runtime_assets, images["runtime_artifact_image"])
+        runtime_hashes = _extract_runtime_assets(runtime_assets, runtime_image)
         results = list(existing.values())
         for sample in samples:
             fixture_path = (manifest_path.parent / sample["fixture_path"]).resolve()
@@ -438,7 +482,9 @@ def run(sample_ids: set[str] | None = None, report_path: Path = REPORT_PATH) -> 
                 "approach": "unmodified plugin artifact in one exact Linux sample lock, run against stock native framework and production Core/Host/Gateway in a network-disabled Docker Worker",
                 "platform": "linux/amd64",
                 "runtime_images_lock": "lab/baselines/runtime-images.lock.json",
+                "runtime_artifact_image": runtime_image,
                 "runtime_artifacts": runtime_hashes,
+                "profile_images_used": images["profile_images"],
                 "windows_sandbox_blocker": {
                     "status": "blocked_before_plugin_start",
                     "win32_error": 4551,
@@ -473,8 +519,21 @@ def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--sample-id", action="append", default=[])
     parser.add_argument("--report", type=Path, default=REPORT_PATH)
+    parser.add_argument("--runtime-image", help="exact sha256 image ID or digest for a freshly built runtime artifact image")
+    parser.add_argument("--nonebot-profile-image", help="digest-pinned NoneBot profile image override")
+    parser.add_argument("--koishi-profile-image", help="digest-pinned Koishi profile image override")
     options = parser.parse_args()
-    report = run(set(options.sample_id) or None, options.report)
+    profile_overrides = {
+        ecosystem: image
+        for ecosystem, image in (("nonebot", options.nonebot_profile_image), ("koishi", options.koishi_profile_image))
+        if image
+    }
+    report = run(
+        set(options.sample_id) or None,
+        options.report,
+        runtime_image_override=options.runtime_image,
+        profile_image_overrides=profile_overrides,
+    )
     print(json.dumps({
         "status": report["status"],
         "samples": [

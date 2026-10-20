@@ -1,0 +1,503 @@
+{
+  "schema_version": 1,
+  "task_id": "S2-09",
+  "kind": "phase2_s209_legacy_support_regression",
+  "status": "in-progress",
+  "source_s205_report": "outputs/acceptance/phase2-s205-20261012.json",
+  "source_s205_report_sha256": "e5122c52d4c0f4d7519caac7be03fcb24ab8cd102961291575070aa99b1da03a",
+  "implementation": {
+    "approach": "unmodified plugin artifact in one exact Linux sample lock, run against stock native framework and production Core/Host/Gateway in a network-disabled Docker Worker",
+    "platform": "linux/amd64",
+    "runtime_images_lock": "lab/baselines/runtime-images.lock.json",
+    "runtime_artifact_image": "sha256:da8004f5b3bf4e3be46f09bdea06e1e91450a7bfb57052cf9d18448685d27d47",
+    "runtime_artifacts": {
+      "runtime_image_id": "sha256:da8004f5b3bf4e3be46f09bdea06e1e91450a7bfb57052cf9d18448685d27d47",
+      "node_sha256": "89af8424dd53e560b1933f87ba650d8bf57c83ca5a04600eefb31f416aabbae7",
+      "core_sha256": "6dc9071961aeb778af4c85904defcd8c8aa3e3d1dd80c56043152c09fb916660"
+    },
+    "profile_images_used": {
+      "nonebot": "ligamina-s205-python-profile@sha256:fcb712608785413b1db90fd2d96031beb1e1a18588b89d6cacdde906ce42ab89",
+      "koishi": "node@sha256:ba849c60be29959425b8734d57b8b4b7d56f98edd9504c9af091d5281095a71e"
+    },
+    "windows_sandbox_blocker": {
+      "status": "blocked_before_plugin_start",
+      "win32_error": 4551,
+      "reason": "Windows Sandbox App Control policy blocked the unsigned CPython executable; the failure occurred before the sample runner started.",
+      "evidence": "outputs/acceptance/phase2-s205-windows-blocker-20261012.json"
+    },
+    "native_paths": {
+      "nonebot": "stock NoneBot 2.5.0 with official OneBot v11 adapter 2.4.6; inject native OneBot Event through Bot.handle_event and capture Bot API sends",
+      "koishi": "stock Koishi core 4.18.11 Context/Session/Bot; dispatch native Session and capture Bot.sendMessage"
+    },
+    "files": [
+      "lab/baselines/nonebot/runner.py",
+      "lab/baselines/koishi/runner.mjs",
+      "lab/baselines/federated.py",
+      "lab/baselines/paired_worker.py",
+      "lab/native_runner.py",
+      "lab/recipes.py"
+    ],
+    "samples": [
+      {
+        "sample_id": "nonebot-autohelp",
+        "status": "failed",
+        "stage": "linux_profile_prepare",
+        "profile": {
+          "status": "passed",
+          "steps": [
+            {
+              "label": "resolve exact Python sample profile",
+              "status": "passed",
+              "command": [
+                "/usr/local/bin/uv",
+                "lock"
+              ],
+              "returncode": 0,
+              "stdout_tail": "",
+              "stderr_tail": "Using CPython 3.12.3 interpreter at: /usr/bin/python3\nResolved 39 packages in 3.58s\n"
+            },
+            {
+              "label": "install locked Python sample profile",
+              "status": "passed",
+              "command": [
+                "/usr/local/bin/uv",
+                "sync",
+                "--locked",
+                "--no-dev",
+                "--no-build",
+                "--python",
+                "3.12.14"
+              ],
+              "returncode": 0,
+              "stdout_tail": "",
+              "stderr_tail": "Downloading cpython-3.12.14-linux-x86_64-gnu (download) (32.6MiB)\n Downloaded cpython-3.12.14-linux-x86_64-gnu (download)\nUsing CPython 3.12.14\nCreating virtual environment at: .venv\nResolved 39 packages in 2ms\nDownloading uvloop (4.3MiB)\nDownloading pydantic-core (2.1MiB)\n Downloaded pydantic-core\n Downloaded uvloop\nPrepared 35 packages in 1.63s\nInstalled 36 packages in 84ms\n + annotated-doc==0.0.5\n + annotated-types==0.8.0\n + anyio==4.15.1\n + attrs==26.1.0\n + click==8.5.0\n + exceptiongroup==1.3.1\n + fastapi==0.151.0\n + h11==0.16.0\n + httptools==0.9.0\n + idna==3.20\n + jsonschema==4.25.1\n + jsonschema-specifications==2025.9.1\n + loguru==0.7.3\n + logzero==1.7.0\n + msgpack==1.2.3\n + multidict==7.1.0\n + nonebot-adapter-onebot==2.4.6\n + nonebot-plugin-autohelp==0.1.7 (from https://files.pythonhosted.org/packages/fc/c0/f6e010f1d0ae8bf2e8fe067ea031b0debb3f764f5480022903f5e5179471/nonebot_plugin_autohelp-0.1.7-py3-none-any.whl)\n + nonebot2==2.5.0\n + opentelemetry-api==1.45.1\n + propcache==0.5.4\n + pydantic==2.14.1\n + pydantic-core==2.50.1\n + pygtrie==2.6.2\n + python-dotenv==1.2.4\n + pyyaml==6.0.3\n + referencing==0.37.0\n + rpds-py==2026.9.1\n + starlette==1.9.0\n + typing-extensions==4.16.0\n + typing-inspection==0.4.4\n + uvicorn==0.54.0\n + uvloop==0.23.0\n + watchfiles==1.3.0\n + websockets==17.3\n + yarl==1.25.1\n"
+            },
+            {
+              "label": "verify installed Python package metadata",
+              "status": "passed",
+              "command": [
+                "/tmp/ligamina-s205-kfqykpqc/nonebot-autohelp/.venv/bin/python",
+                "-c",
+                "from importlib.metadata import version; import sys; print(version(sys.argv[1]))",
+                "nonebot-plugin-autohelp"
+              ],
+              "returncode": 0,
+              "stdout_tail": "0.1.7\n",
+              "stderr_tail": ""
+            }
+          ],
+          "lock_sha256": "e940350c29a68a40d6fd08ca57227af89805fa8b3e7b6420090c2a425515b377"
+        },
+        "linux_profile_prepare": {
+          "status": "failed",
+          "command": [
+            "/usr/bin/docker",
+            "run",
+            "--rm",
+            "--pull=never",
+            "--network",
+            "bridge",
+            "--read-only",
+            "--cap-drop=ALL",
+            "--security-opt=no-new-privileges:true",
+            "--pids-limit",
+            "256",
+            "--memory",
+            "6144m",
+            "--memory-swap",
+            "6144m",
+            "--cpus",
+            "2",
+            "--tmpfs",
+            "/tmp:rw,exec,nosuid,nodev,size=1024m",
+            "--mount",
+            "type=bind,src=/tmp/ligamina-s205-kfqykpqc/nonebot-autohelp,dst=/profile",
+            "--workdir",
+            "/profile",
+            "--env",
+            "HOME=/tmp/home",
+            "--env",
+            "UV_CACHE_DIR=/tmp/uv-cache",
+            "--env",
+            "npm_config_cache=/tmp/npm-cache",
+            "ligamina-s205-python-profile@sha256:fcb712608785413b1db90fd2d96031beb1e1a18588b89d6cacdde906ce42ab89",
+            "sh",
+            "-lc",
+            "mkdir -p /tmp/home && rm -rf .venv && uv sync --locked --no-dev --no-build --python 3.12.14"
+          ],
+          "returncode": 1,
+          "elapsed_seconds": 0.726,
+          "stdout_tail": "",
+          "stderr_tail": "hon3.12/site-packages/jsonschema_specifications/schemas/draft201909/vocabularies/format': Permission denied\nrm: cannot remove '.venv/lib/python3.12/site-packages/jsonschema_specifications/schemas/draft201909/vocabularies/validation': Permission denied\nrm: cannot remove '.venv/lib/python3.12/site-packages/jsonschema_specifications/schemas/draft201909/metaschema.json': Permission denied\nrm: cannot remove '.venv/lib/python3.12/site-packages/jsonschema_specifications/schemas/draft7/metaschema.json': Permission denied\nrm: cannot remove '.venv/lib/python3.12/site-packages/jsonschema_specifications/schemas/draft202012/vocabularies/unevaluated': Permission denied\nrm: cannot remove '.venv/lib/python3.12/site-packages/jsonschema_specifications/schemas/draft202012/vocabularies/applicator': Permission denied\nrm: cannot remove '.venv/lib/python3.12/site-packages/jsonschema_specifications/schemas/draft202012/vocabularies/format-assertion': Permission denied\nrm: cannot remove '.venv/lib/python3.12/site-packages/jsonschema_specifications/schemas/draft202012/vocabularies/content': Permission denied\nrm: cannot remove '.venv/lib/python3.12/site-packages/jsonschema_specifications/schemas/draft202012/vocabularies/meta-data': Permission denied\nrm: cannot remove '.venv/lib/python3.12/site-packages/jsonschema_specifications/schemas/draft202012/vocabularies/core': Permission denied\nrm: cannot remove '.venv/lib/python3.12/site-packages/jsonschema_specifications/schemas/draft202012/vocabularies/validation': Permission denied\nrm: cannot remove '.venv/lib/python3.12/site-packages/jsonschema_specifications/schemas/draft202012/vocabularies/format-annotation': Permission denied\nrm: cannot remove '.venv/lib/python3.12/site-packages/jsonschema_specifications/schemas/draft202012/metaschema.json': Permission denied\nrm: cannot remove '.venv/lib/python3.12/site-packages/jsonschema_specifications/schemas/draft4/metaschema.json': Permission denied\nrm: cannot remove '.venv/lib/python3.12/site-packages/annotated_doc-0.0.5.dist-info/REQUESTED': Permission denied\nrm: cannot remove '.venv/lib/python3.12/site-packages/annotated_doc-0.0.5.dist-info/entry_points.txt': Permission denied\nrm: cannot remove '.venv/lib/python3.12/site-packages/annotated_doc-0.0.5.dist-info/licenses/LICENSE': Permission denied\nrm: cannot remove '.venv/lib/python3.12/site-packages/annotated_doc-0.0.5.dist-info/WHEEL': Permission denied\nrm: cannot remove '.venv/lib/python3.12/site-packages/annotated_doc-0.0.5.dist-info/INSTALLER': Permission denied\nrm: cannot remove '.venv/lib/python3.12/site-packages/annotated_doc-0.0.5.dist-info/RECORD': Permission denied\nrm: cannot remove '.venv/lib/python3.12/site-packages/annotated_doc-0.0.5.dist-info/METADATA': Permission denied\nrm: cannot remove '.venv/bin/activate': Permission denied\nrm: cannot remove '.venv/bin/activate_this.py': Permission denied\nrm: cannot remove '.venv/bin/watchfiles': Permission denied\nrm: cannot remove '.venv/bin/activate.xsh': Permission denied\nrm: cannot remove '.venv/bin/idna': Permission denied\nrm: cannot remove '.venv/bin/activate.bat': Permission denied\nrm: cannot remove '.venv/bin/python3.12': Permission denied\nrm: cannot remove '.venv/bin/uvicorn': Permission denied\nrm: cannot remove '.venv/bin/dotenv': Permission denied\nrm: cannot remove '.venv/bin/deactivate.bat': Permission denied\nrm: cannot remove '.venv/bin/python': Permission denied\nrm: cannot remove '.venv/bin/python3': Permission denied\nrm: cannot remove '.venv/bin/activate.fish': Permission denied\nrm: cannot remove '.venv/bin/pydoc.bat': Permission denied\nrm: cannot remove '.venv/bin/websockets': Permission denied\nrm: cannot remove '.venv/bin/activate.csh': Permission denied\nrm: cannot remove '.venv/bin/jsonschema': Permission denied\nrm: cannot remove '.venv/bin/activate.ps1': Permission denied\nrm: cannot remove '.venv/bin/activate.nu': Permission denied\nrm: cannot remove '.venv/bin/fastapi': Permission denied\nrm: cannot remove '.venv/CACHEDIR.TAG': Permission denied\n",
+          "install_scripts": "Python build backends disabled"
+        },
+        "artifact_verification": {
+          "status": "passed",
+          "artifact_url": "https://files.pythonhosted.org/packages/fc/c0/f6e010f1d0ae8bf2e8fe067ea031b0debb3f764f5480022903f5e5179471/nonebot_plugin_autohelp-0.1.7-py3-none-any.whl",
+          "artifact_hash_algorithm": "sha256",
+          "expected_artifact_hash": "70faef1a7f05a42a448e4d886a4b4a58611d86260df7d6f6e2e2b9deb0e49472",
+          "actual_artifact_hash": "70faef1a7f05a42a448e4d886a4b4a58611d86260df7d6f6e2e2b9deb0e49472",
+          "actual_sha256": "70faef1a7f05a42a448e4d886a4b4a58611d86260df7d6f6e2e2b9deb0e49472",
+          "size_bytes": 9152,
+          "error": null
+        },
+        "profile_source_cleanup": {
+          "status": "passed",
+          "removed": [
+            ".venv"
+          ],
+          "elapsed_seconds": 0.049
+        }
+      },
+      {
+        "sample_id": "nonebot-repeater",
+        "status": "failed",
+        "stage": "linux_profile_prepare",
+        "profile": {
+          "status": "passed",
+          "steps": [
+            {
+              "label": "resolve exact Python sample profile",
+              "status": "passed",
+              "command": [
+                "/usr/local/bin/uv",
+                "lock"
+              ],
+              "returncode": 0,
+              "stdout_tail": "",
+              "stderr_tail": "Using CPython 3.12.3 interpreter at: /usr/bin/python3\nResolved 38 packages in 188ms\n"
+            },
+            {
+              "label": "install locked Python sample profile",
+              "status": "passed",
+              "command": [
+                "/usr/local/bin/uv",
+                "sync",
+                "--locked",
+                "--no-dev",
+                "--no-build",
+                "--python",
+                "3.12.14"
+              ],
+              "returncode": 0,
+              "stdout_tail": "",
+              "stderr_tail": "Downloading cpython-3.12.14-linux-x86_64-gnu (download) (32.6MiB)\n Downloaded cpython-3.12.14-linux-x86_64-gnu (download)\nUsing CPython 3.12.14\nCreating virtual environment at: .venv\nResolved 38 packages in 3ms\nInstalled 35 packages in 71ms\n + annotated-doc==0.0.5\n + annotated-types==0.8.0\n + anyio==4.15.1\n + attrs==26.1.0\n + click==8.5.0\n + exceptiongroup==1.3.1\n + fastapi==0.151.0\n + h11==0.16.0\n + httptools==0.9.0\n + idna==3.20\n + jsonschema==4.25.1\n + jsonschema-specifications==2025.9.1\n + loguru==0.7.3\n + msgpack==1.2.3\n + multidict==7.1.0\n + nonebot-adapter-onebot==2.4.6\n + nonebot-plugin-repeater==3.1.4 (from https://files.pythonhosted.org/packages/60/4c/2a9539fd7c4e78b94c20dd4aed9d2a10b6f4c44ae5be09d554279c78259c/nonebot_plugin_repeater-3.1.4-py3-none-any.whl)\n + nonebot2==2.5.0\n + opentelemetry-api==1.45.1\n + propcache==0.5.4\n + pydantic==2.14.1\n + pydantic-core==2.50.1\n + pygtrie==2.6.2\n + python-dotenv==1.2.4\n + pyyaml==6.0.3\n + referencing==0.37.0\n + rpds-py==2026.9.1\n + starlette==1.9.0\n + typing-extensions==4.16.0\n + typing-inspection==0.4.4\n + uvicorn==0.54.0\n + uvloop==0.23.0\n + watchfiles==1.3.0\n + websockets==17.3\n + yarl==1.25.1\n"
+            },
+            {
+              "label": "verify installed Python package metadata",
+              "status": "passed",
+              "command": [
+                "/tmp/ligamina-s205-kfqykpqc/nonebot-repeater/.venv/bin/python",
+                "-c",
+                "from importlib.metadata import version; import sys; print(version(sys.argv[1]))",
+                "nonebot-plugin-repeater"
+              ],
+              "returncode": 0,
+              "stdout_tail": "3.1.4\n",
+              "stderr_tail": ""
+            }
+          ],
+          "lock_sha256": "8548843ea2b745aff9de17c31775541243a01bf12f4ca67f221fcf1cbb8f7ed5"
+        },
+        "linux_profile_prepare": {
+          "status": "failed",
+          "command": [
+            "/usr/bin/docker",
+            "run",
+            "--rm",
+            "--pull=never",
+            "--network",
+            "bridge",
+            "--read-only",
+            "--cap-drop=ALL",
+            "--security-opt=no-new-privileges:true",
+            "--pids-limit",
+            "256",
+            "--memory",
+            "6144m",
+            "--memory-swap",
+            "6144m",
+            "--cpus",
+            "2",
+            "--tmpfs",
+            "/tmp:rw,exec,nosuid,nodev,size=1024m",
+            "--mount",
+            "type=bind,src=/tmp/ligamina-s205-kfqykpqc/nonebot-repeater,dst=/profile",
+            "--workdir",
+            "/profile",
+            "--env",
+            "HOME=/tmp/home",
+            "--env",
+            "UV_CACHE_DIR=/tmp/uv-cache",
+            "--env",
+            "npm_config_cache=/tmp/npm-cache",
+            "ligamina-s205-python-profile@sha256:fcb712608785413b1db90fd2d96031beb1e1a18588b89d6cacdde906ce42ab89",
+            "sh",
+            "-lc",
+            "mkdir -p /tmp/home && rm -rf .venv && uv sync --locked --no-dev --no-build --python 3.12.14"
+          ],
+          "returncode": 1,
+          "elapsed_seconds": 0.804,
+          "stdout_tail": "",
+          "stderr_tail": "hon3.12/site-packages/jsonschema_specifications/schemas/draft201909/vocabularies/format': Permission denied\nrm: cannot remove '.venv/lib/python3.12/site-packages/jsonschema_specifications/schemas/draft201909/vocabularies/validation': Permission denied\nrm: cannot remove '.venv/lib/python3.12/site-packages/jsonschema_specifications/schemas/draft201909/metaschema.json': Permission denied\nrm: cannot remove '.venv/lib/python3.12/site-packages/jsonschema_specifications/schemas/draft7/metaschema.json': Permission denied\nrm: cannot remove '.venv/lib/python3.12/site-packages/jsonschema_specifications/schemas/draft202012/vocabularies/unevaluated': Permission denied\nrm: cannot remove '.venv/lib/python3.12/site-packages/jsonschema_specifications/schemas/draft202012/vocabularies/applicator': Permission denied\nrm: cannot remove '.venv/lib/python3.12/site-packages/jsonschema_specifications/schemas/draft202012/vocabularies/format-assertion': Permission denied\nrm: cannot remove '.venv/lib/python3.12/site-packages/jsonschema_specifications/schemas/draft202012/vocabularies/content': Permission denied\nrm: cannot remove '.venv/lib/python3.12/site-packages/jsonschema_specifications/schemas/draft202012/vocabularies/meta-data': Permission denied\nrm: cannot remove '.venv/lib/python3.12/site-packages/jsonschema_specifications/schemas/draft202012/vocabularies/core': Permission denied\nrm: cannot remove '.venv/lib/python3.12/site-packages/jsonschema_specifications/schemas/draft202012/vocabularies/validation': Permission denied\nrm: cannot remove '.venv/lib/python3.12/site-packages/jsonschema_specifications/schemas/draft202012/vocabularies/format-annotation': Permission denied\nrm: cannot remove '.venv/lib/python3.12/site-packages/jsonschema_specifications/schemas/draft202012/metaschema.json': Permission denied\nrm: cannot remove '.venv/lib/python3.12/site-packages/jsonschema_specifications/schemas/draft4/metaschema.json': Permission denied\nrm: cannot remove '.venv/lib/python3.12/site-packages/annotated_doc-0.0.5.dist-info/REQUESTED': Permission denied\nrm: cannot remove '.venv/lib/python3.12/site-packages/annotated_doc-0.0.5.dist-info/entry_points.txt': Permission denied\nrm: cannot remove '.venv/lib/python3.12/site-packages/annotated_doc-0.0.5.dist-info/licenses/LICENSE': Permission denied\nrm: cannot remove '.venv/lib/python3.12/site-packages/annotated_doc-0.0.5.dist-info/WHEEL': Permission denied\nrm: cannot remove '.venv/lib/python3.12/site-packages/annotated_doc-0.0.5.dist-info/INSTALLER': Permission denied\nrm: cannot remove '.venv/lib/python3.12/site-packages/annotated_doc-0.0.5.dist-info/RECORD': Permission denied\nrm: cannot remove '.venv/lib/python3.12/site-packages/annotated_doc-0.0.5.dist-info/METADATA': Permission denied\nrm: cannot remove '.venv/bin/activate': Permission denied\nrm: cannot remove '.venv/bin/activate_this.py': Permission denied\nrm: cannot remove '.venv/bin/watchfiles': Permission denied\nrm: cannot remove '.venv/bin/activate.xsh': Permission denied\nrm: cannot remove '.venv/bin/idna': Permission denied\nrm: cannot remove '.venv/bin/activate.bat': Permission denied\nrm: cannot remove '.venv/bin/python3.12': Permission denied\nrm: cannot remove '.venv/bin/uvicorn': Permission denied\nrm: cannot remove '.venv/bin/dotenv': Permission denied\nrm: cannot remove '.venv/bin/deactivate.bat': Permission denied\nrm: cannot remove '.venv/bin/python': Permission denied\nrm: cannot remove '.venv/bin/python3': Permission denied\nrm: cannot remove '.venv/bin/activate.fish': Permission denied\nrm: cannot remove '.venv/bin/pydoc.bat': Permission denied\nrm: cannot remove '.venv/bin/websockets': Permission denied\nrm: cannot remove '.venv/bin/activate.csh': Permission denied\nrm: cannot remove '.venv/bin/jsonschema': Permission denied\nrm: cannot remove '.venv/bin/activate.ps1': Permission denied\nrm: cannot remove '.venv/bin/activate.nu': Permission denied\nrm: cannot remove '.venv/bin/fastapi': Permission denied\nrm: cannot remove '.venv/CACHEDIR.TAG': Permission denied\n",
+          "install_scripts": "Python build backends disabled"
+        },
+        "artifact_verification": {
+          "status": "passed",
+          "artifact_url": "https://files.pythonhosted.org/packages/60/4c/2a9539fd7c4e78b94c20dd4aed9d2a10b6f4c44ae5be09d554279c78259c/nonebot_plugin_repeater-3.1.4-py3-none-any.whl",
+          "artifact_hash_algorithm": "sha256",
+          "expected_artifact_hash": "fe50ad2d4bfc7f1397fcc261ca234d701c4ff02986475ffc5f29647056488d2b",
+          "actual_artifact_hash": "fe50ad2d4bfc7f1397fcc261ca234d701c4ff02986475ffc5f29647056488d2b",
+          "actual_sha256": "fe50ad2d4bfc7f1397fcc261ca234d701c4ff02986475ffc5f29647056488d2b",
+          "size_bytes": 15983,
+          "error": null
+        },
+        "profile_source_cleanup": {
+          "status": "passed",
+          "removed": [
+            ".venv"
+          ],
+          "elapsed_seconds": 0.059
+        }
+      },
+      {
+        "sample_id": "koishi-game-mini",
+        "status": "failed",
+        "stage": "linux_profile_prepare",
+        "profile": {
+          "status": "passed",
+          "steps": [
+            {
+              "label": "resolve exact Node sample profile",
+              "status": "passed",
+              "command": [
+                "/tmp/ligamina-nodeenv/bin/npm",
+                "install",
+                "--package-lock-only",
+                "--ignore-scripts",
+                "--no-audit",
+                "--fund=false"
+              ],
+              "returncode": 0,
+              "stdout_tail": "\nup to date in 18s\n",
+              "stderr_tail": ""
+            },
+            {
+              "label": "install locked Node sample profile",
+              "status": "passed",
+              "command": [
+                "/tmp/ligamina-nodeenv/bin/npm",
+                "ci",
+                "--ignore-scripts",
+                "--no-audit",
+                "--fund=false"
+              ],
+              "returncode": 0,
+              "stdout_tail": "\nadded 240 packages in 7s\n",
+              "stderr_tail": "npm warn deprecated @koa/router@10.1.1: **IMPORTANT 10x+ PERFORMANCE UPGRADE**: Please upgrade to v12.0.1+ as we have fixed an issue with debuglog causing 10x slower router benchmark performance, see https://github.com/koajs/router/pull/173\n"
+            },
+            {
+              "label": "verify installed Node package metadata",
+              "status": "passed",
+              "command": [
+                "/tmp/ligamina-nodeenv/bin/node",
+                "-e",
+                "console.log(require(\"/tmp/ligamina-s205-kfqykpqc/koishi-game-mini/node_modules/koishi-plugin-game-mini/package.json\").version)"
+              ],
+              "returncode": 0,
+              "stdout_tail": "0.4.3\n",
+              "stderr_tail": ""
+            },
+            {
+              "label": "resolve Koishi plugin entry",
+              "status": "passed",
+              "entry_url": "file:///tmp/ligamina-s205-kfqykpqc/koishi-game-mini/node_modules/koishi-plugin-game-mini/lib/index.js"
+            }
+          ],
+          "lock_sha256": "3b003b0fc673b16e684f054d581a7bc877486515be213babe2a8bc56bb47994d"
+        },
+        "linux_profile_prepare": {
+          "status": "failed",
+          "command": [
+            "/usr/bin/docker",
+            "run",
+            "--rm",
+            "--pull=never",
+            "--network",
+            "bridge",
+            "--read-only",
+            "--cap-drop=ALL",
+            "--security-opt=no-new-privileges:true",
+            "--pids-limit",
+            "256",
+            "--memory",
+            "6144m",
+            "--memory-swap",
+            "6144m",
+            "--cpus",
+            "2",
+            "--tmpfs",
+            "/tmp:rw,exec,nosuid,nodev,size=1024m",
+            "--mount",
+            "type=bind,src=/tmp/ligamina-s205-kfqykpqc/koishi-game-mini,dst=/profile",
+            "--workdir",
+            "/profile",
+            "--env",
+            "HOME=/tmp/home",
+            "--env",
+            "UV_CACHE_DIR=/tmp/uv-cache",
+            "--env",
+            "npm_config_cache=/tmp/npm-cache",
+            "node@sha256:ba849c60be29959425b8734d57b8b4b7d56f98edd9504c9af091d5281095a71e",
+            "npm",
+            "ci",
+            "--ignore-scripts",
+            "--no-audit",
+            "--fund=false"
+          ],
+          "returncode": 243,
+          "elapsed_seconds": 1.622,
+          "stdout_tail": "",
+          "stderr_tail": "npm error code EACCES\nnpm error syscall rmdir\nnpm error path /profile/node_modules/.bin\nnpm error errno -13\nnpm error [Error: EACCES: permission denied, rmdir '/profile/node_modules/.bin'] {\nnpm error   errno: -13,\nnpm error   code: 'EACCES',\nnpm error   syscall: 'rmdir',\nnpm error   path: '/profile/node_modules/.bin'\nnpm error }\nnpm error\nnpm error The operation was rejected by your operating system.\nnpm error It is likely you do not have the permissions to access this file as the current user\nnpm error\nnpm error If you believe this might be a permissions issue, please double-check the permissions of the file and its containing directories, or try running the command again as root/Administrator.\nnpm error A complete log of this run can be found in: /tmp/npm-cache/_logs/2026-10-20T11_59_39_522Z-debug-0.log\n",
+          "install_scripts": "disabled"
+        },
+        "artifact_verification": {
+          "status": "passed",
+          "artifact_url": "https://registry.npmjs.org/koishi-plugin-game-mini/-/koishi-plugin-game-mini-0.4.3.tgz",
+          "artifact_hash_algorithm": "sri-sha512",
+          "expected_artifact_hash": "sha512-kTovHhKSP9N8gvk1iVjTfA2tYZRji2roxy1vQrvhzw92xs+Y1zduOUVURVtPe18duxDShchrQyGuILJpEKooqA==",
+          "actual_artifact_hash": "sha512-kTovHhKSP9N8gvk1iVjTfA2tYZRji2roxy1vQrvhzw92xs+Y1zduOUVURVtPe18duxDShchrQyGuILJpEKooqA==",
+          "actual_sha256": "e15d698285ca47c7b1e546173510fae1bb4e865483033e6f358b7aa6ef31939e",
+          "size_bytes": 12672,
+          "error": null
+        },
+        "profile_source_cleanup": {
+          "status": "passed",
+          "removed": [
+            "node_modules"
+          ],
+          "elapsed_seconds": 0.461
+        }
+      },
+      {
+        "sample_id": "koishi-multi-qa",
+        "status": "failed",
+        "stage": "linux_profile_prepare",
+        "profile": {
+          "status": "passed",
+          "steps": [
+            {
+              "label": "resolve exact Node sample profile",
+              "status": "passed",
+              "command": [
+                "/tmp/ligamina-nodeenv/bin/npm",
+                "install",
+                "--package-lock-only",
+                "--ignore-scripts",
+                "--no-audit",
+                "--fund=false"
+              ],
+              "returncode": 0,
+              "stdout_tail": "\nup to date in 3s\n",
+              "stderr_tail": ""
+            },
+            {
+              "label": "install locked Node sample profile",
+              "status": "passed",
+              "command": [
+                "/tmp/ligamina-nodeenv/bin/npm",
+                "ci",
+                "--ignore-scripts",
+                "--no-audit",
+                "--fund=false"
+              ],
+              "returncode": 0,
+              "stdout_tail": "\nadded 240 packages in 5s\n",
+              "stderr_tail": "npm warn deprecated @koa/router@10.1.1: **IMPORTANT 10x+ PERFORMANCE UPGRADE**: Please upgrade to v12.0.1+ as we have fixed an issue with debuglog causing 10x slower router benchmark performance, see https://github.com/koajs/router/pull/173\n"
+            },
+            {
+              "label": "verify installed Node package metadata",
+              "status": "passed",
+              "command": [
+                "/tmp/ligamina-nodeenv/bin/node",
+                "-e",
+                "console.log(require(\"/tmp/ligamina-s205-kfqykpqc/koishi-multi-qa/node_modules/koishi-plugin-multi-qa/package.json\").version)"
+              ],
+              "returncode": 0,
+              "stdout_tail": "1.0.8\n",
+              "stderr_tail": ""
+            },
+            {
+              "label": "resolve Koishi plugin entry",
+              "status": "passed",
+              "entry_url": "file:///tmp/ligamina-s205-kfqykpqc/koishi-multi-qa/node_modules/koishi-plugin-multi-qa/lib/index.js"
+            }
+          ],
+          "lock_sha256": "a847cfd51a36fab33f8e9ce27ac266ec5a45cc805a32ac848fdb01ca3f7d7b41"
+        },
+        "linux_profile_prepare": {
+          "status": "failed",
+          "command": [
+            "/usr/bin/docker",
+            "run",
+            "--rm",
+            "--pull=never",
+            "--network",
+            "bridge",
+            "--read-only",
+            "--cap-drop=ALL",
+            "--security-opt=no-new-privileges:true",
+            "--pids-limit",
+            "256",
+            "--memory",
+            "6144m",
+            "--memory-swap",
+            "6144m",
+            "--cpus",
+            "2",
+            "--tmpfs",
+            "/tmp:rw,exec,nosuid,nodev,size=1024m",
+            "--mount",
+            "type=bind,src=/tmp/ligamina-s205-kfqykpqc/koishi-multi-qa,dst=/profile",
+            "--workdir",
+            "/profile",
+            "--env",
+            "HOME=/tmp/home",
+            "--env",
+            "UV_CACHE_DIR=/tmp/uv-cache",
+            "--env",
+            "npm_config_cache=/tmp/npm-cache",
+            "node@sha256:ba849c60be29959425b8734d57b8b4b7d56f98edd9504c9af091d5281095a71e",
+            "npm",
+            "ci",
+            "--ignore-scripts",
+            "--no-audit",
+            "--fund=false"
+          ],
+          "returncode": 243,
+          "elapsed_seconds": 1.615,
+          "stdout_tail": "",
+          "stderr_tail": "npm error code EACCES\nnpm error syscall rmdir\nnpm error path /profile/node_modules/.bin\nnpm error errno -13\nnpm error [Error: EACCES: permission denied, rmdir '/profile/node_modules/.bin'] {\nnpm error   errno: -13,\nnpm error   code: 'EACCES',\nnpm error   syscall: 'rmdir',\nnpm error   path: '/profile/node_modules/.bin'\nnpm error }\nnpm error\nnpm error The operation was rejected by your operating system.\nnpm error It is likely you do not have the permissions to access this file as the current user\nnpm error\nnpm error If you believe this might be a permissions issue, please double-check the permissions of the file and its containing directories, or try running the command again as root/Administrator.\nnpm error A complete log of this run can be found in: /tmp/npm-cache/_logs/2026-10-20T11_59_51_595Z-debug-0.log\n",
+          "install_scripts": "disabled"
+        },
+        "artifact_verification": {
+          "status": "passed",
+          "artifact_url": "https://registry.npmjs.org/koishi-plugin-multi-qa/-/koishi-plugin-multi-qa-1.0.8.tgz",
+          "artifact_hash_algorithm": "sri-sha512",
+          "expected_artifact_hash": "sha512-gdXhFXMUlhkwDJSFRlHDNXG/4NocLS/pYNDKSrQ3quxgwtNzQcjALMbEZrWFFOOYzu9pv8//u23t9Pt6wktLmg==",
+          "actual_artifact_hash": "sha512-gdXhFXMUlhkwDJSFRlHDNXG/4NocLS/pYNDKSrQ3quxgwtNzQcjALMbEZrWFFOOYzu9pv8//u23t9Pt6wktLmg==",
+          "actual_sha256": "8beb5b5377f09981ff437f3b1c982fc3f4591582ef966b35c027082aee5f39bb",
+          "size_bytes": 3942,
+          "error": null
+        },
+        "profile_source_cleanup": {
+          "status": "passed",
+          "removed": [
+            "node_modules"
+          ],
+          "elapsed_seconds": 0.434
+        }
+      }
+    ]
+  }
+}

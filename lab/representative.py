@@ -298,6 +298,15 @@ def isolated_environment(work: Path, cache_root: Path | None = None) -> dict[str
     return env
 
 
+def _registry_environment(environment: dict[str, str]) -> dict[str, str]:
+    """Pass host proxy settings only to trusted, scripts-disabled package resolution."""
+    result = dict(environment)
+    for key in ("HTTP_PROXY", "HTTPS_PROXY", "NO_PROXY", "http_proxy", "https_proxy", "no_proxy"):
+        if key in os.environ:
+            result[key] = os.environ[key]
+    return result
+
+
 def remove_temporary_tree(path: Path) -> dict[str, Any]:
     if not path.name.startswith("ligamina-representative-"):
         return {"status": "refused", "path": str(path), "error": "temporary directory name does not match the runner prefix"}
@@ -350,10 +359,11 @@ def install_sample(sample: dict[str, Any], work: Path, cache_root: Path | None =
             + "]\n\n[tool.uv]\npackage = false\n",
             encoding="utf-8",
         )
-        lock = command_step("resolve exact Python sample profile", [uv, "lock"], cwd=work, timeout=1200, env=environment)
+        registry_env = _registry_environment(environment)
+        lock = command_step("resolve exact Python sample profile", [uv, "lock"], cwd=work, timeout=1200, env=registry_env)
         sync = command_step(
             "install locked Python sample profile",
-            [uv, "sync", "--locked", "--no-dev", "--no-build", "--python", "3.12.14"], cwd=work, timeout=1200, env=environment,
+            [uv, "sync", "--locked", "--no-dev", "--no-build", "--python", "3.12.14"], cwd=work, timeout=1200, env=registry_env,
         ) if lock["status"] == "passed" else {"label": "install locked Python sample profile", "status": "skipped"}
         if sync["status"] == "passed":
             python_path = work / ".venv" / ("Scripts/python.exe" if os.name == "nt" else "bin/python")
@@ -387,10 +397,11 @@ def install_sample(sample: dict[str, Any], work: Path, cache_root: Path | None =
     (work / "package.json").write_text(json.dumps(package_json, indent=2) + "\n", encoding="utf-8")
     npm = shutil.which("npm.cmd" if os.name == "nt" else "npm") or ("npm.cmd" if os.name == "nt" else "npm")
     npm_prefix = [os.environ.get("COMSPEC", "cmd.exe"), "/d", "/c", npm] if os.name == "nt" else [npm]
-    lock = command_step("resolve exact Node sample profile", [*npm_prefix, "install", "--package-lock-only", "--ignore-scripts", "--no-audit", "--fund=false"], cwd=work, timeout=1200, env=environment)
+    registry_env = _registry_environment(environment)
+    lock = command_step("resolve exact Node sample profile", [*npm_prefix, "install", "--package-lock-only", "--ignore-scripts", "--no-audit", "--fund=false"], cwd=work, timeout=1200, env=registry_env)
     sync = command_step(
         "install locked Node sample profile", [*npm_prefix, "ci", "--ignore-scripts", "--no-audit", "--fund=false"],
-        cwd=work, timeout=1200, env=environment,
+        cwd=work, timeout=1200, env=registry_env,
     ) if lock["status"] == "passed" else {"label": "install locked Node sample profile", "status": "skipped"}
     if sync["status"] == "passed":
         try:

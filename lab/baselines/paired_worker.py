@@ -15,6 +15,7 @@ from typing import Any
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT))
 
+from lab.compare import compare_pair
 from lab.native_runner import run_pair
 from lab.representative import HOST_VERSIONS, isolated_environment, test_events
 
@@ -220,6 +221,18 @@ def execute_payload(project: Path, payload_path: Path, timeout_seconds: float = 
         or native_path.get("bridge_adapter_imported") is True
     ):
         raise RuntimeError("stock baseline imported the Ligamina Bridge")
+    federated_trace = report["federated"].get("federated_trace") or {}
+    route_proven = (
+        federated_trace.get("core_host_route") == "passed"
+        and federated_trace.get("host_pid_reaped") is True
+        and federated_trace.get("gateway_operation_count") == len(report["federated"].get("operations", []))
+    )
+    if report["federated"].get("status") == "completed" and not route_proven:
+        report["federated"]["status"] = "failed"
+        report["execution_integrity"] = {"status": "failed", "reason_code": "core_host_route_unproven"}
+        report["comparison"] = compare_pair(case, report["native"], report["federated"]).as_json()
+    else:
+        report["execution_integrity"] = {"status": "passed", "reason_code": None}
     report.update({
         "sample_id": payload["sample_id"],
         "package": payload["sample"]["package"],

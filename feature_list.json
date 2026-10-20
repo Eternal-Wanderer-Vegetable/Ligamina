@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "updated_at": "2026-10-20",
-  "active_feature": "feat-021",
+  "active_feature": "feat-023",
   "next_feature": "feat-022",
   "features": [
     {
@@ -1448,11 +1448,20 @@
         "feat-017",
         "feat-020"
       ],
-      "status": "in-progress",
+      "status": "done",
       "done_when": "独立可写状态与实际 Core trace；同错/错收件人/缺 expected/状态串扰负例拒绝；四个历史版本回归无新增失败。",
-      "evidence": "尚未实施；2026-10-20 仅制定工程方案，本文档不是运行时或插件验收证据。",
-      "evidence_paths": [],
-      "plan_path": "docs/plans/2026-10-20-phase-3-automation.md"
+      "evidence": "Implemented generic entry-bound Native/Federated execution with independent workspaces, oracle/binding/cleanup checks, stock-native guard, and mandatory Core/Host trace. Linux focused runner/comparator tests passed 23/23 (the Windows bootstrap static test was explicitly excluded from final verification); all four historical supported-plugin Docker regressions passed with no new failures. Catalog behavior cases remain unexecuted and P3-BEHAVIOR is not evaluated.",
+      "evidence_paths": [
+        "lab/automation/execution.py",
+        "lab/tests/test_automation_execution.py",
+        "outputs/acceptance/phase3-p307-linux-legacy-20261020.json"
+      ],
+      "plan_path": "docs/plans/2026-10-20-phase-3-automation.md",
+      "baseline": {
+        "commit": "8f5d368",
+        "command": "uv run --locked --project lab --python 3.12.14 python -m unittest lab.tests.test_native_runner lab.tests.test_compare lab.tests.test_baselines -v",
+        "result": "16 passed before P3-07 implementation on Linux; this baseline command included only one Windows-bootstrap static source test and ran no Windows environment or runtime."
+      }
     },
     {
       "id": "feat-022",
@@ -1479,7 +1488,7 @@
         "feat-017",
         "feat-021"
       ],
-      "status": "not-started",
+      "status": "in-progress",
       "done_when": "干净 checkout 自测通过；实验机不接收 fork PR 工作；同 campaign/Windows 主机不重入；失败和中断仍有完整证据链。",
       "evidence": "尚未实施；2026-10-20 仅制定工程方案，本文档不是运行时或插件验收证据。",
       "evidence_paths": [],
