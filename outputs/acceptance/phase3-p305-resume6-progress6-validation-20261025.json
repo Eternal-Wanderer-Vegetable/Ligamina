@@ -1,0 +1,325 @@
+{
+  "campaign_id": "p3-recovery-linux-842f71712e2c",
+  "captured_at_utc": "2026-10-25T11:11:45Z",
+  "checkpoint_validation": {
+    "actual_sha256": "1585a4d0f41f90e484ed1a3314935896ee227eb2371b1d5e6c786b38c235d6cb",
+    "expected_sha256": "1585a4d0f41f90e484ed1a3314935896ee227eb2371b1d5e6c786b38c235d6cb",
+    "path": "outputs/acceptance/phase3-p305-ext4-resume6-progress6-20261025.json",
+    "valid": true
+  },
+  "checks": [
+    {
+      "command": "wsl.exe -d Ubuntu-24.04 --cd /mnt/e/stella/Ligamina --exec bash init.sh docs",
+      "exit_code": 0,
+      "name": "docs",
+      "output": {
+        "documents": 19,
+        "failures": [],
+        "features": 24,
+        "indexed_historical_markdown": 11,
+        "local_links": 313,
+        "status": "passed"
+      }
+    },
+    {
+      "command": "wsl.exe -d Ubuntu-24.04 --cd /mnt/e/stella/Ligamina --exec bash -lc \"node --test scripts/evidence-hash.test.mjs\"",
+      "exit_code": 0,
+      "name": "evidence_hash_tests",
+      "output": "✔ accepts the recorded S2-07 report hash from an LF checkout (7.906798ms)\r\n✔ still rejects text changes beyond line endings (0.241411ms)\r\n✔ accepts an LF digest from a CRLF checkout (0.260927ms)\r\n✔ does not normalize invalid UTF-8 bytes (0.117365ms)\r\nℹ tests 4\r\nℹ suites 0\r\nℹ pass 4\r\nℹ fail 0\r\nℹ cancelled 0\r\nℹ skipped 0\r\nℹ todo 0\r\nℹ duration_ms 69.420029"
+    },
+    {
+      "command": "wsl.exe -d Ubuntu-24.04 --cd /mnt/e/stella/Ligamina --exec bash -lc \"node .agents/skills/harness-creator/scripts/validate-harness.mjs --target . --json\"",
+      "exit_code": 0,
+      "name": "harness",
+      "output": {
+        "bottleneck": null,
+        "overall": 100,
+        "subsystems": {
+          "instructions": {
+            "checks": [
+              {
+                "message": "Agent instruction file exists",
+                "pass": true
+              },
+              {
+                "message": "Startup workflow documented",
+                "pass": true
+              },
+              {
+                "message": "Definition of done documented",
+                "pass": true
+              },
+              {
+                "message": "Verification commands discoverable",
+                "pass": true
+              },
+              {
+                "message": "State artifacts routed from instructions",
+                "pass": true
+              }
+            ],
+            "passed": 5,
+            "score": 5,
+            "total": 5
+          },
+          "lifecycle": {
+            "checks": [
+              {
+                "message": "Startup script exists",
+                "pass": true
+              },
+              {
+                "message": "End-of-session procedure exists",
+                "pass": true
+              },
+              {
+                "message": "Session handoff template exists",
+                "pass": true
+              },
+              {
+                "message": "Session restart markers exist",
+                "pass": true
+              },
+              {
+                "message": "Clean restart path documented",
+                "pass": true
+              }
+            ],
+            "passed": 5,
+            "score": 5,
+            "total": 5
+          },
+          "scope": {
+            "checks": [
+              {
+                "message": "One-feature-at-a-time rule exists",
+                "pass": true
+              },
+              {
+                "message": "Feature dependencies are tracked",
+                "pass": true
+              },
+              {
+                "message": "Feature status is explicit",
+                "pass": true
+              },
+              {
+                "message": "Scope boundary documented",
+                "pass": true
+              },
+              {
+                "message": "Completion gate limits scope closure",
+                "pass": true
+              }
+            ],
+            "passed": 5,
+            "score": 5,
+            "total": 5
+          },
+          "state": {
+            "checks": [
+              {
+                "message": "Feature tracker exists",
+                "pass": true
+              },
+              {
+                "message": "Feature tracker is valid and has feature fields",
+                "pass": true
+              },
+              {
+                "message": "Progress log exists",
+                "pass": true
+              },
+              {
+                "message": "Progress log supports restart",
+                "pass": true
+              },
+              {
+                "message": "Handoff captures blockers/files/next step",
+                "pass": true
+              }
+            ],
+            "passed": 5,
+            "score": 5,
+            "total": 5
+          },
+          "verification": {
+            "checks": [
+              {
+                "message": "Verification entrypoint exists",
+                "pass": true
+              },
+              {
+                "message": "Verification fails fast",
+                "pass": true
+              },
+              {
+                "message": "Test command documented",
+                "pass": true
+              },
+              {
+                "message": "Static/build check documented",
+                "pass": true
+              },
+              {
+                "message": "Verification evidence is recorded",
+                "pass": true
+              }
+            ],
+            "passed": 5,
+            "score": 5,
+            "total": 5
+          }
+        }
+      }
+    },
+    {
+      "command": "uv run --locked --project lab --python 3.12.14 python -m lab.automation validate-recovery-pilot outputs/acceptance/phase3-p305-linux-affected-v3-manifest-20261025.json",
+      "exit_code": 0,
+      "name": "frozen_manifest",
+      "output": {
+        "campaign_id": "p3-recovery-linux-842f71712e2c",
+        "counts": {
+          "koishi": {
+            "affected_recovery": 1792,
+            "prior_plugin_failure_control": 0
+          },
+          "nonebot": {
+            "affected_recovery": 414,
+            "prior_plugin_failure_control": 0
+          }
+        },
+        "manifest_sha256": "961786350b7c0ebdb990650d051203ad82452fff72ac291402a7f46a517173c8",
+        "selected_units": 2206,
+        "status": "valid"
+      }
+    },
+    {
+      "command": "Read-only final report self-hash, 2,206×4 queue/report status reconciliation, queue quick_check, and frozen manifest validator",
+      "exit_code": 0,
+      "name": "final_report_queue",
+      "output": {
+        "leased": 0,
+        "manifest_canonical_sha256": "961786350b7c0ebdb990650d051203ad82452fff72ac291402a7f46a517173c8",
+        "queue_identity_sha256": "2175bce7afc141c7700b108339bc213bffe3382c2c604bd2f268ff4b8a6a68b9",
+        "queued": 0,
+        "quick_check": "ok",
+        "report_file_sha256": "8b4119e6bc56f2f26f24fc858458aa7c2491f43b0aa42fbc30bc94fe1a19c5f5",
+        "report_object_sha256": "daf67cd8bf9b779e9853073925ba7138734af70dea8894df5953de58c045bcd9",
+        "report_queue_mismatches": 0,
+        "status": "passed",
+        "units_terminal": 2206
+      }
+    },
+    {
+      "command": "wsl.exe --terminate Ubuntu-24.04 (authorized, pending user confirmation because of active pts/1 shell)",
+      "exit_code": null,
+      "name": "wsl_restart",
+      "output": {
+        "authorized_by_user": true,
+        "blocked_by_possible_user_task": {
+          "command": "-bash",
+          "impact": "Terminating Ubuntu-24.04 may close this interactive WSL shell and interrupt unsaved or running work in that session.",
+          "parent_command": "/bin/login -f",
+          "pid": 809,
+          "ppid": 740,
+          "tty": "pts/1",
+          "user": "vegetable"
+        },
+        "status": "pending_user_confirmation",
+        "target_distro": "Ubuntu-24.04"
+      }
+    },
+    {
+      "command": "git diff --check",
+      "exit_code": 0,
+      "name": "git_diff_check",
+      "output": "passed with no whitespace errors"
+    }
+  ],
+  "execution_report_validation": {
+    "actual_file_sha256": "8b4119e6bc56f2f26f24fc858458aa7c2491f43b0aa42fbc30bc94fe1a19c5f5",
+    "actual_object_sha256": "daf67cd8bf9b779e9853073925ba7138734af70dea8894df5953de58c045bcd9",
+    "campaign_id": "p3-recovery-linux-842f71712e2c",
+    "expected_file_sha256": "8b4119e6bc56f2f26f24fc858458aa7c2491f43b0aa42fbc30bc94fe1a19c5f5",
+    "expected_object_sha256": "daf67cd8bf9b779e9853073925ba7138734af70dea8894df5953de58c045bcd9",
+    "manifest_sha256": "961786350b7c0ebdb990650d051203ad82452fff72ac291402a7f46a517173c8",
+    "not_run": 0,
+    "path": "outputs/acceptance/phase3-p305-linux-affected-v3-execution-resume6-20261025.json",
+    "status": "completed",
+    "terminal_units": 2206,
+    "units": 2206,
+    "valid": true
+  },
+  "frozen_manifest_canonical_sha256": "961786350b7c0ebdb990650d051203ad82452fff72ac291402a7f46a517173c8",
+  "historical_report_validations": [
+    {
+      "actual_sha256": "4608fb7e92adb3bf62b33d5da90b782ac0d8d2f58ebcb0c7a43c3a4f5555a759",
+      "expected_sha256": "4608fb7e92adb3bf62b33d5da90b782ac0d8d2f58ebcb0c7a43c3a4f5555a759",
+      "path": "outputs/acceptance/phase3-p305-linux-affected-v3-execution-resume4-20261025.json",
+      "valid": true
+    },
+    {
+      "actual_sha256": "e4b8165c184eb1d6abe45506921e8a9ca65c2875273162cb23af035974bd09b2",
+      "expected_sha256": "e4b8165c184eb1d6abe45506921e8a9ca65c2875273162cb23af035974bd09b2",
+      "path": "outputs/acceptance/phase3-p305-linux-affected-v3-execution-resume5-20261025.json",
+      "valid": true
+    }
+  ],
+  "kind": "phase3_p305_resume6_progress6_validation",
+  "process_validation": {
+    "all_running_docker_containers": 0,
+    "campaign_controller_processes": 0,
+    "campaign_labeled_containers": 0,
+    "checked_at_utc": "2026-10-25T11:06:11Z",
+    "docker_server_version": "29.1.3",
+    "valid": true
+  },
+  "queue_validation": {
+    "filesystem": "WSL ext4",
+    "job_counts": {
+      "failed": 315,
+      "leased": 0,
+      "passed": 7830,
+      "queued": 0,
+      "skipped": 602,
+      "unknown": 77
+    },
+    "leased": 0,
+    "manifest_identity_sha256": "2175bce7afc141c7700b108339bc213bffe3382c2c604bd2f268ff4b8a6a68b9",
+    "path": "/home/vegetable/.local/share/ligamina-automation/queue/p3-recovery-linux-842f71712e2c/linux/queue.sqlite3",
+    "queued": 0,
+    "quick_check": "ok",
+    "report_stage_mismatches": 0,
+    "run_id": "p3-recovery-linux-842f71712e2c",
+    "run_state": "completed",
+    "unit_counts": {
+      "failed": 315,
+      "passed": 1299,
+      "skipped": 553,
+      "unknown": 39
+    },
+    "units_settled": 2206,
+    "units_total": 2206,
+    "valid": true
+  },
+  "report_sha256": "a43018f2ef4976d1ed9fc7e4f20297a9caad30e9a972d8f3eec0bb0d3fc44a6c",
+  "schema_version": 1,
+  "status": "pending_user_confirmation_for_wsl_restart",
+  "windows_catalog_plugins_run": false,
+  "windows_runtime_tests_run": false,
+  "wsl_restart": {
+    "authorized_by_user": true,
+    "blocked_by_possible_user_task": {
+      "command": "-bash",
+      "impact": "Terminating Ubuntu-24.04 may close this interactive WSL shell and interrupt unsaved or running work in that session.",
+      "parent_command": "/bin/login -f",
+      "pid": 809,
+      "ppid": 740,
+      "tty": "pts/1",
+      "user": "vegetable"
+    },
+    "status": "pending_user_confirmation",
+    "target_distro": "Ubuntu-24.04"
+  }
+}
