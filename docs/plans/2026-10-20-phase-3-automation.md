@@ -340,6 +340,10 @@ PR 必跑不依赖实验机的 schema/selection/queue/comparator/fixture 校验�
 
 - 2026-10-25T15:56:13Z observation；checkpoint SHA 2e0b75b96cb503308a3ec5cdfb89f2d7e66507e5526069e5582f5d3c676e417e：174/786 settled，passed=0、failed=58、skipped=114、unknown=2、cleanup confirmed=172、cleanup_unconfirmed=0、remaining=612；status in-progress、health blocked、behavior not_evaluated。checkpoint 内容稳定且 sidecar SHA 匹配；manifest canonical/file SHA、profile-lock SHA 与 admission SHA 均与冻结值匹配。controller PID 33984 仍运行；Sandbox 3cebbbdb-ba01-4a86-90eb-42b11389358c 活动，wsb.exe 子进程 PID 35496 正在采集 guest 输出，最终报告尚未生成。两个 SSL metadata worker-preparation unknown 保持未知；没有 Sandbox 权限错误，不重复派发或重跑终态。
 
+- 2026-10-25T16:01:35Z observation；checkpoint SHA 0281193a598a6403e79e0d131f84a16d87b2628019d10d2d9c7858cb6aafe097：189/786 settled，passed=0、failed=65、skipped=122、unknown=2、cleanup confirmed=187、cleanup_unconfirmed=0、remaining=597；status in-progress、health blocked、behavior not_evaluated。checkpoint 内容稳定且 sidecar SHA 匹配；manifest canonical/file SHA、profile-lock SHA 与 admission SHA 均与冻结值匹配。controller PID 33984 仍运行；Sandbox 98ff9031-8743-48f1-93bd-404588b562fd 活动，wsb.exe 子进程 PID 23172 正在采集 guest 输出，最终报告尚未生成。两个 SSL metadata worker-preparation unknown 保持未知；没有 Sandbox 权限错误，不重复派发或重跑终态。
+
+- 2026-10-25T16:02:28Z observation；checkpoint SHA cf3ef103080a84cc6849895eb568492183482a36233c7954bb32339d58d44167：192/786 settled，passed=0、failed=65、skipped=125、unknown=2、cleanup confirmed=190、cleanup_unconfirmed=0、remaining=594；status in-progress、health blocked、behavior not_evaluated。checkpoint 内容稳定且 sidecar SHA 匹配；manifest canonical/file SHA、profile-lock SHA 与 admission SHA 均与冻结值匹配。controller PID 33984 仍运行；采样时无活动 Sandbox/Worker，最终报告尚未生成。两个 SSL metadata worker-preparation unknown 保持未知；没有 Sandbox 权限错误，不重复派发或重跑终态。
+
 ### P3-05 Koishi Host-service probe 修复（2026-10-25；Linux diagnostics 完成）
 
 - 复核 frozen `koishi-plugin-auto-checkin-all@1.0.3` 发布物后发现 CommonJS 模块并列导出 `apply` 与 `inject`；probe 原来只选择 `loaded.apply`，丢弃 required-service 声明。该 loader 缺陷使 Koishi Core 把插件回调放入等待队列，而插件自身又重试查询，最终表现成 180 秒 Worker timeout。
