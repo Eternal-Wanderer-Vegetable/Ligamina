@@ -331,8 +331,8 @@ do {
     (project_dir / "pilot-probe.mjs").write_text(
         """import { spawn, spawnSync } from 'node:child_process'
 import { createHash } from 'node:crypto'
-import { readFile, writeFile } from 'node:fs/promises'
-import { join } from 'node:path'
+import { mkdir, readFile, writeFile } from 'node:fs/promises'
+import { dirname, join, resolve } from 'node:path'
 
 const specPath = process.env.LIGAMINA_SPEC ?? '/input/spec.json'
 const project = process.env.LIGAMINA_PROJECT ?? '/work/project'
@@ -352,6 +352,8 @@ const stopScratchSampler = async () => {
 const npmArgs = [...npmPrefixArgs, 'ci', '--ignore-scripts', '--offline', '--no-audit', '--no-fund', '--maxsockets=1', '--logs-max=0']
 if (npmCache) npmArgs.push('--cache', npmCache)
 const spec = JSON.parse(await readFile(specPath, 'utf8'))
+const probeSemanticsVersion = Number(spec.probe_semantics_version ?? 2)
+if (![1, 2, 3].includes(probeSemanticsVersion)) throw new Error(`Unsupported probe semantics version: ${probeSemanticsVersion}`)
 const childEnv = { ...process.env, NODE_OPTIONS: `--require=${npmDiagnostics}` }
 const npm = spawnSync(npmCommand, npmArgs, {
   cwd: project, encoding: 'utf8', timeout: spec.install_timeout_ms, env: childEnv,
@@ -365,6 +367,7 @@ const report = {
   package: spec.package,
   version: spec.version,
   profile_id: spec.profile_id,
+  probe_semantics_version: probeSemanticsVersion,
   profile_lock_sha256: spec.profile_lock_sha256,
   artifact_sha256: spec.artifact_sha256,
   dependency_install: {
@@ -408,14 +411,61 @@ try {
   const { Context, version } = await import('@koishijs/core')
   report.environment.framework_version = version
   const loaded = await import(spec.package)
-  const plugin = loaded.apply ?? loaded.default?.apply ?? loaded.default ?? loaded
+  const defaultExport = loaded.default
+  const plugin = loaded.apply ?? defaultExport?.apply ?? defaultExport ?? loaded
   if (typeof plugin !== 'function') {
     report.native_load = { status: 'skipped', reason_code: 'entry_loader_profile_unavailable', export_kind: typeof plugin }
   } else {
     app = new Context({ nickname: ['Ligamina Pilot'] })
-    app.plugin(plugin, {})
-    await app.start()
-    report.native_load = { status: 'passed', reason_code: null, entry_module_imported: true, plugin_registered: true }
+    if (probeSemanticsVersion >= 3) {
+      const declaredInject = loaded.inject ?? defaultExport?.inject ?? plugin.inject
+      if (declaredInject !== undefined && plugin.inject !== declaredInject) {
+        Object.defineProperty(plugin, 'inject', { value: declaredInject, configurable: true, writable: true })
+      }
+      const requiredServices = Array.isArray(declaredInject)
+        ? declaredInject
+        : (Array.isArray(declaredInject?.required) ? declaredInject.required : [])
+      const hostServicePlugins = Array.isArray(spec.host_service_plugins) ? spec.host_service_plugins : []
+      for (const service of hostServicePlugins) {
+        const serviceModule = await import(service.package)
+        const servicePlugin = serviceModule.default ?? serviceModule.apply ?? serviceModule
+        if (typeof servicePlugin !== 'function') throw new TypeError(`Host service provider ${service.package} does not export a Koishi plugin`)
+        const serviceConfig = { ...(service.config ?? {}) }
+        if (typeof serviceConfig.path === 'string') {
+          serviceConfig.path = resolve(project, serviceConfig.path)
+          await mkdir(dirname(serviceConfig.path), { recursive: true })
+        }
+        app.plugin(servicePlugin, serviceConfig)
+      }
+      const profileProvidedServices = new Set(hostServicePlugins.flatMap((service) => Array.isArray(service.provides) ? service.provides : []))
+      const missingServices = requiredServices.filter((name) => app.get(name) == null && !profileProvidedServices.has(name))
+      report.native_load.required_services = requiredServices
+      report.native_load.missing_services = missingServices
+      report.native_load.host_service_profile_id = spec.host_service_profile_id ?? null
+      if (missingServices.length) {
+        report.native_load = {
+          ...report.native_load,
+          status: 'skipped',
+          reason_code: 'required_host_service_unavailable',
+          entry_module_imported: true,
+          plugin_registered: false,
+        }
+      } else {
+        app.plugin(plugin, {})
+        await app.start()
+        report.native_load = {
+          ...report.native_load,
+          status: 'passed',
+          reason_code: null,
+          entry_module_imported: true,
+          plugin_registered: true,
+        }
+      }
+    } else {
+      app.plugin(plugin, {})
+      await app.start()
+      report.native_load = { status: 'passed', reason_code: null, entry_module_imported: true, plugin_registered: true }
+    }
   }
 } catch (error) {
   report.native_load = {
@@ -450,8 +500,15 @@ def run_koishi_load_probe(
     _context: _CatalogContext | None = None,
     platform: str = "linux",
     worker_labels: dict[str, Any] | None = None,
+    probe_semantics_version: int = 2,
+    host_service_plugins: list[dict[str, Any]] | None = None,
+    host_service_profile_id: str | None = None,
 ) -> dict[str, Any]:
     """Install one exact locked Koishi profile offline and load its package in Docker."""
+    if probe_semantics_version not in {1, 2, 3}:
+        raise PilotWorkerError("Koishi probe semantics version is unsupported")
+    if (host_service_plugins or host_service_profile_id) and probe_semantics_version < 3:
+        raise PilotWorkerError("Koishi host service profiles require probe semantics version 3")
     snapshot_dir = Path(snapshot_dir).resolve(strict=True)
     cache_root = Path(cache_root).resolve(strict=True)
     unit, catalog_entry, artifact, lock_ref, artifact_lock_raw, profile_lock_raw = _entry_inputs(
@@ -490,9 +547,12 @@ def run_koishi_load_probe(
             "package": package_name,
             "version": unit.get("version"),
                 "profile_id": entry_doc["profile_id"],
+            "probe_semantics_version": probe_semantics_version,
             "profile_lock_sha256": lock_ref["sha256"],
             "artifact_sha256": artifact_sha,
             "install_timeout_ms": min(timeout_seconds * 1000 - 5000, 20 * 60 * 1000),
+            **({"host_service_plugins": host_service_plugins} if host_service_plugins else {}),
+            **({"host_service_profile_id": host_service_profile_id} if host_service_profile_id else {}),
         }
         (bundle / "spec.json").write_text(json.dumps(spec, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
         _write_probe(project_dir, package_name=package_name, profile_lock_sha256=lock_ref["sha256"])

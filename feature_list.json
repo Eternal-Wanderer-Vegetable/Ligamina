@@ -1388,14 +1388,19 @@
       "dependencies": [
         "feat-016"
       ],
-      "status": "blocked",
+      "status": "done",
       "done_when": "同锁定 runtime 实际启动、隔离/限额/进程树清理全部有实机证据；身份改变独立记账；无可用组合保持 blocked。",
-      "evidence": "2026-10-25 Windows Sandbox 0.8.107.0 benign probes passed 7/7 with cleanup confirmed. The locked uv-managed CPython 3.12.14 executable was rejected while creating the restricted process by App Control Win32 4551; admission remains not_tested/windows_runtime_admission_deferred. A user-authorized host-only probe confirmed that the same locked Python 3.12.14 starts on the host, but its executable is unsigned and the probe does not establish Sandbox isolation or admission. No catalog plugin ran on Windows; P3-04 remains blocked.",
+      "evidence": "2026-10-25: Windows Sandbox CLI 0.8.107.0 admitted for exact alternate runtime profile windows-cpython-3.12.10-official-embed-amd64-psf-signed (profile SHA-256 ab84e3eb8155cfb7ba3da843e8ac4fb3a3fabe8cb5539eadfa17c004626c83bb). Official python.org embeddable archive and PSF Authenticode-signed python.exe identities are frozen in the profile report. Guest interpreter and child process started; existing Sandbox boundary suite passed 7/7 with cleanup; CPU hard cap, active process limit, and Job Object memory cap were exercised and cleanup confirmed. Original uv-managed CPython 3.12.14 remains blocked by App Control Win32 4551 and its evidence is unchanged. This admission is runtime-profile scoped; no catalog plugins ran and Windows catalog claims remain disabled until their 3.12.14 profile locks are rebound and validated.",
       "evidence_paths": [
         "outputs/acceptance/phase3-p304-windows-worker-probes-20261025.json",
         "outputs/acceptance/phase3-p304-windows-runtime-diagnostic-20261025.json",
         "outputs/acceptance/phase3-p304-windows-admission-20261025.json",
-        "outputs/acceptance/phase3-p304-windows-host-runtime-local-20261025.json"
+        "outputs/acceptance/phase3-p304-windows-host-runtime-local-20261025.json",
+        "outputs/acceptance/phase3-p304-windows-signed-python31210-probe-20261025.json",
+        "outputs/acceptance/phase3-p304-windows-signed-python31210-resource-probes-20261025.json",
+        "outputs/acceptance/phase3-p304-windows-signed-python31210-memory-probe-20261025.json",
+        "outputs/acceptance/phase3-p304-windows-admission-python31210-20261025.json",
+        "outputs/acceptance/phase3-p304-windows-signed-python314-probe-20261025.json"
       ],
       "plan_path": "docs/plans/2026-10-20-phase-3-automation.md"
     },
@@ -1409,7 +1414,7 @@
       ],
       "status": "blocked",
       "done_when": "Linux 完成 pilot 和选中集合执行/归因；Windows 仅 P3-04 通过后执行，否则明确剩余范围与 blocked gate；每 OS 独立裁决，原报告不改写。",
-      "evidence": "2026-10-25 cache audit found the resolver stored npm dist.unpackedSize as compressed tarball size_bytes. Resolver/cache inventory now separate metadata and actual archive sizes; the original artifact lock and campaigns remain unchanged. NoneBot metadata version matching now uses PEP 440 equivalence, correcting cuda-toolkit 13.0.3.0 versus PyPI metadata 13.0.3. New semantics-v2 Linux campaign p3-recovery-linux-803a2bc56205 closed 20/20 units and 60/60 stages: 9 recovered, 9 failed, 2 unknown, 0 not_run; cleanup confirmed 20/20, infrastructure_blocker=false, health=blocked. The remaining unknowns are Koishi localstorage/database host-service gaps in the pilot profile, including one worker nonzero exit without a protocol envelope and one 180-second startup timeout. Full selected Linux affected-set execution is not complete; Windows remains ineligible until P3-04. P3-05 remains blocked and plugin compatibility remains not_evaluated.",
+      "evidence": "2026-10-25 semantics-v2 Linux campaign p3-recovery-linux-803a2bc56205 remains immutable: 20/20 units, 60/60 stages, 9 recovered, 9 failed, 2 unknown, cleanup 20/20, health blocked. Source review found the Koishi probe discarded CommonJS named inject metadata when selecting apply, allowing required-service plugins to wait/retry until timeout. Semantics v3 now preserves inject, loads explicit host-service providers, and reports missing services before plugin apply. Focused frozen-artifact Docker diagnostics completed with cleanup confirmed: auto-checkin under LF-locked SQLite 4.7.0 Host profile SHA-256 4f76f59594b1fab0f255b116a986e186ed30e5b101a682b22b7bce388f257482 skipped for missing cron; smmcat under its frozen Native Pilot profile skipped for missing localstorage and puppeteer. Neither plugin callback ran; these are host-service attribution results, not compatibility passes. The full 20-unit v3 pilot and selected Linux affected-set campaign still require immutable per-entry Host provider locks; P3-05 remains blocked and compatibility remains not_evaluated.",
       "evidence_paths": [
         "outputs/acceptance/phase3-p305-linux-cache-audit-20261025.json",
         "outputs/acceptance/phase3-p305-linux-admission-final-20261025.json",
@@ -1420,7 +1425,21 @@
         "lab/automation/recovery.py",
         "lab/tests/test_artifacts.py",
         "lab/tests/test_pilot_nonebot.py",
-        "lab/tests/test_automation_recovery.py"
+        "lab/tests/test_automation_recovery.py",
+        "outputs/acceptance/phase3-p305-host-service-autocheckin-v3-diagnostic-attempt2-20261025.json",
+        "outputs/acceptance/phase3-p305-host-service-smmcat-v3-diagnostic-20261025.json",
+        "outputs/acceptance/phase3-p305-host-service-autocheckin-diagnostic-20261025.json",
+        "outputs/acceptance/phase3-p305-host-service-autocheckin-diagnostic-attempt2-20261025.json",
+        "outputs/acceptance/phase3-p305-koishi-host-profile-auto-checkin-20261025/package.json",
+        "outputs/acceptance/phase3-p305-koishi-host-profile-auto-checkin-20261025/package-lock.json",
+        "lab/pilot_workers.py",
+        "lab/tests/test_pilot_workers.py",
+        "outputs/acceptance/phase3-p305-v3-focused-verification-20261025.json",
+        "outputs/acceptance/phase3-p305-v3-focused-tests-windows-20261025.log",
+        "outputs/acceptance/phase3-p305-v3-focused-tests-linux-20261025.log",
+        "outputs/acceptance/phase3-docs-check-p305-v3-20261025.json",
+        "outputs/acceptance/phase3-docs-check-p305-v3-20261025.log",
+        "outputs/acceptance/phase3-p305-host-service-autocheckin-v3-diagnostic-attempt3-20261025.json"
       ],
       "plan_path": "docs/plans/2026-10-20-phase-3-automation.md",
       "baseline": {
@@ -1487,9 +1506,9 @@
       ],
       "status": "not-started",
       "done_when": "至少 120 必选位置完成双路径执行或依赖归因、三次干净复跑记账与完整 trace/清理证据；兼容 gate 按实测独立裁决，确定插件不兼容可交付检测任务但不扩张支持；缺 OS 准入、漏账或清理未知仍为验收缺项。",
-      "evidence": "Not started. Latest dependency check: P3-04 remains blocked by Windows App Control Win32 4551 for the locked runtime. P3-05 now has a complete 20-unit Linux pilot, but the pilot health gate is blocked by two Koishi host-service unknowns and the full selected affected Linux set has not run. The 120-position behavior pilot and three clean reruns remain ineligible; behavior compatibility is not_evaluated.",
+      "evidence": "Not started. P3-04 is now admitted only for the separately frozen PSF-signed CPython 3.12.10 Worker profile; Windows catalog plugin claims still require profile-lock rebinding. P3-05 Linux remains blocked by two Koishi host-service unknowns and the full selected affected set has not run. The 120-position behavior pilot and three clean reruns remain ineligible; behavior compatibility is not_evaluated.",
       "evidence_paths": [
-        "outputs/acceptance/phase3-p304-windows-admission-20261025.json",
+        "outputs/acceptance/phase3-p304-windows-admission-python31210-20261025.json",
         "outputs/acceptance/phase3-p305-linux-pilot-final2-execution-20261025.json"
       ],
       "plan_path": "docs/plans/2026-10-20-phase-3-automation.md"
@@ -1540,10 +1559,10 @@
       ],
       "status": "not-started",
       "done_when": "分母独立复算、哈希/身份/引用校验、五 gate 分开且无越界支持声明；依赖验收完成，README 与交接可复跑。",
-      "evidence": "Not started. P3-05 full selected-set recovery remains blocked and P3-08 has not started because P3-04/P3-05 dependencies are unmet. No aggregate cross-gate report or final acceptance has been produced; behavior remains not_evaluated and real-platform acceptance remains outstanding.",
+      "evidence": "Not started. P3-05 full selected-set recovery remains blocked by two Koishi host-service unknowns. P3-04 Worker admission is scoped to a separately frozen PSF-signed CPython 3.12.10 profile; no Windows catalog plugins were run and their profile locks need rebinding. No aggregate cross-gate report or final acceptance has been produced; behavior remains not_evaluated and real-platform acceptance remains outstanding.",
       "evidence_paths": [
         "outputs/acceptance/phase3-p305-linux-pilot-final2-execution-20261025.json",
-        "outputs/acceptance/phase3-p304-windows-admission-20261025.json"
+        "outputs/acceptance/phase3-p304-windows-admission-python31210-20261025.json"
       ],
       "plan_path": "docs/plans/2026-10-20-phase-3-automation.md"
     }

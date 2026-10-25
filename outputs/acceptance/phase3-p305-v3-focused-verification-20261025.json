@@ -1,0 +1,51 @@
+{
+  "schema_version": 1,
+  "kind": "phase3-p305-semantics-v3-focused-verification",
+  "status": "passed",
+  "checks": [
+    {
+      "platform": "windows",
+      "python": "C:\\Python314\\python.exe (3.14.7)",
+      "command": "C:\\Python314\\python.exe -m unittest lab.tests.test_pilot_workers lab.tests.test_automation_recovery -v",
+      "status": "passed",
+      "tests": 18,
+      "skipped": 0,
+      "log": "outputs/acceptance/phase3-p305-v3-focused-tests-windows-20261025.log",
+      "log_sha256": "429d5dcbc126176a71eac27ecc792bc0cc69bcf14c1d6a5feb999b2cd2c152c0"
+    },
+    {
+      "platform": "linux-wsl",
+      "python": "uv locked project CPython 3.12.14",
+      "command": "wsl.exe --distribution Ubuntu-24.04 --cd /mnt/e/stella/Ligamina -- uv run --locked --project lab --python 3.12.14 python -m unittest lab.tests.test_pilot_workers lab.tests.test_automation_recovery -v",
+      "status": "passed",
+      "tests": 18,
+      "skipped": 2,
+      "log": "outputs/acceptance/phase3-p305-v3-focused-tests-linux-20261025.log",
+      "log_sha256": "732e0e0fbe8952cc8ddacf0051c7bf59ae458777cd101805c3178d355bfcfe61"
+    }
+  ],
+  "focused_diagnostics": [
+    {
+      "path": "outputs/acceptance/phase3-p305-host-service-autocheckin-v3-diagnostic-attempt3-20261025.json",
+      "sha256": "273137a5a51d57c0793a27c777dfc776b504cc1458aca1f4020dfffa178fdee0",
+      "worker_cleanup_confirmed": true,
+      "native_load": "skipped",
+      "reason_code": "required_host_service_unavailable",
+      "missing_services": [
+        "cron"
+      ]
+    },
+    {
+      "path": "outputs/acceptance/phase3-p305-host-service-smmcat-v3-diagnostic-20261025.json",
+      "sha256": "e1f7c938118a905eb189578ad49d696c73338344a0bf8d7cdbdf717af2465b2e",
+      "worker_cleanup_confirmed": true,
+      "native_load": "skipped",
+      "reason_code": "required_host_service_unavailable",
+      "missing_services": [
+        "localstorage",
+        "puppeteer"
+      ]
+    }
+  ],
+  "scope": "No plugin callback was executed; no full v3 pilot or behavior compatibility claim."
+}

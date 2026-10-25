@@ -1,0 +1,62 @@
+{
+  "schema_version": 1,
+  "kind": "phase3_windows_signed_runtime_resource_probes",
+  "date": "2026-10-25",
+  "runtime_profile_id": "python-3.12.10-official-embed-amd64-psf-signed",
+  "runtime_executable_sha256": "4d6f5f81a4bca11191c4c7c6b43632694d0a4ce74e068619d8fdc161d469859a",
+  "source": "https://www.python.org/ftp/python/3.12.10/python-3.12.10-embed-amd64.zip",
+  "results": [
+    {
+      "name": "cpu-hard-cap",
+      "limits": {
+        "cpu_cores": 0.25,
+        "memory_mb": 1024,
+        "process_limit": 16,
+        "timeout_seconds": 45
+      },
+      "status": "passed",
+      "reason_code": null,
+      "exit_code": 0,
+      "elapsed_seconds": 24.064,
+      "peak_memory_bytes": 7311360,
+      "stdout": "{\"logical_cpus\": 16, \"elapsed_seconds\": 12.214345999999995, \"process_cpu_seconds\": 2.96875, \"cpu_fraction\": 0.24305435591885158, \"iterations\": 1625383777}",
+      "stderr": "",
+      "cleanup_confirmed": true,
+      "measurement": {
+        "logical_cpus": 16,
+        "elapsed_seconds": 12.214345999999995,
+        "process_cpu_seconds": 2.96875,
+        "cpu_fraction": 0.24305435591885158,
+        "iterations": 1625383777
+      },
+      "acceptance_threshold_cpu_fraction": 0.4,
+      "limit_enforced": true,
+      "worker_id": "wsb-ba6c9add23b64ca8"
+    },
+    {
+      "name": "active-process-cap",
+      "limits": {
+        "cpu_cores": 1,
+        "memory_mb": 512,
+        "process_limit": 4,
+        "timeout_seconds": 45
+      },
+      "status": "passed",
+      "reason_code": null,
+      "exit_code": 0,
+      "elapsed_seconds": 12.399,
+      "peak_memory_bytes": 12038144,
+      "stdout": "{\"children_started\": 3, \"creation_blocked\": true, \"error\": \"OSError(12, '\\u914d\\u989d\\u4e0d\\u8db3\\uff0c\\u65e0\\u6cd5\\u5904\\u7406\\u6b64\\u547d\\u4ee4\\u3002', None, 1816, None)\"}",
+      "stderr": "",
+      "cleanup_confirmed": true,
+      "measurement": {
+        "children_started": 3,
+        "creation_blocked": true,
+        "error": "OSError(12, '配额不足，无法处理此命令。', None, 1816, None)"
+      },
+      "limit_enforced": true,
+      "worker_id": "wsb-6caffb280a1d4e0d"
+    }
+  ],
+  "passed": true
+}

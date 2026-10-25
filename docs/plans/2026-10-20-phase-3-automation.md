@@ -1,6 +1,6 @@
 # 第三阶段：可靠自动化检测与行为验证
 
-日期：2026-10-20（Asia/Shanghai）。状态：分阶段实施中；P3-01、P3-02 Linux、P3-03 Linux、P3-06 已交付，P3-04 Windows 按用户的 Linux-first 指示暂缓。代码基线：`a311ac8`，S2-12 历史裁决保持不变。
+日期：2026-10-20（Asia/Shanghai）。状态：分阶段实施中；P3-01、P3-02 Linux、P3-03 Linux、P3-04 Windows（仅 PSF 签名 CPython 3.12.10 profile）、P3-06 已交付。原 uv 管理 CPython 3.12.14 profile 仍被 Windows App Control 阻止；目录插件 Windows claims 尚未开放。代码基线：`a311ac8`，S2-12 历史裁决保持不变。
 
 ## 目标与边界
 
@@ -281,3 +281,19 @@ PR 必跑不依赖实验机的 schema/selection/queue/comparator/fixture 校验�
 - 从提交 `df0705e` 导出的干净 checkout 运行 `PATH=<locked-node>:$PATH GITHUB_RUN_ID=p309-clean-20261020 bash scripts/phase3-linux-self-test.sh`：Node 检查 8/8、Linux 自动化回归 54/54、文档检查 19 documents / 278 links、suite validator 20 entries / 60 cases / 40 platform positions / 4 legacy regressions；总状态 passed，`windows_tests_run=false`、`plugin_execution=false`。报告及对应日志：[self-test report](../../outputs/acceptance/phase3-p309-linux-self-test-clean-checkout-20261020.json)、[self-test log](../../outputs/acceptance/phase3-p309-linux-self-test-clean-checkout-20261020.log)，报告含匹配日志 SHA-256。
 - 两个 workflow 均通过 PyYAML YAML 解析、`bash -n` 和 `scripts/phase3-workflows.test.mjs` 的权限/触发器/fork 隔离/失败证据静态合同。Windows runtime、WSL/Windows tests 未运行；此前误运行的只读 bootstrap 静态测试已在 P3-07 验证中明确排除。
 - P3-09 工程交付完成。后续 P3-08 仍因 P3-04 Windows 准入及 P3-05 冻结缓存缺失而未满足依赖；P3-10 也不可开始。不能据此将 P3-BEHAVIOR 或其他 gate 判为通过。
+
+### P3-04 Windows 实机准入（2026-10-25；替代 runtime profile）
+
+- 分享记录中的 Codex shell sandbox 设置不会改变项目 Worker 的 Windows Sandbox CLI 路径。复核本机 runtime 后发现 uv 管理的 CPython 3.12.14 `python.exe` 未签名，guest restricted-process create 返回 App Control Win32 4551；同机另有由 Python Software Foundation 签名的解释器。
+- 冻结独立 profile `windows-cpython-3.12.10-official-embed-amd64-psf-signed`：官方 [Python 3.12.10 Windows embeddable package](https://www.python.org/downloads/release/python-31210/) 归档 SHA-256 `4acbed6dd1c744b0376e3b1cf57ce906f9dc9e95e68824584c8099a63025a3c3`，`python.exe` SHA-256 `4d6f5f81a4bca11191c4c7c6b43632694d0a4ce74e068619d8fdc161d469859a`，Authenticode `Valid`，签发者 Python Software Foundation。该 profile SHA-256 `ab84e3eb8155cfb7ba3da843e8ac4fb3a3fabe8cb5539eadfa17c004626c83bb`。
+- 该 runtime 在实际 Windows Sandbox 内以隔离低权限进程启动，标准库与子解释器均成功；Worker cleanup confirmed。既有 Windows Sandbox 边界套件 7/7 预期通过、清理确认。额外限额探针实测 CPU hard cap（请求 0.25 core，进程 CPU/wall 比 0.243）、active process 上限 4（Python 加 3 个子进程后第 4 个子进程创建被拒）、Job Object memory limit 256 MiB（Sandbox VM 2,048 MiB，以分离测量；峰值 Job commit 276,340,736 bytes 后 Python 收到 `MemoryError`），清理均确认。综合 admission 报告：[CPython 3.12.10 Windows admission](../../outputs/acceptance/phase3-p304-windows-admission-python31210-20261025.json)。
+- P3-04 对上述精确 runtime/Worker policy profile 为 admitted；原 uv CPython 3.12.14 报告及 4551 仍保持 blocked，不回写或混算。没有运行目录插件；冻结的 Windows catalog profiles 仍绑定 3.12.14，因此 `catalog_plugin_claims_allowed=false`，后续 Windows campaign 必须先生成并验证新 profile/lock 身份。P3-05 Linux 的 Koishi host-service gaps 及完整受影响集合仍阻止 P3-08/P3-10。
+
+### P3-05 Koishi Host-service probe 修复（2026-10-25；focused diagnostics 完成，pilot 仍 blocked）
+
+- 复核 frozen `koishi-plugin-auto-checkin-all@1.0.3` 发布物后发现 CommonJS 模块并列导出 `apply` 与 `inject`；probe 原来只选择 `loaded.apply`，丢弃 required-service 声明。该 loader 缺陷使 Koishi Core 把插件回调放入等待队列，而插件自身又重试查询，最终表现成 180 秒 Worker timeout。
+- 新增 semantics v3 分支：保留并绑定模块的 `inject` 元数据；按 probe spec 中的 Host provider 清单装载已锁定 provider，读取 required services，并在任何目标插件回调前分类缺失服务。缺失项输出结构化 `skipped / required_host_service_unavailable`，不再进入插件重试。v1/v2 probe 及原 campaign 身份保持不变；semantics 3 也进入新 campaign identity。
+- 真实 Linux Docker focused diagnostic 使用 frozen `auto-checkin-all@1.0.3` artifact、combined profile 锁定的 `@minatojs/driver-sqlite@4.7.0`、生产 Host `HostLifecycle` / package-lock identities。最终 LF-byte-locked profile SHA-256 `4f76f59594b1fab0f255b116a986e186ed30e5b101a682b22b7bce388f257482`；Worker 15.784 秒完成，protocol 有效，cleanup confirmed；required services 为 `database`,`cron`，当前 Host profile 提供 database，未提供 cron，因此 native load 明确 skipped，目标插件回调未执行。报告 [auto-checkin v3 diagnostic](../../outputs/acceptance/phase3-p305-host-service-autocheckin-v3-diagnostic-attempt3-20261025.json)，combined [host package-lock](../../outputs/acceptance/phase3-p305-koishi-host-profile-auto-checkin-20261025/package-lock.json)。
+- 真实 Linux Docker focused diagnostic 对 frozen `koishi-plugin-smmcat-economy@0.1.7` artifact/profile 完成离线安装；Worker 9.591 秒完成并确认 cleanup。required services `localstorage`,`puppeteer` 均未由该 Native Pilot profile 提供，probe 输出结构化 skipped，未调用插件回调。报告：[smmcat v3 diagnostic](../../outputs/acceptance/phase3-p305-host-service-smmcat-v3-diagnostic-20261025.json)。这不是插件兼容性结论；puppeteer browser provider 仍需单独冻结与评估。
+- 验证：Windows 本机 CPython 3.14.7 + Node 的 `lab.tests.test_pilot_workers` 与 `lab.tests.test_automation_recovery` 共 18/18 passed；WSL Linux CPython 3.12.14 对应 suites 为 18 tests、16 passed、2 Node-only skipped，Windows 已将两个 Node 用例实跑 2/2 passed。命令与日志哈希见 [focused verification](../../outputs/acceptance/phase3-p305-v3-focused-verification-20261025.json)。`pwsh -NoProfile -File init.ps1 -Mode docs` 已通过 19 documents / 305 local links；最终日志摘要见 [docs check](../../outputs/acceptance/phase3-docs-check-p305-v3-20261025.json)。`git diff --check` 通过。
+> - 这只修复探针归因并关闭两个旧 unknown 的技术成因诊断；原 semantics-v2 campaign 保持 2 个 unknown 不变。尚未冻结全部 20 个 pilot entries 的 Host providers/dependency locks，没有重跑新 20-unit campaign 或完整受影响 Linux 集合。因此 P3-05 仍 blocked，P3-08/P3-10 不得开始，行为兼容仍 `not_evaluated`。

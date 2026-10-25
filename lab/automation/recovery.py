@@ -130,7 +130,7 @@ def build_linux_pilot_manifest(
         raise RecoveryPilotError("recovery manifest and catalog snapshot differ")
     if worker_timeout_seconds < 30 or worker_timeout_seconds > 1200:
         raise RecoveryPilotError("pilot worker timeout must be between 30 and 1200 seconds")
-    if probe_semantics_version not in {1, 2}:
+    if probe_semantics_version not in {1, 2, 3}:
         raise RecoveryPilotError("pilot probe semantics version is unsupported")
     units_by_entry = {item["registry_entry_id"]: item for item in all_units}
     selected_source = [
@@ -254,7 +254,7 @@ def validate_linux_pilot_manifest(manifest: dict[str, Any]) -> dict[str, Any]:
     rows = manifest.get("selection")
     if not isinstance(rows, list) or manifest.get("expected_units") != len(rows):
         raise RecoveryPilotError("pilot selection denominator mismatch")
-    if manifest.get("probe_semantics_version", 1) not in {1, 2}:
+    if manifest.get("probe_semantics_version", 1) not in {1, 2, 3}:
         raise RecoveryPilotError("pilot probe semantics version is unsupported")
     worker_images = manifest.get("worker_images", {})
     if any(not isinstance(worker_images.get(ecosystem), str) or "@sha256:" not in worker_images[ecosystem] for ecosystem in ("nonebot", "koishi")):
@@ -638,7 +638,11 @@ def execute_linux_recovery_pilot(
             if unit["ecosystem"] == "nonebot":
                 probe = run_nonebot_load_probe(snapshot_dir, entry_id, cache_root=cache_root, timeout_seconds=timeout_seconds, context=nonebot_context, worker_labels=labels, image_digest=manifest["worker_images"]["nonebot"])
             else:
-                probe = run_koishi_load_probe(snapshot_dir, entry_id, cache_root=cache_root, timeout_seconds=timeout_seconds, _context=koishi_context, worker_labels=labels, image_digest=manifest["worker_images"]["koishi"])
+                probe = run_koishi_load_probe(
+                    snapshot_dir, entry_id, cache_root=cache_root, timeout_seconds=timeout_seconds,
+                    _context=koishi_context, worker_labels=labels, image_digest=manifest["worker_images"]["koishi"],
+                    probe_semantics_version=manifest.get("probe_semantics_version", 2),
+                )
             probes[entry_id] = probe
             worker = probe.get("worker", {})
             worker = worker if isinstance(worker, dict) else {}

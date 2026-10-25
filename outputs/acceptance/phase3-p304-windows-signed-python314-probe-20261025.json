@@ -1,0 +1,29 @@
+{
+  "schema_version": 1,
+  "kind": "phase3_windows_signed_runtime_probe",
+  "date": "2026-10-25",
+  "host_runtime": {
+    "identity": "3.14.7 (tags/v3.14.7:823f032, Aug  5 2026, 10:51:32) [MSC v.1944 64 bit (AMD64)]",
+    "source": "C:\\Python314",
+    "executable_sha256": "4942b86a6597e5aee0128daa00050ed79bc21f6e709a78eb19cbfeb0c2f39ac9",
+    "signature_status": "Valid",
+    "signer": "Python Software Foundation"
+  },
+  "guest_command": [
+    "C:\\Ligamina\\Input\\Python314\\python.exe",
+    "-I",
+    "-c",
+    "import json,pathlib,subprocess,sys; child=subprocess.run([sys.executable,'-I','-c','import sys; print(sys.version_info.major,sys.version_info.minor,sys.version_info.micro)'],capture_output=True,text=True,check=True); print(json.dumps({'version':sys.version,'executable':sys.executable,'prefix':sys.prefix,'stdlib':str(pathlib.Path(sys.prefix)/'Lib'),'child':child.stdout.strip()}))"
+  ],
+  "guest_result": {
+    "status": "passed",
+    "reason_code": null,
+    "exit_code": 0,
+    "stdout": "{\"version\": \"3.14.7 (tags/v3.14.7:823f032, Aug  5 2026, 10:51:32) [MSC v.1944 64 bit (AMD64)]\", \"executable\": \"C:\\\\Ligamina\\\\Input\\\\Python314\\\\python.exe\", \"prefix\": \"C:\\\\Ligamina\\\\Input\\\\Python314\", \"stdlib\": \"C:\\\\Ligamina\\\\Input\\\\Python314\\\\Lib\", \"child\": \"3 14 7\"}\r\n",
+    "stderr": "",
+    "cleanup_confirmed": true,
+    "worker_id": "wsb-330503303e2147dd",
+    "elapsed_seconds": 79.587
+  },
+  "passed": true
+}

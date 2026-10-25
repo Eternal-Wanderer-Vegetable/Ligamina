@@ -1,0 +1,88 @@
+{
+  "schema_version": 1,
+  "kind": "phase3_worker_admission",
+  "task_id": "P3-04",
+  "date": "2026-10-25",
+  "platform": "windows",
+  "status": "admitted",
+  "execution_scope": "worker_runtime_profile_only_no_catalog_plugins",
+  "host": {
+    "platform": "Windows 11 build 26200",
+    "windows_sandbox_cli": "0.8.107.0"
+  },
+  "runtime_profile": {
+    "profile_id": "windows-cpython-3.12.10-official-embed-amd64-psf-signed",
+    "version": "3.12.10",
+    "architecture": "win_amd64",
+    "distribution": "python.org embeddable package",
+    "archive_url": "https://www.python.org/ftp/python/3.12.10/python-3.12.10-embed-amd64.zip",
+    "archive_sha256": "4acbed6dd1c744b0376e3b1cf57ce906f9dc9e95e68824584c8099a63025a3c3",
+    "executable_sha256": "4d6f5f81a4bca11191c4c7c6b43632694d0a4ce74e068619d8fdc161d469859a",
+    "authenticode_status": "Valid",
+    "signer": "Python Software Foundation",
+    "profile_sha256": "ab84e3eb8155cfb7ba3da843e8ac4fb3a3fabe8cb5539eadfa17c004626c83bb"
+  },
+  "capabilities": {
+    "restricted_runtime_start": true,
+    "network_isolation": true,
+    "filesystem_boundary": true,
+    "cpu_hard_cap": true,
+    "active_process_limit": true,
+    "job_memory_limit": true,
+    "process_tree_cleanup": true,
+    "cleanup_confirmed": true,
+    "claim_allowed_for_profile": true,
+    "catalog_plugin_claims_allowed": false
+  },
+  "probe_summary": {
+    "benign_worker_probes": "7/7 passed with cleanup confirmed",
+    "runtime_start": "passed",
+    "runtime_child_process": "passed",
+    "cpu_cap_requested_cores": 0.25,
+    "cpu_cap_observed_process_fraction": 0.24305435591885158,
+    "active_process_limit": {
+      "configured": 4,
+      "children_created": 3,
+      "next_creation_blocked": true
+    },
+    "job_memory_limit": {
+      "configured_mib": 256,
+      "sandbox_vm_memory_mib": 2048,
+      "allocation_stopped_at_peak_job_commit_bytes": 276340736,
+      "cleanup_confirmed": true
+    }
+  },
+  "evidence": [
+    {
+      "name": "windows_worker_benign_suite",
+      "path": "outputs/acceptance/phase3-p304-windows-worker-probes-20261025.json",
+      "sha256": "e7db7cf0ed2da1e8d24ae8821f6adfe14e9464eccf7520b8cb03a94f376c2188"
+    },
+    {
+      "name": "signed_python31210_guest_runtime",
+      "path": "outputs/acceptance/phase3-p304-windows-signed-python31210-probe-20261025.json",
+      "sha256": "30f18995b6f17675a01671dade114466e9e7e1199e4c1c791180cddf9a2e39be"
+    },
+    {
+      "name": "signed_python31210_cpu_and_process_limits",
+      "path": "outputs/acceptance/phase3-p304-windows-signed-python31210-resource-probes-20261025.json",
+      "sha256": "c15791bfec6849dfccc15bf8a185a30afa014cbcb3b9ffee7d3d06c477717434"
+    },
+    {
+      "name": "signed_python31210_job_memory_limit",
+      "path": "outputs/acceptance/phase3-p304-windows-signed-python31210-memory-probe-20261025.json",
+      "sha256": "c6065515cf31e39fbfb51f505da8249e61ad75dfa2296b3fd5c70b75046da493"
+    }
+  ],
+  "legacy_runtime": {
+    "profile_id": "uv-managed-cpython-3.12.14-windows-x86_64",
+    "status": "blocked",
+    "win32_error": 4551,
+    "reason": "unsigned uv-managed python.exe is blocked by App Control; this identity is not replaced or reclassified"
+  },
+  "limitations": [
+    "This admission applies only to the exact signed Python 3.12.10 runtime profile and current Windows Sandbox worker policy.",
+    "No catalog plugin was run. Existing Windows catalog profile locks name CPython 3.12.14, so plugin claims remain disabled until a new Windows profile identity is frozen and validated.",
+    "The memory-limit probe raised only the Sandbox VM memory to 2048 MiB while retaining the Worker Job Object limit at 256 MiB, to measure the Job Object ceiling independently."
+  ]
+}

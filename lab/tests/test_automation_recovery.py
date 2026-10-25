@@ -45,6 +45,10 @@ class RecoveryPilotManifestTests(unittest.TestCase):
             build_linux_pilot_manifest(source, probe_semantics_version=1)["campaign_id"],
             build_linux_pilot_manifest(source, probe_semantics_version=2)["campaign_id"],
         )
+        self.assertNotEqual(
+            build_linux_pilot_manifest(source, probe_semantics_version=2)["campaign_id"],
+            build_linux_pilot_manifest(source, probe_semantics_version=3)["campaign_id"],
+        )
 
     def test_manifest_rejects_tampered_identity_and_rebalanced_denominator(self) -> None:
         manifest = build_linux_pilot_manifest(ROOT / "outputs/acceptance/phase3-p301-recovery-manifest-20261020.json")
