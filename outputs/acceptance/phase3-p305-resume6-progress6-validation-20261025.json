@@ -1,6 +1,6 @@
 {
   "campaign_id": "p3-recovery-linux-842f71712e2c",
-  "captured_at_utc": "2026-10-25T11:11:45Z",
+  "captured_at_utc": "2026-10-25T11:15:36Z",
   "checkpoint_validation": {
     "actual_sha256": "1585a4d0f41f90e484ed1a3314935896ee227eb2371b1d5e6c786b38c235d6cb",
     "expected_sha256": "1585a4d0f41f90e484ed1a3314935896ee227eb2371b1d5e6c786b38c235d6cb",
@@ -212,22 +212,24 @@
       }
     },
     {
-      "command": "wsl.exe --terminate Ubuntu-24.04 (authorized, pending user confirmation because of active pts/1 shell)",
-      "exit_code": null,
+      "command": "wsl.exe --terminate Ubuntu-24.04; relaunch distro and verify controller/container status",
+      "exit_code": 0,
       "name": "wsl_restart",
       "output": {
         "authorized_by_user": true,
-        "blocked_by_possible_user_task": {
-          "command": "-bash",
-          "impact": "Terminating Ubuntu-24.04 may close this interactive WSL shell and interrupt unsaved or running work in that session.",
-          "parent_command": "/bin/login -f",
-          "pid": 809,
-          "ppid": 740,
-          "tty": "pts/1",
-          "user": "vegetable"
-        },
-        "status": "pending_user_confirmation",
-        "target_distro": "Ubuntu-24.04"
+        "boot_id_after": "6ac4ddbb-42c1-4411-9e18-c53e45703dd6",
+        "boot_id_before": "6ac4ddbb-42c1-4411-9e18-c53e45703dd6",
+        "boot_id_changed": false,
+        "campaign_controller_processes_after_relaunch": 0,
+        "campaign_labeled_containers_after_relaunch": 0,
+        "checked_at_utc": "2026-10-25T11:14:08Z",
+        "docker_server_version_after_relaunch": "29.1.3",
+        "notes": "Ubuntu-24.04 was terminated and relaunched after the user confirmed the pts/1 shell was closed. The running-distro list was empty after termination. The WSL kernel boot ID stayed the same across the distro restart; no kernel reboot is claimed.",
+        "relaunch_exit_code": 0,
+        "running_distros_after_terminate": [],
+        "status": "completed",
+        "target_distro": "Ubuntu-24.04",
+        "terminate_exit_code": 0
       }
     },
     {
@@ -271,7 +273,7 @@
     "all_running_docker_containers": 0,
     "campaign_controller_processes": 0,
     "campaign_labeled_containers": 0,
-    "checked_at_utc": "2026-10-25T11:06:11Z",
+    "checked_at_utc": "2026-10-25T11:14:08Z",
     "docker_server_version": "29.1.3",
     "valid": true
   },
@@ -303,23 +305,25 @@
     "units_total": 2206,
     "valid": true
   },
-  "report_sha256": "a43018f2ef4976d1ed9fc7e4f20297a9caad30e9a972d8f3eec0bb0d3fc44a6c",
+  "report_sha256": "3e33649833cc579840ba09e46466383e3673787d26cb9438f718d722ae49bb8e",
   "schema_version": 1,
-  "status": "pending_user_confirmation_for_wsl_restart",
+  "status": "passed",
   "windows_catalog_plugins_run": false,
   "windows_runtime_tests_run": false,
   "wsl_restart": {
     "authorized_by_user": true,
-    "blocked_by_possible_user_task": {
-      "command": "-bash",
-      "impact": "Terminating Ubuntu-24.04 may close this interactive WSL shell and interrupt unsaved or running work in that session.",
-      "parent_command": "/bin/login -f",
-      "pid": 809,
-      "ppid": 740,
-      "tty": "pts/1",
-      "user": "vegetable"
-    },
-    "status": "pending_user_confirmation",
-    "target_distro": "Ubuntu-24.04"
+    "boot_id_after": "6ac4ddbb-42c1-4411-9e18-c53e45703dd6",
+    "boot_id_before": "6ac4ddbb-42c1-4411-9e18-c53e45703dd6",
+    "boot_id_changed": false,
+    "campaign_controller_processes_after_relaunch": 0,
+    "campaign_labeled_containers_after_relaunch": 0,
+    "checked_at_utc": "2026-10-25T11:14:08Z",
+    "docker_server_version_after_relaunch": "29.1.3",
+    "notes": "Ubuntu-24.04 was terminated and relaunched after the user confirmed the pts/1 shell was closed. The running-distro list was empty after termination. The WSL kernel boot ID stayed the same across the distro restart; no kernel reboot is claimed.",
+    "relaunch_exit_code": 0,
+    "running_distros_after_terminate": [],
+    "status": "completed",
+    "target_distro": "Ubuntu-24.04",
+    "terminate_exit_code": 0
   }
 }
