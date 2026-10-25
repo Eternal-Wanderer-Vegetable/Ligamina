@@ -1,0 +1,225 @@
+{
+  "schema_version": 1,
+  "kind": "phase3_p305_resume6_progress5_validation",
+  "captured_at_utc": "2026-10-25T10:43:49.610Z",
+  "campaign_id": "p3-recovery-linux-842f71712e2c",
+  "frozen_manifest_canonical_sha256": "961786350b7c0ebdb990650d051203ad82452fff72ac291402a7f46a517173c8",
+  "checkpoint_validation": {
+    "path": "outputs/acceptance/phase3-p305-ext4-resume6-progress5-20261025.json",
+    "expected_sha256": "e0a4a168ea1de1c88820488956028ad16fe07284f1ce6d032b1d1ff0e87306b0",
+    "actual_sha256": "e0a4a168ea1de1c88820488956028ad16fe07284f1ce6d032b1d1ff0e87306b0",
+    "valid": true
+  },
+  "historical_report_validations": [
+    {
+      "path": "outputs/acceptance/phase3-p305-linux-affected-v3-execution-resume4-20261025.json",
+      "expected_sha256": "4608fb7e92adb3bf62b33d5da90b782ac0d8d2f58ebcb0c7a43c3a4f5555a759",
+      "actual_sha256": "4608fb7e92adb3bf62b33d5da90b782ac0d8d2f58ebcb0c7a43c3a4f5555a759",
+      "valid": true
+    },
+    {
+      "path": "outputs/acceptance/phase3-p305-linux-affected-v3-execution-resume5-20261025.json",
+      "expected_sha256": "e4b8165c184eb1d6abe45506921e8a9ca65c2875273162cb23af035974bd09b2",
+      "actual_sha256": "e4b8165c184eb1d6abe45506921e8a9ca65c2875273162cb23af035974bd09b2",
+      "valid": true
+    }
+  ],
+  "checks": [
+    {
+      "name": "docs",
+      "command": "wsl.exe -d Ubuntu-24.04 --cd /mnt/e/stella/Ligamina --exec bash init.sh docs",
+      "exit_code": 0,
+      "output": {
+        "status": "passed",
+        "documents": 19,
+        "local_links": 311,
+        "indexed_historical_markdown": 11,
+        "features": 24,
+        "failures": []
+      }
+    },
+    {
+      "name": "evidence_hash_tests",
+      "command": "wsl.exe -d Ubuntu-24.04 --cd /mnt/e/stella/Ligamina --exec bash -lc \"node --test scripts/evidence-hash.test.mjs\"",
+      "exit_code": 0,
+      "output": "✔ accepts the recorded S2-07 report hash from an LF checkout (7.906798ms)\r\n✔ still rejects text changes beyond line endings (0.241411ms)\r\n✔ accepts an LF digest from a CRLF checkout (0.260927ms)\r\n✔ does not normalize invalid UTF-8 bytes (0.117365ms)\r\nℹ tests 4\r\nℹ suites 0\r\nℹ pass 4\r\nℹ fail 0\r\nℹ cancelled 0\r\nℹ skipped 0\r\nℹ todo 0\r\nℹ duration_ms 69.420029"
+    },
+    {
+      "name": "harness",
+      "command": "wsl.exe -d Ubuntu-24.04 --cd /mnt/e/stella/Ligamina --exec bash -lc \"node .agents/skills/harness-creator/scripts/validate-harness.mjs --target . --json\"",
+      "exit_code": 0,
+      "output": {
+        "overall": 100,
+        "bottleneck": null,
+        "subsystems": {
+          "instructions": {
+            "score": 5,
+            "passed": 5,
+            "total": 5,
+            "checks": [
+              {
+                "pass": true,
+                "message": "Agent instruction file exists"
+              },
+              {
+                "pass": true,
+                "message": "Startup workflow documented"
+              },
+              {
+                "pass": true,
+                "message": "Definition of done documented"
+              },
+              {
+                "pass": true,
+                "message": "Verification commands discoverable"
+              },
+              {
+                "pass": true,
+                "message": "State artifacts routed from instructions"
+              }
+            ]
+          },
+          "state": {
+            "score": 5,
+            "passed": 5,
+            "total": 5,
+            "checks": [
+              {
+                "pass": true,
+                "message": "Feature tracker exists"
+              },
+              {
+                "pass": true,
+                "message": "Feature tracker is valid and has feature fields"
+              },
+              {
+                "pass": true,
+                "message": "Progress log exists"
+              },
+              {
+                "pass": true,
+                "message": "Progress log supports restart"
+              },
+              {
+                "pass": true,
+                "message": "Handoff captures blockers/files/next step"
+              }
+            ]
+          },
+          "verification": {
+            "score": 5,
+            "passed": 5,
+            "total": 5,
+            "checks": [
+              {
+                "pass": true,
+                "message": "Verification entrypoint exists"
+              },
+              {
+                "pass": true,
+                "message": "Verification fails fast"
+              },
+              {
+                "pass": true,
+                "message": "Test command documented"
+              },
+              {
+                "pass": true,
+                "message": "Static/build check documented"
+              },
+              {
+                "pass": true,
+                "message": "Verification evidence is recorded"
+              }
+            ]
+          },
+          "scope": {
+            "score": 5,
+            "passed": 5,
+            "total": 5,
+            "checks": [
+              {
+                "pass": true,
+                "message": "One-feature-at-a-time rule exists"
+              },
+              {
+                "pass": true,
+                "message": "Feature dependencies are tracked"
+              },
+              {
+                "pass": true,
+                "message": "Feature status is explicit"
+              },
+              {
+                "pass": true,
+                "message": "Scope boundary documented"
+              },
+              {
+                "pass": true,
+                "message": "Completion gate limits scope closure"
+              }
+            ]
+          },
+          "lifecycle": {
+            "score": 5,
+            "passed": 5,
+            "total": 5,
+            "checks": [
+              {
+                "pass": true,
+                "message": "Startup script exists"
+              },
+              {
+                "pass": true,
+                "message": "End-of-session procedure exists"
+              },
+              {
+                "pass": true,
+                "message": "Session handoff template exists"
+              },
+              {
+                "pass": true,
+                "message": "Session restart markers exist"
+              },
+              {
+                "pass": true,
+                "message": "Clean restart path documented"
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "name": "frozen_manifest",
+      "command": "uv run --locked --project lab --python 3.12.14 python -m lab.automation validate-recovery-pilot outputs/acceptance/phase3-p305-linux-affected-v3-manifest-20261025.json",
+      "exit_code": 0,
+      "output": {
+        "status": "valid",
+        "campaign_id": "p3-recovery-linux-842f71712e2c",
+        "manifest_sha256": "961786350b7c0ebdb990650d051203ad82452fff72ac291402a7f46a517173c8",
+        "selected_units": 2206,
+        "counts": {
+          "nonebot": {
+            "affected_recovery": 414,
+            "prior_plugin_failure_control": 0
+          },
+          "koishi": {
+            "affected_recovery": 1792,
+            "prior_plugin_failure_control": 0
+          }
+        }
+      }
+    },
+    {
+      "name": "git_diff_check",
+      "command": "git diff --check",
+      "exit_code": 0,
+      "output": "passed with no whitespace errors"
+    }
+  ],
+  "windows_runtime_tests_run": false,
+  "windows_catalog_plugins_run": false,
+  "status": "passed",
+  "report_sha256": "7a7b6bd77b027848c49c220b46bcc4658476abf4df4507bb54379070f777279a"
+}
