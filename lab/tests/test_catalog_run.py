@@ -124,6 +124,25 @@ class CatalogRunPlanTests(unittest.TestCase):
         self.assertEqual(len({unit["dependency_lock_sha256"] for unit in units}), 2)
         self.assertTrue(all(unit["artifact_sha256"] == "a" * 64 for unit in units))
 
+    def test_load_catalog_units_can_bind_a_separate_profile_lock_without_mutating_snapshot(self) -> None:
+        original_sha = hashlib.sha256((self.root / "profiles.lock.json").read_bytes()).hexdigest()
+        alternate = Path(self.temporary.name) / "profiles-py31210.json"
+        value = json.loads((self.root / "profiles.lock.json").read_text(encoding="utf-8"))
+        value["entries"][0]["profiles"]["windows-x86_64"]["profile_id"] = "nonebot-profile-py31210-windows"
+        raw = (json.dumps(value, ensure_ascii=False, indent=2) + "\n").encode("utf-8")
+        alternate.write_bytes(raw)
+        alternate.with_name(f"{alternate.name}.sha256").write_text(
+            hashlib.sha256(raw).hexdigest() + f"  {alternate.name}\n", encoding="ascii",
+        )
+
+        with patch("lab.catalog_run._verify_snapshot_inputs", return_value={"snapshot_id": "snapshot-fixture"}):
+            _, units = load_catalog_units(self.root, ("windows",), profile_lock_path=alternate)
+
+        self.assertEqual(len(units), 1)
+        self.assertEqual(units[0]["profile_id"], "nonebot-profile-py31210-windows")
+        self.assertEqual(units[0]["profile_lock_sha256"], hashlib.sha256(raw).hexdigest())
+        self.assertEqual(hashlib.sha256((self.root / "profiles.lock.json").read_bytes()).hexdigest(), original_sha)
+
     def test_platform_independent_koishi_tarball_is_bound_to_both_os_units(self) -> None:
         self.catalog["entries"][0]["ecosystem"] = "koishi"
         _write_json(self.root / "catalog.json", self.catalog)

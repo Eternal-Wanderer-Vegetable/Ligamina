@@ -39,7 +39,69 @@ PLATFORMS = {
     "windows-x86_64": "windows",
     "linux-x86_64": "linux",
 }
+PLATFORM_IDS = {platform: platform_id for platform_id, platform in PLATFORMS.items()}
 PROFILES_RESOLVER_VERSION = 2
+DEFAULT_PYTHON_VERSION = "3.12.14"
+WINDOWS_PIP_BOOTSTRAP = {
+    "version": "25.3",
+    "filename": "pip-25.3-py3-none-any.whl",
+    "metadata_url": "https://pypi.org/pypi/pip/25.3/json",
+    "sha256": "9655943313a94722b7774661c21049070f6bbb0a1516bf02f7c8d5d9201514cd",
+}
+
+
+def _python_profile_id(version: str, platform_id: str) -> str:
+    return f"nonebot-2.5.0-onebot-2.4.6-py{version}-{platform_id}"
+
+
+def _load_windows_runtime_admission(path: Path) -> dict[str, Any]:
+    path = Path(path).expanduser().resolve(strict=True)
+    raw = path.read_bytes()
+    try:
+        document = json.loads(raw.decode("utf-8"))
+    except (UnicodeDecodeError, json.JSONDecodeError) as error:
+        raise ArtifactError(f"Windows runtime admission report is invalid JSON: {path}") from error
+    if (
+        not isinstance(document, dict)
+        or document.get("task_id") != "P3-04"
+        or document.get("kind") != "phase3_worker_admission"
+        or document.get("platform") != "windows"
+        or document.get("status") != "admitted"
+        or document.get("execution_scope") != "worker_runtime_profile_only_no_catalog_plugins"
+    ):
+        raise ArtifactError("Windows runtime admission report does not prove an admitted P3-04 runtime profile")
+    runtime = document.get("runtime_profile")
+    if not isinstance(runtime, dict):
+        raise ArtifactError("Windows runtime admission report has no runtime profile")
+    required = {
+        "profile_id": "windows-cpython-3.12.10-official-embed-amd64-psf-signed",
+        "version": "3.12.10",
+        "architecture": "win_amd64",
+        "distribution": "python.org embeddable package",
+        "archive_url": "https://www.python.org/ftp/python/3.12.10/python-3.12.10-embed-amd64.zip",
+        "archive_sha256": "4acbed6dd1c744b0376e3b1cf57ce906f9dc9e95e68824584c8099a63025a3c3",
+        "executable_sha256": "4d6f5f81a4bca11191c4c7c6b43632694d0a4ce74e068619d8fdc161d469859a",
+        "authenticode_status": "Valid",
+        "signer": "Python Software Foundation",
+    }
+    if any(runtime.get(key) != value for key, value in required.items()):
+        raise ArtifactError("Windows runtime admission report does not match the frozen signed CPython 3.12.10 profile")
+    profile_core = {key: value for key, value in runtime.items() if key != "profile_sha256"}
+    if runtime.get("profile_sha256") != sha256_bytes(canonical_json_bytes(profile_core)):
+        raise ArtifactError("Windows runtime profile SHA-256 is invalid")
+    capabilities = document.get("capabilities")
+    if not isinstance(capabilities, dict) or capabilities.get("claim_allowed_for_profile") is not True:
+        raise ArtifactError("Windows runtime admission does not allow claims for this exact profile")
+    try:
+        admission_path = path.relative_to(ROOT).as_posix()
+    except ValueError:
+        admission_path = path.as_posix()
+    return {
+        **{key: runtime[key] for key in required},
+        "profile_sha256": runtime["profile_sha256"],
+        "admission_report_path": admission_path,
+        "admission_report_sha256": sha256_bytes(raw),
+    }
 
 
 def _utc_now() -> str:
@@ -137,7 +199,14 @@ def _resolve_python_profile(
     platform_id: str,
     cache_root: Path,
     timeout_seconds: int,
+    python_version: str = DEFAULT_PYTHON_VERSION,
+    runtime_profile: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
+    profile_id = _python_profile_id(python_version, platform_id)
+    runtime_profile_id = runtime_profile.get("profile_id") if runtime_profile else None
+    identity = {"profile_id": profile_id}
+    if runtime_profile_id:
+        identity["runtime_profile_id"] = runtime_profile_id
     distribution_name = artifact_entry.get("distribution_name") or entry.get("package")
     version = entry.get("advertised_version")
     platform_record = next((item for item in artifact_entry.get("artifacts", []) if item.get("platform") == platform_id), None)
@@ -149,14 +218,14 @@ def _resolve_python_profile(
         return {
             "status": platform_record.get("status", entry_status) if platform_record else entry_status,
             "reason_code": (platform_record.get("reason_code") or platform_record.get("status")) if platform_record else artifact_entry.get("reason_code"),
-            "profile_id": f"nonebot-2.5.0-onebot-2.4.6-py3.12.14-{platform_id}",
+            **identity,
             "dependency_lock": None,
         }
     if artifact.get("build_required"):
         return {
             "status": "source_build_required",
             "reason_code": "source_build_required",
-            "profile_id": f"nonebot-2.5.0-onebot-2.4.6-py3.12.14-{platform_id}",
+            **identity,
             "artifact_sha256": artifact.get("sha256"),
             "dependency_lock": None,
         }
@@ -164,7 +233,7 @@ def _resolve_python_profile(
         return {
             "status": "source_build_required",
             "reason_code": "source_build_required",
-            "profile_id": f"nonebot-2.5.0-onebot-2.4.6-py3.12.14-{platform_id}",
+            **identity,
             "artifact_sha256": artifact.get("sha256"),
             "dependency_lock": None,
         }
@@ -173,14 +242,14 @@ def _resolve_python_profile(
         return {
             "status": "cache_hash_mismatch",
             "reason_code": "cache_hash_mismatch",
-            "profile_id": f"nonebot-2.5.0-onebot-2.4.6-py3.12.14-{platform_id}",
+            **identity,
             "artifact_sha256": artifact.get("sha256"),
             "dependency_lock": None,
         }
 
     uv = shutil.which("uv")
     if not uv:
-        return {"status": "tool_unavailable", "reason_code": "uv_unavailable", "profile_id": f"nonebot-2.5.0-onebot-2.4.6-py3.12.14-{platform_id}", "dependency_lock": None}
+        return {"status": "tool_unavailable", "reason_code": "uv_unavailable", **identity, "dependency_lock": None}
     with tempfile.TemporaryDirectory(prefix="ligamina-profile-python-") as temporary_dir:
         temporary = Path(temporary_dir)
         input_file = temporary / "requirements.in"
@@ -193,7 +262,7 @@ def _resolve_python_profile(
             uv, "pip", "compile", str(input_file),
             "--output-file", str(output_file),
             "--generate-hashes", "--no-build",
-            "--python-version", "3.12.14",
+            "--python-version", python_version,
             "--python-platform", PLATFORMS[platform_id],
             "--resolution", "highest", "--prerelease", "disallow",
             "--default-index", "https://pypi.org/simple",
@@ -214,13 +283,13 @@ def _resolve_python_profile(
             })
             result = subprocess.run(command, capture_output=True, text=True, timeout=timeout_seconds, check=False, env=child_env)
         except subprocess.TimeoutExpired:
-            return {"status": "unknown", "reason_code": "profile_resolution_timeout", "profile_id": f"nonebot-2.5.0-onebot-2.4.6-py3.12.14-{platform_id}", "dependency_lock": None}
+            return {"status": "unknown", "reason_code": "profile_resolution_timeout", **identity, "dependency_lock": None}
         if result.returncode != 0 or not output_file.is_file():
             reason, _ = _python_failure(result.stderr, result.stdout)
             return {
                 "status": reason,
                 "reason_code": reason,
-                "profile_id": f"nonebot-2.5.0-onebot-2.4.6-py3.12.14-{platform_id}",
+                **identity,
                 "artifact_sha256": artifact.get("sha256"),
                 "diagnostic_sha256": sha256_bytes((result.stdout + "\n" + result.stderr).encode("utf-8", errors="replace")),
             }
@@ -228,17 +297,17 @@ def _resolve_python_profile(
         direct_block = _direct_requirement_block(lock_text, str(distribution_name))
         required_hash = artifact.get("sha256")
         if direct_block is None:
-            return {"status": "artifact_not_in_dependency_lock", "reason_code": "artifact_not_in_dependency_lock", "profile_id": f"nonebot-2.5.0-onebot-2.4.6-py3.12.14-{platform_id}", "dependency_lock": None}
+            return {"status": "artifact_not_in_dependency_lock", "reason_code": "artifact_not_in_dependency_lock", **identity, "dependency_lock": None}
         if required_hash and required_hash not in direct_block:
-            return {"status": "artifact_hash_mismatch", "reason_code": "artifact_hash_mismatch", "profile_id": f"nonebot-2.5.0-onebot-2.4.6-py3.12.14-{platform_id}", "dependency_lock": None}
+            return {"status": "artifact_hash_mismatch", "reason_code": "artifact_hash_mismatch", **identity, "dependency_lock": None}
         if not _python_lock_has_hashes(lock_text):
-            return {"status": "dependency_integrity_missing", "reason_code": "dependency_integrity_missing", "profile_id": f"nonebot-2.5.0-onebot-2.4.6-py3.12.14-{platform_id}", "dependency_lock": None}
+            return {"status": "dependency_integrity_missing", "reason_code": "dependency_integrity_missing", **identity, "dependency_lock": None}
         raw = output_file.read_bytes()
         stored = _store_lock(cache_root, "nonebot", raw)
         return {
             "status": "locked",
             "reason_code": None,
-            "profile_id": f"nonebot-2.5.0-onebot-2.4.6-py3.12.14-{platform_id}",
+            **identity,
             "artifact_sha256": required_hash,
             "dependency_lock": stored,
             "dependency_count": _dependency_count(lock_text),
@@ -416,6 +485,11 @@ def resolve_profiles(
     *,
     timeout_seconds: int = 600,
     workers: int = 8,
+    windows_runtime_admission_report: Path | None = None,
+    output_lock_path: Path | None = None,
+    base_profile_lock_path: Path | None = None,
+    platforms: tuple[str, ...] | None = None,
+    entry_ids: tuple[str, ...] | None = None,
 ) -> dict[str, Any]:
     snapshot_dir = snapshot_dir.resolve(strict=True)
     cache_root = cache_root.expanduser().absolute()
@@ -431,17 +505,115 @@ def resolve_profiles(
         raise ArtifactError("artifact lock denominator/order does not match the source catalog")
     if workers < 1 or workers > 16:
         raise ValueError("workers must be between 1 and 16")
+    selected_platform_names = tuple(("windows", "linux") if platforms is None else platforms)
+    if not selected_platform_names or len(set(selected_platform_names)) != len(selected_platform_names):
+        raise ValueError("platforms must select windows and/or linux once")
+    if any(platform not in PLATFORM_IDS for platform in selected_platform_names):
+        raise ValueError("platforms must select windows and/or linux")
+    selected_platform_ids = tuple(PLATFORM_IDS[platform] for platform in selected_platform_names)
+    runtime_profile = _load_windows_runtime_admission(windows_runtime_admission_report) if windows_runtime_admission_report else None
+    if runtime_profile is not None and "windows-x86_64" not in selected_platform_ids:
+        raise ValueError("a Windows runtime admission can only be used when resolving Windows profiles")
+    python_versions = {platform_id: DEFAULT_PYTHON_VERSION for platform_id in PLATFORMS}
+    catalog_entry_ids = [item["registry_entry_id"] for item in catalog["entries"]]
+    selected_entry_ids = tuple(catalog_entry_ids if entry_ids is None else entry_ids)
+    if not selected_entry_ids or len(set(selected_entry_ids)) != len(selected_entry_ids):
+        raise ValueError("entry_ids must contain unique catalog entry identities")
+    if set(selected_entry_ids) - set(catalog_entry_ids):
+        raise ValueError("entry_ids contains an identity outside the frozen catalog")
+    catalog_entries_by_id = {item["registry_entry_id"]: item for item in catalog["entries"]}
+    runtime_profiles_by_entry = {}
+    if runtime_profile is not None:
+        runtime_profiles_by_entry = {
+            entry_id: runtime_profile for entry_id in selected_entry_ids
+            if catalog_entries_by_id[entry_id].get("ecosystem") == "nonebot"
+        }
+
+    base_lock: dict[str, Any] | None = None
+    base_profiles_by_id: dict[str, dict[str, Any]] = {}
+    if base_profile_lock_path is not None:
+        base_path = Path(base_profile_lock_path).expanduser().resolve(strict=True)
+        try:
+            base_lock = json.loads(base_path.read_text(encoding="utf-8"))
+        except json.JSONDecodeError as error:
+            raise ArtifactError(f"base profiles lock is invalid JSON: {base_path}") from error
+        base_checksum = base_path.with_name("profiles.lock.sha256") if base_path.name == "profiles.lock.json" else base_path.with_name(f"{base_path.name}.sha256")
+        if not base_checksum.is_file():
+            raise ArtifactError(f"base profiles lock checksum is missing: {base_checksum}")
+        if sha256_file(base_path) != base_checksum.read_text(encoding="ascii").split()[0]:
+            raise ArtifactError("base profiles lock checksum mismatch")
+        if (
+            not isinstance(base_lock, dict)
+            or base_lock.get("snapshot_id") != catalog.get("snapshot_id")
+            or base_lock.get("artifacts_lock_sha256") != artifacts_lock_sha256
+            or base_lock.get("source_catalog_sha256") != sha256_file(snapshot_dir / "catalog.json")
+        ):
+            raise ArtifactError("base profiles lock does not match this snapshot and artifact lock")
+        base_entries = base_lock.get("entries")
+        if not isinstance(base_entries, list):
+            raise ArtifactError("base profiles lock has no entry matrix")
+        base_profiles_by_id = {item.get("registry_entry_id"): item for item in base_entries if isinstance(item, dict)}
+        if list(base_profiles_by_id) != [item["registry_entry_id"] for item in catalog["entries"]]:
+            raise ArtifactError("base profiles lock denominator/order does not match the source catalog")
+        for item in base_entries:
+            profiles = item.get("profiles")
+            if not isinstance(profiles, dict) or set(profiles) != set(PLATFORMS):
+                raise ArtifactError(f"base profiles lock has an incomplete platform matrix: {item['registry_entry_id']}")
+    if base_lock is not None and set(selected_platform_ids) == set(PLATFORMS):
+        raise ValueError("a base profiles lock is only useful when resolving a platform subset")
+    if base_lock is None and (
+        set(selected_platform_ids) != set(PLATFORMS) or set(selected_entry_ids) != set(catalog_entry_ids)
+    ):
+        raise ValueError("a base profiles lock is required when resolving only selected platforms or entries")
+    if base_lock is not None and any(
+        platform_id not in base_profiles_by_id[catalog_entry["registry_entry_id"]]["profiles"]
+        for catalog_entry in catalog["entries"] for platform_id in set(PLATFORMS) - set(selected_platform_ids)
+    ):
+        raise ArtifactError("base profiles lock is missing a platform needed for the output matrix")
+
+    def expected_profile_identity(entry: dict[str, Any], platform_id: str) -> tuple[str, str | None]:
+        if entry.get("ecosystem") == "nonebot":
+            expected_runtime = runtime_profiles_by_entry.get(entry["registry_entry_id"]) if platform_id == "windows-x86_64" else None
+            version = expected_runtime["version"] if expected_runtime else python_versions[platform_id]
+            return _python_profile_id(version, platform_id), (
+                expected_runtime.get("profile_id") if expected_runtime else None
+            )
+        return "koishi-core-4.18.11-node-24.20.0-x86_64-portable-lock", None
+
+    def reusable_for_configuration(result: dict[str, Any]) -> bool:
+        if not _profile_result_reusable(result, cache_root):
+            return False
+        entry = entries_by_id.get(result.get("registry_entry_id"))
+        if entry is None:
+            return False
+        for platform_id in PLATFORMS:
+            profile = result["profiles"].get(platform_id, {})
+            profile_id, runtime_id = expected_profile_identity(entry, platform_id)
+            if profile.get("profile_id") != profile_id or profile.get("runtime_profile_id") != runtime_id:
+                return False
+        return True
+
+    entries_by_id = {entry["registry_entry_id"]: entry for entry in catalog["entries"]}
 
     def resolve_entry(entry: dict[str, Any]) -> dict[str, Any]:
         artifact_entry = artifact_entries[entry["registry_entry_id"]]
-        if entry["ecosystem"] == "nonebot":
-            platform_profiles = {
-                platform: _resolve_python_profile(entry, artifact_entry, platform, cache_root, timeout_seconds)
-                for platform in PLATFORMS
-            }
-        else:
-            profile = _resolve_koishi_profile(entry, artifact_entry, cache_root, timeout_seconds)
-            platform_profiles = {platform: dict(profile) for platform in PLATFORMS}
+        base_profiles = base_profiles_by_id.get(entry["registry_entry_id"], {}).get("profiles", {})
+        platform_profiles: dict[str, dict[str, Any]] = {}
+        for platform_id in PLATFORMS:
+            if platform_id not in selected_platform_ids or entry["registry_entry_id"] not in selected_entry_ids:
+                if not base_profiles:
+                    raise ArtifactError("a base profiles lock is required when resolving only selected catalog entries")
+                platform_profiles[platform_id] = dict(base_profiles[platform_id])
+            elif entry["ecosystem"] == "nonebot":
+                platform_profiles[platform_id] = _resolve_python_profile(
+                    entry, artifact_entry, platform_id, cache_root, timeout_seconds,
+                    python_version=(runtime_profiles_by_entry.get(entry["registry_entry_id"], {}).get("version")
+                                    if platform_id == "windows-x86_64" else None) or python_versions[platform_id],
+                    runtime_profile=(runtime_profiles_by_entry.get(entry["registry_entry_id"])
+                                     if platform_id == "windows-x86_64" else None),
+                )
+            else:
+                platform_profiles[platform_id] = _resolve_koishi_profile(entry, artifact_entry, cache_root, timeout_seconds)
         return {
             "registry_entry_id": entry["registry_entry_id"],
             "ecosystem": entry["ecosystem"],
@@ -464,10 +636,34 @@ def resolve_profiles(
                     or record.get("artifacts_lock_sha256") != artifacts_lock_sha256):
                 continue
             result = record.get("result")
-            if isinstance(result, dict) and _profile_result_reusable(result, cache_root):
+            if isinstance(result, dict) and reusable_for_configuration(result):
                 reusable[result["registry_entry_id"]] = result
 
-    results_by_id = dict(reusable)
+    results_by_id: dict[str, dict[str, Any]] = {}
+    for entry in catalog["entries"]:
+        entry_id = entry["registry_entry_id"]
+        if base_lock is not None and entry_id not in selected_entry_ids:
+            profiles = {platform_id: dict(base_profiles_by_id[entry_id]["profiles"][platform_id]) for platform_id in PLATFORMS}
+        elif entry_id in reusable:
+            profiles = {
+                **({
+                    platform_id: dict(base_profiles_by_id[entry_id]["profiles"][platform_id])
+                    for platform_id in set(PLATFORMS) - set(selected_platform_ids)
+                } if base_lock is not None else {}),
+                **{
+                    platform_id: dict(reusable[entry_id]["profiles"][platform_id])
+                    for platform_id in selected_platform_ids
+                },
+            }
+        else:
+            continue
+        results_by_id[entry_id] = {
+            "registry_entry_id": entry_id,
+            "ecosystem": entry["ecosystem"],
+            "package": entry["package"],
+            "advertised_version": entry["advertised_version"],
+            "profiles": profiles,
+        }
     remaining = [entry for entry in catalog["entries"] if entry["registry_entry_id"] not in results_by_id]
     with concurrent.futures.ThreadPoolExecutor(max_workers=workers) as executor:
         futures = {executor.submit(resolve_entry, entry): entry for entry in remaining}
@@ -495,6 +691,16 @@ def resolve_profiles(
         for entry in results
         for profile in entry["profiles"].values()
     )
+    nonebot_profile_spec: dict[str, Any] = {
+        "host": "NoneBot 2.5.0", "adapter": "nonebot-adapter-onebot 2.4.6",
+        "python": DEFAULT_PYTHON_VERSION, "architectures": ["x86_64"], "resolver": "uv",
+        "source_build": "OS Worker only",
+    }
+    if any(version != DEFAULT_PYTHON_VERSION for version in python_versions.values()):
+        nonebot_profile_spec["python_by_platform"] = dict(python_versions)
+    if runtime_profiles_by_entry:
+        nonebot_profile_spec["runtime_profiles_by_entry"] = runtime_profiles_by_entry
+        nonebot_profile_spec["bootstrap_installer"] = WINDOWS_PIP_BOOTSTRAP
     lock = {
         "schema_version": 1,
         "resolver_version": PROFILES_RESOLVER_VERSION,
@@ -503,7 +709,7 @@ def resolve_profiles(
         "source_catalog_sha256": sha256_file(snapshot_dir / "catalog.json"),
         "artifacts_lock_sha256": sha256_file(artifacts_lock_path),
         "profiles": {
-            "nonebot": {"host": "NoneBot 2.5.0", "adapter": "nonebot-adapter-onebot 2.4.6", "python": "3.12.14", "architectures": ["x86_64"], "resolver": "uv", "source_build": "OS Worker only"},
+            "nonebot": nonebot_profile_spec,
             "koishi": {"host": "@koishijs/core 4.18.11", "node": "24.20.0", "architectures": ["x86_64"], "resolver": "npm 12.0.2", "lifecycle_scripts": "disabled"},
         },
         "counts": {
@@ -513,12 +719,16 @@ def resolve_profiles(
         },
         "entries": results,
     }
-    path = snapshot_dir / "profiles.lock.json"
+    path = Path(output_lock_path).expanduser().absolute() if output_lock_path else snapshot_dir / "profiles.lock.json"
+    checksum_path = path.with_name("profiles.lock.sha256") if path.name == "profiles.lock.json" else path.with_name(f"{path.name}.sha256")
+    if output_lock_path is not None and (path.exists() or checksum_path.exists()):
+        raise ArtifactError(f"refusing to overwrite an existing alternate profiles lock: {path}")
     data = pretty_json_bytes(lock)
+    path.parent.mkdir(parents=True, exist_ok=True)
     temporary = path.with_suffix(".json.tmp")
     temporary.write_bytes(data)
     os.replace(temporary, path)
-    path.with_name("profiles.lock.sha256").write_text(f"{sha256_bytes(data)}  profiles.lock.json\n", encoding="ascii")
+    checksum_path.write_text(f"{sha256_bytes(data)}  {path.name}\n", encoding="ascii")
     return {
         "lock_path": str(path),
         "snapshot_id": catalog["snapshot_id"],
@@ -526,6 +736,8 @@ def resolve_profiles(
         "profile_units": lock["counts"]["profile_units"],
         "statuses": dict(sorted(statuses.items())),
         "cache_root": str(cache_root),
+        "selected_platforms": list(selected_platform_ids),
+        "selected_entries": list(selected_entry_ids),
         "resume_journal": str(journal),
     }
 
@@ -557,13 +769,18 @@ def _profile_result_reusable(result: dict[str, Any], cache_root: Path) -> bool:
     return True
 
 
-def verify_profiles(snapshot_dir: Path, cache_root: Path = DEFAULT_CACHE_ROOT) -> dict[str, Any]:
+def verify_profiles(
+    snapshot_dir: Path,
+    cache_root: Path = DEFAULT_CACHE_ROOT,
+    *,
+    profile_lock_path: Path | None = None,
+) -> dict[str, Any]:
     snapshot_dir = snapshot_dir.resolve(strict=True)
     cache_root = cache_root.expanduser().absolute()
     verify_snapshot(snapshot_dir)
     verify_lock(snapshot_dir, cache_root)
-    path = snapshot_dir / "profiles.lock.json"
-    checksum = path.with_name("profiles.lock.sha256")
+    path = Path(profile_lock_path).expanduser().resolve(strict=True) if profile_lock_path else snapshot_dir / "profiles.lock.json"
+    checksum = path.with_name("profiles.lock.sha256") if path.name == "profiles.lock.json" else path.with_name(f"{path.name}.sha256")
     if not path.is_file() or not checksum.is_file():
         raise ArtifactError("profiles lock or checksum is missing")
     expected_hash = checksum.read_text(encoding="ascii").split()[0]
@@ -585,6 +802,38 @@ def verify_profiles(snapshot_dir: Path, cache_root: Path = DEFAULT_CACHE_ROOT) -
     expected_units = len(expected_ids) * len(PLATFORMS)
     if lock.get("counts", {}).get("profile_units") != expected_units:
         raise ArtifactError("profiles lock profile-unit denominator is incomplete")
+    nonebot_spec = lock.get("profiles", {}).get("nonebot", {})
+    default_version = nonebot_spec.get("python") if isinstance(nonebot_spec, dict) else None
+    python_versions = nonebot_spec.get("python_by_platform") if isinstance(nonebot_spec, dict) else None
+    if python_versions is None:
+        if not isinstance(default_version, str):
+            raise ArtifactError("profiles lock has no NoneBot Python version identity")
+        python_versions = {platform_id: default_version for platform_id in PLATFORMS}
+    if not isinstance(python_versions, dict) or set(python_versions) != set(PLATFORMS) or any(
+        not isinstance(version, str) or not re.fullmatch(r"\d+\.\d+\.\d+", version)
+        for version in python_versions.values()
+    ):
+        raise ArtifactError("profiles lock has an invalid per-platform Python runtime matrix")
+    runtime_profiles_by_entry = nonebot_spec.get("runtime_profiles_by_entry", {}) if isinstance(nonebot_spec, dict) else {}
+    if not isinstance(runtime_profiles_by_entry, dict) or set(runtime_profiles_by_entry) - set(expected_ids):
+        raise ArtifactError("profiles lock has an invalid runtime profile map")
+    if runtime_profiles_by_entry and nonebot_spec.get("bootstrap_installer") != WINDOWS_PIP_BOOTSTRAP:
+        raise ArtifactError("profiles lock does not bind the frozen offline Windows bootstrap installer")
+    if not runtime_profiles_by_entry and "bootstrap_installer" in nonebot_spec:
+        raise ArtifactError("profiles lock has an unused Windows bootstrap installer identity")
+    entries_by_id = {item["registry_entry_id"]: item for item in lock["entries"]}
+    for entry_id, runtime_profile in runtime_profiles_by_entry.items():
+        if not isinstance(runtime_profile, dict):
+            raise ArtifactError("profiles lock runtime profile entry is invalid")
+        report_path = Path(str(runtime_profile.get("admission_report_path", "")))
+        if not report_path.is_absolute():
+            report_path = ROOT / report_path
+        verified_runtime = _load_windows_runtime_admission(report_path)
+        if verified_runtime != runtime_profile:
+            raise ArtifactError(f"profiles lock Windows runtime profile differs from P3-04 evidence: {entry_id}")
+        entry_doc = entries_by_id.get(entry_id)
+        if not isinstance(entry_doc, dict) or entry_doc.get("ecosystem") != "nonebot":
+            raise ArtifactError(f"Windows runtime override targets a non-NoneBot entry: {entry_id}")
     checked = 0
     checked_unique: set[str] = set()
     profile_statuses: Counter[str] = Counter()
@@ -595,6 +844,16 @@ def verify_profiles(snapshot_dir: Path, cache_root: Path = DEFAULT_CACHE_ROOT) -
         if artifact_entry is None:
             raise ArtifactError(f"artifact lock entry is missing: {entry['registry_entry_id']}")
         for platform, profile in entry.get("profiles", {}).items():
+            if entry.get("ecosystem") == "nonebot":
+                runtime_profile = runtime_profiles_by_entry.get(entry["registry_entry_id"]) if platform == "windows-x86_64" else None
+                version = runtime_profile["version"] if runtime_profile else python_versions[platform]
+                expected_profile_id = _python_profile_id(version, platform)
+                expected_runtime_id = runtime_profile.get("profile_id") if runtime_profile else None
+            else:
+                expected_profile_id = "koishi-core-4.18.11-node-24.20.0-x86_64-portable-lock"
+                expected_runtime_id = None
+            if profile.get("profile_id") != expected_profile_id or profile.get("runtime_profile_id") != expected_runtime_id:
+                raise ArtifactError(f"profile runtime identity does not match lock metadata: {entry['registry_entry_id']} / {platform}")
             profile_statuses[profile.get("status", "missing_status")] += 1
             dependency_lock = profile.get("dependency_lock")
             if profile.get("status") != "locked":
@@ -671,15 +930,29 @@ def main(argv: list[str] | None = None) -> int:
     resolve_parser.add_argument("--cache-root", type=Path, default=DEFAULT_CACHE_ROOT)
     resolve_parser.add_argument("--timeout-seconds", type=int, default=600)
     resolve_parser.add_argument("--workers", type=int, default=8)
+    resolve_parser.add_argument("--windows-runtime-admission-report", type=Path)
+    resolve_parser.add_argument("--output-lock", type=Path)
+    resolve_parser.add_argument("--base-lock", type=Path)
+    resolve_parser.add_argument("--platform", choices=("windows", "linux"), action="append")
+    resolve_parser.add_argument("--entry-id", action="append")
     verify_parser = subparsers.add_parser("verify", help="verify dependency-lock cache hashes and denominators")
     verify_parser.add_argument("snapshot", type=Path)
     verify_parser.add_argument("--cache-root", type=Path, default=DEFAULT_CACHE_ROOT)
+    verify_parser.add_argument("--profile-lock", type=Path)
     options = parser.parse_args(argv)
     try:
         if options.command == "resolve":
-            result = resolve_profiles(options.snapshot, options.cache_root, timeout_seconds=options.timeout_seconds, workers=options.workers)
+            result = resolve_profiles(
+                options.snapshot, options.cache_root,
+                timeout_seconds=options.timeout_seconds, workers=options.workers,
+                windows_runtime_admission_report=options.windows_runtime_admission_report,
+                output_lock_path=options.output_lock,
+                base_profile_lock_path=options.base_lock,
+                platforms=tuple(options.platform) if options.platform else None,
+                entry_ids=tuple(options.entry_id) if options.entry_id else None,
+            )
         else:
-            result = verify_profiles(options.snapshot, options.cache_root)
+            result = verify_profiles(options.snapshot, options.cache_root, profile_lock_path=options.profile_lock)
     except (ArtifactError, OSError, ValueError, json.JSONDecodeError) as error:
         print(f"profile error: {error}", file=sys.stderr)
         return 2

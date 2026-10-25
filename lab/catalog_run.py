@@ -184,16 +184,30 @@ def build_stage_jobs(unit: dict[str, Any], *, max_attempts: int = 2) -> list[dic
     return jobs
 
 
-def _verify_locks(snapshot_dir: Path, catalog: dict[str, Any], artifact_lock: dict[str, Any], profile_lock: dict[str, Any]) -> None:
+def _verify_locks(
+    snapshot_dir: Path,
+    catalog: dict[str, Any],
+    artifact_lock: dict[str, Any],
+    profile_lock: dict[str, Any],
+    *,
+    profile_lock_path: Path | None = None,
+) -> None:
     expected_ids = [entry.get("registry_entry_id") for entry in catalog.get("entries", [])]
     for name, lock in (("artifact", artifact_lock), ("profile", profile_lock)):
         actual_ids = [entry.get("registry_entry_id") for entry in lock.get("entries", [])]
         if lock.get("snapshot_id") != catalog.get("snapshot_id") or actual_ids != expected_ids:
             raise CatalogRunError(f"{name} lock does not preserve the frozen catalog order and denominator")
     artifact_path = snapshot_dir / "artifacts.lock.json"
-    profile_path = snapshot_dir / "profiles.lock.json"
-    for path, stem in ((artifact_path, "artifacts.lock"), (profile_path, "profiles.lock")):
-        checksum = snapshot_dir / f"{stem}.sha256"
+    profile_path = profile_lock_path or (snapshot_dir / "profiles.lock.json")
+    checksum_paths = (
+        (artifact_path, snapshot_dir / "artifacts.lock.sha256"),
+        (
+            profile_path,
+            profile_path.with_name("profiles.lock.sha256") if profile_path.name == "profiles.lock.json"
+            else profile_path.with_name(f"{profile_path.name}.sha256"),
+        ),
+    )
+    for path, checksum in checksum_paths:
         try:
             expected = checksum.read_text(encoding="ascii").split()[0]
         except (OSError, IndexError) as error:
@@ -206,13 +220,19 @@ def _verify_locks(snapshot_dir: Path, catalog: dict[str, Any], artifact_lock: di
         raise CatalogRunError("profiles lock does not account for both OS profiles per entry")
 
 
-def load_catalog_units(snapshot_dir: Path, platforms: Iterable[str]) -> tuple[dict[str, Any], list[dict[str, Any]]]:
+def load_catalog_units(
+    snapshot_dir: Path,
+    platforms: Iterable[str],
+    *,
+    profile_lock_path: Path | None = None,
+) -> tuple[dict[str, Any], list[dict[str, Any]]]:
     snapshot_dir = Path(snapshot_dir).expanduser().resolve(strict=True)
     snapshot_summary = _verify_snapshot_inputs(snapshot_dir)
     catalog, catalog_bytes = _read(snapshot_dir / "catalog.json")
     artifact_lock, artifact_bytes = _read(snapshot_dir / "artifacts.lock.json")
-    profile_lock, profile_bytes = _read(snapshot_dir / "profiles.lock.json")
-    _verify_locks(snapshot_dir, catalog, artifact_lock, profile_lock)
+    selected_profile_lock = Path(profile_lock_path).expanduser().resolve(strict=True) if profile_lock_path else snapshot_dir / "profiles.lock.json"
+    profile_lock, profile_bytes = _read(selected_profile_lock)
+    _verify_locks(snapshot_dir, catalog, artifact_lock, profile_lock, profile_lock_path=selected_profile_lock)
     if snapshot_summary["snapshot_id"] != catalog.get("snapshot_id"):
         raise CatalogRunError("verified snapshot identity differs from catalog file")
     selected_platforms = tuple(dict.fromkeys(platforms))
@@ -278,9 +298,10 @@ def create_catalog_plan(
     shard_count: int = 1,
     run_id: str | None = None,
     resume: bool = False,
+    profile_lock_path: Path | None = None,
 ) -> dict[str, Any]:
     selected_platforms = tuple(dict.fromkeys(platforms))
-    catalog, all_units = load_catalog_units(snapshot_dir, selected_platforms)
+    catalog, all_units = load_catalog_units(snapshot_dir, selected_platforms, profile_lock_path=profile_lock_path)
     selected = partition_units(all_units, shard_index, shard_count)
     all_jobs = [job for unit in selected for job in build_stage_jobs(unit)]
     manifest = {

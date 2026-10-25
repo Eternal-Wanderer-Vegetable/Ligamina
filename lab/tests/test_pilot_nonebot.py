@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+import zipfile
 import tempfile
 import unittest
 from pathlib import Path
@@ -9,8 +10,10 @@ from unittest.mock import patch
 
 from lab.pilot_nonebot import (
     NoneBotPilotError,
+    _extract_checked_zip,
     _load_release_metadata,
     _pypi_json_url,
+    _reclassify_windows_app_control_load,
     _read_lock_requirements,
     _select_locked_wheel,
     _write_runner,
@@ -63,6 +66,52 @@ class NoneBotPilotLockTests(unittest.TestCase):
         release["urls"][0]["url"] = "https://evil.example/demo.whl"
         with self.assertRaisesRegex(NoneBotPilotError, "outside the allowlist"):
             _select_locked_wheel(requirement, release)
+
+    def test_release_wheel_selects_windows_artifact_for_admitted_patch_runtime(self) -> None:
+        digest = "c" * 64
+        requirement = {"name": "demo-pkg", "canonical_name": "demo-pkg", "version": "1.2.3", "hashes": {digest}}
+        release = {"urls": [{
+            "filename": "demo_pkg-1.2.3-cp312-cp312-win_amd64.whl", "packagetype": "bdist_wheel",
+            "digests": {"sha256": digest}, "size": 10, "url": "https://files.pythonhosted.org/packages/demo.whl",
+            "requires_python": ">=3.12", "yanked": False,
+        }]}
+        selected = _select_locked_wheel(
+            requirement, release, platform_id="windows-x86_64", python_version="3.12.10",
+        )
+        self.assertEqual(selected["filename"], "demo_pkg-1.2.3-cp312-cp312-win_amd64.whl")
+
+    def test_windows_runtime_extractor_rejects_zip_path_traversal_and_cleans_partial_tree(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            archive = root / "unsafe.zip"
+            destination = root / "runtime"
+            with zipfile.ZipFile(archive, "w") as stream:
+                stream.writestr("python.exe", b"verified-runtime")
+                stream.writestr("../escape.txt", b"outside")
+            with self.assertRaisesRegex(NoneBotPilotError, "unsafe or duplicate path"):
+                _extract_checked_zip(archive, destination, max_expanded_bytes=1024)
+            self.assertFalse(destination.exists())
+            self.assertFalse((root / "escape.txt").exists())
+
+    def test_windows_extension_policy_block_is_unknown_not_plugin_failure(self) -> None:
+        protocol = {"native_load": {
+            "status": "failed", "reason_code": "native_load_failed", "exit_code": 1,
+            "stderr_tail": "ImportError: DLL load failed while importing _pydantic_core: application control policy blocked file",
+        }}
+        classified = _reclassify_windows_app_control_load(protocol)
+        self.assertEqual(classified["native_load"]["status"], "unknown")
+        self.assertEqual(classified["native_load"]["reason_code"], "app_control_win32_4551")
+        self.assertEqual(classified["native_load"]["worker_reported_status"], "failed")
+
+    def test_windows_extension_load_without_policy_evidence_is_unattributed_unknown(self) -> None:
+        protocol = {"native_load": {
+            "status": "failed", "reason_code": "native_load_failed", "exit_code": 1,
+            "stderr_tail": "ImportError: DLL load failed while importing _pydantic_core",
+        }}
+        classified = _reclassify_windows_app_control_load(protocol)
+        self.assertEqual(classified["native_load"]["status"], "unknown")
+        self.assertEqual(classified["native_load"]["reason_code"], "windows_native_extension_load_unattributed")
+        self.assertFalse(classified["native_load"]["policy_diagnostic_detected"])
 
     def test_worker_runner_is_offline_hash_only_and_collects_scratch(self) -> None:
         with tempfile.TemporaryDirectory() as temporary:

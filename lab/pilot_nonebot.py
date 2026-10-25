@@ -9,14 +9,17 @@ import json
 import os
 import re
 import shutil
+import stat
 import subprocess
 import tempfile
 import time
+import zipfile
 import urllib.error
 import urllib.parse
 import urllib.request
 from datetime import datetime, timezone
 from pathlib import Path
+from pathlib import PurePosixPath
 from typing import Any
 
 from packaging.requirements import InvalidRequirement, Requirement
@@ -27,7 +30,8 @@ from .artifacts import DEFAULT_CACHE_ROOT, _compatible_python_file, _requires_py
 from .baselines.run_s205 import RUNTIME_LOCK_PATH
 from .catalog_run import load_catalog_units
 from .pilot_workers import PilotWorkerError, _read_json, _sha256
-from .workers import DockerWorker, WorkerLimits, WorkerSpec
+from .workers import DockerWorker, WindowsSandboxWorker, WorkerLimits, WorkerSpec
+from .profiles import WINDOWS_PIP_BOOTSTRAP, _load_windows_runtime_admission, _python_profile_id
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -38,10 +42,36 @@ _HASH_RE = re.compile(r"--hash=sha256:([0-9a-f]{64})\b")
 _MAX_FETCH_WORKERS = 4
 _MAX_ARCHIVE_BYTES = 1024 * 1024 * 1024
 _MAX_METADATA_BYTES = 32 * 1024 * 1024
+_MAX_WINDOWS_RUNTIME_ARCHIVE_BYTES = 64 * 1024 * 1024
+_MAX_WINDOWS_RUNTIME_EXPANDED_BYTES = 256 * 1024 * 1024
 
 
 class NoneBotPilotError(RuntimeError):
     """Raised when frozen NoneBot pilot inputs cannot be trusted or executed."""
+
+
+def _reclassify_windows_app_control_load(protocol: dict[str, Any]) -> dict[str, Any]:
+    native = protocol.get("native_load")
+    if not isinstance(native, dict) or native.get("status") != "failed":
+        return protocol
+    diagnostic = "\n".join(str(native.get(key, "")) for key in ("stdout_tail", "stderr_tail")).casefold()
+    explicit_policy_markers = (
+        "application control policy blocked", "application control policy has blocked",
+        "应用程序控制策略", "app control policy", "win32 4551",
+    )
+    extension_block_markers = ("dll load failed while importing _pydantic_core", "dll load failed while importing pydantic_core")
+    if not any(marker in diagnostic for marker in (*explicit_policy_markers, *extension_block_markers)):
+        return protocol
+    result = dict(protocol)
+    result["native_load"] = {
+        **native,
+        "status": "unknown",
+        "reason_code": "app_control_win32_4551" if any(marker in diagnostic for marker in explicit_policy_markers) else "windows_native_extension_load_unattributed",
+        "worker_reported_status": native.get("status"),
+        "worker_reported_reason_code": native.get("reason_code"),
+        "policy_diagnostic_detected": any(marker in diagnostic for marker in explicit_policy_markers),
+    }
+    return result
 
 
 def _read_lock_requirements(text: str) -> list[dict[str, Any]]:
@@ -136,7 +166,12 @@ def _load_release_metadata(name: str, version: str, cache_root: Path) -> tuple[d
 
 
 def _select_locked_wheel(
-    requirement: dict[str, Any], document: dict[str, Any], *, prefer_sha256: str | None = None,
+    requirement: dict[str, Any],
+    document: dict[str, Any],
+    *,
+    platform_id: str = "linux-x86_64",
+    python_version: str = "3.12.14",
+    prefer_sha256: str | None = None,
 ) -> dict[str, Any]:
     files = document.get("urls")
     if not isinstance(files, list):
@@ -153,9 +188,9 @@ def _select_locked_wheel(
         if record.get("packagetype") == "sdist":
             sdist_hash_matches = True
             continue
-        if record.get("yanked") is True or not _requires_python_allows(record.get("requires_python")):
+        if record.get("yanked") is True or not _requires_python_allows(record.get("requires_python"), python_version):
             continue
-        compatible = _compatible_python_file(record, "linux-x86_64")
+        compatible = _compatible_python_file(record, platform_id)
         if compatible is None:
             continue
         priority, wheel_filename = compatible
@@ -174,7 +209,7 @@ def _select_locked_wheel(
             matches = preferred
     if not matches:
         reason = "dependency_source_build_required" if sdist_hash_matches else "dependency_wheel_unavailable"
-        raise NoneBotPilotError(f"{reason}: no hash-locked CPython 3.12 Linux wheel for {requirement['name']}=={requirement['version']}")
+        raise NoneBotPilotError(f"{reason}: no hash-locked CPython {python_version} {platform_id} wheel for {requirement['name']}=={requirement['version']}")
     matches.sort(key=lambda item: (item[0], item[1]))
     record = matches[0][2]
     digest = (record.get("digests") or {}).get("sha256")
@@ -235,6 +270,8 @@ def _prepare_wheelhouse(
     wheelhouse: Path,
     direct_artifact: dict[str, Any],
     direct_artifact_path: Path,
+    platform_id: str = "linux-x86_64",
+    python_version: str = "3.12.14",
 ) -> dict[str, Any]:
     requirements = _read_lock_requirements(lock_text)
     direct_requirement = next((item for item in requirements if item["canonical_name"] == canonicalize_name(direct_artifact["distribution_name"])), None)
@@ -258,7 +295,9 @@ def _prepare_wheelhouse(
             continue
         metadata, receipt = _load_release_metadata(requirement["name"], requirement["version"], cache_root)
         metadata_receipts[f"{requirement['canonical_name']}=={requirement['version']}"] = receipt
-        selected = _select_locked_wheel(requirement, metadata)
+        selected = _select_locked_wheel(
+            requirement, metadata, platform_id=platform_id, python_version=python_version,
+        )
         resolved_records.append({**requirement, **selected, "source": "pypi_hash_locked_wheel"})
 
     wheelhouse.mkdir(parents=True, exist_ok=True)
@@ -455,10 +494,443 @@ print(json.dumps(report, ensure_ascii=False, separators=(',',':')))
     )
 
 
-def _catalog_context(snapshot_dir: Path) -> tuple[dict[str, Any], dict[str, Any], dict[str, Any], dict[str, Any], bytes, bytes, bytes]:
-    catalog, units = load_catalog_units(snapshot_dir, ("linux",))
+def _download_windows_runtime(runtime_profile: dict[str, Any], cache_root: Path) -> Path:
+    url = runtime_profile.get("archive_url")
+    digest = runtime_profile.get("archive_sha256")
+    parsed = urllib.parse.urlparse(url or "")
+    if parsed.scheme != "https" or parsed.hostname != "www.python.org" or not isinstance(digest, str) or not re.fullmatch(r"[0-9a-f]{64}", digest):
+        raise NoneBotPilotError("admitted Windows Python runtime has an invalid archive identity")
+    path = cache_root / "windows-runtime-cache" / "sha256" / digest[:2] / digest
+    if path.is_file():
+        if path.stat().st_size > _MAX_WINDOWS_RUNTIME_ARCHIVE_BYTES or sha256_file(path) != digest:
+            raise NoneBotPilotError("cached Windows Python runtime failed its frozen size/SHA-256 check")
+        return path
+    path.parent.mkdir(parents=True, exist_ok=True)
+    temporary = path.with_suffix(f".{os.getpid()}.tmp")
+    written = 0
+    digest_stream = hashlib.sha256()
+    request = urllib.request.Request(url, headers={"User-Agent": "Ligamina-catalog-pilot/1.0", "Accept-Encoding": "identity"})
+    try:
+        with urllib.request.urlopen(request, timeout=60) as response, temporary.open("wb") as output:
+            if urllib.parse.urlparse(response.geturl()).hostname != "www.python.org":
+                raise NoneBotPilotError("Python runtime download redirected outside www.python.org")
+            while True:
+                chunk = response.read(1024 * 1024)
+                if not chunk:
+                    break
+                written += len(chunk)
+                if written > _MAX_WINDOWS_RUNTIME_ARCHIVE_BYTES:
+                    raise NoneBotPilotError("Windows Python runtime archive exceeded its frozen download bound")
+                digest_stream.update(chunk)
+                output.write(chunk)
+        if not written or digest_stream.hexdigest() != digest:
+            raise NoneBotPilotError("downloaded Windows Python runtime failed its frozen SHA-256 check")
+        try:
+            temporary.replace(path)
+        except FileExistsError:
+            temporary.unlink(missing_ok=True)
+            if not path.is_file() or sha256_file(path) != digest:
+                raise NoneBotPilotError("concurrent Windows runtime cache write failed integrity check")
+    except BaseException:
+        temporary.unlink(missing_ok=True)
+        raise
+    return path
+
+
+def _extract_checked_zip(archive_path: Path, destination: Path, *, max_expanded_bytes: int) -> dict[str, Any]:
+    destination.mkdir(parents=True, exist_ok=False)
+    seen: set[str] = set()
+    expanded = 0
+    file_count = 0
+    try:
+        with zipfile.ZipFile(archive_path) as archive:
+            for info in archive.infolist():
+                name = info.filename
+                relative = PurePosixPath(name)
+                key = relative.as_posix().casefold().rstrip("/")
+                mode = info.external_attr >> 16
+                if (
+                    not name or "\\" in name or relative.is_absolute()
+                    or any(part in {"", ".", ".."} or ":" in part for part in relative.parts)
+                    or key in seen or stat.S_ISLNK(mode)
+                ):
+                    raise NoneBotPilotError("Windows runtime ZIP contains an unsafe or duplicate path")
+                seen.add(key)
+                target = destination.joinpath(*relative.parts)
+                if info.is_dir():
+                    target.mkdir(parents=True, exist_ok=True)
+                    continue
+                expanded += info.file_size
+                if info.file_size < 0 or expanded > max_expanded_bytes:
+                    raise NoneBotPilotError("Windows runtime ZIP exceeds its expanded size bound")
+                target.parent.mkdir(parents=True, exist_ok=True)
+                written = 0
+                with archive.open(info, "r") as source, target.open("xb") as output:
+                    while True:
+                        chunk = source.read(1024 * 1024)
+                        if not chunk:
+                            break
+                        written += len(chunk)
+                        if written > info.file_size or written > max_expanded_bytes:
+                            raise NoneBotPilotError("Windows runtime ZIP member exceeded its declared size")
+                        output.write(chunk)
+                if written != info.file_size:
+                    raise NoneBotPilotError("Windows runtime ZIP member length differs from its directory entry")
+                file_count += 1
+    except NoneBotPilotError:
+        shutil.rmtree(destination, ignore_errors=True)
+        raise
+    except (OSError, zipfile.BadZipFile, RuntimeError) as error:
+        shutil.rmtree(destination, ignore_errors=True)
+        raise NoneBotPilotError(f"Windows runtime ZIP could not be safely extracted: {error}") from error
+    return {"file_count": file_count, "expanded_bytes": expanded}
+
+
+def _verify_windows_python_signature(python_path: Path) -> dict[str, str]:
+    pwsh = shutil.which("pwsh")
+    if not pwsh:
+        raise NoneBotPilotError("PowerShell 7 is required to verify the signed Windows Python runtime")
+    command = (
+        "$signature=Get-AuthenticodeSignature -LiteralPath '" + str(python_path).replace("'", "''")
+        + "'; [pscustomobject]@{status=$signature.Status.ToString(); subject=$signature.SignerCertificate.Subject}|ConvertTo-Json -Compress"
+    )
+    try:
+        result = subprocess.run([pwsh, "-NoProfile", "-NonInteractive", "-Command", command], capture_output=True, text=True, timeout=20, check=False)
+    except (OSError, subprocess.TimeoutExpired) as error:
+        raise NoneBotPilotError(f"could not verify the Windows Python Authenticode signature: {error}") from error
+    try:
+        signature = json.loads(result.stdout)
+    except json.JSONDecodeError as error:
+        raise NoneBotPilotError("Windows Python Authenticode verification returned invalid output") from error
+    subject = signature.get("subject") if isinstance(signature, dict) else None
+    status = signature.get("status") if isinstance(signature, dict) else None
+    if result.returncode != 0 or status != "Valid" or not isinstance(subject, str) or "Python Software Foundation" not in subject:
+        raise NoneBotPilotError("Windows Python executable does not have the admitted valid PSF signature")
+    return {"status": status, "signer_subject": subject}
+
+
+def _windows_probe_scripts(bundle: Path) -> None:
+    (bundle / "native_probe.py").write_text(
+        """import json, sys\nimport nonebot\nfrom nonebot.adapters.onebot.v11 import Adapter\n\nentry = sys.argv[1]\nnonebot.init(driver='~fastapi', nickname={'Bot'})\ndriver = nonebot.get_driver()\ndriver.register_adapter(Adapter)\nplugin = nonebot.load_plugin(entry)\nif plugin is None:\n    raise RuntimeError(f'NoneBot did not load {entry!r}')\nloaded = {item.name: item for item in nonebot.get_loaded_plugins()}\nif entry not in loaded and getattr(plugin, 'name', None) not in loaded:\n    raise RuntimeError(f'NoneBot did not register the loaded plugin {entry!r}')\nprint(json.dumps({'schema_version':1,'task_id':'S2-09','entry_point':entry,'entry_module_imported':True,'plugin_registered':True,'loaded_plugin_count':len(loaded)},separators=(',',':')))\n""",
+        encoding="utf-8",
+        newline="\n",
+    )
+    (bundle / "windows_driver.py").write_text(
+        r'''from __future__ import annotations
+import hashlib, json, os, shutil, subprocess, sys, zipfile
+from pathlib import Path, PurePosixPath
+
+input_root = Path(sys.argv[1])
+work = Path(sys.argv[2])
+spec = json.loads((input_root / "spec.json").read_text(encoding="utf-8"))
+report = {
+  "schema_version": 1, "task_id": "S2-09", "registry_entry_id": spec["registry_entry_id"],
+  "package": spec["package"], "version": spec["version"], "profile_id": spec["profile_id"],
+  "profile_lock_sha256": spec["profile_lock_sha256"], "artifact_sha256": spec["artifact_sha256"],
+  "dependency_install": {"status": "unknown", "reason_code": "windows_probe_setup_failed"},
+  "native_load": {"status": "skipped", "reason_code": "dependency_install_not_passed"},
+  "resource_observations": {"peak_writable_scratch_bytes": 0},
+}
+
+def safe_extract_wheel(path: Path, destination: Path) -> None:
+    seen = set()
+    with zipfile.ZipFile(path) as archive:
+        for info in archive.infolist():
+            relative = PurePosixPath(info.filename)
+            key = relative.as_posix().casefold().rstrip("/")
+            if not info.filename or "\\" in info.filename or relative.is_absolute() or any(part in {"", ".", ".."} or ":" in part for part in relative.parts) or key in seen:
+                raise RuntimeError("pip wheel contains an unsafe or duplicate path")
+            seen.add(key)
+            target = destination.joinpath(*relative.parts)
+            if info.is_dir():
+                target.mkdir(parents=True, exist_ok=True)
+                continue
+            target.parent.mkdir(parents=True, exist_ok=True)
+            with archive.open(info) as source, target.open("xb") as output:
+                shutil.copyfileobj(source, output, 1024 * 1024)
+
+def run(command, timeout):
+    return subprocess.run(command, cwd=work, capture_output=True, text=True, errors="replace", timeout=timeout, check=False)
+
+try:
+    expected_pip = spec["pip_bootstrap_sha256"]
+    pip_wheel = input_root / "pip-bootstrap.whl"
+    if hashlib.sha256(pip_wheel.read_bytes()).hexdigest() != expected_pip:
+        raise RuntimeError("offline pip bootstrap SHA-256 mismatch")
+    site = work / "site-packages"
+    site.mkdir(parents=True, exist_ok=True)
+    safe_extract_wheel(pip_wheel, site)
+    python = Path(sys.executable)
+    wheelhouse = input_root / "wheelhouse"
+    requirements = input_root / "requirements.txt"
+    install = run([
+      str(python), "-m", "pip", "install", "--disable-pip-version-check", "--no-input", "--no-cache-dir",
+      "--no-index", "--find-links", str(wheelhouse), "--only-binary=:all:", "--require-hashes",
+      "-r", str(requirements), "--target", str(site),
+    ], spec["install_timeout_seconds"])
+    if install.returncode != 0:
+        report["dependency_install"] = {"status": "failed", "reason_code": "dependency_install_failed", "exit_code": install.returncode,
+          "stdout_tail": install.stdout[-4096:], "stderr_tail": install.stderr[-4096:]}
+    else:
+        report["dependency_install"] = {"status": "passed", "reason_code": None, "exit_code": 0,
+          "stdout_sha256": hashlib.sha256(install.stdout.encode("utf-8", errors="replace")).hexdigest(),
+          "stderr_sha256": hashlib.sha256(install.stderr.encode("utf-8", errors="replace")).hexdigest()}
+        probe = run([str(python), str(input_root / "native_probe.py"), spec["entry_point"]], spec["native_timeout_seconds"])
+        if probe.returncode != 0:
+            report["native_load"] = {"status": "failed", "reason_code": "native_load_failed", "exit_code": probe.returncode,
+              "stdout_tail": probe.stdout[-4096:], "stderr_tail": probe.stderr[-4096:]}
+        else:
+            try:
+                result = None
+                for line in reversed(probe.stdout.splitlines()):
+                    if not line.startswith("{"):
+                        continue
+                    try:
+                        result = json.loads(line)
+                    except json.JSONDecodeError:
+                        continue
+                    break
+                if result is None:
+                    raise ValueError("native probe JSON report is missing")
+            except (StopIteration, json.JSONDecodeError, ValueError):
+                report["native_load"] = {"status": "unknown", "reason_code": "native_probe_report_missing",
+                  "stdout_tail": probe.stdout[-4096:], "stderr_tail": probe.stderr[-4096:]}
+            else:
+                report["native_load"] = {"status": "passed", "reason_code": None, "exit_code": 0, "native_report": result,
+                  "stderr_sha256": hashlib.sha256(probe.stderr.encode("utf-8", errors="replace")).hexdigest()}
+except Exception as error:
+    report["dependency_install"] = {"status": "unknown", "reason_code": "windows_probe_setup_failed", "error": (type(error).__name__ + ": " + str(error))[:1024]}
+print(json.dumps(report, ensure_ascii=False, separators=(",", ":")))
+''',
+        encoding="utf-8",
+        newline="\n",
+    )
+    (bundle / "run-nonebot-pilot.ps1").write_text(
+        r'''$ErrorActionPreference = 'Stop'
+$inputRoot = 'C:\Ligamina\Input'
+$workspaceRoot = 'C:\Ligamina\Workspace'
+$work = Join-Path $workspaceRoot 'p305-nonebot'
+$runtime = Join-Path $work 'runtime'
+New-Item -ItemType Directory -Path $work -Force | Out-Null
+Copy-Item -LiteralPath (Join-Path $inputRoot 'runtime') -Destination $runtime -Recurse -Force
+$python = Join-Path $runtime 'python.exe'
+$pth = Join-Path $runtime 'python312._pth'
+if (-not (Test-Path -LiteralPath $python) -or -not (Test-Path -LiteralPath $pth)) { throw 'admitted CPython runtime layout is incomplete' }
+@('python312.zip', '.', (Join-Path $work 'site-packages'), 'import site') | Set-Content -LiteralPath $pth -Encoding ascii
+$env:PYTHONNOUSERSITE = '1'
+$env:PIP_NO_INDEX = '1'
+$env:PIP_DISABLE_PIP_VERSION_CHECK = '1'
+$env:PIP_NO_INPUT = '1'
+$driverOutput = & $python (Join-Path $inputRoot 'windows_driver.py') $inputRoot $work
+if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+Write-Output $driverOutput
+exit 0
+''',
+        encoding="utf-8",
+        newline="\n",
+    )
+
+
+def run_nonebot_windows_load_probe(
+    snapshot_dir: Path,
+    entry_id: str,
+    *,
+    profile_lock_path: Path,
+    cache_root: Path = DEFAULT_CACHE_ROOT,
+    timeout_seconds: int = 1200,
+    context: tuple[dict[str, Any], dict[str, Any], dict[str, Any], dict[str, Any], bytes, bytes, bytes] | None = None,
+    worker_labels: dict[str, Any] | None = None,
+) -> dict[str, Any]:
+    """Run one hash-locked NoneBot install/load probe under the admitted Windows Sandbox profile."""
+    snapshot_dir = Path(snapshot_dir).resolve(strict=True)
+    profile_lock_path = Path(profile_lock_path).resolve(strict=True)
+    cache_root = Path(cache_root).resolve(strict=True)
+    entries, units, artifacts, profiles, artifact_lock_raw, profile_lock_raw, catalog_raw = context or _catalog_context(
+        snapshot_dir, platform="windows", profile_lock_path=profile_lock_path,
+    )
+    entry = entries.get(entry_id)
+    unit = units.get(entry_id)
+    artifact_entry = artifacts.get(entry_id)
+    profile_record = profiles.get(entry_id)
+    profile = (profile_record or {}).get("profiles", {}).get("windows-x86_64", {})
+    lock_ref = profile.get("dependency_lock")
+    if not isinstance(entry, dict) or not isinstance(unit, dict) or entry.get("ecosystem") != "nonebot":
+        raise NoneBotPilotError(f"entry is not a frozen Windows NoneBot catalog item: {entry_id}")
+    if unit.get("artifact_status") != "locked" or unit.get("profile_status") != "locked" or profile.get("status") != "locked":
+        raise NoneBotPilotError("Windows NoneBot pilot entry has no locked artifact and admitted profile")
+    try:
+        lock_document = json.loads(profile_lock_raw.decode("utf-8"))
+    except (UnicodeDecodeError, json.JSONDecodeError) as error:
+        raise NoneBotPilotError("alternate Windows profile lock is invalid JSON") from error
+    runtime_profiles = lock_document.get("profiles", {}).get("nonebot", {}).get("runtime_profiles_by_entry", {})
+    runtime_profile = runtime_profiles.get(entry_id) if isinstance(runtime_profiles, dict) else None
+    if not isinstance(runtime_profile, dict) or profile.get("runtime_profile_id") != runtime_profile.get("profile_id"):
+        raise NoneBotPilotError("Windows profile lock does not bind an admitted runtime for this entry")
+    admission_path = Path(runtime_profile["admission_report_path"])
+    if not admission_path.is_absolute():
+        admission_path = ROOT / admission_path
+    verified_runtime = _load_windows_runtime_admission(admission_path)
+    if verified_runtime != runtime_profile:
+        raise NoneBotPilotError("Windows profile runtime identity differs from the P3-04 admission report")
+    if profile.get("profile_id") != _python_profile_id("3.12.10", "windows-x86_64"):
+        raise NoneBotPilotError("Windows profile ID does not encode the admitted CPython 3.12.10 runtime")
+    if lock_document.get("profiles", {}).get("nonebot", {}).get("bootstrap_installer") != WINDOWS_PIP_BOOTSTRAP:
+        raise NoneBotPilotError("Windows profile lock does not freeze the offline pip bootstrap identity")
+    if not isinstance(artifact_entry, dict) or not isinstance(lock_ref, dict):
+        raise NoneBotPilotError("frozen Windows artifact or dependency lock is missing")
+    artifact_record = next((item for item in artifact_entry.get("artifacts", []) if item.get("platform") == "windows-x86_64"), None)
+    artifact = artifact_record.get("artifact") if isinstance(artifact_record, dict) else None
+    if not isinstance(artifact, dict) or profile.get("artifact_sha256") != (artifact.get("computed_digests") or {}).get("sha256"):
+        raise NoneBotPilotError("Windows profile lock points to different direct artifact bytes")
+    artifact_path = cache_root / artifact["cache_path"]
+    if not artifact_path.is_file() or sha256_file(artifact_path) != artifact["computed_digests"]["sha256"]:
+        raise NoneBotPilotError("Windows catalog wheel failed its frozen artifact SHA-256 check")
+    lock_path = cache_root / lock_ref["cache_path"]
+    lock_raw = lock_path.read_bytes()
+    if len(lock_raw) != lock_ref.get("size_bytes") or _sha256(lock_raw) != lock_ref.get("sha256"):
+        raise NoneBotPilotError("Windows dependency lock failed its frozen hash/size check")
+    if artifact.get("build_required") or not artifact.get("filename", "").endswith(".whl"):
+        raise NoneBotPilotError("Windows catalog pilot only installs frozen wheel artifacts")
+    distribution_name = artifact_entry.get("distribution_name") or entry.get("package")
+    version = entry.get("advertised_version")
+    if not isinstance(distribution_name, str) or not isinstance(version, str):
+        raise NoneBotPilotError("Windows catalog entry lacks exact distribution/version identity")
+    entry_point = entry.get("entry_point") or entry.get("registry_identity", {}).get("module_name")
+    if not isinstance(entry_point, str) or not entry_point.strip():
+        raise NoneBotPilotError("Windows NoneBot registry entry has no importable entry point")
+    if worker_labels and not all(key in worker_labels for key in ("campaign_id", "job_id", "attempt_id", "generation")):
+        raise NoneBotPilotError("worker labels require campaign_id, job_id, attempt_id, and generation")
+
+    runtime_archive = _download_windows_runtime(verified_runtime, cache_root)
+    with tempfile.TemporaryDirectory(prefix="ligamina-pilot-nonebot-windows-", dir=cache_root) as temporary:
+        bundle = Path(temporary)
+        runtime_dir = bundle / "runtime"
+        extraction = _extract_checked_zip(runtime_archive, runtime_dir, max_expanded_bytes=_MAX_WINDOWS_RUNTIME_EXPANDED_BYTES)
+        python_path = runtime_dir / "python.exe"
+        if not python_path.is_file() or sha256_file(python_path) != verified_runtime["executable_sha256"]:
+            raise NoneBotPilotError("extracted Windows Python executable differs from the admitted runtime hash")
+        if not (runtime_dir / "python312.zip").is_file() or not (runtime_dir / "python312._pth").is_file():
+            raise NoneBotPilotError("admitted Windows Python archive has an incomplete embeddable runtime layout")
+        signature = _verify_windows_python_signature(python_path)
+        wheelhouse = bundle / "wheelhouse"
+        dependency_stats = _prepare_wheelhouse(
+            lock_raw.decode("utf-8"), cache_root=cache_root, wheelhouse=wheelhouse,
+            direct_artifact={"distribution_name": distribution_name, "version": version, "filename": artifact["filename"], "sha256": artifact["computed_digests"]["sha256"]},
+            direct_artifact_path=artifact_path,
+            platform_id="windows-x86_64", python_version="3.12.10",
+        )
+        pip_metadata, pip_receipt = _load_release_metadata("pip", WINDOWS_PIP_BOOTSTRAP["version"], cache_root)
+        pip_requirement = {
+            "name": "pip", "canonical_name": "pip", "version": WINDOWS_PIP_BOOTSTRAP["version"],
+            "hashes": {WINDOWS_PIP_BOOTSTRAP["sha256"]},
+        }
+        pip_record = _select_locked_wheel(
+            pip_requirement, pip_metadata, platform_id="windows-x86_64", python_version="3.12.10",
+            prefer_sha256=WINDOWS_PIP_BOOTSTRAP["sha256"],
+        )
+        if pip_record["filename"] != WINDOWS_PIP_BOOTSTRAP["filename"]:
+            raise NoneBotPilotError("PyPI pip bootstrap wheel filename differs from the frozen profile identity")
+        pip_path, pip_downloaded_bytes, pip_cache_hit = _download_wheel(pip_record, cache_root)
+        shutil.copyfile(pip_path, bundle / "pip-bootstrap.whl")
+        spec = {
+            "registry_entry_id": entry_id, "package": entry.get("package"), "version": version,
+            "profile_id": unit.get("profile_id"), "profile_lock_sha256": _sha256(profile_lock_raw),
+            "artifact_sha256": artifact["computed_digests"]["sha256"], "entry_point": entry_point,
+            "pip_bootstrap_sha256": WINDOWS_PIP_BOOTSTRAP["sha256"],
+            "install_timeout_seconds": max(30, min(timeout_seconds - 30, 1200)),
+            "native_timeout_seconds": max(30, min(timeout_seconds - 20, 600)),
+        }
+        (bundle / "requirements.txt").write_bytes(lock_raw)
+        (bundle / "spec.json").write_text(json.dumps(spec, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+        _windows_probe_scripts(bundle)
+        bundle_bytes = sum(item.stat().st_size for item in bundle.rglob("*") if item.is_file())
+        temp_root = cache_root / "s209-windows-worker-temp"
+        temp_root.mkdir(parents=True, exist_ok=True)
+        worker = WindowsSandboxWorker(repository_root=ROOT, temporary_root=temp_root)
+        command = (
+            r"C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe",
+            "-NoProfile", "-NonInteractive", "-ExecutionPolicy", "Bypass",
+            "-File", r"C:\Ligamina\Input\run-nonebot-pilot.ps1",
+        )
+        labels = worker_labels or {}
+        result = worker.run(WorkerSpec(
+            run_id=labels.get("campaign_id", "p305-nonebot-windows-pilot"), entry_id=entry_id,
+            command=command, input_dir=bundle,
+            limits=WorkerLimits(timeout_seconds=timeout_seconds, memory_mb=8192, cpu_cores=2, process_limit=256),
+            attempt_id=labels.get("attempt_id"), generation=labels.get("generation"), job_id=labels.get("job_id"),
+        ))
+        protocol = None
+        for line in reversed(result.stdout.decode("utf-8", errors="replace").splitlines()):
+            try:
+                candidate = json.loads(line)
+            except json.JSONDecodeError:
+                continue
+            if isinstance(candidate, dict) and candidate.get("task_id") == "S2-09" and candidate.get("registry_entry_id") == entry_id:
+                protocol = candidate
+                break
+        if isinstance(protocol, dict):
+            protocol = _reclassify_windows_app_control_load(protocol)
+            protocol["cleanup"] = {
+                "status": "passed" if result.cleanup_confirmed else "unknown",
+                "reason_code": None if result.cleanup_confirmed else "worker_cleanup_unconfirmed",
+                "evidence": "Windows Sandbox teardown and worker resource reconciliation",
+            }
+        if result.status != "passed" or not result.cleanup_confirmed or not isinstance(protocol, dict):
+            overall_status = "unknown" if result.status == "unknown" else "failed"
+            overall_reason = result.reason_code or "worker_report_invalid"
+        else:
+            stage_statuses = [protocol.get(key, {}).get("status") for key in ("dependency_install", "native_load", "cleanup")]
+            if "failed" in stage_statuses:
+                overall_status = "failed"
+            elif "unknown" in stage_statuses:
+                overall_status = "unknown"
+            else:
+                overall_status = "skipped"
+            overall_reason = next((protocol[key].get("reason_code") for key in ("dependency_install", "native_load", "cleanup") if protocol.get(key, {}).get("reason_code")), "missing_entry_bound_fixture" if overall_status == "skipped" else None)
+        return {
+            "schema_version": 1, "task_id": "S2-09", "result_id": f"catalog:{entry_id}|windows",
+            "unit_type": "catalog_entry", "registry_entry_id": entry_id, "ecosystem": "nonebot",
+            "package": entry.get("package"), "version": version, "platform": "windows",
+            "status": overall_status, "reason_code": overall_reason, "attempted": True,
+            "detail": "NoneBot dependencies were installed offline with hashes and the native plugin was loaded using the P3-04 admitted PSF-signed CPython runtime inside Windows Sandbox; no entry-bound behavior fixture exists.",
+            "profile_id": unit.get("profile_id"), "profile_lock_sha256": lock_ref["sha256"],
+            "profile_document_sha256": _sha256(profile_lock_raw), "catalog_document_sha256": _sha256(catalog_raw),
+            "artifact_lock_sha256": _sha256(artifact_lock_raw), "requirements_lock_sha256": _sha256(lock_raw),
+            "artifact_sha256": artifact["computed_digests"]["sha256"], "plugin_archive_bytes": artifact_path.stat().st_size,
+            "dependency_archives": dependency_stats,
+            "windows_runtime": {**verified_runtime, "archive_bytes": runtime_archive.stat().st_size,
+                "executable_sha256": sha256_file(python_path), "authenticode_status": signature["status"],
+                "authenticode_signer": signature["signer_subject"], "extracted_file_count": extraction["file_count"],
+                "expanded_bytes": extraction["expanded_bytes"]},
+            "pip_bootstrap": {**WINDOWS_PIP_BOOTSTRAP, "wheel_size_bytes": pip_record["size_bytes"],
+                "downloaded_bytes": pip_downloaded_bytes, "cache_hit": pip_cache_hit, "metadata_receipt": pip_receipt},
+            "worker": {
+                "status": result.status, "reason_code": result.reason_code, "exit_code": result.exit_code,
+                "elapsed_seconds": result.elapsed_seconds, "peak_memory_bytes": result.peak_memory_bytes,
+                "memory_limit_mb": 8192, "cleanup_confirmed": result.cleanup_confirmed,
+                "stdout_sha256": result.stdout_sha256, "stderr_sha256": result.stderr_sha256,
+                "stdout_tail": result.stdout.decode("utf-8", errors="replace")[-4096:],
+                "stderr_tail": result.stderr.decode("utf-8", errors="replace")[-4096:],
+                "output_truncated": result.output_truncated, "input_bytes": bundle_bytes,
+                "runtime_archive_sha256": verified_runtime["archive_sha256"],
+                "runtime_executable_sha256": verified_runtime["executable_sha256"],
+                "network": "disabled by Windows Sandbox policy", "read_only_input": True,
+                "package_manager": "pip offline --require-hashes --only-binary", "protocol_report": protocol,
+            },
+            "resource_observations": protocol.get("resource_observations") if isinstance(protocol, dict) else None,
+        }
+
+
+def _catalog_context(
+    snapshot_dir: Path,
+    *,
+    platform: str = "linux",
+    profile_lock_path: Path | None = None,
+) -> tuple[dict[str, Any], dict[str, Any], dict[str, Any], dict[str, Any], bytes, bytes, bytes]:
+    catalog, units = load_catalog_units(snapshot_dir, (platform,), profile_lock_path=profile_lock_path)
     artifact_lock, artifact_raw = _read_json(snapshot_dir / "artifacts.lock.json")
-    profile_lock, profile_raw = _read_json(snapshot_dir / "profiles.lock.json")
+    selected_profile_lock = Path(profile_lock_path) if profile_lock_path else snapshot_dir / "profiles.lock.json"
+    profile_lock, profile_raw = _read_json(selected_profile_lock)
     catalog_raw = (snapshot_dir / "catalog.json").read_bytes()
     if not isinstance(catalog, dict) or not isinstance(units, list):
         raise NoneBotPilotError("frozen catalog snapshot did not validate")

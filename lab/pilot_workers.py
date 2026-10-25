@@ -1,4 +1,4 @@
-"""Hash-locked, offline Linux Worker dispatch for S2-09 catalog pilots.
+"""Hash-locked, offline Linux Docker and Windows Sandbox catalog pilot Workers.
 
 The host only downloads and verifies registry tarballs. npm extraction and all
 plugin imports happen inside the digest-pinned, network-disabled Docker Worker.
@@ -13,14 +13,17 @@ import hashlib
 import json
 import os
 import shutil
+import stat
 import subprocess
 import tempfile
 import time
+import zipfile
 from dataclasses import dataclass
 import urllib.error
 import urllib.parse
 import urllib.request
 from pathlib import Path
+from pathlib import PurePosixPath
 from typing import Any
 
 from .artifacts import DEFAULT_CACHE_ROOT, sha256_file
@@ -35,6 +38,14 @@ RUNTIME_LOCK_PATH = ROOT / "lab/baselines/runtime-images.lock.json"
 NPM_ALLOWED_HOST = "registry.npmjs.org"
 MAX_ARCHIVE_BYTES = 256 * 1024 * 1024
 MAX_FETCH_WORKERS = 8
+WINDOWS_NODE_RUNTIME = {
+    "version": "24.20.0",
+    "archive_url": "https://nodejs.org/dist/v24.20.0/node-v24.20.0-win-x64.zip",
+    "archive_sha256": "6cac9ffbca8f6a47091e4b5c772e0606049c3871cb67d900c0cedde630e545ba",
+    "archive_size_limit_bytes": 96 * 1024 * 1024,
+    "node_executable_sha256": "5c976096e04e5c2c1f091938926234cc9fbebfe9787ddd149351b3b0ecc707b5",
+    "checksum_source_url": "https://nodejs.org/en/blog/release/v24.20.0",
+}
 
 
 class PilotWorkerError(ValueError):
@@ -138,11 +149,20 @@ def _download_npm_archive(url: str, integrity: str, cache_root: Path, *, entry_p
     raise PilotWorkerError(f"could not download npm archive for {entry_path}: {last_error}")
 
 
-def _load_catalog_context(snapshot_dir: Path, platform: str) -> _CatalogContext:
+def _load_catalog_context(
+    snapshot_dir: Path,
+    platform: str,
+    *,
+    profile_lock_path: Path | None = None,
+) -> _CatalogContext:
     snapshot_dir = Path(snapshot_dir).resolve(strict=True)
-    catalog, units = load_catalog_units(snapshot_dir, (platform,))
+    catalog, units = (
+        load_catalog_units(snapshot_dir, (platform,), profile_lock_path=profile_lock_path)
+        if profile_lock_path is not None else load_catalog_units(snapshot_dir, (platform,))
+    )
     artifact_lock, artifact_raw = _read_json(snapshot_dir / "artifacts.lock.json")
-    profile_lock, profile_raw = _read_json(snapshot_dir / "profiles.lock.json")
+    selected_profile_path = Path(profile_lock_path).resolve(strict=True) if profile_lock_path is not None else snapshot_dir / "profiles.lock.json"
+    profile_lock, profile_raw = _read_json(selected_profile_path)
     return _CatalogContext(
         snapshot_dir=snapshot_dir,
         entries_by_id={item["registry_entry_id"]: item for item in catalog["entries"]},
@@ -665,8 +685,113 @@ def _tree_sha256(directory: Path) -> str:
     return digest.hexdigest()
 
 
-def _windows_node_runtime() -> tuple[Path, Path, dict[str, Any]]:
-    node_path = Path(os.environ.get("ProgramFiles", r"C:\Program Files")) / "nodejs" / "node.exe"
+def _download_windows_node_archive(cache_root: Path) -> Path:
+    record = WINDOWS_NODE_RUNTIME
+    parsed = urllib.parse.urlparse(record["archive_url"])
+    if parsed.scheme != "https" or parsed.hostname != "nodejs.org":
+        raise PilotWorkerError("pinned Windows Node archive URL is outside nodejs.org")
+    digest = record["archive_sha256"]
+    path = cache_root / "windows-node-runtime-cache" / "sha256" / digest[:2] / digest
+    if path.is_file():
+        if path.stat().st_size > record["archive_size_limit_bytes"] or sha256_file(path) != digest:
+            raise PilotWorkerError("cached Windows Node archive failed its frozen size/SHA-256 check")
+        return path
+    path.parent.mkdir(parents=True, exist_ok=True)
+    temporary = path.with_suffix(f".{os.getpid()}.tmp")
+    written = 0
+    digest_stream = hashlib.sha256()
+    request = urllib.request.Request(record["archive_url"], headers={"User-Agent": "Ligamina-catalog-pilot/1.0", "Accept-Encoding": "identity"})
+    try:
+        with urllib.request.urlopen(request, timeout=60) as response, temporary.open("wb") as output:
+            if urllib.parse.urlparse(response.geturl()).hostname != "nodejs.org":
+                raise PilotWorkerError("Node archive download redirected outside nodejs.org")
+            while True:
+                chunk = response.read(1024 * 1024)
+                if not chunk:
+                    break
+                written += len(chunk)
+                if written > record["archive_size_limit_bytes"]:
+                    raise PilotWorkerError("Node archive exceeded its frozen download bound")
+                digest_stream.update(chunk)
+                output.write(chunk)
+        if not written or digest_stream.hexdigest() != digest:
+            raise PilotWorkerError("downloaded Windows Node archive failed its official SHA-256 check")
+        try:
+            temporary.replace(path)
+        except FileExistsError:
+            temporary.unlink(missing_ok=True)
+            if not path.is_file() or sha256_file(path) != digest:
+                raise PilotWorkerError("concurrent Node archive cache write failed integrity check")
+    except BaseException:
+        temporary.unlink(missing_ok=True)
+        raise
+    return path
+
+
+def _extract_windows_node_runtime(archive_path: Path, destination: Path) -> dict[str, Any]:
+    root_name = "node-v24.20.0-win-x64"
+    destination.mkdir(parents=True, exist_ok=False)
+    seen: set[str] = set()
+    expanded = 0
+    file_count = 0
+    try:
+        with zipfile.ZipFile(archive_path) as archive:
+            for info in archive.infolist():
+                name = info.filename
+                relative = PurePosixPath(name)
+                key = relative.as_posix().casefold().rstrip("/")
+                mode = info.external_attr >> 16
+                if not name or "\\" in name or relative.is_absolute() or any(part in {"", ".", ".."} or ":" in part for part in relative.parts) or key in seen or stat.S_ISLNK(mode):
+                    raise PilotWorkerError("pinned Node archive contains an unsafe or duplicate path")
+                seen.add(key)
+                if not relative.parts or relative.parts[0] != root_name:
+                    continue
+                subpath = PurePosixPath(*relative.parts[1:])
+                if not subpath.parts:
+                    continue
+                if subpath.parts != ("node.exe",) and subpath.parts[:2] != ("node_modules", "npm"):
+                    continue
+                target = destination.joinpath(*subpath.parts)
+                if info.is_dir():
+                    target.mkdir(parents=True, exist_ok=True)
+                    continue
+                expanded += info.file_size
+                if info.file_size < 0 or expanded > 192 * 1024 * 1024:
+                    raise PilotWorkerError("pinned Node runtime exceeds its expanded size bound")
+                target.parent.mkdir(parents=True, exist_ok=True)
+                written = 0
+                with archive.open(info, "r") as source, target.open("xb") as output:
+                    while True:
+                        chunk = source.read(1024 * 1024)
+                        if not chunk:
+                            break
+                        written += len(chunk)
+                        if written > info.file_size or written > 192 * 1024 * 1024:
+                            raise PilotWorkerError("Node archive member exceeded its declared size")
+                        output.write(chunk)
+                if written != info.file_size:
+                    raise PilotWorkerError("Node archive member length differs from its directory entry")
+                file_count += 1
+    except PilotWorkerError:
+        shutil.rmtree(destination, ignore_errors=True)
+        raise
+    except (OSError, zipfile.BadZipFile, RuntimeError) as error:
+        shutil.rmtree(destination, ignore_errors=True)
+        raise PilotWorkerError(f"pinned Node archive could not be safely extracted: {error}") from error
+    node_path = destination / "node.exe"
+    npm_package = destination / "node_modules" / "npm" / "package.json"
+    if not node_path.is_file() or not npm_package.is_file():
+        shutil.rmtree(destination, ignore_errors=True)
+        raise PilotWorkerError("pinned Node archive lacks node.exe or bundled npm")
+    if sha256_file(node_path) != WINDOWS_NODE_RUNTIME["node_executable_sha256"]:
+        shutil.rmtree(destination, ignore_errors=True)
+        raise PilotWorkerError("extracted Node executable differs from the frozen official SHA-256")
+    return {"file_count": file_count, "expanded_bytes": expanded}
+
+
+def _windows_node_runtime(runtime_dir: Path | None = None) -> tuple[Path, Path, dict[str, Any]]:
+    node_root = Path(runtime_dir).resolve(strict=True) if runtime_dir is not None else Path(os.environ.get("ProgramFiles", r"C:\Program Files")) / "nodejs"
+    node_path = node_root / "node.exe"
     npm_root = node_path.parent / "node_modules" / "npm"
     if not node_path.is_file() or not npm_root.is_dir():
         raise PilotWorkerError("a local Node.js 24.20.0 runtime and bundled npm are required for Windows Koishi pilot")
@@ -678,6 +803,9 @@ def _windows_node_runtime() -> tuple[Path, Path, dict[str, Any]]:
         raise PilotWorkerError(f"could not identify the Windows Node runtime: {error}") from error
     if node_version.returncode != 0 or node_version.stdout.strip() != "v24.20.0":
         raise PilotWorkerError(f"Windows Node runtime must be v24.20.0, got {node_version.stdout.strip()}")
+    node_sha256 = sha256_file(node_path)
+    if node_sha256 != WINDOWS_NODE_RUNTIME["node_executable_sha256"]:
+        raise PilotWorkerError("Windows Node executable differs from the frozen official v24.20.0 SHA-256")
     signature_command = (
         "Get-AuthenticodeSignature -LiteralPath '" + str(node_path).replace("'", "''")
         + "' | ForEach-Object { '{0}|{1}' -f $_.Status,$_.SignerCertificate.Subject }"
@@ -697,7 +825,7 @@ def _windows_node_runtime() -> tuple[Path, Path, dict[str, Any]]:
         raise PilotWorkerError("Windows Node runtime lacks the expected valid OpenJS Foundation signature")
     return node_path, npm_root, {
         "node_version": node_version.stdout.strip().lstrip("v"),
-        "node_sha256": sha256_file(node_path),
+        "node_sha256": node_sha256,
         "node_bytes": node_path.stat().st_size,
         "authenticode_status": signature_value[0],
         "authenticode_signer": signature_value[1],
@@ -712,9 +840,20 @@ def run_koishi_windows_load_probe(
     *,
     cache_root: Path = DEFAULT_CACHE_ROOT,
     timeout_seconds: int = 300,
+    memory_mb: int = 16384,
+    worker_labels: dict[str, Any] | None = None,
+    probe_semantics_version: int = 2,
+    host_service_plugins: list[dict[str, Any]] | None = None,
+    host_service_profile_id: str | None = None,
     _context: _CatalogContext | None = None,
 ) -> dict[str, Any]:
     """Install one portable Koishi profile and load its entry in Windows Sandbox."""
+    if probe_semantics_version not in {1, 2, 3}:
+        raise PilotWorkerError("Koishi probe semantics version is unsupported")
+    if (host_service_plugins or host_service_profile_id) and probe_semantics_version < 3:
+        raise PilotWorkerError("Koishi host service profiles require probe semantics version 3")
+    if worker_labels and not all(key in worker_labels for key in ("campaign_id", "job_id", "attempt_id", "generation")):
+        raise PilotWorkerError("worker labels require campaign_id, job_id, attempt_id, and generation")
     snapshot_dir = Path(snapshot_dir).resolve(strict=True)
     cache_root = Path(cache_root).resolve(strict=True)
     context = _context or _load_catalog_context(snapshot_dir, "windows")
@@ -726,7 +865,7 @@ def run_koishi_windows_load_probe(
         raise PilotWorkerError("catalog plugin tarball failed its frozen artifact hash check")
     lock_path = cache_root / lock_ref["cache_path"]
     lock, lock_raw = _load_npm_lock(lock_path, lock_ref)
-    node_path, npm_root, runtime = _windows_node_runtime()
+    node_archive = _download_windows_node_archive(cache_root)
     package_name = unit["package"]
     direct_record = lock.get("packages", {}).get(f"node_modules/{package_name}", {})
     artifact_sha = sha256_file(artifact_path)
@@ -744,18 +883,33 @@ def run_koishi_windows_load_probe(
         project_dir = bundle / "project"
         dependency_stats = _prepare_npm_project(lock, package_name=package_name, cache_root=cache_root, project_dir=project_dir)
         shutil.copyfile(artifact_path, project_dir / "catalog-plugin.tgz")
+        node_source = bundle / "verified-node-source"
+        node_archive_inventory = _extract_windows_node_runtime(node_archive, node_source)
+        node_path, npm_root, runtime = _windows_node_runtime(node_source)
+        runtime.update({
+            "archive_url": WINDOWS_NODE_RUNTIME["archive_url"],
+            "archive_sha256": WINDOWS_NODE_RUNTIME["archive_sha256"],
+            "archive_bytes": node_archive.stat().st_size,
+            "archive_checksum_source_url": WINDOWS_NODE_RUNTIME["checksum_source_url"],
+            "extracted_file_count": node_archive_inventory["file_count"],
+            "expanded_bytes": node_archive_inventory["expanded_bytes"],
+        })
         runtime_dir = bundle / "runtime"
         runtime_dir.mkdir()
         shutil.copy2(node_path, runtime_dir / "node.exe")
         shutil.copytree(npm_root, runtime_dir / "node_modules" / "npm", symlinks=False)
+        shutil.rmtree(node_source)
         spec = {
             "registry_entry_id": entry_id,
             "package": package_name,
             "version": unit.get("version"),
             "profile_id": unit["profile_id"],
+            "probe_semantics_version": probe_semantics_version,
             "profile_lock_sha256": lock_ref["sha256"],
             "artifact_sha256": artifact_sha,
             "install_timeout_ms": min(timeout_seconds * 1000 - 5000, 20 * 60 * 1000),
+            **({"host_service_plugins": host_service_plugins} if host_service_plugins is not None else {}),
+            **({"host_service_profile_id": host_service_profile_id} if host_service_profile_id else {}),
         }
         (bundle / "spec.json").write_text(json.dumps(spec, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
         _write_probe(project_dir, package_name=package_name, profile_lock_sha256=lock_ref["sha256"])
@@ -793,13 +947,17 @@ exit $LASTEXITCODE
             "-NoProfile", "-NonInteractive", "-ExecutionPolicy", "Bypass",
             "-File", r"C:\Ligamina\Input\run-koishi-pilot.ps1",
         )
+        identity = worker_labels or {}
         result = worker.run(
             WorkerSpec(
-                run_id="s209-koishi-windows-pilot",
+                run_id=identity.get("campaign_id", "s209-koishi-windows-pilot"),
                 entry_id=entry_id,
                 command=command,
                 input_dir=bundle,
-                limits=WorkerLimits(timeout_seconds=timeout_seconds, memory_mb=8192, cpu_cores=2, process_limit=256),
+                limits=WorkerLimits(timeout_seconds=timeout_seconds, memory_mb=memory_mb, cpu_cores=2, process_limit=256),
+                attempt_id=identity.get("attempt_id"),
+                generation=identity.get("generation"),
+                job_id=identity.get("job_id"),
             )
         )
         protocol = None
@@ -858,7 +1016,9 @@ exit $LASTEXITCODE
                 "exit_code": result.exit_code,
                 "elapsed_seconds": result.elapsed_seconds,
                 "peak_memory_bytes": result.peak_memory_bytes,
-                "memory_limit_mb": 8192,
+                "memory_limit_mb": memory_mb,
+                "probe_semantics_version": probe_semantics_version,
+                "worker_labels": identity,
                 "cleanup_confirmed": result.cleanup_confirmed,
                 "stdout_sha256": result.stdout_sha256,
                 "stderr_sha256": result.stderr_sha256,
@@ -883,6 +1043,7 @@ def run_selected_koishi_pilot(
     cache_root: Path = DEFAULT_CACHE_ROOT,
     timeout_seconds: int = 240,
     platform: str = "linux",
+    windows_memory_mb: int = 16384,
     checkpoint_path: Path | None = None,
     resume_from: Path | None = None,
 ) -> dict[str, Any]:
@@ -907,7 +1068,13 @@ def run_selected_koishi_pilot(
 
     context = _load_catalog_context(snapshot_dir, platform)
     units = context.units_by_id
-    runtime_details = _windows_node_runtime()[2] if platform == "windows" else "Node.js runtime pinned by the Docker image and profile lock"
+    runtime_details = ({
+        "runtime_profile_id": "koishi-core-4.18.11-node-24.20.0-x86_64-portable-lock",
+        "node_version": WINDOWS_NODE_RUNTIME["version"],
+        "archive_sha256": WINDOWS_NODE_RUNTIME["archive_sha256"],
+        "node_executable_sha256": WINDOWS_NODE_RUNTIME["node_executable_sha256"],
+        "worker_verification": "official archive hash, executable hash, version, and OpenJS Authenticode checked before each Sandbox run",
+    } if platform == "windows" else "Node.js runtime pinned by the Docker image and profile lock")
     expected_ids = {f"catalog:{entry_id}|{platform}" for entry_id in ids}
     results: list[dict[str, Any]] = []
     resume_sha256 = None
@@ -1012,8 +1179,13 @@ def run_selected_koishi_pilot(
             }
         else:
             try:
-                probe = run_koishi_load_probe if platform == "linux" else run_koishi_windows_load_probe
-                result = probe(snapshot_dir, entry_id, cache_root=cache_root, timeout_seconds=timeout_seconds, _context=context)
+                if platform == "linux":
+                    result = run_koishi_load_probe(snapshot_dir, entry_id, cache_root=cache_root, timeout_seconds=timeout_seconds, _context=context)
+                else:
+                    result = run_koishi_windows_load_probe(
+                        snapshot_dir, entry_id, cache_root=cache_root, timeout_seconds=timeout_seconds,
+                        memory_mb=windows_memory_mb, _context=context,
+                    )
             except (PilotWorkerError, OSError, RuntimeError, StopIteration, ValueError) as error:
                 result = {
                     "schema_version": 1, "task_id": "S2-09", "result_id": result_id,

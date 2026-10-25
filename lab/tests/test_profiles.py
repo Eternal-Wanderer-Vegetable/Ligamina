@@ -2,20 +2,91 @@ from __future__ import annotations
 
 import base64
 import hashlib
+import json
+import tempfile
 import unittest
+from pathlib import Path
 
 from lab.profiles import (
     _direct_requirement_block,
     _integrity_matches,
+    _load_windows_runtime_admission,
     _npm_failure,
     _npm_lock_has_integrities,
     _profile_result_reusable,
     _python_failure,
+    _python_profile_id,
     _python_lock_has_hashes,
 )
+from lab.artifacts import ArtifactError, canonical_json_bytes, sha256_bytes
 
 
 class ProfileResolutionTests(unittest.TestCase):
+    def test_python_profile_identity_encodes_the_selected_patch_runtime(self) -> None:
+        self.assertEqual(
+            _python_profile_id("3.12.14", "windows-x86_64"),
+            "nonebot-2.5.0-onebot-2.4.6-py3.12.14-windows-x86_64",
+        )
+        self.assertEqual(
+            _python_profile_id("3.12.10", "windows-x86_64"),
+            "nonebot-2.5.0-onebot-2.4.6-py3.12.10-windows-x86_64",
+        )
+
+    def test_admitted_signed_windows_runtime_is_bound_to_its_report_hash(self) -> None:
+        runtime = {
+            "profile_id": "windows-cpython-3.12.10-official-embed-amd64-psf-signed",
+            "version": "3.12.10",
+            "architecture": "win_amd64",
+            "distribution": "python.org embeddable package",
+            "archive_url": "https://www.python.org/ftp/python/3.12.10/python-3.12.10-embed-amd64.zip",
+            "archive_sha256": "4acbed6dd1c744b0376e3b1cf57ce906f9dc9e95e68824584c8099a63025a3c3",
+            "executable_sha256": "4d6f5f81a4bca11191c4c7c6b43632694d0a4ce74e068619d8fdc161d469859a",
+            "authenticode_status": "Valid",
+            "signer": "Python Software Foundation",
+        }
+        runtime["profile_sha256"] = sha256_bytes(canonical_json_bytes(runtime))
+        document = {
+            "task_id": "P3-04",
+            "kind": "phase3_worker_admission",
+            "platform": "windows",
+            "status": "admitted",
+            "execution_scope": "worker_runtime_profile_only_no_catalog_plugins",
+            "runtime_profile": runtime,
+            "capabilities": {"claim_allowed_for_profile": True, "catalog_plugin_claims_allowed": False},
+        }
+        with tempfile.TemporaryDirectory() as temporary:
+            path = Path(temporary) / "admission.json"
+            path.write_bytes(canonical_json_bytes(document))
+            verified = _load_windows_runtime_admission(path)
+        self.assertEqual(verified["profile_id"], runtime["profile_id"])
+        self.assertEqual(verified["version"], "3.12.10")
+        self.assertEqual(verified["admission_report_sha256"], sha256_bytes(canonical_json_bytes(document)))
+
+    def test_windows_runtime_admission_rejects_an_unadmitted_or_tampered_identity(self) -> None:
+        runtime = {
+            "profile_id": "windows-cpython-3.12.10-official-embed-amd64-psf-signed",
+            "version": "3.12.10",
+            "architecture": "win_amd64",
+            "distribution": "python.org embeddable package",
+            "archive_url": "https://www.python.org/ftp/python/3.12.10/python-3.12.10-embed-amd64.zip",
+            "archive_sha256": "4acbed6dd1c744b0376e3b1cf57ce906f9dc9e95e68824584c8099a63025a3c3",
+            "executable_sha256": "4d6f5f81a4bca11191c4c7c6b43632694d0a4ce74e068619d8fdc161d469859a",
+            "authenticode_status": "Valid",
+            "signer": "Python Software Foundation",
+        }
+        runtime["profile_sha256"] = sha256_bytes(canonical_json_bytes(runtime))
+        document = {
+            "task_id": "P3-04", "kind": "phase3_worker_admission", "platform": "windows",
+            "status": "admitted", "execution_scope": "worker_runtime_profile_only_no_catalog_plugins",
+            "runtime_profile": runtime, "capabilities": {"claim_allowed_for_profile": True},
+        }
+        with tempfile.TemporaryDirectory() as temporary:
+            path = Path(temporary) / "admission.json"
+            document["runtime_profile"]["archive_sha256"] = "0" * 64
+            path.write_bytes(canonical_json_bytes(document))
+            with self.assertRaisesRegex(ArtifactError, "signed CPython 3.12.10"):
+                _load_windows_runtime_admission(path)
+
     def test_python_lock_direct_package_must_carry_the_selected_artifact_hash(self) -> None:
         lock = """# generated lock
 demo_plugin==1.2.3 \\

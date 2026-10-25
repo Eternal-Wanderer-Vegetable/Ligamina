@@ -341,7 +341,8 @@ class KoishiPilotWorkerPreparationTests(unittest.TestCase):
         self.assertEqual(resumed["results"], [expected])
         self.assertEqual(checkpoint_report["terminal_results"], 1)
         windows_probe.assert_called_once_with(
-            Path(temporary), entry_id, cache_root=Path(temporary), timeout_seconds=30, _context=context
+            Path(temporary), entry_id, cache_root=Path(temporary), timeout_seconds=30,
+            memory_mb=16384, _context=context,
         )
 
 

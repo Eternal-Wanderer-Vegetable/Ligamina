@@ -1,0 +1,190 @@
+{
+  "schema_version": 1,
+  "kind": "phase3_p305_windows_koishi_pilot_diagnostic",
+  "task_id": "P3-05",
+  "status": "diagnostic_only",
+  "created_at_utc": "2026-10-25T11:58:06+00:00",
+  "source_recovery_manifest_path": "outputs/acceptance/phase3-p301-recovery-manifest-20261020.json",
+  "source_recovery_manifest_sha256": "7df9f31a6f4f921c1c3bfc2fa02cdc43ff83c8476a6652921aa5879838369399",
+  "source_selection": {
+    "result_id": "catalog:ko-018cabc87fdd600bf1c3acd1|windows",
+    "identity": {
+      "snapshot_id": "p2-41649744e057d61031d5",
+      "registry_entry_id": "ko-018cabc87fdd600bf1c3acd1",
+      "ecosystem": "koishi",
+      "package": "koishi-plugin-rtc-bridge",
+      "version": "0.2.1",
+      "platform": "windows",
+      "profile_id": "koishi-core-4.18.11-node-24.20.0-x86_64-portable-lock",
+      "profile_lock_sha256": "68a7391620a06e7141d949519333a1f4fc5ccee7abd84dc036c46d09fdae8d38",
+      "artifact_sha256": "4510dfeee93144e4d048dea23783d27b9976b4d5ceac1e8fd9b282c6bf1e64be",
+      "dependency_lock_sha256": "e9624bfc5ed4fbabd3be1dbefc710fe6b80df6f585012818a229fafc8adab3be"
+    },
+    "identity_sha256": "88282d2d1848e56dee3938a6dd9b7fd190ba8ca6e2cec03c804e714e49485c3b",
+    "selection_reasons": [
+      "failure_domain:worker-resource-limit"
+    ],
+    "source": {
+      "task_id": "S2-11",
+      "shard_report_path": "outputs/acceptance/phase2-s211-rerun-census-windows-shard251of256-20261014.json",
+      "shard_report_sha256": "e96b54c1facf560ed1e16be51c75a0ea2f2cb475319e3014d47bfbcf985c488a",
+      "unit_status": "failed",
+      "attribution_domain": "worker-resource-limit",
+      "stage_statuses": {
+        "prepare": "passed",
+        "install": "failed",
+        "native": "skipped",
+        "federated": "skipped",
+        "compare": "skipped",
+        "cleanup": "passed"
+      },
+      "stage_result_sha256": {
+        "prepare": "84e32d42ee2e7a6d616e4c4583e83828a7e3a0bfdee2fdcde2f9cf9b7e649219",
+        "install": "a5130e9c2adc87cdb00c641009cd3300fe7af4edb296c31cf3161cad64099640",
+        "native": "2fc59eff7e39cef3626ed794c0803a4ce439b65a6a75bafa3ed648c12fa9d0fc",
+        "federated": "2fc59eff7e39cef3626ed794c0803a4ce439b65a6a75bafa3ed648c12fa9d0fc",
+        "compare": "54760bc887ea51bdb707c91f1a316af40f1d294f11b21ddf4a8b6f508d51a359",
+        "cleanup": "4b959393e6d32343f22fe6f4d0c96c303f0e19aa0cb1dd0d9a1d28bb8428aeb1"
+      }
+    },
+    "required_stages": [
+      "prepare",
+      "install",
+      "native",
+      "federated",
+      "compare",
+      "cleanup"
+    ]
+  },
+  "source_identity_sha256": "88282d2d1848e56dee3938a6dd9b7fd190ba8ca6e2cec03c804e714e49485c3b",
+  "profile_lock_path": "catalogs/p2-41649744e057d61031d5/profiles.lock.json",
+  "profile_lock_sha256": "68a7391620a06e7141d949519333a1f4fc5ccee7abd84dc036c46d09fdae8d38",
+  "denominator": {
+    "expected_units": 1,
+    "attempted_units": 1
+  },
+  "counts": {
+    "passed": 0,
+    "failed": 1,
+    "skipped": 0,
+    "unknown": 0
+  },
+  "gate": {
+    "health": "diagnostic_only",
+    "plugin_compatibility": "not_evaluated"
+  },
+  "result": {
+    "schema_version": 1,
+    "task_id": "S2-09",
+    "result_id": "catalog:ko-018cabc87fdd600bf1c3acd1|windows",
+    "unit_type": "catalog_entry",
+    "registry_entry_id": "ko-018cabc87fdd600bf1c3acd1",
+    "ecosystem": "koishi",
+    "package": "koishi-plugin-rtc-bridge",
+    "version": "0.2.1",
+    "platform": "windows",
+    "status": "failed",
+    "reason_code": "offline_npm_install_failed",
+    "attempted": true,
+    "detail": "Koishi dependency installation and native plugin load ran in Windows Sandbox with Networking=Disabled and npm lifecycle scripts disabled; no entry-bound behavior fixture exists.",
+    "profile_id": "koishi-core-4.18.11-node-24.20.0-x86_64-portable-lock",
+    "profile_lock_sha256": "e9624bfc5ed4fbabd3be1dbefc710fe6b80df6f585012818a229fafc8adab3be",
+    "profile_document_sha256": "68a7391620a06e7141d949519333a1f4fc5ccee7abd84dc036c46d09fdae8d38",
+    "artifact_lock_sha256": "8dcec5da7cd81b9ed7d0f4e8aead8e76ef15cd7e17dfcdc4fa6f7b8944b83d4a",
+    "npm_lock_sha256": "e9624bfc5ed4fbabd3be1dbefc710fe6b80df6f585012818a229fafc8adab3be",
+    "artifact_sha256": "4510dfeee93144e4d048dea23783d27b9976b4d5ceac1e8fd9b282c6bf1e64be",
+    "plugin_archive_bytes": 1116822,
+    "dependency_archives": {
+      "downloaded_bytes": 0,
+      "downloaded_archives": 0,
+      "cache_hits": 295,
+      "archive_bytes": 183962192,
+      "locked_package_count": 299,
+      "unique_archive_count": 295,
+      "package_lock_sha256": "4c5727239b7b2c123426bb09432514a9edb3d45bb9f7e9449b0331614ca89f98"
+    },
+    "windows_node_runtime": {
+      "node_version": "24.20.0",
+      "node_sha256": "5c976096e04e5c2c1f091938926234cc9fbebfe9787ddd149351b3b0ecc707b5",
+      "node_bytes": 93381448,
+      "authenticode_status": "Valid",
+      "authenticode_signer": "CN=OpenJS Foundation, O=OpenJS Foundation, L=San Francisco, S=California, C=US",
+      "npm_version": "11.19.0",
+      "npm_tree_sha256": "d7b69cc05246635e9e9ca8c3bc7da3551947841ebc1eb51e35adecea2d08de6b",
+      "archive_url": "https://nodejs.org/dist/v24.20.0/node-v24.20.0-win-x64.zip",
+      "archive_sha256": "6cac9ffbca8f6a47091e4b5c772e0606049c3871cb67d900c0cedde630e545ba",
+      "archive_bytes": 37539751,
+      "archive_checksum_source_url": "https://nodejs.org/en/blog/release/v24.20.0",
+      "extracted_file_count": 1927,
+      "expanded_bytes": 105891150
+    },
+    "worker": {
+      "status": "passed",
+      "reason_code": null,
+      "exit_code": 0,
+      "elapsed_seconds": 56.75106899999082,
+      "peak_memory_bytes": 8606797824,
+      "memory_limit_mb": 8192,
+      "cleanup_confirmed": true,
+      "stdout_sha256": "dfd35221ca82859c15bc1ad35e366c7c41286372d0eee5d7825613c5414fc7b9",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": "{\"schema_version\":1,\"task_id\":\"S2-09\",\"registry_entry_id\":\"ko-018cabc87fdd600bf1c3acd1\",\"package\":\"koishi-plugin-rtc-bridge\",\"version\":\"0.2.1\",\"profile_id\":\"koishi-core-4.18.11-node-24.20.0-x86_64-portable-lock\",\"probe_semantics_version\":2,\"profile_lock_sha256\":\"e9624bfc5ed4fbabd3be1dbefc710fe6b80df6f585012818a229fafc8adab3be\",\"artifact_sha256\":\"4510dfeee93144e4d048dea23783d27b9976b4d5ceac1e8fd9b282c6bf1e64be\",\"dependency_install\":{\"status\":\"failed\",\"exit_code\":1,\"reason_code\":\"offline_npm_install_failed\",\"stdout_bytes\":0,\"stderr_bytes\":1710,\"stdout_sha256\":\"e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855\",\"stderr_sha256\":\"e80bfbed916d2cf3d18d5f7b39d8d0f0a3a7446dd4f09f13b3952c0aff900efd\",\"stdout_tail\":\"\",\"stderr_tail\":\"LIGAMINA_NPM_RUNTIME={\\\"heap_limit_bytes\\\":2348810240}\\nnpm warn deprecated @koa/router@10.1.1: **IMPORTANT 10x+ PERFORMANCE UPGRADE**: Please upgrade to v12.0.1+ as we have fixed an issue with debuglog causing 10x slower router benchmark performance, see https://github.com/koajs/router/pull/173\\nnpm warn deprecated uuid@8.3.2: uuid@10 and below is no longer supported.  For ESM codebases, update to uuid@latest.  For CommonJS codebases, use uuid@11 (but be aware this version will likely be deprecated in 2028).\\nnpm warn cleanup Failed to remove some directories [\\nnpm warn cleanup   [\\nnpm warn cleanup     '\\\\\\\\\\\\\\\\?\\\\\\\\C:\\\\\\\\Ligamina\\\\\\\\Workspace\\\\\\\\project\\\\\\\\node_modules\\\\\\\\@koa',\\nnpm warn cleanup     [Error: EPERM: operation not permitted, rmdir 'C:\\\\Ligamina\\\\Workspace\\\\project\\\\node_modules\\\\@koa\\\\router\\\\node_modules'] {\\nnpm warn cleanup       errno: -4048,\\nnpm warn cleanup       code: 'EPERM',\\nnpm warn cleanup       syscall: 'rmdir',\\nnpm warn cleanup       path: 'C:\\\\\\\\Ligamina\\\\\\\\Workspace\\\\\\\\project\\\\\\\\node_modules\\\\\\\\@koa\\\\\\\\router\\\\\\\\node_modules'\\nnpm warn cleanup     }\\nnpm warn cleanup   ],\\nnpm warn cleanup   [\\nnpm warn cleanup     '\\\\\\\\\\\\\\\\?\\\\\\\\C:\\\\\\\\Ligamina\\\\\\\\Workspace\\\\\\\\project\\\\\\\\node_modules',\\nnpm warn cleanup     [Error: EPERM: operation not permitted, rmdir 'C:\\\\Ligamina\\\\Workspace\\\\project\\\\node_modules\\\\cookies'] {\\nnpm warn cleanup       errno: -4048,\\nnpm warn cleanup       code: 'EPERM',\\nnpm warn cleanup       syscall: 'rmdir',\\nnpm warn cleanup       path: 'C:\\\\\\\\Ligamina\\\\\\\\Workspace\\\\\\\\project\\\\\\\\node_modules\\\\\\\\cookies'\\nnpm warn cleanup     }\\nnpm warn cleanup   ]\\nnpm warn cleanup ]\\nnpm error code ERR_MEMORY_ALLOCATION_FAILED\\nnpm error Failed to allocate memory\\nnpm error Log files were not written due to the config logs-max=0\\n\"},\"native_load\":{\"status\":\"skipped\",\"reason_code\":\"dependency_install_failed\"},\"behavior\":{\"status\":\"skipped\",\"reason_code\":\"missing_entry_bound_fixture\"},\"cleanup\":{\"status\":\"passed\"},\"environment\":{\"ecosystem\":\"koishi\",\"runtime_version\":\"24.20.0\",\"v8_heap_limit_bytes\":2348810240,\"host_node_options_ignored\":true,\"npm_v8_heap_limit_bytes\":2348810240},\"resource_observations\":{\"peak_writable_scratch_bytes\":291960207,\"sample_count\":4}}\n",
+      "stderr_tail": "",
+      "output_truncated": false,
+      "input_bytes": 291154712,
+      "runtime_binary_sha256": "5c976096e04e5c2c1f091938926234cc9fbebfe9787ddd149351b3b0ecc707b5",
+      "network": "disabled by Windows Sandbox policy",
+      "read_only_input": true,
+      "npm_scripts": "disabled",
+      "protocol_report": {
+        "schema_version": 1,
+        "task_id": "S2-09",
+        "registry_entry_id": "ko-018cabc87fdd600bf1c3acd1",
+        "package": "koishi-plugin-rtc-bridge",
+        "version": "0.2.1",
+        "profile_id": "koishi-core-4.18.11-node-24.20.0-x86_64-portable-lock",
+        "probe_semantics_version": 2,
+        "profile_lock_sha256": "e9624bfc5ed4fbabd3be1dbefc710fe6b80df6f585012818a229fafc8adab3be",
+        "artifact_sha256": "4510dfeee93144e4d048dea23783d27b9976b4d5ceac1e8fd9b282c6bf1e64be",
+        "dependency_install": {
+          "status": "failed",
+          "exit_code": 1,
+          "reason_code": "offline_npm_install_failed",
+          "stdout_bytes": 0,
+          "stderr_bytes": 1710,
+          "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "stderr_sha256": "e80bfbed916d2cf3d18d5f7b39d8d0f0a3a7446dd4f09f13b3952c0aff900efd",
+          "stdout_tail": "",
+          "stderr_tail": "LIGAMINA_NPM_RUNTIME={\"heap_limit_bytes\":2348810240}\nnpm warn deprecated @koa/router@10.1.1: **IMPORTANT 10x+ PERFORMANCE UPGRADE**: Please upgrade to v12.0.1+ as we have fixed an issue with debuglog causing 10x slower router benchmark performance, see https://github.com/koajs/router/pull/173\nnpm warn deprecated uuid@8.3.2: uuid@10 and below is no longer supported.  For ESM codebases, update to uuid@latest.  For CommonJS codebases, use uuid@11 (but be aware this version will likely be deprecated in 2028).\nnpm warn cleanup Failed to remove some directories [\nnpm warn cleanup   [\nnpm warn cleanup     '\\\\\\\\?\\\\C:\\\\Ligamina\\\\Workspace\\\\project\\\\node_modules\\\\@koa',\nnpm warn cleanup     [Error: EPERM: operation not permitted, rmdir 'C:\\Ligamina\\Workspace\\project\\node_modules\\@koa\\router\\node_modules'] {\nnpm warn cleanup       errno: -4048,\nnpm warn cleanup       code: 'EPERM',\nnpm warn cleanup       syscall: 'rmdir',\nnpm warn cleanup       path: 'C:\\\\Ligamina\\\\Workspace\\\\project\\\\node_modules\\\\@koa\\\\router\\\\node_modules'\nnpm warn cleanup     }\nnpm warn cleanup   ],\nnpm warn cleanup   [\nnpm warn cleanup     '\\\\\\\\?\\\\C:\\\\Ligamina\\\\Workspace\\\\project\\\\node_modules',\nnpm warn cleanup     [Error: EPERM: operation not permitted, rmdir 'C:\\Ligamina\\Workspace\\project\\node_modules\\cookies'] {\nnpm warn cleanup       errno: -4048,\nnpm warn cleanup       code: 'EPERM',\nnpm warn cleanup       syscall: 'rmdir',\nnpm warn cleanup       path: 'C:\\\\Ligamina\\\\Workspace\\\\project\\\\node_modules\\\\cookies'\nnpm warn cleanup     }\nnpm warn cleanup   ]\nnpm warn cleanup ]\nnpm error code ERR_MEMORY_ALLOCATION_FAILED\nnpm error Failed to allocate memory\nnpm error Log files were not written due to the config logs-max=0\n"
+        },
+        "native_load": {
+          "status": "skipped",
+          "reason_code": "dependency_install_failed"
+        },
+        "behavior": {
+          "status": "skipped",
+          "reason_code": "missing_entry_bound_fixture"
+        },
+        "cleanup": {
+          "status": "passed"
+        },
+        "environment": {
+          "ecosystem": "koishi",
+          "runtime_version": "24.20.0",
+          "v8_heap_limit_bytes": 2348810240,
+          "host_node_options_ignored": true,
+          "npm_v8_heap_limit_bytes": 2348810240
+        },
+        "resource_observations": {
+          "peak_writable_scratch_bytes": 291960207,
+          "sample_count": 4
+        }
+      }
+    },
+    "resource_observations": {
+      "peak_writable_scratch_bytes": 291960207,
+      "sample_count": 4
+    }
+  },
+  "report_sha256": "f9a9650affa18affb957b3f24fc1af4d2691b5de5af6cf0d9dbfa590dc3d78e4"
+}

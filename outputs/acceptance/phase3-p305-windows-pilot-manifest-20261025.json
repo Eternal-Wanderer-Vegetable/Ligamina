@@ -1,0 +1,1785 @@
+{
+  "schema_version": 1,
+  "contract": "phase3-windows-recovery-pilot-v1",
+  "kind": "phase3_p305_windows_pilot_manifest",
+  "campaign_id": "p3-recovery-windows-pilot-9666ebb4609f",
+  "snapshot_id": "p2-41649744e057d61031d5",
+  "platform": "windows",
+  "expected_units": 20,
+  "required_stage_positions": 60,
+  "stage_scope": [
+    "install",
+    "native",
+    "cleanup"
+  ],
+  "probe_semantics_version": 3,
+  "source_recovery_manifest_path": "outputs/acceptance/phase3-p301-recovery-manifest-20261020.json",
+  "source_recovery_manifest_sha256": "f084778b6cfee271876ba6493e039fc2a288e0295a7a0fe9353f0d6f2074416e",
+  "source_recovery_manifest_file_sha256": "7df9f31a6f4f921c1c3bfc2fa02cdc43ff83c8476a6652921aa5879838369399",
+  "artifact_lock_path": "catalogs/p2-41649744e057d61031d5/artifacts.lock.json",
+  "artifact_lock_sha256": "8dcec5da7cd81b9ed7d0f4e8aead8e76ef15cd7e17dfcdc4fa6f7b8944b83d4a",
+  "profile_lock_path": "outputs/acceptance/phase3-p305-windows-python31210-profile-lock-pilot-v3-20261025.json",
+  "profile_lock_sha256": "e58651dfa5e46b3ebc8590b7ba89fd7aef86e8dd42d47580c9ed7fb536d880df",
+  "runtime_admission_path": "outputs/acceptance/phase3-p304-windows-admission-python31210-20261025.json",
+  "runtime_admission_sha256": "3a1a1d5755df58ed8097a58b924cb683b278f475102c11be5de57fad3fca7d70",
+  "windows_node_runtime": {
+    "version": "24.20.0",
+    "archive_sha256": "6cac9ffbca8f6a47091e4b5c772e0606049c3871cb67d900c0cedde630e545ba",
+    "node_executable_sha256": "5c976096e04e5c2c1f091938926234cc9fbebfe9787ddd149351b3b0ecc707b5"
+  },
+  "worker_policy": {
+    "sandbox_memory_mb": 16384,
+    "cpu_cores": 2,
+    "process_limit": 256,
+    "network": "disabled",
+    "input": "read-only",
+    "npm_lifecycle_scripts": "disabled",
+    "windows_sandbox_required": true
+  },
+  "selection_algorithm": "10 NoneBot by registry-entry order; 10 Koishi stratified across prior Windows attribution domains then registry-entry order",
+  "selection": [
+    {
+      "selection_kind": "affected_windows_pilot",
+      "identity": {
+        "snapshot_id": "p2-41649744e057d61031d5",
+        "registry_entry_id": "nb-0051899c326ef8ed00eff8ab",
+        "ecosystem": "nonebot",
+        "package": "criminal_dance",
+        "version": "0.2.0",
+        "platform": "windows",
+        "profile_id": "nonebot-2.5.0-onebot-2.4.6-py3.12.10-windows-x86_64",
+        "profile_lock_sha256": "e58651dfa5e46b3ebc8590b7ba89fd7aef86e8dd42d47580c9ed7fb536d880df",
+        "artifact_sha256": "202bc14a29265879746720c410392bc79bdb34d9c5df526a90242670f5a9de6a",
+        "dependency_lock_sha256": "ee98bc178065b3dd364586832105b38feec6ad46a63dac2857f1038aacaf3ece"
+      },
+      "identity_sha256": "f64ed1bbecac54891174fd9177257c5b26d9d216c7c07b434ade6cae513a075e",
+      "source_identity": {
+        "snapshot_id": "p2-41649744e057d61031d5",
+        "registry_entry_id": "nb-0051899c326ef8ed00eff8ab",
+        "ecosystem": "nonebot",
+        "package": "criminal_dance",
+        "version": "0.2.0",
+        "platform": "windows",
+        "profile_id": "nonebot-2.5.0-onebot-2.4.6-py3.12.14-windows-x86_64",
+        "profile_lock_sha256": "68a7391620a06e7141d949519333a1f4fc5ccee7abd84dc036c46d09fdae8d38",
+        "artifact_sha256": "202bc14a29265879746720c410392bc79bdb34d9c5df526a90242670f5a9de6a",
+        "dependency_lock_sha256": "d4bb0e62e551c731ad21f4a4aa686ba0bf973dbbfc9a4c686cf051d487006f1d"
+      },
+      "source_identity_sha256": "8efe604f431d8707f80f9aa87dcb009899660d8158b55592e40399b9590ade6d",
+      "source_selection_reasons": [
+        "stage_unknown:install"
+      ],
+      "source": {
+        "result_id": "catalog:nb-0051899c326ef8ed00eff8ab|windows",
+        "identity": {
+          "snapshot_id": "p2-41649744e057d61031d5",
+          "registry_entry_id": "nb-0051899c326ef8ed00eff8ab",
+          "ecosystem": "nonebot",
+          "package": "criminal_dance",
+          "version": "0.2.0",
+          "platform": "windows",
+          "profile_id": "nonebot-2.5.0-onebot-2.4.6-py3.12.14-windows-x86_64",
+          "profile_lock_sha256": "68a7391620a06e7141d949519333a1f4fc5ccee7abd84dc036c46d09fdae8d38",
+          "artifact_sha256": "202bc14a29265879746720c410392bc79bdb34d9c5df526a90242670f5a9de6a",
+          "dependency_lock_sha256": "d4bb0e62e551c731ad21f4a4aa686ba0bf973dbbfc9a4c686cf051d487006f1d"
+        },
+        "identity_sha256": "8efe604f431d8707f80f9aa87dcb009899660d8158b55592e40399b9590ade6d",
+        "selection_reasons": [
+          "stage_unknown:install"
+        ],
+        "source": {
+          "task_id": "S2-11",
+          "shard_report_path": "outputs/acceptance/phase2-s211-rerun-census-windows-shard26of256-20261014.json",
+          "shard_report_sha256": "0060a3b0ea976add770aef712761dbb7fe53a5e2c1a126040dd35ae94f46e0a7",
+          "unit_status": "unknown",
+          "attribution_domain": "platform-policy",
+          "stage_statuses": {
+            "prepare": "passed",
+            "install": "unknown",
+            "native": "skipped",
+            "federated": "skipped",
+            "compare": "skipped",
+            "cleanup": "skipped"
+          },
+          "stage_result_sha256": {
+            "prepare": "3425594b53fb4c0a1e8c86f40b8dfa8a6e142d49a23d953cee00cb544a39b84f",
+            "install": "23a809983f3548c2cf673a80c4fedc6b8d5ed86bb8c0f67073f7a5b945d64eea",
+            "native": "828ce97e064676fc760335b40878f75a75819225ecf606de0f2cecde9165cf7e",
+            "federated": "828ce97e064676fc760335b40878f75a75819225ecf606de0f2cecde9165cf7e",
+            "compare": "b47e2fe4f69d7558332731539857d26f83adc34d6056afba0ab2bcc270e8da74",
+            "cleanup": "f1392bf40e6422554fe7c05b11a0282e2902106bf95ae7e94b4c67d7d04ce767"
+          }
+        },
+        "required_stages": [
+          "prepare",
+          "install",
+          "native",
+          "federated",
+          "compare",
+          "cleanup"
+        ]
+      },
+      "old_to_new_identity": {
+        "profile_id_changed": true,
+        "profile_lock_sha256_changed": true,
+        "dependency_lock_sha256_changed": true
+      }
+    },
+    {
+      "selection_kind": "affected_windows_pilot",
+      "identity": {
+        "snapshot_id": "p2-41649744e057d61031d5",
+        "registry_entry_id": "nb-0054dd2d400d0361cd6b0277",
+        "ecosystem": "nonebot",
+        "package": "nonebot_plugin_shiro_web_console",
+        "version": "0.2.2",
+        "platform": "windows",
+        "profile_id": "nonebot-2.5.0-onebot-2.4.6-py3.12.10-windows-x86_64",
+        "profile_lock_sha256": "e58651dfa5e46b3ebc8590b7ba89fd7aef86e8dd42d47580c9ed7fb536d880df",
+        "artifact_sha256": "cfe054f21c1eece93689facf3b90d7340cc97fd304df5bdd66680c0eefb4913a",
+        "dependency_lock_sha256": "92fdc5330eb5dedfa5fe49bc37197f44a95d3423436cedc17f12ec0bd31bc859"
+      },
+      "identity_sha256": "98edaee6cc7eccdfbe376ba0029cd9eede060f8820258ad2a893b4692aaf7ec1",
+      "source_identity": {
+        "snapshot_id": "p2-41649744e057d61031d5",
+        "registry_entry_id": "nb-0054dd2d400d0361cd6b0277",
+        "ecosystem": "nonebot",
+        "package": "nonebot_plugin_shiro_web_console",
+        "version": "0.2.2",
+        "platform": "windows",
+        "profile_id": "nonebot-2.5.0-onebot-2.4.6-py3.12.14-windows-x86_64",
+        "profile_lock_sha256": "68a7391620a06e7141d949519333a1f4fc5ccee7abd84dc036c46d09fdae8d38",
+        "artifact_sha256": "cfe054f21c1eece93689facf3b90d7340cc97fd304df5bdd66680c0eefb4913a",
+        "dependency_lock_sha256": "055c1496f47ee3ee549e5241e9f79a8cb275f062fa2ef4a0a8fcab562f66013a"
+      },
+      "source_identity_sha256": "400233934aa6cf94d8a35f8fdc8b2f475b6d767b3d288812892a8e8cd2c99499",
+      "source_selection_reasons": [
+        "stage_unknown:install"
+      ],
+      "source": {
+        "result_id": "catalog:nb-0054dd2d400d0361cd6b0277|windows",
+        "identity": {
+          "snapshot_id": "p2-41649744e057d61031d5",
+          "registry_entry_id": "nb-0054dd2d400d0361cd6b0277",
+          "ecosystem": "nonebot",
+          "package": "nonebot_plugin_shiro_web_console",
+          "version": "0.2.2",
+          "platform": "windows",
+          "profile_id": "nonebot-2.5.0-onebot-2.4.6-py3.12.14-windows-x86_64",
+          "profile_lock_sha256": "68a7391620a06e7141d949519333a1f4fc5ccee7abd84dc036c46d09fdae8d38",
+          "artifact_sha256": "cfe054f21c1eece93689facf3b90d7340cc97fd304df5bdd66680c0eefb4913a",
+          "dependency_lock_sha256": "055c1496f47ee3ee549e5241e9f79a8cb275f062fa2ef4a0a8fcab562f66013a"
+        },
+        "identity_sha256": "400233934aa6cf94d8a35f8fdc8b2f475b6d767b3d288812892a8e8cd2c99499",
+        "selection_reasons": [
+          "stage_unknown:install"
+        ],
+        "source": {
+          "task_id": "S2-11",
+          "shard_report_path": "outputs/acceptance/phase2-s211-rerun-census-windows-shard134of256-20261014.json",
+          "shard_report_sha256": "98b55c01844d0064ce55e3b20e84325888a928c572e867d901f40de18ad6ceb4",
+          "unit_status": "unknown",
+          "attribution_domain": "platform-policy",
+          "stage_statuses": {
+            "prepare": "passed",
+            "install": "unknown",
+            "native": "skipped",
+            "federated": "skipped",
+            "compare": "skipped",
+            "cleanup": "skipped"
+          },
+          "stage_result_sha256": {
+            "prepare": "318077432f08a2e1113067f7e1458efc909c80ec309eef7e4f4eb10a5fc7f627",
+            "install": "23a809983f3548c2cf673a80c4fedc6b8d5ed86bb8c0f67073f7a5b945d64eea",
+            "native": "b400c59032f17cde9b2c6b2861fa7c7165aceb526aacac4fb9e5ffca7625aa90",
+            "federated": "b400c59032f17cde9b2c6b2861fa7c7165aceb526aacac4fb9e5ffca7625aa90",
+            "compare": "56c076b8e74e679dbf675f36729d0592b4c6fb9595ac5c6952f649ed00d7155a",
+            "cleanup": "f1392bf40e6422554fe7c05b11a0282e2902106bf95ae7e94b4c67d7d04ce767"
+          }
+        },
+        "required_stages": [
+          "prepare",
+          "install",
+          "native",
+          "federated",
+          "compare",
+          "cleanup"
+        ]
+      },
+      "old_to_new_identity": {
+        "profile_id_changed": true,
+        "profile_lock_sha256_changed": true,
+        "dependency_lock_sha256_changed": true
+      }
+    },
+    {
+      "selection_kind": "affected_windows_pilot",
+      "identity": {
+        "snapshot_id": "p2-41649744e057d61031d5",
+        "registry_entry_id": "nb-005f1c44fb0a5194b2cef12b",
+        "ecosystem": "nonebot",
+        "package": "nonebot_plugin_dicky_pk",
+        "version": "0.7.1",
+        "platform": "windows",
+        "profile_id": "nonebot-2.5.0-onebot-2.4.6-py3.12.10-windows-x86_64",
+        "profile_lock_sha256": "e58651dfa5e46b3ebc8590b7ba89fd7aef86e8dd42d47580c9ed7fb536d880df",
+        "artifact_sha256": "adccb7fef70fa8a58fd6c7093f14f000cbfcde1c1a895adcd8597337db8d4697",
+        "dependency_lock_sha256": "35007306f79063273a7a3271b4d07a379fd8d6ca2f60811756f37ee72a4cbfa3"
+      },
+      "identity_sha256": "fa3c1ddc3cec8c698a0e8696c77610e2b70ae0725c3281636641ceedae01d1d6",
+      "source_identity": {
+        "snapshot_id": "p2-41649744e057d61031d5",
+        "registry_entry_id": "nb-005f1c44fb0a5194b2cef12b",
+        "ecosystem": "nonebot",
+        "package": "nonebot_plugin_dicky_pk",
+        "version": "0.7.1",
+        "platform": "windows",
+        "profile_id": "nonebot-2.5.0-onebot-2.4.6-py3.12.14-windows-x86_64",
+        "profile_lock_sha256": "68a7391620a06e7141d949519333a1f4fc5ccee7abd84dc036c46d09fdae8d38",
+        "artifact_sha256": "adccb7fef70fa8a58fd6c7093f14f000cbfcde1c1a895adcd8597337db8d4697",
+        "dependency_lock_sha256": "5defd16649938eb76486c68dd1f40e4bfda3897567c8189863498a49699ce6af"
+      },
+      "source_identity_sha256": "8ded9331350ead144eff3662654c3d747b02c6922a1b086bbf909d223093fa83",
+      "source_selection_reasons": [
+        "stage_unknown:install"
+      ],
+      "source": {
+        "result_id": "catalog:nb-005f1c44fb0a5194b2cef12b|windows",
+        "identity": {
+          "snapshot_id": "p2-41649744e057d61031d5",
+          "registry_entry_id": "nb-005f1c44fb0a5194b2cef12b",
+          "ecosystem": "nonebot",
+          "package": "nonebot_plugin_dicky_pk",
+          "version": "0.7.1",
+          "platform": "windows",
+          "profile_id": "nonebot-2.5.0-onebot-2.4.6-py3.12.14-windows-x86_64",
+          "profile_lock_sha256": "68a7391620a06e7141d949519333a1f4fc5ccee7abd84dc036c46d09fdae8d38",
+          "artifact_sha256": "adccb7fef70fa8a58fd6c7093f14f000cbfcde1c1a895adcd8597337db8d4697",
+          "dependency_lock_sha256": "5defd16649938eb76486c68dd1f40e4bfda3897567c8189863498a49699ce6af"
+        },
+        "identity_sha256": "8ded9331350ead144eff3662654c3d747b02c6922a1b086bbf909d223093fa83",
+        "selection_reasons": [
+          "stage_unknown:install"
+        ],
+        "source": {
+          "task_id": "S2-11",
+          "shard_report_path": "outputs/acceptance/phase2-s211-rerun-census-windows-shard190of256-20261014.json",
+          "shard_report_sha256": "f49edf65df140902a0464812eb7fc9e7c6ee5d0db46b533ec9e9c854a6027e24",
+          "unit_status": "unknown",
+          "attribution_domain": "platform-policy",
+          "stage_statuses": {
+            "prepare": "passed",
+            "install": "unknown",
+            "native": "skipped",
+            "federated": "skipped",
+            "compare": "skipped",
+            "cleanup": "skipped"
+          },
+          "stage_result_sha256": {
+            "prepare": "0e1b1b5f8ed1f8ea3a195d937ee4e9213a9332cd924603b114489094e637b968",
+            "install": "23a809983f3548c2cf673a80c4fedc6b8d5ed86bb8c0f67073f7a5b945d64eea",
+            "native": "c8215a9a3627369f75945cca7d9ed94a25d8810f0ac7f8534f34eaac4acfe959",
+            "federated": "c8215a9a3627369f75945cca7d9ed94a25d8810f0ac7f8534f34eaac4acfe959",
+            "compare": "5496055d951a0794eb0e8ada9aa446fc215ed3569cd70907fa7dd44ac3b2719d",
+            "cleanup": "f1392bf40e6422554fe7c05b11a0282e2902106bf95ae7e94b4c67d7d04ce767"
+          }
+        },
+        "required_stages": [
+          "prepare",
+          "install",
+          "native",
+          "federated",
+          "compare",
+          "cleanup"
+        ]
+      },
+      "old_to_new_identity": {
+        "profile_id_changed": true,
+        "profile_lock_sha256_changed": true,
+        "dependency_lock_sha256_changed": true
+      }
+    },
+    {
+      "selection_kind": "affected_windows_pilot",
+      "identity": {
+        "snapshot_id": "p2-41649744e057d61031d5",
+        "registry_entry_id": "nb-010263635bbc11e0ba3fef3f",
+        "ecosystem": "nonebot",
+        "package": "nonebot_plugin_cube",
+        "version": "1.0.8",
+        "platform": "windows",
+        "profile_id": "nonebot-2.5.0-onebot-2.4.6-py3.12.10-windows-x86_64",
+        "profile_lock_sha256": "e58651dfa5e46b3ebc8590b7ba89fd7aef86e8dd42d47580c9ed7fb536d880df",
+        "artifact_sha256": "a4786b6e81a981f1ac19bf629821c4b29ca79275794bd0b79987b9cde339d2ff",
+        "dependency_lock_sha256": "586723e8e2eb9f79cfa942021d4a2817afd6ff62d44e55b18ff1e3032352742a"
+      },
+      "identity_sha256": "2417bf912252d64099483971efcd932e1757ac0df2ee70cc9674ab3a4e180468",
+      "source_identity": {
+        "snapshot_id": "p2-41649744e057d61031d5",
+        "registry_entry_id": "nb-010263635bbc11e0ba3fef3f",
+        "ecosystem": "nonebot",
+        "package": "nonebot_plugin_cube",
+        "version": "1.0.8",
+        "platform": "windows",
+        "profile_id": "nonebot-2.5.0-onebot-2.4.6-py3.12.14-windows-x86_64",
+        "profile_lock_sha256": "68a7391620a06e7141d949519333a1f4fc5ccee7abd84dc036c46d09fdae8d38",
+        "artifact_sha256": "a4786b6e81a981f1ac19bf629821c4b29ca79275794bd0b79987b9cde339d2ff",
+        "dependency_lock_sha256": "86fccd3ad9d51720943e8c50db5b4494c508f187e97396d86a429e932947951a"
+      },
+      "source_identity_sha256": "2c85828058e96aa25f855fe15583ce2884bb20112393c04cdd0c2dda2198ad9a",
+      "source_selection_reasons": [
+        "stage_unknown:install"
+      ],
+      "source": {
+        "result_id": "catalog:nb-010263635bbc11e0ba3fef3f|windows",
+        "identity": {
+          "snapshot_id": "p2-41649744e057d61031d5",
+          "registry_entry_id": "nb-010263635bbc11e0ba3fef3f",
+          "ecosystem": "nonebot",
+          "package": "nonebot_plugin_cube",
+          "version": "1.0.8",
+          "platform": "windows",
+          "profile_id": "nonebot-2.5.0-onebot-2.4.6-py3.12.14-windows-x86_64",
+          "profile_lock_sha256": "68a7391620a06e7141d949519333a1f4fc5ccee7abd84dc036c46d09fdae8d38",
+          "artifact_sha256": "a4786b6e81a981f1ac19bf629821c4b29ca79275794bd0b79987b9cde339d2ff",
+          "dependency_lock_sha256": "86fccd3ad9d51720943e8c50db5b4494c508f187e97396d86a429e932947951a"
+        },
+        "identity_sha256": "2c85828058e96aa25f855fe15583ce2884bb20112393c04cdd0c2dda2198ad9a",
+        "selection_reasons": [
+          "stage_unknown:install"
+        ],
+        "source": {
+          "task_id": "S2-11",
+          "shard_report_path": "outputs/acceptance/phase2-s211-rerun-census-windows-shard178of256-20261014.json",
+          "shard_report_sha256": "987c15853f31529dfbfbc8bb837dc40fb2132611cc1a99daaef5d77ab386f13b",
+          "unit_status": "unknown",
+          "attribution_domain": "platform-policy",
+          "stage_statuses": {
+            "prepare": "passed",
+            "install": "unknown",
+            "native": "skipped",
+            "federated": "skipped",
+            "compare": "skipped",
+            "cleanup": "skipped"
+          },
+          "stage_result_sha256": {
+            "prepare": "c38b84562ae56dca58545a2bfd1553703bd01444ea021ba4886a45a04d5d34d2",
+            "install": "23a809983f3548c2cf673a80c4fedc6b8d5ed86bb8c0f67073f7a5b945d64eea",
+            "native": "2e88a76c8c50e77857c7d48d889104518992bd17809ba6f773a8e6d3b3327ecf",
+            "federated": "2e88a76c8c50e77857c7d48d889104518992bd17809ba6f773a8e6d3b3327ecf",
+            "compare": "b3fc736d2496990f5e85acd3ee63f89f23c81ad3810ee26ace745ff133f05461",
+            "cleanup": "f1392bf40e6422554fe7c05b11a0282e2902106bf95ae7e94b4c67d7d04ce767"
+          }
+        },
+        "required_stages": [
+          "prepare",
+          "install",
+          "native",
+          "federated",
+          "compare",
+          "cleanup"
+        ]
+      },
+      "old_to_new_identity": {
+        "profile_id_changed": true,
+        "profile_lock_sha256_changed": true,
+        "dependency_lock_sha256_changed": true
+      }
+    },
+    {
+      "selection_kind": "affected_windows_pilot",
+      "identity": {
+        "snapshot_id": "p2-41649744e057d61031d5",
+        "registry_entry_id": "nb-01491b5cc43100c7f4b75a24",
+        "ecosystem": "nonebot",
+        "package": "nonebot_plugin_boardgamehelper",
+        "version": "1.0.0",
+        "platform": "windows",
+        "profile_id": "nonebot-2.5.0-onebot-2.4.6-py3.12.10-windows-x86_64",
+        "profile_lock_sha256": "e58651dfa5e46b3ebc8590b7ba89fd7aef86e8dd42d47580c9ed7fb536d880df",
+        "artifact_sha256": "9ca64c6eb01a6010bdd60f7972746bcbb31883ae4695a28398295b2043f7fc40",
+        "dependency_lock_sha256": "ca8ec39003e7b7a960c4f35f01c65a257ba11dfcf29af8c16fdbde38e8ff82d0"
+      },
+      "identity_sha256": "dd849c42c9eb4382d60242c5424c40165409e870dd2905df01bc6d2f96b7544f",
+      "source_identity": {
+        "snapshot_id": "p2-41649744e057d61031d5",
+        "registry_entry_id": "nb-01491b5cc43100c7f4b75a24",
+        "ecosystem": "nonebot",
+        "package": "nonebot_plugin_boardgamehelper",
+        "version": "1.0.0",
+        "platform": "windows",
+        "profile_id": "nonebot-2.5.0-onebot-2.4.6-py3.12.14-windows-x86_64",
+        "profile_lock_sha256": "68a7391620a06e7141d949519333a1f4fc5ccee7abd84dc036c46d09fdae8d38",
+        "artifact_sha256": "9ca64c6eb01a6010bdd60f7972746bcbb31883ae4695a28398295b2043f7fc40",
+        "dependency_lock_sha256": "a899d667891ddd19e6b885561f74447cc3f83c1528519385a444f6c3e2606744"
+      },
+      "source_identity_sha256": "74ecd973543d8ad9add67d0054d091e58250ebf131ba6f8aa709f5226c7e0bd6",
+      "source_selection_reasons": [
+        "stage_unknown:install"
+      ],
+      "source": {
+        "result_id": "catalog:nb-01491b5cc43100c7f4b75a24|windows",
+        "identity": {
+          "snapshot_id": "p2-41649744e057d61031d5",
+          "registry_entry_id": "nb-01491b5cc43100c7f4b75a24",
+          "ecosystem": "nonebot",
+          "package": "nonebot_plugin_boardgamehelper",
+          "version": "1.0.0",
+          "platform": "windows",
+          "profile_id": "nonebot-2.5.0-onebot-2.4.6-py3.12.14-windows-x86_64",
+          "profile_lock_sha256": "68a7391620a06e7141d949519333a1f4fc5ccee7abd84dc036c46d09fdae8d38",
+          "artifact_sha256": "9ca64c6eb01a6010bdd60f7972746bcbb31883ae4695a28398295b2043f7fc40",
+          "dependency_lock_sha256": "a899d667891ddd19e6b885561f74447cc3f83c1528519385a444f6c3e2606744"
+        },
+        "identity_sha256": "74ecd973543d8ad9add67d0054d091e58250ebf131ba6f8aa709f5226c7e0bd6",
+        "selection_reasons": [
+          "stage_unknown:install"
+        ],
+        "source": {
+          "task_id": "S2-11",
+          "shard_report_path": "outputs/acceptance/phase2-s211-rerun-census-windows-shard110of256-20261014.json",
+          "shard_report_sha256": "9755164c1357311d6f5bcc71fc60567acc7ff5e5d3b397cbe2cb0d0088c1c2d4",
+          "unit_status": "unknown",
+          "attribution_domain": "platform-policy",
+          "stage_statuses": {
+            "prepare": "passed",
+            "install": "unknown",
+            "native": "skipped",
+            "federated": "skipped",
+            "compare": "skipped",
+            "cleanup": "skipped"
+          },
+          "stage_result_sha256": {
+            "prepare": "4db57e1560cb730a88bbd2f7de8ff5606c20cb2ae1cef0a102918870defa9649",
+            "install": "23a809983f3548c2cf673a80c4fedc6b8d5ed86bb8c0f67073f7a5b945d64eea",
+            "native": "093f0b20144c31680605c15ab194439c508fdc378c084e282875abf425a8c718",
+            "federated": "093f0b20144c31680605c15ab194439c508fdc378c084e282875abf425a8c718",
+            "compare": "9ed2a950b3ab9b9457b26abca249d60636124b9eff2599a5345df5369f05ab3c",
+            "cleanup": "f1392bf40e6422554fe7c05b11a0282e2902106bf95ae7e94b4c67d7d04ce767"
+          }
+        },
+        "required_stages": [
+          "prepare",
+          "install",
+          "native",
+          "federated",
+          "compare",
+          "cleanup"
+        ]
+      },
+      "old_to_new_identity": {
+        "profile_id_changed": true,
+        "profile_lock_sha256_changed": true,
+        "dependency_lock_sha256_changed": true
+      }
+    },
+    {
+      "selection_kind": "affected_windows_pilot",
+      "identity": {
+        "snapshot_id": "p2-41649744e057d61031d5",
+        "registry_entry_id": "nb-01a8e5406bb44c46fa984e91",
+        "ecosystem": "nonebot",
+        "package": "nonebot_plugin_jm",
+        "version": "0.4.1",
+        "platform": "windows",
+        "profile_id": "nonebot-2.5.0-onebot-2.4.6-py3.12.10-windows-x86_64",
+        "profile_lock_sha256": "e58651dfa5e46b3ebc8590b7ba89fd7aef86e8dd42d47580c9ed7fb536d880df",
+        "artifact_sha256": "3b3f0f59f31d05bf88c3aebf552652f64207609e441e938d8f38d5712755f25b",
+        "dependency_lock_sha256": "fe0d370f4234f842b939bffb3690be0999f9ad54d3b57d614821df70de086b46"
+      },
+      "identity_sha256": "d4b0d9a027ed1b6738f4303e6d9b032d55b7bbfea9bc6b4b8a39163c4f6a49f2",
+      "source_identity": {
+        "snapshot_id": "p2-41649744e057d61031d5",
+        "registry_entry_id": "nb-01a8e5406bb44c46fa984e91",
+        "ecosystem": "nonebot",
+        "package": "nonebot_plugin_jm",
+        "version": "0.4.1",
+        "platform": "windows",
+        "profile_id": "nonebot-2.5.0-onebot-2.4.6-py3.12.14-windows-x86_64",
+        "profile_lock_sha256": "68a7391620a06e7141d949519333a1f4fc5ccee7abd84dc036c46d09fdae8d38",
+        "artifact_sha256": "3b3f0f59f31d05bf88c3aebf552652f64207609e441e938d8f38d5712755f25b",
+        "dependency_lock_sha256": "b78aed7728c574f9c639f3c70562df1e08b1f9831c7b462dd847932f0cbe3469"
+      },
+      "source_identity_sha256": "18c2918d050860ce2975d960ea56ed6ff7dcff99b70f4063115b8d51b02b99ff",
+      "source_selection_reasons": [
+        "stage_unknown:install"
+      ],
+      "source": {
+        "result_id": "catalog:nb-01a8e5406bb44c46fa984e91|windows",
+        "identity": {
+          "snapshot_id": "p2-41649744e057d61031d5",
+          "registry_entry_id": "nb-01a8e5406bb44c46fa984e91",
+          "ecosystem": "nonebot",
+          "package": "nonebot_plugin_jm",
+          "version": "0.4.1",
+          "platform": "windows",
+          "profile_id": "nonebot-2.5.0-onebot-2.4.6-py3.12.14-windows-x86_64",
+          "profile_lock_sha256": "68a7391620a06e7141d949519333a1f4fc5ccee7abd84dc036c46d09fdae8d38",
+          "artifact_sha256": "3b3f0f59f31d05bf88c3aebf552652f64207609e441e938d8f38d5712755f25b",
+          "dependency_lock_sha256": "b78aed7728c574f9c639f3c70562df1e08b1f9831c7b462dd847932f0cbe3469"
+        },
+        "identity_sha256": "18c2918d050860ce2975d960ea56ed6ff7dcff99b70f4063115b8d51b02b99ff",
+        "selection_reasons": [
+          "stage_unknown:install"
+        ],
+        "source": {
+          "task_id": "S2-11",
+          "shard_report_path": "outputs/acceptance/phase2-s211-rerun-census-windows-shard141of256-20261014.json",
+          "shard_report_sha256": "62e431826513a0c03b539090868b5a392403c896f94f3518bfe2dea3a4f0edab",
+          "unit_status": "unknown",
+          "attribution_domain": "platform-policy",
+          "stage_statuses": {
+            "prepare": "passed",
+            "install": "unknown",
+            "native": "skipped",
+            "federated": "skipped",
+            "compare": "skipped",
+            "cleanup": "skipped"
+          },
+          "stage_result_sha256": {
+            "prepare": "b218b0cea18fa0acdebd3dae5ebee3424eae46352d2d4af14bec6c48d46bdd7f",
+            "install": "23a809983f3548c2cf673a80c4fedc6b8d5ed86bb8c0f67073f7a5b945d64eea",
+            "native": "41f2d0c138c164d37db930741679e6448d09115e0b49201d13b6fd20cab1bfbf",
+            "federated": "41f2d0c138c164d37db930741679e6448d09115e0b49201d13b6fd20cab1bfbf",
+            "compare": "c7c6119a9e84bd3f141bd335eb28ea3ed092be42771c1ec8f01624a726988be3",
+            "cleanup": "f1392bf40e6422554fe7c05b11a0282e2902106bf95ae7e94b4c67d7d04ce767"
+          }
+        },
+        "required_stages": [
+          "prepare",
+          "install",
+          "native",
+          "federated",
+          "compare",
+          "cleanup"
+        ]
+      },
+      "old_to_new_identity": {
+        "profile_id_changed": true,
+        "profile_lock_sha256_changed": true,
+        "dependency_lock_sha256_changed": true
+      }
+    },
+    {
+      "selection_kind": "affected_windows_pilot",
+      "identity": {
+        "snapshot_id": "p2-41649744e057d61031d5",
+        "registry_entry_id": "nb-022d49a5ee2114b84aac6d20",
+        "ecosystem": "nonebot",
+        "package": "nonebot_plugin_aigf_master",
+        "version": "1.6.2",
+        "platform": "windows",
+        "profile_id": "nonebot-2.5.0-onebot-2.4.6-py3.12.10-windows-x86_64",
+        "profile_lock_sha256": "e58651dfa5e46b3ebc8590b7ba89fd7aef86e8dd42d47580c9ed7fb536d880df",
+        "artifact_sha256": "87be384b52e909f3862304ce0f06fb85ddfe562c704eeb89ee10ee22aa7dca32",
+        "dependency_lock_sha256": "0689efe9d0e4e0217ea92c8a97ad7578270e929339549ad6c15ba0e14eb2859e"
+      },
+      "identity_sha256": "6b064ad12b907eeed9f680ddded101ca488aabbe55a23fdd3af54a5de133612c",
+      "source_identity": {
+        "snapshot_id": "p2-41649744e057d61031d5",
+        "registry_entry_id": "nb-022d49a5ee2114b84aac6d20",
+        "ecosystem": "nonebot",
+        "package": "nonebot_plugin_aigf_master",
+        "version": "1.6.2",
+        "platform": "windows",
+        "profile_id": "nonebot-2.5.0-onebot-2.4.6-py3.12.14-windows-x86_64",
+        "profile_lock_sha256": "68a7391620a06e7141d949519333a1f4fc5ccee7abd84dc036c46d09fdae8d38",
+        "artifact_sha256": "87be384b52e909f3862304ce0f06fb85ddfe562c704eeb89ee10ee22aa7dca32",
+        "dependency_lock_sha256": "1be4f99deadfb37d85724298f85f7bb88b430e4f110b11706b69eab14b1f4bfb"
+      },
+      "source_identity_sha256": "1c108cc8cc0028936db6f84735f2feb87469e0ccc7e3dc75cc471e91abd435e6",
+      "source_selection_reasons": [
+        "stage_unknown:install"
+      ],
+      "source": {
+        "result_id": "catalog:nb-022d49a5ee2114b84aac6d20|windows",
+        "identity": {
+          "snapshot_id": "p2-41649744e057d61031d5",
+          "registry_entry_id": "nb-022d49a5ee2114b84aac6d20",
+          "ecosystem": "nonebot",
+          "package": "nonebot_plugin_aigf_master",
+          "version": "1.6.2",
+          "platform": "windows",
+          "profile_id": "nonebot-2.5.0-onebot-2.4.6-py3.12.14-windows-x86_64",
+          "profile_lock_sha256": "68a7391620a06e7141d949519333a1f4fc5ccee7abd84dc036c46d09fdae8d38",
+          "artifact_sha256": "87be384b52e909f3862304ce0f06fb85ddfe562c704eeb89ee10ee22aa7dca32",
+          "dependency_lock_sha256": "1be4f99deadfb37d85724298f85f7bb88b430e4f110b11706b69eab14b1f4bfb"
+        },
+        "identity_sha256": "1c108cc8cc0028936db6f84735f2feb87469e0ccc7e3dc75cc471e91abd435e6",
+        "selection_reasons": [
+          "stage_unknown:install"
+        ],
+        "source": {
+          "task_id": "S2-11",
+          "shard_report_path": "outputs/acceptance/phase2-s211-rerun-census-windows-shard45of256-20261014.json",
+          "shard_report_sha256": "a2ef7a956ae74284b72828dff396dc1e25a15aee5801f466b8a67595fd73eb7a",
+          "unit_status": "unknown",
+          "attribution_domain": "platform-policy",
+          "stage_statuses": {
+            "prepare": "passed",
+            "install": "unknown",
+            "native": "skipped",
+            "federated": "skipped",
+            "compare": "skipped",
+            "cleanup": "skipped"
+          },
+          "stage_result_sha256": {
+            "prepare": "05f8ab4b170e611f396da07a11a5d06d8d9759e55d35567e1f45a8791792f8d2",
+            "install": "23a809983f3548c2cf673a80c4fedc6b8d5ed86bb8c0f67073f7a5b945d64eea",
+            "native": "77015af7181a22d9a8d1e06c404433a2c65b04735389c13bf2c24bbce5fa797f",
+            "federated": "77015af7181a22d9a8d1e06c404433a2c65b04735389c13bf2c24bbce5fa797f",
+            "compare": "8d56da2784b4c3a064c98f8b5c6d45f9a85a3030112447528a99ccbe7232ec6b",
+            "cleanup": "f1392bf40e6422554fe7c05b11a0282e2902106bf95ae7e94b4c67d7d04ce767"
+          }
+        },
+        "required_stages": [
+          "prepare",
+          "install",
+          "native",
+          "federated",
+          "compare",
+          "cleanup"
+        ]
+      },
+      "old_to_new_identity": {
+        "profile_id_changed": true,
+        "profile_lock_sha256_changed": true,
+        "dependency_lock_sha256_changed": true
+      }
+    },
+    {
+      "selection_kind": "affected_windows_pilot",
+      "identity": {
+        "snapshot_id": "p2-41649744e057d61031d5",
+        "registry_entry_id": "nb-02458ca26cfc2886fef22956",
+        "ecosystem": "nonebot",
+        "package": "nonebot_plugin_handle",
+        "version": "0.4.4",
+        "platform": "windows",
+        "profile_id": "nonebot-2.5.0-onebot-2.4.6-py3.12.10-windows-x86_64",
+        "profile_lock_sha256": "e58651dfa5e46b3ebc8590b7ba89fd7aef86e8dd42d47580c9ed7fb536d880df",
+        "artifact_sha256": "7205a66851b2e6e954582bfb84ec68b2c7bbbdbda0f8042f060b9346973b1da0",
+        "dependency_lock_sha256": "55cef24f05654a7c4e714d3b7b24dcd3749963d5808849f70a91ff1e4b72f7b8"
+      },
+      "identity_sha256": "49715e3bcfeef1ea03d1b41c163abc0ea26a33ad1bca8da4d4af5aee94aa94ec",
+      "source_identity": {
+        "snapshot_id": "p2-41649744e057d61031d5",
+        "registry_entry_id": "nb-02458ca26cfc2886fef22956",
+        "ecosystem": "nonebot",
+        "package": "nonebot_plugin_handle",
+        "version": "0.4.4",
+        "platform": "windows",
+        "profile_id": "nonebot-2.5.0-onebot-2.4.6-py3.12.14-windows-x86_64",
+        "profile_lock_sha256": "68a7391620a06e7141d949519333a1f4fc5ccee7abd84dc036c46d09fdae8d38",
+        "artifact_sha256": "7205a66851b2e6e954582bfb84ec68b2c7bbbdbda0f8042f060b9346973b1da0",
+        "dependency_lock_sha256": "c7778db46e37139977cd4cdba07135a702f74521c8253a5d714cd248a629d137"
+      },
+      "source_identity_sha256": "54ec5b4d86baec1a1be0d69de3e1bbe55d65d79d1c51bd19add56dfcbee8f874",
+      "source_selection_reasons": [
+        "stage_unknown:install"
+      ],
+      "source": {
+        "result_id": "catalog:nb-02458ca26cfc2886fef22956|windows",
+        "identity": {
+          "snapshot_id": "p2-41649744e057d61031d5",
+          "registry_entry_id": "nb-02458ca26cfc2886fef22956",
+          "ecosystem": "nonebot",
+          "package": "nonebot_plugin_handle",
+          "version": "0.4.4",
+          "platform": "windows",
+          "profile_id": "nonebot-2.5.0-onebot-2.4.6-py3.12.14-windows-x86_64",
+          "profile_lock_sha256": "68a7391620a06e7141d949519333a1f4fc5ccee7abd84dc036c46d09fdae8d38",
+          "artifact_sha256": "7205a66851b2e6e954582bfb84ec68b2c7bbbdbda0f8042f060b9346973b1da0",
+          "dependency_lock_sha256": "c7778db46e37139977cd4cdba07135a702f74521c8253a5d714cd248a629d137"
+        },
+        "identity_sha256": "54ec5b4d86baec1a1be0d69de3e1bbe55d65d79d1c51bd19add56dfcbee8f874",
+        "selection_reasons": [
+          "stage_unknown:install"
+        ],
+        "source": {
+          "task_id": "S2-11",
+          "shard_report_path": "outputs/acceptance/phase2-s211-rerun-census-windows-shard131of256-20261014.json",
+          "shard_report_sha256": "40c9a61883902c6dd14ca6da8c03557f5d7a630a97d0beec48d94119639dd4a7",
+          "unit_status": "unknown",
+          "attribution_domain": "platform-policy",
+          "stage_statuses": {
+            "prepare": "passed",
+            "install": "unknown",
+            "native": "skipped",
+            "federated": "skipped",
+            "compare": "skipped",
+            "cleanup": "skipped"
+          },
+          "stage_result_sha256": {
+            "prepare": "1b2c2d492481b7cd28510ad80d85ee8e542a5f88dce3b2bce71c3529e3557031",
+            "install": "23a809983f3548c2cf673a80c4fedc6b8d5ed86bb8c0f67073f7a5b945d64eea",
+            "native": "bc015ce2d68e8e9aa22a448de95fa4d04a469c8b7594569affb38e71f8a08df8",
+            "federated": "bc015ce2d68e8e9aa22a448de95fa4d04a469c8b7594569affb38e71f8a08df8",
+            "compare": "bbbc3d2b4e36669d5071800d9b47354607bd0415a25d1317605e87c99b0507a9",
+            "cleanup": "f1392bf40e6422554fe7c05b11a0282e2902106bf95ae7e94b4c67d7d04ce767"
+          }
+        },
+        "required_stages": [
+          "prepare",
+          "install",
+          "native",
+          "federated",
+          "compare",
+          "cleanup"
+        ]
+      },
+      "old_to_new_identity": {
+        "profile_id_changed": true,
+        "profile_lock_sha256_changed": true,
+        "dependency_lock_sha256_changed": true
+      }
+    },
+    {
+      "selection_kind": "affected_windows_pilot",
+      "identity": {
+        "snapshot_id": "p2-41649744e057d61031d5",
+        "registry_entry_id": "nb-02b4a3862bbae4a686d8a9c3",
+        "ecosystem": "nonebot",
+        "package": "nonebot_plugin_lxns_maimai",
+        "version": "0.1.3",
+        "platform": "windows",
+        "profile_id": "nonebot-2.5.0-onebot-2.4.6-py3.12.10-windows-x86_64",
+        "profile_lock_sha256": "e58651dfa5e46b3ebc8590b7ba89fd7aef86e8dd42d47580c9ed7fb536d880df",
+        "artifact_sha256": "62e3d7ddd50f708b969cb8dca78586edbeda18a95520951b680103eaa76262c5",
+        "dependency_lock_sha256": "8dc0bcc51694a4d04051f9d73a043b80f906275e64c43a86a3ad2fcc21c00e49"
+      },
+      "identity_sha256": "4f6aa0b0993b187e94ecc358878df91e21ca621736c6250059351fab334bb779",
+      "source_identity": {
+        "snapshot_id": "p2-41649744e057d61031d5",
+        "registry_entry_id": "nb-02b4a3862bbae4a686d8a9c3",
+        "ecosystem": "nonebot",
+        "package": "nonebot_plugin_lxns_maimai",
+        "version": "0.1.3",
+        "platform": "windows",
+        "profile_id": "nonebot-2.5.0-onebot-2.4.6-py3.12.14-windows-x86_64",
+        "profile_lock_sha256": "68a7391620a06e7141d949519333a1f4fc5ccee7abd84dc036c46d09fdae8d38",
+        "artifact_sha256": "62e3d7ddd50f708b969cb8dca78586edbeda18a95520951b680103eaa76262c5",
+        "dependency_lock_sha256": "2a3ab860554816f6f1584d9358dbf13f7fb32b708519b5792afdf519aff64d15"
+      },
+      "source_identity_sha256": "f9735bc074afe2a52e1580699f3d7b7a9668bc145e7520f5d72fc18197a26cd3",
+      "source_selection_reasons": [
+        "stage_unknown:install"
+      ],
+      "source": {
+        "result_id": "catalog:nb-02b4a3862bbae4a686d8a9c3|windows",
+        "identity": {
+          "snapshot_id": "p2-41649744e057d61031d5",
+          "registry_entry_id": "nb-02b4a3862bbae4a686d8a9c3",
+          "ecosystem": "nonebot",
+          "package": "nonebot_plugin_lxns_maimai",
+          "version": "0.1.3",
+          "platform": "windows",
+          "profile_id": "nonebot-2.5.0-onebot-2.4.6-py3.12.14-windows-x86_64",
+          "profile_lock_sha256": "68a7391620a06e7141d949519333a1f4fc5ccee7abd84dc036c46d09fdae8d38",
+          "artifact_sha256": "62e3d7ddd50f708b969cb8dca78586edbeda18a95520951b680103eaa76262c5",
+          "dependency_lock_sha256": "2a3ab860554816f6f1584d9358dbf13f7fb32b708519b5792afdf519aff64d15"
+        },
+        "identity_sha256": "f9735bc074afe2a52e1580699f3d7b7a9668bc145e7520f5d72fc18197a26cd3",
+        "selection_reasons": [
+          "stage_unknown:install"
+        ],
+        "source": {
+          "task_id": "S2-11",
+          "shard_report_path": "outputs/acceptance/phase2-s211-rerun-census-windows-shard45of256-20261014.json",
+          "shard_report_sha256": "a2ef7a956ae74284b72828dff396dc1e25a15aee5801f466b8a67595fd73eb7a",
+          "unit_status": "unknown",
+          "attribution_domain": "platform-policy",
+          "stage_statuses": {
+            "prepare": "passed",
+            "install": "unknown",
+            "native": "skipped",
+            "federated": "skipped",
+            "compare": "skipped",
+            "cleanup": "skipped"
+          },
+          "stage_result_sha256": {
+            "prepare": "78638f7e10efc17d1a8a85f3f072ac3a97feaf3472860de8405552fc9761fdf9",
+            "install": "23a809983f3548c2cf673a80c4fedc6b8d5ed86bb8c0f67073f7a5b945d64eea",
+            "native": "db60f8ccfd7974ad236903d6cc915e84debec6a9213cd1992f3195d92c33b174",
+            "federated": "db60f8ccfd7974ad236903d6cc915e84debec6a9213cd1992f3195d92c33b174",
+            "compare": "d536cc50d3cff5a65085929597df4544c6d77c94b2172022325d5dc0dccbad49",
+            "cleanup": "f1392bf40e6422554fe7c05b11a0282e2902106bf95ae7e94b4c67d7d04ce767"
+          }
+        },
+        "required_stages": [
+          "prepare",
+          "install",
+          "native",
+          "federated",
+          "compare",
+          "cleanup"
+        ]
+      },
+      "old_to_new_identity": {
+        "profile_id_changed": true,
+        "profile_lock_sha256_changed": true,
+        "dependency_lock_sha256_changed": true
+      }
+    },
+    {
+      "selection_kind": "affected_windows_pilot",
+      "identity": {
+        "snapshot_id": "p2-41649744e057d61031d5",
+        "registry_entry_id": "nb-031f347fab50945ebffe96d4",
+        "ecosystem": "nonebot",
+        "package": "nonebot_plugin_picstatus",
+        "version": "2.3.1",
+        "platform": "windows",
+        "profile_id": "nonebot-2.5.0-onebot-2.4.6-py3.12.10-windows-x86_64",
+        "profile_lock_sha256": "e58651dfa5e46b3ebc8590b7ba89fd7aef86e8dd42d47580c9ed7fb536d880df",
+        "artifact_sha256": "3a0729e93556f6d8744ee8a37ae522f7f4aa0ef8b3703babace5e9683df2b570",
+        "dependency_lock_sha256": "5c14d2d37c1d0a457255947970c176c9d94e97e6a26876c9eb47f7cf912312e0"
+      },
+      "identity_sha256": "a515ba3f2b5c78503d957eba17bb618303a3904006d2ec2400c99fc6ea7b5e6a",
+      "source_identity": {
+        "snapshot_id": "p2-41649744e057d61031d5",
+        "registry_entry_id": "nb-031f347fab50945ebffe96d4",
+        "ecosystem": "nonebot",
+        "package": "nonebot_plugin_picstatus",
+        "version": "2.3.1",
+        "platform": "windows",
+        "profile_id": "nonebot-2.5.0-onebot-2.4.6-py3.12.14-windows-x86_64",
+        "profile_lock_sha256": "68a7391620a06e7141d949519333a1f4fc5ccee7abd84dc036c46d09fdae8d38",
+        "artifact_sha256": "3a0729e93556f6d8744ee8a37ae522f7f4aa0ef8b3703babace5e9683df2b570",
+        "dependency_lock_sha256": "a770eabebc665e5fbea10a0fef11cec05ed3880c7de05bdfbabdcae4e40d0076"
+      },
+      "source_identity_sha256": "ee157f8890a8d91eb35860e7a979bbb9619fbd38c01f1127d36f9d265a61eded",
+      "source_selection_reasons": [
+        "stage_unknown:install"
+      ],
+      "source": {
+        "result_id": "catalog:nb-031f347fab50945ebffe96d4|windows",
+        "identity": {
+          "snapshot_id": "p2-41649744e057d61031d5",
+          "registry_entry_id": "nb-031f347fab50945ebffe96d4",
+          "ecosystem": "nonebot",
+          "package": "nonebot_plugin_picstatus",
+          "version": "2.3.1",
+          "platform": "windows",
+          "profile_id": "nonebot-2.5.0-onebot-2.4.6-py3.12.14-windows-x86_64",
+          "profile_lock_sha256": "68a7391620a06e7141d949519333a1f4fc5ccee7abd84dc036c46d09fdae8d38",
+          "artifact_sha256": "3a0729e93556f6d8744ee8a37ae522f7f4aa0ef8b3703babace5e9683df2b570",
+          "dependency_lock_sha256": "a770eabebc665e5fbea10a0fef11cec05ed3880c7de05bdfbabdcae4e40d0076"
+        },
+        "identity_sha256": "ee157f8890a8d91eb35860e7a979bbb9619fbd38c01f1127d36f9d265a61eded",
+        "selection_reasons": [
+          "stage_unknown:install"
+        ],
+        "source": {
+          "task_id": "S2-11",
+          "shard_report_path": "outputs/acceptance/phase2-s211-rerun-census-windows-shard186of256-20261014.json",
+          "shard_report_sha256": "64557dd02ad59c92fcc7d3d7dd4dc2d8ace9cef461d39cb38f97ca69ff19cd2c",
+          "unit_status": "unknown",
+          "attribution_domain": "platform-policy",
+          "stage_statuses": {
+            "prepare": "passed",
+            "install": "unknown",
+            "native": "skipped",
+            "federated": "skipped",
+            "compare": "skipped",
+            "cleanup": "skipped"
+          },
+          "stage_result_sha256": {
+            "prepare": "bb072d4e992c947db6ef14434c382c2965f8a7da7899896f4a5b4877e49e6e2e",
+            "install": "23a809983f3548c2cf673a80c4fedc6b8d5ed86bb8c0f67073f7a5b945d64eea",
+            "native": "7d620c0500ffa74be1a6bfc9d2482f510580ef4fff74b1d6a1bc3dbbc4a9f0ec",
+            "federated": "7d620c0500ffa74be1a6bfc9d2482f510580ef4fff74b1d6a1bc3dbbc4a9f0ec",
+            "compare": "beb6c563f3b65d6035b3f9d448e088be90524e4c47864ecb476c1deea121765f",
+            "cleanup": "f1392bf40e6422554fe7c05b11a0282e2902106bf95ae7e94b4c67d7d04ce767"
+          }
+        },
+        "required_stages": [
+          "prepare",
+          "install",
+          "native",
+          "federated",
+          "compare",
+          "cleanup"
+        ]
+      },
+      "old_to_new_identity": {
+        "profile_id_changed": true,
+        "profile_lock_sha256_changed": true,
+        "dependency_lock_sha256_changed": true
+      }
+    },
+    {
+      "selection_kind": "affected_windows_pilot",
+      "identity": {
+        "snapshot_id": "p2-41649744e057d61031d5",
+        "registry_entry_id": "ko-018cabc87fdd600bf1c3acd1",
+        "ecosystem": "koishi",
+        "package": "koishi-plugin-rtc-bridge",
+        "version": "0.2.1",
+        "platform": "windows",
+        "profile_id": "koishi-core-4.18.11-node-24.20.0-x86_64-portable-lock",
+        "profile_lock_sha256": "e58651dfa5e46b3ebc8590b7ba89fd7aef86e8dd42d47580c9ed7fb536d880df",
+        "artifact_sha256": "4510dfeee93144e4d048dea23783d27b9976b4d5ceac1e8fd9b282c6bf1e64be",
+        "dependency_lock_sha256": "e9624bfc5ed4fbabd3be1dbefc710fe6b80df6f585012818a229fafc8adab3be"
+      },
+      "identity_sha256": "88c8146e720f02ef3a84d7be394df48406912e0b4cd192429515a2b8385df350",
+      "source_identity": {
+        "snapshot_id": "p2-41649744e057d61031d5",
+        "registry_entry_id": "ko-018cabc87fdd600bf1c3acd1",
+        "ecosystem": "koishi",
+        "package": "koishi-plugin-rtc-bridge",
+        "version": "0.2.1",
+        "platform": "windows",
+        "profile_id": "koishi-core-4.18.11-node-24.20.0-x86_64-portable-lock",
+        "profile_lock_sha256": "68a7391620a06e7141d949519333a1f4fc5ccee7abd84dc036c46d09fdae8d38",
+        "artifact_sha256": "4510dfeee93144e4d048dea23783d27b9976b4d5ceac1e8fd9b282c6bf1e64be",
+        "dependency_lock_sha256": "e9624bfc5ed4fbabd3be1dbefc710fe6b80df6f585012818a229fafc8adab3be"
+      },
+      "source_identity_sha256": "88282d2d1848e56dee3938a6dd9b7fd190ba8ca6e2cec03c804e714e49485c3b",
+      "source_selection_reasons": [
+        "failure_domain:worker-resource-limit"
+      ],
+      "source": {
+        "result_id": "catalog:ko-018cabc87fdd600bf1c3acd1|windows",
+        "identity": {
+          "snapshot_id": "p2-41649744e057d61031d5",
+          "registry_entry_id": "ko-018cabc87fdd600bf1c3acd1",
+          "ecosystem": "koishi",
+          "package": "koishi-plugin-rtc-bridge",
+          "version": "0.2.1",
+          "platform": "windows",
+          "profile_id": "koishi-core-4.18.11-node-24.20.0-x86_64-portable-lock",
+          "profile_lock_sha256": "68a7391620a06e7141d949519333a1f4fc5ccee7abd84dc036c46d09fdae8d38",
+          "artifact_sha256": "4510dfeee93144e4d048dea23783d27b9976b4d5ceac1e8fd9b282c6bf1e64be",
+          "dependency_lock_sha256": "e9624bfc5ed4fbabd3be1dbefc710fe6b80df6f585012818a229fafc8adab3be"
+        },
+        "identity_sha256": "88282d2d1848e56dee3938a6dd9b7fd190ba8ca6e2cec03c804e714e49485c3b",
+        "selection_reasons": [
+          "failure_domain:worker-resource-limit"
+        ],
+        "source": {
+          "task_id": "S2-11",
+          "shard_report_path": "outputs/acceptance/phase2-s211-rerun-census-windows-shard251of256-20261014.json",
+          "shard_report_sha256": "e96b54c1facf560ed1e16be51c75a0ea2f2cb475319e3014d47bfbcf985c488a",
+          "unit_status": "failed",
+          "attribution_domain": "worker-resource-limit",
+          "stage_statuses": {
+            "prepare": "passed",
+            "install": "failed",
+            "native": "skipped",
+            "federated": "skipped",
+            "compare": "skipped",
+            "cleanup": "passed"
+          },
+          "stage_result_sha256": {
+            "prepare": "84e32d42ee2e7a6d616e4c4583e83828a7e3a0bfdee2fdcde2f9cf9b7e649219",
+            "install": "a5130e9c2adc87cdb00c641009cd3300fe7af4edb296c31cf3161cad64099640",
+            "native": "2fc59eff7e39cef3626ed794c0803a4ce439b65a6a75bafa3ed648c12fa9d0fc",
+            "federated": "2fc59eff7e39cef3626ed794c0803a4ce439b65a6a75bafa3ed648c12fa9d0fc",
+            "compare": "54760bc887ea51bdb707c91f1a316af40f1d294f11b21ddf4a8b6f508d51a359",
+            "cleanup": "4b959393e6d32343f22fe6f4d0c96c303f0e19aa0cb1dd0d9a1d28bb8428aeb1"
+          }
+        },
+        "required_stages": [
+          "prepare",
+          "install",
+          "native",
+          "federated",
+          "compare",
+          "cleanup"
+        ]
+      },
+      "old_to_new_identity": {
+        "profile_id_changed": false,
+        "profile_lock_sha256_changed": true,
+        "dependency_lock_sha256_changed": false
+      }
+    },
+    {
+      "selection_kind": "affected_windows_pilot",
+      "identity": {
+        "snapshot_id": "p2-41649744e057d61031d5",
+        "registry_entry_id": "ko-03b0d6a048bc907ec5e801fb",
+        "ecosystem": "koishi",
+        "package": "koishi-plugin-smmcat-economy",
+        "version": "0.1.7",
+        "platform": "windows",
+        "profile_id": "koishi-core-4.18.11-node-24.20.0-x86_64-portable-lock",
+        "profile_lock_sha256": "e58651dfa5e46b3ebc8590b7ba89fd7aef86e8dd42d47580c9ed7fb536d880df",
+        "artifact_sha256": "5d8eb3c2463d6af6e9b2860f785cedd5c9051f156b050a13785dabff965e41a9",
+        "dependency_lock_sha256": "db466d675d42bfa7aee8d2c8672fe51d73ffcf0522d38451abbeec94f22c5172"
+      },
+      "identity_sha256": "6965e9b0129d9efef853bbd3bd7dde7802b0694b16893c4e173959024a4110db",
+      "source_identity": {
+        "snapshot_id": "p2-41649744e057d61031d5",
+        "registry_entry_id": "ko-03b0d6a048bc907ec5e801fb",
+        "ecosystem": "koishi",
+        "package": "koishi-plugin-smmcat-economy",
+        "version": "0.1.7",
+        "platform": "windows",
+        "profile_id": "koishi-core-4.18.11-node-24.20.0-x86_64-portable-lock",
+        "profile_lock_sha256": "68a7391620a06e7141d949519333a1f4fc5ccee7abd84dc036c46d09fdae8d38",
+        "artifact_sha256": "5d8eb3c2463d6af6e9b2860f785cedd5c9051f156b050a13785dabff965e41a9",
+        "dependency_lock_sha256": "db466d675d42bfa7aee8d2c8672fe51d73ffcf0522d38451abbeec94f22c5172"
+      },
+      "source_identity_sha256": "cb3ec9ec05b79ffb63a76ef5f1e8de59e1bb6f7612c6a2d4d1ab2680904eaf38",
+      "source_selection_reasons": [
+        "failure_domain:worker-exit"
+      ],
+      "source": {
+        "result_id": "catalog:ko-03b0d6a048bc907ec5e801fb|windows",
+        "identity": {
+          "snapshot_id": "p2-41649744e057d61031d5",
+          "registry_entry_id": "ko-03b0d6a048bc907ec5e801fb",
+          "ecosystem": "koishi",
+          "package": "koishi-plugin-smmcat-economy",
+          "version": "0.1.7",
+          "platform": "windows",
+          "profile_id": "koishi-core-4.18.11-node-24.20.0-x86_64-portable-lock",
+          "profile_lock_sha256": "68a7391620a06e7141d949519333a1f4fc5ccee7abd84dc036c46d09fdae8d38",
+          "artifact_sha256": "5d8eb3c2463d6af6e9b2860f785cedd5c9051f156b050a13785dabff965e41a9",
+          "dependency_lock_sha256": "db466d675d42bfa7aee8d2c8672fe51d73ffcf0522d38451abbeec94f22c5172"
+        },
+        "identity_sha256": "cb3ec9ec05b79ffb63a76ef5f1e8de59e1bb6f7612c6a2d4d1ab2680904eaf38",
+        "selection_reasons": [
+          "failure_domain:worker-exit"
+        ],
+        "source": {
+          "task_id": "S2-11",
+          "shard_report_path": "outputs/acceptance/phase2-s211-rerun-census-windows-shard53of256-20261014.json",
+          "shard_report_sha256": "4855d387408af7f79a780bc28022d0313357aaae50173877e507bc995f806b4c",
+          "unit_status": "failed",
+          "attribution_domain": "worker-exit",
+          "stage_statuses": {
+            "prepare": "passed",
+            "install": "failed",
+            "native": "skipped",
+            "federated": "skipped",
+            "compare": "skipped",
+            "cleanup": "passed"
+          },
+          "stage_result_sha256": {
+            "prepare": "a082c867f72ad4d16bfe6b0cdc86a33ee9b13378625adb59b60e04aab9b33039",
+            "install": "311eda7adb9341c6b79982b1f60f2713f2458af9f9a44a6bd4b2c1e375a0c238",
+            "native": "a6c8e9c3d22ba693824bf4af9ed236b4a13af1c922e790c103eb1c3b7482beba",
+            "federated": "a6c8e9c3d22ba693824bf4af9ed236b4a13af1c922e790c103eb1c3b7482beba",
+            "compare": "939f0e6fb8bf969c75bb6a4c9d82ae586cd8973c076ceff1c4e4c6555107dc76",
+            "cleanup": "3844832efa3996713d9c5f30e730a44374c761102119e7753cac99b035b5aec9"
+          }
+        },
+        "required_stages": [
+          "prepare",
+          "install",
+          "native",
+          "federated",
+          "compare",
+          "cleanup"
+        ]
+      },
+      "old_to_new_identity": {
+        "profile_id_changed": false,
+        "profile_lock_sha256_changed": true,
+        "dependency_lock_sha256_changed": false
+      }
+    },
+    {
+      "selection_kind": "affected_windows_pilot",
+      "identity": {
+        "snapshot_id": "p2-41649744e057d61031d5",
+        "registry_entry_id": "ko-0486f1a907d5574c8963cba7",
+        "ecosystem": "koishi",
+        "package": "@miemiemie/koishi-plugin-mwi-tool",
+        "version": "0.0.3",
+        "platform": "windows",
+        "profile_id": "koishi-core-4.18.11-node-24.20.0-x86_64-portable-lock",
+        "profile_lock_sha256": "e58651dfa5e46b3ebc8590b7ba89fd7aef86e8dd42d47580c9ed7fb536d880df",
+        "artifact_sha256": "ee99825cb573243c15ad5435e0b1eed8fe9479a98f9ce66715490204cf1aa7d1",
+        "dependency_lock_sha256": "beac7d700ac40e7efe28c9a546df2e9400f21e1e608e37500513af9adad2601c"
+      },
+      "identity_sha256": "822a6021582085cd2bd91e30e7a9cb1d3e3a90e5f2a27a5b9e7da8d8bd0dec53",
+      "source_identity": {
+        "snapshot_id": "p2-41649744e057d61031d5",
+        "registry_entry_id": "ko-0486f1a907d5574c8963cba7",
+        "ecosystem": "koishi",
+        "package": "@miemiemie/koishi-plugin-mwi-tool",
+        "version": "0.0.3",
+        "platform": "windows",
+        "profile_id": "koishi-core-4.18.11-node-24.20.0-x86_64-portable-lock",
+        "profile_lock_sha256": "68a7391620a06e7141d949519333a1f4fc5ccee7abd84dc036c46d09fdae8d38",
+        "artifact_sha256": "ee99825cb573243c15ad5435e0b1eed8fe9479a98f9ce66715490204cf1aa7d1",
+        "dependency_lock_sha256": "beac7d700ac40e7efe28c9a546df2e9400f21e1e608e37500513af9adad2601c"
+      },
+      "source_identity_sha256": "3fb3f902de84be3ec38806945d09176332949e874580d300b534945a1bce31e4",
+      "source_selection_reasons": [
+        "failure_domain:worker-resource-limit"
+      ],
+      "source": {
+        "result_id": "catalog:ko-0486f1a907d5574c8963cba7|windows",
+        "identity": {
+          "snapshot_id": "p2-41649744e057d61031d5",
+          "registry_entry_id": "ko-0486f1a907d5574c8963cba7",
+          "ecosystem": "koishi",
+          "package": "@miemiemie/koishi-plugin-mwi-tool",
+          "version": "0.0.3",
+          "platform": "windows",
+          "profile_id": "koishi-core-4.18.11-node-24.20.0-x86_64-portable-lock",
+          "profile_lock_sha256": "68a7391620a06e7141d949519333a1f4fc5ccee7abd84dc036c46d09fdae8d38",
+          "artifact_sha256": "ee99825cb573243c15ad5435e0b1eed8fe9479a98f9ce66715490204cf1aa7d1",
+          "dependency_lock_sha256": "beac7d700ac40e7efe28c9a546df2e9400f21e1e608e37500513af9adad2601c"
+        },
+        "identity_sha256": "3fb3f902de84be3ec38806945d09176332949e874580d300b534945a1bce31e4",
+        "selection_reasons": [
+          "failure_domain:worker-resource-limit"
+        ],
+        "source": {
+          "task_id": "S2-11",
+          "shard_report_path": "outputs/acceptance/phase2-s211-rerun-census-windows-shard165of256-20261014.json",
+          "shard_report_sha256": "dc287619ec1e98f301080b1588dd3fc9b952769b6317ce4dc5fa08d6cc9f59f5",
+          "unit_status": "failed",
+          "attribution_domain": "worker-resource-limit",
+          "stage_statuses": {
+            "prepare": "passed",
+            "install": "failed",
+            "native": "skipped",
+            "federated": "skipped",
+            "compare": "skipped",
+            "cleanup": "passed"
+          },
+          "stage_result_sha256": {
+            "prepare": "f6c6a6ffe9f00948328c52cfd1759a2e921477c24af82e484575c9cf34b752a9",
+            "install": "f8dd233ed9e6171f7878105843d0034e8bff7a195f3c216edb145c65286929ad",
+            "native": "21a1fa579adc6d7f0d11f787fba798d025116fbc50ba89c9cedf31d276caac33",
+            "federated": "21a1fa579adc6d7f0d11f787fba798d025116fbc50ba89c9cedf31d276caac33",
+            "compare": "ac849da4d42e892c0739bc0639db85c377a5e25add9b0762ffeaac60e12a7607",
+            "cleanup": "c4e80691b9a20bafebc3b58b9328ab237765afdf4d8b4002b63c706d6f964c97"
+          }
+        },
+        "required_stages": [
+          "prepare",
+          "install",
+          "native",
+          "federated",
+          "compare",
+          "cleanup"
+        ]
+      },
+      "old_to_new_identity": {
+        "profile_id_changed": false,
+        "profile_lock_sha256_changed": true,
+        "dependency_lock_sha256_changed": false
+      }
+    },
+    {
+      "selection_kind": "affected_windows_pilot",
+      "identity": {
+        "snapshot_id": "p2-41649744e057d61031d5",
+        "registry_entry_id": "ko-08348a3f5ad86e643230d59c",
+        "ecosystem": "koishi",
+        "package": "koishi-plugin-bd2redeem",
+        "version": "1.0.0",
+        "platform": "windows",
+        "profile_id": "koishi-core-4.18.11-node-24.20.0-x86_64-portable-lock",
+        "profile_lock_sha256": "e58651dfa5e46b3ebc8590b7ba89fd7aef86e8dd42d47580c9ed7fb536d880df",
+        "artifact_sha256": "edd1a0becbd0b3eac500725129961f862c049eab3879a310625960e05e26f09e",
+        "dependency_lock_sha256": "f02fb39288b63d004e3aefee850b3867e6f99a79d239d9eefdb73bd7392e576c"
+      },
+      "identity_sha256": "459a9e74b82ed6bdac18f86fabbdf277afb83cc1ecd10e6f0b1a32c7b8d429f6",
+      "source_identity": {
+        "snapshot_id": "p2-41649744e057d61031d5",
+        "registry_entry_id": "ko-08348a3f5ad86e643230d59c",
+        "ecosystem": "koishi",
+        "package": "koishi-plugin-bd2redeem",
+        "version": "1.0.0",
+        "platform": "windows",
+        "profile_id": "koishi-core-4.18.11-node-24.20.0-x86_64-portable-lock",
+        "profile_lock_sha256": "68a7391620a06e7141d949519333a1f4fc5ccee7abd84dc036c46d09fdae8d38",
+        "artifact_sha256": "edd1a0becbd0b3eac500725129961f862c049eab3879a310625960e05e26f09e",
+        "dependency_lock_sha256": "f02fb39288b63d004e3aefee850b3867e6f99a79d239d9eefdb73bd7392e576c"
+      },
+      "source_identity_sha256": "95eb070241fa9ac807db7367e440d1da4aa08a61662457cbbf4c193621096d46",
+      "source_selection_reasons": [
+        "failure_domain:worker-resource-limit"
+      ],
+      "source": {
+        "result_id": "catalog:ko-08348a3f5ad86e643230d59c|windows",
+        "identity": {
+          "snapshot_id": "p2-41649744e057d61031d5",
+          "registry_entry_id": "ko-08348a3f5ad86e643230d59c",
+          "ecosystem": "koishi",
+          "package": "koishi-plugin-bd2redeem",
+          "version": "1.0.0",
+          "platform": "windows",
+          "profile_id": "koishi-core-4.18.11-node-24.20.0-x86_64-portable-lock",
+          "profile_lock_sha256": "68a7391620a06e7141d949519333a1f4fc5ccee7abd84dc036c46d09fdae8d38",
+          "artifact_sha256": "edd1a0becbd0b3eac500725129961f862c049eab3879a310625960e05e26f09e",
+          "dependency_lock_sha256": "f02fb39288b63d004e3aefee850b3867e6f99a79d239d9eefdb73bd7392e576c"
+        },
+        "identity_sha256": "95eb070241fa9ac807db7367e440d1da4aa08a61662457cbbf4c193621096d46",
+        "selection_reasons": [
+          "failure_domain:worker-resource-limit"
+        ],
+        "source": {
+          "task_id": "S2-11",
+          "shard_report_path": "outputs/acceptance/phase2-s211-rerun-census-windows-shard190of256-20261014.json",
+          "shard_report_sha256": "f49edf65df140902a0464812eb7fc9e7c6ee5d0db46b533ec9e9c854a6027e24",
+          "unit_status": "failed",
+          "attribution_domain": "worker-resource-limit",
+          "stage_statuses": {
+            "prepare": "passed",
+            "install": "failed",
+            "native": "skipped",
+            "federated": "skipped",
+            "compare": "skipped",
+            "cleanup": "passed"
+          },
+          "stage_result_sha256": {
+            "prepare": "81c6ad346f64e84356871ef6e5cefab373797d1d15925238ce469460d54c2674",
+            "install": "f1d5a78f6bfd88b14272dd73f0a9a8c0c733676ba91fb63a162438f9457fbebd",
+            "native": "19b222a03840cdb9dc991eef65b0539cb29927f719d999519a40fd010be16689",
+            "federated": "19b222a03840cdb9dc991eef65b0539cb29927f719d999519a40fd010be16689",
+            "compare": "79a3391d371b90ffe810d39fbe87e48740a7eff7c9da44d7978c8c589802a281",
+            "cleanup": "8c55a6e0ee45e6ab9a39c96da23afd11a20d4ee6f5c9d4604ee5f92c7d4a78e3"
+          }
+        },
+        "required_stages": [
+          "prepare",
+          "install",
+          "native",
+          "federated",
+          "compare",
+          "cleanup"
+        ]
+      },
+      "old_to_new_identity": {
+        "profile_id_changed": false,
+        "profile_lock_sha256_changed": true,
+        "dependency_lock_sha256_changed": false
+      }
+    },
+    {
+      "selection_kind": "affected_windows_pilot",
+      "identity": {
+        "snapshot_id": "p2-41649744e057d61031d5",
+        "registry_entry_id": "ko-0d802a45371a0a343845a70a",
+        "ecosystem": "koishi",
+        "package": "koishi-plugin-qrcode-service",
+        "version": "0.0.3",
+        "platform": "windows",
+        "profile_id": "koishi-core-4.18.11-node-24.20.0-x86_64-portable-lock",
+        "profile_lock_sha256": "e58651dfa5e46b3ebc8590b7ba89fd7aef86e8dd42d47580c9ed7fb536d880df",
+        "artifact_sha256": "c44157eee771fde6cf49ef308a61a8a1a9027875959e4651ff9ec630a55b1a63",
+        "dependency_lock_sha256": "a201caa77ffe6c4b9e770e96086bd8c97eec538ebb32b22766b310bc8a28b5d0"
+      },
+      "identity_sha256": "e42947afb908255c88eb80da197e4f5072bc2445e25be840b29a59989ce5ee9d",
+      "source_identity": {
+        "snapshot_id": "p2-41649744e057d61031d5",
+        "registry_entry_id": "ko-0d802a45371a0a343845a70a",
+        "ecosystem": "koishi",
+        "package": "koishi-plugin-qrcode-service",
+        "version": "0.0.3",
+        "platform": "windows",
+        "profile_id": "koishi-core-4.18.11-node-24.20.0-x86_64-portable-lock",
+        "profile_lock_sha256": "68a7391620a06e7141d949519333a1f4fc5ccee7abd84dc036c46d09fdae8d38",
+        "artifact_sha256": "c44157eee771fde6cf49ef308a61a8a1a9027875959e4651ff9ec630a55b1a63",
+        "dependency_lock_sha256": "a201caa77ffe6c4b9e770e96086bd8c97eec538ebb32b22766b310bc8a28b5d0"
+      },
+      "source_identity_sha256": "9e5f5a92b5f6364ef6240adceb92944e6560882caa2dbfc67efda3c5214bb5c4",
+      "source_selection_reasons": [
+        "failure_domain:worker-resource-limit"
+      ],
+      "source": {
+        "result_id": "catalog:ko-0d802a45371a0a343845a70a|windows",
+        "identity": {
+          "snapshot_id": "p2-41649744e057d61031d5",
+          "registry_entry_id": "ko-0d802a45371a0a343845a70a",
+          "ecosystem": "koishi",
+          "package": "koishi-plugin-qrcode-service",
+          "version": "0.0.3",
+          "platform": "windows",
+          "profile_id": "koishi-core-4.18.11-node-24.20.0-x86_64-portable-lock",
+          "profile_lock_sha256": "68a7391620a06e7141d949519333a1f4fc5ccee7abd84dc036c46d09fdae8d38",
+          "artifact_sha256": "c44157eee771fde6cf49ef308a61a8a1a9027875959e4651ff9ec630a55b1a63",
+          "dependency_lock_sha256": "a201caa77ffe6c4b9e770e96086bd8c97eec538ebb32b22766b310bc8a28b5d0"
+        },
+        "identity_sha256": "9e5f5a92b5f6364ef6240adceb92944e6560882caa2dbfc67efda3c5214bb5c4",
+        "selection_reasons": [
+          "failure_domain:worker-resource-limit"
+        ],
+        "source": {
+          "task_id": "S2-11",
+          "shard_report_path": "outputs/acceptance/phase2-s211-rerun-census-windows-shard89of256-20261014.json",
+          "shard_report_sha256": "e67bbe8a3f50b9b5eb6e842f52f009a8c897b1732ffaabe85c1448390d19f8ce",
+          "unit_status": "failed",
+          "attribution_domain": "worker-resource-limit",
+          "stage_statuses": {
+            "prepare": "passed",
+            "install": "failed",
+            "native": "skipped",
+            "federated": "skipped",
+            "compare": "skipped",
+            "cleanup": "passed"
+          },
+          "stage_result_sha256": {
+            "prepare": "b34897d182a347b4a4580d841ab55e7d66f51354bca2cd25c078145f924a1780",
+            "install": "211caf2f08e3304516ab34a40d4513fb96c10dac1636f1e59786d22a36691449",
+            "native": "bb952021312d190bdcad8ff4eca4140de019ea871c07fda04c90aeff2683192b",
+            "federated": "bb952021312d190bdcad8ff4eca4140de019ea871c07fda04c90aeff2683192b",
+            "compare": "5326bd6d228dc85ad3810cf64d2c8cac03a088bf174e6c0a084debefd410cc99",
+            "cleanup": "606e229b502797b83e779d0f26730b73021e08d4ff5ae652b0c53027b6867c3e"
+          }
+        },
+        "required_stages": [
+          "prepare",
+          "install",
+          "native",
+          "federated",
+          "compare",
+          "cleanup"
+        ]
+      },
+      "old_to_new_identity": {
+        "profile_id_changed": false,
+        "profile_lock_sha256_changed": true,
+        "dependency_lock_sha256_changed": false
+      }
+    },
+    {
+      "selection_kind": "affected_windows_pilot",
+      "identity": {
+        "snapshot_id": "p2-41649744e057d61031d5",
+        "registry_entry_id": "ko-0f858cd8fec3b87a3161e559",
+        "ecosystem": "koishi",
+        "package": "koishi-plugin-jm2pdf",
+        "version": "1.5.2",
+        "platform": "windows",
+        "profile_id": "koishi-core-4.18.11-node-24.20.0-x86_64-portable-lock",
+        "profile_lock_sha256": "e58651dfa5e46b3ebc8590b7ba89fd7aef86e8dd42d47580c9ed7fb536d880df",
+        "artifact_sha256": "ca1bf75e87bbef26910b97c0eb595971c63ec593e34828b52cdd6bdd7618f913",
+        "dependency_lock_sha256": "6595b6cd30a6d465f7b2d7bff2a81a5efde83e4f9660624a8b7007c3ccc0b512"
+      },
+      "identity_sha256": "1d195207c037f7de100aa308bc5cb82241187b6bce8b6eee0106fee12801c781",
+      "source_identity": {
+        "snapshot_id": "p2-41649744e057d61031d5",
+        "registry_entry_id": "ko-0f858cd8fec3b87a3161e559",
+        "ecosystem": "koishi",
+        "package": "koishi-plugin-jm2pdf",
+        "version": "1.5.2",
+        "platform": "windows",
+        "profile_id": "koishi-core-4.18.11-node-24.20.0-x86_64-portable-lock",
+        "profile_lock_sha256": "68a7391620a06e7141d949519333a1f4fc5ccee7abd84dc036c46d09fdae8d38",
+        "artifact_sha256": "ca1bf75e87bbef26910b97c0eb595971c63ec593e34828b52cdd6bdd7618f913",
+        "dependency_lock_sha256": "6595b6cd30a6d465f7b2d7bff2a81a5efde83e4f9660624a8b7007c3ccc0b512"
+      },
+      "source_identity_sha256": "e7b84a1c2e2de415443019b3d663d991a3c1508d8da9ce30ac0ab9bc2a446efe",
+      "source_selection_reasons": [
+        "failure_domain:preparation"
+      ],
+      "source": {
+        "result_id": "catalog:ko-0f858cd8fec3b87a3161e559|windows",
+        "identity": {
+          "snapshot_id": "p2-41649744e057d61031d5",
+          "registry_entry_id": "ko-0f858cd8fec3b87a3161e559",
+          "ecosystem": "koishi",
+          "package": "koishi-plugin-jm2pdf",
+          "version": "1.5.2",
+          "platform": "windows",
+          "profile_id": "koishi-core-4.18.11-node-24.20.0-x86_64-portable-lock",
+          "profile_lock_sha256": "68a7391620a06e7141d949519333a1f4fc5ccee7abd84dc036c46d09fdae8d38",
+          "artifact_sha256": "ca1bf75e87bbef26910b97c0eb595971c63ec593e34828b52cdd6bdd7618f913",
+          "dependency_lock_sha256": "6595b6cd30a6d465f7b2d7bff2a81a5efde83e4f9660624a8b7007c3ccc0b512"
+        },
+        "identity_sha256": "e7b84a1c2e2de415443019b3d663d991a3c1508d8da9ce30ac0ab9bc2a446efe",
+        "selection_reasons": [
+          "failure_domain:preparation"
+        ],
+        "source": {
+          "task_id": "S2-11",
+          "shard_report_path": "outputs/acceptance/phase2-s211-rerun-census-windows-shard56of256-20261014.json",
+          "shard_report_sha256": "a96103091cbe21ec4d21b708f04bb93577b5d329c7c3fa26ca85bd1615e9a2ba",
+          "unit_status": "failed",
+          "attribution_domain": "preparation",
+          "stage_statuses": {
+            "prepare": "passed",
+            "install": "failed",
+            "native": "skipped",
+            "federated": "skipped",
+            "compare": "skipped",
+            "cleanup": "passed"
+          },
+          "stage_result_sha256": {
+            "prepare": "b54737fcab9207c2077801ac1c78d0be434b537bbca134f71e6015ab90fa87c2",
+            "install": "7e303945234438afae7ae99bb54178741ed7ecd1b834dea4ef0224ce29d84f81",
+            "native": "c7f8c8208f2cf0a7199c51bc459324cb532934aabb8b07d5a41ab4d98070e817",
+            "federated": "c7f8c8208f2cf0a7199c51bc459324cb532934aabb8b07d5a41ab4d98070e817",
+            "compare": "43ad47178ff16fab5e86d1ddd243c3a78842f83acea4aa60fb74c63c269db199",
+            "cleanup": "f2f970a38c17810a70f39dd7b87930c6bc3f75d244a5db4a6746e3dc8f8ba187"
+          }
+        },
+        "required_stages": [
+          "prepare",
+          "install",
+          "native",
+          "federated",
+          "compare",
+          "cleanup"
+        ]
+      },
+      "old_to_new_identity": {
+        "profile_id_changed": false,
+        "profile_lock_sha256_changed": true,
+        "dependency_lock_sha256_changed": false
+      }
+    },
+    {
+      "selection_kind": "affected_windows_pilot",
+      "identity": {
+        "snapshot_id": "p2-41649744e057d61031d5",
+        "registry_entry_id": "ko-433e3217e395d7ce2c1c7cc7",
+        "ecosystem": "koishi",
+        "package": "koishi-plugin-nailong-logger",
+        "version": "0.0.1",
+        "platform": "windows",
+        "profile_id": "koishi-core-4.18.11-node-24.20.0-x86_64-portable-lock",
+        "profile_lock_sha256": "e58651dfa5e46b3ebc8590b7ba89fd7aef86e8dd42d47580c9ed7fb536d880df",
+        "artifact_sha256": "a5bbfb9a8ff9919583f46e55e3604e5f6f933cb19b75e705617c20f11888d98e",
+        "dependency_lock_sha256": "c7e8e27bd8136460e13c3614a5c7a04a4708fa374e23b74a49d6ba41c7a6193e"
+      },
+      "identity_sha256": "5f4871e824d4fc973beead341869386aa6b501e4a6976306e78c2571462a1358",
+      "source_identity": {
+        "snapshot_id": "p2-41649744e057d61031d5",
+        "registry_entry_id": "ko-433e3217e395d7ce2c1c7cc7",
+        "ecosystem": "koishi",
+        "package": "koishi-plugin-nailong-logger",
+        "version": "0.0.1",
+        "platform": "windows",
+        "profile_id": "koishi-core-4.18.11-node-24.20.0-x86_64-portable-lock",
+        "profile_lock_sha256": "68a7391620a06e7141d949519333a1f4fc5ccee7abd84dc036c46d09fdae8d38",
+        "artifact_sha256": "a5bbfb9a8ff9919583f46e55e3604e5f6f933cb19b75e705617c20f11888d98e",
+        "dependency_lock_sha256": "c7e8e27bd8136460e13c3614a5c7a04a4708fa374e23b74a49d6ba41c7a6193e"
+      },
+      "source_identity_sha256": "c6266d108e9528055c1d549dea91741bcb3c9733341d02736eb7ec22467142b2",
+      "source_selection_reasons": [
+        "stage_unknown:cleanup"
+      ],
+      "source": {
+        "result_id": "catalog:ko-433e3217e395d7ce2c1c7cc7|windows",
+        "identity": {
+          "snapshot_id": "p2-41649744e057d61031d5",
+          "registry_entry_id": "ko-433e3217e395d7ce2c1c7cc7",
+          "ecosystem": "koishi",
+          "package": "koishi-plugin-nailong-logger",
+          "version": "0.0.1",
+          "platform": "windows",
+          "profile_id": "koishi-core-4.18.11-node-24.20.0-x86_64-portable-lock",
+          "profile_lock_sha256": "68a7391620a06e7141d949519333a1f4fc5ccee7abd84dc036c46d09fdae8d38",
+          "artifact_sha256": "a5bbfb9a8ff9919583f46e55e3604e5f6f933cb19b75e705617c20f11888d98e",
+          "dependency_lock_sha256": "c7e8e27bd8136460e13c3614a5c7a04a4708fa374e23b74a49d6ba41c7a6193e"
+        },
+        "identity_sha256": "c6266d108e9528055c1d549dea91741bcb3c9733341d02736eb7ec22467142b2",
+        "selection_reasons": [
+          "stage_unknown:cleanup"
+        ],
+        "source": {
+          "task_id": "S2-11",
+          "shard_report_path": "outputs/acceptance/phase2-s211-rerun-census-windows-shard52of256-20261014.json",
+          "shard_report_sha256": "26bbf5e0856599c6a3b3b0b9ab7069bcf7c1bb823e9190a62c6a5440dfb1e392",
+          "unit_status": "failed",
+          "attribution_domain": "native-load",
+          "stage_statuses": {
+            "prepare": "passed",
+            "install": "passed",
+            "native": "failed",
+            "federated": "skipped",
+            "compare": "skipped",
+            "cleanup": "unknown"
+          },
+          "stage_result_sha256": {
+            "prepare": "0cecf91b67b5888dac5cdc02c8ed9a0eb0ed75a29c1f9000cb6eec2acdeefe34",
+            "install": "bcfc4e7ac7d1cfbe869c35410792b39c930256a62215c20822cf34958d29319d",
+            "native": "4040a285930078061fa8f06cf7b0043aa7c3707d7bd5149cea961e4bb5278aa4",
+            "federated": "230dde1a123ced7c3670531069da83bed23e51531544b2f0e8571e0dff2d9fa3",
+            "compare": "b63e4ca585fd3a8211f552180aa6f3d8cd7a9b5131b33e8510ba82bfef5ff6bc",
+            "cleanup": "4d43c1d05a91845b4353020ca3920710521948fb1034f21c5c0a2bc5d5f1ceb1"
+          }
+        },
+        "required_stages": [
+          "prepare",
+          "install",
+          "native",
+          "federated",
+          "compare",
+          "cleanup"
+        ]
+      },
+      "old_to_new_identity": {
+        "profile_id_changed": false,
+        "profile_lock_sha256_changed": true,
+        "dependency_lock_sha256_changed": false
+      }
+    },
+    {
+      "selection_kind": "affected_windows_pilot",
+      "identity": {
+        "snapshot_id": "p2-41649744e057d61031d5",
+        "registry_entry_id": "ko-44dc4d65cd0343cf6b5f2817",
+        "ecosystem": "koishi",
+        "package": "koishi-plugin-w-ygo",
+        "version": "0.0.4",
+        "platform": "windows",
+        "profile_id": "koishi-core-4.18.11-node-24.20.0-x86_64-portable-lock",
+        "profile_lock_sha256": "e58651dfa5e46b3ebc8590b7ba89fd7aef86e8dd42d47580c9ed7fb536d880df",
+        "artifact_sha256": "310e7b45734a5bf422b82496eb4699fc043ccdaa7504dd8a721a692cbacb5cc5",
+        "dependency_lock_sha256": "1a8c85326d2e176432fe2cbafa3f74a3322dbeff52019d881bc1e465bd474425"
+      },
+      "identity_sha256": "65d25fe4f479713aef0436997dd2840c64d6002202164be03ffd51018b1648e8",
+      "source_identity": {
+        "snapshot_id": "p2-41649744e057d61031d5",
+        "registry_entry_id": "ko-44dc4d65cd0343cf6b5f2817",
+        "ecosystem": "koishi",
+        "package": "koishi-plugin-w-ygo",
+        "version": "0.0.4",
+        "platform": "windows",
+        "profile_id": "koishi-core-4.18.11-node-24.20.0-x86_64-portable-lock",
+        "profile_lock_sha256": "68a7391620a06e7141d949519333a1f4fc5ccee7abd84dc036c46d09fdae8d38",
+        "artifact_sha256": "310e7b45734a5bf422b82496eb4699fc043ccdaa7504dd8a721a692cbacb5cc5",
+        "dependency_lock_sha256": "1a8c85326d2e176432fe2cbafa3f74a3322dbeff52019d881bc1e465bd474425"
+      },
+      "source_identity_sha256": "9ffc73dd08ef0956cac9f5cbb4fc944df89f9f8e74aeaa5a9d6b204a40ddce69",
+      "source_selection_reasons": [
+        "failure_domain:worker-backend"
+      ],
+      "source": {
+        "result_id": "catalog:ko-44dc4d65cd0343cf6b5f2817|windows",
+        "identity": {
+          "snapshot_id": "p2-41649744e057d61031d5",
+          "registry_entry_id": "ko-44dc4d65cd0343cf6b5f2817",
+          "ecosystem": "koishi",
+          "package": "koishi-plugin-w-ygo",
+          "version": "0.0.4",
+          "platform": "windows",
+          "profile_id": "koishi-core-4.18.11-node-24.20.0-x86_64-portable-lock",
+          "profile_lock_sha256": "68a7391620a06e7141d949519333a1f4fc5ccee7abd84dc036c46d09fdae8d38",
+          "artifact_sha256": "310e7b45734a5bf422b82496eb4699fc043ccdaa7504dd8a721a692cbacb5cc5",
+          "dependency_lock_sha256": "1a8c85326d2e176432fe2cbafa3f74a3322dbeff52019d881bc1e465bd474425"
+        },
+        "identity_sha256": "9ffc73dd08ef0956cac9f5cbb4fc944df89f9f8e74aeaa5a9d6b204a40ddce69",
+        "selection_reasons": [
+          "failure_domain:worker-backend"
+        ],
+        "source": {
+          "task_id": "S2-11",
+          "shard_report_path": "outputs/acceptance/phase2-s211-rerun-census-windows-shard233of256-20261014.json",
+          "shard_report_sha256": "e9af33cfc0756a8edaf1fb89152aa03a370405c922f25ab08e272bbbc9b11b41",
+          "unit_status": "skipped",
+          "attribution_domain": "worker-backend",
+          "stage_statuses": {
+            "prepare": "passed",
+            "install": "passed",
+            "native": "passed",
+            "federated": "skipped",
+            "compare": "skipped",
+            "cleanup": "passed"
+          },
+          "stage_result_sha256": {
+            "prepare": "efb7469aa404f86f818e72446ccad32a7bdea478ef9ccd14652dcf111e7857fb",
+            "install": "4af26aaa8c2b917eb4c6e2d4fd7c1929fe7c6f97c526d3c05e4a81e5483eeccd",
+            "native": "f351f04d7ba01aa22dde89d20802d9438d9622063a678527cc6319df38d453db",
+            "federated": "230dde1a123ced7c3670531069da83bed23e51531544b2f0e8571e0dff2d9fa3",
+            "compare": "2eda5ec95ab7b04a8da88ad5597216656792741405c3e8d77aa9640e0cd692f0",
+            "cleanup": "f351f04d7ba01aa22dde89d20802d9438d9622063a678527cc6319df38d453db"
+          }
+        },
+        "required_stages": [
+          "prepare",
+          "install",
+          "native",
+          "federated",
+          "compare",
+          "cleanup"
+        ]
+      },
+      "old_to_new_identity": {
+        "profile_id_changed": false,
+        "profile_lock_sha256_changed": true,
+        "dependency_lock_sha256_changed": false
+      }
+    },
+    {
+      "selection_kind": "affected_windows_pilot",
+      "identity": {
+        "snapshot_id": "p2-41649744e057d61031d5",
+        "registry_entry_id": "ko-49faa76157ad072ec5791025",
+        "ecosystem": "koishi",
+        "package": "koishi-plugin-auto-checkin-all",
+        "version": "1.0.3",
+        "platform": "windows",
+        "profile_id": "koishi-core-4.18.11-node-24.20.0-x86_64-portable-lock",
+        "profile_lock_sha256": "e58651dfa5e46b3ebc8590b7ba89fd7aef86e8dd42d47580c9ed7fb536d880df",
+        "artifact_sha256": "072b340f42aba5d4cc0ddc09a097efc234497f71bf4dbcbdedce9a87def4dff3",
+        "dependency_lock_sha256": "de6a93a4502c3e455a64e84954e990a3cbb270f812879f0c0cdcea44d3ef1804"
+      },
+      "identity_sha256": "d762906e5f3994b5bb5ac2e0e06e71488aa94b5fad41f8de9b47c27b8ddb470b",
+      "source_identity": {
+        "snapshot_id": "p2-41649744e057d61031d5",
+        "registry_entry_id": "ko-49faa76157ad072ec5791025",
+        "ecosystem": "koishi",
+        "package": "koishi-plugin-auto-checkin-all",
+        "version": "1.0.3",
+        "platform": "windows",
+        "profile_id": "koishi-core-4.18.11-node-24.20.0-x86_64-portable-lock",
+        "profile_lock_sha256": "68a7391620a06e7141d949519333a1f4fc5ccee7abd84dc036c46d09fdae8d38",
+        "artifact_sha256": "072b340f42aba5d4cc0ddc09a097efc234497f71bf4dbcbdedce9a87def4dff3",
+        "dependency_lock_sha256": "de6a93a4502c3e455a64e84954e990a3cbb270f812879f0c0cdcea44d3ef1804"
+      },
+      "source_identity_sha256": "c138c1406f270159e07cc2a3d11808eca49d4f39fa6afcb75236d465a9c09044",
+      "source_selection_reasons": [
+        "failure_domain:worker-timeout",
+        "stage_unknown:install"
+      ],
+      "source": {
+        "result_id": "catalog:ko-49faa76157ad072ec5791025|windows",
+        "identity": {
+          "snapshot_id": "p2-41649744e057d61031d5",
+          "registry_entry_id": "ko-49faa76157ad072ec5791025",
+          "ecosystem": "koishi",
+          "package": "koishi-plugin-auto-checkin-all",
+          "version": "1.0.3",
+          "platform": "windows",
+          "profile_id": "koishi-core-4.18.11-node-24.20.0-x86_64-portable-lock",
+          "profile_lock_sha256": "68a7391620a06e7141d949519333a1f4fc5ccee7abd84dc036c46d09fdae8d38",
+          "artifact_sha256": "072b340f42aba5d4cc0ddc09a097efc234497f71bf4dbcbdedce9a87def4dff3",
+          "dependency_lock_sha256": "de6a93a4502c3e455a64e84954e990a3cbb270f812879f0c0cdcea44d3ef1804"
+        },
+        "identity_sha256": "c138c1406f270159e07cc2a3d11808eca49d4f39fa6afcb75236d465a9c09044",
+        "selection_reasons": [
+          "failure_domain:worker-timeout",
+          "stage_unknown:install"
+        ],
+        "source": {
+          "task_id": "S2-11",
+          "shard_report_path": "outputs/acceptance/phase2-s211-rerun-census-windows-shard49of256-20261014.json",
+          "shard_report_sha256": "1b1c19c407a061e6d56940f8c3f383132a1c286f98e50d934a12a73e1608bcba",
+          "unit_status": "unknown",
+          "attribution_domain": "worker-timeout",
+          "stage_statuses": {
+            "prepare": "passed",
+            "install": "unknown",
+            "native": "skipped",
+            "federated": "skipped",
+            "compare": "skipped",
+            "cleanup": "passed"
+          },
+          "stage_result_sha256": {
+            "prepare": "91b4c4d7f42433e340b191acce0b54833f5f30583143d11fbd7338fdda2721c2",
+            "install": "eaf0d4d6ef442c5091cc6780454aaea853f44a25e9231473acea2ff12df96ebe",
+            "native": "c7495f8f6be006cd5387b37be7b2681ed4bf63e05cbd7796867bd261bb648c40",
+            "federated": "c7495f8f6be006cd5387b37be7b2681ed4bf63e05cbd7796867bd261bb648c40",
+            "compare": "e47b5d15487a5bbcffa3849fa81819b59f259d5e2c4c5319399a3a50db34f76c",
+            "cleanup": "ddb02a364872939c8f3dcafc128f305b68f43ff0f029bc32e54a6c70ad5d790c"
+          }
+        },
+        "required_stages": [
+          "prepare",
+          "install",
+          "native",
+          "federated",
+          "compare",
+          "cleanup"
+        ]
+      },
+      "old_to_new_identity": {
+        "profile_id_changed": false,
+        "profile_lock_sha256_changed": true,
+        "dependency_lock_sha256_changed": false
+      }
+    },
+    {
+      "selection_kind": "affected_windows_pilot",
+      "identity": {
+        "snapshot_id": "p2-41649744e057d61031d5",
+        "registry_entry_id": "ko-724d2b0ffd6aea58e041dd20",
+        "ecosystem": "koishi",
+        "package": "koishi-plugin-generative-games",
+        "version": "0.0.3",
+        "platform": "windows",
+        "profile_id": "koishi-core-4.18.11-node-24.20.0-x86_64-portable-lock",
+        "profile_lock_sha256": "e58651dfa5e46b3ebc8590b7ba89fd7aef86e8dd42d47580c9ed7fb536d880df",
+        "artifact_sha256": "f6f95d2c640cfb5efa579168a36416791fbbef7da18d39b631f960f4b52f851a",
+        "dependency_lock_sha256": "a2a29534a9bf81c6ba6a9a8ad4cbf2d71be70777d8b33d38ece336a66a081c57"
+      },
+      "identity_sha256": "19701a2b567c16c917bc53db66acefa9a7a777ee416470544ffc768c1844f594",
+      "source_identity": {
+        "snapshot_id": "p2-41649744e057d61031d5",
+        "registry_entry_id": "ko-724d2b0ffd6aea58e041dd20",
+        "ecosystem": "koishi",
+        "package": "koishi-plugin-generative-games",
+        "version": "0.0.3",
+        "platform": "windows",
+        "profile_id": "koishi-core-4.18.11-node-24.20.0-x86_64-portable-lock",
+        "profile_lock_sha256": "68a7391620a06e7141d949519333a1f4fc5ccee7abd84dc036c46d09fdae8d38",
+        "artifact_sha256": "f6f95d2c640cfb5efa579168a36416791fbbef7da18d39b631f960f4b52f851a",
+        "dependency_lock_sha256": "a2a29534a9bf81c6ba6a9a8ad4cbf2d71be70777d8b33d38ece336a66a081c57"
+      },
+      "source_identity_sha256": "62b06d24213a79b243e540f765ca8d154fc808fb5f01a5ef36be3f9e2127f060",
+      "source_selection_reasons": [
+        "stage_unknown:install"
+      ],
+      "source": {
+        "result_id": "catalog:ko-724d2b0ffd6aea58e041dd20|windows",
+        "identity": {
+          "snapshot_id": "p2-41649744e057d61031d5",
+          "registry_entry_id": "ko-724d2b0ffd6aea58e041dd20",
+          "ecosystem": "koishi",
+          "package": "koishi-plugin-generative-games",
+          "version": "0.0.3",
+          "platform": "windows",
+          "profile_id": "koishi-core-4.18.11-node-24.20.0-x86_64-portable-lock",
+          "profile_lock_sha256": "68a7391620a06e7141d949519333a1f4fc5ccee7abd84dc036c46d09fdae8d38",
+          "artifact_sha256": "f6f95d2c640cfb5efa579168a36416791fbbef7da18d39b631f960f4b52f851a",
+          "dependency_lock_sha256": "a2a29534a9bf81c6ba6a9a8ad4cbf2d71be70777d8b33d38ece336a66a081c57"
+        },
+        "identity_sha256": "62b06d24213a79b243e540f765ca8d154fc808fb5f01a5ef36be3f9e2127f060",
+        "selection_reasons": [
+          "stage_unknown:install"
+        ],
+        "source": {
+          "task_id": "S2-11",
+          "shard_report_path": "outputs/acceptance/phase2-s211-rerun-census-windows-shard62of256-20261014.json",
+          "shard_report_sha256": "f97b7ea245058e629062db38726988b6fbbfaf8fa3d75872cbeaf7b717ba5a77",
+          "unit_status": "unknown",
+          "attribution_domain": null,
+          "stage_statuses": {
+            "prepare": "passed",
+            "install": "unknown",
+            "native": "skipped",
+            "federated": "skipped",
+            "compare": "skipped",
+            "cleanup": "passed"
+          },
+          "stage_result_sha256": {
+            "prepare": "757e1ccf9976f223311387fe0df8ec1ae71ebe86add36aa495dc42e6805afed0",
+            "install": "f155ff90641a5c55d8c3b3cac2d91a02b4998762b1bc13dd5f4ba4f3d4c9ef3b",
+            "native": "1add465b1d514b754adc6873fe1791545a67380e9a459f32d54305edf6b76cd8",
+            "federated": "1add465b1d514b754adc6873fe1791545a67380e9a459f32d54305edf6b76cd8",
+            "compare": "375e7430eed3958f03f435e2b760d3579972b5c032d39cab336b471171828572",
+            "cleanup": "4bdcde8b0aec166db36f6a210f3540ecb86fcfa175d5d182a045d15f96800643"
+          }
+        },
+        "required_stages": [
+          "prepare",
+          "install",
+          "native",
+          "federated",
+          "compare",
+          "cleanup"
+        ]
+      },
+      "old_to_new_identity": {
+        "profile_id_changed": false,
+        "profile_lock_sha256_changed": true,
+        "dependency_lock_sha256_changed": false
+      }
+    }
+  ],
+  "manifest_sha256": "14eccd7baea9f6db82a397e15677b340e91be0c58c19629fccc2ec6fa84e92c9"
+}
