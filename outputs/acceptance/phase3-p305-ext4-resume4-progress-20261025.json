@@ -1,40 +1,81 @@
 {
   "schema_version": 1,
   "kind": "phase3_p305_ext4_resume4_checkpoint",
-  "captured_at_epoch": 1792915724.7004962,
+  "captured_at_epoch": 1792915983.041745,
   "campaign_id": "p3-recovery-linux-842f71712e2c",
   "status": "running",
   "denominator": {
     "units_total": 2206,
-    "units_settled": 300,
+    "units_settled": 351,
     "required_stage_positions": 6618
   },
   "stage_job_counts": {
-    "passed": 1059,
-    "skipped": 105,
-    "failed": 25,
-    "unknown": 13,
+    "passed": 1243,
+    "skipped": 119,
+    "failed": 29,
+    "unknown": 15,
     "leased": 2,
-    "queued": 7620
+    "queued": 7416
   },
-  "settled_unknown_units": 7,
-  "cleanup_stage_confirmed_units": 298,
+  "settled_unknown_units": 8,
+  "cleanup_stage_confirmed_units": 349,
   "install_attempt_reconciliations_cleanup_confirmed": 2,
-  "cleanup_evidence_units_lower_bound": 300,
+  "cleanup_evidence_units_lower_bound": 351,
+  "recent_install_unknowns": [
+    {
+      "unit_id": "ko-35fa632a84da235eb2d7366e|linux|catalog|install",
+      "registry_entry_id": "ko-35fa632a84da235eb2d7366e",
+      "package": "koishi-plugin-multi-bot-controller",
+      "version": "1.0.15",
+      "updated_at": 1792915958.1427224,
+      "reason_code": "worker_nonzero_exit",
+      "worker_exit_code": 1,
+      "cleanup_confirmed": true,
+      "stderr_sha256": "e11e60817a826e3623c370928e19164df33a189ccba4be63bc19c18f3dfdf4d5",
+      "stderr_tail": "/work/project/node_modules/@cordisjs/core/lib/index.cjs:637\n    throw new CordisError(\"INACTIVE_EFFECT\");\n    ^\n\nCordisError: cannot create effect on inactive context\n    at MainScope.assertActive (/work/project/node_modules/@cordisjs/core/lib/index.cjs:637:11)\n    at Proxy.on (/work/project/node_modules/@cordisjs/core/lib/index.cjs:549:20)\n    at Proxy.set (/work/project/node_modules/@koishijs/core/lib/index.cjs:2329:13)\n    at Object.apply (/work/project/node_modules/@cordisjs/core/lib/index.cjs:178:40)\n    at CommandsService.updateConfigSchema (/work/project/node_modules/koishi-plugin-multi-bot-controller/lib/index.js:174:29)\n    at CommandsService.scanCommands (/work/project/node_modules/koishi-plugin-multi-bot-controller/lib/index.js:112:22)\n    at Timeout._onTimeout (/work/project/node_modules/koishi-plugin-multi-bot-controller/lib/index.js:85:56)\n    at listOnTimeout (node:internal/timers:685:17)\n    at process.processTimers (node:internal/timers:618:7) {\n  code: 'INACTIVE_EFFECT'\n}\n\nNode.js v24.20.0\n",
+      "protocol_report_present": false
+    },
+    {
+      "unit_id": "ko-23ea0fb63b9c2091c32e979b|linux|catalog|install",
+      "registry_entry_id": "ko-23ea0fb63b9c2091c32e979b",
+      "package": "koishi-plugin-npm-unused",
+      "version": "1.0.2",
+      "updated_at": 1792915396.8286717,
+      "reason_code": "worker_nonzero_exit",
+      "worker_exit_code": 1,
+      "cleanup_confirmed": true,
+      "stderr_sha256": "ee7889e04f488f27cb920801b7cdd512b0a7ec23e8fefc666ab51e0ad378cfa4",
+      "stderr_tail": "/work/project/node_modules/koishi-plugin-npm-unused/lib/index.js:38\n    const http = ctx.http.extend({\n                          ^\n\nTypeError: Cannot read properties of undefined (reading 'extend')\n    at getUnused (/work/project/node_modules/koishi-plugin-npm-unused/lib/index.js:38:27)\n    at new apply (/work/project/node_modules/koishi-plugin-npm-unused/lib/index.js:19:5)\n    at MainScope.apply (/work/project/node_modules/@cordisjs/core/lib/index.cjs:878:24)\n    at /work/project/node_modules/@cordisjs/core/lib/index.cjs:900:49\n    at MainScope.ensure (/work/project/node_modules/@cordisjs/core/lib/index.cjs:686:18)\n    at MainScope.start (/work/project/node_modules/@cordisjs/core/lib/index.cjs:900:12)\n    at MainScope.init (/work/project/node_modules/@cordisjs/core/lib/index.cjs:719:12)\n    at new MainScope (/work/project/node_modules/@cordisjs/core/lib/index.cjs:835:12)\n    at Proxy.plugin (/work/project/node_modules/@cordisjs/core/lib/index.cjs:1062:15)\n    at file:///work/project/pilot-probe.mjs:129:13\n\nNode.js v24.20.0\n",
+      "protocol_report_present": false
+    },
+    {
+      "unit_id": "ko-2126d25bcc1a117a7ff777cb|linux|catalog|install",
+      "registry_entry_id": "ko-2126d25bcc1a117a7ff777cb",
+      "package": "koishi-plugin-chatluna-command-tool",
+      "version": "0.0.1",
+      "updated_at": 1792914746.9547355,
+      "reason_code": "worker_lost",
+      "worker_exit_code": null,
+      "cleanup_confirmed": false,
+      "stderr_sha256": null,
+      "stderr_tail": null,
+      "protocol_report_present": false
+    }
+  ],
   "active_workers": [
     "p3-linux-842f71712e2c-1",
     "p3-linux-842f71712e2c-2"
   ],
   "leases": [
     {
-      "unit_id": "ko-2cac1b84e84df9d6332af718|linux|catalog|install",
+      "unit_id": "ko-3663a85e36dcfab86f5af16d|linux|catalog|install",
       "worker_id": "p3-linux-842f71712e2c-2",
-      "lease_expires_at": 1792915837.800998
+      "lease_expires_at": 1792916096.1708467
     },
     {
-      "unit_id": "ko-2cb18de0ee04c506dff845db|linux|catalog|install",
+      "unit_id": "ko-36677737f95b47d9ffe3a662|linux|catalog|install",
       "worker_id": "p3-linux-842f71712e2c-1",
-      "lease_expires_at": 1792915840.1204324
+      "lease_expires_at": 1792916096.7698233
     }
   ],
   "run_manifest_identity_sha256": "2175bce7afc141c7700b108339bc213bffe3382c2c604bd2f268ff4b8a6a68b9",
@@ -49,5 +90,5 @@
   "behavior_compatibility": "not_evaluated",
   "windows_tests_run": false,
   "windows_catalog_plugins_run": false,
-  "report_sha256": "768c2f0dd12afae2cfcb698bb2248e390381b74021761e110f5af6fe511ca9e9"
+  "report_sha256": "6141ac6efbd2807b0ca784ece415e68d882fc44cd4931cfb6979438fefdc7fce"
 }
