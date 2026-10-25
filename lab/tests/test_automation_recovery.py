@@ -11,6 +11,7 @@ from unittest.mock import patch
 from lab.automation.recovery import (
     RecoveryPilotError,
     _locked_input_inventory,
+    _cleanup_confirmed_from_result,
     _project_worker_stage_result,
     _verify_pilot_worker_images,
     build_linux_pilot_manifest,
@@ -167,6 +168,10 @@ class RecoveryPilotManifestTests(unittest.TestCase):
         self.assertEqual(cleanup["status"], "unknown")
         self.assertEqual(cleanup["reason_code"], "worker_cleanup_unconfirmed")
         self.assertFalse(cleanup["cleanup_confirmed"])
+
+    def test_cleanup_reconciliation_confirmation_is_retained_separately_from_stage_status(self) -> None:
+        self.assertTrue(_cleanup_confirmed_from_result({"status": "unknown", "reconciliation": {"cleanup_confirmed": True}}))
+        self.assertFalse(_cleanup_confirmed_from_result({"status": "unknown", "reconciliation": {"cleanup_confirmed": False}}))
 
     def test_malformed_worker_probe_remains_unknown_instead_of_aborting_projection(self) -> None:
         missing = _project_worker_stage_result("native", None, "c" * 64)

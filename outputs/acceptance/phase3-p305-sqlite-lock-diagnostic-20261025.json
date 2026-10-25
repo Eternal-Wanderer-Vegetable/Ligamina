@@ -1,0 +1,42 @@
+{
+  "schema_version": 1,
+  "kind": "phase3_p305_sqlite_lock_failure_checkpoint",
+  "campaign_id": "p3-recovery-linux-842f71712e2c",
+  "result": "interrupted",
+  "report_emitted_by_failed_execution": false,
+  "exception": "sqlite3.OperationalError: database is locked",
+  "failure_location": "StageQueue.finish: BEGIN IMMEDIATE",
+  "database_path": ".work/automation/p3-recovery-linux-842f71712e2c/linux/queue.sqlite3",
+  "database_quick_check": "ok",
+  "run_state": "interrupted",
+  "worker_count_configured": 2,
+  "observed_worker_ids": [
+    "p3-linux-842f71712e2c-1",
+    "p3-linux-842f71712e2c-2"
+  ],
+  "job_counts_at_checkpoint": {
+    "failed": 5,
+    "leased": 1,
+    "passed": 219,
+    "queued": 8586,
+    "skipped": 13,
+    "unknown": 0
+  },
+  "expired_lease": {
+    "unit_id": "ko-0831a0963acd3839ef3cb5f4|linux|catalog|cleanup",
+    "job_id": "d5ca23ea7819896cd471f1925121124a90ed7c828244eaf3287825264b9e12f6",
+    "attempt_id": "50caf51fcf01a3be0b8b5385424463d4954fc6da2e3fdb0c",
+    "generation": 1,
+    "worker_id": "p3-linux-842f71712e2c-1",
+    "attempt_status_before_reconciliation": "leased",
+    "lease_expired_at_epoch": 1792911516.2658553,
+    "reconciliation_required_before_resume": true
+  },
+  "inference": "The prior claim and blocked-dependency scans repeatedly ran inside SQLite write transactions over thousands of jobs; this is a plausible contributor to long contention. The direct error does not by itself prove the mounted filesystem caused it. The regression now narrows blocked-job lookup to unsuccessful dependency sources, adds the reverse dependency index, and moves the resumed queue to WSL ext4.",
+  "log_path": "outputs/acceptance/phase3-p305-concurrency-resumed-execution-20261025.log",
+  "log_sha256": "a3178a55e374dc153c1b429f15305c5bea142e2058ee2d8ff1cac00d8cbd194f",
+  "report_sha256": "63b9848a6d7c24d45920324d3f20b3f95d79be9a9e71ec25917681390a48889a",
+  "settled_units_at_checkpoint": 58,
+  "cleanup_confirmed_units_at_checkpoint": 58,
+  "settled_unknown_units_at_checkpoint": 0
+}

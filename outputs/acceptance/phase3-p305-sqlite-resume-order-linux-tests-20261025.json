@@ -1,0 +1,30 @@
+{
+  "schema_version": 1,
+  "kind": "phase3_p305_sqlite_resume_order_regression_tests",
+  "platform": "linux_wsl",
+  "campaign_id": "p3-recovery-linux-842f71712e2c",
+  "command": "UV_PROJECT_ENVIRONMENT=/tmp/ligamina-lab-p3-v3-20261025 TMPDIR=/home/vegetable/.cache/ligamina-test-tmp uv run --locked --project lab --python 3.12.14 python -m unittest lab.tests.test_queue lab.tests.test_automation_dispatcher lab.tests.test_automation_recovery -v",
+  "exit_code": 0,
+  "result": "passed",
+  "tests": 41,
+  "duration_seconds": 66.898,
+  "summary": "OK",
+  "new_regressions": [
+    "test_resume_reconciles_expired_lease_before_reopening_claims",
+    "test_cleanup_reconciliation_confirmation_is_retained_separately_from_stage_status"
+  ],
+  "large_queue_regression": {
+    "units": 64,
+    "stage_jobs": 384,
+    "workers": 2,
+    "lease_seconds": 30,
+    "duration_seconds": 2.101,
+    "result": "passed"
+  },
+  "windows_host_tests_run": false,
+  "windows_sandbox_runtime_tests_run": false,
+  "windows_catalog_plugins_run": false,
+  "log_path": "outputs/acceptance/phase3-p305-sqlite-resume-order-linux-tests-20261025.log",
+  "log_sha256": "f421c9ccfa49d72205b7dcbc2e6dfada284054bf561894dcccd9b7f4aad13ad4",
+  "report_sha256": "1ab64a8966b9840e8d9de767441d0e5317950e4c7145b84e4ec72f6819eae6c0"
+}

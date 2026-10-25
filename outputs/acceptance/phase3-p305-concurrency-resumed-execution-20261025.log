@@ -1,0 +1,26 @@
+Using CPython 3.12.14
+Creating virtual environment at: /tmp/ligamina-lab-p3-v3-20261025
+Installed 7 packages in 20ms
+Traceback (most recent call last):
+  File "<frozen runpy>", line 198, in _run_module_as_main
+  File "<frozen runpy>", line 88, in _run_code
+  File "/mnt/e/stella/Ligamina/lab/automation/__main__.py", line 135, in <module>
+    raise SystemExit(main())
+                     ^^^^^^
+  File "/mnt/e/stella/Ligamina/lab/automation/__main__.py", line 121, in main
+    report = execute_linux_recovery_pilot(**arguments)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/mnt/e/stella/Ligamina/lab/automation/recovery.py", line 775, in execute_linux_recovery_pilot
+    infrastructure_stop = dispatch_until_idle(
+                          ^^^^^^^^^^^^^^^^^^^^
+  File "/mnt/e/stella/Ligamina/lab/automation/dispatcher.py", line 165, in dispatch_until_idle
+    raise errors[0]
+  File "/mnt/e/stella/Ligamina/lab/automation/dispatcher.py", line 137, in worker
+    outcome = dispatcher.dispatch_one()
+              ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/mnt/e/stella/Ligamina/lab/automation/dispatcher.py", line 66, in dispatch_one
+    committed = self.queue.finish(
+                ^^^^^^^^^^^^^^^^^^
+  File "/mnt/e/stella/Ligamina/lab/queue.py", line 542, in finish
+    connection.execute("BEGIN IMMEDIATE")
+sqlite3.OperationalError: database is locked

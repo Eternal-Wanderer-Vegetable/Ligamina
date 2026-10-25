@@ -13,7 +13,7 @@ from unittest.mock import patch
 from lab.automation.circuit_breaker import BackendCircuitBreaker, CircuitPolicy
 from lab.automation.dispatcher import Dispatcher, dispatch_until_idle
 from lab.automation.host_lock import HostLock
-from lab.automation.reconcile import DockerReconciler, ReconciliationResult, reconcile_expired_attempts
+from lab.automation.reconcile import DockerReconciler, ReconciliationResult, reconcile_expired_attempts, resume_reconciled_run
 from lab.queue import QueueError, StageQueue
 from lab.workers import DockerWorker, WorkerSpec
 
@@ -246,6 +246,41 @@ class AutomationDispatchTests(unittest.TestCase):
             self.queue.complete_reconciliation("campaign", now=14)
         resumed = self.queue.resume_run("campaign", now=15)
         self.assertEqual(resumed["state"], "interrupted")
+
+    def test_resume_reconciles_expired_lease_before_reopening_claims(self) -> None:
+        path = Path(self.temporary.name) / "resume-order.sqlite3"
+        queue = StageQueue(path)
+        queue.create_run("resume-order", "snapshot", "b" * 64, {"schema_version": 1}, fencing_required=True)
+        queue.enqueue_jobs("resume-order", [{
+            "unit_id": "expired-unit", "registry_entry_id": "entry", "ecosystem": "nonebot",
+            "platform": "linux", "profile_id": "profile", "stage": "cleanup", "case_id": "cleanup",
+            "payload": {}, "max_attempts": 1,
+        }], now=10)
+        claimed = queue.claim("resume-order", "old-worker", lease_seconds=1, now=10)
+        queue.interrupt_run("resume-order", now=10.5)
+
+        class InspectingReconciler:
+            request = None
+
+            def reconcile(self, **kwargs):
+                self.request = kwargs
+                attempt = queue.list_attempts("resume-order")[0]
+                self_attempt = attempt.get("result") or {}
+                if attempt["status"] != "unknown" or not self_attempt.get("requires_reconciliation"):
+                    raise AssertionError("expired attempt must be recorded unknown before Docker reconciliation")
+                return ReconciliationResult(True, (), (), None)
+
+        reconciler = InspectingReconciler()
+        result = resume_reconciled_run(queue, "resume-order", reconciler, now=12)
+
+        self.assertEqual(reconciler.request["job_id"], claimed["job_id"])
+        self.assertEqual(reconciler.request["attempt_id"], claimed["attempt_id"])
+        self.assertEqual(reconciler.request["generation"], 1)
+        self.assertEqual(result["reconciliation"]["reconciled_attempts"], 1)
+        self.assertEqual(result["run"]["state"], "running")
+        attempt = queue.list_attempts("resume-order")[0]
+        self.assertEqual(attempt["status"], "unknown")
+        self.assertTrue(attempt["result"]["reconciliation"]["cleanup_confirmed"])
 
     def test_worker_spec_emits_generation_scoped_docker_labels(self) -> None:
         with tempfile.TemporaryDirectory(prefix="ligamina-worker-input-") as directory:

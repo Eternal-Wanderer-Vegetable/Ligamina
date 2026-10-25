@@ -111,3 +111,19 @@ def reconcile_expired_attempts(queue: StageQueue, run_id: str, reconciler: Docke
             run_id, attempt["unit_id"], attempt["attempt_id"], evidence, now=now,
         ))
     return {"run_id": run_id, "reconciled_attempts": len(outcomes), "outcomes": outcomes}
+
+
+def resume_reconciled_run(
+    queue: StageQueue,
+    run_id: str,
+    reconciler: DockerReconciler,
+    *,
+    now: float | None = None,
+) -> dict[str, Any]:
+    """Mark expired fenced leases unknown, reconcile their exact resources, then reopen claims."""
+    resumed = queue.resume_run(run_id, now=now)
+    reconciliation = {"run_id": run_id, "reconciled_attempts": 0, "outcomes": []}
+    if resumed["reconciliation_required"]:
+        reconciliation = reconcile_expired_attempts(queue, run_id, reconciler, now=now)
+        queue.complete_reconciliation(run_id, now=now)
+    return {"resume": resumed, "reconciliation": reconciliation, "run": queue.run(run_id)}

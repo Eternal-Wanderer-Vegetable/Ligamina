@@ -16,7 +16,7 @@ from lab.artifacts import DEFAULT_CACHE_ROOT, _verify_upstream_digest, sha256_fi
 from lab.automation.circuit_breaker import BackendCircuitBreaker, CircuitPolicy
 from lab.automation.dispatcher import dispatch_until_idle
 from lab.automation.health import collect_linux_health
-from lab.automation.reconcile import DockerReconciler, reconcile_expired_attempts
+from lab.automation.reconcile import DockerReconciler, reconcile_expired_attempts, resume_reconciled_run
 from lab.automation.selection import ROOT, AutomationContractError, object_sha256, sha256, validate_manifest
 from lab.catalog_run import load_catalog_units
 from lab.pilot_nonebot import _catalog_context, run_nonebot_load_probe
@@ -500,6 +500,13 @@ def _project_worker_stage_result(stage_name: str, probe: Any, probe_result_sha25
     return result
 
 
+def _cleanup_confirmed_from_result(result: dict[str, Any]) -> bool:
+    reconciliation = result.get("reconciliation")
+    return result.get("cleanup_confirmed") is True or (
+        isinstance(reconciliation, dict) and reconciliation.get("cleanup_confirmed") is True
+    )
+
+
 def _locked_input_inventory(manifest: dict[str, Any], snapshot_dir: Path, cache_root: Path) -> dict[str, Any]:
     artifacts, artifact_lock_raw = _read_json(snapshot_dir / "artifacts.lock.json")
     overrides_contract = manifest.get("archive_size_overrides")
@@ -621,6 +628,7 @@ def execute_linux_recovery_pilot(
     snapshot_dir: Path = ROOT / "catalogs/p2-41649744e057d61031d5",
     cache_root: Path = DEFAULT_CACHE_ROOT,
     evidence_root: Path = Path("../Ligamina-automation-evidence"),
+    queue_root: Path | None = None,
     timeout_seconds: int | None = None,
     now: float | None = None,
 ) -> dict[str, Any]:
@@ -662,7 +670,8 @@ def execute_linux_recovery_pilot(
         selected_units.append({**unit, "pilot_selection_kind": row["selection_kind"], "source": row["source"]})
 
     cache_inventory = _locked_input_inventory(manifest, snapshot_dir, cache_root)
-    queue_path = ROOT / ".work" / "automation" / manifest["campaign_id"] / "linux" / "queue.sqlite3"
+    queue_base = queue_root if queue_root is not None else ROOT / ".work" / "automation"
+    queue_path = queue_base / manifest["campaign_id"] / "linux" / "queue.sqlite3"
     campaign_dir = (evidence_root / manifest["campaign_id"] / "linux").resolve()
     if ROOT.resolve() == campaign_dir or ROOT.resolve() in campaign_dir.parents:
         raise RecoveryPilotError("automation evidence must be outside the repository")
@@ -708,9 +717,7 @@ def execute_linux_recovery_pilot(
     all_jobs = [job for unit in selected_units for job in _recovery_jobs(unit)]
     queue.enqueue_jobs(manifest["campaign_id"], all_jobs, now=at)
     if queue.run(manifest["campaign_id"])["state"] == "interrupted":
-        reconcile_expired_attempts(queue, manifest["campaign_id"], DockerReconciler(), now=at)
-        queue.complete_reconciliation(manifest["campaign_id"], now=at)
-        queue.resume_run(manifest["campaign_id"], now=at)
+        resume_reconciled_run(queue, manifest["campaign_id"], DockerReconciler(), now=at)
 
     from lab.automation.host_lock import HostLock
     lock = HostLock(ROOT / ".work" / "automation" / "linux-controller.lock")
@@ -795,7 +802,7 @@ def execute_linux_recovery_pilot(
         failed = any(new_statuses[stage] == "failed" for stage in required)
         not_run = any(new_statuses[stage] == "queued" for stage in required)
         cleanup_result = stages["cleanup"].get("result") or {}
-        cleanup_confirmed = cleanup_result.get("cleanup_confirmed") is True
+        cleanup_confirmed = _cleanup_confirmed_from_result(cleanup_result)
         rows.append({
             "registry_entry_id": entry_id, "ecosystem": selected["ecosystem"], "package": selected["package"],
             "version": selected.get("version"), "platform": "linux", "selection_kind": selected["pilot_selection_kind"],

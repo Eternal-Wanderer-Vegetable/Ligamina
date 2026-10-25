@@ -57,6 +57,7 @@ def main(argv: list[str] | None = None) -> int:
     recovery_execute.add_argument("--admission", type=Path, required=True)
     recovery_execute.add_argument("--snapshot", type=Path, default=ROOT / "catalogs/p2-41649744e057d61031d5")
     recovery_execute.add_argument("--cache-root", type=Path)
+    recovery_execute.add_argument("--queue-root", type=Path, help="queue directory; defaults to .work/automation under the repository")
     recovery_execute.add_argument("--evidence-root", type=Path, default=ROOT.parent / "Ligamina-automation-evidence")
     recovery_execute.add_argument("--timeout", type=int, help="must match the timeout frozen in the pilot manifest")
     recovery_execute.add_argument("--output", type=Path, required=True)
@@ -114,6 +115,7 @@ def main(argv: list[str] | None = None) -> int:
                 "admission_path": options.admission,
                 "snapshot_dir": options.snapshot,
                 "evidence_root": options.evidence_root,
+                "queue_root": options.queue_root,
                 "timeout_seconds": options.timeout,
             }
             if options.cache_root:

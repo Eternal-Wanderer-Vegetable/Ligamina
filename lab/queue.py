@@ -98,6 +98,7 @@ class StageQueue:
                 );
                 CREATE INDEX IF NOT EXISTS jobs_claim_order ON jobs(run_id, status, created_at, job_id);
                 CREATE INDEX IF NOT EXISTS jobs_lease_expiry ON jobs(status, lease_expires_at);
+                CREATE INDEX IF NOT EXISTS dependencies_by_source ON job_dependencies(depends_on_job_id, job_id);
                 CREATE INDEX IF NOT EXISTS attempts_job_order ON attempts(job_id, attempt_number);
                 PRAGMA journal_mode=WAL;
                 PRAGMA synchronous=FULL;
@@ -373,15 +374,32 @@ class StageQueue:
 
     def _skip_blocked(self, connection: sqlite3.Connection, run_id: str, now: float) -> int:
         total_changed = 0
+        terminal_marks = ",".join("?" for _ in TERMINAL_STATUSES)
+        unsuccessful_statuses = tuple(status for status in TERMINAL_STATUSES if status != "passed")
+        unsuccessful_marks = ",".join("?" for _ in unsuccessful_statuses)
         while True:
-            rows = connection.execute("SELECT * FROM jobs WHERE run_id=? AND status='queued' ORDER BY created_at,unit_id", (run_id,)).fetchall()
+            rows = connection.execute(
+                f"""
+                SELECT DISTINCT candidate.* FROM jobs AS source
+                JOIN job_dependencies AS dependency_edge ON dependency_edge.depends_on_job_id=source.job_id
+                JOIN jobs AS candidate ON candidate.job_id=dependency_edge.job_id
+                WHERE source.run_id=? AND source.status IN ({unsuccessful_marks})
+                  AND candidate.run_id=? AND candidate.status='queued' AND candidate.always_run=0
+                  AND NOT EXISTS (
+                    SELECT 1 FROM job_dependencies AS dependency_edge
+                    JOIN jobs AS dependency ON dependency.job_id=dependency_edge.depends_on_job_id
+                    WHERE dependency_edge.job_id=candidate.job_id
+                      AND dependency.status NOT IN ({terminal_marks})
+                  )
+                ORDER BY candidate.created_at,candidate.unit_id
+                """,
+                (run_id, *unsuccessful_statuses, run_id, *TERMINAL_STATUSES),
+            ).fetchall()
             changed = 0
             for row in rows:
                 dependencies = self._dependencies(connection, row["job_id"])
-                if not dependencies or any(dependency["status"] not in TERMINAL_STATUSES for dependency in dependencies):
-                    continue
                 unsuccessful = [dependency for dependency in dependencies if dependency["status"] != "passed"]
-                if unsuccessful and not row["always_run"]:
+                if unsuccessful:
                     source = unsuccessful[0]
                     result = {
                         "status": "skipped",
@@ -444,19 +462,26 @@ class StageQueue:
                     connection.commit()
                     return None
                 self._skip_blocked(connection, run_id, at)
-                rows = connection.execute(
-                    "SELECT * FROM jobs WHERE run_id=? AND status='queued' ORDER BY created_at,unit_id",
-                    (run_id,),
-                ).fetchall()
-                selected = None
-                for row in rows:
-                    dependencies = self._dependencies(connection, row["job_id"])
-                    if dependencies and any(item["status"] not in TERMINAL_STATUSES for item in dependencies):
-                        continue
-                    if dependencies and not row["always_run"] and any(item["status"] != "passed" for item in dependencies):
-                        continue
-                    selected = row
-                    break
+                terminal_marks = ",".join("?" for _ in TERMINAL_STATUSES)
+                selected = connection.execute(
+                    f"""
+                    SELECT candidate.* FROM jobs AS candidate
+                    WHERE candidate.run_id=? AND candidate.status='queued'
+                      AND NOT EXISTS (
+                        SELECT 1 FROM job_dependencies AS dependency_edge
+                        JOIN jobs AS dependency ON dependency.job_id=dependency_edge.depends_on_job_id
+                        WHERE dependency_edge.job_id=candidate.job_id
+                          AND dependency.status NOT IN ({terminal_marks})
+                      )
+                      AND (candidate.always_run=1 OR NOT EXISTS (
+                        SELECT 1 FROM job_dependencies AS dependency_edge
+                        JOIN jobs AS dependency ON dependency.job_id=dependency_edge.depends_on_job_id
+                        WHERE dependency_edge.job_id=candidate.job_id AND dependency.status!='passed'
+                      ))
+                    ORDER BY candidate.created_at,candidate.unit_id LIMIT 1
+                    """,
+                    (run_id, *TERMINAL_STATUSES),
+                ).fetchone()
                 if selected is None:
                     self._refresh_run_state(connection, run_id, at)
                     connection.commit()

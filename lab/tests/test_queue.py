@@ -222,6 +222,43 @@ class StageQueueTests(unittest.TestCase):
         self.assertEqual(len(claimed), 1)
         self.assertEqual(queue.counts("race")["leased"], 1)
 
+    def test_large_independent_queue_drains_with_two_concurrent_workers(self) -> None:
+        path = Path(self.temporary.name) / "large-concurrent.sqlite3"
+        queue = StageQueue(path)
+        queue.create_run("large-race", "snapshot-1", "e" * 64, {"schema_version": 1})
+        jobs = []
+        for index in range(64):
+            unit = {
+                **self.unit,
+                "unit_id": f"entry-{index:03d}|linux|catalog",
+                "registry_entry_id": f"entry-{index:03d}",
+            }
+            jobs.extend(build_stage_jobs(unit))
+        queue.enqueue_jobs("large-race", jobs, now=100)
+        first_claims = threading.Barrier(2)
+
+        def drain(worker_id: str) -> None:
+            synchronize_first_pair = True
+            while True:
+                job = queue.claim("large-race", worker_id, lease_seconds=30)
+                if job is None:
+                    return
+                if synchronize_first_pair:
+                    first_claims.wait(timeout=10)
+                    synchronize_first_pair = False
+                queue.finish(job["job_id"], worker_id, {"status": "passed"}, attempt_id=job["attempt_id"])
+
+        with ThreadPoolExecutor(max_workers=2) as pool:
+            list(pool.map(drain, ("large-w1", "large-w2")))
+
+        counts = queue.counts("large-race")
+        self.assertEqual(counts["passed"], len(jobs))
+        self.assertEqual(counts["leased"], 0)
+        self.assertEqual(counts["queued"], 0)
+        self.assertEqual(queue.run("large-race")["state"], "completed")
+        attempts = queue.list_attempts("large-race")
+        self.assertEqual({attempt["worker_id"] for attempt in attempts}, {"large-w1", "large-w2"})
+
     def test_enqueue_is_idempotent_but_conflicting_identity_is_rejected(self) -> None:
         repeated = self.queue.enqueue_jobs("run-1", self.jobs, now=101)
         self.assertEqual(repeated, {"created": 0, "existing": 6})

@@ -1414,7 +1414,7 @@
       ],
       "status": "in-progress",
       "done_when": "Linux 完成 pilot 和选中集合执行/归因；Windows 仅 P3-04 通过后执行，否则明确剩余范围与 blocked gate；每 OS 独立裁决，原报告不改写。",
-      "evidence": "2026-10-25: semantics-v3 preserves CommonJS inject metadata and performs Host-service preflight before plugin callbacks. Full P3-01 Linux cache audit found exact artifact SHA and profile-lock SHA/size for 2,206/2,206 entries. The new 20-unit pilot p3-recovery-linux-b9518c95b224 closed 20/20 units and 60/60 required stages: 11 recovered, 9 plugin/stage failed, 0 unknown, 0 not_run, cleanup 20/20, infrastructure_blocker=false, health passed; plugin compatibility remains not_evaluated. The full affected-linux scope is frozen as p3-recovery-linux-842f71712e2c (414 NoneBot, 1,792 Koishi) with per-entry core-only Koishi Host profiles and exact archive-size overrides. A fresh Linux admission and 10/10 benign Worker probes passed before execution; the serial Docker campaign was safely paused at 56/2,206 terminal units with cleanup confirmed and no active leases. P3-05 remains in-progress pending full campaign closure and attribution; Windows catalog plugins were not run. Bounded Linux dispatch now uses a shared thread-safe circuit breaker and the configured maximum of two workers; it stops new claims on backend loss and preserves fenced interruption/resume semantics. Linux WSL passed all 38 focused dispatcher/recovery/queue tests with no skips; its log/report hash is recorded in phase3-p305-concurrency-dispatch-linux-tests-20261025.json. A separate earlier Windows-host unit run recorded 37 passed plus one Linux-only host-lock skip and did not launch Sandbox or catalog plugins; see phase3-p305-concurrency-dispatch-tests-20261025.json. Documentation validation passed 19 documents/298 links and harness validation scored 100/100; both summaries have hash-bound acceptance reports. Resume preflight for the unchanged 2,206-unit manifest passed with 10/10 benign Worker probes, 10/10 cleanup confirmations, admitted Linux health fingerprint e4526a08f45c2ada598c479aa819fcc4a882aacb8acca8ec407885b39ad5c264; execution is ready to resume from the interrupted SQLite queue.",
+      "evidence": "2026-10-25: semantics-v3 preserves CommonJS inject metadata and checks Koishi Host services before plugin callbacks. The 20-unit Linux pilot p3-recovery-linux-b9518c95b224 closed 20/20 units and 60/60 required stages: 11 recovered, 9 plugin/stage failed, 0 unknown, cleanup 20/20; behavior compatibility remains not_evaluated. The immutable affected-linux manifest p3-recovery-linux-842f71712e2c binds 414 NoneBot and 1,792 Koishi entries; exact artifact/profile lock inputs were available for all 2,206 units. The earlier serial queue reached 56/2,206 settled units. Its first bounded two-worker resume observed concurrent leases and stopped at StageQueue.finish with sqlite3.OperationalError: database is locked; no complete execution report was emitted. The original database passed quick_check and remains preserved. A read-only SQLite backup to WSL ext4 has identical logical dump SHA-256 and queue state; at that checkpoint 58/2,206 units were settled, cleanup 58/58, unknown 0, and one expired cleanup-stage attempt awaited reconciliation. Queue dependency skipping now uses an indexed reverse lookup from unsuccessful dependencies. Recovery marks expired leases unknown before exact Docker-label reconciliation; confirmed cleanup remains separate from the unknown stage outcome. Linux WSL passed 41/41 focused queue/dispatcher/recovery tests with no skips, including a 64-unit/384-job/two-worker drain in 2.101s under 30-second leases. A fresh 10/10 benign probe and admitted Linux preflight passed with fingerprint af5f364a9dec8e7f5438d6c68b0961bdc2aa77f5b54ea0390cb17d3e82f5168f; the frozen manifest revalidated as 2,206 units with unchanged SHA. The full affected campaign remains open; Windows catalog plugins were not run.",
       "evidence_paths": [
         "outputs/acceptance/phase3-p305-linux-cache-audit-20261025.json",
         "outputs/acceptance/phase3-p305-linux-admission-final-20261025.json",
@@ -1459,7 +1459,27 @@
         "outputs/acceptance/phase3-p305-concurrency-harness-20261025.json",
         "outputs/acceptance/phase3-p305-linux-workers-affected-v3-resume-20261025.json",
         "outputs/acceptance/phase3-p305-linux-admission-affected-v3-resume-20261025.json",
-        "outputs/acceptance/phase3-p305-concurrency-resume-preflight-20261025.json"
+        "outputs/acceptance/phase3-p305-concurrency-resume-preflight-20261025.json",
+        "lab/queue.py",
+        "lab/tests/test_queue.py",
+        "outputs/acceptance/phase3-p305-sqlite-lock-diagnostic-20261025.json",
+        "outputs/acceptance/phase3-p305-concurrency-resumed-execution-20261025.log",
+        "outputs/acceptance/phase3-p305-queue-ext4-checkpoint-20261025.json",
+        "outputs/acceptance/phase3-p305-sqlite-dispatch-linux-tests-20261025.json",
+        "outputs/acceptance/phase3-p305-sqlite-dispatch-linux-tests-20261025.log",
+        "outputs/acceptance/phase3-p305-sqlite-docs-20261025.json",
+        "outputs/acceptance/phase3-p305-sqlite-harness-20261025.json",
+        "outputs/acceptance/phase3-p305-sqlite-evidence-hash-20261025.json",
+        "outputs/acceptance/phase3-p305-sqlite-docs-20261025.log",
+        "outputs/acceptance/phase3-p305-sqlite-harness-20261025.log",
+        "outputs/acceptance/phase3-p305-sqlite-evidence-hash-20261025.log",
+        "lab/automation/reconcile.py",
+        "outputs/acceptance/phase3-p305-sqlite-resume-order-linux-tests-20261025.json",
+        "outputs/acceptance/phase3-p305-sqlite-resume-order-linux-tests-20261025.log",
+        "outputs/acceptance/phase3-p305-sqlite-resume2-preflight-20261025.json",
+        "outputs/acceptance/phase3-p305-linux-workers-affected-v3-resume2-20261025.json",
+        "outputs/acceptance/phase3-p305-linux-admission-affected-v3-resume2-20261025.json",
+        "outputs/acceptance/phase3-p305-linux-affected-v3-manifest-resume2-20261025.log"
       ],
       "plan_path": "docs/plans/2026-10-20-phase-3-automation.md",
       "baseline": {
@@ -1526,10 +1546,12 @@
       ],
       "status": "not-started",
       "done_when": "至少 120 必选位置完成双路径执行或依赖归因、三次干净复跑记账与完整 trace/清理证据；兼容 gate 按实测独立裁决，确定插件不兼容可交付检测任务但不扩张支持；缺 OS 准入、漏账或清理未知仍为验收缺项。",
-      "evidence": "Not started. P3-04 is now admitted only for the separately frozen PSF-signed CPython 3.12.10 Worker profile; Windows catalog plugin claims still require profile-lock rebinding. P3-05 Linux remains blocked by two Koishi host-service unknowns and the full selected affected set has not run. The 120-position behavior pilot and three clean reruns remain ineligible; behavior compatibility is not_evaluated.",
+      "evidence": "Not started. P3-04 Sandbox admission passed only for the separately frozen PSF-signed CPython 3.12.10 profile; Windows catalog profile locks remain bound to CPython 3.12.14 and need rebinding. P3-05 Linux affected campaign remains open after a two-worker SQLite lock interruption; the original queue is preserved and an ext4 recovery copy is prepared, but no complete affected-set report exists yet. The 120-position behavior pilot and three clean reruns remain ineligible; behavior compatibility is not_evaluated.",
       "evidence_paths": [
         "outputs/acceptance/phase3-p304-windows-admission-python31210-20261025.json",
-        "outputs/acceptance/phase3-p305-linux-pilot-final2-execution-20261025.json"
+        "outputs/acceptance/phase3-p305-linux-pilot-final2-execution-20261025.json",
+        "outputs/acceptance/phase3-p305-sqlite-lock-diagnostic-20261025.json",
+        "outputs/acceptance/phase3-p305-queue-ext4-checkpoint-20261025.json"
       ],
       "plan_path": "docs/plans/2026-10-20-phase-3-automation.md"
     },
@@ -1579,10 +1601,12 @@
       ],
       "status": "not-started",
       "done_when": "分母独立复算、哈希/身份/引用校验、五 gate 分开且无越界支持声明；依赖验收完成，README 与交接可复跑。",
-      "evidence": "Not started. P3-05 full selected-set recovery remains blocked by two Koishi host-service unknowns. P3-04 Worker admission is scoped to a separately frozen PSF-signed CPython 3.12.10 profile; no Windows catalog plugins were run and their profile locks need rebinding. No aggregate cross-gate report or final acceptance has been produced; behavior remains not_evaluated and real-platform acceptance remains outstanding.",
+      "evidence": "Not started. P3-05 Linux affected recovery is still running toward a complete 2,206-unit ledger after a recorded SQLite lock interruption; no aggregate cross-gate report exists. P3-08 behavior positions have not run. Windows catalog plugins were not run, Windows catalog profile locks still require rebinding, and controlled-runner deployment remains unconfirmed. Behavior remains not_evaluated and real-platform acceptance remains outstanding.",
       "evidence_paths": [
         "outputs/acceptance/phase3-p305-linux-pilot-final2-execution-20261025.json",
-        "outputs/acceptance/phase3-p304-windows-admission-python31210-20261025.json"
+        "outputs/acceptance/phase3-p304-windows-admission-python31210-20261025.json",
+        "outputs/acceptance/phase3-p305-sqlite-lock-diagnostic-20261025.json",
+        "outputs/acceptance/phase3-p305-queue-ext4-checkpoint-20261025.json"
       ],
       "plan_path": "docs/plans/2026-10-20-phase-3-automation.md"
     }
