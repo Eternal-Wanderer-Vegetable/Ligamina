@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "updated_at": "2026-10-25",
-  "active_feature": null,
+  "active_feature": "feat-019",
   "next_feature": "feat-022",
   "features": [
     {
@@ -1412,9 +1412,9 @@
       "dependencies": [
         "feat-017"
       ],
-      "status": "blocked",
+      "status": "in-progress",
       "done_when": "Linux 完成 pilot 和选中集合执行/归因；Windows 仅 P3-04 通过后执行，否则明确剩余范围与 blocked gate；每 OS 独立裁决，原报告不改写。",
-      "evidence": "2026-10-25 semantics-v2 Linux campaign p3-recovery-linux-803a2bc56205 remains immutable: 20/20 units, 60/60 stages, 9 recovered, 9 failed, 2 unknown, cleanup 20/20, health blocked. Source review found the Koishi probe discarded CommonJS named inject metadata when selecting apply, allowing required-service plugins to wait/retry until timeout. Semantics v3 now preserves inject, loads explicit host-service providers, and reports missing services before plugin apply. Focused frozen-artifact Docker diagnostics completed with cleanup confirmed: auto-checkin under LF-locked SQLite 4.7.0 Host profile SHA-256 4f76f59594b1fab0f255b116a986e186ed30e5b101a682b22b7bce388f257482 skipped for missing cron; smmcat under its frozen Native Pilot profile skipped for missing localstorage and puppeteer. Neither plugin callback ran; these are host-service attribution results, not compatibility passes. The full 20-unit v3 pilot and selected Linux affected-set campaign still require immutable per-entry Host provider locks; P3-05 remains blocked and compatibility remains not_evaluated.",
+      "evidence": "2026-10-25: semantics-v3 preserves CommonJS inject metadata and performs Host-service preflight before plugin callbacks. Full P3-01 Linux cache audit found exact artifact SHA and profile-lock SHA/size for 2,206/2,206 entries. The new 20-unit pilot p3-recovery-linux-b9518c95b224 closed 20/20 units and 60/60 required stages: 11 recovered, 9 plugin/stage failed, 0 unknown, 0 not_run, cleanup 20/20, infrastructure_blocker=false, health passed; plugin compatibility remains not_evaluated. The full affected-linux scope is frozen as p3-recovery-linux-842f71712e2c (414 NoneBot, 1,792 Koishi) with per-entry core-only Koishi Host profiles and exact archive-size overrides. A fresh Linux admission and 10/10 benign Worker probes passed; the 2,206-unit Docker campaign is active. P3-05 remains in-progress pending full campaign closure and attribution; Windows catalog plugins were not run.",
       "evidence_paths": [
         "outputs/acceptance/phase3-p305-linux-cache-audit-20261025.json",
         "outputs/acceptance/phase3-p305-linux-admission-final-20261025.json",
@@ -1439,7 +1439,17 @@
         "outputs/acceptance/phase3-p305-v3-focused-tests-linux-20261025.log",
         "outputs/acceptance/phase3-docs-check-p305-v3-20261025.json",
         "outputs/acceptance/phase3-docs-check-p305-v3-20261025.log",
-        "outputs/acceptance/phase3-p305-host-service-autocheckin-v3-diagnostic-attempt3-20261025.json"
+        "outputs/acceptance/phase3-p305-host-service-autocheckin-v3-diagnostic-attempt3-20261025.json",
+        "outputs/acceptance/phase3-p305-linux-pilot-v3-exact-images-manifest-20261025.json",
+        "outputs/acceptance/phase3-p305-linux-pilot-v3-exact-images-execution-20261025.json",
+        "outputs/acceptance/phase3-p305-linux-affected-v3-manifest-20261025.json",
+        "outputs/acceptance/phase3-p305-linux-admission-affected-v3-20261025.json",
+        "outputs/acceptance/phase3-p305-linux-workers-affected-v3-20261025.json",
+        "lab/automation/__main__.py",
+        "docs/guides/development.md",
+        "outputs/acceptance/phase3-p305-affected-manifest-focused-tests-20261025.json",
+        "outputs/acceptance/phase3-docs-check-p305-affected-v3-20261025.json",
+        "outputs/acceptance/phase3-docs-check-p305-affected-v3-20261025.log"
       ],
       "plan_path": "docs/plans/2026-10-20-phase-3-automation.md",
       "baseline": {

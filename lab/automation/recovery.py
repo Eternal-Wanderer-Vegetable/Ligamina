@@ -120,6 +120,7 @@ def build_linux_pilot_manifest(
     archive_cache_root: Path | None = None,
     worker_timeout_seconds: int = 240,
     probe_semantics_version: int = 2,
+    selection_scope: str = "pilot",
 ) -> dict[str, Any]:
     """Freeze 8 affected units plus 2 historical plugin-failure controls per ecosystem."""
     source_manifest, source_raw = _read_json(recovery_manifest_path)
@@ -132,6 +133,8 @@ def build_linux_pilot_manifest(
         raise RecoveryPilotError("pilot worker timeout must be between 30 and 1200 seconds")
     if probe_semantics_version not in {1, 2, 3}:
         raise RecoveryPilotError("pilot probe semantics version is unsupported")
+    if selection_scope not in {"pilot", "affected-linux"}:
+        raise RecoveryPilotError("pilot selection scope is unsupported")
     units_by_entry = {item["registry_entry_id"]: item for item in all_units}
     selected_source = [
         row for row in source_manifest["selection"]
@@ -142,67 +145,89 @@ def build_linux_pilot_manifest(
     ]
 
     outputs: list[dict[str, Any]] = []
-    for ecosystem in ("nonebot", "koishi"):
-        candidates = [row for row in selected_source if row["identity"]["ecosystem"] == ecosystem]
-        strata: dict[str, list[dict[str, Any]]] = defaultdict(list)
-        for row in candidates:
-            domain = row.get("source", {}).get("attribution_domain") or "unclassified_infrastructure"
-            strata[domain].append(row)
-        for values in strata.values():
-            values.sort(key=lambda item: item["identity"]["registry_entry_id"])
-        recovery: list[dict[str, Any]] = []
-        for domain in sorted(strata):
-            if len(recovery) < recovery_per_ecosystem:
-                recovery.append(strata[domain][0])
-        already = {item["identity"]["registry_entry_id"] for item in recovery}
-        for row in sorted(candidates, key=lambda item: item["identity"]["registry_entry_id"]):
-            if len(recovery) >= recovery_per_ecosystem:
-                break
-            if row["identity"]["registry_entry_id"] not in already:
-                recovery.append(row)
-                already.add(row["identity"]["registry_entry_id"])
-        if len(recovery) != recovery_per_ecosystem:
-            raise RecoveryPilotError(f"not enough locked recovery candidates for {ecosystem}")
-        for row in recovery:
-            unit = units_by_entry[row["identity"]["registry_entry_id"]]
+    if selection_scope == "affected-linux":
+        recovery_counts = {ecosystem: 0 for ecosystem in ("nonebot", "koishi")}
+        for row in sorted(selected_source, key=lambda item: item["identity"]["registry_entry_id"]):
+            entry_id = row["identity"]["registry_entry_id"]
+            unit = units_by_entry[entry_id]
+            identity = _entry_identity(unit, snapshot_id)
+            if row["identity"] != identity:
+                raise RecoveryPilotError(f"P3-01 source identity differs from the frozen catalog for {entry_id}")
+            recovery_counts[identity["ecosystem"]] += 1
             outputs.append({
                 "selection_kind": "affected_recovery",
-                "identity": _entry_identity(unit, snapshot_id),
-                "identity_sha256": object_sha256(_entry_identity(unit, snapshot_id)),
+                "identity": identity,
+                "identity_sha256": object_sha256(identity),
                 "selection_reason": row.get("selection_reasons", []),
                 "source": _source_shard(row),
             })
-
-        failed: list[tuple[dict[str, Any], Path]] = []
-        for report_path in sorted(reports_dir.glob("phase2-s211-rerun-census-linux-shard*of256-20261014.json")):
-            report, _ = _read_json(report_path)
-            if report.get("snapshot_id") != snapshot_id or report.get("platform") != "linux":
-                continue
-            for report_row in report.get("plugin_reports", []):
-                if report_row.get("ecosystem") == ecosystem and report_row.get("unit_status") == "failed" and report_row.get("cleanup_confirmed") is True:
-                    entry_id = report_row.get("registry_entry_id")
-                    if (
-                        entry_id in units_by_entry and entry_id not in already
-                        and units_by_entry[entry_id].get("artifact_status") == "locked"
-                        and units_by_entry[entry_id].get("profile_status") == "locked"
-                    ):
-                        failed.append((report_row, report_path))
-        failed.sort(key=lambda pair: pair[0].get("registry_entry_id", ""))
-        if len(failed) < failed_controls_per_ecosystem:
-            raise RecoveryPilotError(f"not enough prior plugin-failure controls for {ecosystem}")
-        for report_row, report_path in failed[:failed_controls_per_ecosystem]:
-            unit = units_by_entry[report_row["registry_entry_id"]]
-            control = {
-                "selection_kind": "prior_plugin_failure_control",
-                "identity": _entry_identity(unit, snapshot_id),
-                "identity_sha256": object_sha256(_entry_identity(unit, snapshot_id)),
-                "selection_reason": ["prior_native_failure_control"],
-                "source": _source_shard({
+        if not outputs:
+            raise RecoveryPilotError("P3-01 has no locked affected Linux entries")
+        failed_control_counts = {ecosystem: 0 for ecosystem in ("nonebot", "koishi")}
+    else:
+        for ecosystem in ("nonebot", "koishi"):
+            candidates = [row for row in selected_source if row["identity"]["ecosystem"] == ecosystem]
+            strata: dict[str, list[dict[str, Any]]] = defaultdict(list)
+            for row in candidates:
+                domain = row.get("source", {}).get("attribution_domain") or "unclassified_infrastructure"
+                strata[domain].append(row)
+            for values in strata.values():
+                values.sort(key=lambda item: item["identity"]["registry_entry_id"])
+            recovery: list[dict[str, Any]] = []
+            for domain in sorted(strata):
+                if len(recovery) < recovery_per_ecosystem:
+                    recovery.append(strata[domain][0])
+            already = {item["identity"]["registry_entry_id"] for item in recovery}
+            for row in sorted(candidates, key=lambda item: item["identity"]["registry_entry_id"]):
+                if len(recovery) >= recovery_per_ecosystem:
+                    break
+                if row["identity"]["registry_entry_id"] not in already:
+                    recovery.append(row)
+                    already.add(row["identity"]["registry_entry_id"])
+            if len(recovery) != recovery_per_ecosystem:
+                raise RecoveryPilotError(f"not enough locked recovery candidates for {ecosystem}")
+            for row in recovery:
+                unit = units_by_entry[row["identity"]["registry_entry_id"]]
+                outputs.append({
+                    "selection_kind": "affected_recovery",
                     "identity": _entry_identity(unit, snapshot_id),
-                    "result_id": f"catalog:{unit['registry_entry_id']}|linux",
-                }, fallback_path=report_path),
-            }
-            outputs.append(control)
+                    "identity_sha256": object_sha256(_entry_identity(unit, snapshot_id)),
+                    "selection_reason": row.get("selection_reasons", []),
+                    "source": _source_shard(row),
+                })
+
+            failed: list[tuple[dict[str, Any], Path]] = []
+            for report_path in sorted(reports_dir.glob("phase2-s211-rerun-census-linux-shard*of256-20261014.json")):
+                report, _ = _read_json(report_path)
+                if report.get("snapshot_id") != snapshot_id or report.get("platform") != "linux":
+                    continue
+                for report_row in report.get("plugin_reports", []):
+                    if report_row.get("ecosystem") == ecosystem and report_row.get("unit_status") == "failed" and report_row.get("cleanup_confirmed") is True:
+                        entry_id = report_row.get("registry_entry_id")
+                        if (
+                            entry_id in units_by_entry and entry_id not in already
+                            and units_by_entry[entry_id].get("artifact_status") == "locked"
+                            and units_by_entry[entry_id].get("profile_status") == "locked"
+                        ):
+                            failed.append((report_row, report_path))
+            failed.sort(key=lambda pair: pair[0].get("registry_entry_id", ""))
+            if len(failed) < failed_controls_per_ecosystem:
+                raise RecoveryPilotError(f"not enough prior plugin-failure controls for {ecosystem}")
+            for report_row, report_path in failed[:failed_controls_per_ecosystem]:
+                unit = units_by_entry[report_row["registry_entry_id"]]
+                control = {
+                    "selection_kind": "prior_plugin_failure_control",
+                    "identity": _entry_identity(unit, snapshot_id),
+                    "identity_sha256": object_sha256(_entry_identity(unit, snapshot_id)),
+                    "selection_reason": ["prior_native_failure_control"],
+                    "source": _source_shard({
+                        "identity": _entry_identity(unit, snapshot_id),
+                        "result_id": f"catalog:{unit['registry_entry_id']}|linux",
+                    }, fallback_path=report_path),
+                }
+                outputs.append(control)
+        recovery_counts = recovery_per_ecosystem
+        failed_control_counts = failed_controls_per_ecosystem
 
     identities = [item["identity"]["registry_entry_id"] for item in outputs]
     if len(identities) != len(set(identities)):
@@ -221,6 +246,7 @@ def build_linux_pilot_manifest(
             outputs, snapshot_dir=snapshot_dir, cache_root=archive_cache_root,
             expected_artifact_lock_sha256=source_manifest["source_identity"]["artifact_lock_sha256"],
         )
+    host_service_profiles = _build_core_only_host_service_profiles(outputs) if probe_semantics_version >= 3 else None
     core = {
         "schema_version": 1,
         "contract": "phase3-linux-recovery-pilot-v1",
@@ -229,23 +255,52 @@ def build_linux_pilot_manifest(
         "platform": "linux",
         "source_recovery_manifest_sha256": source_digest,
         "source_identity": source_manifest["source_identity"],
-        "selection_algorithm": "per-ecosystem: attribution-domain-stratified recovery candidates, then entry-id order; 2 cleanup-confirmed native-failure controls",
+        "selection_algorithm": (
+            "all locked P3-01 affected Linux entries in registry-entry order"
+            if selection_scope == "affected-linux"
+            else "per-ecosystem: attribution-domain-stratified recovery candidates, then entry-id order; 2 cleanup-confirmed native-failure controls"
+        ),
         "expected_units": len(outputs),
-        "recovery_per_ecosystem": recovery_per_ecosystem,
-        "failed_controls_per_ecosystem": failed_controls_per_ecosystem,
+        "recovery_per_ecosystem": recovery_counts,
+        "failed_controls_per_ecosystem": failed_control_counts,
         "stage_scope": ["prepare", "install", "native", "cleanup"],
         "stage_projection": "cleanup-evidence-on-cleanup-stage-only-v2",
         "probe_semantics_version": probe_semantics_version,
         "worker_limits": {"timeout_seconds": worker_timeout_seconds, "memory_mb": 4096, "cpu_cores": 2, "process_limit": 256},
         "worker_policy": worker_policy_id,
         "worker_images": worker_images,
+        **({"selection_scope": "p301-all-affected-linux-v1"} if selection_scope == "affected-linux" else {}),
         **({"archive_size_overrides": archive_size_overrides} if archive_size_overrides is not None else {}),
+        **({"host_service_profiles": host_service_profiles} if host_service_profiles is not None else {}),
         "selection": outputs,
     }
     campaign_seed = object_sha256(core)
     manifest = {"campaign_id": f"p3-recovery-linux-{campaign_seed[:12]}", **core}
     manifest["manifest_sha256"] = object_sha256(manifest)
     return manifest
+
+
+def _build_core_only_host_service_profiles(selection: list[dict[str, Any]]) -> dict[str, Any]:
+    """Bind the exact Koishi catalog lock and an explicit empty provider set for v3 probes."""
+    bindings = []
+    for row in selection:
+        identity = row["identity"]
+        if identity["ecosystem"] != "koishi":
+            continue
+        binding = {
+            "registry_entry_id": identity["registry_entry_id"],
+            "profile_id": f"koishi-core-only-native-pilot-v1-{identity['registry_entry_id']}",
+            "dependency_lock_sha256": identity["dependency_lock_sha256"],
+            "providers": [],
+            "provided_services": [],
+        }
+        binding["profile_sha256"] = object_sha256(binding)
+        bindings.append(binding)
+    return {
+        "schema_version": 1,
+        "strategy": "koishi-core-only-native-pilot-v1",
+        "entry_bindings": bindings,
+    }
 
 
 def validate_linux_pilot_manifest(manifest: dict[str, Any]) -> dict[str, Any]:
@@ -270,6 +325,41 @@ def validate_linux_pilot_manifest(manifest: dict[str, Any]) -> dict[str, Any]:
             raise RecoveryPilotError("pilot selection contains duplicate or modified identity")
         ids.add(entry_id)
         counts[identity["ecosystem"]][row.get("selection_kind")] += 1
+    semantics_version = manifest.get("probe_semantics_version", 1)
+    host_profiles = manifest.get("host_service_profiles")
+    if semantics_version >= 3:
+        host_bindings = host_profiles.get("entry_bindings") if isinstance(host_profiles, dict) else None
+        koishi_rows = {
+            row["identity"]["registry_entry_id"]: row
+            for row in rows if row["identity"]["ecosystem"] == "koishi"
+        }
+        if (
+            not isinstance(host_profiles, dict)
+            or host_profiles.get("schema_version") != 1
+            or host_profiles.get("strategy") != "koishi-core-only-native-pilot-v1"
+            or not isinstance(host_bindings, list)
+            or len(host_bindings) != len(koishi_rows)
+        ):
+            raise RecoveryPilotError("v3 Koishi host service profile bindings are incomplete")
+        bindings_by_id = {
+            item.get("registry_entry_id"): item
+            for item in host_bindings if isinstance(item, dict)
+        }
+        if len(bindings_by_id) != len(host_bindings) or set(bindings_by_id) != set(koishi_rows):
+            raise RecoveryPilotError("v3 Koishi host service profiles do not match the pilot selection")
+        for entry_id, row in koishi_rows.items():
+            binding = bindings_by_id[entry_id]
+            binding_core = {key: value for key, value in binding.items() if key != "profile_sha256"}
+            if (
+                binding.get("profile_id") != f"koishi-core-only-native-pilot-v1-{entry_id}"
+                or binding.get("dependency_lock_sha256") != row["identity"].get("dependency_lock_sha256")
+                or binding.get("providers") != []
+                or binding.get("provided_services") != []
+                or binding.get("profile_sha256") != object_sha256(binding_core)
+            ):
+                raise RecoveryPilotError(f"v3 Koishi host service profile identity is invalid for {entry_id}")
+    elif host_profiles is not None:
+        raise RecoveryPilotError("Koishi host service profiles require probe semantics version 3")
     overrides = manifest.get("archive_size_overrides")
     if overrides is not None:
         override_rows = overrides.get("entries") if isinstance(overrides, dict) else None
@@ -299,9 +389,18 @@ def validate_linux_pilot_manifest(manifest: dict[str, Any]) -> dict[str, Any]:
                 or override["metadata_size_bytes"] < 1
             ):
                 raise RecoveryPilotError(f"archive size override identity is invalid for {identity['registry_entry_id']}")
+    selection_scope = manifest.get("selection_scope", "pilot")
+    if selection_scope not in {"pilot", "p301-all-affected-linux-v1"}:
+        raise RecoveryPilotError("pilot selection scope is unsupported")
+    recovery_counts = manifest.get("recovery_per_ecosystem")
+    failed_control_counts = manifest.get("failed_controls_per_ecosystem")
     for ecosystem in counts:
-        if counts[ecosystem]["affected_recovery"] != manifest.get("recovery_per_ecosystem") or counts[ecosystem]["prior_plugin_failure_control"] != manifest.get("failed_controls_per_ecosystem"):
+        expected_recovery = recovery_counts.get(ecosystem) if isinstance(recovery_counts, dict) else recovery_counts
+        expected_controls = failed_control_counts.get(ecosystem) if isinstance(failed_control_counts, dict) else failed_control_counts
+        if counts[ecosystem]["affected_recovery"] != expected_recovery or counts[ecosystem]["prior_plugin_failure_control"] != expected_controls:
             raise RecoveryPilotError(f"pilot selection strata incomplete for {ecosystem}")
+    if selection_scope == "p301-all-affected-linux-v1" and any(counts[ecosystem]["prior_plugin_failure_control"] for ecosystem in counts):
+        raise RecoveryPilotError("full affected Linux selection must not contain pilot failure controls")
     worker_limits = manifest.get("worker_limits")
     if worker_limits is not None and (
         not isinstance(worker_limits, dict)
@@ -626,6 +725,10 @@ def execute_linux_recovery_pilot(
     nonebot_context = _catalog_context(snapshot_dir)
     koishi_context = _load_catalog_context(snapshot_dir, "linux")
     probes: dict[str, dict[str, Any]] = {}
+    host_profiles_by_entry = {
+        item["registry_entry_id"]: item
+        for item in manifest.get("host_service_profiles", {}).get("entry_bindings", [])
+    }
 
     def execute(job: dict[str, Any], cancelled) -> dict[str, Any]:
         unit = job["payload"]
@@ -638,10 +741,20 @@ def execute_linux_recovery_pilot(
             if unit["ecosystem"] == "nonebot":
                 probe = run_nonebot_load_probe(snapshot_dir, entry_id, cache_root=cache_root, timeout_seconds=timeout_seconds, context=nonebot_context, worker_labels=labels, image_digest=manifest["worker_images"]["nonebot"])
             else:
+                host_profile = host_profiles_by_entry.get(entry_id)
+                host_service_arguments = {}
+                if manifest.get("probe_semantics_version", 2) >= 3:
+                    if host_profile is None:
+                        raise RecoveryPilotError(f"v3 Koishi host service profile is missing for {entry_id}")
+                    host_service_arguments = {
+                        "host_service_plugins": host_profile["providers"],
+                        "host_service_profile_id": host_profile["profile_id"],
+                    }
                 probe = run_koishi_load_probe(
                     snapshot_dir, entry_id, cache_root=cache_root, timeout_seconds=timeout_seconds,
                     _context=koishi_context, worker_labels=labels, image_digest=manifest["worker_images"]["koishi"],
                     probe_semantics_version=manifest.get("probe_semantics_version", 2),
+                    **host_service_arguments,
                 )
             probes[entry_id] = probe
             worker = probe.get("worker", {})

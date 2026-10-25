@@ -16,7 +16,7 @@ from lab.automation.recovery import (
     build_linux_pilot_manifest,
     validate_linux_pilot_manifest,
 )
-from lab.automation.selection import ROOT
+from lab.automation.selection import ROOT, object_sha256
 
 
 class RecoveryPilotManifestTests(unittest.TestCase):
@@ -49,6 +49,57 @@ class RecoveryPilotManifestTests(unittest.TestCase):
             build_linux_pilot_manifest(source, probe_semantics_version=2)["campaign_id"],
             build_linux_pilot_manifest(source, probe_semantics_version=3)["campaign_id"],
         )
+
+    def test_v3_manifest_freezes_core_only_host_service_profiles_per_koishi_entry(self) -> None:
+        source = ROOT / "outputs/acceptance/phase3-p301-recovery-manifest-20261020.json"
+        manifest = build_linux_pilot_manifest(source, probe_semantics_version=3)
+        result = validate_linux_pilot_manifest(manifest)
+        koishi_rows = {
+            row["identity"]["registry_entry_id"]: row
+            for row in manifest["selection"] if row["identity"]["ecosystem"] == "koishi"
+        }
+        profile_set = manifest["host_service_profiles"]
+        bindings = {row["registry_entry_id"]: row for row in profile_set["entry_bindings"]}
+
+        self.assertEqual(result["status"], "valid")
+        self.assertEqual(profile_set["strategy"], "koishi-core-only-native-pilot-v1")
+        self.assertEqual(set(bindings), set(koishi_rows))
+        for entry_id, selected in koishi_rows.items():
+            binding = bindings[entry_id]
+            self.assertEqual(binding["dependency_lock_sha256"], selected["identity"]["dependency_lock_sha256"])
+            self.assertEqual(binding["providers"], [])
+            self.assertEqual(binding["provided_services"], [])
+            self.assertEqual(
+                binding["profile_sha256"],
+                object_sha256({key: value for key, value in binding.items() if key != "profile_sha256"}),
+            )
+
+    def test_v3_manifest_rejects_modified_host_service_profile(self) -> None:
+        manifest = build_linux_pilot_manifest(
+            ROOT / "outputs/acceptance/phase3-p301-recovery-manifest-20261020.json",
+            probe_semantics_version=3,
+        )
+        manifest["host_service_profiles"]["entry_bindings"][0]["providers"] = [{"package": "unlocked"}]
+        manifest["manifest_sha256"] = object_sha256({key: value for key, value in manifest.items() if key != "manifest_sha256"})
+        with self.assertRaisesRegex(RecoveryPilotError, "host service profile identity"):
+            validate_linux_pilot_manifest(manifest)
+
+    def test_affected_linux_manifest_covers_the_full_locked_p301_selection(self) -> None:
+        source = ROOT / "outputs/acceptance/phase3-p301-recovery-manifest-20261020.json"
+        with patch("lab.automation.recovery._source_shard", return_value={"task_id": "S2-11", "report_sha256": "a" * 64}):
+            manifest = build_linux_pilot_manifest(
+                source,
+                probe_semantics_version=3,
+                selection_scope="affected-linux",
+            )
+        validation = validate_linux_pilot_manifest(manifest)
+        self.assertEqual(validation["status"], "valid")
+        self.assertEqual(validation["selected_units"], 2206)
+        self.assertEqual(manifest["selection_scope"], "p301-all-affected-linux-v1")
+        self.assertEqual(manifest["recovery_per_ecosystem"], {"nonebot": 414, "koishi": 1792})
+        self.assertEqual(manifest["failed_controls_per_ecosystem"], {"nonebot": 0, "koishi": 0})
+        self.assertEqual(len(manifest["host_service_profiles"]["entry_bindings"]), 1792)
+        self.assertTrue(all(row["selection_kind"] == "affected_recovery" for row in manifest["selection"]))
 
     def test_manifest_rejects_tampered_identity_and_rebalanced_denominator(self) -> None:
         manifest = build_linux_pilot_manifest(ROOT / "outputs/acceptance/phase3-p301-recovery-manifest-20261020.json")

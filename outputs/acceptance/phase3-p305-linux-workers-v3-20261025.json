@@ -1,0 +1,272 @@
+{
+  "schema_version": 1,
+  "date": "2026-10-12",
+  "backend": "Docker Engine",
+  "host_platform": "Linux-6.18.54.1-microsoft-standard-WSL2-x86_64-with-glibc2.39",
+  "docker_server": "29.1.3 linux x86_64",
+  "worker_image": "python@sha256:f77ac9e44ae96ef2c90b8053ea08c31f8be030f824196b0ae4db6d462c84e51f",
+  "worker_image_lock": "deploy/lab/linux/worker-image.lock.json",
+  "results": [
+    {
+      "name": "filesystem-network-and-secret-boundaries",
+      "limits": {
+        "timeout_seconds": 120,
+        "memory_mb": 4096,
+        "cpu_cores": 2.0,
+        "process_limit": 256,
+        "output_limit_bytes": 4194304
+      },
+      "status": "passed",
+      "reason_code": null,
+      "exit_code": 0,
+      "elapsed_seconds": 1.11,
+      "stdout": "linux-worker-boundaries-passed\n",
+      "stderr": "",
+      "stdout_sha256": "ad43a07b2dc0c5e357703fc9fac4522f1ee497750458abeb0939fc6b2ac6e80f",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "output_truncated": false,
+      "cleanup_confirmed": true,
+      "worker_id": "ligamina-8b1ada69c3fa4e00",
+      "expected": {
+        "status": "passed",
+        "reason_code": null
+      },
+      "passed": true
+    },
+    {
+      "name": "sibling-one-write",
+      "limits": {
+        "timeout_seconds": 120,
+        "memory_mb": 4096,
+        "cpu_cores": 2.0,
+        "process_limit": 256,
+        "output_limit_bytes": 4194304
+      },
+      "status": "passed",
+      "reason_code": null,
+      "exit_code": 0,
+      "elapsed_seconds": 1.037,
+      "stdout": "",
+      "stderr": "",
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "output_truncated": false,
+      "cleanup_confirmed": true,
+      "worker_id": "ligamina-9668aa8893644f8b",
+      "expected": {
+        "status": "passed",
+        "reason_code": null
+      },
+      "passed": true
+    },
+    {
+      "name": "sibling-two-state-isolated",
+      "limits": {
+        "timeout_seconds": 120,
+        "memory_mb": 4096,
+        "cpu_cores": 2.0,
+        "process_limit": 256,
+        "output_limit_bytes": 4194304
+      },
+      "status": "passed",
+      "reason_code": null,
+      "exit_code": 0,
+      "elapsed_seconds": 1.035,
+      "stdout": "sibling-isolated\n",
+      "stderr": "",
+      "stdout_sha256": "853ea4dc6c2196f7d6d1068cca60e151447bdf1517d41892e0c179579d9f0edf",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "output_truncated": false,
+      "cleanup_confirmed": true,
+      "worker_id": "ligamina-4b1c2e4f253c4641",
+      "expected": {
+        "status": "passed",
+        "reason_code": null
+      },
+      "passed": true
+    },
+    {
+      "name": "nonzero-exit",
+      "limits": {
+        "timeout_seconds": 120,
+        "memory_mb": 4096,
+        "cpu_cores": 2.0,
+        "process_limit": 256,
+        "output_limit_bytes": 4194304
+      },
+      "status": "failed",
+      "reason_code": "worker_nonzero_exit",
+      "exit_code": 17,
+      "elapsed_seconds": 0.991,
+      "stdout": "",
+      "stderr": "",
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "output_truncated": false,
+      "cleanup_confirmed": true,
+      "worker_id": "ligamina-9b218ddff82f4205",
+      "expected": {
+        "status": "failed",
+        "reason_code": "worker_nonzero_exit"
+      },
+      "passed": true
+    },
+    {
+      "name": "cgroup-memory-cpu-and-pid-limits",
+      "limits": {
+        "timeout_seconds": 30,
+        "memory_mb": 256,
+        "cpu_cores": 1,
+        "process_limit": 8,
+        "output_limit_bytes": 4194304
+      },
+      "status": "passed",
+      "reason_code": null,
+      "exit_code": 0,
+      "elapsed_seconds": 1.035,
+      "stdout": "resource-limits-passed:memory=268435456:cpu=100000/100000:pids=8:children=6\n",
+      "stderr": "",
+      "stdout_sha256": "fcf970ffc58cc854acf26b5a606c82b2bad8e2b1d0c605142cdbb64a9fb0416d",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "output_truncated": false,
+      "cleanup_confirmed": true,
+      "worker_id": "ligamina-0dce0e79660c4d7d",
+      "expected": {
+        "status": "passed",
+        "reason_code": null
+      },
+      "passed": true
+    },
+    {
+      "name": "timeout",
+      "limits": {
+        "timeout_seconds": 3,
+        "memory_mb": 256,
+        "cpu_cores": 1,
+        "process_limit": 32,
+        "output_limit_bytes": 4194304
+      },
+      "status": "unknown",
+      "reason_code": "worker_timeout",
+      "exit_code": null,
+      "elapsed_seconds": 4.018,
+      "stdout": "",
+      "stderr": "",
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "output_truncated": false,
+      "cleanup_confirmed": true,
+      "worker_id": "ligamina-8453912438844a09",
+      "expected": {
+        "status": "unknown",
+        "reason_code": "worker_timeout"
+      },
+      "passed": true
+    },
+    {
+      "name": "output-overflow",
+      "limits": {
+        "timeout_seconds": 30,
+        "memory_mb": 256,
+        "cpu_cores": 1,
+        "process_limit": 32,
+        "output_limit_bytes": 1024
+      },
+      "status": "unknown",
+      "reason_code": "worker_output_truncated",
+      "exit_code": null,
+      "elapsed_seconds": 2.078,
+      "stdout": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+      "stderr": "",
+      "stdout_sha256": "49abd65bbf7f7e40c7055093ed2e3fd75f2f602f2c5fcf955c213e3135eb03f7",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "output_truncated": true,
+      "cleanup_confirmed": true,
+      "worker_id": "ligamina-a752c17628634b79",
+      "expected": {
+        "status": "unknown",
+        "reason_code": "worker_output_truncated"
+      },
+      "passed": true
+    },
+    {
+      "name": "memory-limit",
+      "limits": {
+        "timeout_seconds": 30,
+        "memory_mb": 256,
+        "cpu_cores": 1,
+        "process_limit": 32,
+        "output_limit_bytes": 4194304
+      },
+      "status": "unknown",
+      "reason_code": "worker_resource_limit",
+      "exit_code": 137,
+      "elapsed_seconds": 1.469,
+      "stdout": "",
+      "stderr": "",
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "output_truncated": false,
+      "cleanup_confirmed": true,
+      "worker_id": "ligamina-35514a0aba9449e7",
+      "expected": {
+        "status": "unknown",
+        "reason_code": "worker_resource_limit"
+      },
+      "passed": true
+    },
+    {
+      "name": "process-tree-cleanup",
+      "limits": {
+        "timeout_seconds": 120,
+        "memory_mb": 4096,
+        "cpu_cores": 2.0,
+        "process_limit": 256,
+        "output_limit_bytes": 4194304
+      },
+      "status": "passed",
+      "reason_code": null,
+      "exit_code": 0,
+      "elapsed_seconds": 0.961,
+      "stdout": "child=8\n",
+      "stderr": "",
+      "stdout_sha256": "5bd87c9ee0b6c3625ca20e6c9fdcdc73a146620c5c652c9010c773e56f69e725",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "output_truncated": false,
+      "cleanup_confirmed": true,
+      "worker_id": "ligamina-ff5b2a2e5bc04297",
+      "expected": {
+        "status": "passed",
+        "reason_code": null
+      },
+      "passed": true
+    },
+    {
+      "name": "worker-loss",
+      "limits": {
+        "timeout_seconds": 90,
+        "memory_mb": 256,
+        "cpu_cores": 1,
+        "process_limit": 32,
+        "output_limit_bytes": 4194304
+      },
+      "status": "unknown",
+      "reason_code": "worker_lost",
+      "exit_code": 137,
+      "elapsed_seconds": 1.926,
+      "stdout": "",
+      "stderr": "",
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "output_truncated": false,
+      "cleanup_confirmed": true,
+      "worker_id": "ligamina-5a7cb31bd72b473e",
+      "expected": {
+        "status": "unknown",
+        "reason_code": "worker_lost"
+      },
+      "passed": true
+    }
+  ],
+  "passed": true
+}
