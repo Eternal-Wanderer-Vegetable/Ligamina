@@ -11,6 +11,7 @@ from lab.profiles import (
     _direct_requirement_block,
     _integrity_matches,
     _load_windows_runtime_admission,
+    _merge_runtime_profiles,
     _npm_failure,
     _npm_lock_has_integrities,
     _profile_result_reusable,
@@ -22,6 +23,23 @@ from lab.artifacts import ArtifactError, canonical_json_bytes, sha256_bytes
 
 
 class ProfileResolutionTests(unittest.TestCase):
+    def test_partial_windows_resolution_preserves_base_runtime_overrides(self) -> None:
+        base = {
+            "profiles": {
+                "nonebot": {
+                    "runtime_profiles_by_entry": {
+                        "pilot-entry": {"profile_id": "signed-python-3.12.10"},
+                    },
+                },
+            },
+        }
+        selected = {"remaining-entry": {"profile_id": "signed-python-3.12.10"}}
+
+        merged = _merge_runtime_profiles(base, selected)
+
+        self.assertEqual(merged, {**base["profiles"]["nonebot"]["runtime_profiles_by_entry"], **selected})
+        self.assertIsNot(merged["pilot-entry"], base["profiles"]["nonebot"]["runtime_profiles_by_entry"]["pilot-entry"])
+
     def test_python_profile_identity_encodes_the_selected_patch_runtime(self) -> None:
         self.assertEqual(
             _python_profile_id("3.12.14", "windows-x86_64"),

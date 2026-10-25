@@ -4,6 +4,7 @@ import argparse
 import hashlib
 import json
 import os
+import re
 import sys
 from datetime import datetime, timezone
 from pathlib import Path
@@ -72,18 +73,15 @@ def counts(rows: list[dict]) -> dict[str, int]:
 
 
 def main() -> int:
-    parser = argparse.ArgumentParser(description="Execute the frozen Phase 3 Windows recovery pilot.")
+    parser = argparse.ArgumentParser(description="Execute a frozen Phase 3 Windows recovery pilot or affected campaign.")
     parser.add_argument("--snapshot", type=Path, default=ROOT / "catalogs/p2-41649744e057d61031d5")
     parser.add_argument("--manifest", type=Path, default=ROOT / "outputs/acceptance/phase3-p305-windows-pilot-manifest-v2-20261025.json")
     parser.add_argument("--profile-lock", type=Path, default=ROOT / "outputs/acceptance/phase3-p305-windows-python31210-profile-lock-pilot-v3-20261025.json")
     parser.add_argument("--cache-root", type=Path, default=Path(r"E:\stella\Ligamina-artifact-cache"))
     parser.add_argument("--checkpoint", type=Path, default=ROOT / "outputs/acceptance/phase3-p305-windows-pilot-v2-checkpoint-20261025.json")
     parser.add_argument("--report", type=Path, default=ROOT / "outputs/acceptance/phase3-p305-windows-pilot-v2-execution-20261025.json")
+    parser.add_argument("--validate-only", action="store_true", help="verify frozen inputs and exit before creating reports or running Workers")
     args = parser.parse_args()
-
-    # Keep this handle alive for the full campaign. The OS releases the lock if
-    # the controller exits or is interrupted; the lock file itself is stable.
-    _controller_lock = acquire_controller_lock(ROOT / ".work/phase3-p305-windows-pilot-v2.controller.lock")
 
     snapshot = args.snapshot.resolve(strict=True)
     manifest_path = args.manifest.resolve(strict=True)
@@ -91,8 +89,18 @@ def main() -> int:
     cache_root = args.cache_root.resolve(strict=True)
     manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
     manifest_sha = manifest.get("manifest_sha256")
-    if manifest.get("kind") != "phase3_p305_windows_pilot_manifest_v2" or manifest.get("platform") != "windows":
+    manifest_kind = manifest.get("kind")
+    if manifest_kind not in {
+        "phase3_p305_windows_pilot_manifest_v2",
+        "phase3_p305_windows_affected_manifest_v1",
+    } or manifest.get("platform") != "windows":
         raise ValueError("unexpected pilot manifest kind or platform")
+    campaign_id = manifest.get("campaign_id")
+    if not isinstance(campaign_id, str) or not re.fullmatch(r"[a-z0-9-]{1,128}", campaign_id):
+        raise ValueError("campaign ID is not safe for a controller lock file")
+    # A per-campaign lock prevents duplicate controllers without serializing
+    # unrelated, separately frozen Windows campaigns behind the pilot lock.
+    _controller_lock = acquire_controller_lock(ROOT / ".work" / f"{campaign_id}.controller.lock")
     if object_sha256({key: value for key, value in manifest.items() if key != "manifest_sha256"}) != manifest_sha:
         raise ValueError("pilot manifest canonical SHA-256 mismatch")
     source_path = (ROOT / manifest["source_recovery_manifest_path"]).resolve(strict=True)
@@ -109,18 +117,70 @@ def main() -> int:
     if sha256_file(runtime_path) != manifest["runtime_admission_sha256"]:
         raise ValueError("P3-04 Windows admission report hash differs from manifest")
 
+    execution_kind = "phase3_p305_windows_pilot_execution_v2"
+    if manifest_kind == "phase3_p305_windows_affected_manifest_v1":
+        execution_kind = "phase3_p305_windows_affected_execution_v1"
+        if manifest.get("ecosystem") != "nonebot":
+            raise ValueError("Windows affected manifest must select only the NoneBot ecosystem")
+        policy_profile = manifest.get("sandbox_policy_profile")
+        if not isinstance(policy_profile, dict) or policy_profile.get("profile_id") != "windows-sandbox-default-sac-evaluation-v1":
+            raise ValueError("Windows affected manifest has no accepted default Evaluation policy profile")
+        policy_path = (ROOT / policy_profile["preflight_report_path"]).resolve(strict=True)
+        if sha256_file(policy_path) != policy_profile.get("preflight_report_file_sha256"):
+            raise ValueError("Sandbox Evaluation policy preflight hash differs from the manifest")
+        verify_sidecar(policy_path)
+        for evidence in policy_profile.get("preflight_evidence", {}).values():
+            evidence_path = (ROOT / evidence["path"]).resolve(strict=True)
+            if sha256_file(evidence_path) != evidence.get("sha256"):
+                raise ValueError(f"Sandbox policy evidence hash differs from the manifest: {evidence_path}")
+            verify_sidecar(evidence_path)
+        policy_evidence = json.loads(policy_path.read_text(encoding="utf-8"))
+        evaluation = policy_evidence.get("sac_evaluation_baseline", {})
+        if (
+            policy_evidence.get("result") != "default WSB configuration produced the expected two SAC Evaluation policy activations; no hash allow rule or policy change is needed for this Evaluation-scoped batch."
+            or evaluation.get("base_policy_guid") != "{1283ac0f-fff1-49ae-ada1-8a933130cad6}"
+            or evaluation.get("base_options") != "0xb18d2714"
+            or evaluation.get("base_audit_mode_enabled") is not True
+            or evaluation.get("flight_supplemental_guid") != "{2678656c-05ef-481f-bc5b-ebd8c991502d}"
+            or evaluation.get("flight_supplemental_options") != "0xd1892304"
+            or evaluation.get("supplemental_audit_mode_enabled") is not True
+            or policy_evidence.get("codeintegrity_event_counts") != {"3076": 0, "3077": 0, "3089": 0, "3099": 18}
+        ):
+            raise ValueError("Sandbox policy evidence no longer matches the frozen Evaluation profile")
+
     selection = manifest.get("selection")
     if not isinstance(selection, list) or len(selection) != manifest.get("expected_units"):
         raise ValueError("pilot selection denominator mismatch")
     selected_ids = [row["identity"]["registry_entry_id"] for row in selection]
     if len(set(selected_ids)) != len(selected_ids):
         raise ValueError("pilot manifest contains duplicate registry identities")
+    if manifest_kind == "phase3_p305_windows_affected_manifest_v1":
+        excluded = manifest.get("exclusions", {}).get("source_identity_sha256", [])
+        selected_source_hashes = [row.get("source_identity_sha256") for row in selection]
+        if (
+            len(selection) != 786
+            or any(row["identity"].get("ecosystem") != "nonebot" for row in selection)
+            or len(excluded) != 10
+            or len(set(excluded)) != 10
+            or set(excluded).intersection(selected_source_hashes)
+        ):
+            raise ValueError("Windows affected selection overlaps the closed pilot or has an unexpected denominator")
     for row in selection:
         identity = row["identity"]
         if object_sha256(identity) != row.get("identity_sha256"):
             raise ValueError(f"entry identity hash mismatch: {identity.get('registry_entry_id')}")
         if object_sha256(row["source_identity"]) != row.get("source_identity_sha256"):
             raise ValueError(f"source identity hash mismatch: {identity.get('registry_entry_id')}")
+        if manifest_kind == "phase3_p305_windows_affected_manifest_v1":
+            binding = row.get("probe_profile", {})
+            if (
+                identity.get("platform") != "windows"
+                or identity.get("profile_lock_sha256") != manifest.get("profile_lock_sha256")
+                or binding.get("profile_lock_sha256") != manifest.get("profile_lock_sha256")
+                or binding.get("runtime_admission_sha256") != manifest.get("runtime_admission_sha256")
+                or binding.get("sandbox_policy_profile_id") != "windows-sandbox-default-sac-evaluation-v1"
+            ):
+                raise ValueError(f"NoneBot Sandbox profile binding mismatch: {identity.get('registry_entry_id')}")
         binding = row.get("probe_profile", {})
         if identity["ecosystem"] == "koishi":
             expected_profile = f"koishi-core-only-native-pilot-v1-{identity['registry_entry_id']}"
@@ -132,6 +192,19 @@ def main() -> int:
     nonebot_context = _catalog_context(snapshot, platform="windows", profile_lock_path=profile_path)
     koishi_context = _load_catalog_context(snapshot, "windows", profile_lock_path=profile_path)
     expected_results = {f"catalog:{entry_id}|windows" for entry_id in selected_ids}
+    if args.validate_only:
+        print(json.dumps({
+            "valid": True,
+            "campaign_id": campaign_id,
+            "manifest_sha256": manifest_sha,
+            "profile_lock_sha256": sha256_file(profile_path),
+            "selected_units": len(selection),
+            "ecosystems": sorted({row["identity"]["ecosystem"] for row in selection}),
+            "sandbox_policy_profile_id": manifest.get("sandbox_policy_profile", {}).get("profile_id"),
+            "worker_will_start": False,
+            "reports_written": False,
+        }, ensure_ascii=False), flush=True)
+        return 0
     if args.report.exists():
         verify_sidecar(args.report)
         final = json.loads(args.report.read_text(encoding="utf-8"))
@@ -176,7 +249,7 @@ def main() -> int:
             "schema_version": 1,
             "date": "2026-10-25",
             "task_id": "P3-05",
-            "kind": "phase3_p305_windows_pilot_execution_v2",
+            "kind": execution_kind,
             "status": status,
             "health": "passed" if status == "completed" and not totals["unknown"] and not cleanup_unconfirmed else "blocked",
             "plugin_compatibility": "not_evaluated",
@@ -197,6 +270,8 @@ def main() -> int:
             "cleanup_confirmed": sum(item["result"].get("worker", {}).get("cleanup_confirmed") is True for item in rows),
             "cleanup_unconfirmed": cleanup_unconfirmed,
             "results": rows,
+            **({"sandbox_policy_profile": manifest["sandbox_policy_profile"]}
+               if manifest_kind == "phase3_p305_windows_affected_manifest_v1" else {}),
             "execution_scope": {
                 "worker": "Windows Sandbox only",
                 "concurrency": 1,
@@ -273,6 +348,7 @@ def main() -> int:
     if len(rows) != len(selection) or set(result_ids) != expected_results or len(set(result_ids)) != len(result_ids):
         raise ValueError("pilot did not close each selected Windows identity exactly once")
     final = report("completed")
+    final["kind"] = execution_kind
     final["driver_source_sha256"] = sha256_file(Path(__file__).resolve())
     digest = write_json(args.report, final)
     print(json.dumps({"final_report":str(args.report),"report_file_sha256":digest,"manifest_sha256":manifest_sha,"counts":final["unit_counts"]},ensure_ascii=False), flush=True)

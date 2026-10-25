@@ -321,6 +321,13 @@ PR 必跑不依赖实验机的 schema/selection/queue/comparator/fixture 校验�
 - 已新增只读采集器 [phase3-windows-policy-inventory.ps1](../../scripts/phase3-windows-policy-inventory.ps1)（PowerShell 语法检查通过；尚未在 Sandbox 执行）。它在 guest 内输出 OS build、CiTool -lp -json、3076/3077/3089/3099 事件和 CodeIntegrity EVTX。下一次需用禁网的一次性 guest 运行；脚本输入只读共享，结果目录单独授予 Sandbox 写入。当前 wsb.exe list 后出现活动 guest ID 3323b88e-1f8c-438f-8b73-c56f85597af8，来源不明；本轮未连接、执行命令或停止它。待确认 guest 所属并在其退出后，先核实没有其他 Sandbox，再开自己的诊断 guest。
 - 暂不生成/部署 Hash Allow、不改 App Control policy、不运行 Python catalog unit。若确认默认 SAC Evaluation guest 是 P3-05 接受基线，应冻结独立 profile lock、manifest、checkpoint/report 后再执行；若要求 enforcement 验收，必须先在确认的强制策略下重跑 native-only 诊断并绑定 policy inventory/events。原 pilot 的 10 个 unknown 保持不变。
 
+### P3-05 Windows NoneBot Evaluation campaign（2026-10-25；执行中）
+
+- 用户选择 Windows Sandbox 默认 Evaluation profile。专用 guest 的只读 preflight 绑定 Evaluation base {1283ac0f-fff1-49ae-ada1-8a933130cad6} / options 0xb18d2714 与 supplemental {2678656c-05ef-481f-bc5b-ebd8c991502d} / options 0xd1892304；两者 Audit Mode bit 置位。inventory、EVTX、解析事件与 preflight JSON 的 SHA sidecar 均已保存于 outputs/acceptance/phase3-p305-windows-default-evaluation-preflight-20261025/。CiTool -lp -json 在 guest 返回 0x80073bc3，故 policy 身份/options 取自 3099 事件；采集限制已记录。没有部署或更改 App Control policy。
+- 新 manifest phase3-p305-windows-nonebot-evaluation-manifest-20261025.json canonical SHA 6c5ffb197dddc1c135117a610560a74cb2bfe669d720dc30bad7e537216dc914，仅选取 786 个未与旧 pilot 终态重叠的 NoneBot 条目；profile lock SHA 31814e498cab1365fa201497faa9b3918316db701d8f503c212f32d20e9a286a，P3-04 admission SHA 3a1a1d5755df58ed8097a58b924cb683b278f475102c11be5de57fad3fca7d70。--validate-only 确认分母和绑定身份一致。
+- 2026-10-25T14:41:50Z checkpoint SHA 85258ab7ae39696339168f3e7957f5998b81cf615a9d747a7652df1e30427083：20/786 settled，failed=8、skipped=12、passed=0、unknown=0、cleanup confirmed=20/20、remaining=766；status in-progress、health blocked、behavior not_evaluated。controller PID 33984 活动；该时点 Sandbox ID 为 c8c7537f-cb91-4106-a458-4262ce56f368。最终报告尚未生成；后续继续同一 controller/checkpoint，不重复派发或改写终态。
+- 该批次仅代表默认 Evaluation profile 下的 Sandbox 加载证据，不能证明 enforcement 接受。旧 pilot 10 个 unknown 保持不变；不生成 Hash Allow、不修改策略、不在宿主机执行插件。旧 pilot 后总体尚有 953 个 Windows affected 项待覆盖，本批次完成后仍需独立处理 167 个 Koishi 项及剩余依赖；P3-05、P3-08、P3-10 均不可提前声明完成。
+
 ### P3-05 Koishi Host-service probe 修复（2026-10-25；Linux diagnostics 完成）
 
 - 复核 frozen `koishi-plugin-auto-checkin-all@1.0.3` 发布物后发现 CommonJS 模块并列导出 `apply` 与 `inject`；probe 原来只选择 `loaded.apply`，丢弃 required-service 声明。该 loader 缺陷使 Koishi Core 把插件回调放入等待队列，而插件自身又重试查询，最终表现成 180 秒 Worker timeout。

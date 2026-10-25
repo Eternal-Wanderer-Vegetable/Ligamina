@@ -54,6 +54,32 @@ def _python_profile_id(version: str, platform_id: str) -> str:
     return f"nonebot-2.5.0-onebot-2.4.6-py{version}-{platform_id}"
 
 
+def _merge_runtime_profiles(
+    base_lock: dict[str, Any] | None,
+    selected_runtime_profiles: dict[str, dict[str, Any]],
+) -> dict[str, dict[str, Any]]:
+    """Keep runtime overrides from the base lock when resolving a partial cohort."""
+    merged: dict[str, dict[str, Any]] = {}
+    if base_lock is not None:
+        profile_specs = base_lock.get("profiles")
+        nonebot_spec = profile_specs.get("nonebot") if isinstance(profile_specs, dict) else None
+        base_runtime_profiles = (
+            nonebot_spec.get("runtime_profiles_by_entry", {})
+            if isinstance(nonebot_spec, dict) else {}
+        )
+        if not isinstance(base_runtime_profiles, dict):
+            raise ArtifactError("base profiles lock has an invalid Windows runtime override map")
+        for entry_id, runtime in base_runtime_profiles.items():
+            if not isinstance(entry_id, str) or not isinstance(runtime, dict):
+                raise ArtifactError("base profiles lock has an invalid Windows runtime override entry")
+            merged[entry_id] = dict(runtime)
+    for entry_id, runtime in selected_runtime_profiles.items():
+        if not isinstance(entry_id, str) or not isinstance(runtime, dict):
+            raise ArtifactError("selected Windows runtime override is invalid")
+        merged[entry_id] = dict(runtime)
+    return merged
+
+
 def _load_windows_runtime_admission(path: Path) -> dict[str, Any]:
     path = Path(path).expanduser().resolve(strict=True)
     raw = path.read_bytes()
@@ -570,6 +596,7 @@ def resolve_profiles(
         for catalog_entry in catalog["entries"] for platform_id in set(PLATFORMS) - set(selected_platform_ids)
     ):
         raise ArtifactError("base profiles lock is missing a platform needed for the output matrix")
+    runtime_profiles_by_entry = _merge_runtime_profiles(base_lock, runtime_profiles_by_entry)
 
     def expected_profile_identity(entry: dict[str, Any], platform_id: str) -> tuple[str, str | None]:
         if entry.get("ecosystem") == "nonebot":

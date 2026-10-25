@@ -1,0 +1,123 @@
+{
+  "activated_policies": [
+    {
+      "activation_status": "0x0",
+      "audit_mode_enabled": true,
+      "options": "0xb18d2714",
+      "policy_guid": "{1283ac0f-fff1-49ae-ada1-8a933130cad6}",
+      "policy_name": "VerifiedAndReputableDesktopEvaluation",
+      "record_id": 8
+    },
+    {
+      "activation_status": "0x0",
+      "audit_mode_enabled": true,
+      "options": "0xd1892304",
+      "policy_guid": "{2678656c-05ef-481f-bc5b-ebd8c991502d}",
+      "policy_name": "VerifiedAndReputableDesktopEvaluationFlightSupplemental",
+      "record_id": 12
+    },
+    {
+      "activation_status": "0x0",
+      "audit_mode_enabled": false,
+      "options": "0x90802404",
+      "policy_guid": "{60fd87f8-4593-44a0-91b0-2e0da022f248}",
+      "policy_name": "Microsoft Windows Endpoint Security Policy",
+      "record_id": 2
+    },
+    {
+      "activation_status": "0x0",
+      "audit_mode_enabled": true,
+      "options": "0x90850000",
+      "policy_guid": "{784c4414-79f4-4c32-a6a5-f0fb42a51d0d}",
+      "policy_name": "Microsoft Windows Cross Certificates for Code Integrity Exceptions Audit Policy",
+      "record_id": 4
+    },
+    {
+      "activation_status": "0x0",
+      "audit_mode_enabled": false,
+      "options": "0x90800000",
+      "policy_guid": "{a072029f-588b-4b5e-b7f9-05aad67df687}",
+      "policy_name": "Microsoft Windows Virtualization Based Security Policy",
+      "record_id": 6
+    },
+    {
+      "activation_status": "0x0",
+      "audit_mode_enabled": false,
+      "options": "0x80880200",
+      "policy_guid": "{d2bda982-ccf6-4344-ac5b-0b44427b6816}",
+      "policy_name": "Microsoft Windows Driver Policy",
+      "record_id": 10
+    }
+  ],
+  "citool": {
+    "exit_code": -2147009597,
+    "hresult_hex": "0x80073bc3",
+    "note": "CiTool -lp -json returned an OperationResult error; active policy identities/options below are independently extracted from guest CodeIntegrity 3099 EVTX.",
+    "parsed_json": {
+      "OperationResult": -2147009597
+    }
+  },
+  "cleanup": {
+    "cleanup_confirmed": true,
+    "stop_requested": true,
+    "vmmem_windows_sandbox_absent_after_stop": true,
+    "wsb_list_empty_after_stop": true
+  },
+  "codeintegrity_event_counts": {
+    "3076": 0,
+    "3077": 0,
+    "3089": 0,
+    "3099": 18
+  },
+  "date": "2026-10-25",
+  "evidence": {
+    "collector_script": {
+      "path": "scripts/phase3-windows-policy-inventory.ps1",
+      "sha256": "171264e4f58751cbe2be4b41fdc9bc78842777bc1829f6661997220353e6be64"
+    },
+    "guest_evtx": {
+      "path": "outputs/acceptance/phase3-p305-windows-default-evaluation-preflight-20261025/CodeIntegrity-Operational.evtx",
+      "sha256": "296e9159093d841a8e5bd1ce4f28b6b042507331bfa551373bf46b1edf4e3f00"
+    },
+    "guest_inventory": {
+      "path": "outputs/acceptance/phase3-p305-windows-default-evaluation-preflight-20261025/guest-policy-inventory.json",
+      "sha256": "54af85f9995b9f58b8fb741746f36cf5d1f961507b611ca142cba9a823cd33fb"
+    },
+    "parsed_event_xml": {
+      "path": "outputs/acceptance/phase3-p305-windows-default-evaluation-preflight-20261025/codeintegrity-events.json",
+      "sha256": "a625285ee416e2d6c25176b6bb3789f2c04fc89e488522e74c36dff761afc12e"
+    }
+  },
+  "guest": {
+    "BuildNumber": "26100",
+    "Caption": "Microsoft Windows 11 企业版",
+    "OSArchitecture": "64 位",
+    "Version": "10.0.26100"
+  },
+  "host": {
+    "windows_build": 26200,
+    "windows_sandbox_cli": "0.8.107.0"
+  },
+  "kind": "phase3_p305_windows_default_evaluation_policy_preflight",
+  "result": "default WSB configuration produced the expected two SAC Evaluation policy activations; no hash allow rule or policy change is needed for this Evaluation-scoped batch.",
+  "sac_evaluation_baseline": {
+    "base_audit_mode_enabled": true,
+    "base_options": "0xb18d2714",
+    "base_policy_guid": "{1283ac0f-fff1-49ae-ada1-8a933130cad6}",
+    "basis": "3099 policy activation records from this fresh default Windows Sandbox guest; this is an Evaluation-mode baseline and does not prove enforcement acceptance.",
+    "flight_supplemental_guid": "{2678656c-05ef-481f-bc5b-ebd8c991502d}",
+    "flight_supplemental_options": "0xd1892304",
+    "supplemental_audit_mode_enabled": true
+  },
+  "sandbox_config_sha256": "9ab2f41b6d5dbf6d2f60ecd10bb295db611ed83e28a3fd015babef4d4d37dd86",
+  "sandbox_id": "e0f566ce-709a-4e43-9dce-8f431a2a4a30",
+  "schema_version": 1,
+  "scope": {
+    "catalog_plugins_executed": false,
+    "code_integrity_policy_changed": false,
+    "input_share": "read-only",
+    "networking": "disabled",
+    "sandbox_memory_mb": 16384
+  },
+  "task_id": "P3-05"
+}
