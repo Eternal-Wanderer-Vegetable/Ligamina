@@ -9,6 +9,8 @@ from unittest.mock import patch
 
 from lab.pilot_nonebot import (
     NoneBotPilotError,
+    _load_release_metadata,
+    _pypi_json_url,
     _read_lock_requirements,
     _select_locked_wheel,
     _write_runner,
@@ -17,6 +19,21 @@ from lab.pilot_nonebot import (
 
 
 class NoneBotPilotLockTests(unittest.TestCase):
+    def test_release_metadata_accepts_pep440_equivalent_version_spelling(self) -> None:
+        requested_version = "13.0.3.0"
+        with tempfile.TemporaryDirectory() as directory:
+            cache = Path(directory)
+            url = _pypi_json_url("cuda-toolkit", requested_version)
+            key = hashlib.sha256(url.encode("utf-8")).hexdigest()
+            path = cache / "pypi-wheel-metadata" / "sha256" / key[:2] / key
+            path.parent.mkdir(parents=True)
+            path.write_text(json.dumps({"info": {"name": "cuda_toolkit", "version": "13.0.3"}, "urls": []}), encoding="utf-8")
+
+            document, receipt = _load_release_metadata("cuda-toolkit", requested_version, cache)
+
+        self.assertEqual(document["info"]["version"], "13.0.3")
+        self.assertTrue(receipt["cache_hit"])
+
     def test_profile_requirements_are_exact_and_hash_locked(self) -> None:
         lock = """demo-pkg==1.2.3 \\
     --hash=sha256:{digest}

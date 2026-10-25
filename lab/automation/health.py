@@ -42,6 +42,22 @@ def _docker_facts(docker_cli: str | None) -> dict[str, Any]:
     }
 
 
+def _linux_available_memory_bytes(meminfo_path: Path | None = None) -> int | None:
+    """Read Linux MemAvailable, returning None when the host cannot provide it."""
+    path = meminfo_path or Path("/proc/meminfo")
+    try:
+        lines = path.read_text(encoding="ascii").splitlines()
+    except OSError:
+        return None
+    for line in lines:
+        if line.startswith("MemAvailable:"):
+            try:
+                return int(line.split()[1]) * 1024
+            except (IndexError, ValueError):
+                return None
+    return None
+
+
 def collect_linux_health(*, probe_report_path: Path | None = None) -> dict[str, Any]:
     """Collect current Linux backend facts; admit only after exact pinned probes pass."""
     if platform.system() != "Linux":
@@ -85,16 +101,14 @@ def collect_linux_health(*, probe_report_path: Path | None = None) -> dict[str, 
             failures.append("benign_probe_report_not_accepted")
     host = {"system": platform.system(), "release": platform.release(), "machine": platform.machine(), "python": platform.python_version()}
     config = json.loads((ROOT / "config/lab/phase3-automation-v1.json").read_text(encoding="utf-8"))
-    available_memory = None
-    for line in Path("/proc/meminfo").read_text(encoding="ascii").splitlines():
-        if line.startswith("MemAvailable:"):
-            available_memory = int(line.split()[1]) * 1024
-            break
+    available_memory = _linux_available_memory_bytes()
     scratch_free = shutil.disk_usage(ROOT).free
     worker_memory = config["linux_worker"]["default_limits"]["memory_bytes"]
     required_memory = worker_memory * config["campaign_policy"]["initial_linux_concurrency"] + config["campaign_policy"]["admission_memory_headroom_bytes"]
     resources = {"memory_available_bytes": available_memory, "memory_required_bytes": required_memory, "scratch_free_bytes": scratch_free, "scratch_minimum_bytes": config["campaign_policy"]["minimum_free_scratch_bytes"]}
-    if available_memory is None or available_memory < required_memory:
+    if available_memory is None:
+        failures.append("linux_memory_headroom_unavailable")
+    elif available_memory < required_memory:
         failures.append("linux_memory_headroom_insufficient")
     if scratch_free < config["campaign_policy"]["minimum_free_scratch_bytes"]:
         failures.append("linux_scratch_headroom_insufficient")

@@ -6,11 +6,16 @@ import tempfile
 from pathlib import Path
 from unittest.mock import patch
 
-from lab.automation.health import collect_linux_health, require_current_admission
+from lab.automation.health import _linux_available_memory_bytes, collect_linux_health, require_current_admission
 from lab.automation.selection import AutomationContractError
 
 
 class LinuxAdmissionTests(unittest.TestCase):
+    def test_missing_meminfo_is_reported_as_unavailable(self) -> None:
+        with tempfile.TemporaryDirectory(prefix="p3-meminfo-test-") as directory:
+            missing = Path(directory) / "meminfo"
+            self.assertIsNone(_linux_available_memory_bytes(missing))
+
     @patch("lab.automation.health.platform.system", return_value="Linux")
     @patch("lab.automation.health.shutil.which", return_value=None)
     def test_missing_docker_backend_blocks_claims(self, _which, _system) -> None:

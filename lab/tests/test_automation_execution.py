@@ -14,7 +14,7 @@ import json, pathlib, sys
 request = json.load(sys.stdin)
 execution = request["context"]["execution"]
 workspace = pathlib.Path(execution["workspace"])
-assert pathlib.Path.cwd() == workspace
+assert pathlib.Path.cwd().samefile(workspace)
 marker = workspace / "state.json"
 assert not marker.exists(), "workspace was reused across paths"
 marker.write_text(json.dumps({"mode": execution["mode"]}))

@@ -1,9 +1,11 @@
 from __future__ import annotations
 
 import hashlib
+import io
 import tempfile
 import unittest
 from pathlib import Path
+from unittest.mock import patch
 
 from lab.artifacts import (
     _choose_pypi_file,
@@ -12,6 +14,7 @@ from lab.artifacts import (
     _release_status,
     _requires_python_allows,
     _verify_upstream_digest,
+    download_artifact,
 )
 
 
@@ -64,6 +67,48 @@ class ArtifactSelectionTests(unittest.TestCase):
             self.assertEqual(actual["sha256"], digest)
             with self.assertRaisesRegex(Exception, "do not match"):
                 _verify_upstream_digest(artifact, [{"algorithm": "sha256", "hex": "0" * 64}])
+
+    def test_cached_tarball_size_uses_archive_bytes_not_unpacked_metadata(self) -> None:
+        payload = b"compressed npm tarball"
+        digest = hashlib.sha512(payload).digest()
+        expected = [{"algorithm": "sha512", "hex": digest.hex()}]
+        with tempfile.TemporaryDirectory() as directory:
+            cache_root = Path(directory)
+            cache_path = cache_root / "sha256" / digest.hex()[:2] / digest.hex()
+            cache_path.parent.mkdir(parents=True)
+            cache_path.write_bytes(payload)
+            resolved, error = download_artifact({
+                "url": "https://registry.npmjs.org/demo/-/demo.tgz",
+                "upstream_digests": expected,
+                "size_bytes": 987654,
+                "unpacked_size_bytes": 987654,
+            }, cache_root, allowed_hosts={"registry.npmjs.org"})
+        self.assertIsNone(error)
+        self.assertEqual(resolved["size_bytes"], len(payload))
+        self.assertEqual(resolved["unpacked_size_bytes"], 987654)
+
+    def test_downloaded_tarball_size_uses_archive_bytes(self) -> None:
+        payload = b"new compressed npm tarball"
+        digest = hashlib.sha512(payload).digest()
+
+        class Response(io.BytesIO):
+            status = 200
+            headers = {"Content-Length": str(len(payload))}
+
+            def geturl(self) -> str:
+                return "https://registry.npmjs.org/demo/-/demo.tgz"
+
+        with tempfile.TemporaryDirectory() as directory:
+            with patch("lab.artifacts.urllib.request.urlopen", return_value=Response(payload)):
+                resolved, error = download_artifact({
+                    "url": "https://registry.npmjs.org/demo/-/demo.tgz",
+                    "upstream_digests": [{"algorithm": "sha512", "hex": digest.hex()}],
+                    "size_bytes": 654321,
+                    "unpacked_size_bytes": 654321,
+                }, Path(directory), allowed_hosts={"registry.npmjs.org"})
+        self.assertIsNone(error)
+        self.assertEqual(resolved["size_bytes"], len(payload))
+        self.assertEqual(resolved["unpacked_size_bytes"], 654321)
 
     def test_missing_release_is_not_misreported_as_a_network_failure(self) -> None:
         self.assertEqual(_metadata_failure_status(RuntimeError("metadata HTTP 404: https://pypi.org/...")), ("release_unavailable", "release_unavailable"))

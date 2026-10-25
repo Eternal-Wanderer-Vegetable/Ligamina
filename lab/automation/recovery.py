@@ -4,12 +4,15 @@ from __future__ import annotations
 
 import hashlib
 import json
+import re
+import shutil
+import subprocess
 import time
 from collections import defaultdict
 from pathlib import Path
 from typing import Any
 
-from lab.artifacts import DEFAULT_CACHE_ROOT, sha256_file
+from lab.artifacts import DEFAULT_CACHE_ROOT, _verify_upstream_digest, sha256_file
 from lab.automation.circuit_breaker import BackendCircuitBreaker, CircuitPolicy, CircuitOpen
 from lab.automation.dispatcher import Dispatcher
 from lab.automation.health import collect_linux_health
@@ -23,6 +26,31 @@ from lab.queue import StageQueue
 
 class RecoveryPilotError(ValueError):
     """A frozen pilot identity or execution report is invalid."""
+
+
+def _verify_pilot_worker_images(worker_images: dict[str, str]) -> list[dict[str, str]]:
+    docker = shutil.which("docker") or shutil.which("docker.exe")
+    if not docker:
+        raise RecoveryPilotError("Docker CLI is unavailable for pilot worker image preflight")
+    results = []
+    for ecosystem in ("nonebot", "koishi"):
+        reference = worker_images.get(ecosystem)
+        match = re.fullmatch(r"[^\s@]+@sha256:([a-f0-9]{64})", reference or "")
+        if not match:
+            raise RecoveryPilotError(f"{ecosystem} pilot image is not digest pinned")
+        try:
+            inspect = subprocess.run(
+                [docker, "image", "inspect", reference, "--format", "{{.Id}}"],
+                stdin=subprocess.DEVNULL, capture_output=True, text=True, timeout=20, check=False,
+            )
+        except (OSError, subprocess.TimeoutExpired) as error:
+            raise RecoveryPilotError(f"{ecosystem} pilot image inspection failed: {type(error).__name__}") from error
+        expected_id = f"sha256:{match.group(1)}"
+        actual_id = inspect.stdout.strip()
+        if inspect.returncode != 0 or actual_id != expected_id:
+            raise RecoveryPilotError(f"{ecosystem} pilot image is unavailable or mismatched: {reference}")
+        results.append({"ecosystem": ecosystem, "reference": reference, "image_id": actual_id, "status": "present"})
+    return results
 
 
 def _read_json(path: Path) -> tuple[dict[str, Any], bytes]:
@@ -89,6 +117,9 @@ def build_linux_pilot_manifest(
     failed_controls_per_ecosystem: int = 2,
     worker_images: dict[str, str] | None = None,
     worker_policy_id: str = "s205-locked-profile-images-v1",
+    archive_cache_root: Path | None = None,
+    worker_timeout_seconds: int = 240,
+    probe_semantics_version: int = 2,
 ) -> dict[str, Any]:
     """Freeze 8 affected units plus 2 historical plugin-failure controls per ecosystem."""
     source_manifest, source_raw = _read_json(recovery_manifest_path)
@@ -97,6 +128,10 @@ def build_linux_pilot_manifest(
     snapshot_id = catalog["snapshot_id"]
     if snapshot_id != source_manifest["snapshot_id"]:
         raise RecoveryPilotError("recovery manifest and catalog snapshot differ")
+    if worker_timeout_seconds < 30 or worker_timeout_seconds > 1200:
+        raise RecoveryPilotError("pilot worker timeout must be between 30 and 1200 seconds")
+    if probe_semantics_version not in {1, 2}:
+        raise RecoveryPilotError("pilot probe semantics version is unsupported")
     units_by_entry = {item["registry_entry_id"]: item for item in all_units}
     selected_source = [
         row for row in source_manifest["selection"]
@@ -180,6 +215,12 @@ def build_linux_pilot_manifest(
         image = worker_images.get(ecosystem)
         if not isinstance(image, str) or "@sha256:" not in image:
             raise RecoveryPilotError(f"{ecosystem} worker image must be digest pinned")
+    archive_size_overrides = None
+    if archive_cache_root is not None:
+        archive_size_overrides = _build_archive_size_overrides(
+            outputs, snapshot_dir=snapshot_dir, cache_root=archive_cache_root,
+            expected_artifact_lock_sha256=source_manifest["source_identity"]["artifact_lock_sha256"],
+        )
     core = {
         "schema_version": 1,
         "contract": "phase3-linux-recovery-pilot-v1",
@@ -193,8 +234,12 @@ def build_linux_pilot_manifest(
         "recovery_per_ecosystem": recovery_per_ecosystem,
         "failed_controls_per_ecosystem": failed_controls_per_ecosystem,
         "stage_scope": ["prepare", "install", "native", "cleanup"],
+        "stage_projection": "cleanup-evidence-on-cleanup-stage-only-v2",
+        "probe_semantics_version": probe_semantics_version,
+        "worker_limits": {"timeout_seconds": worker_timeout_seconds, "memory_mb": 4096, "cpu_cores": 2, "process_limit": 256},
         "worker_policy": worker_policy_id,
         "worker_images": worker_images,
+        **({"archive_size_overrides": archive_size_overrides} if archive_size_overrides is not None else {}),
         "selection": outputs,
     }
     campaign_seed = object_sha256(core)
@@ -209,6 +254,8 @@ def validate_linux_pilot_manifest(manifest: dict[str, Any]) -> dict[str, Any]:
     rows = manifest.get("selection")
     if not isinstance(rows, list) or manifest.get("expected_units") != len(rows):
         raise RecoveryPilotError("pilot selection denominator mismatch")
+    if manifest.get("probe_semantics_version", 1) not in {1, 2}:
+        raise RecoveryPilotError("pilot probe semantics version is unsupported")
     worker_images = manifest.get("worker_images", {})
     if any(not isinstance(worker_images.get(ecosystem), str) or "@sha256:" not in worker_images[ecosystem] for ecosystem in ("nonebot", "koishi")):
         raise RecoveryPilotError("pilot worker image identities must be digest pinned")
@@ -223,13 +270,96 @@ def validate_linux_pilot_manifest(manifest: dict[str, Any]) -> dict[str, Any]:
             raise RecoveryPilotError("pilot selection contains duplicate or modified identity")
         ids.add(entry_id)
         counts[identity["ecosystem"]][row.get("selection_kind")] += 1
+    overrides = manifest.get("archive_size_overrides")
+    if overrides is not None:
+        override_rows = overrides.get("entries") if isinstance(overrides, dict) else None
+        if (
+            not isinstance(overrides, dict)
+            or manifest.get("stage_projection") != "cleanup-evidence-on-cleanup-stage-only-v2"
+            or overrides.get("schema_version") != 1
+            or not isinstance(overrides.get("base_artifact_lock_sha256"), str)
+            or len(overrides["base_artifact_lock_sha256"]) != 64
+            or not isinstance(override_rows, list)
+            or len(override_rows) != len(rows)
+        ):
+            raise RecoveryPilotError("archive size override contract is invalid")
+        by_id = {item.get("registry_entry_id"): item for item in override_rows if isinstance(item, dict)}
+        if len(by_id) != len(override_rows) or set(by_id) != ids:
+            raise RecoveryPilotError("archive size overrides do not cover the pilot selection")
+        for row in rows:
+            identity = row["identity"]
+            override = by_id[identity["registry_entry_id"]]
+            if (
+                override.get("artifact_sha256") != identity.get("artifact_sha256")
+                or not isinstance(override.get("cache_path"), str)
+                or not override["cache_path"]
+                or not isinstance(override.get("archive_size_bytes"), int)
+                or override["archive_size_bytes"] < 1
+                or not isinstance(override.get("metadata_size_bytes"), int)
+                or override["metadata_size_bytes"] < 1
+            ):
+                raise RecoveryPilotError(f"archive size override identity is invalid for {identity['registry_entry_id']}")
     for ecosystem in counts:
         if counts[ecosystem]["affected_recovery"] != manifest.get("recovery_per_ecosystem") or counts[ecosystem]["prior_plugin_failure_control"] != manifest.get("failed_controls_per_ecosystem"):
             raise RecoveryPilotError(f"pilot selection strata incomplete for {ecosystem}")
+    worker_limits = manifest.get("worker_limits")
+    if worker_limits is not None and (
+        not isinstance(worker_limits, dict)
+        or not isinstance(worker_limits.get("timeout_seconds"), int)
+        or not 30 <= worker_limits["timeout_seconds"] <= 1200
+        or worker_limits.get("memory_mb") != 4096
+        or worker_limits.get("cpu_cores") != 2
+        or worker_limits.get("process_limit") != 256
+    ):
+        raise RecoveryPilotError("pilot worker limits are invalid")
     digest = object_sha256({key: value for key, value in manifest.items() if key != "manifest_sha256"})
     if manifest.get("manifest_sha256") != digest:
         raise RecoveryPilotError("pilot manifest hash mismatch")
     return {"status": "valid", "campaign_id": manifest["campaign_id"], "manifest_sha256": digest, "selected_units": len(rows), "counts": {key: dict(value) for key, value in counts.items()}}
+
+
+def _build_archive_size_overrides(
+    selection: list[dict[str, Any]], *, snapshot_dir: Path, cache_root: Path,
+    expected_artifact_lock_sha256: str,
+) -> dict[str, Any]:
+    lock, lock_raw = _read_json(snapshot_dir / "artifacts.lock.json")
+    lock_sha256 = sha256(lock_raw)
+    if lock_sha256 != expected_artifact_lock_sha256:
+        raise RecoveryPilotError("artifact lock differs from the frozen recovery source identity")
+    cache_root = Path(cache_root).expanduser().resolve(strict=True)
+    entries = {item["registry_entry_id"]: item for item in lock.get("entries", [])}
+    overrides = []
+    for selected in selection:
+        identity = selected["identity"]
+        entry_id = identity["registry_entry_id"]
+        artifact_entry = entries.get(entry_id, {})
+        artifact_platform = "all" if identity["ecosystem"] == "koishi" else "linux-x86_64"
+        record = next((item for item in artifact_entry.get("artifacts", []) if item.get("platform") == artifact_platform), {})
+        artifact = record.get("artifact") or {}
+        relative = Path(str(artifact.get("cache_path", "")))
+        if relative.is_absolute() or ".." in relative.parts:
+            raise RecoveryPilotError(f"unsafe cache path for {entry_id}")
+        path = (cache_root / relative).resolve(strict=True)
+        if not path.is_file() or not path.is_relative_to(cache_root):
+            raise RecoveryPilotError(f"locked archive is missing or escapes the cache for {entry_id}")
+        expected_sha256 = artifact.get("computed_digests", {}).get("sha256")
+        if expected_sha256 != identity.get("artifact_sha256") or sha256_file(path) != expected_sha256:
+            raise RecoveryPilotError(f"locked archive SHA-256 mismatch for {entry_id}")
+        try:
+            _verify_upstream_digest(path, artifact.get("upstream_digests", []))
+        except Exception as error:
+            raise RecoveryPilotError(f"locked archive upstream digest mismatch for {entry_id}") from error
+        metadata_size = artifact.get("size_bytes")
+        if not isinstance(metadata_size, int) or metadata_size < 1:
+            raise RecoveryPilotError(f"locked archive has no positive metadata size for {entry_id}")
+        overrides.append({
+            "registry_entry_id": entry_id,
+            "artifact_sha256": expected_sha256,
+            "cache_path": relative.as_posix(),
+            "metadata_size_bytes": metadata_size,
+            "archive_size_bytes": path.stat().st_size,
+        })
+    return {"schema_version": 1, "base_artifact_lock_sha256": lock_sha256, "entries": overrides}
 
 
 def _recovery_jobs(unit: dict[str, Any]) -> list[dict[str, Any]]:
@@ -247,8 +377,39 @@ def _recovery_jobs(unit: dict[str, Any]) -> list[dict[str, Any]]:
     ]
 
 
+def _project_worker_stage_result(stage_name: str, probe: Any, probe_result_sha256: str | None) -> dict[str, Any]:
+    if not isinstance(probe, dict):
+        return {
+            "status": "unknown", "reason_code": "worker_probe_missing", "attempted": True,
+            "probe_result_sha256": probe_result_sha256,
+            **({"cleanup_confirmed": False} if stage_name == "cleanup" else {}),
+        }
+    worker = probe.get("worker", {})
+    worker = worker if isinstance(worker, dict) else {}
+    protocol = worker.get("protocol_report")
+    key = {"native": "native_load", "cleanup": "cleanup"}[stage_name]
+    stage = protocol.get(key, {}) if isinstance(protocol, dict) else {}
+    stage = stage if isinstance(stage, dict) else {}
+    status = stage.get("status") if stage.get("status") in {"passed", "failed", "skipped", "unknown"} else "unknown"
+    reason = stage.get("reason_code") or worker.get("reason_code") or (None if status == "passed" else f"{stage_name}_evidence_missing")
+    result = {"status": status, "reason_code": reason, "attempted": True, "probe_result_sha256": probe_result_sha256}
+    if stage_name == "cleanup":
+        cleanup_confirmed = worker.get("cleanup_confirmed") is True
+        result["cleanup_confirmed"] = cleanup_confirmed
+        if not cleanup_confirmed:
+            result["status"], result["reason_code"] = "unknown", "worker_cleanup_unconfirmed"
+    return result
+
+
 def _locked_input_inventory(manifest: dict[str, Any], snapshot_dir: Path, cache_root: Path) -> dict[str, Any]:
-    artifacts, _ = _read_json(snapshot_dir / "artifacts.lock.json")
+    artifacts, artifact_lock_raw = _read_json(snapshot_dir / "artifacts.lock.json")
+    overrides_contract = manifest.get("archive_size_overrides")
+    if overrides_contract is not None and overrides_contract.get("base_artifact_lock_sha256") != sha256(artifact_lock_raw):
+        raise RecoveryPilotError("archive size overrides are bound to a different artifact lock")
+    overrides = {
+        item["registry_entry_id"]: item
+        for item in (overrides_contract or {}).get("entries", [])
+    }
     profiles, _ = _read_json(snapshot_dir / "profiles.lock.json")
     artifacts_by_id = {item["registry_entry_id"]: item for item in artifacts["entries"]}
     profiles_by_id = {item["registry_entry_id"]: item for item in profiles["entries"]}
@@ -262,18 +423,34 @@ def _locked_input_inventory(manifest: dict[str, Any], snapshot_dir: Path, cache_
         artifact_platform = "all" if ecosystem == "koishi" else platform_id
         artifact_record = next((item for item in artifact_entry.get("artifacts", []) if item.get("platform") == artifact_platform), {})
         artifact = artifact_record.get("artifact") or {}
+        override = overrides.get(entry_id)
+        if override is not None and (
+            override.get("artifact_sha256") != artifact.get("computed_digests", {}).get("sha256")
+            or override.get("cache_path") != artifact.get("cache_path")
+        ):
+            raise RecoveryPilotError(f"archive size override does not match the locked artifact for {entry_id}")
         profile = profile_entry.get("profiles", {}).get(platform_id, {})
         lock_ref = profile.get("dependency_lock") or {}
         checks = []
         for name, relative, expected_sha, expected_size in (
-            ("artifact", artifact.get("cache_path"), artifact.get("computed_digests", {}).get("sha256"), artifact.get("size_bytes")),
+            (
+                "artifact", artifact.get("cache_path"), artifact.get("computed_digests", {}).get("sha256"),
+                override.get("archive_size_bytes") if override is not None else artifact.get("size_bytes"),
+            ),
             ("dependency_lock", lock_ref.get("cache_path"), lock_ref.get("sha256"), lock_ref.get("size_bytes")),
         ):
             path = cache_root / relative if isinstance(relative, str) else None
             exists = path is not None and path.is_file()
             hash_matches = bool(exists and expected_sha and sha256_file(path) == expected_sha)
             size_matches = bool(exists and (expected_size is None or path.stat().st_size == expected_size))
-            checks.append({"name": name, "path": relative, "expected_sha256": expected_sha, "exists": exists, "hash_matches": hash_matches, "size_matches": size_matches})
+            checks.append({
+                "name": name, "path": relative, "expected_sha256": expected_sha,
+                "expected_size_bytes": expected_size,
+                "metadata_size_bytes": override.get("metadata_size_bytes") if name == "artifact" and override is not None else expected_size,
+                "actual_size_bytes": path.stat().st_size if exists else None,
+                "size_basis": "sha256_verified_cache_archive" if name == "artifact" and override is not None else "frozen_lock",
+                "exists": exists, "hash_matches": hash_matches, "size_matches": size_matches,
+            })
         records.append({"registry_entry_id": entry_id, "ecosystem": ecosystem, "checks": checks, "ready": all(item["exists"] and item["hash_matches"] and item["size_matches"] for item in checks)})
     return {"ready": all(item["ready"] for item in records), "ready_units": sum(item["ready"] for item in records), "expected_units": len(records), "units": records}
 
@@ -345,12 +522,17 @@ def execute_linux_recovery_pilot(
     snapshot_dir: Path = ROOT / "catalogs/p2-41649744e057d61031d5",
     cache_root: Path = DEFAULT_CACHE_ROOT,
     evidence_root: Path = Path("../Ligamina-automation-evidence"),
-    timeout_seconds: int = 1200,
+    timeout_seconds: int | None = None,
     now: float | None = None,
 ) -> dict[str, Any]:
     """Run a frozen 20-unit Linux pilot in a new fenced queue and emit old→new rows."""
     manifest, manifest_raw = _read_json(manifest_path)
     validation = validate_linux_pilot_manifest(manifest)
+    frozen_timeout = manifest.get("worker_limits", {}).get("timeout_seconds", 1200)
+    if timeout_seconds is None:
+        timeout_seconds = frozen_timeout
+    elif timeout_seconds != frozen_timeout:
+        raise RecoveryPilotError("execution timeout differs from the pilot manifest")
     at = time.time() if now is None else now
     admission, _ = _read_json(admission_path)
     if admission.get("status") != "admitted" or admission.get("platform") != "linux":
@@ -363,6 +545,7 @@ def execute_linux_recovery_pilot(
     fresh_health = collect_linux_health(probe_report_path=probe_path)
     if fresh_health.get("status") != "admitted":
         raise RecoveryPilotError("current Linux Worker health is blocked: " + ",".join(fresh_health.get("reason_codes", [])))
+    worker_image_inventory = _verify_pilot_worker_images(manifest["worker_images"])
     if object_sha256({key: value for key, value in manifest.items() if key != "manifest_sha256"}) != manifest["manifest_sha256"]:
         raise RecoveryPilotError("pilot manifest identity hash mismatch")
 
@@ -468,17 +651,7 @@ def execute_linux_recovery_pilot(
             return {"status": status, "reason_code": reason, "attempted": True, "cleanup_confirmed": worker.get("cleanup_confirmed") is True, "probe_result": probe, "probe_result_sha256": object_sha256(probe)}
         install = queue.get_job(manifest["campaign_id"], install_unit_id).get("result") or {}
         probe = install.get("probe_result", {})
-        worker = probe.get("worker", {}) if isinstance(probe, dict) else {}
-        worker = worker if isinstance(worker, dict) else {}
-        protocol = worker.get("protocol_report") if isinstance(worker, dict) else None
-        key = {"native": "native_load", "cleanup": "cleanup"}[job["stage"]]
-        stage = protocol.get(key, {}) if isinstance(protocol, dict) else {}
-        status = stage.get("status") if stage.get("status") in {"passed", "failed", "skipped", "unknown"} else "unknown"
-        reason = stage.get("reason_code") or worker.get("reason_code") or (None if status == "passed" else f"{job['stage']}_evidence_missing")
-        cleanup_confirmed = worker.get("cleanup_confirmed") is True and key == "cleanup"
-        if key == "cleanup" and not cleanup_confirmed:
-            status, reason = "unknown", "worker_cleanup_unconfirmed"
-        return {"status": status, "reason_code": reason, "attempted": True, "cleanup_confirmed": cleanup_confirmed, "probe_result_sha256": install.get("probe_result_sha256")}
+        return _project_worker_stage_result(job["stage"], probe, install.get("probe_result_sha256"))
 
     dispatcher = Dispatcher(
         queue, manifest["campaign_id"], f"p3-linux-{manifest['campaign_id'][-12:]}", execute, breaker,
@@ -529,6 +702,7 @@ def execute_linux_recovery_pilot(
         "schema_version": 1, "kind": "phase3_linux_recovery_pilot", "campaign_id": manifest["campaign_id"],
         "manifest_sha256": validation["manifest_sha256"], "snapshot_id": manifest["snapshot_id"],
         "platform": "linux", "admission_fingerprint": fresh_health["environment_fingerprint"],
+        "worker_image_inventory": worker_image_inventory,
         "queue_path": queue_path.as_posix(), "queue_state": state,
         "status": "interrupted" if infrastructure_stop or state == "interrupted" else "completed" if state == "completed" else "incomplete",
         "denominator": {"expected_units": len(rows), "terminal_units": sum(all(row["old_to_new"]["new_stage_statuses"][stage] in {"passed", "failed", "skipped", "unknown"} for stage in ("install", "native", "cleanup")) for row in rows), "required_stage_positions": len(rows) * 3},

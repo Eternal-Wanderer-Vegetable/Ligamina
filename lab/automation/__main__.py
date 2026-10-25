@@ -44,6 +44,8 @@ def main(argv: list[str] | None = None) -> int:
     recovery_plan.add_argument("--reports", type=Path, default=ROOT / "outputs/acceptance")
     recovery_plan.add_argument("--nonebot-image", help="optional digest-pinned local NoneBot Worker image override")
     recovery_plan.add_argument("--koishi-image", help="optional digest-pinned local Koishi Worker image override")
+    recovery_plan.add_argument("--archive-cache-root", type=Path, help="verify and bind exact cached archive sizes into a new pilot manifest")
+    recovery_plan.add_argument("--worker-timeout-seconds", type=int, default=240, help="bind the per-entry Worker timeout into the pilot manifest")
     recovery_plan.add_argument("--worker-policy-id", default="s205-locked-profile-images-v1")
     recovery_plan.add_argument("--output", type=Path, required=True)
     recovery_validate = commands.add_parser("validate-recovery-pilot", help="validate frozen Linux pilot identities")
@@ -54,7 +56,7 @@ def main(argv: list[str] | None = None) -> int:
     recovery_execute.add_argument("--snapshot", type=Path, default=ROOT / "catalogs/p2-41649744e057d61031d5")
     recovery_execute.add_argument("--cache-root", type=Path)
     recovery_execute.add_argument("--evidence-root", type=Path, default=ROOT.parent / "Ligamina-automation-evidence")
-    recovery_execute.add_argument("--timeout", type=int, default=1200)
+    recovery_execute.add_argument("--timeout", type=int, help="must match the timeout frozen in the pilot manifest")
     recovery_execute.add_argument("--output", type=Path, required=True)
     options = parser.parse_args(argv)
     try:
@@ -91,6 +93,8 @@ def main(argv: list[str] | None = None) -> int:
             manifest = build_linux_pilot_manifest(
                 options.manifest, options.snapshot, options.reports,
                 worker_images=worker_images, worker_policy_id=options.worker_policy_id,
+                archive_cache_root=options.archive_cache_root,
+                worker_timeout_seconds=options.worker_timeout_seconds,
             )
             _write_json(options.output, manifest)
             result = validate_linux_pilot_manifest(manifest)

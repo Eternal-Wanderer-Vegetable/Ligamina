@@ -304,7 +304,12 @@ def download_artifact(
             verified = _verify_upstream_digest(cache_path, expected)
         except ArtifactError:
             return None, "cache_hash_mismatch"
-        return {**artifact, "cache_path": cache_path.relative_to(cache_root).as_posix(), "computed_digests": verified}, None
+        return {
+            **artifact,
+            "cache_path": cache_path.relative_to(cache_root).as_posix(),
+            "computed_digests": verified,
+            "size_bytes": cache_path.stat().st_size,
+        }, None
 
     request = urllib.request.Request(url, headers={"User-Agent": "Ligamina-artifact-lock/0.1"})
     temp_path: Path | None = None
@@ -542,7 +547,7 @@ def _koishi_entry(entry: dict[str, Any], cache_root: Path, refresh: bool) -> dic
         "url": tarball,
         "upstream_digests": expected,
         "sha256": preferred["hex"] if preferred["algorithm"] == "sha256" else None,
-        "size_bytes": dist.get("unpackedSize"),
+        "unpacked_size_bytes": dist.get("unpackedSize"),
         "build_required": False,
     }
     downloaded, error = download_artifact(selected, cache_root, allowed_hosts={"registry.npmjs.org"})

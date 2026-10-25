@@ -125,7 +125,11 @@ def _load_release_metadata(name: str, version: str, cache_root: Path) -> tuple[d
     except json.JSONDecodeError as error:
         raise NoneBotPilotError(f"invalid PyPI JSON for {name}=={version}") from error
     info = document.get("info", {}) if isinstance(document, dict) else {}
-    if (not isinstance(document, dict) or info.get("version") != version
+    try:
+        metadata_version_matches = isinstance(info.get("version"), str) and Version(info["version"]) == Version(version)
+    except InvalidVersion:
+        metadata_version_matches = False
+    if (not isinstance(document, dict) or not metadata_version_matches
             or canonicalize_name(str(info.get("name", ""))) != canonicalize_name(name)):
         raise NoneBotPilotError(f"PyPI returned an unexpected release identity for {name}=={version}")
     return document, {"url_sha256": key, "response_sha256": _sha256(raw), "response_bytes": len(raw), "cache_hit": not fetched}
