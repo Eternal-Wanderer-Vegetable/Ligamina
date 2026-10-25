@@ -1,0 +1,32 @@
+{
+  "schema_version": 1,
+  "kind": "phase3_p305_koishi_worker_exit_regression",
+  "platform": "linux_wsl",
+  "fixture": "self-authored Koishi plugin starts an interval during apply and leaves it open after app.stop()",
+  "baseline_source_commit": "106dbc8",
+  "fixed_source_commit": "8726773",
+  "test": "lab.tests.test_pilot_workers.KoishiPilotWorkerPreparationTests.test_probe_exits_after_report_when_plugin_leaves_an_open_handle",
+  "test_command": "UV_PROJECT_ENVIRONMENT=/tmp/ligamina-lab-p3-v3-20261025 TMPDIR=/home/vegetable/.cache/ligamina-test-tmp uv run --locked --project lab --python 3.12.14 python -m unittest lab.tests.test_pilot_workers.KoishiPilotWorkerPreparationTests.test_probe_exits_after_report_when_plugin_leaves_an_open_handle -v",
+  "expected_red": {
+    "result": "expected_failure_before_fix",
+    "exit_code": 1,
+    "observed": "subprocess.TimeoutExpired after 4 seconds while the plugin interval kept the Node process alive",
+    "log_path": "outputs/acceptance/phase3-p305-koishi-worker-exit-regression-red-20261025.log",
+    "log_sha256": "8833c7f98b9c1596c1b795e7251433e7d268fd744fd09814c2f18076232dd5af"
+  },
+  "green": {
+    "result": "passed",
+    "exit_code": 0,
+    "tests": 1,
+    "duration_seconds": 0.651,
+    "observed": "probe exited after writing the report; dependency_install, native_load, and cleanup all passed",
+    "log_path": "outputs/acceptance/phase3-p305-koishi-worker-exit-regression-green-20261025.log",
+    "log_sha256": "b79cb59b44fd09c1add63adcb7ebfa5c2101deece48a259f448453b046fb2791"
+  },
+  "fix": "flush the JSON report to stdout and explicitly exit only after the write callback completes",
+  "windows_tests_run": false,
+  "windows_catalog_plugins_run": false,
+  "official_catalog_plugins_run": false,
+  "behavior_compatibility": "not_evaluated",
+  "report_sha256": "7343be461252ad9d74725718c8a371d4dea5608654287f4c28ddb7008998f002"
+}

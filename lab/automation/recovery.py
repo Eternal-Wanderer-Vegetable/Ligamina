@@ -476,7 +476,23 @@ def _recovery_jobs(unit: dict[str, Any]) -> list[dict[str, Any]]:
     ]
 
 
-def _project_worker_stage_result(stage_name: str, probe: Any, probe_result_sha256: str | None) -> dict[str, Any]:
+def _project_worker_stage_result(
+    stage_name: str,
+    probe: Any,
+    probe_result_sha256: str | None,
+    *,
+    reconciliation: dict[str, Any] | None = None,
+) -> dict[str, Any]:
+    if stage_name == "cleanup" and isinstance(reconciliation, dict) and reconciliation.get("cleanup_confirmed") is True:
+        return {
+            "status": "passed",
+            "reason_code": None,
+            "attempted": False,
+            "probe_result_sha256": probe_result_sha256,
+            "cleanup_confirmed": True,
+            "cleanup_evidence_source": reconciliation.get("source"),
+            "reconciliation": reconciliation,
+        }
     if not isinstance(probe, dict):
         return {
             "status": "unknown", "reason_code": "worker_probe_missing", "attempted": True,
@@ -505,6 +521,11 @@ def _cleanup_confirmed_from_result(result: dict[str, Any]) -> bool:
     return result.get("cleanup_confirmed") is True or (
         isinstance(reconciliation, dict) and reconciliation.get("cleanup_confirmed") is True
     )
+
+
+def _unit_cleanup_confirmed(cleanup_result: dict[str, Any], install_result: dict[str, Any]) -> bool:
+    """Keep cleanup proof from exact Worker reconciliation independent of install status."""
+    return _cleanup_confirmed_from_result(cleanup_result) or _cleanup_confirmed_from_result(install_result)
 
 
 def _locked_input_inventory(manifest: dict[str, Any], snapshot_dir: Path, cache_root: Path) -> dict[str, Any]:
@@ -776,7 +797,10 @@ def execute_linux_recovery_pilot(
             return {"status": status, "reason_code": reason, "attempted": True, "cleanup_confirmed": worker.get("cleanup_confirmed") is True, "probe_result": probe, "probe_result_sha256": object_sha256(probe)}
         install = queue.get_job(manifest["campaign_id"], install_unit_id).get("result") or {}
         probe = install.get("probe_result", {})
-        return _project_worker_stage_result(job["stage"], probe, install.get("probe_result_sha256"))
+        return _project_worker_stage_result(
+            job["stage"], probe, install.get("probe_result_sha256"),
+            reconciliation=install.get("reconciliation"),
+        )
 
     try:
         infrastructure_stop = dispatch_until_idle(
@@ -802,7 +826,8 @@ def execute_linux_recovery_pilot(
         failed = any(new_statuses[stage] == "failed" for stage in required)
         not_run = any(new_statuses[stage] == "queued" for stage in required)
         cleanup_result = stages["cleanup"].get("result") or {}
-        cleanup_confirmed = _cleanup_confirmed_from_result(cleanup_result)
+        install_result = stages["install"].get("result") or {}
+        cleanup_confirmed = _unit_cleanup_confirmed(cleanup_result, install_result)
         rows.append({
             "registry_entry_id": entry_id, "ecosystem": selected["ecosystem"], "package": selected["package"],
             "version": selected.get("version"), "platform": "linux", "selection_kind": selected["pilot_selection_kind"],

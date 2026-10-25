@@ -240,7 +240,9 @@ class StageQueueTests(unittest.TestCase):
         def drain(worker_id: str) -> None:
             synchronize_first_pair = True
             while True:
-                job = queue.claim("large-race", worker_id, lease_seconds=30)
+                # This test stresses concurrent SQLite claims; keep lease expiry outside
+                # slow CI and filesystem windows so it does not become a timing test.
+                job = queue.claim("large-race", worker_id, lease_seconds=300)
                 if job is None:
                     return
                 if synchronize_first_pair:

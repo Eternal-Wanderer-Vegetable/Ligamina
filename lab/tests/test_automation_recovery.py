@@ -12,6 +12,7 @@ from lab.automation.recovery import (
     RecoveryPilotError,
     _locked_input_inventory,
     _cleanup_confirmed_from_result,
+    _unit_cleanup_confirmed,
     _project_worker_stage_result,
     _verify_pilot_worker_images,
     build_linux_pilot_manifest,
@@ -172,6 +173,33 @@ class RecoveryPilotManifestTests(unittest.TestCase):
     def test_cleanup_reconciliation_confirmation_is_retained_separately_from_stage_status(self) -> None:
         self.assertTrue(_cleanup_confirmed_from_result({"status": "unknown", "reconciliation": {"cleanup_confirmed": True}}))
         self.assertFalse(_cleanup_confirmed_from_result({"status": "unknown", "reconciliation": {"cleanup_confirmed": False}}))
+        self.assertTrue(_unit_cleanup_confirmed(
+            {"status": "unknown", "cleanup_confirmed": False},
+            {"status": "unknown", "reconciliation": {"cleanup_confirmed": True}},
+        ))
+        self.assertFalse(_unit_cleanup_confirmed(
+            {"status": "unknown", "cleanup_confirmed": False},
+            {"status": "unknown", "reconciliation": {"cleanup_confirmed": False}},
+        ))
+
+    def test_cleanup_stage_uses_confirmed_reconciliation_when_worker_probe_is_missing(self) -> None:
+        reconciliation = {
+            "cleanup_confirmed": True,
+            "resource_ids": ["container-id"],
+            "removed_ids": ["container-id"],
+            "source": "docker_label_reconciliation",
+        }
+        cleanup = _project_worker_stage_result("cleanup", None, None, reconciliation=reconciliation)
+        self.assertEqual(cleanup["status"], "passed")
+        self.assertTrue(cleanup["cleanup_confirmed"])
+        self.assertFalse(cleanup["attempted"])
+        self.assertEqual(cleanup["cleanup_evidence_source"], "docker_label_reconciliation")
+        self.assertEqual(cleanup["reconciliation"], reconciliation)
+        unconfirmed = _project_worker_stage_result(
+            "cleanup", None, None, reconciliation={"cleanup_confirmed": False},
+        )
+        self.assertEqual(unconfirmed["status"], "unknown")
+        self.assertFalse(unconfirmed["cleanup_confirmed"])
 
     def test_malformed_worker_probe_remains_unknown_instead_of_aborting_projection(self) -> None:
         missing = _project_worker_stage_result("native", None, "c" * 64)

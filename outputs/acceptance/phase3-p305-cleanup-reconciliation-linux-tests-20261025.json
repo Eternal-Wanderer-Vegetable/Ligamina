@@ -1,0 +1,25 @@
+{
+  "schema_version": 1,
+  "kind": "phase3_p305_cleanup_reconciliation_linux_tests",
+  "platform": "linux_wsl",
+  "campaign_id": "p3-recovery-linux-842f71712e2c",
+  "command": "UV_PROJECT_ENVIRONMENT=/tmp/ligamina-lab-p3-v3-20261025 TMPDIR=/home/vegetable/.cache/ligamina-test-tmp uv run --locked --project lab --python 3.12.14 python -m unittest lab.tests.test_automation_recovery lab.tests.test_automation_dispatcher lab.tests.test_queue -v",
+  "exit_code": 0,
+  "result": "passed",
+  "tests": 42,
+  "duration_seconds": 76.711,
+  "new_regressions": [
+    "test_cleanup_stage_uses_confirmed_reconciliation_when_worker_probe_is_missing",
+    "test_cleanup_reconciliation_confirmation_is_retained_separately_from_stage_status"
+  ],
+  "behavior": "confirmed Docker cleanup remains separate from worker/plugin execution status; an unknown install stays unknown",
+  "queue_stress_lease_seconds": 300,
+  "prior_timing_failure": "The same queue stress case once exceeded a 30-second lease in a slow SQLite/filesystem run; it now uses a 300-second lease because the case checks concurrent claims/drain, not lease expiry.",
+  "log_path": "outputs/acceptance/phase3-p305-cleanup-reconciliation-tests-linux-20261025.log",
+  "log_sha256": "9456188d6c8f296e7e5ec35861688d880547127cd35d64acf51810afa64bc3c6",
+  "windows_tests_run": false,
+  "windows_sandbox_runtime_tests_run": false,
+  "windows_catalog_plugins_run": false,
+  "behavior_compatibility": "not_evaluated",
+  "report_sha256": "d6737e877474f96e236aa8b5ddc3f2b1c4348f40287751229934b41524135bd8"
+}
