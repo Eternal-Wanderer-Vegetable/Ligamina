@@ -1,0 +1,131 @@
+{
+  "schema_version": 1,
+  "kind": "phase3_p305_ext4_resume5_checkpoint",
+  "captured_at_epoch": 1792919816.816891,
+  "campaign_id": "p3-recovery-linux-842f71712e2c",
+  "status": "running",
+  "denominator": {
+    "units_total": 2206,
+    "units_settled": 877,
+    "required_stage_positions": 6618
+  },
+  "unit_progress": {
+    "settled_unknown_units": 18,
+    "open_units": 1329,
+    "unit_terminal_definition": "install, native, and cleanup stages are passed, failed, skipped, or unknown"
+  },
+  "stage_job_counts": {
+    "passed": 3097,
+    "failed": 82,
+    "skipped": 296,
+    "unknown": 35,
+    "leased": 2,
+    "queued": 5312
+  },
+  "cleanup_stage_confirmed_units": 873,
+  "install_attempt_reconciliations_cleanup_confirmed": 3,
+  "cleanup_evidence_units_lower_bound": 877,
+  "recent_install_unknowns": [
+    {
+      "registry_entry_id": "ko-79b16b599ec4f1e0ac0a23e3",
+      "unit_id": "ko-79b16b599ec4f1e0ac0a23e3|linux|catalog",
+      "updated_at": 1792919631.0313272,
+      "reason_code": "worker_nonzero_exit",
+      "cleanup_confirmed": true,
+      "reconciliation_cleanup_confirmed": null,
+      "stderr_sha256": "aca1ec6970cc75325a920055e0cc5d9eb36bea54ed6c1791024ef0e143523e5b"
+    },
+    {
+      "registry_entry_id": "ko-746ff9aa464c19e1644573f7",
+      "unit_id": "ko-746ff9aa464c19e1644573f7|linux|catalog",
+      "updated_at": 1792919470.6406853,
+      "reason_code": "worker_nonzero_exit",
+      "cleanup_confirmed": true,
+      "reconciliation_cleanup_confirmed": null,
+      "stderr_sha256": "f7b69a4d72f7abc66e6850d136dc1babc12defc4abff1c77b8e0392589e9b7a5"
+    },
+    {
+      "registry_entry_id": "ko-71f2a90afa28ed51610ff4ac",
+      "unit_id": "ko-71f2a90afa28ed51610ff4ac|linux|catalog",
+      "updated_at": 1792919402.961112,
+      "reason_code": "worker_nonzero_exit",
+      "cleanup_confirmed": true,
+      "reconciliation_cleanup_confirmed": null,
+      "stderr_sha256": "4ab80794d59633bb034b51ce283229e67ead8e7574e98f7abeb82429cf1639f2"
+    },
+    {
+      "registry_entry_id": "ko-6fe9d9f97d8b46fc72373dac",
+      "unit_id": "ko-6fe9d9f97d8b46fc72373dac|linux|catalog",
+      "updated_at": 1792919352.0932958,
+      "reason_code": "worker_nonzero_exit",
+      "cleanup_confirmed": true,
+      "reconciliation_cleanup_confirmed": null,
+      "stderr_sha256": "5718d50faa780d874dff09e791c06fb49a0535181d827e93dfa9a71172df8a81"
+    },
+    {
+      "registry_entry_id": "ko-6fe5b7f33ce97eb5093b3005",
+      "unit_id": "ko-6fe5b7f33ce97eb5093b3005|linux|catalog",
+      "updated_at": 1792919193.3473513,
+      "reason_code": "dispatcher_executor_error",
+      "cleanup_confirmed": null,
+      "reconciliation_cleanup_confirmed": true,
+      "stderr_sha256": null
+    }
+  ],
+  "active_workers": [
+    "p3-linux-842f71712e2c-1",
+    "p3-linux-842f71712e2c-2"
+  ],
+  "leases": [
+    {
+      "unit_id": "ko-7e9ffdc625dd787c2bc37542|linux|catalog|install",
+      "lease_owner": "p3-linux-842f71712e2c-1",
+      "lease_expires_at": 1792919902.6026232
+    },
+    {
+      "unit_id": "ko-7e60373a2fdf0d429c2dba4b|linux|catalog|install",
+      "lease_owner": "p3-linux-842f71712e2c-2",
+      "lease_expires_at": 1792919900.3819306
+    }
+  ],
+  "active_campaign_containers": [
+    "2086d5afb0b6 ligamina-a49b09f3182d42b7 Up 1 second",
+    "afe9e5c650b4 ligamina-c798927306f34aba Up 33 seconds"
+  ],
+  "docker_ps_exit_code": 0,
+  "controller_processes": [
+    {
+      "pid": 844,
+      "state": "S (sleeping)",
+      "args": "bash /tmp/ligamina-p305-resume5.sh "
+    },
+    {
+      "pid": 850,
+      "state": "S (sleeping)",
+      "args": "uv run --locked --project lab --python 3.12.14 python -m lab.automation execute-recovery-pilot --manifest outputs/acceptance/phase3-p305-linux-affected-v3-manifest-20261025.json --admission outputs/acceptance/phase3-p305-linux-admission-affected-v3-resume5-20261025.json --snapshot catalogs/p2-41649744e057d61031d5 --cache-root /mnt/e/stella/Ligamina-artifact-cache --queue-root /home/vegetable/.local/share/ligamina-automation/queue --evidence-root "
+    },
+    {
+      "pid": 884,
+      "state": "S (sleeping)",
+      "args": "/tmp/ligamina-lab-p3-v3-20261025/bin/python -m lab.automation execute-recovery-pilot --manifest outputs/acceptance/phase3-p305-linux-affected-v3-manifest-20261025.json --admission outputs/acceptance/phase3-p305-linux-admission-affected-v3-resume5-20261025.json --snapshot catalogs/p2-41649744e057d61031d5 --cache-root /mnt/e/stella/Ligamina-artifact-cache --queue-root /home/vegetable/.local/share/ligamina-automation/queue --evidence-root /mnt/e/ste"
+    }
+  ],
+  "run_manifest_identity_sha256": "2175bce7afc141c7700b108339bc213bffe3382c2c604bd2f268ff4b8a6a68b9",
+  "frozen_manifest_path": "outputs/acceptance/phase3-p305-linux-affected-v3-manifest-20261025.json",
+  "frozen_manifest_file_sha256": "91798c872560306155a5e8330067062f95be3f6d7fee6b566156ebc9f9087cbe",
+  "frozen_manifest_canonical_sha256": "961786350b7c0ebdb990650d051203ad82452fff72ac291402a7f46a517173c8",
+  "admission_path": "outputs/acceptance/phase3-p305-linux-admission-affected-v3-resume5-20261025.json",
+  "admission_file_sha256": "fb7c1a5efce69afacb5842f62adfb9c827ed1cd002637473283011f4e7b28725",
+  "admission_fingerprint": "95159d99e3c30e9b2301ae149f4921422494d3566c66816638c898ca0d668641",
+  "queue_path": "/home/vegetable/.local/share/ligamina-automation/queue/p3-recovery-linux-842f71712e2c/linux/queue.sqlite3",
+  "queue_filesystem": "WSL ext4",
+  "queue_quick_check": "ok",
+  "worker_limit": 2,
+  "execution_report_path": "outputs/acceptance/phase3-p305-linux-affected-v3-execution-resume5-20261025.json",
+  "execution_report_present": false,
+  "behavior_compatibility": "not_evaluated",
+  "windows_tests_run": false,
+  "windows_catalog_plugins_run": false,
+  "frozen_manifest_validation": "valid",
+  "report_sha256": "0b8ea75e732935827b076f60008aacc7dbb73c0d6b643140fb0691e9b482e871"
+}
