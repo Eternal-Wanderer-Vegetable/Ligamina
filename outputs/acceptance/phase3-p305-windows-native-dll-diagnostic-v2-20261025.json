@@ -1,0 +1,109 @@
+{
+  "schema_version": 1,
+  "kind": "phase3_p305_windows_native_dll_diagnostic",
+  "date": "2026-10-25",
+  "generated_at_utc": "2026-10-25T13:32:16.489904+00:00",
+  "task_id": "P3-05 diagnostic-only; no catalog unit executed",
+  "driver_source_sha256": "a3da92513d5ce95b948ebd609ff5a21f99e052981152de9c99cb119067f94890",
+  "source": {
+    "campaign_id": "p3-recovery-windows-pilot-v2-9666ebb4609f",
+    "manifest_sha256": "0796fad72d14f0e84cfd91b77e63177873a26510dfa3adee55c9a3298feed4fa",
+    "manifest_file_sha256": "c28dcdddc035df73841e42a811abd4b4fd4c89c6fd795b783ea0214dcf9f21d5",
+    "execution_report_sha256": "5e1f02f68e65faecf8048a5fc722cf613dda33b55792ae1e0e09a6a35d95d976",
+    "profile_lock_sha256": "e58651dfa5e46b3ebc8590b7ba89fd7aef86e8dd42d47580c9ed7fb536d880df",
+    "dependency_lock_sha256": "ee98bc178065b3dd364586832105b38feec6ad46a63dac2857f1038aacaf3ece",
+    "runtime_admission_report_sha256": "3a1a1d5755df58ed8097a58b924cb683b278f475102c11be5de57fad3fca7d70",
+    "prior_diagnostic_report_sha256": "66646448fc2dedd3a4d311fcf0d2e8ce6163832abe01f1fcf4b81d778837d013"
+  },
+  "diagnostic_scope": {
+    "catalog_plugin_execution": false,
+    "catalog_unit_outcome_changed": false,
+    "codeintegrity_events_collected_in_guest": true,
+    "packages_installed": [
+      {
+        "name": "pydantic-core",
+        "version": "2.50.1",
+        "wheel_filename": "pydantic_core-2.50.1-cp312-cp312-win_amd64.whl",
+        "wheel_sha256": "132529c83901437ff642f585216831bf5fd7a91df66829907e155192ead62498",
+        "wheel_size_bytes": 2172522
+      },
+      {
+        "name": "typing-extensions",
+        "version": "4.16.0",
+        "wheel_filename": "typing_extensions-4.16.0-py3-none-any.whl",
+        "wheel_sha256": "481caa481374e813c1b176ada14e97f1f67a4539ce9cfeb3f350d78d6370c2e8",
+        "wheel_size_bytes": 45571
+      }
+    ],
+    "pydantic_core_extension": {
+      "filename": "pydantic_core/_pydantic_core.cp312-win_amd64.pyd",
+      "sha256": "d38e098d798d381cc44f867162bc6da2ebc5d77bf444f0dd00d42a1bc8484297"
+    },
+    "runtime_archive_sha256": "4acbed6dd1c744b0376e3b1cf57ce906f9dc9e95e68824584c8099a63025a3c3",
+    "python_executable_sha256": "4d6f5f81a4bca11191c4c7c6b43632694d0a4ce74e068619d8fdc161d469859a",
+    "runtime_extracted_file_count": 35
+  },
+  "worker": {
+    "status": "passed",
+    "reason_code": null,
+    "exit_code": 0,
+    "cleanup_confirmed": true,
+    "elapsed_seconds": 30.932019200001378,
+    "stdout_sha256": "149b12f0b4837fa669d5857674f2db43ed54e7bd46ad0ae6624f7c59a6692a5b",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_tail": "{\"task_id\":\"p305-windows-native-dll-diagnostic-v2\",\"dependency_install\":{\"status\":\"passed\",\"exit_code\":0,\"stdout_tail\":\"Looking in links: c:\\\\Ligamina\\\\Input\\\\wheelhouse\\nProcessing c:\\\\ligamina\\\\input\\\\wheelhouse\\\\pydantic_core-2.50.1-cp312-cp312-win_amd64.whl (from -r C:\\\\Ligamina\\\\Input\\\\requirements.txt (line 1))\\nProcessing c:\\\\ligamina\\\\input\\\\wheelhouse\\\\typing_extensions-4.16.0-py3-none-any.whl (from -r C:\\\\Ligamina\\\\Input\\\\requirements.txt (line 2))\\nInstalling collected packages: typing-extensions, pydantic-core\\n\\nSuccessfully installed pydantic-core-2.50.1 typing-extensions-4.16.0\\n\",\"stderr_tail\":\"\"},\"native_diagnostic\":{\"exit_code\":0,\"stdout_tail\":\"{\\\"python_version\\\":\\\"3.12.10\\\",\\\"python_executable\\\":\\\"C:\\\\\\\\Ligamina\\\\\\\\Workspace\\\\\\\\p305-native-dll-diagnostic\\\\\\\\runtime\\\\\\\\python.exe\\\",\\\"runtime_crt_files\\\":[{\\\"name\\\":\\\"vcruntime140.dll\\\",\\\"present\\\":true,\\\"sha256\\\":\\\"052ad6a20d375957e82aa6a3c441ea548d89be0981516ca7eb306e063d5027f4\\\"},{\\\"name\\\":\\\"vcruntime140_1.dll\\\",\\\"present\\\":true,\\\"sha256\\\":\\\"6a99bc0128e0c7d6cbbf615fcc26909565e17d4ca3451b97f8987f9c6acbc6c8\\\"}],\\\"extension\\\":[{\\\"path\\\":\\\"C:\\\\\\\\Ligamina\\\\\\\\Workspace\\\\\\\\p305-native-dll-diagnostic\\\\\\\\site-packages\\\\\\\\pydantic_core\\\\\\\\_pydantic_core.cp312-win_amd64.pyd\\\",\\\"size\\\":5541888,\\\"sha256\\\":\\\"d38e098d798d381cc44f867162bc6da2ebc5d77bf444f0dd00d42a1bc8484297\\\"}],\\\"controls\\\":{\\\"_ctypes\\\":{\\\"loaded\\\":true},\\\"_ssl\\\":{\\\"loaded\\\":true},\\\"bcryptprimitives.dll\\\":{\\\"loaded\\\":true}},\\\"pydantic_core_import\\\":{\\\"loaded\\\":false,\\\"type\\\":\\\"ImportError\\\",\\\"message\\\":\\\"DLL load failed while importing _pydantic_core: 应用程序控制策略已阻止此文件。\\\"},\\\"direct_loadlibrary\\\":{\\\"loaded\\\":false,\\\"winerror\\\":4551,\\\"errno\\\":22,\\\"message\\\":\\\"[WinError 4551] 应用程序控制策略已阻止此文件。\\\"}}\\n\",\"stderr_tail\":\"\"},\"codeintegrity_events\":[{\"event_id\":3099,\"time_created_utc\":\"2026-10-25T13:32:02.5604877Z\",\"provider\":\"Microsoft-Windows-CodeIntegrity\",\"data\":{\"Options\":\"0xd1882304\",\"PolicyGUID\":\"{1678656c-05ef-481f-bc5b-ebd8c991502d}\",\"PolicyNameBuffer\":\"VerifiedAndReputableDesktopFlightSupplemental\",\"PolicyHash\":\"140CE61A30A209A23B5D43906C9BF0E8AFCD7C2CFA952F5CD04E8058EBBFAFE2\",\"PolicyNameLength\":\"45\",\"PolicyIdLength\":\"17\",\"OptionsV2\":\"0x0\",\"PolicyIdBuffer\":\"27766.241221-1700\",\"PolicyHashSize\":\"32\",\"Status\":\"0x0\"}},{\"event_id\":3099,\"time_created_utc\":\"2026-10-25T13:32:02.5604795Z\",\"provider\":\"Microsoft-Windows-CodeIntegrity\",\"data\":{\"Options\":\"0xb18c2714\",\"PolicyGUID\":\"{0283ac0f-fff1-49ae-ada1-8a933130cad6}\",\"PolicyNameBuffer\":\"VerifiedAndReputableDesktop\",\"PolicyHash\":\"2668895A5B233A80432D00D67251D7B7F52686A3FB13780F4B242C5A1F937A01\",\"PolicyNameLength\":\"27\",\"PolicyIdLength\":\"17\",\"OptionsV2\":\"0x0\",\"PolicyIdBuffer\":\"27555.1000.240208\",\"PolicyHashSize\":\"32\",\"Status\":\"0x0\"}}],\"codeintegrity_event_query_error\":null}\r\n",
+    "stderr_tail": ""
+  },
+  "guest_report": {
+    "task_id": "p305-windows-native-dll-diagnostic-v2",
+    "dependency_install": {
+      "status": "passed",
+      "exit_code": 0,
+      "stdout_tail": "Looking in links: c:\\Ligamina\\Input\\wheelhouse\nProcessing c:\\ligamina\\input\\wheelhouse\\pydantic_core-2.50.1-cp312-cp312-win_amd64.whl (from -r C:\\Ligamina\\Input\\requirements.txt (line 1))\nProcessing c:\\ligamina\\input\\wheelhouse\\typing_extensions-4.16.0-py3-none-any.whl (from -r C:\\Ligamina\\Input\\requirements.txt (line 2))\nInstalling collected packages: typing-extensions, pydantic-core\n\nSuccessfully installed pydantic-core-2.50.1 typing-extensions-4.16.0\n",
+      "stderr_tail": ""
+    },
+    "native_diagnostic": {
+      "exit_code": 0,
+      "stdout_tail": "{\"python_version\":\"3.12.10\",\"python_executable\":\"C:\\\\Ligamina\\\\Workspace\\\\p305-native-dll-diagnostic\\\\runtime\\\\python.exe\",\"runtime_crt_files\":[{\"name\":\"vcruntime140.dll\",\"present\":true,\"sha256\":\"052ad6a20d375957e82aa6a3c441ea548d89be0981516ca7eb306e063d5027f4\"},{\"name\":\"vcruntime140_1.dll\",\"present\":true,\"sha256\":\"6a99bc0128e0c7d6cbbf615fcc26909565e17d4ca3451b97f8987f9c6acbc6c8\"}],\"extension\":[{\"path\":\"C:\\\\Ligamina\\\\Workspace\\\\p305-native-dll-diagnostic\\\\site-packages\\\\pydantic_core\\\\_pydantic_core.cp312-win_amd64.pyd\",\"size\":5541888,\"sha256\":\"d38e098d798d381cc44f867162bc6da2ebc5d77bf444f0dd00d42a1bc8484297\"}],\"controls\":{\"_ctypes\":{\"loaded\":true},\"_ssl\":{\"loaded\":true},\"bcryptprimitives.dll\":{\"loaded\":true}},\"pydantic_core_import\":{\"loaded\":false,\"type\":\"ImportError\",\"message\":\"DLL load failed while importing _pydantic_core: 应用程序控制策略已阻止此文件。\"},\"direct_loadlibrary\":{\"loaded\":false,\"winerror\":4551,\"errno\":22,\"message\":\"[WinError 4551] 应用程序控制策略已阻止此文件。\"}}\n",
+      "stderr_tail": ""
+    },
+    "codeintegrity_events": [
+      {
+        "event_id": 3099,
+        "time_created_utc": "2026-10-25T13:32:02.5604877Z",
+        "provider": "Microsoft-Windows-CodeIntegrity",
+        "data": {
+          "Options": "0xd1882304",
+          "PolicyGUID": "{1678656c-05ef-481f-bc5b-ebd8c991502d}",
+          "PolicyNameBuffer": "VerifiedAndReputableDesktopFlightSupplemental",
+          "PolicyHash": "140CE61A30A209A23B5D43906C9BF0E8AFCD7C2CFA952F5CD04E8058EBBFAFE2",
+          "PolicyNameLength": "45",
+          "PolicyIdLength": "17",
+          "OptionsV2": "0x0",
+          "PolicyIdBuffer": "27766.241221-1700",
+          "PolicyHashSize": "32",
+          "Status": "0x0"
+        }
+      },
+      {
+        "event_id": 3099,
+        "time_created_utc": "2026-10-25T13:32:02.5604795Z",
+        "provider": "Microsoft-Windows-CodeIntegrity",
+        "data": {
+          "Options": "0xb18c2714",
+          "PolicyGUID": "{0283ac0f-fff1-49ae-ada1-8a933130cad6}",
+          "PolicyNameBuffer": "VerifiedAndReputableDesktop",
+          "PolicyHash": "2668895A5B233A80432D00D67251D7B7F52686A3FB13780F4B242C5A1F937A01",
+          "PolicyNameLength": "27",
+          "PolicyIdLength": "17",
+          "OptionsV2": "0x0",
+          "PolicyIdBuffer": "27555.1000.240208",
+          "PolicyHashSize": "32",
+          "Status": "0x0"
+        }
+      }
+    ],
+    "codeintegrity_event_query_error": null
+  },
+  "interpretation": "Diagnostic only. The existing ten NoneBot pilot outcomes remain unknown; this report does not revise the sealed campaign. Code Integrity events are collected from the disposable Sandbox guest after the native-load probe; an empty event list is not proof that no policy blocked the file."
+}
