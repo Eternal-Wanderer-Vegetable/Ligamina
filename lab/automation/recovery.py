@@ -13,8 +13,8 @@ from pathlib import Path
 from typing import Any
 
 from lab.artifacts import DEFAULT_CACHE_ROOT, _verify_upstream_digest, sha256_file
-from lab.automation.circuit_breaker import BackendCircuitBreaker, CircuitPolicy, CircuitOpen
-from lab.automation.dispatcher import Dispatcher
+from lab.automation.circuit_breaker import BackendCircuitBreaker, CircuitPolicy
+from lab.automation.dispatcher import dispatch_until_idle
 from lab.automation.health import collect_linux_health
 from lab.automation.reconcile import DockerReconciler, reconcile_expired_attempts
 from lab.automation.selection import ROOT, AutomationContractError, object_sha256, sha256, validate_manifest
@@ -624,7 +624,7 @@ def execute_linux_recovery_pilot(
     timeout_seconds: int | None = None,
     now: float | None = None,
 ) -> dict[str, Any]:
-    """Run a frozen 20-unit Linux pilot in a new fenced queue and emit old→new rows."""
+    """Run a frozen Linux recovery campaign in its fenced queue and emit old→new rows."""
     manifest, manifest_raw = _read_json(manifest_path)
     validation = validate_linux_pilot_manifest(manifest)
     frozen_timeout = manifest.get("worker_limits", {}).get("timeout_seconds", 1200)
@@ -715,7 +715,8 @@ def execute_linux_recovery_pilot(
     from lab.automation.host_lock import HostLock
     lock = HostLock(ROOT / ".work" / "automation" / "linux-controller.lock")
     lock.acquire()
-    breaker_cfg = json.loads((ROOT / "config/lab/phase3-automation-v1.json").read_text(encoding="utf-8"))["campaign_policy"]["circuit_breaker"]
+    campaign_policy = json.loads((ROOT / "config/lab/phase3-automation-v1.json").read_text(encoding="utf-8"))["campaign_policy"]
+    breaker_cfg = campaign_policy["circuit_breaker"]
     breaker = BackendCircuitBreaker(CircuitPolicy(
         consecutive_failures=breaker_cfg["consecutive_failures"], window_size=breaker_cfg["window_size"],
         window_failures=breaker_cfg["window_failures"], cooldown_seconds=breaker_cfg["cooldown_seconds"],
@@ -770,21 +771,13 @@ def execute_linux_recovery_pilot(
         probe = install.get("probe_result", {})
         return _project_worker_stage_result(job["stage"], probe, install.get("probe_result_sha256"))
 
-    dispatcher = Dispatcher(
-        queue, manifest["campaign_id"], f"p3-linux-{manifest['campaign_id'][-12:]}", execute, breaker,
-        heartbeat_seconds=20, lease_seconds=120,
-    )
-    infrastructure_stop = False
     try:
-        while True:
-            try:
-                outcome = dispatcher.dispatch_one()
-            except CircuitOpen:
-                queue.interrupt_run(manifest["campaign_id"])
-                infrastructure_stop = True
-                break
-            if outcome is None:
-                break
+        infrastructure_stop = dispatch_until_idle(
+            queue, manifest["campaign_id"], f"p3-linux-{manifest['campaign_id'][-12:]}", execute, breaker,
+            worker_count=campaign_policy["initial_linux_concurrency"],
+            heartbeat_seconds=campaign_policy["heartbeat_seconds"],
+            lease_seconds=campaign_policy["lease_seconds"],
+        )
     finally:
         lock.release()
 

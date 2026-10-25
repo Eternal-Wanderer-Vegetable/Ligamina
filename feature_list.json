@@ -1414,7 +1414,7 @@
       ],
       "status": "in-progress",
       "done_when": "Linux 完成 pilot 和选中集合执行/归因；Windows 仅 P3-04 通过后执行，否则明确剩余范围与 blocked gate；每 OS 独立裁决，原报告不改写。",
-      "evidence": "2026-10-25: semantics-v3 preserves CommonJS inject metadata and performs Host-service preflight before plugin callbacks. Full P3-01 Linux cache audit found exact artifact SHA and profile-lock SHA/size for 2,206/2,206 entries. The new 20-unit pilot p3-recovery-linux-b9518c95b224 closed 20/20 units and 60/60 required stages: 11 recovered, 9 plugin/stage failed, 0 unknown, 0 not_run, cleanup 20/20, infrastructure_blocker=false, health passed; plugin compatibility remains not_evaluated. The full affected-linux scope is frozen as p3-recovery-linux-842f71712e2c (414 NoneBot, 1,792 Koishi) with per-entry core-only Koishi Host profiles and exact archive-size overrides. A fresh Linux admission and 10/10 benign Worker probes passed; the 2,206-unit Docker campaign is active. P3-05 remains in-progress pending full campaign closure and attribution; Windows catalog plugins were not run.",
+      "evidence": "2026-10-25: semantics-v3 preserves CommonJS inject metadata and performs Host-service preflight before plugin callbacks. Full P3-01 Linux cache audit found exact artifact SHA and profile-lock SHA/size for 2,206/2,206 entries. The new 20-unit pilot p3-recovery-linux-b9518c95b224 closed 20/20 units and 60/60 required stages: 11 recovered, 9 plugin/stage failed, 0 unknown, 0 not_run, cleanup 20/20, infrastructure_blocker=false, health passed; plugin compatibility remains not_evaluated. The full affected-linux scope is frozen as p3-recovery-linux-842f71712e2c (414 NoneBot, 1,792 Koishi) with per-entry core-only Koishi Host profiles and exact archive-size overrides. A fresh Linux admission and 10/10 benign Worker probes passed before execution; the serial Docker campaign was safely paused at 56/2,206 terminal units with cleanup confirmed and no active leases. P3-05 remains in-progress pending full campaign closure and attribution; Windows catalog plugins were not run. Bounded Linux dispatch now uses a shared thread-safe circuit breaker and the configured maximum of two workers; it stops new claims on backend loss and preserves fenced interruption/resume semantics. Linux WSL passed all 38 focused dispatcher/recovery/queue tests with no skips; its log/report hash is recorded in phase3-p305-concurrency-dispatch-linux-tests-20261025.json. A separate earlier Windows-host unit run recorded 37 passed plus one Linux-only host-lock skip and did not launch Sandbox or catalog plugins; see phase3-p305-concurrency-dispatch-tests-20261025.json. Documentation validation passed 19 documents/298 links and harness validation scored 100/100; both summaries have hash-bound acceptance reports. Resume preflight for the unchanged 2,206-unit manifest passed with 10/10 benign Worker probes, 10/10 cleanup confirmations, admitted Linux health fingerprint e4526a08f45c2ada598c479aa819fcc4a882aacb8acca8ec407885b39ad5c264; execution is ready to resume from the interrupted SQLite queue.",
       "evidence_paths": [
         "outputs/acceptance/phase3-p305-linux-cache-audit-20261025.json",
         "outputs/acceptance/phase3-p305-linux-admission-final-20261025.json",
@@ -1449,7 +1449,17 @@
         "docs/guides/development.md",
         "outputs/acceptance/phase3-p305-affected-manifest-focused-tests-20261025.json",
         "outputs/acceptance/phase3-docs-check-p305-affected-v3-20261025.json",
-        "outputs/acceptance/phase3-docs-check-p305-affected-v3-20261025.log"
+        "outputs/acceptance/phase3-docs-check-p305-affected-v3-20261025.log",
+        "lab/automation/dispatcher.py",
+        "lab/automation/circuit_breaker.py",
+        "lab/tests/test_automation_dispatcher.py",
+        "outputs/acceptance/phase3-p305-concurrency-dispatch-tests-20261025.json",
+        "outputs/acceptance/phase3-p305-concurrency-dispatch-linux-tests-20261025.json",
+        "outputs/acceptance/phase3-p305-concurrency-docs-20261025.json",
+        "outputs/acceptance/phase3-p305-concurrency-harness-20261025.json",
+        "outputs/acceptance/phase3-p305-linux-workers-affected-v3-resume-20261025.json",
+        "outputs/acceptance/phase3-p305-linux-admission-affected-v3-resume-20261025.json",
+        "outputs/acceptance/phase3-p305-concurrency-resume-preflight-20261025.json"
       ],
       "plan_path": "docs/plans/2026-10-20-phase-3-automation.md",
       "baseline": {

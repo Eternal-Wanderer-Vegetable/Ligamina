@@ -11,7 +11,7 @@ from subprocess import CompletedProcess
 from unittest.mock import patch
 
 from lab.automation.circuit_breaker import BackendCircuitBreaker, CircuitPolicy
-from lab.automation.dispatcher import Dispatcher
+from lab.automation.dispatcher import Dispatcher, dispatch_until_idle
 from lab.automation.host_lock import HostLock
 from lab.automation.reconcile import DockerReconciler, ReconciliationResult, reconcile_expired_attempts
 from lab.queue import QueueError, StageQueue
@@ -60,6 +60,95 @@ class AutomationDispatchTests(unittest.TestCase):
         result = dispatcher.dispatch_one()
         self.assertTrue(result["committed"])
         self.assertGreaterEqual(sum(item["event_type"] == "lease_renewed" for item in self.queue.journal("campaign")), 1)
+
+    def test_dispatch_pool_runs_up_to_two_workers_and_drains_the_queue(self) -> None:
+        jobs = [{
+            "unit_id": f"unit-{index}", "registry_entry_id": f"entry-{index}", "ecosystem": "nonebot",
+            "platform": "linux", "profile_id": "profile", "stage": "probe", "case_id": "case",
+            "payload": {},
+        } for index in range(4)]
+        self.queue.enqueue_jobs("campaign", jobs, now=11)
+        active = 0
+        peak_active = 0
+        guard = threading.Lock()
+        both_workers_started = threading.Barrier(2)
+
+        def execute(job, lost):
+            nonlocal active, peak_active
+            with guard:
+                active += 1
+                peak_active = max(peak_active, active)
+            try:
+                both_workers_started.wait(timeout=2)
+                time.sleep(.02)
+                return {"status": "passed", "cleanup_confirmed": True}
+            finally:
+                with guard:
+                    active -= 1
+
+        breaker = BackendCircuitBreaker(clock=time.time)
+        stopped_for_infrastructure = dispatch_until_idle(
+            self.queue, "campaign", "workers", execute, breaker,
+            worker_count=2, heartbeat_seconds=.01, lease_seconds=2,
+        )
+
+        self.assertFalse(stopped_for_infrastructure)
+        self.assertEqual(peak_active, 2)
+        self.assertEqual(self.queue.run("campaign")["state"], "completed")
+        self.assertEqual([item["status"] for item in self.queue.list_jobs("campaign")], ["passed"] * 4)
+        self.assertEqual({item["worker_id"] for item in self.queue.list_attempts("campaign")}, {"workers-1", "workers-2"})
+
+    def test_dispatch_pool_rejects_more_than_two_workers(self) -> None:
+        with self.assertRaisesRegex(ValueError, "worker_count must be between 1 and 2"):
+            dispatch_until_idle(
+                self.queue, "campaign", "workers", lambda job, lost: {"status": "passed"},
+                BackendCircuitBreaker(clock=time.time), worker_count=3,
+            )
+
+    def test_dispatch_pool_interrupts_after_backend_loss_and_resumes_without_lost_leases(self) -> None:
+        jobs = [{
+            "unit_id": f"unit-{index}", "registry_entry_id": f"entry-{index}", "ecosystem": "nonebot",
+            "platform": "linux", "profile_id": "profile", "stage": "probe", "case_id": "case",
+            "payload": {},
+        } for index in range(3)]
+        self.queue.enqueue_jobs("campaign", jobs, now=11)
+        lock = threading.Lock()
+        started = threading.Barrier(2)
+        calls = 0
+
+        def flaky_execute(job, lost):
+            nonlocal calls
+            with lock:
+                calls += 1
+                call_number = calls
+            started.wait(timeout=2)
+            if call_number == 1:
+                return {"status": "unknown", "reason_code": "worker_backend_unavailable", "cleanup_confirmed": True}
+            time.sleep(.02)
+            return {"status": "passed", "cleanup_confirmed": True}
+
+        first_breaker = BackendCircuitBreaker(clock=time.time)
+        stopped_for_infrastructure = dispatch_until_idle(
+            self.queue, "campaign", "workers", flaky_execute, first_breaker,
+            worker_count=2, heartbeat_seconds=.01, lease_seconds=2,
+        )
+
+        self.assertTrue(stopped_for_infrastructure)
+        self.assertEqual(self.queue.run("campaign")["state"], "interrupted")
+        self.assertEqual(self.queue.counts("campaign")["leased"], 0)
+        self.assertEqual(self.queue.counts("campaign")["queued"], 1)
+
+        self.queue.resume_run("campaign", now=12)
+        resumed_breaker = BackendCircuitBreaker(clock=time.time)
+        stopped_for_infrastructure = dispatch_until_idle(
+            self.queue, "campaign", "resume", lambda job, lost: {"status": "passed", "cleanup_confirmed": True},
+            resumed_breaker, worker_count=2, heartbeat_seconds=.01, lease_seconds=2,
+        )
+
+        self.assertFalse(stopped_for_infrastructure)
+        self.assertEqual(self.queue.run("campaign")["state"], "completed")
+        self.assertEqual(self.queue.counts("campaign")["unknown"], 1)
+        self.assertEqual(self.queue.counts("campaign")["passed"], 2)
 
     def test_expired_fenced_lease_stays_interrupted_until_cleanup_evidence(self) -> None:
         claim = self.queue.claim("campaign", "same-owner", lease_seconds=1, now=10)

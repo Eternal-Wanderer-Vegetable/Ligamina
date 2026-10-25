@@ -93,4 +93,77 @@ class Dispatcher:
                 return
 
 
-__all__ = ["Dispatcher", "CircuitOpen"]
+def dispatch_until_idle(
+    queue: StageQueue,
+    run_id: str,
+    worker_id_prefix: str,
+    execute: Callable[[dict[str, Any], threading.Event], dict[str, Any]],
+    breaker: BackendCircuitBreaker,
+    *,
+    worker_count: int = 1,
+    heartbeat_seconds: float = 20,
+    lease_seconds: float = 120,
+) -> bool:
+    """Drain a run with a bounded worker pool; return whether infrastructure stopped it."""
+    if worker_count < 1 or worker_count > 2:
+        raise ValueError("worker_count must be between 1 and 2")
+    if not worker_id_prefix:
+        raise ValueError("worker_id_prefix must not be empty")
+
+    stop = threading.Event()
+    stop_lock = threading.Lock()
+    errors_lock = threading.Lock()
+    infrastructure_stop = False
+    errors: list[BaseException] = []
+
+    def request_stop(*, infrastructure: bool = False, interrupt: bool = False) -> None:
+        nonlocal infrastructure_stop
+        with stop_lock:
+            infrastructure_stop = infrastructure_stop or infrastructure
+            if stop.is_set():
+                return
+            stop.set()
+            if interrupt and queue.run(run_id)["state"] == "running":
+                queue.interrupt_run(run_id)
+
+    def worker(index: int) -> None:
+        try:
+            dispatcher = Dispatcher(
+                queue, run_id, f"{worker_id_prefix}-{index}", execute, breaker,
+                heartbeat_seconds=heartbeat_seconds, lease_seconds=lease_seconds,
+            )
+            while not stop.is_set():
+                try:
+                    outcome = dispatcher.dispatch_one()
+                except CircuitOpen:
+                    request_stop(infrastructure=True, interrupt=True)
+                    return
+                except QueueError:
+                    if stop.is_set() or queue.run(run_id)["state"] != "running":
+                        request_stop()
+                        return
+                    raise
+                if outcome is None:
+                    return
+                if not breaker.allow_dispatch():
+                    request_stop(infrastructure=True, interrupt=True)
+                    return
+        except BaseException as error:
+            with errors_lock:
+                errors.append(error)
+            request_stop(interrupt=True)
+
+    threads = [
+        threading.Thread(target=worker, args=(index,), name=f"dispatcher-{index}")
+        for index in range(1, worker_count + 1)
+    ]
+    for thread in threads:
+        thread.start()
+    for thread in threads:
+        thread.join()
+    if errors:
+        raise errors[0]
+    return infrastructure_stop
+
+
+__all__ = ["Dispatcher", "CircuitOpen", "dispatch_until_idle"]
