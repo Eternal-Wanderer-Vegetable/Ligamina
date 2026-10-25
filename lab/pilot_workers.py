@@ -360,6 +360,12 @@ const npm = spawnSync(npmCommand, npmArgs, {
 })
 const tail = (value) => String(value ?? '').slice(-4096)
 const digest = (value) => createHash('sha256').update(value ?? '').digest('hex')
+const writeReportAndExit = (value) => new Promise((resolve) => {
+  process.stdout.write(`${JSON.stringify(value)}\n`, () => {
+    process.exit(0)
+    resolve()
+  })
+})
 const report = {
   schema_version: 1,
   task_id: 'S2-09',
@@ -394,8 +400,7 @@ if (npmRuntimeLine) {
 if (npm.error || npm.status !== 0) {
   if (npm.error?.code === 'ETIMEDOUT') report.dependency_install.reason_code = 'dependency_install_timeout'
   report.resource_observations = await stopScratchSampler()
-  console.log(JSON.stringify(report))
-  process.exit(0)
+  await writeReportAndExit(report)
 }
 
 let app
@@ -483,7 +488,7 @@ try {
 }
 
 report.resource_observations = await stopScratchSampler()
-console.log(JSON.stringify(report))
+await writeReportAndExit(report)
 """,
         encoding="utf-8",
         newline="\n",
