@@ -297,6 +297,12 @@ PR 必跑不依赖实验机的 schema/selection/queue/comparator/fixture 校验�
 - Koishi 使用 Node 24.20.0 官方哈希锁定 runtime 和 16 GiB Sandbox。结果：4 个 native load 正常但因缺 entry-bound behavior fixture 而 skipped；4 个 required Host service 不在空 provider profile 而 skipped；另 2 个 native load failed，分别为 `sqlite3` 安装脚本被禁用后没有 `node_sqlite3.node`，以及插件引用未冻结进 Host profile 的 optional peer `@koishijs/plugin-console`。这两项记录保留 failed，但属于加载/依赖配置证据，不单独形成行为兼容结论。行为 gate 保持 `not_evaluated`。
 - 复跑器 `scripts/phase3-windows-pilot.py` 支持冻结身份校验、单控制器互斥锁、串行派发、原子 checkpoint/恢复和最终报告幂等复核；定向 `py_compile` 与 `lab.tests.test_profiles lab.tests.test_catalog_run lab.tests.test_pilot_nonebot lab.tests.test_pilot_workers` 34/34 通过。另增加中性 reason code `windows_native_extension_load_unattributed`：DLL load failed 而没有明确 policy marker 时仍记 unknown，不推断 App Control。Windows affected 总分母 973（796 NoneBot /177 Koishi）；pilot 已执行各 10 个，仍有 953 个（786/167）未完成。P3-05 保持 in-progress，P3-08/P3-10 暂不可开始。
 
+### P3-05 Windows native DLL attribution（2026-10-25；diagnostic-only）
+
+- 为归因 pilot 中十个相同的 `pydantic_core._pydantic_core` 导入错误，使用独立 Sandbox 诊断运行锁定的 CPython 3.12.10、`pydantic-core==2.50.1` wheel SHA-256 `132529c83901437ff642f585216831bf5fd7a91df66829907e155192ead62498` 和 `typing-extensions==4.16.0`。未安装或加载任何 catalog plugin，未更改既有 campaign 的终态。
+- Sandbox 中 `_ctypes`、`_ssl` 与 `bcryptprimitives.dll` control load 成功；官方 runtime archive 内含 `vcruntime140.dll` 与 `vcruntime140_1.dll`。对锁定的 `_pydantic_core.cp312-win_amd64.pyd`（SHA-256 `d38e098d798d381cc44f867162bc6da2ebc5d77bf444f0dd00d42a1bc8484297`）执行 import 和直接 LoadLibrary 都复现失败，后者捕获到 WinError 4551：App Control policy blocked this file。报告：[native DLL diagnostic](../../outputs/acceptance/phase3-p305-windows-native-dll-diagnostic-20261025.json)，SHA-256 `66646448fc2dedd3a4d311fcf0d2e8ce6163832abe01f1fcf4b81d778837d013`；可复跑脚本：[phase3-windows-native-dll-diagnostic.py](../../scripts/phase3-windows-native-dll-diagnostic.py)。
+- 此诊断将十个 pilot unknown 的共同失败定位到 Sandbox 的原生扩展加载策略层，不构成插件行为结论，也不将 unknown 改写为通过。没有 Sandbox 权限错误；不在宿主机运行插件、不关闭 App Control。继续覆盖 Python 条目需要获批的 Sandbox policy/签名方案和新的冻结 profile lock；Koishi native profile 仍需纳入 sqlite3 binding 与 `@koishijs/plugin-console` provider。Windows 全量 affected 集合还有 953 项未执行，P3-05 继续 in-progress，P3-08/P3-10 仍不可开始。
+
 ### P3-05 Koishi Host-service probe 修复（2026-10-25；Linux diagnostics 完成）
 
 - 复核 frozen `koishi-plugin-auto-checkin-all@1.0.3` 发布物后发现 CommonJS 模块并列导出 `apply` 与 `inject`；probe 原来只选择 `loaded.apply`，丢弃 required-service 声明。该 loader 缺陷使 Koishi Core 把插件回调放入等待队列，而插件自身又重试查询，最终表现成 180 秒 Worker timeout。
