@@ -342,7 +342,10 @@ PR 必跑不依赖实验机的 schema/selection/queue/comparator/fixture 校验�
 
 - 2026-10-25T16:01:35Z observation；checkpoint SHA 0281193a598a6403e79e0d131f84a16d87b2628019d10d2d9c7858cb6aafe097：189/786 settled，passed=0、failed=65、skipped=122、unknown=2、cleanup confirmed=187、cleanup_unconfirmed=0、remaining=597；status in-progress、health blocked、behavior not_evaluated。checkpoint 内容稳定且 sidecar SHA 匹配；manifest canonical/file SHA、profile-lock SHA 与 admission SHA 均与冻结值匹配。controller PID 33984 仍运行；Sandbox 98ff9031-8743-48f1-93bd-404588b562fd 活动，wsb.exe 子进程 PID 23172 正在采集 guest 输出，最终报告尚未生成。两个 SSL metadata worker-preparation unknown 保持未知；没有 Sandbox 权限错误，不重复派发或重跑终态。
 
+
 - 2026-10-25T16:02:28Z observation；checkpoint SHA cf3ef103080a84cc6849895eb568492183482a36233c7954bb32339d58d44167：192/786 settled，passed=0、failed=65、skipped=125、unknown=2、cleanup confirmed=190、cleanup_unconfirmed=0、remaining=594；status in-progress、health blocked、behavior not_evaluated。checkpoint 内容稳定且 sidecar SHA 匹配；manifest canonical/file SHA、profile-lock SHA 与 admission SHA 均与冻结值匹配。controller PID 33984 仍运行；采样时无活动 Sandbox/Worker，最终报告尚未生成。两个 SSL metadata worker-preparation unknown 保持未知；没有 Sandbox 权限错误，不重复派发或重跑终态。
+- 2026-10-25T16:19:59Z observation；checkpoint SHA a1bb78b98a0c5210884066cf41954b85b4013b3a4a8eedead523f0feec83e8df：246/786 settled，passed=0、failed=81、skipped=162、unknown=3、cleanup confirmed=243、cleanup_unconfirmed=0、remaining=540；status in-progress、health blocked、behavior not_evaluated。checkpoint 及 sidecar SHA 匹配；manifest canonical/file SHA、profile-lock SHA 与 admission SHA 均保持冻结值。controller PID 33984 运行；Sandbox c636d807-c425-4d69-a130-bc147840c84c 活动，wsb.exe exec PID 22812 正在运行；最终报告尚未生成。3 个 PyPI metadata TLS unexpected EOF worker-preparation unknown 保持未知；checkpoint 未显示 Sandbox 权限错误，不重复派发或重跑。
+
 
 ### P3-05 Koishi Host-service probe 修复（2026-10-25；Linux diagnostics 完成）
 
