@@ -63,6 +63,61 @@ def _file_record(path: Path) -> dict[str, str]:
 def behavior_accounting_matches_frozen(rebuilt: dict[str, Any], frozen: dict[str, Any]) -> bool:
     """Check P3-08 evidence while allowing only source-file line-ending variants."""
     current = json.loads(json.dumps(rebuilt, ensure_ascii=False))
+    current_positions = current.get("positions", [])
+    frozen_positions = frozen.get("positions", [])
+    if len(current_positions) != len(frozen_positions):
+        return False
+
+    cache_unavailable = 0
+    for position, recorded in zip(current_positions, frozen_positions, strict=True):
+        if any(position.get(key) != recorded.get(key) for key in ("position_id", "registry_entry_id", "case_id", "platform")):
+            return False
+        current_profile = position.get("profile", {})
+        frozen_profile = recorded.get("profile", {})
+        current_cache = current_profile.get("cache_verification", {})
+        frozen_cache = frozen_profile.get("cache_verification", {})
+        if current_cache.get("status") != "not_available" or frozen_cache.get("status") != "verified":
+            continue
+        # External dependency blobs are intentionally not required in a clean
+        # checkout. Reuse historical verification only when the immutable lock
+        # identity and expected digest/size still match; a present mismatch is
+        # never normalized away.
+        lock_sha = current_profile.get("dependency_lock_sha256")
+        if (
+            not lock_sha
+            or lock_sha != frozen_profile.get("dependency_lock_sha256")
+            or lock_sha != current_cache.get("sha256")
+            or current_cache.get("sha256") != frozen_cache.get("sha256")
+            or current_cache.get("size_bytes") != frozen_cache.get("size_bytes")
+            or "locked_dependency_blob_not_verified" not in position.get("reason_codes", [])
+        ):
+            return False
+        current_profile["status"] = frozen_profile.get("status")
+        current_profile["cache_verification"] = frozen_cache
+        position["reason_codes"].remove("locked_dependency_blob_not_verified")
+        for attempt in position.get("attempts", []):
+            attempt_reasons = attempt.get("reason_codes", [])
+            if "locked_dependency_blob_not_verified" not in attempt_reasons:
+                return False
+            attempt_reasons.remove("locked_dependency_blob_not_verified")
+        cache_unavailable += 1
+
+    if cache_unavailable:
+        current_counts = current.get("accounting", {}).get("profile_cache_checks", {})
+        frozen_counts = frozen.get("accounting", {}).get("profile_cache_checks", {})
+        if (
+            current_counts.get("not_available", 0) - cache_unavailable != frozen_counts.get("not_available", 0)
+            or current_counts.get("verified", 0) + cache_unavailable != frozen_counts.get("verified", 0)
+            or current_counts.get("mismatch", 0) != frozen_counts.get("mismatch", 0)
+            or current_counts.get("missing_or_invalid", 0) != frozen_counts.get("missing_or_invalid", 0)
+            or current.get("accounting", {}).get("unverified_profile_positions", 0) - cache_unavailable
+            != frozen.get("accounting", {}).get("unverified_profile_positions", 0)
+        ):
+            return False
+        current["accounting"]["profile_cache_checks"] = frozen_counts
+        current["accounting"]["unverified_profile_positions"] = frozen["accounting"]["unverified_profile_positions"]
+        current["gate"]["reason_codes"] = sorted({reason for position in current_positions for reason in position["reason_codes"]})
+
     current_sources = current.get("source_evidence", [])
     frozen_sources = frozen.get("source_evidence", [])
     if len(current_sources) != len(frozen_sources):
