@@ -2,16 +2,21 @@
 
 ## Current Objective
 
-- **P3-05 已完成执行/归因闭合（2026-10-26）。** Linux 2,206 项与 Windows 973 个唯一受影响项全部有终态；六项 Koishi HTTP v4 为同一批次旧条目的补充归因，不增加分母。闭合审计 [脚本](scripts/phase3-p305-closure-audit.py) 输出 [总报告](outputs/acceptance/phase3-p305-overall-closure-20261026.json)，canonical SHA `c6bcaf6841100f5b66afd2356ad4c2891dbf713ec1bdf4bb7120a8e6b8429692`，file SHA `e9dc78cb2da54a7a99476664ee057ec0b029da23cb311a7c22625c1b200dd886`。3,179 个唯一单位：passed=1,299、failed=688、skipped=1,139、unknown=53、remaining=0；未确认清理=0。39 个 Linux、10 个旧 Windows pilot、4 个 NoneBot 准备阶段 unknown 均保持 unknown。健康 gate 仍 blocked，行为兼容 `not_evaluated`；SAC Evaluation/Audit Mode 不证明 enforcement acceptance。P3-08/P3-10 没有在此任务中启动。
-- **最终验证：** 闭合审计检查了来源 manifest SHA、分组互斥/完备、逐项 report identity、profile lock、report SHA sidecar、v1/v3/v4 supersession 链和结果投影；Linux 2,206 report 与冻结 manifest canonical SHA 对账。Python 3.14 `py_compile` 通过，`git diff --check` 通过，`pwsh -NoProfile -File init.ps1 -Mode docs` 通过（19 documents / 355 local links / 11 indexed historical Markdown / 24 features）。未运行测试套件、`init.ps1 -Mode full`、Windows full smoke、宿主机 catalog plugin。
-- **收尾完成（2026-10-26）：** 用户明确授权终止活动会话并重启 Ubuntu-24.04；terminate/relaunch 已执行。重启后 PID 1 于 2026-10-26 12:18:34（本地时间）启动；ext4 队列仍为 `completed`、`PRAGMA quick_check=ok`，2,206 units 对应 8,824 个终态 stage jobs：passed=7,830、failed=315、skipped=602、unknown=77、queued=leased=0。重启后的进程检查未发现 P3-05 controller/Worker、运行容器或 Windows Sandbox；短暂核验仅见 Docker daemon/containerd 与 pts/1 登录 shell。之后的 `wsl --list --running --verbose` 显示 Ubuntu-24.04 和 docker-desktop 均为 `Stopped`。未以 boot ID 声称内核重启。闭合报告身份保持不变；53 个跨平台 unknown 保持 unknown，health=blocked、plugin compatibility=`not_evaluated`。
-- **不要重跑：** 已终态的 Linux、Windows pilot、NoneBot、Koishi 和 HTTP follow-up campaign。后续任务应独立处理 53 个 unknown 的证据缺口与健康 gate；不能将其转为 pass，也不能把 P3-05 的执行闭合表述成插件兼容通过。
+- **P3-05 execution/attribution closed (2026-10-26).** Linux 2,206 + Windows 973 = 3,179 unique units; passed=1,299, failed=688, skipped=1,139, unknown=53, remaining=0, cleanup_unconfirmed=0. Six Koishi HTTP v4 outcomes re-attribute existing rows. Canonical closure SHA `c6bcaf6841100f5b66afd2356ad4c2891dbf713ec1bdf4bb7120a8e6b8429692`; file SHA `e9dc78cb2da54a7a99476664ee057ec0b029da23cb311a7c22625c1b200dd886`. Health remains blocked; Evaluation/Audit Mode is not enforcement acceptance.
+- **P3-08 accounting delivered with dispatch blockers.** The frozen 20-entry / 60-case suite maps to 120 Linux/Windows positions and 360 attempt slots. Every position is dependency-attributed because executable Host event/setup fixtures are absent; 0 attempts dispatched, 360 not_dispatched, cleanup is not applicable before Worker start. Report [behavior accounting](outputs/acceptance/phase3-p308-behavior-accounting-20261026.json): canonical SHA `2401714f4fe64d52e9e4ccd07c8ec3b332e3dd3077b1d361d240284e2433b389`, file SHA `3daaf8aa387bb01b26ae72ca0a8bd6db9b1e0ab9f192a5ddd3d054f928e0e1f5`. P3-BEHAVIOR stays `not_evaluated`.
+- **P3-10 audit deliverable completed with separate gate rulings.** Denominators were independently recalculated: 5,690 catalog entries / 11,380 entry×OS positions; P3-05 2,206 Linux + 973 Windows = 3,179; P3-08 120 positions / 360 slots. Rulings: P3-ENGINE=`passed_scoped` (admitted backend profiles only); P3-RECOVERY=`blocked` (53 terminal unknowns); P3-AUTOMATION=`blocked` (same unknowns and deployment-side runner status unverified); P3-BEHAVIOR=`not_evaluated`; P3-FIELD=`not_run`. No support expansion. Audit report file SHA `716efa2e9af8537506e26215c231ef68bf8b30585d61e070bffff76237692b90`; 3,179-row matrix SHA `7b777a2e4cc23f499c7b0b5ba49001126fdb87d71d08f1b14d46022e9d130b3d`.
+- **验证：** P3-08/P3-10 定向回归 8/8、Python 3.14 `py_compile`、两份账本 `--check`、README evidence renderer `--check` 与 P3-05 closure 证据复核通过。`pwsh -NoProfile -File init.ps1 -Mode docs` 通过（19 documents / 366 local links / 12 indexed historical Markdown / 24 features），`git diff --check` 通过。没有运行目录插件、Windows full smoke、P3-08 Worker 或 `init.ps1 -Mode full`。
+- **后续 gate blockers：** 53 个 P3-05 unknown 保持未知；行为 fixture 需要新冻结、可执行 Host adapters/setup/oracles；Windows P3-04 仅准入 CPython 3.12.10 runtime，`catalog_plugin_claims_allowed=false`；GitHub runner/Environment 部署状态未由本地证据确认；真实平台 field acceptance 未执行。不要重跑已终态 campaign 或把报告交付解释为 gate 通过。
 
 ## Resume Commands
 
-- 复核 P3-05 聚合：`C:\Python314\python.exe scripts/phase3-p305-closure-audit.py --check`；该只读模式重验冻结输入并与已保存闭合报告比较，不写入或覆盖证据。
-- 核对最终报告 sidecar：`Get-FileHash outputs/acceptance/phase3-p305-overall-closure-20261026.json -Algorithm SHA256`，与 `.sha256` 文件比较；再核对 `report_sha256` canonical identity。
-- 查看运行状态：`git status --short`、`wsl --list --running`、`wsb.exe list`；不要启动任何已闭合 campaign。
+- 复核 P3-08：`C:\Python314\python.exe scripts/phase3-p308-behavior-accounting.py --report outputs/acceptance/phase3-p308-behavior-accounting-20261026.json --check`。
+- 复核 P3-10 audit 与矩阵：`C:\Python314\python.exe scripts/phase3-p310-gate-audit.py --check`。
+- 定向回归：`C:\Python314\python.exe -m unittest lab.tests.test_automation_behavior_campaign lab.tests.test_automation_gate_audit -v`。
+- README/docs：`node scripts/render-readme.mjs --check`、`pwsh -NoProfile -File init.ps1 -Mode docs`。
+- 复核 P3-05 聚合：`C:\Python314\python.exe scripts/phase3-p305-closure-audit.py --check`；只读重验冻结输入及 closure report。
+- 核对 P3-05 closure file sidecar：`Get-FileHash outputs/acceptance/phase3-p305-overall-closure-20261026.json -Algorithm SHA256`，与 sidecar 比较，再核对 `report_sha256` canonical identity。
+- 查看环境：`git status --short`、`wsl --list --running`、`wsb.exe list`；不要启动任何已闭合 campaign，也不要把未知 Sandbox 据此归属本任务。
 
 ## Historical S2 Objective (2026-10-17)
 

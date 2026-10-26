@@ -92,6 +92,26 @@ S2-11 同冻结快照复跑截至 2026-10-17T02:25:14+08:00：512/512 份 canoni
 证据：[目录快照](outputs/acceptance/phase2-catalog-snapshot-20261012.json)、[分类 dry run](outputs/acceptance/phase2-s206-20261012.json)、[调度验收](outputs/acceptance/phase2-s207-20261012.json)、[S2-07 实际 CLI 计划](outputs/acceptance/phase2-s207-cli-smoke-20261012.json)、[S2-08 报告验收](outputs/acceptance/phase2-s208-20261012.json)、[S2-09 baseline](outputs/acceptance/phase2-s209-baseline-20261012.json)、[S2-09 pilot 清单](outputs/acceptance/phase2-s209-pilot-manifest-20261012.json)、[S2-09 pilot 结果](outputs/acceptance/phase2-s209-20261012.json)、[S2-10 baseline](outputs/acceptance/phase2-s210-baseline-20261012.json)、[S2-10 实现验证](outputs/acceptance/phase2-s210-implementation-20261012.json)、[S2-10 smoke shard](outputs/acceptance/phase2-s210-census-linux-shard0of256-smoke-20261012.json)、[S2-10 正式 Linux shard 0](outputs/acceptance/phase2-s210-census-linux-shard0of256-20261012.json)、[S2-10 正式 Linux shard 1](outputs/acceptance/phase2-s210-census-linux-shard1of256-20261012.json)、[S2-10 正式 Linux shard 2](outputs/acceptance/phase2-s210-census-linux-shard2of256-20261012.json)、[S2-10 正式 Windows shard 0](outputs/acceptance/phase2-s210-census-windows-shard0of256-20261012.json)、[S2-10 正式 Windows shard 1](outputs/acceptance/phase2-s210-census-windows-shard1of256-20261012.json)、[Windows 首次投影 attempt](outputs/acceptance/phase2-s210-census-windows-shard0of256-attempt1-20261012.json)、[S2-10 当前未闭合汇总](outputs/acceptance/phase2-s210-census-interim-20261012.json)、[S2-11 复跑 checkpoint](outputs/acceptance/phase2-s211-process-exit-regression-20261014.json)、[S2-12 审计](outputs/acceptance/phase2-s212-audit-20261017.json)、[兼容矩阵](outputs/acceptance/phase2-s212-compatibility-matrix-20261017.md)、[完整实施计划](docs/plans/2026-10-12-phase-2-full-catalog.md)。
 <!-- ligamina:phase2:end -->
 
+## 第三阶段
+
+<!-- ligamina:phase3:start -->
+P3-01–P3-10 工程与报告交付已推进至 P3-10；这不代表五道门均通过，也不扩张插件支持范围。
+
+P3-05 受影响账本：3,179/3,179 唯一单位有终态；通过 / 失败 / 跳过 / 未知 1299 / 688 / 1139 / 53；健康 gate blocked。
+P3-08 双平台行为账本：120 个位置、360 个三次尝试槽，实际派发 0 次；可执行 Host fixture 缺失，P3-BEHAVIOR 保持 not evaluated。
+
+| Gate | 裁决 | 范围与边界 |
+| --- | --- | --- |
+| P3-ENGINE | **passed_scoped** | Windows catalog_plugin_claims_allowed=false |
+| P3-RECOVERY | **blocked** | 53 terminal unknown outcomes remain: Linux 39, Windows 14. |
+| P3-AUTOMATION | **blocked** | The same 53 P3-05 unknowns block automation health. |
+| P3-BEHAVIOR | **not_evaluated** | 0 attempts dispatched; all 120 positions lack executable Host event/setup bindings. |
+| P3-FIELD | **not_run** | No real-platform acceptance was included in this plan. |
+
+证据：[P3-10 gate audit](outputs/acceptance/phase3-p310-gate-audit-20261026.json)、[3,179 单位兼容与执行矩阵](outputs/acceptance/phase3-p310-compatibility-matrix-20261026.md)、[P3-08 行为账本](outputs/acceptance/phase3-p308-behavior-accounting-20261026.json)。审计 SHA-256 `716efa2e9af8537506e26215c231ef68bf8b30585d61e070bffff76237692b90`；矩阵 SHA-256 `7b777a2e4cc23f499c7b0b5ba49001126fdb87d71d08f1b14d46022e9d130b3d`.
+Windows 结果仅适用于已记录的 Evaluation/Audit Mode Worker profile；没有强制模式、全目录行为兼容或真实平台投递结论。
+<!-- ligamina:phase3:end -->
+
 状态见 [功能清单](feature_list.json)、[当前进展](progress.md) 和 [会话交接](session-handoff.md)。
 
 ## 文档与来源

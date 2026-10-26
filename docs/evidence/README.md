@@ -36,4 +36,10 @@
 - [S2-12 最终审计与 gate 裁决](../../outputs/acceptance/phase2-s212-audit-20261017.json)
 - [S2-12 官方目录兼容矩阵](../../outputs/acceptance/phase2-s212-compatibility-matrix-20261017.md)
 
+## 第三阶段 gate 审计
+
+- [P3-10 五 gate 审计](../../outputs/acceptance/phase3-p310-gate-audit-20261026.json)：独立复算 P3-05/P3-08 分母，分别裁决 engine、recovery、automation、behavior 与 field gate。
+- [P3-10 受影响单元矩阵](../../outputs/acceptance/phase3-p310-compatibility-matrix-20261026.md)：3,179 个 P3-05 unique units 的终态、归因、清理状态与来源报告。
+- [P3-08 双平台行为账本](../../outputs/acceptance/phase3-p308-behavior-accounting-20261026.json)：120 个位置、360 个 attempt slots；缺少 executable Host fixture，0 dispatch，behavior gate 未评估。
+
 其他 JSON、锁和 traces 保留在 outputs/acceptance 下，由相应报告和历史文档引用；S2-11 复跑使用独立文件名和 SQLite 队列，不能覆盖旧 S2-10 acceptance。

@@ -1,4 +1,5 @@
 import { readFile, writeFile } from 'node:fs/promises';
+import { createHash } from 'node:crypto';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { matchesTextSha256 } from './evidence-hash.mjs';
@@ -8,6 +9,8 @@ const start = '<!-- ligamina:phase1:start -->';
 const end = '<!-- ligamina:phase1:end -->';
 const phase2Start = '<!-- ligamina:phase2:start -->';
 const phase2End = '<!-- ligamina:phase2:end -->';
+const phase3Start = '<!-- ligamina:phase3:start -->';
+const phase3End = '<!-- ligamina:phase3:end -->';
 const auditPath = 'outputs/acceptance/t18-final-audit-20261012.json';
 const reports = [
   ['Windows', 'outputs/acceptance/t13-representative-windows-full-20261010.json'],
@@ -16,6 +19,13 @@ const reports = [
 
 const load = async (relative) => JSON.parse(await readFile(path.join(root, relative), 'utf8'));
 const escape = (value) => String(value).replaceAll('|', '\\|').replaceAll('\n', ' ');
+const stableJson = (value) => {
+  if (Array.isArray(value)) return `[${value.map(stableJson).join(',')}]`;
+  if (value && typeof value === 'object') {
+    return `{${Object.keys(value).sort().map((key) => `${JSON.stringify(key)}:${stableJson(value[key])}`).join(',')}}`;
+  }
+  return JSON.stringify(value);
+};
 
 export async function phase1Block() {
   const audit = await load(auditPath);
@@ -464,6 +474,68 @@ export async function phase2Block() {
   ].join('\n');
 }
 
+export async function phase3Block() {
+  const auditPath = 'outputs/acceptance/phase3-p310-gate-audit-20261026.json';
+  const matrixPath = 'outputs/acceptance/phase3-p310-compatibility-matrix-20261026.md';
+  const auditBytes = await readFile(path.join(root, auditPath));
+  const matrixBytes = await readFile(path.join(root, matrixPath));
+  const auditSidecar = (await readFile(path.join(root, `${auditPath}.sha256`), 'utf8')).trim().split(/\s+/)[0];
+  const matrixSidecar = (await readFile(path.join(root, `${matrixPath}.sha256`), 'utf8')).trim().split(/\s+/)[0];
+  const fileSha = (bytes) => createHash('sha256').update(bytes).digest('hex');
+  const audit = JSON.parse(auditBytes.toString('utf8'));
+  const matrixSha = fileSha(matrixBytes);
+  const auditBody = { ...audit };
+  delete auditBody.report_sha256;
+  const auditCanonicalSha = fileSha(Buffer.from(stableJson(auditBody), 'utf8'));
+  if (fileSha(auditBytes) !== auditSidecar || matrixSha !== matrixSidecar
+      || matrixSha !== audit.matrix?.file_sha256 || audit.matrix?.rows !== 3179
+      || auditCanonicalSha !== audit.report_sha256
+      || audit.status !== 'completed_with_blocked_gates' || audit.support_expansion !== false
+      || audit.plugin_compatibility !== 'not_evaluated') {
+    throw new Error('Invalid or stale P3-10 gate audit or compatibility matrix');
+  }
+  for (const source of audit.evidence_manifest ?? []) {
+    const sourceBytes = await readFile(path.join(root, source.path));
+    if (fileSha(sourceBytes) !== source.file_sha256) throw new Error(`Stale P3-10 source evidence: ${source.path}`);
+    if (source.sidecar_path) {
+      const sourceSidecar = await readFile(path.join(root, source.sidecar_path), 'utf8');
+      if (sourceSidecar.trim().split(/\s+/)[0] !== source.file_sha256) throw new Error(`Stale P3-10 source sidecar: ${source.path}`);
+    }
+  }
+  const expectedGates = {
+    'P3-ENGINE': 'passed_scoped',
+    'P3-RECOVERY': 'blocked',
+    'P3-AUTOMATION': 'blocked',
+    'P3-BEHAVIOR': 'not_evaluated',
+    'P3-FIELD': 'not_run',
+  };
+  const actualGates = Object.fromEntries(audit.gates.map((gate) => [gate.gate, gate.status]));
+  if (JSON.stringify(actualGates) !== JSON.stringify(expectedGates)
+      || audit.denominators?.p305_cross_platform_unique_units !== 3179
+      || audit.denominators?.p308_behavior_positions !== 120
+      || audit.denominators?.p308_planned_attempt_slots !== 360
+      || audit.denominators?.p308_dispatched_attempts !== 0) {
+    throw new Error('P3-10 gate rulings or denominators changed');
+  }
+  const counts = audit.p305_effective_unit_counts.cross_platform_3179;
+  const gateRows = audit.gates.map((gate) => `| ${escape(gate.gate)} | **${escape(gate.status)}** | ${escape(gate.limitations[0])} |`);
+  return [
+    phase3Start,
+    'P3-01–P3-10 工程与报告交付已推进至 P3-10；这不代表五道门均通过，也不扩张插件支持范围。',
+    '',
+    `P3-05 受影响账本：3,179/3,179 唯一单位有终态；通过 / 失败 / 跳过 / 未知 ${counts.passed} / ${counts.failed} / ${counts.skipped} / ${counts.unknown}；健康 gate blocked。`,
+    `P3-08 双平台行为账本：${audit.denominators.p308_behavior_positions} 个位置、${audit.denominators.p308_planned_attempt_slots} 个三次尝试槽，实际派发 ${audit.denominators.p308_dispatched_attempts} 次；可执行 Host fixture 缺失，P3-BEHAVIOR 保持 not evaluated。`,
+    '',
+    '| Gate | 裁决 | 范围与边界 |',
+    '| --- | --- | --- |',
+    ...gateRows,
+    '',
+    `证据：[P3-10 gate audit](${auditPath})、[3,179 单位兼容与执行矩阵](${matrixPath})、[P3-08 行为账本](outputs/acceptance/phase3-p308-behavior-accounting-20261026.json)。审计 SHA-256 \`${fileSha(auditBytes)}\`；矩阵 SHA-256 \`${matrixSha}\`.`,
+    'Windows 结果仅适用于已记录的 Evaluation/Audit Mode Worker profile；没有强制模式、全目录行为兼容或真实平台投递结论。',
+    phase3End,
+  ].join('\n');
+}
+
 export async function expectedReadme() {
   const current = await readFile(path.join(root, 'README.md'), 'utf8');
   const replace = async (source, blockStart, blockEnd, render, label) => {
@@ -476,6 +548,7 @@ export async function expectedReadme() {
   };
   let expected = await replace(current, start, end, phase1Block, 'phase-one');
   expected = await replace(expected, phase2Start, phase2End, phase2Block, 'phase-two');
+  expected = await replace(expected, phase3Start, phase3End, phase3Block, 'phase-three');
   return { current, expected };
 }
 
@@ -486,10 +559,10 @@ if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.me
     const { current, expected } = await expectedReadme();
     if (args.includes('--check')) {
       if (current !== expected) throw new Error('README evidence block is stale; run node scripts/render-readme.mjs');
-      console.log('README evidence blocks match validated phase-one and phase-two reports.');
+      console.log('README evidence blocks match validated phase-one, phase-two, and phase-three reports.');
     } else {
       await writeFile(path.join(root, 'README.md'), expected, 'utf8');
-      console.log('README evidence blocks rendered from phase-one and phase-two reports.');
+      console.log('README evidence blocks rendered from phase-one, phase-two, and phase-three reports.');
     }
   } catch (error) {
     console.error(error.message);

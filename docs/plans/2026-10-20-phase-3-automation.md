@@ -1,6 +1,6 @@
 # 第三阶段：可靠自动化检测与行为验证
 
-日期：2026-10-20（Asia/Shanghai）。当前状态：分阶段实施中；P3-01、P3-02 Linux、P3-03 Linux、P3-04 Windows（仅 PSF 签名 CPython 3.12.10 profile）、P3-05 执行/归因闭合、P3-06、P3-07、P3-09 已交付。P3-05 仍有 53 个终态 unknown，健康 gate blocked，插件行为兼容 not_evaluated；此处闭合不代表兼容通过。P3-08/P3-10 保持未启动/未裁决。Windows catalog 证据仅来自隔离 Evaluation profile，不宣称 enforcement acceptance。代码基线：`a311ac8`，S2-12 历史裁决保持不变。
+日期：2026-10-20（Asia/Shanghai）。当前状态：P3-01–P3-10 工程/审计交付已完成到 P3-10；P3-08 以逐位置依赖归因和 attempt 账本交付，P3-10 已产出独立五 gate 裁决。P3-05 的 53 个终态 unknown 使 health/P3-RECOVERY/P3-AUTOMATION 保持 blocked；P3-BEHAVIOR=`not_evaluated`，P3-FIELD=`not_run`。此交付不表示所有 gate 通过。Windows catalog 证据仅来自隔离 Evaluation profile，不宣称 enforcement acceptance。代码基线：`a311ac8`，S2-12 历史裁决保持不变。
 
 原计划状态（2026-10-20）：P3-01、P3-02 Linux、P3-03 Linux、P3-04 Windows（仅 PSF 签名 CPython 3.12.10 profile）、P3-06 已交付。原 uv 管理 CPython 3.12.14 profile 仍被 Windows App Control 阻止；目录插件 Windows claims 尚未开放。代码基线：`a311ac8`，S2-12 历史裁决保持不变。
 
@@ -415,3 +415,18 @@ PR 必跑不依赖实验机的 schema/selection/queue/comparator/fixture 校验�
 P3-05 execution/attribution is closed against the frozen recovery ledger: 2,206 Linux units plus 973 unique Windows affected units, with six Koishi HTTP follow-ups treated as additive re-attribution of existing rows. All 3,179 unique units have terminal outcomes, no unit remains open, and no cleanup is unconfirmed. The aggregate is passed=1,299, failed=688, skipped=1,139, unknown=53. The 39 Linux, 10 Windows pilot, and 4 NoneBot worker-preparation unknowns remain unknown. Health is blocked and behavior compatibility is not_evaluated; Windows SAC Evaluation/Audit Mode is not enforcement acceptance. Do not mark P3-08/P3-10 complete from this closure.
 
 Reproducible reconciliation: `C:\Python314\python.exe scripts/phase3-p305-closure-audit.py`. Evidence: `outputs/acceptance/phase3-p305-overall-closure-20261026.json` (canonical SHA `c6bcaf6841100f5b66afd2356ad4c2891dbf713ec1bdf4bb7120a8e6b8429692`, file SHA `e9dc78cb2da54a7a99476664ee057ec0b029da23cb311a7c22625c1b200dd886`). The original campaign reports and superseded attempts remain immutable.
+
+### P3-08 双平台行为账本（2026-10-26）
+
+- 冻结 P3-06 suite 保持原样：20 个 catalog entries、60 个必选 cases、40 个 entry×OS profile pairs。账本将其交叉生成 120 个 entry×OS×case 位置与 360 个 attempt slots（每位置三次），逐位置绑定 artifact、profile identity/cache、fixture 字段及阻塞 reason codes。
+- 120/120 位置均为 dependency-attributed；60 个 suite stimuli 仍是自然语言输入描述，缺少可执行 Host event/runtime adapter/setup，不能据此启动 P3-07 的 Native/Federated case envelope。Linux Docker admission/probes 为其精确 Worker profile 提供 scoped backend evidence；P3-04 Windows admission 明确 `catalog_plugin_claims_allowed=false`，不允许派发 Windows catalog behavior cases。没有启动 catalog plugin。
+- 360/360 attempts 均为 `not_dispatched`，Worker starts=0，cleanup 记为 `not_applicable_before_worker_start`，没有声称未发生的 trace 或清理。P3-BEHAVIOR 保持 `not_evaluated`。报告：[P3-08 accounting](../../outputs/acceptance/phase3-p308-behavior-accounting-20261026.json)，canonical SHA `2401714f4fe64d52e9e4ccd07c8ec3b332e3dd3077b1d361d240284e2433b389`，file/sidecar SHA `3daaf8aa387bb01b26ae72ca0a8bd6db9b1e0ab9f192a5ddd3d054f928e0e1f5`；生成/重验：`C:\Python314\python.exe scripts/phase3-p308-behavior-accounting.py --report outputs/acceptance/phase3-p308-behavior-accounting-20261026.json --check`。
+- P3-08 engineering accounting deliverable is complete with explicit dispatch blockers; behavior compatibility is not accepted. To execute later, freeze reviewed Host adapters, event/setup/oracle bindings, then a new suite/profile/manifest/checkpoint identity; do not edit this report or reinterpret not-dispatched attempts.
+
+### P3-10 五 gate 审计与矩阵（2026-10-26）
+
+- 新增 `lab/automation/gate_audit.py` 与 `scripts/phase3-p310-gate-audit.py`。脚本校验源 manifest canonical identities、来源文件/sidecar SHA、P3-09 log digests、P3-05 closure self-hash、P3-08 冻结输入复算；独立从 catalog / recovery manifests 计算 5,690 entries / 11,380 entry×OS 与 P3-05 的 2,206 Linux + 973 Windows = 3,179 个唯一单位，并验证 Linux/Windows cohort 互斥、HTTP v1/v3/v4 六项 follow-up identity 相同且不加分母。
+- 完整矩阵覆盖 3,179 个唯一 terminal unit；结果为 passed=1,299、failed=688、skipped=1,139、unknown=53。按唯一 unit 投影，cleanup confirmed=3,169、Worker 未启动而 not applicable=10、unconfirmed=0。P3-08 独立分母为 120 positions / 360 slots / 0 dispatches。
+- Gate rulings: P3-ENGINE=`passed_scoped`（仅 Linux admitted Docker Worker 与 Windows CPython 3.12.10 Sandbox runtime admission/benign probes；Windows catalog claims 不准入）；P3-RECOVERY=`blocked`（53 terminal unknown）；P3-AUTOMATION=`blocked`（同一 unknown 且 GitHub hosted/protected self-hosted runner 部署状态未被本地证据验证）；P3-BEHAVIOR=`not_evaluated`（缺 executable fixture、0 dispatch）；P3-FIELD=`not_run`。无新支持项、无真实平台投递结论。
+- [P3-10 audit JSON](../../outputs/acceptance/phase3-p310-gate-audit-20261026.json)：canonical SHA `03b82fc3a4ab5610ab68aa6724bf4ddb8a3195d66cbbccd0b8dd36f8ca0bef3d`，file/sidecar SHA `716efa2e9af8537506e26215c231ef68bf8b30585d61e070bffff76237692b90`；[3,179-row matrix](../../outputs/acceptance/phase3-p310-compatibility-matrix-20261026.md)：file/sidecar SHA `7b777a2e4cc23f499c7b0b5ba49001126fdb87d71d08f1b14d46022e9d130b3d`。
+- P3-10 engineering/reporting deliverable is complete with blocked/unassessed gates disclosed. Reproduce read-only checks with `C:\Python314\python.exe scripts/phase3-p310-gate-audit.py --check` and `node scripts/render-readme.mjs --check`.

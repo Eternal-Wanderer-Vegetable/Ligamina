@@ -2,7 +2,7 @@
   "schema_version": 1,
   "updated_at": "2026-10-26",
   "active_feature": null,
-  "next_feature": "feat-022",
+  "next_feature": null,
   "features": [
     {
       "id": "feat-001",
@@ -1607,9 +1607,9 @@
         "feat-019",
         "feat-021"
       ],
-      "status": "not-started",
-      "done_when": "至少 120 必选位置完成双路径执行或依赖归因、三次干净复跑记账与完整 trace/清理证据；兼容 gate 按实测独立裁决，确定插件不兼容可交付检测任务但不扩张支持；缺 OS 准入、漏账或清理未知仍为验收缺项。",
-      "evidence": "Not started. P3-04 Sandbox admission passed only for the separately frozen PSF-signed CPython 3.12.10 profile; Windows catalog profile locks remain bound to CPython 3.12.14 and need rebinding. P3-05 Linux affected campaign remains open after a two-worker SQLite lock interruption; the original queue is preserved and an ext4 recovery copy is prepared, but no complete affected-set report exists yet. The 120-position behavior pilot and three clean reruns remain ineligible; behavior compatibility is not_evaluated.\n\nLatest dependency check (2026-10-25): Linux P3-05 is now closed at 2,206/2,206, but Windows P3-05 has only a 20-entry pilot; the 973 affected Windows entries include 10+10 terminal pilot rows; 786 NoneBot and 167 Koishi remain unexecuted. P3-04 admission applies to the alternate signed CPython 3.12.10 profile; behavior remains not_evaluated. Latest check (2026-10-26): P3-05 execution/attribution is closed (2,206 Linux plus 973 unique Windows terminal units), while health remains blocked with 53 unknown and behavior compatibility is not_evaluated; this feature remains not-started, and closure is not behavior acceptance.",
+      "status": "done",
+      "done_when": "至少 120 个双平台位置完成执行或逐项依赖归因；每个位置的三次计划 attempt 均记账；已启动 Worker 的 trace/清理有证据，未启动 attempt 明确记为 not applicable；行为 gate 按实际执行独立裁决。",
+      "evidence": "P3-08 behavior accounting engineering deliverable completed with dispatch blockers. The frozen suite has 20 entries and 60 cases; all 120 entry×OS×case positions and 360 attempt slots are recorded. All positions are dependency-attributed because the frozen prose stimuli lack executable Host event/setup bindings; 0 attempts dispatched, 360 not_dispatched, and cleanup is not applicable before Worker start. Linux backend admission is scoped and passed; Windows P3-04 remains runtime-only with catalog_plugin_claims_allowed=false. P3-BEHAVIOR stays not_evaluated; this is not behavior acceptance or support expansion. P3-08 report canonical SHA 2401714f4fe64d52e9e4ccd07c8ec3b332e3dd3077b1d361d240284e2433b389; file SHA 3daaf8aa387bb01b26ae72ca0a8bd6db9b1e0ab9f192a5ddd3d054f928e0e1f5.",
       "evidence_paths": [
         "outputs/acceptance/phase3-p304-windows-admission-python31210-20261025.json",
         "outputs/acceptance/phase3-p305-linux-pilot-final2-execution-20261025.json",
@@ -1617,7 +1617,15 @@
         "outputs/acceptance/phase3-p305-queue-ext4-checkpoint-20261025.json",
         "outputs/acceptance/phase3-p305-windows-pilot-v2-execution-20261025.json",
         "scripts/phase3-windows-pilot.py",
-        "outputs/acceptance/phase3-p305-windows-pilot-v2-validation-20261025.json"
+        "outputs/acceptance/phase3-p305-windows-pilot-v2-validation-20261025.json",
+        "lab/automation/behavior_campaign.py",
+        "lab/tests/test_automation_behavior_campaign.py",
+        "scripts/phase3-p308-behavior-accounting.py",
+        "outputs/acceptance/phase3-p308-behavior-accounting-20261026.json",
+        "outputs/acceptance/phase3-p308-behavior-accounting-20261026.json.sha256",
+        "outputs/acceptance/phase3-p308-linux-admission-20261026.json",
+        "outputs/acceptance/phase3-p308-linux-worker-probes-20261026.json",
+        "contracts/lab/automation/v1/fixtures/behavior-suite.phase3-v1.json"
       ],
       "plan_path": "docs/plans/2026-10-20-phase-3-automation.md"
     },
@@ -1665,9 +1673,9 @@
         "feat-022",
         "feat-023"
       ],
-      "status": "not-started",
+      "status": "done",
       "done_when": "分母独立复算、哈希/身份/引用校验、五 gate 分开且无越界支持声明；依赖验收完成，README 与交接可复跑。",
-      "evidence": "Not started. P3-05 Linux affected recovery is still running toward a complete 2,206-unit ledger after a recorded SQLite lock interruption; no aggregate cross-gate report exists. P3-08 behavior positions have not run. Windows catalog plugins were not run, Windows catalog profile locks still require rebinding, and controlled-runner deployment remains unconfirmed. Behavior remains not_evaluated and real-platform acceptance remains outstanding.\n\nLatest dependency check (2026-10-25): Linux P3-05 is now closed at 2,206/2,206, but Windows P3-05 has only a 20-entry pilot; the 973 affected Windows entries include 10+10 terminal pilot rows; 786 NoneBot and 167 Koishi remain unexecuted. P3-04 admission applies to the alternate signed CPython 3.12.10 profile; behavior remains not_evaluated. Latest check (2026-10-26): P3-05 execution/attribution is closed (2,206 Linux plus 973 unique Windows terminal units), while health remains blocked with 53 unknown and behavior compatibility is not_evaluated; this feature remains not-started, and closure is not behavior acceptance.",
+      "evidence": "P3-10 reporting and gate-audit deliverable completed with independently re-derived denominators and a hash-bound 3,179-unit matrix. Five gates are separate: P3-ENGINE passed_scoped (admitted Worker backend profiles only), P3-RECOVERY blocked (53 terminal unknowns), P3-AUTOMATION blocked (same unknowns and deployment-side runner state unverified), P3-BEHAVIOR not_evaluated (0/120 positions dispatched), and P3-FIELD not_run. Frozen catalog is 5,690 entries / 11,380 entry×OS; P3-05 is 2,206 Linux + 973 Windows unique units; six HTTP follow-ups are re-attributions, not new units. No support expansion. Audit canonical SHA 03b82fc3a4ab5610ab68aa6724bf4ddb8a3195d66cbbccd0b8dd36f8ca0bef3d; report file SHA 716efa2e9af8537506e26215c231ef68bf8b30585d61e070bffff76237692b90; matrix file SHA 7b777a2e4cc23f499c7b0b5ba49001126fdb87d71d08f1b14d46022e9d130b3d.",
       "evidence_paths": [
         "outputs/acceptance/phase3-p305-linux-pilot-final2-execution-20261025.json",
         "outputs/acceptance/phase3-p304-windows-admission-python31210-20261025.json",
@@ -1675,7 +1683,15 @@
         "outputs/acceptance/phase3-p305-queue-ext4-checkpoint-20261025.json",
         "outputs/acceptance/phase3-p305-windows-pilot-v2-execution-20261025.json",
         "scripts/phase3-windows-pilot.py",
-        "outputs/acceptance/phase3-p305-windows-pilot-v2-validation-20261025.json"
+        "outputs/acceptance/phase3-p305-windows-pilot-v2-validation-20261025.json",
+        "lab/automation/gate_audit.py",
+        "lab/tests/test_automation_gate_audit.py",
+        "scripts/phase3-p310-gate-audit.py",
+        "outputs/acceptance/phase3-p310-gate-audit-20261026.json",
+        "outputs/acceptance/phase3-p310-gate-audit-20261026.json.sha256",
+        "outputs/acceptance/phase3-p310-compatibility-matrix-20261026.md",
+        "outputs/acceptance/phase3-p310-compatibility-matrix-20261026.md.sha256",
+        "README.md"
       ],
       "plan_path": "docs/plans/2026-10-20-phase-3-automation.md"
     }
