@@ -1,0 +1,2998 @@
+{
+  "schema_version": 1,
+  "kind": "phase3_p305_windows_koishi_lifecycle_source_audit",
+  "generated_at_utc": "2026-10-26T00:15:23Z",
+  "scope": "offline inspection of exact SRI-locked npm tarballs referenced by the 167 frozen Windows Koishi target locks; no extraction to disk, install, lifecycle script, package code, Worker, or Sandbox execution",
+  "inputs": {
+    "matrix_path": "outputs/acceptance/phase3-p305-windows-koishi-entry-requirements-matrix-v1-20261026.json",
+    "matrix_canonical_sha256": "e5fa8a4a67dcb3a0ba771d36ec137c8386768919e83e5a292ba0e88feebfb042",
+    "matrix_file_sha256": "2bbe98ab0f04d7f6c5c7e5f89e8b108e73f3bee261ee34f64ad1884f7d9f10a4",
+    "profiles_lock_file_sha256": "68a7391620a06e7141d949519333a1f4fc5ccee7abd84dc036c46d09fdae8d38",
+    "catalog_snapshot_id": "p2-41649744e057d61031d5",
+    "target_recovery_manifest_canonical_sha256": "f084778b6cfee271876ba6493e039fc2a288e0295a7a0fe9353f0d6f2074416e",
+    "cache_root": "E:\\stella\\Ligamina-artifact-cache",
+    "lock_script_occurrence_count": 113
+  },
+  "summary": {
+    "target_units": 167,
+    "target_lock_blobs_reverified": 167,
+    "has_install_script_occurrences": 113,
+    "windows_x64_constraint_status_counts": {
+      "excluded_by_os_constraint": 13,
+      "not_excluded_by_declared_constraints": 100
+    },
+    "windows_x64_occurrences_not_excluded_by_lock_metadata": 100,
+    "windows_x64_occurrences_with_explicit_lifecycle_scripts_not_excluded_by_lock_metadata": 99,
+    "unique_lifecycle_archive_identities": 51,
+    "unique_lifecycle_package_names": 28,
+    "package_archives_sri_verified": 51,
+    "package_manifest_identity_matches": 51,
+    "packages_with_explicit_lifecycle_scripts": 49,
+    "lock_marked_packages_without_explicit_lifecycle_or_binding_gyp": 2,
+    "lock_marked_packages_without_explicit_lifecycle_or_binding_gyp_detail": [
+      {
+        "package": "@stdlib/number-float64-base-normalize",
+        "version": "0.0.9",
+        "resolved": "https://registry.npmjs.org/@stdlib/number-float64-base-normalize/-/number-float64-base-normalize-0.0.9.tgz",
+        "os_constraints": [
+          "aix",
+          "darwin",
+          "freebsd",
+          "linux",
+          "macos",
+          "openbsd",
+          "sunos",
+          "win32",
+          "windows"
+        ],
+        "cpu_constraints": null,
+        "native_files_in_archive": [],
+        "lock_occurrence_count": 1
+      },
+      {
+        "package": "fsevents",
+        "version": "2.3.3",
+        "resolved": "https://registry.npmjs.org/fsevents/-/fsevents-2.3.3.tgz",
+        "os_constraints": [
+          "darwin"
+        ],
+        "cpu_constraints": null,
+        "native_files_in_archive": [
+          {
+            "member": "package/fsevents.node",
+            "size_bytes": 163626,
+            "sha256": "40f2f51199e4f5fc46fa6b985fb3461bb63e6cd86c62bfa9bcee45ed4438d5fb"
+          }
+        ],
+        "lock_occurrence_count": 7
+      }
+    ],
+    "native_files_observed_in_archives": 23,
+    "packages_with_win32_x64_prebuilt_node_payload": 3,
+    "win32_x64_prebuilt_node_payloads": [
+      {
+        "package": "bufferutil",
+        "version": "4.1.0",
+        "members": [
+          {
+            "member": "package/prebuilds/win32-x64/bufferutil.node",
+            "size_bytes": 155136,
+            "sha256": "9bf6ec4d84b75403a50f22d9bdba2cfb287f12472374c9d5eb736c963a997ee9"
+          }
+        ]
+      },
+      {
+        "package": "leveldown",
+        "version": "6.1.1",
+        "members": [
+          {
+            "member": "package/prebuilds/win32-x64/node.napi.node",
+            "size_bytes": 506880,
+            "sha256": "c19cc096eee9424ec00aaba8b2756613e9b5dc7f1559bc7141acbd18ce4cc79b"
+          }
+        ]
+      },
+      {
+        "package": "utf-8-validate",
+        "version": "6.0.6",
+        "members": [
+          {
+            "member": "package/prebuilds/win32-x64/utf-8-validate.node",
+            "size_bytes": 174592,
+            "sha256": "563ad0209336017a68e14d40fa8964f09021ed33cccc6b26414e1331b4fead99"
+          }
+        ]
+      }
+    ],
+    "lifecycle_signature_occurrence_counts": {
+      "{\"install\":\"(node install/libvips && node install/dll-copy && prebuild-install) || (node install/can-compile && node-gyp rebuild && node install/dll-copy)\"}": 2,
+      "{\"install\":\"node buildcheck.js > buildcheck.gypi && node-gyp rebuild\"}": 1,
+      "{\"install\":\"node install.js\",\"prepare\":\"node typescript-if-required.js && husky install\"}": 2,
+      "{\"install\":\"node install.js\"}": 3,
+      "{\"install\":\"node install/check\"}": 6,
+      "{\"install\":\"node install/check.js || npm run build\"}": 3,
+      "{\"install\":\"node scripts/build-from-source.js\"}": 5,
+      "{\"install\":\"node-gyp-build\"}": 4,
+      "{\"install\":\"node-pre-gyp install --fallback-to-build --update-binary\"}": 2,
+      "{\"install\":\"node-pre-gyp install || npm run build -- --release\"}": 2,
+      "{\"install\":\"prebuild-install -r napi || node-gyp rebuild\"}": 3,
+      "{\"install\":\"prebuild-install || node-gyp rebuild --release\"}": 1,
+      "{\"postinstall\":\"chmod u+x ffmpeg\"}": 6,
+      "{\"postinstall\":\"node -e \\\"try{require('./scripts/postinstall.js')}catch(e){}\\\"\"}": 15,
+      "{\"postinstall\":\"node ./scripts/postinstall.js\"}": 2,
+      "{\"postinstall\":\"node attribution.js\"}": 1,
+      "{\"postinstall\":\"node install.js\"}": 14,
+      "{\"postinstall\":\"node install.mjs\"}": 24,
+      "{\"postinstall\":\"node postinstall.js\"}": 1,
+      "{\"postinstall\":\"node scripts/patch-deps.mjs\"}": 1,
+      "{\"postinstall\":\"node scripts/postinstall\"}": 7,
+      "{}": 8
+    },
+    "identity_mismatches": [],
+    "profile_ready": false,
+    "interpretation": "This audit exposes commands and archive contents only. Lifecycle scripts remain disabled; the audit does not establish that a script is safe to run or that any native file is loadable or behaviorally compatible on Windows."
+  },
+  "lifecycle_packages": [
+    {
+      "package": "@ffmpeg-installer/darwin-arm64",
+      "version": "4.1.5",
+      "resolved": "https://registry.npmjs.org/@ffmpeg-installer/darwin-arm64/-/darwin-arm64-4.1.5.tgz",
+      "integrity": "sha512-hYqTiP63mXz7wSQfuqfFwfLOfwwFChUedeCVKkBtl/cliaTM7/ePI9bVzfZ2c+dWu3TqCwLDRWNSJ5pqZl8otA==",
+      "target_lock_has_install_script_marker": true,
+      "archive_size_bytes": 15712439,
+      "archive_sha256": "8a4306e64ed3ba3cb5e51093266c8c72f65314bec146c899a50426f21aaa0f44",
+      "lock_integrity_algorithm": "sha512",
+      "lock_integrity_digest": "858a9388feb7997cfbc1241fbaa7c5c1f2ce7f0c050a151e75e0952a406d97f72589a4cceff78f23d6d5cdf67673e756bb74ea0b02c3456352279a6a665f28b4",
+      "lock_integrity_matched": true,
+      "package_manifest_sha256": "9700ab1f71c27cbd3e859e01d07975d291c75880e63ebaa4847cc63daaa2437a",
+      "package_manifest_name": "@ffmpeg-installer/darwin-arm64",
+      "package_manifest_version": "4.1.5",
+      "lifecycle_scripts": {
+        "postinstall": "chmod u+x ffmpeg"
+      },
+      "binding_gyp_present": false,
+      "gypfile_declared": false,
+      "binary_metadata": null,
+      "os_constraints": [
+        "darwin"
+      ],
+      "cpu_constraints": [
+        "arm64"
+      ],
+      "native_files_in_archive": [],
+      "lock_occurrence_count": 1,
+      "consumer_entry_count": 1,
+      "windows_x64_constraint_excluded_occurrence_count": 1,
+      "consumer_entries": [
+        {
+          "registry_entry_id": "ko-3d62db10ddb40acb70713fba",
+          "consumer_package": "koishi-plugin-lo-terr",
+          "consumer_version": "2.1.0",
+          "dependency_path": "node_modules/@ffmpeg-installer/darwin-arm64",
+          "optional": true,
+          "os_constraints": [
+            "darwin"
+          ],
+          "cpu_constraints": [
+            "arm64"
+          ],
+          "windows_x64_constraint_status": "excluded_by_os_constraint"
+        }
+      ]
+    },
+    {
+      "package": "@ffmpeg-installer/darwin-x64",
+      "version": "4.1.0",
+      "resolved": "https://registry.npmjs.org/@ffmpeg-installer/darwin-x64/-/darwin-x64-4.1.0.tgz",
+      "integrity": "sha512-Z4EyG3cIFjdhlY8wI9aLUXuH8nVt7E9SlMVZtWvSPnm2sm37/yC2CwjUzyCQbJbySnef1tQwGG2Sx+uWhd9IAw==",
+      "target_lock_has_install_script_marker": true,
+      "archive_size_bytes": 22361696,
+      "archive_sha256": "4f22b9ce0c0507e3f4cd6e822fb23214abc5fb70d48eb046ff94a1484299cdbf",
+      "lock_integrity_algorithm": "sha512",
+      "lock_integrity_digest": "6781321b7708163761958f3023d68b517b87f2756dec4f5294c559b56bd23e79b6b26dfbff20b60b08d4cf20906c96f24a779fd6d430186d92c7eb9685df4803",
+      "lock_integrity_matched": true,
+      "package_manifest_sha256": "f1fd61731153d25739714a8db2d79ce7fd71a92c7834c4343bd3d503f22c8275",
+      "package_manifest_name": "@ffmpeg-installer/darwin-x64",
+      "package_manifest_version": "4.1.0",
+      "lifecycle_scripts": {
+        "postinstall": "chmod u+x ffmpeg"
+      },
+      "binding_gyp_present": false,
+      "gypfile_declared": false,
+      "binary_metadata": null,
+      "os_constraints": [
+        "darwin"
+      ],
+      "cpu_constraints": [
+        "x64"
+      ],
+      "native_files_in_archive": [],
+      "lock_occurrence_count": 1,
+      "consumer_entry_count": 1,
+      "windows_x64_constraint_excluded_occurrence_count": 1,
+      "consumer_entries": [
+        {
+          "registry_entry_id": "ko-3d62db10ddb40acb70713fba",
+          "consumer_package": "koishi-plugin-lo-terr",
+          "consumer_version": "2.1.0",
+          "dependency_path": "node_modules/@ffmpeg-installer/darwin-x64",
+          "optional": true,
+          "os_constraints": [
+            "darwin"
+          ],
+          "cpu_constraints": [
+            "x64"
+          ],
+          "windows_x64_constraint_status": "excluded_by_os_constraint"
+        }
+      ]
+    },
+    {
+      "package": "@ffmpeg-installer/linux-arm",
+      "version": "4.1.3",
+      "resolved": "https://registry.npmjs.org/@ffmpeg-installer/linux-arm/-/linux-arm-4.1.3.tgz",
+      "integrity": "sha512-NDf5V6l8AfzZ8WzUGZ5mV8O/xMzRag2ETR6+TlGIsMHp81agx51cqpPItXPib/nAZYmo55Bl2L6/WOMI3A5YRg==",
+      "target_lock_has_install_script_marker": true,
+      "archive_size_bytes": 14829516,
+      "archive_sha256": "8384d0abea7d04ed0720eccf1cc6f9a782606f57cae53ae203933a65f2ed679b",
+      "lock_integrity_algorithm": "sha512",
+      "lock_integrity_digest": "3437f957a97c01fcd9f16cd4199e6657c3bfc4ccd16a0d844d1ebe4e5188b0c1e9f356a0c79d5caa93c8b573e26ff9c06589a8e79065d8bebf58e308dc0e5846",
+      "lock_integrity_matched": true,
+      "package_manifest_sha256": "5560af4ad3acdfcbf6bdcbf982e145041533653e5288d195ec494793e30a33a9",
+      "package_manifest_name": "@ffmpeg-installer/linux-arm",
+      "package_manifest_version": "4.1.3",
+      "lifecycle_scripts": {
+        "postinstall": "chmod u+x ffmpeg"
+      },
+      "binding_gyp_present": false,
+      "gypfile_declared": false,
+      "binary_metadata": null,
+      "os_constraints": [
+        "linux"
+      ],
+      "cpu_constraints": [
+        "arm"
+      ],
+      "native_files_in_archive": [],
+      "lock_occurrence_count": 1,
+      "consumer_entry_count": 1,
+      "windows_x64_constraint_excluded_occurrence_count": 1,
+      "consumer_entries": [
+        {
+          "registry_entry_id": "ko-3d62db10ddb40acb70713fba",
+          "consumer_package": "koishi-plugin-lo-terr",
+          "consumer_version": "2.1.0",
+          "dependency_path": "node_modules/@ffmpeg-installer/linux-arm",
+          "optional": true,
+          "os_constraints": [
+            "linux"
+          ],
+          "cpu_constraints": [
+            "arm"
+          ],
+          "windows_x64_constraint_status": "excluded_by_os_constraint"
+        }
+      ]
+    },
+    {
+      "package": "@ffmpeg-installer/linux-arm64",
+      "version": "4.1.4",
+      "resolved": "https://registry.npmjs.org/@ffmpeg-installer/linux-arm64/-/linux-arm64-4.1.4.tgz",
+      "integrity": "sha512-dljEqAOD0oIM6O6DxBW9US/FkvqvQwgJ2lGHOwHDDwu/pX8+V0YsDL1xqHbj1DMX/+nP9rxw7G7gcUvGspSoKg==",
+      "target_lock_has_install_script_marker": true,
+      "archive_size_bytes": 15645188,
+      "archive_sha256": "2dbe7362c21f8d6bec085d6ad5dfd4b883876013d670e0a8ec60fdb51399814a",
+      "lock_integrity_algorithm": "sha512",
+      "lock_integrity_digest": "7658c4a80383d2820ce8ee83c415bd512fc592faaf430809da51873b01c30f0bbfa57f3e57462c0cbd71a876e3d43317ffe9cff6bc70ec6ee0714bc6b294a82a",
+      "lock_integrity_matched": true,
+      "package_manifest_sha256": "fb06221f1085d44a3bbbe9af5c69a804dfaf1f4b6a70ab7ce3dc42f1a6f077db",
+      "package_manifest_name": "@ffmpeg-installer/linux-arm64",
+      "package_manifest_version": "4.1.4",
+      "lifecycle_scripts": {
+        "postinstall": "chmod u+x ffmpeg"
+      },
+      "binding_gyp_present": false,
+      "gypfile_declared": false,
+      "binary_metadata": null,
+      "os_constraints": [
+        "linux"
+      ],
+      "cpu_constraints": [
+        "arm64"
+      ],
+      "native_files_in_archive": [],
+      "lock_occurrence_count": 1,
+      "consumer_entry_count": 1,
+      "windows_x64_constraint_excluded_occurrence_count": 1,
+      "consumer_entries": [
+        {
+          "registry_entry_id": "ko-3d62db10ddb40acb70713fba",
+          "consumer_package": "koishi-plugin-lo-terr",
+          "consumer_version": "2.1.0",
+          "dependency_path": "node_modules/@ffmpeg-installer/linux-arm64",
+          "optional": true,
+          "os_constraints": [
+            "linux"
+          ],
+          "cpu_constraints": [
+            "arm64"
+          ],
+          "windows_x64_constraint_status": "excluded_by_os_constraint"
+        }
+      ]
+    },
+    {
+      "package": "@ffmpeg-installer/linux-ia32",
+      "version": "4.1.0",
+      "resolved": "https://registry.npmjs.org/@ffmpeg-installer/linux-ia32/-/linux-ia32-4.1.0.tgz",
+      "integrity": "sha512-0LWyFQnPf+Ij9GQGD034hS6A90URNu9HCtQ5cTqo5MxOEc7Rd8gLXrJvn++UmxhU0J5RyRE9KRYstdCVUjkNOQ==",
+      "target_lock_has_install_script_marker": true,
+      "archive_size_bytes": 17188131,
+      "archive_sha256": "9f6344d2a979f08d18cce771bf84f36f913dcac615130edb757ff768563ae2fc",
+      "lock_integrity_algorithm": "sha512",
+      "lock_integrity_digest": "d0b5b21509cf7fe223f464060f4df8852e80f7451136ef470ad439713aa8e4cc4e11ced177c80b5eb26f9fef949b1854d09e51c9113d29162cb5d09552390d39",
+      "lock_integrity_matched": true,
+      "package_manifest_sha256": "9172e985077978a92e1bce24ff2cf32dea2e042f9a6e5d0a565f966b93649ca2",
+      "package_manifest_name": "@ffmpeg-installer/linux-ia32",
+      "package_manifest_version": "4.1.0",
+      "lifecycle_scripts": {
+        "postinstall": "chmod u+x ffmpeg"
+      },
+      "binding_gyp_present": false,
+      "gypfile_declared": false,
+      "binary_metadata": null,
+      "os_constraints": [
+        "linux"
+      ],
+      "cpu_constraints": [
+        "ia32"
+      ],
+      "native_files_in_archive": [],
+      "lock_occurrence_count": 1,
+      "consumer_entry_count": 1,
+      "windows_x64_constraint_excluded_occurrence_count": 1,
+      "consumer_entries": [
+        {
+          "registry_entry_id": "ko-3d62db10ddb40acb70713fba",
+          "consumer_package": "koishi-plugin-lo-terr",
+          "consumer_version": "2.1.0",
+          "dependency_path": "node_modules/@ffmpeg-installer/linux-ia32",
+          "optional": true,
+          "os_constraints": [
+            "linux"
+          ],
+          "cpu_constraints": [
+            "ia32"
+          ],
+          "windows_x64_constraint_status": "excluded_by_os_constraint"
+        }
+      ]
+    },
+    {
+      "package": "@ffmpeg-installer/linux-x64",
+      "version": "4.1.0",
+      "resolved": "https://registry.npmjs.org/@ffmpeg-installer/linux-x64/-/linux-x64-4.1.0.tgz",
+      "integrity": "sha512-Y5BWhGLU/WpQjOArNIgXD3z5mxxdV8c41C+U15nsE5yF8tVcdCGet5zPs5Zy3Ta6bU7haGpIzryutqCGQA/W8A==",
+      "target_lock_has_install_script_marker": true,
+      "archive_size_bytes": 23070854,
+      "archive_sha256": "b836abe532912ae6c3388dbe713952af293a3d005fc9e4d34d52f14da99dda71",
+      "lock_integrity_algorithm": "sha512",
+      "lock_integrity_digest": "6390568462d4fd6a508ce02b3488170f7cf99b1c5d57c738d42f94d799ec139c85f2d55c74219eb79ccfb39672dd36ba6d4ee1686a48cebcaeb6a086400fd6f0",
+      "lock_integrity_matched": true,
+      "package_manifest_sha256": "831d36741c930c67933af2873c670928e623eca313ad6a067880cce7750dc1a0",
+      "package_manifest_name": "@ffmpeg-installer/linux-x64",
+      "package_manifest_version": "4.1.0",
+      "lifecycle_scripts": {
+        "postinstall": "chmod u+x ffmpeg"
+      },
+      "binding_gyp_present": false,
+      "gypfile_declared": false,
+      "binary_metadata": null,
+      "os_constraints": [
+        "linux"
+      ],
+      "cpu_constraints": [
+        "x64"
+      ],
+      "native_files_in_archive": [],
+      "lock_occurrence_count": 1,
+      "consumer_entry_count": 1,
+      "windows_x64_constraint_excluded_occurrence_count": 1,
+      "consumer_entries": [
+        {
+          "registry_entry_id": "ko-3d62db10ddb40acb70713fba",
+          "consumer_package": "koishi-plugin-lo-terr",
+          "consumer_version": "2.1.0",
+          "dependency_path": "node_modules/@ffmpeg-installer/linux-x64",
+          "optional": true,
+          "os_constraints": [
+            "linux"
+          ],
+          "cpu_constraints": [
+            "x64"
+          ],
+          "windows_x64_constraint_status": "excluded_by_os_constraint"
+        }
+      ]
+    },
+    {
+      "package": "@fortawesome/fontawesome-free",
+      "version": "5.15.4",
+      "resolved": "https://registry.npmjs.org/@fortawesome/fontawesome-free/-/fontawesome-free-5.15.4.tgz",
+      "integrity": "sha512-eYm8vijH/hpzr/6/1CJ/V/Eb1xQFW2nnUKArb3z+yUWv7HTwj6M7SP957oMjfZjAHU6qpoNc2wQvIxBLWYa/Jg==",
+      "target_lock_has_install_script_marker": true,
+      "archive_size_bytes": 4246572,
+      "archive_sha256": "6d890608585d48f50f6434a90ed3f581e76d360edb26800dba2f782ef3e77e11",
+      "lock_integrity_algorithm": "sha512",
+      "lock_integrity_digest": "7989bcbe28c7fe1a73affebfd4227f57f11bd714055b69e750a02b6f7cfec945afec74f08fa33b48ff79ee83237d98c01d4eaaa6835cdb042f23104b5986bf26",
+      "lock_integrity_matched": true,
+      "package_manifest_sha256": "536c862ba67b5970cec27e47c1792a117462cc98ccfef0cef12bd504c280c8fc",
+      "package_manifest_name": "@fortawesome/fontawesome-free",
+      "package_manifest_version": "5.15.4",
+      "lifecycle_scripts": {
+        "postinstall": "node attribution.js"
+      },
+      "binding_gyp_present": false,
+      "gypfile_declared": false,
+      "binary_metadata": null,
+      "os_constraints": null,
+      "cpu_constraints": null,
+      "native_files_in_archive": [],
+      "lock_occurrence_count": 1,
+      "consumer_entry_count": 1,
+      "windows_x64_constraint_excluded_occurrence_count": 0,
+      "consumer_entries": [
+        {
+          "registry_entry_id": "ko-b395bb25ddd9b13efad695e8",
+          "consumer_package": "koishi-plugin-xsxn",
+          "consumer_version": "1.4.1",
+          "dependency_path": "node_modules/@fortawesome/fontawesome-free",
+          "optional": false,
+          "os_constraints": null,
+          "cpu_constraints": null,
+          "windows_x64_constraint_status": "not_excluded_by_declared_constraints"
+        }
+      ]
+    },
+    {
+      "package": "@parcel/watcher",
+      "version": "2.6.0",
+      "resolved": "https://registry.npmjs.org/@parcel/watcher/-/watcher-2.6.0.tgz",
+      "integrity": "sha512-7FNeNl8NCE7aINx7WXiKQrPYZWC/hvrTsmk6zmxbI7LTXE7hVek/n8AfVgpe2y82zl3w0HvCHN0bVKMBoJcC0w==",
+      "target_lock_has_install_script_marker": true,
+      "archive_size_bytes": 34902,
+      "archive_sha256": "ab42807be3df24a12d01e31568a7e61def1a4bee636a7c60a397319eff677e95",
+      "lock_integrity_algorithm": "sha512",
+      "lock_integrity_digest": "ec535e365f0d084eda20dc7b59788a42b3d86560bf86fad3b2693ace6c5b23b2d35c4ee155e93f9fc01f560a5edb2f36ce5df0d07bc21cdd1b54a301a09702d3",
+      "lock_integrity_matched": true,
+      "package_manifest_sha256": "b1fad194cd1597d84446a821f32969dd61f12f6a148e5a9c94958271978dc0e0",
+      "package_manifest_name": "@parcel/watcher",
+      "package_manifest_version": "2.6.0",
+      "lifecycle_scripts": {
+        "install": "node scripts/build-from-source.js"
+      },
+      "binding_gyp_present": true,
+      "gypfile_declared": false,
+      "binary_metadata": {
+        "napi_versions": [
+          3
+        ]
+      },
+      "os_constraints": null,
+      "cpu_constraints": null,
+      "native_files_in_archive": [],
+      "lock_occurrence_count": 5,
+      "consumer_entry_count": 5,
+      "windows_x64_constraint_excluded_occurrence_count": 0,
+      "consumer_entries": [
+        {
+          "registry_entry_id": "ko-6cc09a7c20d31ab46d1a309d",
+          "consumer_package": "koishi-plugin-fonts4pptr",
+          "consumer_version": "1.0.1",
+          "dependency_path": "node_modules/@parcel/watcher",
+          "optional": true,
+          "os_constraints": null,
+          "cpu_constraints": null,
+          "windows_x64_constraint_status": "not_excluded_by_declared_constraints"
+        },
+        {
+          "registry_entry_id": "ko-8e241d55fc0fcd1d2704806e",
+          "consumer_package": "koishi-plugin-adapter-bilibili-dm",
+          "consumer_version": "2.8.5",
+          "dependency_path": "node_modules/@parcel/watcher",
+          "optional": true,
+          "os_constraints": null,
+          "cpu_constraints": null,
+          "windows_x64_constraint_status": "not_excluded_by_declared_constraints"
+        },
+        {
+          "registry_entry_id": "ko-b395bb25ddd9b13efad695e8",
+          "consumer_package": "koishi-plugin-xsxn",
+          "consumer_version": "1.4.1",
+          "dependency_path": "node_modules/@parcel/watcher",
+          "optional": true,
+          "os_constraints": null,
+          "cpu_constraints": null,
+          "windows_x64_constraint_status": "not_excluded_by_declared_constraints"
+        },
+        {
+          "registry_entry_id": "ko-bb1f5f331c63775c59c31905",
+          "consumer_package": "koishi-plugin-gocq-session-uploader",
+          "consumer_version": "1.0.2",
+          "dependency_path": "node_modules/@parcel/watcher",
+          "optional": true,
+          "os_constraints": null,
+          "cpu_constraints": null,
+          "windows_x64_constraint_status": "not_excluded_by_declared_constraints"
+        },
+        {
+          "registry_entry_id": "ko-d5d43667d9446f27dd1b1433",
+          "consumer_package": "koishi-plugin-fonts",
+          "consumer_version": "1.0.4",
+          "dependency_path": "node_modules/@parcel/watcher",
+          "optional": true,
+          "os_constraints": null,
+          "cpu_constraints": null,
+          "windows_x64_constraint_status": "not_excluded_by_declared_constraints"
+        }
+      ]
+    },
+    {
+      "package": "@stdlib/number-float64-base-normalize",
+      "version": "0.0.9",
+      "resolved": "https://registry.npmjs.org/@stdlib/number-float64-base-normalize/-/number-float64-base-normalize-0.0.9.tgz",
+      "integrity": "sha512-+rm7RQJEj8zHkqYFE2a6DgNQSB5oKE/IydHAajgZl40YB91BoYRYf/ozs5/tTwfy2Fc04+tIpSfFtzDr4ZY19Q==",
+      "target_lock_has_install_script_marker": true,
+      "archive_size_bytes": 11004,
+      "archive_sha256": "01de78f3bb7fe9663ed965d05caf29b28e7bc5ef987d3bda66f53d45e30ede38",
+      "lock_integrity_algorithm": "sha512",
+      "lock_integrity_digest": "fab9bb4502448fccc792a6051366ba0e0350481e68284fc8c9d1c06a3819978d1807dd41a184587ffa33b39fed4f07f2d85734e3eb48a527c5b730ebe19635f5",
+      "lock_integrity_matched": true,
+      "package_manifest_sha256": "84bc394c93c8f2ea1a61542816d45fe0a83ce2d2607de91b813bf316eb1b8d76",
+      "package_manifest_name": "@stdlib/number-float64-base-normalize",
+      "package_manifest_version": "0.0.9",
+      "lifecycle_scripts": {},
+      "binding_gyp_present": false,
+      "gypfile_declared": false,
+      "binary_metadata": null,
+      "os_constraints": [
+        "aix",
+        "darwin",
+        "freebsd",
+        "linux",
+        "macos",
+        "openbsd",
+        "sunos",
+        "win32",
+        "windows"
+      ],
+      "cpu_constraints": null,
+      "native_files_in_archive": [],
+      "lock_occurrence_count": 1,
+      "consumer_entry_count": 1,
+      "windows_x64_constraint_excluded_occurrence_count": 0,
+      "consumer_entries": [
+        {
+          "registry_entry_id": "ko-4d105d757f4cf0c25a09bc94",
+          "consumer_package": "koishi-plugin-fortune",
+          "consumer_version": "11.4.2",
+          "dependency_path": "node_modules/@stdlib/number-float64-base-normalize",
+          "optional": false,
+          "os_constraints": [
+            "aix",
+            "darwin",
+            "freebsd",
+            "linux",
+            "macos",
+            "openbsd",
+            "sunos",
+            "win32",
+            "windows"
+          ],
+          "cpu_constraints": null,
+          "windows_x64_constraint_status": "not_excluded_by_declared_constraints"
+        }
+      ]
+    },
+    {
+      "package": "@swc/core",
+      "version": "1.16.18",
+      "resolved": "https://registry.npmjs.org/@swc/core/-/core-1.16.18.tgz",
+      "integrity": "sha512-0cYQLkpcwUngg55TDwpwrrVOU+B6zh1NFbp+oS7dVFhmYkzaARelwugo/bzPJh1FrcnppmF+KTqioCGwyqbcEw==",
+      "target_lock_has_install_script_marker": true,
+      "archive_size_bytes": 25313,
+      "archive_sha256": "ceeb7326a488481fbcf44c9e2038aee66f9593d0d9876845c418693e32efb9bd",
+      "lock_integrity_algorithm": "sha512",
+      "lock_integrity_digest": "d1c6102e4a5cc149e0839e530f0a70aeb54e53e07ace1d4d15ba7ea12edd545866624cda0117a5c2e828fdbccf261d45adc9e9a6617e293aa2a021b0caa6dc13",
+      "lock_integrity_matched": true,
+      "package_manifest_sha256": "3e671961cccd0625d60c7c20b4be95256102ae33246e14942d0da7c8139c1a4c",
+      "package_manifest_name": "@swc/core",
+      "package_manifest_version": "1.16.18",
+      "lifecycle_scripts": {
+        "postinstall": "node postinstall.js"
+      },
+      "binding_gyp_present": false,
+      "gypfile_declared": false,
+      "binary_metadata": null,
+      "os_constraints": null,
+      "cpu_constraints": null,
+      "native_files_in_archive": [],
+      "lock_occurrence_count": 1,
+      "consumer_entry_count": 1,
+      "windows_x64_constraint_excluded_occurrence_count": 0,
+      "consumer_entries": [
+        {
+          "registry_entry_id": "ko-4f9dda3b5e4f0e088360b99d",
+          "consumer_package": "koishi-plugin-adapter-wechat4u",
+          "consumer_version": "0.0.8",
+          "dependency_path": "node_modules/@swc/core",
+          "optional": false,
+          "os_constraints": null,
+          "cpu_constraints": null,
+          "windows_x64_constraint_status": "not_excluded_by_declared_constraints"
+        }
+      ]
+    },
+    {
+      "package": "better-sqlite3",
+      "version": "12.11.1",
+      "resolved": "https://registry.npmjs.org/better-sqlite3/-/better-sqlite3-12.11.1.tgz",
+      "integrity": "sha512-dq9AtApgg5PGFtBzPFSBl3HZQjHok5gaQCM6zh2Yk0aSmDCs1CbnVI8/HgASQkNKsWFpseIO9beg5xxpYhbIfA==",
+      "target_lock_has_install_script_marker": true,
+      "archive_size_bytes": 2660617,
+      "archive_sha256": "ebf0ed75a7a59dbcb3b24bbd014ef49d9f15bc328e4adcbf516f2a8fadfa2835",
+      "lock_integrity_algorithm": "sha512",
+      "lock_integrity_digest": "76af40b40a608393c616d0733c54819771d94231e893981a40233ace1d989346929830acd426e7548f3f1e001242434ab16169b1e20ef5b7a0e71c696216c87c",
+      "lock_integrity_matched": true,
+      "package_manifest_sha256": "4665126292eff5dffe6c0ffabf98c4de18e479aa0b53edd775028eb567b3ecc1",
+      "package_manifest_name": "better-sqlite3",
+      "package_manifest_version": "12.11.1",
+      "lifecycle_scripts": {
+        "install": "prebuild-install || node-gyp rebuild --release"
+      },
+      "binding_gyp_present": true,
+      "gypfile_declared": false,
+      "binary_metadata": null,
+      "os_constraints": null,
+      "cpu_constraints": null,
+      "native_files_in_archive": [],
+      "lock_occurrence_count": 1,
+      "consumer_entry_count": 1,
+      "windows_x64_constraint_excluded_occurrence_count": 0,
+      "consumer_entries": [
+        {
+          "registry_entry_id": "ko-b16901dcd8944d4c67bf3695",
+          "consumer_package": "koishi-plugin-bilivoice-cutter",
+          "consumer_version": "1.0.1",
+          "dependency_path": "node_modules/better-sqlite3",
+          "optional": false,
+          "os_constraints": null,
+          "cpu_constraints": null,
+          "windows_x64_constraint_status": "not_excluded_by_declared_constraints"
+        }
+      ]
+    },
+    {
+      "package": "bufferutil",
+      "version": "4.1.0",
+      "resolved": "https://registry.npmjs.org/bufferutil/-/bufferutil-4.1.0.tgz",
+      "integrity": "sha512-ZMANVnAixE6AWWnPzlW2KpUrxhm9woycYvPOo67jWHyFowASTEd9s+QN1EIMsSDtwhIxN4sWE1jotpuDUIgyIw==",
+      "target_lock_has_install_script_marker": true,
+      "archive_size_bytes": 163631,
+      "archive_sha256": "19af5978088739b8baf861a95ab4a1feb69a2d30830ced707c37920591046a87",
+      "lock_integrity_algorithm": "sha512",
+      "lock_integrity_digest": "64c00d567022c44e805969cfce55b62a952bc619bdc28c9c62f3cea3aee3587c85a300124c477db3e40dd4420cb120edc21231378b161358e8b69b8350883223",
+      "lock_integrity_matched": true,
+      "package_manifest_sha256": "73f8333d4bf76ac969c65581b8017f56ec579a0346d6beef1d0bcc88d5174474",
+      "package_manifest_name": "bufferutil",
+      "package_manifest_version": "4.1.0",
+      "lifecycle_scripts": {
+        "install": "node-gyp-build"
+      },
+      "binding_gyp_present": true,
+      "gypfile_declared": false,
+      "binary_metadata": null,
+      "os_constraints": null,
+      "cpu_constraints": null,
+      "native_files_in_archive": [
+        {
+          "member": "package/prebuilds/darwin-arm64/bufferutil.node",
+          "size_bytes": 34064,
+          "sha256": "688f957f5a989f6406e5caa26382e213c8b7316eb600303307dc95be60c287c0"
+        },
+        {
+          "member": "package/prebuilds/darwin-x64/bufferutil.node",
+          "size_bytes": 9072,
+          "sha256": "f1c90f748d9149cc42f6a00fa846add14c056403d2e67fc8179c1a53a4f22b1b"
+        },
+        {
+          "member": "package/prebuilds/linux-x64/bufferutil.node",
+          "size_bytes": 14584,
+          "sha256": "9d0bce137193c8630da76797596742368798f72d1564d43be0d716ac74312bda"
+        },
+        {
+          "member": "package/prebuilds/win32-ia32/bufferutil.node",
+          "size_bytes": 129024,
+          "sha256": "d3cc72764c09f4b2a7f885f5167811fd22dd3728b59bb1a18fa5a6f504317689"
+        },
+        {
+          "member": "package/prebuilds/win32-x64/bufferutil.node",
+          "size_bytes": 155136,
+          "sha256": "9bf6ec4d84b75403a50f22d9bdba2cfb287f12472374c9d5eb736c963a997ee9"
+        }
+      ],
+      "lock_occurrence_count": 1,
+      "consumer_entry_count": 1,
+      "windows_x64_constraint_excluded_occurrence_count": 0,
+      "consumer_entries": [
+        {
+          "registry_entry_id": "ko-ddd45c02f4048e7bd8e6711e",
+          "consumer_package": "koishi-plugin-mindustry-service-handler",
+          "consumer_version": "0.0.3",
+          "dependency_path": "node_modules/bufferutil",
+          "optional": false,
+          "os_constraints": null,
+          "cpu_constraints": null,
+          "windows_x64_constraint_status": "not_excluded_by_declared_constraints"
+        }
+      ]
+    },
+    {
+      "package": "canvas",
+      "version": "2.11.2",
+      "resolved": "https://registry.npmjs.org/canvas/-/canvas-2.11.2.tgz",
+      "integrity": "sha512-ItanGBMrmRV7Py2Z+Xhs7cT+FNt5K0vPL4p9EZ/UX/Mu7hFbkxSjKF2KVtPwX7UYWp7dRKnrTvReflgrItJbdw==",
+      "target_lock_has_install_script_marker": true,
+      "archive_size_bytes": 125947,
+      "archive_sha256": "ae1056a48a4c8d54bcaf31caef9c1e843783f2df726c79628e35c5e39d740f21",
+      "lock_integrity_algorithm": "sha512",
+      "lock_integrity_digest": "22d6a718132b99157b3f2d99f9786cedc4fe14db792b4bcf2f8a7d119fd45ff32eee115b9314a3285d8a56d3f05fb5185a9edd44a9eb4ef45e7e582b22d25b77",
+      "lock_integrity_matched": true,
+      "package_manifest_sha256": "96d3394a65216130f678e4cfe285c2c6899fd8815d6f9a7d912843c8b2ff11dd",
+      "package_manifest_name": "canvas",
+      "package_manifest_version": "2.11.2",
+      "lifecycle_scripts": {
+        "install": "node-pre-gyp install --fallback-to-build --update-binary"
+      },
+      "binding_gyp_present": true,
+      "gypfile_declared": false,
+      "binary_metadata": {
+        "module_name": "canvas",
+        "module_path": "build/Release",
+        "host": "https://github.com/Automattic/node-canvas/releases/download/",
+        "remote_path": "v{version}",
+        "package_name": "{module_name}-v{version}-{node_abi}-{platform}-{libc}-{arch}.tar.gz"
+      },
+      "os_constraints": null,
+      "cpu_constraints": null,
+      "native_files_in_archive": [],
+      "lock_occurrence_count": 2,
+      "consumer_entry_count": 2,
+      "windows_x64_constraint_excluded_occurrence_count": 0,
+      "consumer_entries": [
+        {
+          "registry_entry_id": "ko-3d62db10ddb40acb70713fba",
+          "consumer_package": "koishi-plugin-lo-terr",
+          "consumer_version": "2.1.0",
+          "dependency_path": "node_modules/canvas",
+          "optional": false,
+          "os_constraints": null,
+          "cpu_constraints": null,
+          "windows_x64_constraint_status": "not_excluded_by_declared_constraints"
+        },
+        {
+          "registry_entry_id": "ko-56f3785545bcd702721165fc",
+          "consumer_package": "koishi-plugin-scbot",
+          "consumer_version": "4.0.5",
+          "dependency_path": "node_modules/canvas",
+          "optional": false,
+          "os_constraints": null,
+          "cpu_constraints": null,
+          "windows_x64_constraint_status": "not_excluded_by_declared_constraints"
+        }
+      ]
+    },
+    {
+      "package": "canvas",
+      "version": "3.1.0",
+      "resolved": "https://registry.npmjs.org/canvas/-/canvas-3.1.0.tgz",
+      "integrity": "sha512-tTj3CqqukVJ9NgSahykNwtGda7V33VLObwrHfzT0vqJXu7J4d4C/7kQQW3fOEGDfZZoILPut5H00gOjyttPGyg==",
+      "target_lock_has_install_script_marker": true,
+      "archive_size_bytes": 97171,
+      "archive_sha256": "374ee2cdbd433bee125ed4567510bed9db03f11b4884c3154e6af5b5d7620605",
+      "lock_integrity_algorithm": "sha512",
+      "lock_integrity_digest": "b538f70aaaae91527d36049a87290dc2d19d6bb577dd52ce6f0ac77f34f4bea257bbb2787780bfee44105b77ce1060df659a082cfbade47d3480e8f2b6d3c6ca",
+      "lock_integrity_matched": true,
+      "package_manifest_sha256": "f40208874513c05b3f008e4847aed74b9eacbbae318b6c021062d6c2c7cc3005",
+      "package_manifest_name": "canvas",
+      "package_manifest_version": "3.1.0",
+      "lifecycle_scripts": {
+        "install": "prebuild-install -r napi || node-gyp rebuild"
+      },
+      "binding_gyp_present": true,
+      "gypfile_declared": false,
+      "binary_metadata": {
+        "napi_versions": [
+          7
+        ]
+      },
+      "os_constraints": null,
+      "cpu_constraints": null,
+      "native_files_in_archive": [],
+      "lock_occurrence_count": 1,
+      "consumer_entry_count": 1,
+      "windows_x64_constraint_excluded_occurrence_count": 0,
+      "consumer_entries": [
+        {
+          "registry_entry_id": "ko-b85e122e2665732086351d79",
+          "consumer_package": "koishi-plugin-jsbot",
+          "consumer_version": "1.2.22",
+          "dependency_path": "node_modules/canvas",
+          "optional": false,
+          "os_constraints": null,
+          "cpu_constraints": null,
+          "windows_x64_constraint_status": "not_excluded_by_declared_constraints"
+        }
+      ]
+    },
+    {
+      "package": "canvas",
+      "version": "3.2.3",
+      "resolved": "https://registry.npmjs.org/canvas/-/canvas-3.2.3.tgz",
+      "integrity": "sha512-PzE5nJZPz72YUAfo8oTp0u3fqqY7IzlTubneAihqDYAUcBk7ryeCmBbdJBEdaH0bptSOe2VT2Zwcb3UaFyaSWw==",
+      "target_lock_has_install_script_marker": true,
+      "archive_size_bytes": 96010,
+      "archive_sha256": "8b0e958df3511566da8e797da68035d0b2425f13a4b6879b5b3e39bca2f96217",
+      "lock_integrity_algorithm": "sha512",
+      "lock_integrity_digest": "3f31399c964fcfbd985007e8f284e9d2eddfaaa63b233953b9b9de02286a0d801470193baf27829816dd24111d687d1ba6d48e7b6553d99c1c6f751a1726925b",
+      "lock_integrity_matched": true,
+      "package_manifest_sha256": "a0d8fc7c96dc8c05154d93f27d646a09e6dcf74cb8bb6efe7f9179bb22e1e29f",
+      "package_manifest_name": "canvas",
+      "package_manifest_version": "3.2.3",
+      "lifecycle_scripts": {
+        "install": "prebuild-install -r napi || node-gyp rebuild"
+      },
+      "binding_gyp_present": true,
+      "gypfile_declared": false,
+      "binary_metadata": {
+        "napi_versions": [
+          7
+        ]
+      },
+      "os_constraints": null,
+      "cpu_constraints": null,
+      "native_files_in_archive": [],
+      "lock_occurrence_count": 1,
+      "consumer_entry_count": 1,
+      "windows_x64_constraint_excluded_occurrence_count": 0,
+      "consumer_entries": [
+        {
+          "registry_entry_id": "ko-1657263b0ba4278b4b6cb5d2",
+          "consumer_package": "koishi-plugin-msg-photo",
+          "consumer_version": "1.0.1",
+          "dependency_path": "node_modules/canvas",
+          "optional": false,
+          "os_constraints": null,
+          "cpu_constraints": null,
+          "windows_x64_constraint_status": "not_excluded_by_declared_constraints"
+        }
+      ]
+    },
+    {
+      "package": "cpu-features",
+      "version": "0.0.10",
+      "resolved": "https://registry.npmjs.org/cpu-features/-/cpu-features-0.0.10.tgz",
+      "integrity": "sha512-9IkYqtX3YHPCzoVg1Py+o9057a3i0fp7S530UWokCSaFVTc7CwXPRiOjRjBQQ18ZCNafx78YfnG+HALxtVmOGA==",
+      "target_lock_has_install_script_marker": true,
+      "archive_size_bytes": 112485,
+      "archive_sha256": "58a4cea14b272b9845e25b31aef88026eaabc641a308c00270c0ed2e95777ad4",
+      "lock_integrity_algorithm": "sha512",
+      "lock_integrity_digest": "f48918aad5f76073c2ce8560d4fcbea3dd39edade2d1fa7b4b9df4516a2409268555373b0b05cf4623a3463050435f1908d69fc7bf187e71be1c02f1b5598e18",
+      "lock_integrity_matched": true,
+      "package_manifest_sha256": "c47e0020f5434c5b87b7a108c07fd7042656c2524ca2387c4b132adde52fa985",
+      "package_manifest_name": "cpu-features",
+      "package_manifest_version": "0.0.10",
+      "lifecycle_scripts": {
+        "install": "node buildcheck.js > buildcheck.gypi && node-gyp rebuild"
+      },
+      "binding_gyp_present": true,
+      "gypfile_declared": false,
+      "binary_metadata": null,
+      "os_constraints": null,
+      "cpu_constraints": null,
+      "native_files_in_archive": [],
+      "lock_occurrence_count": 1,
+      "consumer_entry_count": 1,
+      "windows_x64_constraint_excluded_occurrence_count": 0,
+      "consumer_entries": [
+        {
+          "registry_entry_id": "ko-15de73c9e3526e8e329299a6",
+          "consumer_package": "koishi-plugin-docker-control",
+          "consumer_version": "0.2.0",
+          "dependency_path": "node_modules/cpu-features",
+          "optional": true,
+          "os_constraints": null,
+          "cpu_constraints": null,
+          "windows_x64_constraint_status": "not_excluded_by_declared_constraints"
+        }
+      ]
+    },
+    {
+      "package": "esbuild",
+      "version": "0.14.54",
+      "resolved": "https://registry.npmjs.org/esbuild/-/esbuild-0.14.54.tgz",
+      "integrity": "sha512-Cy9llcy8DvET5uznocPyqL3BFRrFXSVqbgpMJ9Wz8oVjZlh/zUSNbPRbov0VX7VxN2JH1Oa0uNxZ7eLRb62pJA==",
+      "target_lock_has_install_script_marker": true,
+      "archive_size_bytes": 26204,
+      "archive_sha256": "51e74b3753ed567a83b41423be91ff71fcbeca500139f832f15a011c5a512141",
+      "lock_integrity_algorithm": "sha512",
+      "lock_integrity_digest": "0b2f6595ccbc0ef113e6ece7a1c3f2a8bdc1151ac55d256a6e0a4c27d5b3f2856366587fcd448d6cf45ba2fd155fb571376247d4e6b4b8dc59ede2d16fada924",
+      "lock_integrity_matched": true,
+      "package_manifest_sha256": "f93242e9ea782fd2b87f69d4d361eafc2acf9a2a0dccaf1bd1fc64be62349a6d",
+      "package_manifest_name": "esbuild",
+      "package_manifest_version": "0.14.54",
+      "lifecycle_scripts": {
+        "postinstall": "node install.js"
+      },
+      "binding_gyp_present": false,
+      "gypfile_declared": false,
+      "binary_metadata": null,
+      "os_constraints": null,
+      "cpu_constraints": null,
+      "native_files_in_archive": [],
+      "lock_occurrence_count": 1,
+      "consumer_entry_count": 1,
+      "windows_x64_constraint_excluded_occurrence_count": 0,
+      "consumer_entries": [
+        {
+          "registry_entry_id": "ko-b395bb25ddd9b13efad695e8",
+          "consumer_package": "koishi-plugin-xsxn",
+          "consumer_version": "1.4.1",
+          "dependency_path": "node_modules/esbuild",
+          "optional": false,
+          "os_constraints": null,
+          "cpu_constraints": null,
+          "windows_x64_constraint_status": "not_excluded_by_declared_constraints"
+        }
+      ]
+    },
+    {
+      "package": "esbuild",
+      "version": "0.15.18",
+      "resolved": "https://registry.npmjs.org/esbuild/-/esbuild-0.15.18.tgz",
+      "integrity": "sha512-x/R72SmW3sSFRm5zrrIjAhCeQSAWoni3CmHEqfQrZIQTM3lVCdehdwuIqaOtfC2slvpdlLa62GYoN8SxT23m6Q==",
+      "target_lock_has_install_script_marker": true,
+      "archive_size_bytes": 27100,
+      "archive_sha256": "ede365bc46bfd49b80677955b56a4fbeb6c4b50f187cece83d3b99b39cf1f0b1",
+      "lock_integrity_algorithm": "sha512",
+      "lock_integrity_digest": "c7f47bd92996dec485466e73aeb22302109e412016a278b70a61c4a9f42b64841333795509d7a1770b88a9a3ad7c2dac96fa5d94b6bad8662837c4b14f6de6e9",
+      "lock_integrity_matched": true,
+      "package_manifest_sha256": "d067a3eba5b1e31500d2d6e8d95485ee73f375b479afd117ad7ba72aef42b3e7",
+      "package_manifest_name": "esbuild",
+      "package_manifest_version": "0.15.18",
+      "lifecycle_scripts": {
+        "postinstall": "node install.js"
+      },
+      "binding_gyp_present": false,
+      "gypfile_declared": false,
+      "binary_metadata": null,
+      "os_constraints": null,
+      "cpu_constraints": null,
+      "native_files_in_archive": [],
+      "lock_occurrence_count": 1,
+      "consumer_entry_count": 1,
+      "windows_x64_constraint_excluded_occurrence_count": 0,
+      "consumer_entries": [
+        {
+          "registry_entry_id": "ko-bb1f5f331c63775c59c31905",
+          "consumer_package": "koishi-plugin-gocq-session-uploader",
+          "consumer_version": "1.0.2",
+          "dependency_path": "node_modules/esbuild",
+          "optional": false,
+          "os_constraints": null,
+          "cpu_constraints": null,
+          "windows_x64_constraint_status": "not_excluded_by_declared_constraints"
+        }
+      ]
+    },
+    {
+      "package": "esbuild",
+      "version": "0.18.20",
+      "resolved": "https://registry.npmjs.org/esbuild/-/esbuild-0.18.20.tgz",
+      "integrity": "sha512-ceqxoedUrcayh7Y7ZX6NdbbDzGROiyVBgC4PriJThBKSVPWnnFHZAkfI1lJT8QFkOwH4qOS2SJkS4wvpGl8BpA==",
+      "target_lock_has_install_script_marker": true,
+      "archive_size_bytes": 29378,
+      "archive_sha256": "ab40043a2bd859bbc20f34ee294a2c326783b15814a6d37881bc446f519bcb7d",
+      "lock_integrity_algorithm": "sha512",
+      "lock_integrity_digest": "71eab1a1e754adc6b287b63b657e8d75b6c3cc644e8b2541802e0fae225384129254f5a79c51d90247c8d65253f101643b01f8a8e4b6489912e30be91a5f01a4",
+      "lock_integrity_matched": true,
+      "package_manifest_sha256": "37251f359539b55497a78f9daaff4545c30ed6c3d1c2e4fac01aa5a5d3d5bf7b",
+      "package_manifest_name": "esbuild",
+      "package_manifest_version": "0.18.20",
+      "lifecycle_scripts": {
+        "postinstall": "node install.js"
+      },
+      "binding_gyp_present": false,
+      "gypfile_declared": false,
+      "binary_metadata": null,
+      "os_constraints": null,
+      "cpu_constraints": null,
+      "native_files_in_archive": [],
+      "lock_occurrence_count": 1,
+      "consumer_entry_count": 1,
+      "windows_x64_constraint_excluded_occurrence_count": 0,
+      "consumer_entries": [
+        {
+          "registry_entry_id": "ko-d7d99917a2a00cd3e0972de3",
+          "consumer_package": "koishi-plugin-rpixiv",
+          "consumer_version": "0.2.2",
+          "dependency_path": "node_modules/esbuild",
+          "optional": false,
+          "os_constraints": null,
+          "cpu_constraints": null,
+          "windows_x64_constraint_status": "not_excluded_by_declared_constraints"
+        }
+      ]
+    },
+    {
+      "package": "esbuild",
+      "version": "0.21.5",
+      "resolved": "https://registry.npmjs.org/esbuild/-/esbuild-0.21.5.tgz",
+      "integrity": "sha512-mg3OPMV4hXywwpoDxu3Qda5xCKQi+vCTZq8S9J/EpkhB2HzKXq4SNFZE3+NK93JYxc8VMSep+lOUSC/RVKaBqw==",
+      "target_lock_has_install_script_marker": true,
+      "archive_size_bytes": 30513,
+      "archive_sha256": "0f60f3d3dc5efa299e3464d29b6a7dc51d1dff665fe7b036aa95021ce6fd827a",
+      "lock_integrity_algorithm": "sha512",
+      "lock_integrity_digest": "9a0dce3cc578857cb0c29a03c6edd075ae7108a422faf09366af12f49fc4a64841d87cca5eae12345644dfe34af77258c5cf153127a9fa5394482fd154a681ab",
+      "lock_integrity_matched": true,
+      "package_manifest_sha256": "0f35e0d63bd60a43ed85879604a40f7e9688b321904cf28a95be5b1bc629559c",
+      "package_manifest_name": "esbuild",
+      "package_manifest_version": "0.21.5",
+      "lifecycle_scripts": {
+        "postinstall": "node install.js"
+      },
+      "binding_gyp_present": false,
+      "gypfile_declared": false,
+      "binary_metadata": null,
+      "os_constraints": null,
+      "cpu_constraints": null,
+      "native_files_in_archive": [],
+      "lock_occurrence_count": 3,
+      "consumer_entry_count": 3,
+      "windows_x64_constraint_excluded_occurrence_count": 0,
+      "consumer_entries": [
+        {
+          "registry_entry_id": "ko-6cc09a7c20d31ab46d1a309d",
+          "consumer_package": "koishi-plugin-fonts4pptr",
+          "consumer_version": "1.0.1",
+          "dependency_path": "node_modules/vite/node_modules/esbuild",
+          "optional": false,
+          "os_constraints": null,
+          "cpu_constraints": null,
+          "windows_x64_constraint_status": "not_excluded_by_declared_constraints"
+        },
+        {
+          "registry_entry_id": "ko-8e241d55fc0fcd1d2704806e",
+          "consumer_package": "koishi-plugin-adapter-bilibili-dm",
+          "consumer_version": "2.8.5",
+          "dependency_path": "node_modules/vite/node_modules/esbuild",
+          "optional": false,
+          "os_constraints": null,
+          "cpu_constraints": null,
+          "windows_x64_constraint_status": "not_excluded_by_declared_constraints"
+        },
+        {
+          "registry_entry_id": "ko-d5d43667d9446f27dd1b1433",
+          "consumer_package": "koishi-plugin-fonts",
+          "consumer_version": "1.0.4",
+          "dependency_path": "node_modules/vite/node_modules/esbuild",
+          "optional": false,
+          "os_constraints": null,
+          "cpu_constraints": null,
+          "windows_x64_constraint_status": "not_excluded_by_declared_constraints"
+        }
+      ]
+    },
+    {
+      "package": "esbuild",
+      "version": "0.23.1",
+      "resolved": "https://registry.npmjs.org/esbuild/-/esbuild-0.23.1.tgz",
+      "integrity": "sha512-VVNz/9Sa0bs5SELtn3f7qhJCDPCF5oMEl5cO9/SSinpE9hbPVvxbd572HH5AKiP7WD8INO53GgfDDhRjkylHEg==",
+      "target_lock_has_install_script_marker": true,
+      "archive_size_bytes": 30549,
+      "archive_sha256": "992d8528706f19f36ee8dddd740ed3ac583d2960cd1883d01db0471d8cbc8eeb",
+      "lock_integrity_algorithm": "sha512",
+      "lock_integrity_digest": "555373ffd49ad1bb394842ed9f77fbaa12420cf085e6830497970ef7f4928a7a44f616cf56fc5b779ef61c7e402a23fb583f0834ee771a07c30e146393294712",
+      "lock_integrity_matched": true,
+      "package_manifest_sha256": "4697c6893ca261b39744e3512f3eeeb6b73ed2badb0b3d89c140913ece013fe5",
+      "package_manifest_name": "esbuild",
+      "package_manifest_version": "0.23.1",
+      "lifecycle_scripts": {
+        "postinstall": "node install.js"
+      },
+      "binding_gyp_present": false,
+      "gypfile_declared": false,
+      "binary_metadata": null,
+      "os_constraints": null,
+      "cpu_constraints": null,
+      "native_files_in_archive": [],
+      "lock_occurrence_count": 1,
+      "consumer_entry_count": 1,
+      "windows_x64_constraint_excluded_occurrence_count": 0,
+      "consumer_entries": [
+        {
+          "registry_entry_id": "ko-4db71115bfe494d4f58282f5",
+          "consumer_package": "koishi-plugin-maimai-player-queue",
+          "consumer_version": "0.3.2",
+          "dependency_path": "node_modules/esbuild",
+          "optional": false,
+          "os_constraints": null,
+          "cpu_constraints": null,
+          "windows_x64_constraint_status": "not_excluded_by_declared_constraints"
+        }
+      ]
+    },
+    {
+      "package": "esbuild",
+      "version": "0.25.12",
+      "resolved": "https://registry.npmjs.org/esbuild/-/esbuild-0.25.12.tgz",
+      "integrity": "sha512-bbPBYYrtZbkt6Os6FiTLCTFxvq4tt3JKall1vRwshA3fdVztsLAatFaZobhkBC8/BrPetoa0oksYoKXoG4ryJg==",
+      "target_lock_has_install_script_marker": true,
+      "archive_size_bytes": 30947,
+      "archive_sha256": "227584145829e5c4782734b3fb7b91b49c6aa12876d6cf070e6a3d9d4de543f9",
+      "lock_integrity_algorithm": "sha512",
+      "lock_integrity_digest": "6db3c1618aed65b92de8eb3a1624cb093171beae2db7724a6a5975bd1c2c840ddf755cedb0b01ab45699a1b864042f3f06b3deb686b4a24b18a0a5e81b8af226",
+      "lock_integrity_matched": true,
+      "package_manifest_sha256": "cb7d5b1fe478f8cbaae566a86031b6fdf5f7d444354f35d1cb3cba9adf6d2935",
+      "package_manifest_name": "esbuild",
+      "package_manifest_version": "0.25.12",
+      "lifecycle_scripts": {
+        "postinstall": "node install.js"
+      },
+      "binding_gyp_present": false,
+      "gypfile_declared": false,
+      "binary_metadata": null,
+      "os_constraints": null,
+      "cpu_constraints": null,
+      "native_files_in_archive": [],
+      "lock_occurrence_count": 3,
+      "consumer_entry_count": 3,
+      "windows_x64_constraint_excluded_occurrence_count": 0,
+      "consumer_entries": [
+        {
+          "registry_entry_id": "ko-6cc09a7c20d31ab46d1a309d",
+          "consumer_package": "koishi-plugin-fonts4pptr",
+          "consumer_version": "1.0.1",
+          "dependency_path": "node_modules/esbuild",
+          "optional": false,
+          "os_constraints": null,
+          "cpu_constraints": null,
+          "windows_x64_constraint_status": "not_excluded_by_declared_constraints"
+        },
+        {
+          "registry_entry_id": "ko-8e241d55fc0fcd1d2704806e",
+          "consumer_package": "koishi-plugin-adapter-bilibili-dm",
+          "consumer_version": "2.8.5",
+          "dependency_path": "node_modules/esbuild",
+          "optional": false,
+          "os_constraints": null,
+          "cpu_constraints": null,
+          "windows_x64_constraint_status": "not_excluded_by_declared_constraints"
+        },
+        {
+          "registry_entry_id": "ko-d5d43667d9446f27dd1b1433",
+          "consumer_package": "koishi-plugin-fonts",
+          "consumer_version": "1.0.4",
+          "dependency_path": "node_modules/esbuild",
+          "optional": false,
+          "os_constraints": null,
+          "cpu_constraints": null,
+          "windows_x64_constraint_status": "not_excluded_by_declared_constraints"
+        }
+      ]
+    },
+    {
+      "package": "esbuild",
+      "version": "0.28.2",
+      "resolved": "https://registry.npmjs.org/esbuild/-/esbuild-0.28.2.tgz",
+      "integrity": "sha512-HKVLS8dvII+xoKW9kmqxbRKrnWEXfJJr/FZhhJmiqIB0e053QNYFqOBouTMO/k5sID4MvCiUCvv8b9M4h32wIA==",
+      "target_lock_has_install_script_marker": true,
+      "archive_size_bytes": 34207,
+      "archive_sha256": "e045f94c235c7adc50e77ba2a579c7bec41b496b6b47c3a7845f7c1e19959a88",
+      "lock_integrity_algorithm": "sha512",
+      "lock_integrity_digest": "1ca54b4bc76f208fb1a0a5bd926ab16d12ab9d61177c926bfc56618499a2a880747b4e7740d605a8e068b9330efe4e6c203e0cbc28940afbfc6fd338877db020",
+      "lock_integrity_matched": true,
+      "package_manifest_sha256": "9d0bc453f4e791553c4cc2298ba023b409241fd9801e494741666eb0f6051490",
+      "package_manifest_name": "esbuild",
+      "package_manifest_version": "0.28.2",
+      "lifecycle_scripts": {
+        "postinstall": "node install.js"
+      },
+      "binding_gyp_present": false,
+      "gypfile_declared": false,
+      "binary_metadata": null,
+      "os_constraints": null,
+      "cpu_constraints": null,
+      "native_files_in_archive": [],
+      "lock_occurrence_count": 3,
+      "consumer_entry_count": 3,
+      "windows_x64_constraint_excluded_occurrence_count": 0,
+      "consumer_entries": [
+        {
+          "registry_entry_id": "ko-6cc09a7c20d31ab46d1a309d",
+          "consumer_package": "koishi-plugin-fonts4pptr",
+          "consumer_version": "1.0.1",
+          "dependency_path": "node_modules/tsx/node_modules/esbuild",
+          "optional": false,
+          "os_constraints": null,
+          "cpu_constraints": null,
+          "windows_x64_constraint_status": "not_excluded_by_declared_constraints"
+        },
+        {
+          "registry_entry_id": "ko-8e241d55fc0fcd1d2704806e",
+          "consumer_package": "koishi-plugin-adapter-bilibili-dm",
+          "consumer_version": "2.8.5",
+          "dependency_path": "node_modules/tsx/node_modules/esbuild",
+          "optional": false,
+          "os_constraints": null,
+          "cpu_constraints": null,
+          "windows_x64_constraint_status": "not_excluded_by_declared_constraints"
+        },
+        {
+          "registry_entry_id": "ko-d5d43667d9446f27dd1b1433",
+          "consumer_package": "koishi-plugin-fonts",
+          "consumer_version": "1.0.4",
+          "dependency_path": "node_modules/tsx/node_modules/esbuild",
+          "optional": false,
+          "os_constraints": null,
+          "cpu_constraints": null,
+          "windows_x64_constraint_status": "not_excluded_by_declared_constraints"
+        }
+      ]
+    },
+    {
+      "package": "ffmpeg-static",
+      "version": "5.3.0",
+      "resolved": "https://registry.npmjs.org/ffmpeg-static/-/ffmpeg-static-5.3.0.tgz",
+      "integrity": "sha512-H+K6sW6TiIX6VGend0KQwthe+kaceeH/luE8dIZyOP35ik7ahYojDuqlTV1bOrtEwl01sy2HFNGQfi5IDJvotg==",
+      "target_lock_has_install_script_marker": true,
+      "archive_size_bytes": 17329,
+      "archive_sha256": "0525c908c27618582a6fb5d4cc70452a2f2d4f50cb3d88b19b16a3c1cc8df25d",
+      "lock_integrity_algorithm": "sha512",
+      "lock_integrity_digest": "1fe2bab16e938885fa5467a7774290c2d85efa469c79e1ff96e13c74867238fdf98a4eda858a230eeaa54d5d5b3abb44c25d35b32d8714d1907e2e480c9be8b6",
+      "lock_integrity_matched": true,
+      "package_manifest_sha256": "646ba194bac40bdb76856effc9629463477c0e1e7ccded3888971328ff7761c5",
+      "package_manifest_name": "ffmpeg-static",
+      "package_manifest_version": "5.3.0",
+      "lifecycle_scripts": {
+        "install": "node install.js"
+      },
+      "binding_gyp_present": false,
+      "gypfile_declared": false,
+      "binary_metadata": null,
+      "os_constraints": null,
+      "cpu_constraints": null,
+      "native_files_in_archive": [],
+      "lock_occurrence_count": 1,
+      "consumer_entry_count": 1,
+      "windows_x64_constraint_excluded_occurrence_count": 0,
+      "consumer_entries": [
+        {
+          "registry_entry_id": "ko-6fe9d9f97d8b46fc72373dac",
+          "consumer_package": "koishi-plugin-tsugu-external",
+          "consumer_version": "0.0.3",
+          "dependency_path": "node_modules/ffmpeg-static",
+          "optional": false,
+          "os_constraints": null,
+          "cpu_constraints": null,
+          "windows_x64_constraint_status": "not_excluded_by_declared_constraints"
+        }
+      ]
+    },
+    {
+      "package": "fsevents",
+      "version": "2.3.3",
+      "resolved": "https://registry.npmjs.org/fsevents/-/fsevents-2.3.3.tgz",
+      "integrity": "sha512-5xoDfX+fL7faATnagmWPpbFtwh/R77WmMMqqHGS65C3vvB0YHrgF+B1YmZ3441tMj5n63k0212XNoJwzlhffQw==",
+      "target_lock_has_install_script_marker": true,
+      "archive_size_bytes": 22808,
+      "archive_sha256": "c77e7a5d5ff31dd7acea7c44d4a0455e0528cdacbd24a8cb6c82b66d239b587e",
+      "lock_integrity_algorithm": "sha512",
+      "lock_integrity_digest": "e71a037d7f9f2fb7da0139da82658fa5b16dc21fd1efb5a630caaa1c64bae42defbc1d181eb805f81d58999df8e35b4c8f99fade4d36d765cda09c339617df43",
+      "lock_integrity_matched": true,
+      "package_manifest_sha256": "500839fcc76f6c5efcb454e6614b23c26775e75e1140619fff9ca64c291aec2b",
+      "package_manifest_name": "fsevents",
+      "package_manifest_version": "2.3.3",
+      "lifecycle_scripts": {},
+      "binding_gyp_present": false,
+      "gypfile_declared": false,
+      "binary_metadata": null,
+      "os_constraints": [
+        "darwin"
+      ],
+      "cpu_constraints": null,
+      "native_files_in_archive": [
+        {
+          "member": "package/fsevents.node",
+          "size_bytes": 163626,
+          "sha256": "40f2f51199e4f5fc46fa6b985fb3461bb63e6cd86c62bfa9bcee45ed4438d5fb"
+        }
+      ],
+      "lock_occurrence_count": 7,
+      "consumer_entry_count": 7,
+      "windows_x64_constraint_excluded_occurrence_count": 7,
+      "consumer_entries": [
+        {
+          "registry_entry_id": "ko-3d62db10ddb40acb70713fba",
+          "consumer_package": "koishi-plugin-lo-terr",
+          "consumer_version": "2.1.0",
+          "dependency_path": "node_modules/fsevents",
+          "optional": true,
+          "os_constraints": [
+            "darwin"
+          ],
+          "cpu_constraints": null,
+          "windows_x64_constraint_status": "excluded_by_os_constraint"
+        },
+        {
+          "registry_entry_id": "ko-6cc09a7c20d31ab46d1a309d",
+          "consumer_package": "koishi-plugin-fonts4pptr",
+          "consumer_version": "1.0.1",
+          "dependency_path": "node_modules/fsevents",
+          "optional": true,
+          "os_constraints": [
+            "darwin"
+          ],
+          "cpu_constraints": null,
+          "windows_x64_constraint_status": "excluded_by_os_constraint"
+        },
+        {
+          "registry_entry_id": "ko-8e241d55fc0fcd1d2704806e",
+          "consumer_package": "koishi-plugin-adapter-bilibili-dm",
+          "consumer_version": "2.8.5",
+          "dependency_path": "node_modules/fsevents",
+          "optional": true,
+          "os_constraints": [
+            "darwin"
+          ],
+          "cpu_constraints": null,
+          "windows_x64_constraint_status": "excluded_by_os_constraint"
+        },
+        {
+          "registry_entry_id": "ko-b395bb25ddd9b13efad695e8",
+          "consumer_package": "koishi-plugin-xsxn",
+          "consumer_version": "1.4.1",
+          "dependency_path": "node_modules/fsevents",
+          "optional": true,
+          "os_constraints": [
+            "darwin"
+          ],
+          "cpu_constraints": null,
+          "windows_x64_constraint_status": "excluded_by_os_constraint"
+        },
+        {
+          "registry_entry_id": "ko-bb1f5f331c63775c59c31905",
+          "consumer_package": "koishi-plugin-gocq-session-uploader",
+          "consumer_version": "1.0.2",
+          "dependency_path": "node_modules/fsevents",
+          "optional": true,
+          "os_constraints": [
+            "darwin"
+          ],
+          "cpu_constraints": null,
+          "windows_x64_constraint_status": "excluded_by_os_constraint"
+        },
+        {
+          "registry_entry_id": "ko-d5d43667d9446f27dd1b1433",
+          "consumer_package": "koishi-plugin-fonts",
+          "consumer_version": "1.0.4",
+          "dependency_path": "node_modules/fsevents",
+          "optional": true,
+          "os_constraints": [
+            "darwin"
+          ],
+          "cpu_constraints": null,
+          "windows_x64_constraint_status": "excluded_by_os_constraint"
+        },
+        {
+          "registry_entry_id": "ko-d7d99917a2a00cd3e0972de3",
+          "consumer_package": "koishi-plugin-rpixiv",
+          "consumer_version": "0.2.2",
+          "dependency_path": "node_modules/fsevents",
+          "optional": true,
+          "os_constraints": [
+            "darwin"
+          ],
+          "cpu_constraints": null,
+          "windows_x64_constraint_status": "excluded_by_os_constraint"
+        }
+      ]
+    },
+    {
+      "package": "koishi-plugin-kkk",
+      "version": "4.0.1",
+      "resolved": "https://registry.npmjs.org/koishi-plugin-kkk/-/koishi-plugin-kkk-4.0.1.tgz",
+      "integrity": "sha512-sBXRGdCbpVQSqTw3F8YkuSwDgrKLaH60A/w+PJuLHe+F2N3x7z9YmSBwboTBxGFl2qxmTpqpn8o9mdprjiyG4A==",
+      "target_lock_has_install_script_marker": true,
+      "archive_size_bytes": 6768981,
+      "archive_sha256": "73f0c4ed484b02a3a1d6f401277a597b281ede492e89a37940d6d2510fd7678a",
+      "lock_integrity_algorithm": "sha512",
+      "lock_integrity_digest": "b015d119d09ba55412a93c3717c624b92c0382b28b687eb403fc3e3c9b8b1def85d8ddf1ef3f589920706e84c1c46165daac664e9aa99fca3d99da6b8e2c86e0",
+      "lock_integrity_matched": true,
+      "package_manifest_sha256": "331fcdc562228fc5dea6b2e5bb114cee30e80aba2cb2d468f3f8b241ecbe5a82",
+      "package_manifest_name": "koishi-plugin-kkk",
+      "package_manifest_version": "4.0.1",
+      "lifecycle_scripts": {
+        "postinstall": "node scripts/patch-deps.mjs"
+      },
+      "binding_gyp_present": false,
+      "gypfile_declared": false,
+      "binary_metadata": null,
+      "os_constraints": null,
+      "cpu_constraints": null,
+      "native_files_in_archive": [],
+      "lock_occurrence_count": 1,
+      "consumer_entry_count": 1,
+      "windows_x64_constraint_excluded_occurrence_count": 0,
+      "consumer_entries": [
+        {
+          "registry_entry_id": "ko-4ffb740ee99f763b364bfca5",
+          "consumer_package": "koishi-plugin-kkk",
+          "consumer_version": "4.0.1",
+          "dependency_path": "node_modules/koishi-plugin-kkk",
+          "optional": false,
+          "os_constraints": null,
+          "cpu_constraints": null,
+          "windows_x64_constraint_status": "not_excluded_by_declared_constraints"
+        }
+      ]
+    },
+    {
+      "package": "leveldown",
+      "version": "6.1.1",
+      "resolved": "https://registry.npmjs.org/leveldown/-/leveldown-6.1.1.tgz",
+      "integrity": "sha512-88c+E+Eizn4CkQOBHwqlCJaTNEjGpaEIikn1S+cINc5E9HEvJ77bqY4JY/HxT5u0caWqsc3P3DcFIKBI1vHt+A==",
+      "target_lock_has_install_script_marker": true,
+      "archive_size_bytes": 2215716,
+      "archive_sha256": "fe534f13e475826331c9cd59f279f073c3238e4db2ff2c930e17a786ba0f4f01",
+      "lock_integrity_algorithm": "sha512",
+      "lock_integrity_digest": "f3c73e13e122ce7e029103811f0aa50896933448c6a5a1088a49f54be70835ce44f4712f27bedba98e0963f1f14f9bb471a5aab1cdcfdc370520a048d6f1edf8",
+      "lock_integrity_matched": true,
+      "package_manifest_sha256": "202fa660df67d0592e11c01fc2c8338819134574107966a28508bea7142b8ab7",
+      "package_manifest_name": "leveldown",
+      "package_manifest_version": "6.1.1",
+      "lifecycle_scripts": {
+        "install": "node-gyp-build"
+      },
+      "binding_gyp_present": true,
+      "gypfile_declared": true,
+      "binary_metadata": null,
+      "os_constraints": null,
+      "cpu_constraints": null,
+      "native_files_in_archive": [
+        {
+          "member": "package/prebuilds/android-arm/node.napi.armv7.node",
+          "size_bytes": 324752,
+          "sha256": "4b41085392466e8042ab08cdbbc060636828fc68e16ce859de28bbc1aa016190"
+        },
+        {
+          "member": "package/prebuilds/android-arm64/node.napi.armv8.node",
+          "size_bytes": 357912,
+          "sha256": "ae41a0d08b8f288d91dec640c83510ee46577d1a907405a3e6f441f1e790f161"
+        },
+        {
+          "member": "package/prebuilds/darwin-x64+arm64/node.napi.node",
+          "size_bytes": 630560,
+          "sha256": "e0ffe9880ab98dabdb5b24a7eb052d50bd2f4e92a5ad39f040f190c75e17e0bb"
+        },
+        {
+          "member": "package/prebuilds/linux-arm/node.napi.armv6.node",
+          "size_bytes": 388548,
+          "sha256": "a966f0b8d3f0f085df6d8ccb5b6c17a19cbc008daac6ec8bdc4bf62b71074b66"
+        },
+        {
+          "member": "package/prebuilds/linux-arm/node.napi.armv7.node",
+          "size_bytes": 388560,
+          "sha256": "05dd2a7cde4f687b3df70ab3f0685554192884ae5749b4d3ad55e866dd5cc785"
+        },
+        {
+          "member": "package/prebuilds/linux-arm64/node.napi.armv8.node",
+          "size_bytes": 439776,
+          "sha256": "be97ad8866dae56519f18c690cd265440f194cbcb1342f1aa6b4bb1c623b95e4"
+        },
+        {
+          "member": "package/prebuilds/linux-x64/node.napi.glibc.node",
+          "size_bytes": 497168,
+          "sha256": "03f4700c26adb994727d90d3af33b92371277f6427898fbb58447a2a8b1dea75"
+        },
+        {
+          "member": "package/prebuilds/linux-x64/node.napi.musl.node",
+          "size_bytes": 456624,
+          "sha256": "490a70030ec5a91573a93f016a5f9fca986a2baba54b8f60d0743fd0b35862c9"
+        },
+        {
+          "member": "package/prebuilds/win32-ia32/node.napi.node",
+          "size_bytes": 432640,
+          "sha256": "99d29045ae4f307ec20a1d0c481e62ecfb7232954ddd8752879af13d7f57543c"
+        },
+        {
+          "member": "package/prebuilds/win32-x64/node.napi.node",
+          "size_bytes": 506880,
+          "sha256": "c19cc096eee9424ec00aaba8b2756613e9b5dc7f1559bc7141acbd18ce4cc79b"
+        }
+      ],
+      "lock_occurrence_count": 2,
+      "consumer_entry_count": 2,
+      "windows_x64_constraint_excluded_occurrence_count": 0,
+      "consumer_entries": [
+        {
+          "registry_entry_id": "ko-20134f413531bb1125813d69",
+          "consumer_package": "koishi-plugin-ffxiv",
+          "consumer_version": "2.0.8",
+          "dependency_path": "node_modules/leveldown",
+          "optional": false,
+          "os_constraints": null,
+          "cpu_constraints": null,
+          "windows_x64_constraint_status": "not_excluded_by_declared_constraints"
+        },
+        {
+          "registry_entry_id": "ko-4f9dda3b5e4f0e088360b99d",
+          "consumer_package": "koishi-plugin-adapter-wechat4u",
+          "consumer_version": "0.0.8",
+          "dependency_path": "node_modules/leveldown",
+          "optional": false,
+          "os_constraints": null,
+          "cpu_constraints": null,
+          "windows_x64_constraint_status": "not_excluded_by_declared_constraints"
+        }
+      ]
+    },
+    {
+      "package": "protobufjs",
+      "version": "6.11.6",
+      "resolved": "https://registry.npmjs.org/protobufjs/-/protobufjs-6.11.6.tgz",
+      "integrity": "sha512-k8BHqgPBOtrlougZZqF2uUk5Z7bN8f0wj+3e8M3hvtSv0NBAz4VBy5f6R5Nxq/l+i7mRFTgNZb2trxqTpHNY/A==",
+      "target_lock_has_install_script_marker": true,
+      "archive_size_bytes": 3554950,
+      "archive_sha256": "d591cbbb11ca86be2784a3c38be868580deec9d00da8ae9d992a843e74f89703",
+      "lock_integrity_algorithm": "sha512",
+      "lock_integrity_digest": "93c047aa03c13adae5a2e81966a176b9493967b6cdf1fd308feddef0cde1bed4afd0d040cf8541cb97fa479371abf97e8bb99115380d65bdadaf1a93a47358fc",
+      "lock_integrity_matched": true,
+      "package_manifest_sha256": "8dd45ce37a858d238b55202f6a237f7f852d8118aa872da2dfdb6dbb4c691a2b",
+      "package_manifest_name": "protobufjs",
+      "package_manifest_version": "6.11.6",
+      "lifecycle_scripts": {
+        "postinstall": "node scripts/postinstall"
+      },
+      "binding_gyp_present": false,
+      "gypfile_declared": false,
+      "binary_metadata": null,
+      "os_constraints": null,
+      "cpu_constraints": null,
+      "native_files_in_archive": [],
+      "lock_occurrence_count": 1,
+      "consumer_entry_count": 1,
+      "windows_x64_constraint_excluded_occurrence_count": 0,
+      "consumer_entries": [
+        {
+          "registry_entry_id": "ko-a77908164683fead2d9ee80a",
+          "consumer_package": "koishi-plugin-vit-nsfw-detect",
+          "consumer_version": "0.1.0",
+          "dependency_path": "node_modules/protobufjs",
+          "optional": false,
+          "os_constraints": null,
+          "cpu_constraints": null,
+          "windows_x64_constraint_status": "not_excluded_by_declared_constraints"
+        }
+      ]
+    },
+    {
+      "package": "protobufjs",
+      "version": "7.2.4",
+      "resolved": "https://registry.npmjs.org/protobufjs/-/protobufjs-7.2.4.tgz",
+      "integrity": "sha512-AT+RJgD2sH8phPmCf7OUZR8xGdcJRga4+1cOaXJ64hvcSkVhNcRHOwIxUatPH15+nj59WAGTDv3LSGZPEQbJaQ==",
+      "target_lock_has_install_script_marker": true,
+      "archive_size_bytes": 574857,
+      "archive_sha256": "c17ae0f0cd33446f6b8374cee979ba225aea8b77f0352300f776aa67366944ef",
+      "lock_integrity_algorithm": "sha512",
+      "lock_integrity_digest": "013f912600f6b07f2984f9827fb394651f3119d7094606b8fb570e69727ae21bdc4a456135c4473b023151ab4f1f5e7e9e3e7d5801930efdcb48664f1106c969",
+      "lock_integrity_matched": true,
+      "package_manifest_sha256": "3f8e1d4e60182509efdb59a99fcd71fb8b73f39df37dacc6e1bb7fc5a7f22c78",
+      "package_manifest_name": "protobufjs",
+      "package_manifest_version": "7.2.4",
+      "lifecycle_scripts": {
+        "postinstall": "node scripts/postinstall"
+      },
+      "binding_gyp_present": false,
+      "gypfile_declared": false,
+      "binary_metadata": null,
+      "os_constraints": null,
+      "cpu_constraints": null,
+      "native_files_in_archive": [],
+      "lock_occurrence_count": 1,
+      "consumer_entry_count": 1,
+      "windows_x64_constraint_excluded_occurrence_count": 0,
+      "consumer_entries": [
+        {
+          "registry_entry_id": "ko-ab1958e5b58395750a67e82d",
+          "consumer_package": "koishi-plugin-vrc-activity-calendar",
+          "consumer_version": "1.1.1",
+          "dependency_path": "node_modules/protobufjs",
+          "optional": false,
+          "os_constraints": null,
+          "cpu_constraints": null,
+          "windows_x64_constraint_status": "not_excluded_by_declared_constraints"
+        }
+      ]
+    },
+    {
+      "package": "protobufjs",
+      "version": "7.6.6",
+      "resolved": "https://registry.npmjs.org/protobufjs/-/protobufjs-7.6.6.tgz",
+      "integrity": "sha512-dYDWdjSl5RNb7SgPxGQcRU+GtvP7s2fpkrY0r432PcOIaZ0/rBcxEZnQN67iJhFuQiVw754JDoPruPCNdGsbjg==",
+      "target_lock_has_install_script_marker": true,
+      "archive_size_bytes": 641865,
+      "archive_sha256": "df0241b3046b505d27396da6eef107f14dffb108f77aa89cfd9611a928eb6dfe",
+      "lock_integrity_algorithm": "sha512",
+      "lock_integrity_digest": "7580d67634a5e5135bed280fc4641c454f86b6f3fbb367e992b634af8df63dc388699d3fac17311199d037aee226116e422570ef9e090e83ebb8f08d746b1b8e",
+      "lock_integrity_matched": true,
+      "package_manifest_sha256": "0e56b70de03bffc143e74311b42ae22b557370a4a1f4b5066568fbc77857639a",
+      "package_manifest_name": "protobufjs",
+      "package_manifest_version": "7.6.6",
+      "lifecycle_scripts": {
+        "postinstall": "node scripts/postinstall"
+      },
+      "binding_gyp_present": false,
+      "gypfile_declared": false,
+      "binary_metadata": null,
+      "os_constraints": null,
+      "cpu_constraints": null,
+      "native_files_in_archive": [],
+      "lock_occurrence_count": 5,
+      "consumer_entry_count": 5,
+      "windows_x64_constraint_excluded_occurrence_count": 0,
+      "consumer_entries": [
+        {
+          "registry_entry_id": "ko-15de73c9e3526e8e329299a6",
+          "consumer_package": "koishi-plugin-docker-control",
+          "consumer_version": "0.2.0",
+          "dependency_path": "node_modules/protobufjs",
+          "optional": false,
+          "os_constraints": null,
+          "cpu_constraints": null,
+          "windows_x64_constraint_status": "not_excluded_by_declared_constraints"
+        },
+        {
+          "registry_entry_id": "ko-4f9dda3b5e4f0e088360b99d",
+          "consumer_package": "koishi-plugin-adapter-wechat4u",
+          "consumer_version": "0.0.8",
+          "dependency_path": "node_modules/protobufjs",
+          "optional": false,
+          "os_constraints": null,
+          "cpu_constraints": null,
+          "windows_x64_constraint_status": "not_excluded_by_declared_constraints"
+        },
+        {
+          "registry_entry_id": "ko-ab1958e5b58395750a67e82d",
+          "consumer_package": "koishi-plugin-vrc-activity-calendar",
+          "consumer_version": "1.1.1",
+          "dependency_path": "node_modules/@grpc/proto-loader/node_modules/protobufjs",
+          "optional": false,
+          "os_constraints": null,
+          "cpu_constraints": null,
+          "windows_x64_constraint_status": "not_excluded_by_declared_constraints"
+        },
+        {
+          "registry_entry_id": "ko-f02d20177f0df4b6977781e6",
+          "consumer_package": "koishi-plugin-milvus",
+          "consumer_version": "1.0.0",
+          "dependency_path": "node_modules/protobufjs",
+          "optional": false,
+          "os_constraints": null,
+          "cpu_constraints": null,
+          "windows_x64_constraint_status": "not_excluded_by_declared_constraints"
+        },
+        {
+          "registry_entry_id": "ko-fcb58cbf4ce83ac9c7681f4f",
+          "consumer_package": "koishi-plugin-sns-embed",
+          "consumer_version": "0.1.0",
+          "dependency_path": "node_modules/protobufjs",
+          "optional": false,
+          "os_constraints": null,
+          "cpu_constraints": null,
+          "windows_x64_constraint_status": "not_excluded_by_declared_constraints"
+        }
+      ]
+    },
+    {
+      "package": "puppeteer",
+      "version": "13.7.0",
+      "resolved": "https://registry.npmjs.org/puppeteer/-/puppeteer-13.7.0.tgz",
+      "integrity": "sha512-U1uufzBjz3+PkpCxFrWzh4OrMIdIb2ztzCu0YEPfRHjHswcSwHZswnK+WdsOQJsRV8WeTg3jLhJR4D867+fjsA==",
+      "target_lock_has_install_script_marker": true,
+      "archive_size_bytes": 431399,
+      "archive_sha256": "6d895871465e1648a7e3704a09f47af8d20fe33816d699bd4638e1ff181427c0",
+      "lock_integrity_algorithm": "sha512",
+      "lock_integrity_digest": "535bae7f3063cf7f8f9290b116b5b38783ab3087486f6cedcc2bb46043df4478c7b30712c0766cc272be59db0e409b1157c59e4e0de32e1251e03f3aefe7e3b0",
+      "lock_integrity_matched": true,
+      "package_manifest_sha256": "44e8255177fc3992c9a755f3ddc6c1c132de79581d917c9386bd415a460f14d7",
+      "package_manifest_name": "puppeteer",
+      "package_manifest_version": "13.7.0",
+      "lifecycle_scripts": {
+        "install": "node install.js",
+        "prepare": "node typescript-if-required.js && husky install"
+      },
+      "binding_gyp_present": false,
+      "gypfile_declared": false,
+      "binary_metadata": null,
+      "os_constraints": null,
+      "cpu_constraints": null,
+      "native_files_in_archive": [],
+      "lock_occurrence_count": 2,
+      "consumer_entry_count": 2,
+      "windows_x64_constraint_excluded_occurrence_count": 0,
+      "consumer_entries": [
+        {
+          "registry_entry_id": "ko-6fe5b7f33ce97eb5093b3005",
+          "consumer_package": "koishi-plugin-capture-website",
+          "consumer_version": "1.5.5",
+          "dependency_path": "node_modules/puppeteer",
+          "optional": false,
+          "os_constraints": null,
+          "cpu_constraints": null,
+          "windows_x64_constraint_status": "not_excluded_by_declared_constraints"
+        },
+        {
+          "registry_entry_id": "ko-955c6fd1bf22bd37901a4244",
+          "consumer_package": "koishi-plugin-gfm",
+          "consumer_version": "1.0.1",
+          "dependency_path": "node_modules/puppeteer",
+          "optional": false,
+          "os_constraints": null,
+          "cpu_constraints": null,
+          "windows_x64_constraint_status": "not_excluded_by_declared_constraints"
+        }
+      ]
+    },
+    {
+      "package": "puppeteer",
+      "version": "19.11.1",
+      "resolved": "https://registry.npmjs.org/puppeteer/-/puppeteer-19.11.1.tgz",
+      "integrity": "sha512-39olGaX2djYUdhaQQHDZ0T0GwEp+5f9UB9HmEP0qHfdQHIq0xGQZuAZ5TLnJIc/88SrPLpEflPC+xUqOTv3c5g==",
+      "target_lock_has_install_script_marker": true,
+      "archive_size_bytes": 68293,
+      "archive_sha256": "62730abf39e3b538fa8451153ae300669d43bf2b3a7b01119643372f8df92fd7",
+      "lock_integrity_algorithm": "sha512",
+      "lock_integrity_digest": "dfda2519a5f67636147616904070d9d13d06c04a7ee5ff5407d1e610fd2a1df7501c8ab4c46419b806794cb9c921cffcf12acf2e911f94f0bec54a8e4efddce6",
+      "lock_integrity_matched": true,
+      "package_manifest_sha256": "ffacd16eec99fc345a5a10033bcfb299c2dd6aecadbcabcf98113467ee5a78df",
+      "package_manifest_name": "puppeteer",
+      "package_manifest_version": "19.11.1",
+      "lifecycle_scripts": {
+        "postinstall": "node install.js"
+      },
+      "binding_gyp_present": false,
+      "gypfile_declared": false,
+      "binary_metadata": null,
+      "os_constraints": null,
+      "cpu_constraints": null,
+      "native_files_in_archive": [],
+      "lock_occurrence_count": 1,
+      "consumer_entry_count": 1,
+      "windows_x64_constraint_excluded_occurrence_count": 0,
+      "consumer_entries": [
+        {
+          "registry_entry_id": "ko-adce8e9b6cdc3a6105ba9e25",
+          "consumer_package": "@kuroshio/koishi-plugin-genshin",
+          "consumer_version": "1.0.17",
+          "dependency_path": "node_modules/puppeteer",
+          "optional": false,
+          "os_constraints": null,
+          "cpu_constraints": null,
+          "windows_x64_constraint_status": "not_excluded_by_declared_constraints"
+        }
+      ]
+    },
+    {
+      "package": "puppeteer",
+      "version": "2.1.1",
+      "resolved": "https://registry.npmjs.org/puppeteer/-/puppeteer-2.1.1.tgz",
+      "integrity": "sha512-LWzaDVQkk1EPiuYeTOj+CZRIjda4k2s5w4MK4xoH2+kgWV/SDlkYHmxatDdtYrciHUKSXTsGgPgPP8ILVdBsxg==",
+      "target_lock_has_install_script_marker": true,
+      "archive_size_bytes": 166790,
+      "archive_sha256": "e7fea5db70b0c2de89a417a46368c3dccf9051da2559e0b8f5900cc52fcae55e",
+      "lock_integrity_algorithm": "sha512",
+      "lock_integrity_digest": "2d6cda0d542493510f8ae61e4ce8fe0994488dd6b8936b39c3830ae31a07dbe920595fd20e59181e6c5ab4376d62b7221d42925d3b0680f80f3fc20b55d06cc6",
+      "lock_integrity_matched": true,
+      "package_manifest_sha256": "590d9876d17f00fe6649b27c67b571fddc61c208fc9a4dc75c8ba106976dcb09",
+      "package_manifest_name": "puppeteer",
+      "package_manifest_version": "2.1.1",
+      "lifecycle_scripts": {
+        "install": "node install.js"
+      },
+      "binding_gyp_present": false,
+      "gypfile_declared": false,
+      "binary_metadata": null,
+      "os_constraints": null,
+      "cpu_constraints": null,
+      "native_files_in_archive": [],
+      "lock_occurrence_count": 1,
+      "consumer_entry_count": 1,
+      "windows_x64_constraint_excluded_occurrence_count": 0,
+      "consumer_entries": [
+        {
+          "registry_entry_id": "ko-4cb444662855b36bd914c5ed",
+          "consumer_package": "koishi-plugin-smmcat-photodisk-htmlpictureapi",
+          "consumer_version": "0.3.1",
+          "dependency_path": "node_modules/puppeteer",
+          "optional": false,
+          "os_constraints": null,
+          "cpu_constraints": null,
+          "windows_x64_constraint_status": "not_excluded_by_declared_constraints"
+        }
+      ]
+    },
+    {
+      "package": "puppeteer",
+      "version": "21.11.0",
+      "resolved": "https://registry.npmjs.org/puppeteer/-/puppeteer-21.11.0.tgz",
+      "integrity": "sha512-9jTHuYe22TD3sNxy0nEIzC7ZrlRnDgeX3xPkbS7PnbdwYjl2o/z/YuCrRBwezdKpbTDTJ4VqIggzNyeRcKq3cg==",
+      "target_lock_has_install_script_marker": true,
+      "archive_size_bytes": 73696,
+      "archive_sha256": "b827aab980e67f268ee99b4831b6994c1107c3914711867e4fbba268d3c2b497",
+      "lock_integrity_algorithm": "sha512",
+      "lock_integrity_digest": "f634c7b987b6d930f7b0dc72d27108cc2ed9ae54670e0797df13e46d2ecf9db770623976a3fcff62e0ab441c1ecdd2a96d30d327856a22083337279170aab772",
+      "lock_integrity_matched": true,
+      "package_manifest_sha256": "94e9755c08053b2688cc510b68b4d1edf0e28c4e70c2113530a11d93d8d0f76b",
+      "package_manifest_name": "puppeteer",
+      "package_manifest_version": "21.11.0",
+      "lifecycle_scripts": {
+        "postinstall": "node install.mjs"
+      },
+      "binding_gyp_present": false,
+      "gypfile_declared": false,
+      "binary_metadata": null,
+      "os_constraints": null,
+      "cpu_constraints": null,
+      "native_files_in_archive": [],
+      "lock_occurrence_count": 4,
+      "consumer_entry_count": 4,
+      "windows_x64_constraint_excluded_occurrence_count": 0,
+      "consumer_entries": [
+        {
+          "registry_entry_id": "ko-15de73c9e3526e8e329299a6",
+          "consumer_package": "koishi-plugin-docker-control",
+          "consumer_version": "0.2.0",
+          "dependency_path": "node_modules/puppeteer",
+          "optional": false,
+          "os_constraints": null,
+          "cpu_constraints": null,
+          "windows_x64_constraint_status": "not_excluded_by_declared_constraints"
+        },
+        {
+          "registry_entry_id": "ko-50e512c997d2f3f2b7114217",
+          "consumer_package": "koishi-plugin-exg-luntan",
+          "consumer_version": "1.2.0",
+          "dependency_path": "node_modules/puppeteer",
+          "optional": false,
+          "os_constraints": null,
+          "cpu_constraints": null,
+          "windows_x64_constraint_status": "not_excluded_by_declared_constraints"
+        },
+        {
+          "registry_entry_id": "ko-8ba56e053ca15abe61649917",
+          "consumer_package": "koishi-plugin-mc-crash-analyzer",
+          "consumer_version": "1.0.7",
+          "dependency_path": "node_modules/puppeteer",
+          "optional": false,
+          "os_constraints": null,
+          "cpu_constraints": null,
+          "windows_x64_constraint_status": "not_excluded_by_declared_constraints"
+        },
+        {
+          "registry_entry_id": "ko-8f784055cddb247f0ff0de8b",
+          "consumer_package": "koishi-plugin-fdmcwatcher",
+          "consumer_version": "0.0.2",
+          "dependency_path": "node_modules/puppeteer",
+          "optional": false,
+          "os_constraints": null,
+          "cpu_constraints": null,
+          "windows_x64_constraint_status": "not_excluded_by_declared_constraints"
+        }
+      ]
+    },
+    {
+      "package": "puppeteer",
+      "version": "22.15.0",
+      "resolved": "https://registry.npmjs.org/puppeteer/-/puppeteer-22.15.0.tgz",
+      "integrity": "sha512-XjCY1SiSEi1T7iSYuxS82ft85kwDJUS7wj1Z0eGVXKdtr5g4xnVcbjwxhq5xBnpK/E7x1VZZoJDxpjAOasHT4Q==",
+      "target_lock_has_install_script_marker": true,
+      "archive_size_bytes": 71708,
+      "archive_sha256": "9ce365c2db80eafa7d3b4dabe0dbbda7de2008255e39da07bfb7abdde3f05947",
+      "lock_integrity_algorithm": "sha512",
+      "lock_integrity_digest": "5e3098d52892122d53ee2498bb14bcd9fb7ce64c032544bbc23d59d1e1955ca76daf9838c6755c6e3c3186ae71067a4afc4ef1d55659a090f1a6300e6ac1d3e1",
+      "lock_integrity_matched": true,
+      "package_manifest_sha256": "cf3b74a801b0944a6f32d367eafed81aef81d8a129b5259148a607a485bd4447",
+      "package_manifest_name": "puppeteer",
+      "package_manifest_version": "22.15.0",
+      "lifecycle_scripts": {
+        "postinstall": "node install.mjs"
+      },
+      "binding_gyp_present": false,
+      "gypfile_declared": false,
+      "binary_metadata": null,
+      "os_constraints": null,
+      "cpu_constraints": null,
+      "native_files_in_archive": [],
+      "lock_occurrence_count": 1,
+      "consumer_entry_count": 1,
+      "windows_x64_constraint_excluded_occurrence_count": 0,
+      "consumer_entries": [
+        {
+          "registry_entry_id": "ko-ef852c73710265491868114c",
+          "consumer_package": "koishi-plugin-triple-sos",
+          "consumer_version": "1.0.2",
+          "dependency_path": "node_modules/puppeteer",
+          "optional": false,
+          "os_constraints": null,
+          "cpu_constraints": null,
+          "windows_x64_constraint_status": "not_excluded_by_declared_constraints"
+        }
+      ]
+    },
+    {
+      "package": "puppeteer",
+      "version": "23.11.1",
+      "resolved": "https://registry.npmjs.org/puppeteer/-/puppeteer-23.11.1.tgz",
+      "integrity": "sha512-53uIX3KR5en8l7Vd8n5DUv90Ae9QDQsyIthaUFVzwV6yU750RjqRznEtNMBT20VthqAdemnJN+hxVdmMHKt7Zw==",
+      "target_lock_has_install_script_marker": true,
+      "archive_size_bytes": 73289,
+      "archive_sha256": "1c702caf05e8fe95f690d3d744aacce2980119ecf397298b0402d82c0fd3e4e8",
+      "lock_integrity_algorithm": "sha512",
+      "lock_integrity_digest": "e77b885f7291e5e9fc97b55df27e4352ff7401ef500d0b3222d85a505573c15eb253be74463a91ce712d34c053db456d86a01d7a69c937e87155d98c1cab7b67",
+      "lock_integrity_matched": true,
+      "package_manifest_sha256": "3461ebb63369bea318d16c3f1e797d96f0dba740bb5af92ce9a8ec4384283556",
+      "package_manifest_name": "puppeteer",
+      "package_manifest_version": "23.11.1",
+      "lifecycle_scripts": {
+        "postinstall": "node install.mjs"
+      },
+      "binding_gyp_present": false,
+      "gypfile_declared": false,
+      "binary_metadata": null,
+      "os_constraints": null,
+      "cpu_constraints": null,
+      "native_files_in_archive": [],
+      "lock_occurrence_count": 5,
+      "consumer_entry_count": 5,
+      "windows_x64_constraint_excluded_occurrence_count": 0,
+      "consumer_entries": [
+        {
+          "registry_entry_id": "ko-1e11a86f8c1e092290524e2e",
+          "consumer_package": "@nuanr_mxi/koishi-plugin-phizone",
+          "consumer_version": "2.0.3",
+          "dependency_path": "node_modules/puppeteer",
+          "optional": false,
+          "os_constraints": null,
+          "cpu_constraints": null,
+          "windows_x64_constraint_status": "not_excluded_by_declared_constraints"
+        },
+        {
+          "registry_entry_id": "ko-4bd825a64f37fbe1fe1f8b7f",
+          "consumer_package": "koishi-plugin-osuprofile",
+          "consumer_version": "0.0.1",
+          "dependency_path": "node_modules/puppeteer",
+          "optional": false,
+          "os_constraints": null,
+          "cpu_constraints": null,
+          "windows_x64_constraint_status": "not_excluded_by_declared_constraints"
+        },
+        {
+          "registry_entry_id": "ko-56f3785545bcd702721165fc",
+          "consumer_package": "koishi-plugin-scbot",
+          "consumer_version": "4.0.5",
+          "dependency_path": "node_modules/puppeteer",
+          "optional": false,
+          "os_constraints": null,
+          "cpu_constraints": null,
+          "windows_x64_constraint_status": "not_excluded_by_declared_constraints"
+        },
+        {
+          "registry_entry_id": "ko-62911ddcb126c482e281f5af",
+          "consumer_package": "@quanhuzeyu/koishi-plugin-puppeteer-isunsafe",
+          "consumer_version": "0.0.2",
+          "dependency_path": "node_modules/puppeteer",
+          "optional": false,
+          "os_constraints": null,
+          "cpu_constraints": null,
+          "windows_x64_constraint_status": "not_excluded_by_declared_constraints"
+        },
+        {
+          "registry_entry_id": "ko-6754cb688795f4664a24ef6a",
+          "consumer_package": "koishi-plugin-atis-plugin",
+          "consumer_version": "0.0.1",
+          "dependency_path": "node_modules/puppeteer",
+          "optional": false,
+          "os_constraints": null,
+          "cpu_constraints": null,
+          "windows_x64_constraint_status": "not_excluded_by_declared_constraints"
+        }
+      ]
+    },
+    {
+      "package": "puppeteer",
+      "version": "24.38.0",
+      "resolved": "https://registry.npmjs.org/puppeteer/-/puppeteer-24.38.0.tgz",
+      "integrity": "sha512-abnJOBVoL9PQTLKSbYGm9mjNFyIPaTVj77J/6cS370dIQtcZMpx8wyZoAuBzR71Aoon6yvI71NEVFUsl3JU82g==",
+      "target_lock_has_install_script_marker": true,
+      "archive_size_bytes": 12809,
+      "archive_sha256": "8e4f88acfe98c9946408d06cbaa4a7c847a1b4e4af519bc0f76f9948aad3a522",
+      "lock_integrity_algorithm": "sha512",
+      "lock_integrity_digest": "69b9c93815682fd3d04cb2926d81a6f668cd17220f693563efb27fe9c4b7ef474842d719329c7cc3266802e07347bd40a289facaf23bd4d115154b25dc953cda",
+      "lock_integrity_matched": true,
+      "package_manifest_sha256": "4d6a6406695d9eda74d9d9e9aaa540e27a4ca6f3fe27a944e1ee37e3dd04f64e",
+      "package_manifest_name": "puppeteer",
+      "package_manifest_version": "24.38.0",
+      "lifecycle_scripts": {
+        "postinstall": "node install.mjs"
+      },
+      "binding_gyp_present": false,
+      "gypfile_declared": false,
+      "binary_metadata": null,
+      "os_constraints": null,
+      "cpu_constraints": null,
+      "native_files_in_archive": [],
+      "lock_occurrence_count": 1,
+      "consumer_entry_count": 1,
+      "windows_x64_constraint_excluded_occurrence_count": 0,
+      "consumer_entries": [
+        {
+          "registry_entry_id": "ko-a059989c98f27690cc28beb4",
+          "consumer_package": "koishi-plugin-adapter-whatsapp-web",
+          "consumer_version": "0.0.8",
+          "dependency_path": "node_modules/puppeteer",
+          "optional": false,
+          "os_constraints": null,
+          "cpu_constraints": null,
+          "windows_x64_constraint_status": "not_excluded_by_declared_constraints"
+        }
+      ]
+    },
+    {
+      "package": "puppeteer",
+      "version": "24.43.1",
+      "resolved": "https://registry.npmjs.org/puppeteer/-/puppeteer-24.43.1.tgz",
+      "integrity": "sha512-/FSOViCrqRdb1HDocpsM9Z1giA71gTQPUt3SpHGVRALKAy/rJr1fLFYZW9F23qPxqVxTHQnbh/5B5opJST3kAw==",
+      "target_lock_has_install_script_marker": true,
+      "archive_size_bytes": 12760,
+      "archive_sha256": "79ded9ec2a6b798f005ba8c2852a0df39f5a2d29e2a67bed53e4e6600ac9dfba",
+      "lock_integrity_algorithm": "sha512",
+      "lock_integrity_digest": "fc548e5620aba9175bd470e8729b0cf59d60880ef581340f52ddd2a471954402ca032feb26bd5f2c56195bd176dea3f1a95c531d09db87fe41e68a49493de403",
+      "lock_integrity_matched": true,
+      "package_manifest_sha256": "272004b818c6d457077b0e86b12c08e53fa7ecd4185f66fdfc94522693770c8d",
+      "package_manifest_name": "puppeteer",
+      "package_manifest_version": "24.43.1",
+      "lifecycle_scripts": {
+        "postinstall": "node install.mjs"
+      },
+      "binding_gyp_present": false,
+      "gypfile_declared": false,
+      "binary_metadata": null,
+      "os_constraints": null,
+      "cpu_constraints": null,
+      "native_files_in_archive": [],
+      "lock_occurrence_count": 11,
+      "consumer_entry_count": 11,
+      "windows_x64_constraint_excluded_occurrence_count": 0,
+      "consumer_entries": [
+        {
+          "registry_entry_id": "ko-1657263b0ba4278b4b6cb5d2",
+          "consumer_package": "koishi-plugin-msg-photo",
+          "consumer_version": "1.0.1",
+          "dependency_path": "node_modules/puppeteer",
+          "optional": false,
+          "os_constraints": null,
+          "cpu_constraints": null,
+          "windows_x64_constraint_status": "not_excluded_by_declared_constraints"
+        },
+        {
+          "registry_entry_id": "ko-3d62db10ddb40acb70713fba",
+          "consumer_package": "koishi-plugin-lo-terr",
+          "consumer_version": "2.1.0",
+          "dependency_path": "node_modules/puppeteer",
+          "optional": false,
+          "os_constraints": null,
+          "cpu_constraints": null,
+          "windows_x64_constraint_status": "not_excluded_by_declared_constraints"
+        },
+        {
+          "registry_entry_id": "ko-3da0653ae47d3e1dc1b64edc",
+          "consumer_package": "@lf_maple/koishi-plugin-phi-plugin-full",
+          "consumer_version": "0.1.80",
+          "dependency_path": "node_modules/puppeteer",
+          "optional": false,
+          "os_constraints": null,
+          "cpu_constraints": null,
+          "windows_x64_constraint_status": "not_excluded_by_declared_constraints"
+        },
+        {
+          "registry_entry_id": "ko-52315c7e7fbb67f1d9b40f9d",
+          "consumer_package": "koishi-plugin-meme-upload-114",
+          "consumer_version": "0.0.2",
+          "dependency_path": "node_modules/puppeteer",
+          "optional": false,
+          "os_constraints": null,
+          "cpu_constraints": null,
+          "windows_x64_constraint_status": "not_excluded_by_declared_constraints"
+        },
+        {
+          "registry_entry_id": "ko-652f242026c9508a1e39039b",
+          "consumer_package": "koishi-plugin-cs2-server-query",
+          "consumer_version": "2.7.0",
+          "dependency_path": "node_modules/puppeteer",
+          "optional": false,
+          "os_constraints": null,
+          "cpu_constraints": null,
+          "windows_x64_constraint_status": "not_excluded_by_declared_constraints"
+        },
+        {
+          "registry_entry_id": "ko-66c99fcbf8d7cd39ecc8637d",
+          "consumer_package": "koishi-plugin-frk-plugin",
+          "consumer_version": "0.0.1",
+          "dependency_path": "node_modules/puppeteer",
+          "optional": false,
+          "os_constraints": null,
+          "cpu_constraints": null,
+          "windows_x64_constraint_status": "not_excluded_by_declared_constraints"
+        },
+        {
+          "registry_entry_id": "ko-9d8da495941d27f4b3f12027",
+          "consumer_package": "koishi-plugin-banana-zy",
+          "consumer_version": "2.0.3",
+          "dependency_path": "node_modules/puppeteer",
+          "optional": false,
+          "os_constraints": null,
+          "cpu_constraints": null,
+          "windows_x64_constraint_status": "not_excluded_by_declared_constraints"
+        },
+        {
+          "registry_entry_id": "ko-a0a24c353515cf97bab90049",
+          "consumer_package": "koishi-plugin-sb-board",
+          "consumer_version": "0.0.8",
+          "dependency_path": "node_modules/puppeteer",
+          "optional": false,
+          "os_constraints": null,
+          "cpu_constraints": null,
+          "windows_x64_constraint_status": "not_excluded_by_declared_constraints"
+        },
+        {
+          "registry_entry_id": "ko-d806a2cfa9a0544c8cc889fe",
+          "consumer_package": "koishi-plugin-niuke-data",
+          "consumer_version": "1.3.0",
+          "dependency_path": "node_modules/puppeteer",
+          "optional": false,
+          "os_constraints": null,
+          "cpu_constraints": null,
+          "windows_x64_constraint_status": "not_excluded_by_declared_constraints"
+        },
+        {
+          "registry_entry_id": "ko-e9406d492eb32e13d82b8c81",
+          "consumer_package": "koishi-plugin-exg-mapcd",
+          "consumer_version": "1.3.0",
+          "dependency_path": "node_modules/puppeteer",
+          "optional": false,
+          "os_constraints": null,
+          "cpu_constraints": null,
+          "windows_x64_constraint_status": "not_excluded_by_declared_constraints"
+        },
+        {
+          "registry_entry_id": "ko-fa07925b1df6bade8f8511df",
+          "consumer_package": "koishi-plugin-exg-mingren",
+          "consumer_version": "1.4.9",
+          "dependency_path": "node_modules/puppeteer",
+          "optional": false,
+          "os_constraints": null,
+          "cpu_constraints": null,
+          "windows_x64_constraint_status": "not_excluded_by_declared_constraints"
+        }
+      ]
+    },
+    {
+      "package": "puppeteer",
+      "version": "24.6.1",
+      "resolved": "https://registry.npmjs.org/puppeteer/-/puppeteer-24.6.1.tgz",
+      "integrity": "sha512-/4ocGfu8LNvDbWUqJZV2VmwEWpbOdJa69y2Jivd213tV0ekAtUh/bgT1hhW63SDN/CtrEucOPwoomZ+9M+eBEg==",
+      "target_lock_has_install_script_marker": true,
+      "archive_size_bytes": 74202,
+      "archive_sha256": "6038f4f7bcf16c6278ffeb51fd2928c4825d052a26bf9054f38654621af806b2",
+      "lock_integrity_algorithm": "sha512",
+      "lock_integrity_digest": "ff8a1c19fbbc2cdbc36d652a259576566c045a96ce7496baf72d898af776d77b55d1e900b5487f6e04f58615badd20cdfc2b6b12e70e3f0a28999fbd33e78112",
+      "lock_integrity_matched": true,
+      "package_manifest_sha256": "f13cd1ae50fbddce11f98a3d27c8f1f5def01d5106d69e5fe22c3a20a7a9443b",
+      "package_manifest_name": "puppeteer",
+      "package_manifest_version": "24.6.1",
+      "lifecycle_scripts": {
+        "postinstall": "node install.mjs"
+      },
+      "binding_gyp_present": false,
+      "gypfile_declared": false,
+      "binary_metadata": null,
+      "os_constraints": null,
+      "cpu_constraints": null,
+      "native_files_in_archive": [],
+      "lock_occurrence_count": 1,
+      "consumer_entry_count": 1,
+      "windows_x64_constraint_excluded_occurrence_count": 0,
+      "consumer_entries": [
+        {
+          "registry_entry_id": "ko-b85e122e2665732086351d79",
+          "consumer_package": "koishi-plugin-jsbot",
+          "consumer_version": "1.2.22",
+          "dependency_path": "node_modules/puppeteer",
+          "optional": false,
+          "os_constraints": null,
+          "cpu_constraints": null,
+          "windows_x64_constraint_status": "not_excluded_by_declared_constraints"
+        }
+      ]
+    },
+    {
+      "package": "puppeteer",
+      "version": "25.13.0",
+      "resolved": "https://registry.npmjs.org/puppeteer/-/puppeteer-25.13.0.tgz",
+      "integrity": "sha512-vB4KLXTT5QqlikcOQ/xV0RY18bBVtNyLUTfqJ9mW+penHyoM+5DmANYuDCI4jgBtiL0eD9I5ZFSafW6/a6Trpg==",
+      "target_lock_has_install_script_marker": true,
+      "archive_size_bytes": 11697,
+      "archive_sha256": "642ebd61222712574df614095f740be052f0e1dc87626377f6fab30c71378c2c",
+      "lock_integrity_algorithm": "sha512",
+      "lock_integrity_digest": "bc1e0a2d74d3e50aa58a470e43fc55d11635f1b055b4dc8b5137ea27d996fa97a71f2a0cfb90e600d62e0c22388e006d88bd1e0fd23964549a7d6ebf6ba4eba6",
+      "lock_integrity_matched": true,
+      "package_manifest_sha256": "ebb9a3c1c4920e9570bd5f5ba6eeea1e533f29bce2c574adea99be9622fc949a",
+      "package_manifest_name": "puppeteer",
+      "package_manifest_version": "25.13.0",
+      "lifecycle_scripts": {
+        "postinstall": "node install.mjs"
+      },
+      "binding_gyp_present": false,
+      "gypfile_declared": false,
+      "binary_metadata": null,
+      "os_constraints": null,
+      "cpu_constraints": null,
+      "native_files_in_archive": [],
+      "lock_occurrence_count": 1,
+      "consumer_entry_count": 1,
+      "windows_x64_constraint_excluded_occurrence_count": 0,
+      "consumer_entries": [
+        {
+          "registry_entry_id": "ko-93587db90af7b69d905c38a7",
+          "consumer_package": "koishi-plugin-game-tracker",
+          "consumer_version": "1.0.7",
+          "dependency_path": "node_modules/puppeteer",
+          "optional": false,
+          "os_constraints": null,
+          "cpu_constraints": null,
+          "windows_x64_constraint_status": "not_excluded_by_declared_constraints"
+        }
+      ]
+    },
+    {
+      "package": "sharp",
+      "version": "0.30.7",
+      "resolved": "https://registry.npmjs.org/sharp/-/sharp-0.30.7.tgz",
+      "integrity": "sha512-G+MY2YW33jgflKPTXXptVO28HvNOo9G3j0MybYAHeEmby+QuD2U98dT6ueht9cv/XDqZspSpIhoSW+BAKJ7Hig==",
+      "target_lock_has_install_script_marker": true,
+      "archive_size_bytes": 99509,
+      "archive_sha256": "354c24358fa809755a89f64fe3ef3c7fb97b13a764f9973bbbf89d767b51a60f",
+      "lock_integrity_algorithm": "sha512",
+      "lock_integrity_digest": "1be318d985b7de381f94a3d35d7a6d54edbc1ef34ea3d1b78f43326d800778499bcbe42e0f653df1d4fab9e86df5cbff5c3a99b294a9221a125be040289ec78a",
+      "lock_integrity_matched": true,
+      "package_manifest_sha256": "6706988c84a9ba543778d46482a6baecf51a62dbe8640e92dd743faf55fff354",
+      "package_manifest_name": "sharp",
+      "package_manifest_version": "0.30.7",
+      "lifecycle_scripts": {
+        "install": "(node install/libvips && node install/dll-copy && prebuild-install) || (node install/can-compile && node-gyp rebuild && node install/dll-copy)"
+      },
+      "binding_gyp_present": true,
+      "gypfile_declared": false,
+      "binary_metadata": {
+        "napi_versions": [
+          5
+        ]
+      },
+      "os_constraints": null,
+      "cpu_constraints": null,
+      "native_files_in_archive": [],
+      "lock_occurrence_count": 1,
+      "consumer_entry_count": 1,
+      "windows_x64_constraint_excluded_occurrence_count": 0,
+      "consumer_entries": [
+        {
+          "registry_entry_id": "ko-72412a4eef3f1b3c132e6298",
+          "consumer_package": "koishi-plugin-petpet",
+          "consumer_version": "1.0.7",
+          "dependency_path": "node_modules/sharp",
+          "optional": false,
+          "os_constraints": null,
+          "cpu_constraints": null,
+          "windows_x64_constraint_status": "not_excluded_by_declared_constraints"
+        }
+      ]
+    },
+    {
+      "package": "sharp",
+      "version": "0.32.6",
+      "resolved": "https://registry.npmjs.org/sharp/-/sharp-0.32.6.tgz",
+      "integrity": "sha512-KyLTWwgcR9Oe4d9HwCwNM2l7+J0dUQwn/yf7S0EnTtb0eVS4RxO0eUSvxPtzT4F3SY+C4K6fqdv/DO27sJ/v/w==",
+      "target_lock_has_install_script_marker": true,
+      "archive_size_bytes": 123812,
+      "archive_sha256": "b7cf83160f7258875866ae845cdac4d8a58acd8bf9c00e101805d00452a207f0",
+      "lock_integrity_algorithm": "sha512",
+      "lock_integrity_digest": "2b22d35b081c47d39ee1df47c02c0d33697bf89d1d510c27ff27fb4b41274ed6f47954b84713b47944afc4fb734f8177498f82e0ae9fa9dbff0cedbbb09fefff",
+      "lock_integrity_matched": true,
+      "package_manifest_sha256": "610d9cf008aa9d52925965ec2bf3fcf6870953062becea022212dbf3824eb59b",
+      "package_manifest_name": "sharp",
+      "package_manifest_version": "0.32.6",
+      "lifecycle_scripts": {
+        "install": "(node install/libvips && node install/dll-copy && prebuild-install) || (node install/can-compile && node-gyp rebuild && node install/dll-copy)"
+      },
+      "binding_gyp_present": true,
+      "gypfile_declared": false,
+      "binary_metadata": {
+        "napi_versions": [
+          7
+        ]
+      },
+      "os_constraints": null,
+      "cpu_constraints": null,
+      "native_files_in_archive": [],
+      "lock_occurrence_count": 1,
+      "consumer_entry_count": 1,
+      "windows_x64_constraint_excluded_occurrence_count": 0,
+      "consumer_entries": [
+        {
+          "registry_entry_id": "ko-a77908164683fead2d9ee80a",
+          "consumer_package": "koishi-plugin-vit-nsfw-detect",
+          "consumer_version": "0.1.0",
+          "dependency_path": "node_modules/sharp",
+          "optional": false,
+          "os_constraints": null,
+          "cpu_constraints": null,
+          "windows_x64_constraint_status": "not_excluded_by_declared_constraints"
+        }
+      ]
+    },
+    {
+      "package": "sharp",
+      "version": "0.33.5",
+      "resolved": "https://registry.npmjs.org/sharp/-/sharp-0.33.5.tgz",
+      "integrity": "sha512-haPVm1EkS9pgvHrQ/F3Xy+hgcuMV0Wm9vfIBSiwZ05k+xgb0PkBQpGsAA/oWdDobNaZTH5ppvHtzCFbnSEwHVw==",
+      "target_lock_has_install_script_marker": true,
+      "archive_size_bytes": 113419,
+      "archive_sha256": "1fb1b4c33c92428587785267b93c003407750bfffbc6c08c9bb7f46896f08e78",
+      "lock_integrity_algorithm": "sha512",
+      "lock_integrity_digest": "85a3d59b51244bda60bc7ad0fc5dd7cbe86072e315d169bdbdf2014a2c19d3993ec606f43e4050a46b0003fa16743a1b35a6531f9a69bc7b730856e7484c0757",
+      "lock_integrity_matched": true,
+      "package_manifest_sha256": "75e24f70d7732d18f503c731856febabd43c7083d3edd162a745f0c387c49d4f",
+      "package_manifest_name": "sharp",
+      "package_manifest_version": "0.33.5",
+      "lifecycle_scripts": {
+        "install": "node install/check"
+      },
+      "binding_gyp_present": false,
+      "gypfile_declared": false,
+      "binary_metadata": {
+        "napi_versions": [
+          9
+        ]
+      },
+      "os_constraints": null,
+      "cpu_constraints": null,
+      "native_files_in_archive": [],
+      "lock_occurrence_count": 6,
+      "consumer_entry_count": 6,
+      "windows_x64_constraint_excluded_occurrence_count": 0,
+      "consumer_entries": [
+        {
+          "registry_entry_id": "ko-3eee7b0c29101964b90a556b",
+          "consumer_package": "koishi-plugin-revoke-image",
+          "consumer_version": "0.0.6",
+          "dependency_path": "node_modules/sharp",
+          "optional": false,
+          "os_constraints": null,
+          "cpu_constraints": null,
+          "windows_x64_constraint_status": "not_excluded_by_declared_constraints"
+        },
+        {
+          "registry_entry_id": "ko-4cb444662855b36bd914c5ed",
+          "consumer_package": "koishi-plugin-smmcat-photodisk-htmlpictureapi",
+          "consumer_version": "0.3.1",
+          "dependency_path": "node_modules/sharp",
+          "optional": false,
+          "os_constraints": null,
+          "cpu_constraints": null,
+          "windows_x64_constraint_status": "not_excluded_by_declared_constraints"
+        },
+        {
+          "registry_entry_id": "ko-50e512c997d2f3f2b7114217",
+          "consumer_package": "koishi-plugin-exg-luntan",
+          "consumer_version": "1.2.0",
+          "dependency_path": "node_modules/sharp",
+          "optional": false,
+          "os_constraints": null,
+          "cpu_constraints": null,
+          "windows_x64_constraint_status": "not_excluded_by_declared_constraints"
+        },
+        {
+          "registry_entry_id": "ko-86a33617c19b83aebc1f8d8b",
+          "consumer_package": "koishi-plugin-eggy",
+          "consumer_version": "0.0.80",
+          "dependency_path": "node_modules/sharp",
+          "optional": false,
+          "os_constraints": null,
+          "cpu_constraints": null,
+          "windows_x64_constraint_status": "not_excluded_by_declared_constraints"
+        },
+        {
+          "registry_entry_id": "ko-b25166b7c0fae7def42e26ce",
+          "consumer_package": "koishi-plugin-hhs-huatu",
+          "consumer_version": "1.3.15",
+          "dependency_path": "node_modules/sharp",
+          "optional": false,
+          "os_constraints": null,
+          "cpu_constraints": null,
+          "windows_x64_constraint_status": "not_excluded_by_declared_constraints"
+        },
+        {
+          "registry_entry_id": "ko-efd856460c2be20ea9d09339",
+          "consumer_package": "koishi-plugin-zssm",
+          "consumer_version": "0.1.10",
+          "dependency_path": "node_modules/sharp",
+          "optional": false,
+          "os_constraints": null,
+          "cpu_constraints": null,
+          "windows_x64_constraint_status": "not_excluded_by_declared_constraints"
+        }
+      ]
+    },
+    {
+      "package": "sharp",
+      "version": "0.34.5",
+      "resolved": "https://registry.npmjs.org/sharp/-/sharp-0.34.5.tgz",
+      "integrity": "sha512-Ou9I5Ft9WNcCbXrU9cMgPBcCK8LiwLqcbywW3t4oDV37n1pzpuNLsYiAV8eODnjbtQlSDwZ2cUEeQz4E54Hltg==",
+      "target_lock_has_install_script_marker": true,
+      "archive_size_bytes": 119719,
+      "archive_sha256": "460712506f9df808cf25bc2ba15be828bfa9179bd31b6ca47a9db624980026c3",
+      "lock_integrity_algorithm": "sha512",
+      "lock_integrity_digest": "3aef48e45b7d58d7026d7ad4f5c3203c17022bc2e2c0ba9c6f2c16dede280d5dfb9f5a73a6e34bb1888057c78e0e78dbb509520f067671411e433e04e781e5b6",
+      "lock_integrity_matched": true,
+      "package_manifest_sha256": "e6be69319929151be3aa240bf1485f25a3477cb6d2286f92510b9fceb3cbef26",
+      "package_manifest_name": "sharp",
+      "package_manifest_version": "0.34.5",
+      "lifecycle_scripts": {
+        "install": "node install/check.js || npm run build"
+      },
+      "binding_gyp_present": false,
+      "gypfile_declared": false,
+      "binary_metadata": null,
+      "os_constraints": null,
+      "cpu_constraints": null,
+      "native_files_in_archive": [],
+      "lock_occurrence_count": 3,
+      "consumer_entry_count": 3,
+      "windows_x64_constraint_excluded_occurrence_count": 0,
+      "consumer_entries": [
+        {
+          "registry_entry_id": "ko-3d62db10ddb40acb70713fba",
+          "consumer_package": "koishi-plugin-lo-terr",
+          "consumer_version": "2.1.0",
+          "dependency_path": "node_modules/sharp",
+          "optional": false,
+          "os_constraints": null,
+          "cpu_constraints": null,
+          "windows_x64_constraint_status": "not_excluded_by_declared_constraints"
+        },
+        {
+          "registry_entry_id": "ko-9d8da495941d27f4b3f12027",
+          "consumer_package": "koishi-plugin-banana-zy",
+          "consumer_version": "2.0.3",
+          "dependency_path": "node_modules/sharp",
+          "optional": false,
+          "os_constraints": null,
+          "cpu_constraints": null,
+          "windows_x64_constraint_status": "not_excluded_by_declared_constraints"
+        },
+        {
+          "registry_entry_id": "ko-e55f703a5d6ed453e7a01cd5",
+          "consumer_package": "koishi-plugin-rinngo-qrcode",
+          "consumer_version": "0.0.4",
+          "dependency_path": "node_modules/sharp",
+          "optional": false,
+          "os_constraints": null,
+          "cpu_constraints": null,
+          "windows_x64_constraint_status": "not_excluded_by_declared_constraints"
+        }
+      ]
+    },
+    {
+      "package": "skia-canvas",
+      "version": "0.9.30",
+      "resolved": "https://registry.npmjs.org/skia-canvas/-/skia-canvas-0.9.30.tgz",
+      "integrity": "sha512-Y4BZZhJpdGeRRfu/pyT1395UAE5Hgzup+P5tDq1vTTKcOgXmUuAWeDhvfeDn9FWaE6tNkOTQWO/mK7fdD5qIrw==",
+      "target_lock_has_install_script_marker": true,
+      "archive_size_bytes": 46574,
+      "archive_sha256": "e9ae06086750b0d22a01e80b8604f0d8714ff010454447a611be0264a2703ac6",
+      "lock_integrity_algorithm": "sha512",
+      "lock_integrity_digest": "63805966126974679145fbbfa724f5dfde54004e47833ba9f8fe6d0ead6f4d329c3a05e652e01678386f7de0e7f4559a13ab4d90e4d058efe62bb7dd0f9a88af",
+      "lock_integrity_matched": true,
+      "package_manifest_sha256": "f7b7050fae39483312b50e0fbde569705a09fe4ae002fc0404bcc5671462ad2b",
+      "package_manifest_name": "skia-canvas",
+      "package_manifest_version": "0.9.30",
+      "lifecycle_scripts": {
+        "install": "node-pre-gyp install || npm run build -- --release"
+      },
+      "binding_gyp_present": false,
+      "gypfile_declared": false,
+      "binary_metadata": {
+        "module_name": "index",
+        "module_path": "./lib/v{napi_build_version}",
+        "remote_path": "./v{version}",
+        "package_name": "{platform}-{arch}-{node_napi_label}-{libc}.tar.gz",
+        "host": "https://skia-canvas.s3.us-east-1.amazonaws.com",
+        "napi_versions": [
+          6
+        ]
+      },
+      "os_constraints": null,
+      "cpu_constraints": null,
+      "native_files_in_archive": [],
+      "lock_occurrence_count": 2,
+      "consumer_entry_count": 2,
+      "windows_x64_constraint_excluded_occurrence_count": 0,
+      "consumer_entries": [
+        {
+          "registry_entry_id": "ko-20134f413531bb1125813d69",
+          "consumer_package": "koishi-plugin-ffxiv",
+          "consumer_version": "2.0.8",
+          "dependency_path": "node_modules/skia-canvas",
+          "optional": false,
+          "os_constraints": null,
+          "cpu_constraints": null,
+          "windows_x64_constraint_status": "not_excluded_by_declared_constraints"
+        },
+        {
+          "registry_entry_id": "ko-72412a4eef3f1b3c132e6298",
+          "consumer_package": "koishi-plugin-petpet",
+          "consumer_version": "1.0.7",
+          "dependency_path": "node_modules/skia-canvas",
+          "optional": false,
+          "os_constraints": null,
+          "cpu_constraints": null,
+          "windows_x64_constraint_status": "not_excluded_by_declared_constraints"
+        }
+      ]
+    },
+    {
+      "package": "sqlite3",
+      "version": "5.1.7",
+      "resolved": "https://registry.npmjs.org/sqlite3/-/sqlite3-5.1.7.tgz",
+      "integrity": "sha512-GGIyOiFaG+TUra3JIfkI/zGP8yZYLPQ0pl1bH+ODjiX57sPhrLU5sQJn1y9bDKZUFYkX1crlrPfSYt0BKKdkog==",
+      "target_lock_has_install_script_marker": true,
+      "archive_size_bytes": 3237363,
+      "archive_sha256": "44cc9bdee02705a7b636f76968d745e21c1d0b2f1c62810c678bc3b0ececab1b",
+      "lock_integrity_algorithm": "sha512",
+      "lock_integrity_digest": "1862323a215a1be4d4adadc921f908ff318ff326582cf434a65d5b1fe3838e25f9eec3e1acb539b10267d72f5b0ca654158917d5cae5acf7d262dd0128a764a2",
+      "lock_integrity_matched": true,
+      "package_manifest_sha256": "c782c19485b0026e209076a236484a62885cb3a0828322a2936043230ed1ec41",
+      "package_manifest_name": "sqlite3",
+      "package_manifest_version": "5.1.7",
+      "lifecycle_scripts": {
+        "install": "prebuild-install -r napi || node-gyp rebuild"
+      },
+      "binding_gyp_present": true,
+      "gypfile_declared": false,
+      "binary_metadata": {
+        "napi_versions": [
+          3,
+          6
+        ]
+      },
+      "os_constraints": null,
+      "cpu_constraints": null,
+      "native_files_in_archive": [],
+      "lock_occurrence_count": 1,
+      "consumer_entry_count": 1,
+      "windows_x64_constraint_excluded_occurrence_count": 0,
+      "consumer_entries": [
+        {
+          "registry_entry_id": "ko-c2cd287f0be05c4c80bed280",
+          "consumer_package": "koishi-plugin-sleep-shiyi",
+          "consumer_version": "1.0.2",
+          "dependency_path": "node_modules/sqlite3",
+          "optional": false,
+          "os_constraints": null,
+          "cpu_constraints": null,
+          "windows_x64_constraint_status": "not_excluded_by_declared_constraints"
+        }
+      ]
+    },
+    {
+      "package": "ssh2",
+      "version": "1.17.0",
+      "resolved": "https://registry.npmjs.org/ssh2/-/ssh2-1.17.0.tgz",
+      "integrity": "sha512-wPldCk3asibAjQ/kziWQQt1Wh3PgDFpC0XpwclzKcdT1vql6KeYxf5LIt4nlFkUeR8WuphYMKqUA56X4rjbfgQ==",
+      "target_lock_has_install_script_marker": true,
+      "archive_size_bytes": 257206,
+      "archive_sha256": "8bf2fff9c148973ed24a95087c0b4cea9b8f07a61621c8ab3ded453e3cbcd7d7",
+      "lock_integrity_algorithm": "sha512",
+      "lock_integrity_digest": "c0f95d0a4ddab226c08d0fe4ce259042dd568773e00c5a42d17a70725cca71d4f5bea97a29e6317f92c8b789e516451e47c5aea6160c2aa500e7a5f8ae36df81",
+      "lock_integrity_matched": true,
+      "package_manifest_sha256": "e6fd4e4c3e69e4ad185c87cb5ee1df631e3f4cbd43cf89470f83c1e5d1a76dfb",
+      "package_manifest_name": "ssh2",
+      "package_manifest_version": "1.17.0",
+      "lifecycle_scripts": {
+        "install": "node install.js"
+      },
+      "binding_gyp_present": false,
+      "gypfile_declared": false,
+      "binary_metadata": null,
+      "os_constraints": null,
+      "cpu_constraints": null,
+      "native_files_in_archive": [
+        {
+          "member": "mscdex-ssh2-5c506eb/util/pagent.exe",
+          "size_bytes": 50688,
+          "sha256": "282aa0848b35408f8aa3caca0d7185d2c79abf1ec07fec8038893d0d4e16b796"
+        }
+      ],
+      "lock_occurrence_count": 1,
+      "consumer_entry_count": 1,
+      "windows_x64_constraint_excluded_occurrence_count": 0,
+      "consumer_entries": [
+        {
+          "registry_entry_id": "ko-15de73c9e3526e8e329299a6",
+          "consumer_package": "koishi-plugin-docker-control",
+          "consumer_version": "0.2.0",
+          "dependency_path": "node_modules/ssh2",
+          "optional": false,
+          "os_constraints": null,
+          "cpu_constraints": null,
+          "windows_x64_constraint_status": "not_excluded_by_declared_constraints"
+        }
+      ]
+    },
+    {
+      "package": "utf-8-validate",
+      "version": "6.0.6",
+      "resolved": "https://registry.npmjs.org/utf-8-validate/-/utf-8-validate-6.0.6.tgz",
+      "integrity": "sha512-q3l3P9UtEEiAHcsgsqTgf9PPjctrDWoIXW3NpOHFdRDbLvu4DLIcxHangJ4RLrWkBcKjmcs/6NkerI8T/rE4LA==",
+      "target_lock_has_install_script_marker": true,
+      "archive_size_bytes": 237581,
+      "archive_sha256": "f65e05feb1174937bd67b5ddb7a70d5eed314989d2bc8637e1594e1623c4a00f",
+      "lock_integrity_algorithm": "sha512",
+      "lock_integrity_digest": "ab79773fd52d1048801dcb20b2a4e07fd3cf8dcb6b0d6a085d6dcda4e1c57510db2efbb80cb21cc476a7809e112eb5a405c2a399cb3fe8d91eac8f13feb1382c",
+      "lock_integrity_matched": true,
+      "package_manifest_sha256": "75c6c1c5441fcc22114f12ddd202de797f606c1dc056f6c5181ed0abd4cda329",
+      "package_manifest_name": "utf-8-validate",
+      "package_manifest_version": "6.0.6",
+      "lifecycle_scripts": {
+        "install": "node-gyp-build"
+      },
+      "binding_gyp_present": true,
+      "gypfile_declared": false,
+      "binary_metadata": null,
+      "os_constraints": null,
+      "cpu_constraints": null,
+      "native_files_in_archive": [
+        {
+          "member": "package/prebuilds/darwin-arm64/utf-8-validate.node",
+          "size_bytes": 36256,
+          "sha256": "3aa78e7e2eda10bb968a98f96d713981fa6e9316efce0c750af1b3e8fe50170f"
+        },
+        {
+          "member": "package/prebuilds/darwin-x64/utf-8-validate.node",
+          "size_bytes": 20216,
+          "sha256": "84d42dc1e7d811271d803d2374aeb1d2439d02a2a2b9cfd59b190d9acd73cac4"
+        },
+        {
+          "member": "package/prebuilds/linux-x64/utf-8-validate.musl.node",
+          "size_bytes": 34656,
+          "sha256": "2c52b81a656cda0a9f874f8ce163f2ccad60707391a50ff23738e48d657287ee"
+        },
+        {
+          "member": "package/prebuilds/linux-x64/utf-8-validate.node",
+          "size_bytes": 31200,
+          "sha256": "428fa0b3a3c52ddf28cce7d4ad95a68023200f9514328d2d0e4a11f0633d3610"
+        },
+        {
+          "member": "package/prebuilds/win32-ia32/utf-8-validate.node",
+          "size_bytes": 139264,
+          "sha256": "0fc404bf0e45866c66c99d5fce490446e8b0703af57f10c7e5292db28ac98ecd"
+        },
+        {
+          "member": "package/prebuilds/win32-x64/utf-8-validate.node",
+          "size_bytes": 174592,
+          "sha256": "563ad0209336017a68e14d40fa8964f09021ed33cccc6b26414e1331b4fead99"
+        }
+      ],
+      "lock_occurrence_count": 1,
+      "consumer_entry_count": 1,
+      "windows_x64_constraint_excluded_occurrence_count": 0,
+      "consumer_entries": [
+        {
+          "registry_entry_id": "ko-ddd45c02f4048e7bd8e6711e",
+          "consumer_package": "koishi-plugin-mindustry-service-handler",
+          "consumer_version": "0.0.3",
+          "dependency_path": "node_modules/utf-8-validate",
+          "optional": false,
+          "os_constraints": null,
+          "cpu_constraints": null,
+          "windows_x64_constraint_status": "not_excluded_by_declared_constraints"
+        }
+      ]
+    },
+    {
+      "package": "vue-demi",
+      "version": "0.13.11",
+      "resolved": "https://registry.npmjs.org/vue-demi/-/vue-demi-0.13.11.tgz",
+      "integrity": "sha512-IR8HoEEGM65YY3ZJYAjMlKygDQn25D5ajNFNoKh9RSDMQtlzCxtfQjdQgv9jjK+m3377SsJXY8ysq8kLCZL25A==",
+      "target_lock_has_install_script_marker": true,
+      "archive_size_bytes": 7424,
+      "archive_sha256": "f3b9d99f3635d8d9b1ea1fe5d55010e10ace2ef68885fadde03c4f4d32e3c774",
+      "lock_integrity_algorithm": "sha512",
+      "lock_integrity_digest": "211f07a0410633ae586376496008cc94aca00d09f6e43e5a8cd14da0a87d4520cc42d9730b1b5f42375082ff638cafa6df7efb4ac25763ccacabc90b0992f6e4",
+      "lock_integrity_matched": true,
+      "package_manifest_sha256": "8fae2b96127e52de4fd136ad02d2105fbd1bfc23294b858f872d1a407814f965",
+      "package_manifest_name": "vue-demi",
+      "package_manifest_version": "0.13.11",
+      "lifecycle_scripts": {
+        "postinstall": "node ./scripts/postinstall.js"
+      },
+      "binding_gyp_present": false,
+      "gypfile_declared": false,
+      "binary_metadata": null,
+      "os_constraints": null,
+      "cpu_constraints": null,
+      "native_files_in_archive": [],
+      "lock_occurrence_count": 1,
+      "consumer_entry_count": 1,
+      "windows_x64_constraint_excluded_occurrence_count": 0,
+      "consumer_entries": [
+        {
+          "registry_entry_id": "ko-b395bb25ddd9b13efad695e8",
+          "consumer_package": "koishi-plugin-xsxn",
+          "consumer_version": "1.4.1",
+          "dependency_path": "node_modules/vue-demi",
+          "optional": false,
+          "os_constraints": null,
+          "cpu_constraints": null,
+          "windows_x64_constraint_status": "not_excluded_by_declared_constraints"
+        }
+      ]
+    },
+    {
+      "package": "vue-demi",
+      "version": "0.14.10",
+      "resolved": "https://registry.npmjs.org/vue-demi/-/vue-demi-0.14.10.tgz",
+      "integrity": "sha512-nMZBOwuzabUO0nLgIcc6rycZEebF6eeUfaiQx9+WSk8e29IbLvPU9feI6tqW4kTo3hvoYAJkMh8n8D0fuISphg==",
+      "target_lock_has_install_script_marker": true,
+      "archive_size_bytes": 7893,
+      "archive_sha256": "b239890af0797bac06350b2e78d9030aff37824b03f74711130bd9dcf3198e19",
+      "lock_integrity_algorithm": "sha512",
+      "lock_integrity_digest": "9cc6413b0bb369b50ed272e021c73aaf271911e6c5e9e7947da890c7df964a4f1edbd21b2ef3d4f5f788eada96e244e8de1be8600264321f27f03d1fb884a986",
+      "lock_integrity_matched": true,
+      "package_manifest_sha256": "826a3e8415b8bb1ff91b890f119dd95069e9e0d4db1cd7779e538d3a7a8c42a5",
+      "package_manifest_name": "vue-demi",
+      "package_manifest_version": "0.14.10",
+      "lifecycle_scripts": {
+        "postinstall": "node -e \"try{require('./scripts/postinstall.js')}catch(e){}\""
+      },
+      "binding_gyp_present": false,
+      "gypfile_declared": false,
+      "binary_metadata": null,
+      "os_constraints": null,
+      "cpu_constraints": null,
+      "native_files_in_archive": [],
+      "lock_occurrence_count": 15,
+      "consumer_entry_count": 5,
+      "windows_x64_constraint_excluded_occurrence_count": 0,
+      "consumer_entries": [
+        {
+          "registry_entry_id": "ko-6cc09a7c20d31ab46d1a309d",
+          "consumer_package": "koishi-plugin-fonts4pptr",
+          "consumer_version": "1.0.1",
+          "dependency_path": "node_modules/@vueuse/core/node_modules/vue-demi",
+          "optional": false,
+          "os_constraints": null,
+          "cpu_constraints": null,
+          "windows_x64_constraint_status": "not_excluded_by_declared_constraints"
+        },
+        {
+          "registry_entry_id": "ko-6cc09a7c20d31ab46d1a309d",
+          "consumer_package": "koishi-plugin-fonts4pptr",
+          "consumer_version": "1.0.1",
+          "dependency_path": "node_modules/@vueuse/shared/node_modules/vue-demi",
+          "optional": false,
+          "os_constraints": null,
+          "cpu_constraints": null,
+          "windows_x64_constraint_status": "not_excluded_by_declared_constraints"
+        },
+        {
+          "registry_entry_id": "ko-6cc09a7c20d31ab46d1a309d",
+          "consumer_package": "koishi-plugin-fonts4pptr",
+          "consumer_version": "1.0.1",
+          "dependency_path": "node_modules/element-plus/node_modules/@vueuse/core/node_modules/vue-demi",
+          "optional": false,
+          "os_constraints": null,
+          "cpu_constraints": null,
+          "windows_x64_constraint_status": "not_excluded_by_declared_constraints"
+        },
+        {
+          "registry_entry_id": "ko-6cc09a7c20d31ab46d1a309d",
+          "consumer_package": "koishi-plugin-fonts4pptr",
+          "consumer_version": "1.0.1",
+          "dependency_path": "node_modules/element-plus/node_modules/@vueuse/shared/node_modules/vue-demi",
+          "optional": false,
+          "os_constraints": null,
+          "cpu_constraints": null,
+          "windows_x64_constraint_status": "not_excluded_by_declared_constraints"
+        },
+        {
+          "registry_entry_id": "ko-749c9328259cb3520c2ec2dd",
+          "consumer_package": "koishi-plugin-market-next",
+          "consumer_version": "3.6.3",
+          "dependency_path": "node_modules/@vueuse/core/node_modules/vue-demi",
+          "optional": false,
+          "os_constraints": null,
+          "cpu_constraints": null,
+          "windows_x64_constraint_status": "not_excluded_by_declared_constraints"
+        },
+        {
+          "registry_entry_id": "ko-749c9328259cb3520c2ec2dd",
+          "consumer_package": "koishi-plugin-market-next",
+          "consumer_version": "3.6.3",
+          "dependency_path": "node_modules/@vueuse/shared/node_modules/vue-demi",
+          "optional": false,
+          "os_constraints": null,
+          "cpu_constraints": null,
+          "windows_x64_constraint_status": "not_excluded_by_declared_constraints"
+        },
+        {
+          "registry_entry_id": "ko-8e241d55fc0fcd1d2704806e",
+          "consumer_package": "koishi-plugin-adapter-bilibili-dm",
+          "consumer_version": "2.8.5",
+          "dependency_path": "node_modules/@vueuse/core/node_modules/vue-demi",
+          "optional": false,
+          "os_constraints": null,
+          "cpu_constraints": null,
+          "windows_x64_constraint_status": "not_excluded_by_declared_constraints"
+        },
+        {
+          "registry_entry_id": "ko-8e241d55fc0fcd1d2704806e",
+          "consumer_package": "koishi-plugin-adapter-bilibili-dm",
+          "consumer_version": "2.8.5",
+          "dependency_path": "node_modules/@vueuse/shared/node_modules/vue-demi",
+          "optional": false,
+          "os_constraints": null,
+          "cpu_constraints": null,
+          "windows_x64_constraint_status": "not_excluded_by_declared_constraints"
+        },
+        {
+          "registry_entry_id": "ko-8e241d55fc0fcd1d2704806e",
+          "consumer_package": "koishi-plugin-adapter-bilibili-dm",
+          "consumer_version": "2.8.5",
+          "dependency_path": "node_modules/element-plus/node_modules/@vueuse/core/node_modules/vue-demi",
+          "optional": false,
+          "os_constraints": null,
+          "cpu_constraints": null,
+          "windows_x64_constraint_status": "not_excluded_by_declared_constraints"
+        },
+        {
+          "registry_entry_id": "ko-8e241d55fc0fcd1d2704806e",
+          "consumer_package": "koishi-plugin-adapter-bilibili-dm",
+          "consumer_version": "2.8.5",
+          "dependency_path": "node_modules/element-plus/node_modules/@vueuse/shared/node_modules/vue-demi",
+          "optional": false,
+          "os_constraints": null,
+          "cpu_constraints": null,
+          "windows_x64_constraint_status": "not_excluded_by_declared_constraints"
+        },
+        {
+          "registry_entry_id": "ko-bb1f5f331c63775c59c31905",
+          "consumer_package": "koishi-plugin-gocq-session-uploader",
+          "consumer_version": "1.0.2",
+          "dependency_path": "node_modules/vue-demi",
+          "optional": false,
+          "os_constraints": null,
+          "cpu_constraints": null,
+          "windows_x64_constraint_status": "not_excluded_by_declared_constraints"
+        },
+        {
+          "registry_entry_id": "ko-d5d43667d9446f27dd1b1433",
+          "consumer_package": "koishi-plugin-fonts",
+          "consumer_version": "1.0.4",
+          "dependency_path": "node_modules/@vueuse/core/node_modules/vue-demi",
+          "optional": false,
+          "os_constraints": null,
+          "cpu_constraints": null,
+          "windows_x64_constraint_status": "not_excluded_by_declared_constraints"
+        },
+        {
+          "registry_entry_id": "ko-d5d43667d9446f27dd1b1433",
+          "consumer_package": "koishi-plugin-fonts",
+          "consumer_version": "1.0.4",
+          "dependency_path": "node_modules/@vueuse/shared/node_modules/vue-demi",
+          "optional": false,
+          "os_constraints": null,
+          "cpu_constraints": null,
+          "windows_x64_constraint_status": "not_excluded_by_declared_constraints"
+        },
+        {
+          "registry_entry_id": "ko-d5d43667d9446f27dd1b1433",
+          "consumer_package": "koishi-plugin-fonts",
+          "consumer_version": "1.0.4",
+          "dependency_path": "node_modules/element-plus/node_modules/@vueuse/core/node_modules/vue-demi",
+          "optional": false,
+          "os_constraints": null,
+          "cpu_constraints": null,
+          "windows_x64_constraint_status": "not_excluded_by_declared_constraints"
+        },
+        {
+          "registry_entry_id": "ko-d5d43667d9446f27dd1b1433",
+          "consumer_package": "koishi-plugin-fonts",
+          "consumer_version": "1.0.4",
+          "dependency_path": "node_modules/element-plus/node_modules/@vueuse/shared/node_modules/vue-demi",
+          "optional": false,
+          "os_constraints": null,
+          "cpu_constraints": null,
+          "windows_x64_constraint_status": "not_excluded_by_declared_constraints"
+        }
+      ]
+    },
+    {
+      "package": "vue-echarts",
+      "version": "6.7.3",
+      "resolved": "https://registry.npmjs.org/vue-echarts/-/vue-echarts-6.7.3.tgz",
+      "integrity": "sha512-vXLKpALFjbPphW9IfQPOVfb1KjGZ/f8qa/FZHi9lZIWzAnQC1DgnmEK3pJgEkyo6EP7UnX6Bv/V3Ke7p+qCNXA==",
+      "target_lock_has_install_script_marker": true,
+      "archive_size_bytes": 210457,
+      "archive_sha256": "67718f9fe85bc575ad3b18ffc96d7a9573e564e92660a45fef5dafd77177551a",
+      "lock_integrity_algorithm": "sha512",
+      "lock_integrity_digest": "bd72caa402c58db3e9856f487d03ce55f6f52a3199fdff2a6bf1591e2f656485b3027402d438279842b7a49804932a3a10fed49d7e81bff57729eee9faa08d5c",
+      "lock_integrity_matched": true,
+      "package_manifest_sha256": "13dd48492baa71dc3a895552520fd7a01f4136888fd30ab67377c7755370df14",
+      "package_manifest_name": "vue-echarts",
+      "package_manifest_version": "6.7.3",
+      "lifecycle_scripts": {
+        "postinstall": "node ./scripts/postinstall.js"
+      },
+      "binding_gyp_present": false,
+      "gypfile_declared": false,
+      "binary_metadata": null,
+      "os_constraints": null,
+      "cpu_constraints": null,
+      "native_files_in_archive": [],
+      "lock_occurrence_count": 1,
+      "consumer_entry_count": 1,
+      "windows_x64_constraint_excluded_occurrence_count": 0,
+      "consumer_entries": [
+        {
+          "registry_entry_id": "ko-b395bb25ddd9b13efad695e8",
+          "consumer_package": "koishi-plugin-xsxn",
+          "consumer_version": "1.4.1",
+          "dependency_path": "node_modules/vue-echarts",
+          "optional": false,
+          "os_constraints": null,
+          "cpu_constraints": null,
+          "windows_x64_constraint_status": "not_excluded_by_declared_constraints"
+        }
+      ]
+    }
+  ],
+  "limitations": [
+    "A lock hasInstallScript marker or package.json lifecycle command does not show what an executed script would do under the Sandbox environment.",
+    "Native archive members are hash observations only; no file was extracted to disk or loaded.",
+    "This report does not authorize lifecycle scripts, modify the Worker no-scripts policy, or create a combined Host profile.",
+    "A complete independent profile, per-entry provider config/combined lock, native binding policy, manifest, checkpoint, report, and validate-only result are still required before dispatch."
+  ],
+  "report_sha256": "f8ba063721607481beba16ddd72fafd7d38b8db0f3e6682cc32d5327138b2278"
+}
