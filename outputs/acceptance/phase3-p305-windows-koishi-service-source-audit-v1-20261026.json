@@ -1,0 +1,1317 @@
+{
+  "generated_at_utc": "2026-10-25T23:59:26Z",
+  "inputs": {
+    "artifact_lock_file_sha256": "8dcec5da7cd81b9ed7d0f4e8aead8e76ef15cd7e17dfcdc4fa6f7b8944b83d4a",
+    "cache_root": "E:\\stella\\Ligamina-artifact-cache",
+    "catalog_file_sha256": "8c75d69358cd8334d0d311c1e19c642794d7436056d32041f02e6c1de1a06163",
+    "catalog_snapshot_id": "p2-41649744e057d61031d5",
+    "profiles_lock_file_sha256": "68a7391620a06e7141d949519333a1f4fc5ccee7abd84dc036c46d09fdae8d38",
+    "provider_candidate_audit_canonical_sha256": "7f8e2efcbfa8ca7daa125327f38af21d5b105b5259a09a0dae361f0102703204",
+    "provider_candidate_audit_file_sha256": "1425619ed40d45742688b8cf6b942fbda805f8c77a8fd7b527e99bed8699e0be",
+    "provider_candidate_audit_path": "outputs/acceptance/phase3-p305-windows-koishi-provider-candidate-audit-v1-20261026.json",
+    "static_audit_canonical_sha256": "793ceb01e02dc0311123fd6d32c7b0db67f9dea650b03774f77530f3b4cc4508",
+    "static_audit_file_sha256": "fa6a145e279c3939b6d932305ef3b73b31371906b03cfcf23cf792da13ecd4db",
+    "static_audit_path": "outputs/acceptance/phase3-p305-windows-koishi-host-profile-static-audit-v3-20261026.json"
+  },
+  "interpretation": "This source audit narrows service-provider discovery and corrects a template-string false positive. It is not a Host/native profile, dependency-closure, installation, load, behavior, or compatibility acceptance. Keep Koishi undispatched until a complete new profile and per-entry locks/configurations, manifest, checkpoint, and report are independently frozen and validate-only succeeds.",
+  "kind": "phase3_p305_windows_koishi_service_source_audit",
+  "official_document_references": {
+    "core_builtin_services": "https://koishi.chat/en-US/api/",
+    "core_context": "https://koishi.chat/en-US/api/core/context",
+    "publishing_metadata": "https://koishi.chat/en-US/guide/develop/publish",
+    "service_plugins": "https://koishi.chat/en-US/market/service"
+  },
+  "provider_archives": [
+    {
+      "artifact_sha256": "36752278db7e6bd43b6240ae2708b402c662f75c419949a6ee9c1c0be0d4ed8d",
+      "artifact_sha256_matches_lock": true,
+      "dependency_archives_reverified": false,
+      "dependency_lock_blob_sha256_matches_lock": true,
+      "dependency_lock_sha256": "768ad9b0a25aefff0a7994b0c3dd15369526617c730ae0228629970eb36eea3c",
+      "package": "koishi-plugin-bilibili-login",
+      "package_manifest_identity_matches_catalog": true,
+      "package_manifest_sha256": "2100070f4f8fa78851d7e2782827306fbdf29ae8ddde779d642a26b15f28a884",
+      "registry_entry_id": "ko-429c6634899115798dfa92ab",
+      "services": [
+        {
+          "class_name": "BiliBiliLive",
+          "package_service_metadata": [],
+          "profile_configuration_frozen_for_remaining_units": false,
+          "required_by_units": [
+            {
+              "package": "koishi-plugin-iirose-media-request",
+              "registry_entry_id": "ko-91a95bc2e58274eb2946f327",
+              "version": "0.5.34"
+            }
+          ],
+          "same_package_self_service_candidate": false,
+          "service_name": "BiliBiliLive",
+          "static_registration": {
+            "char_offset": 604,
+            "excerpt": ".plugin(Service_1.BiliBiliMovie);     ctx.plugin(Service_1.BiliBiliSearch);     ctx.plugin(Service_1.BiliBiliLive);     let x;     // const bl = ctx.bilibiliLogin     // x = await bl.getNavUserData()     // const bv = ctx.BiliBiliVide",
+            "line": 15,
+            "matched_source": "ctx.plugin(Service_1.BiliBiliLive)",
+            "member": "package/lib/API/index.js",
+            "member_sha256": "84b0abb6e415b57103af57d0eaf134fccaa02eac97489fce403db6829f6b329e",
+            "member_size_bytes": 3170
+          },
+          "static_service_constructor": {
+            "char_offset": 1119,
+            "excerpt": "xportStar(require(\"../BiliBiliAPI/BiliBiliLive/LiveStreamInterface\"), exports); class BiliBiliLive extends koishi_1.Service {     constructor(ctx) {         super(ctx, 'BiliBiliLive', true);         this.ctx = ctx;     }     async getBilibiliAccountData() {         const select = new select_database_1",
+            "line": 23,
+            "matched_source": "class BiliBiliLive extends koishi_1.Service {\n    constructor(ctx) {\n        super(ctx, 'BiliBiliLive'",
+            "member": "package/lib/API/Service/BiliBiliLive.js",
+            "member_sha256": "3beca72974a24251edb45987e9f6cc7fd29dbbaf0a38d7c4671e462b1bcb5f54",
+            "member_size_bytes": 5850
+          }
+        },
+        {
+          "class_name": "BiliBiliLogin",
+          "package_service_metadata": [],
+          "profile_configuration_frozen_for_remaining_units": false,
+          "required_by_units": [
+            {
+              "package": "koishi-plugin-iirose-media-request",
+              "registry_entry_id": "ko-91a95bc2e58274eb2946f327",
+              "version": "0.5.34"
+            }
+          ],
+          "same_package_self_service_candidate": false,
+          "service_name": "BiliBiliLogin",
+          "static_registration": {
+            "char_offset": 439,
+            "excerpt": "\"); const timers_1 = require(\"timers\"); async function apply(ctx, Config) {     ctx.plugin(Service_1.BiliBiliLogin);     ctx.plugin(Service_1.BiliBiliVideo);     ctx.plugin(Service_1.BiliBiliMovie);     ctx.plugin(Service_1.BiliBiliSea",
+            "line": 11,
+            "matched_source": "ctx.plugin(Service_1.BiliBiliLogin)",
+            "member": "package/lib/API/index.js",
+            "member_sha256": "84b0abb6e415b57103af57d0eaf134fccaa02eac97489fce403db6829f6b329e",
+            "member_size_bytes": 3170
+          },
+          "static_service_constructor": {
+            "char_offset": 1081,
+            "excerpt": "; __exportStar(require(\"../BiliBiliAPI/LoginAPI/LoginInfoInterface\"), exports); class BiliBiliLogin extends koishi_1.Service {     constructor(ctx) {         super(ctx, 'BiliBiliLogin', true);         this.ctx = ctx;     }     /**      * 获取Bilibili账号数据      * @returns {Promise<BilibiliAccountData>}     ",
+            "line": 23,
+            "matched_source": "class BiliBiliLogin extends koishi_1.Service {\n    constructor(ctx) {\n        super(ctx, 'BiliBiliLogin'",
+            "member": "package/lib/API/Service/BilibiliLogin.js",
+            "member_sha256": "e360cbb192b0ee0672f32ba4501543382977ea1056a8e9c84b2169f784ef2796",
+            "member_size_bytes": 2108
+          }
+        },
+        {
+          "class_name": "BiliBiliMovie",
+          "package_service_metadata": [],
+          "profile_configuration_frozen_for_remaining_units": false,
+          "required_by_units": [
+            {
+              "package": "koishi-plugin-iirose-media-request",
+              "registry_entry_id": "ko-91a95bc2e58274eb2946f327",
+              "version": "0.5.34"
+            }
+          ],
+          "same_package_self_service_candidate": false,
+          "service_name": "BiliBiliMovie",
+          "static_registration": {
+            "char_offset": 521,
+            "excerpt": "x.plugin(Service_1.BiliBiliLogin);     ctx.plugin(Service_1.BiliBiliVideo);     ctx.plugin(Service_1.BiliBiliMovie);     ctx.plugin(Service_1.BiliBiliSearch);     ctx.plugin(Service_1.BiliBiliLive);     let x;     // const bl = ctx.bil",
+            "line": 13,
+            "matched_source": "ctx.plugin(Service_1.BiliBiliMovie)",
+            "member": "package/lib/API/index.js",
+            "member_sha256": "84b0abb6e415b57103af57d0eaf134fccaa02eac97489fce403db6829f6b329e",
+            "member_size_bytes": 3170
+          },
+          "static_service_constructor": {
+            "char_offset": 1293,
+            "excerpt": "ortStar(require(\"../BiliBiliAPI/BiliBiliMovie/FollowMovieInterface\"), exports); class BiliBiliMovie extends koishi_1.Service {     constructor(ctx) {         super(ctx, 'BiliBiliMovie', true);         this.ctx = ctx;     }     async getBilibiliAccountData() {         const select = new select_database_1",
+            "line": 25,
+            "matched_source": "class BiliBiliMovie extends koishi_1.Service {\n    constructor(ctx) {\n        super(ctx, 'BiliBiliMovie'",
+            "member": "package/lib/API/Service/BiliBiliMovie.js",
+            "member_sha256": "de8575f119848895cbb3675343def0931f1456bfbd9d35a901778c59570cfa15",
+            "member_size_bytes": 6511
+          }
+        },
+        {
+          "class_name": "BiliBiliSearch",
+          "package_service_metadata": [],
+          "profile_configuration_frozen_for_remaining_units": false,
+          "required_by_units": [
+            {
+              "package": "koishi-plugin-nazrin-video-bilibili",
+              "registry_entry_id": "ko-fe82a7f071e43a43d254a378",
+              "version": "0.1.15"
+            }
+          ],
+          "same_package_self_service_candidate": false,
+          "service_name": "BiliBiliSearch",
+          "static_registration": {
+            "char_offset": 562,
+            "excerpt": "x.plugin(Service_1.BiliBiliVideo);     ctx.plugin(Service_1.BiliBiliMovie);     ctx.plugin(Service_1.BiliBiliSearch);     ctx.plugin(Service_1.BiliBiliLive);     let x;     // const bl = ctx.bilibiliLogin     // x = await bl.getNavUserD",
+            "line": 14,
+            "matched_source": "ctx.plugin(Service_1.BiliBiliSearch)",
+            "member": "package/lib/API/index.js",
+            "member_sha256": "84b0abb6e415b57103af57d0eaf134fccaa02eac97489fce403db6829f6b329e",
+            "member_size_bytes": 3170
+          },
+          "static_service_constructor": {
+            "char_offset": 1047,
+            "excerpt": "Star(require(\"../BiliBiliAPI/BiliBiliSearch/SearchRequestInterface\"), exports); class BiliBiliSearch extends koishi_1.Service {     constructor(ctx) {         super(ctx, 'BiliBiliSearch', true);         this.ctx = ctx;     }     /**      * 获取Bilibili账号数据      * @returns {Promise<BilibiliAccountData>}     ",
+            "line": 22,
+            "matched_source": "class BiliBiliSearch extends koishi_1.Service {\n    constructor(ctx) {\n        super(ctx, 'BiliBiliSearch'",
+            "member": "package/lib/API/Service/BiliBiliSearch.js",
+            "member_sha256": "9d740ab8308a051645cb31098b5b48c927f9163e3d979084d08b989ee60691eb",
+            "member_size_bytes": 11242
+          }
+        },
+        {
+          "class_name": "BiliBiliVideo",
+          "package_service_metadata": [],
+          "profile_configuration_frozen_for_remaining_units": false,
+          "required_by_units": [
+            {
+              "package": "koishi-plugin-iirose-media-request",
+              "registry_entry_id": "ko-91a95bc2e58274eb2946f327",
+              "version": "0.5.34"
+            },
+            {
+              "package": "koishi-plugin-nazrin-video-bilibili",
+              "registry_entry_id": "ko-fe82a7f071e43a43d254a378",
+              "version": "0.1.15"
+            }
+          ],
+          "same_package_self_service_candidate": false,
+          "service_name": "BiliBiliVideo",
+          "static_registration": {
+            "char_offset": 480,
+            "excerpt": "sync function apply(ctx, Config) {     ctx.plugin(Service_1.BiliBiliLogin);     ctx.plugin(Service_1.BiliBiliVideo);     ctx.plugin(Service_1.BiliBiliMovie);     ctx.plugin(Service_1.BiliBiliSearch);     ctx.plugin(Service_1.BiliBiliLi",
+            "line": 12,
+            "matched_source": "ctx.plugin(Service_1.BiliBiliVideo)",
+            "member": "package/lib/API/index.js",
+            "member_sha256": "84b0abb6e415b57103af57d0eaf134fccaa02eac97489fce403db6829f6b329e",
+            "member_size_bytes": 3170
+          },
+          "static_service_constructor": {
+            "char_offset": 2191,
+            "excerpt": "r(require(\"../BiliBiliAPI/BiliBiliVideoAPI/SeasonArchivesInterface\"), exports); class BiliBiliVideo extends koishi_1.Service {     constructor(ctx) {         super(ctx, 'BiliBiliVideo', true);         this.ctx = ctx;     }     async getBilibiliAccountData() {         const select = new select_database_1",
+            "line": 35,
+            "matched_source": "class BiliBiliVideo extends koishi_1.Service {\n    constructor(ctx) {\n        super(ctx, 'BiliBiliVideo'",
+            "member": "package/lib/API/Service/BilibiliVideo.js",
+            "member_sha256": "e3a8732891ce8193d086bc00401e2c339af963e6b3fff5d8ec0974c7ca422890",
+            "member_size_bytes": 25105
+          }
+        }
+      ],
+      "version": "0.1.50",
+      "windows_profile_id": "koishi-core-4.18.11-node-24.20.0-x86_64-portable-lock",
+      "windows_profile_status": "locked"
+    },
+    {
+      "artifact_sha256": "d111f37eeee0d7ced1a5fd7c287cefa3281751b5ebf6bcd6b22371dee67aa95b",
+      "artifact_sha256_matches_lock": true,
+      "dependency_archives_reverified": false,
+      "dependency_lock_blob_sha256_matches_lock": true,
+      "dependency_lock_sha256": "7e947575764d65fcf38341814495bacccfcc095d3c3e28e873ded4fe64f5a74d",
+      "package": "@quanhuzeyu/koishi-plugin-qhzy-sharp",
+      "package_manifest_identity_matches_catalog": true,
+      "package_manifest_sha256": "c51037a1f2a0181216b65829a2683016db6a348227f6cd160377a9ce904f143d",
+      "registry_entry_id": "ko-31a0a85bbbf89e5f2955070e",
+      "services": [
+        {
+          "class_name": "SharpService",
+          "package_service_metadata": [
+            {
+              "path": "koishi.services.implements",
+              "values": [
+                "sharp"
+              ]
+            }
+          ],
+          "profile_configuration_frozen_for_remaining_units": false,
+          "required_by_units": [
+            {
+              "package": "@quanhuzeyu/koishi-plugin-arknights-wiki",
+              "registry_entry_id": "ko-1de6abe87bfca49ed4744042",
+              "version": "0.3.0"
+            },
+            {
+              "package": "@quanhuzeyu/koishi-plugin-gtnh-wiki",
+              "registry_entry_id": "ko-6c826386e32f5f7db40e80eb",
+              "version": "0.1.1"
+            }
+          ],
+          "same_package_self_service_candidate": false,
+          "service_name": "QhzySharp",
+          "static_registration": {
+            "char_offset": 3307,
+            "excerpt": "    logger.error(\"sharp加载失败，请检查node服务\");     });   } }; function apply(ctx) {   ctx.plugin(SharpService); } __name(apply, \"apply\"); // Annotate the CommonJS export names for ESM import in node: 0 && (module.exports = {   Con",
+            "line": 88,
+            "matched_source": "ctx.plugin(SharpService)",
+            "member": "package/lib/index.js",
+            "member_sha256": "760c04fdb57a8fa70685469a256c4a6a1bda7da5eda72dcef1b7ebda1e67531b",
+            "member_size_bytes": 3605
+          },
+          "static_service_constructor": {
+            "char_offset": 2386,
+            "excerpt": ": import_koishi.Schema.string().description(\"指定sharp的版本\").default(\"0.33.5\") }); var SharpService = class extends import_koishi.Service {   static {     __name(this, \"SharpService\");   }   Sharp;   tmpDir = import_path.default.resolve(this.ctx.baseDir, \"data/assets/qhzy/sharp/tmp\");   sharpV = \"0.33.5\";   nodeBinaryPath = \"data/assets/qhzy/sharp\";   construct",
+            "line": 57,
+            "matched_source": "var SharpService = class extends import_koishi.Service {\n  static {\n    __name(this, \"SharpService\");\n  }\n  Sharp;\n  tmpDir = import_path.default.resolve(this.ctx.baseDir, \"data/assets/qhzy/sharp/tmp\");\n  sharpV = \"0.33.5\";\n  nodeBinaryPath = \"data/assets/qhzy/sharp\";\n  constructor(ctx, config) {\n    super(ctx, \"QhzySharp\"",
+            "member": "package/lib/index.js",
+            "member_sha256": "760c04fdb57a8fa70685469a256c4a6a1bda7da5eda72dcef1b7ebda1e67531b",
+            "member_size_bytes": 3605
+          }
+        }
+      ],
+      "version": "1.2.1",
+      "windows_profile_id": "koishi-core-4.18.11-node-24.20.0-x86_64-portable-lock",
+      "windows_profile_status": "locked"
+    },
+    {
+      "artifact_sha256": "63ede29a2bb372f5100fec86768c9c411af82d80aabe887883aa616d7765ebf6",
+      "artifact_sha256_matches_lock": true,
+      "dependency_archives_reverified": false,
+      "dependency_lock_blob_sha256_matches_lock": true,
+      "dependency_lock_sha256": "2eb73c5d6c13be7c9f47c51c19ddffa718a511795af1dd9ed0840363fd89cc20",
+      "package": "koishi-plugin-fonts",
+      "package_manifest_identity_matches_catalog": true,
+      "package_manifest_sha256": "522b56c340b4e671fdd5b55b7d51f0ef19254b7ed5ca61355e6bda3e94407397",
+      "registry_entry_id": "ko-d5d43667d9446f27dd1b1433",
+      "services": [
+        {
+          "class_name": "Fonts",
+          "package_service_metadata": [
+            {
+              "path": "koishi.implements",
+              "values": [
+                "fonts"
+              ]
+            }
+          ],
+          "profile_configuration_frozen_for_remaining_units": false,
+          "required_by_units": [
+            {
+              "package": "koishi-plugin-fonts4pptr",
+              "registry_entry_id": "ko-6cc09a7c20d31ab46d1a309d",
+              "version": "1.0.1"
+            }
+          ],
+          "same_package_self_service_candidate": false,
+          "service_name": "fonts",
+          "static_registration": {
+            "char_offset": 36403,
+            "excerpt": "uired: [\"database\"],   optional: [\"console\"] }; function apply(ctx, config) {   ctx.plugin(Fonts, config);   ctx.inject([\"console\"], (ctx2) => {     ctx2.console.addEntry({       dev: resolve3(__dirname, \"../client/index.ts\")",
+            "line": 1062,
+            "matched_source": "ctx.plugin(Fonts, config)",
+            "member": "package/lib/index.js",
+            "member_sha256": "9a9b0c992cf6bf4193c80153f92a3e66bc8a9906fc584826eca8ab6363aaeb54",
+            "member_size_bytes": 36742
+          },
+          "static_service_constructor": {
+            "char_offset": 10860,
+            "excerpt": "().length > 0); } __name(isNonEmptyString, \"isNonEmptyString\");  // src/font.ts var Fonts = class _Fonts extends Service {   constructor(ctx, config) {     super(ctx, \"fonts\");     this.config = config;     ctx.model.extend(       \"fonts\",       {         \"id\": { type: \"string\", length: 64, nu",
+            "line": 357,
+            "matched_source": "var Fonts = class _Fonts extends Service {\n  constructor(ctx, config) {\n    super(ctx, \"fonts\"",
+            "member": "package/lib/index.js",
+            "member_sha256": "9a9b0c992cf6bf4193c80153f92a3e66bc8a9906fc584826eca8ab6363aaeb54",
+            "member_size_bytes": 36742
+          }
+        }
+      ],
+      "version": "1.0.4",
+      "windows_profile_id": "koishi-core-4.18.11-node-24.20.0-x86_64-portable-lock",
+      "windows_profile_status": "locked"
+    },
+    {
+      "artifact_sha256": "c70472b948795eddd56597fcf04411e6d90617d36a1a70f639759d7ac8a56b6a",
+      "artifact_sha256_matches_lock": true,
+      "dependency_archives_reverified": false,
+      "dependency_lock_blob_sha256_matches_lock": true,
+      "dependency_lock_sha256": "3f019e447b844094a0cd36224585095af20f3e384fce4b0321123edf376c86db",
+      "package": "koishi-plugin-smmcat-localstorage",
+      "package_manifest_identity_matches_catalog": true,
+      "package_manifest_sha256": "35e14b81b7c83d1676bc64fea685abc274f14ddc1a3bb29499fb8453f5c1657f",
+      "registry_entry_id": "ko-187be45372ea214c5d8fce80",
+      "services": [
+        {
+          "class_name": "localstorageClass",
+          "package_service_metadata": [],
+          "profile_configuration_frozen_for_remaining_units": false,
+          "required_by_units": [
+            {
+              "package": "koishi-plugin-smmcat-grongvijug",
+              "registry_entry_id": "ko-33040a1dccdeb84e4535c2d2",
+              "version": "0.0.7"
+            },
+            {
+              "package": "koishi-plugin-smmcat-robloxservice",
+              "registry_entry_id": "ko-3ef2a3db0a9841d526ae5c3f",
+              "version": "0.1.105"
+            },
+            {
+              "package": "koishi-plugin-smmcat-openword",
+              "registry_entry_id": "ko-5bd61db9a3ae436584c651ad",
+              "version": "0.1.19"
+            },
+            {
+              "package": "koishi-plugin-smmcat-faqcooking",
+              "registry_entry_id": "ko-6f055df387401b1c06d3ffbf",
+              "version": "0.1.2"
+            },
+            {
+              "package": "koishi-plugin-smmcat-dontstarveapi",
+              "registry_entry_id": "ko-85a0965e8018d814bb169e24",
+              "version": "0.0.6"
+            },
+            {
+              "package": "koishi-plugin-smmcat-setu",
+              "registry_entry_id": "ko-e4f88844c206f342f0c2e000",
+              "version": "0.0.15"
+            },
+            {
+              "package": "koishi-plugin-smmcat-timepiece",
+              "registry_entry_id": "ko-ebc9bc1110ab3f452fc9b337",
+              "version": "0.0.1"
+            },
+            {
+              "package": "koishi-plugin-smmcat-picthesaurus",
+              "registry_entry_id": "ko-fb30c3f4ec905592e6b15432",
+              "version": "0.0.18"
+            }
+          ],
+          "same_package_self_service_candidate": false,
+          "service_name": "localstorage",
+          "static_registration": {
+            "char_offset": 4150,
+            "excerpt": "basePath, key), value);       };     });   } }; function apply(ctx, config) {   ctx.plugin(localstorageClass, config); } __name(apply, \"apply\"); // Annotate the CommonJS export names for ESM import in node: 0 && (module.exports = {   Con",
+            "line": 131,
+            "matched_source": "ctx.plugin(localstorageClass, config)",
+            "member": "package/lib/index.js",
+            "member_sha256": "30cda899ac6cfe159150c305b35c3f6d98714cb5b59f528a81a7d3515d7386ea",
+            "member_size_bytes": 4553
+          },
+          "static_service_constructor": {
+            "char_offset": 3324,
+            "excerpt": ".Schema.string().default(\"./data/localStorage\").description(\"本地存储数据指向的文件夹\") }); var localstorageClass = class extends import_koishi.Service {   static {     __name(this, \"localstorageClass\");   }   basePath;   setItem;   getItem;   constructor(ctx, config) {     super(ctx, \"localstorage\", true);     this.basePath = import_path2.default.join(ctx.baseDir, conf",
+            "line": 103,
+            "matched_source": "var localstorageClass = class extends import_koishi.Service {\n  static {\n    __name(this, \"localstorageClass\");\n  }\n  basePath;\n  setItem;\n  getItem;\n  constructor(ctx, config) {\n    super(ctx, \"localstorage\"",
+            "member": "package/lib/index.js",
+            "member_sha256": "30cda899ac6cfe159150c305b35c3f6d98714cb5b59f528a81a7d3515d7386ea",
+            "member_size_bytes": 4553
+          }
+        }
+      ],
+      "version": "0.0.2",
+      "windows_profile_id": "koishi-core-4.18.11-node-24.20.0-x86_64-portable-lock",
+      "windows_profile_status": "locked"
+    },
+    {
+      "artifact_sha256": "377175c634c0fe93fa0fc0a22e3acaf33467e91de532d09a8906305ccda41fab",
+      "artifact_sha256_matches_lock": true,
+      "dependency_archives_reverified": false,
+      "dependency_lock_blob_sha256_matches_lock": true,
+      "dependency_lock_sha256": "ae978c6b8476123598ce9b49ab93145991192bf0e8851893388bb3a83e62e000",
+      "package": "koishi-plugin-nazrin-core",
+      "package_manifest_identity_matches_catalog": true,
+      "package_manifest_sha256": "29820f62bb5521bf3a7b065ed44e658e115c2d51cdd25169536a71f1055bdc4c",
+      "registry_entry_id": "ko-8ab0ce43e89bc209361f3cf7",
+      "services": [
+        {
+          "class_name": "nazrin",
+          "package_service_metadata": [],
+          "profile_configuration_frozen_for_remaining_units": false,
+          "required_by_units": [
+            {
+              "package": "koishi-plugin-nazrin-video-bilibili",
+              "registry_entry_id": "ko-fe82a7f071e43a43d254a378",
+              "version": "0.1.15"
+            }
+          ],
+          "same_package_self_service_candidate": false,
+          "service_name": "nazrin",
+          "static_registration": {
+            "char_offset": 348,
+            "excerpt": "nazrin-core'; exports.inject = ['puppeteer']; function apply(ctx, config) {     ctx.plugin(Service_1.nazrin);     ctx.inject(['nazrin'], (ctx) => {         ctx.command('nazrin', '聚合搜索核心！！')             .option('music', '-m <keyw",
+            "line": 10,
+            "matched_source": "ctx.plugin(Service_1.nazrin)",
+            "member": "package/lib/Core/index.js",
+            "member_sha256": "345029e9a8fa61b268a4464f155c330130d0b63ba45e2976849e3dd2da7843bd",
+            "member_size_bytes": 1744
+          },
+          "static_service_constructor": {
+            "char_offset": 138,
+            "excerpt": " { value: true }); exports.nazrin = void 0; const koishi_1 = require(\"koishi\"); class nazrin extends koishi_1.Service {     music = [];     video = [];     short_video = [];     acg = [];     movie = [];     comics = [];     picture = [];     film = [];     constructor(ctx) {         // 这样写你就不需要手动给 ctx 赋值了         super(ctx, 'nazrin', true);     } } exports.",
+            "line": 5,
+            "matched_source": "class nazrin extends koishi_1.Service {\n    music = [];\n    video = [];\n    short_video = [];\n    acg = [];\n    movie = [];\n    comics = [];\n    picture = [];\n    film = [];\n    constructor(ctx) {\n        // 这样写你就不需要手动给 ctx 赋值了\n        super(ctx, 'nazrin'",
+            "member": "package/lib/Service/index.js",
+            "member_sha256": "2b466b072c9ee5ab805688ce0a401e85985608cb4faa6c8a2e0b3284e40fbe2c",
+            "member_size_bytes": 463
+          }
+        }
+      ],
+      "version": "0.1.25",
+      "windows_profile_id": "koishi-core-4.18.11-node-24.20.0-x86_64-portable-lock",
+      "windows_profile_status": "locked"
+    },
+    {
+      "artifact_sha256": "6cdd7f7568453f6d7df08970dab417e407a0b93312ba68e227ba579a5d79d418",
+      "artifact_sha256_matches_lock": true,
+      "dependency_archives_reverified": false,
+      "dependency_lock_blob_sha256_matches_lock": true,
+      "dependency_lock_sha256": "5ba3da5a2ffe3ea072ee14f68f1300038872d8867dc521078fc7cb5c54dc4810",
+      "package": "@ltxhhz/koishi-plugin-skia-canvas",
+      "package_manifest_identity_matches_catalog": true,
+      "package_manifest_sha256": "08edac7ea08d2d461136ef6ad60a6ee2bdcd4a607425859e199ea508ea770db4",
+      "registry_entry_id": "ko-68501ea7ad6acec9815245ef",
+      "services": [
+        {
+          "class_name": "Skia",
+          "package_service_metadata": [
+            {
+              "path": "koishi.services.implements",
+              "values": [
+                "skia"
+              ]
+            }
+          ],
+          "profile_configuration_frozen_for_remaining_units": false,
+          "required_by_units": [
+            {
+              "package": "@gjfleo/koishi-plugin-g2",
+              "registry_entry_id": "ko-724229e8e3a2b17222e72357",
+              "version": "1.0.0"
+            }
+          ],
+          "same_package_self_service_candidate": false,
+          "service_name": "skia",
+          "static_registration": null,
+          "static_service_constructor": {
+            "char_offset": 2143,
+            "excerpt": "-canvas\"; var filter = false; var inject = [\"http\"]; var skiaVersion = \"1.0.2\"; var Skia = class extends import_koishi.Service {   static {     __name(this, \"Skia\");   }   Canvas;   loadImage;   FontLibrary;   Path2D;   Image;   ImageData;   CanvasGradient;   CanvasPattern;   CanvasTexture;   App;   DOMMatrix;   DOMPoint;   DOMRect;   Window;   constructor(c",
+            "line": 52,
+            "matched_source": "var Skia = class extends import_koishi.Service {\n  static {\n    __name(this, \"Skia\");\n  }\n  Canvas;\n  loadImage;\n  FontLibrary;\n  Path2D;\n  Image;\n  ImageData;\n  CanvasGradient;\n  CanvasPattern;\n  CanvasTexture;\n  App;\n  DOMMatrix;\n  DOMPoint;\n  DOMRect;\n  Window;\n  constructor(ctx, config) {\n    super(ctx, \"skia\"",
+            "member": "package/lib/index.js",
+            "member_sha256": "86e8fcc19dd6d7f94442f9c25a5e893fc20f6e75c66417ebeb0c828a6996810f",
+            "member_size_bytes": 12145
+          }
+        }
+      ],
+      "version": "0.0.10",
+      "windows_profile_id": "koishi-core-4.18.11-node-24.20.0-x86_64-portable-lock",
+      "windows_profile_status": "locked"
+    },
+    {
+      "artifact_sha256": "597ef3926cf42047cc1c26c4306c7edc5607acd8d53738bfd456dfbdbbfee800",
+      "artifact_sha256_matches_lock": true,
+      "dependency_archives_reverified": false,
+      "dependency_lock_blob_sha256_matches_lock": true,
+      "dependency_lock_sha256": "e654cda0a0f840445eabb59436fd9408dca324ffbab322dc3e5ddcf8cb2cc82c",
+      "package": "koishi-plugin-hajimi-lizard",
+      "package_manifest_identity_matches_catalog": true,
+      "package_manifest_sha256": "0d13bc42332825a5f8dc49a26fb14c56dd231dd423aec78ca311419722994de1",
+      "registry_entry_id": "ko-1713c88871bd1765d4e787e4",
+      "services": [
+        {
+          "class_name": "HajimiService",
+          "package_service_metadata": [],
+          "profile_configuration_frozen_for_remaining_units": false,
+          "required_by_units": [
+            {
+              "package": "koishi-plugin-hajimi-lizard",
+              "registry_entry_id": "ko-1713c88871bd1765d4e787e4",
+              "version": "1.1.0"
+            }
+          ],
+          "same_package_self_service_candidate": true,
+          "service_name": "hajimi",
+          "static_registration": {
+            "char_offset": 9533,
+            "excerpt": " force: true });     }     return files;   } }; function apply(ctx, config) {   ctx.plugin(HajimiService, config);   ctx.command(\"猫赛克\", \"处理图片\").action(async ({ session }) => {     const images = session.elements.filter((el) => el.typ",
+            "line": 252,
+            "matched_source": "ctx.plugin(HajimiService, config)",
+            "member": "package/lib/index.js",
+            "member_sha256": "10db9abafdf1c7ed96e6a4e5b41637c6c3c0ca9b9d635ba01cad548eea0807f7",
+            "member_size_bytes": 11335
+          },
+          "static_service_constructor": {
+            "char_offset": 6148,
+            "excerpt": "eHash)(\"sha256\").update(content).digest(\"hex\"); } __name(hashFile, \"hashFile\"); var HajimiService = class extends import_koishi.Service {   static {     __name(this, \"HajimiService\");   }   pythonExec;   inputDir;   outputDir;   hajimiDir;   batchScript;   patternImage;   headImage;   autoClean = true;   constructor(ctx, config) {     super(ctx, \"hajimi\");  ",
+            "line": 162,
+            "matched_source": "var HajimiService = class extends import_koishi.Service {\n  static {\n    __name(this, \"HajimiService\");\n  }\n  pythonExec;\n  inputDir;\n  outputDir;\n  hajimiDir;\n  batchScript;\n  patternImage;\n  headImage;\n  autoClean = true;\n  constructor(ctx, config) {\n    super(ctx, \"hajimi\"",
+            "member": "package/lib/index.js",
+            "member_sha256": "10db9abafdf1c7ed96e6a4e5b41637c6c3c0ca9b9d635ba01cad548eea0807f7",
+            "member_size_bytes": 11335
+          }
+        }
+      ],
+      "version": "1.1.0",
+      "windows_profile_id": "koishi-core-4.18.11-node-24.20.0-x86_64-portable-lock",
+      "windows_profile_status": "locked"
+    }
+  ],
+  "readiness_blockers": [
+    "Source constructors and registration calls are static evidence only; none of these providers or target plugins was loaded in a Host or Sandbox.",
+    "Provider dependency-lock blobs are hash-verified, but provider dependency archives and the combined target-entry dependency closures have not been verified for execution.",
+    "No service provider set or configuration has been selected and frozen for the 167 remaining Koishi units; combined target-entry locks remain 0/167.",
+    "The frozen profiles still include two unsupported Git SSH dependency references and 113 lifecycle-script package occurrences; sqlite3 Windows binding remains unresolved with scripts disabled.",
+    "The Skia service is native-sensitive and its locked package source downloads platform assets at runtime; no approved offline Windows native asset closure is frozen."
+  ],
+  "report_sha256": "08e59310407435f3e50dd989eb716197a09faa6c31d8a97f89ec9283265bd669",
+  "schema_version": 1,
+  "scope": "offline inspection of exact hash-locked Koishi Windows catalog provider tarballs and their source members; no package installation, code execution, lifecycle script, Worker, Sandbox, or App Control changes",
+  "service_crosswalk": [
+    {
+      "previous_metadata_audit_classification": "unresolved_in_frozen_catalog",
+      "service_name": "BiliBiliLive",
+      "source_audit_classification": "hash_locked_archive_source_candidate",
+      "source_evidence": {
+        "class_name": "BiliBiliLive",
+        "package_service_metadata": [],
+        "profile_configuration_frozen_for_remaining_units": false,
+        "required_by_units": [
+          {
+            "package": "koishi-plugin-iirose-media-request",
+            "registry_entry_id": "ko-91a95bc2e58274eb2946f327",
+            "version": "0.5.34"
+          }
+        ],
+        "same_package_self_service_candidate": false,
+        "service_name": "BiliBiliLive",
+        "static_registration": {
+          "char_offset": 604,
+          "excerpt": ".plugin(Service_1.BiliBiliMovie);     ctx.plugin(Service_1.BiliBiliSearch);     ctx.plugin(Service_1.BiliBiliLive);     let x;     // const bl = ctx.bilibiliLogin     // x = await bl.getNavUserData()     // const bv = ctx.BiliBiliVide",
+          "line": 15,
+          "matched_source": "ctx.plugin(Service_1.BiliBiliLive)",
+          "member": "package/lib/API/index.js",
+          "member_sha256": "84b0abb6e415b57103af57d0eaf134fccaa02eac97489fce403db6829f6b329e",
+          "member_size_bytes": 3170
+        },
+        "static_service_constructor": {
+          "char_offset": 1119,
+          "excerpt": "xportStar(require(\"../BiliBiliAPI/BiliBiliLive/LiveStreamInterface\"), exports); class BiliBiliLive extends koishi_1.Service {     constructor(ctx) {         super(ctx, 'BiliBiliLive', true);         this.ctx = ctx;     }     async getBilibiliAccountData() {         const select = new select_database_1",
+          "line": 23,
+          "matched_source": "class BiliBiliLive extends koishi_1.Service {\n    constructor(ctx) {\n        super(ctx, 'BiliBiliLive'",
+          "member": "package/lib/API/Service/BiliBiliLive.js",
+          "member_sha256": "3beca72974a24251edb45987e9f6cc7fd29dbbaf0a38d7c4671e462b1bcb5f54",
+          "member_size_bytes": 5850
+        }
+      },
+      "static_required_by_unit_count": 1,
+      "static_required_by_units": [
+        {
+          "package": "koishi-plugin-iirose-media-request",
+          "registry_entry_id": "ko-91a95bc2e58274eb2946f327",
+          "version": "0.5.34"
+        }
+      ]
+    },
+    {
+      "previous_metadata_audit_classification": "unresolved_in_frozen_catalog",
+      "service_name": "BiliBiliLogin",
+      "source_audit_classification": "hash_locked_archive_source_candidate",
+      "source_evidence": {
+        "class_name": "BiliBiliLogin",
+        "package_service_metadata": [],
+        "profile_configuration_frozen_for_remaining_units": false,
+        "required_by_units": [
+          {
+            "package": "koishi-plugin-iirose-media-request",
+            "registry_entry_id": "ko-91a95bc2e58274eb2946f327",
+            "version": "0.5.34"
+          }
+        ],
+        "same_package_self_service_candidate": false,
+        "service_name": "BiliBiliLogin",
+        "static_registration": {
+          "char_offset": 439,
+          "excerpt": "\"); const timers_1 = require(\"timers\"); async function apply(ctx, Config) {     ctx.plugin(Service_1.BiliBiliLogin);     ctx.plugin(Service_1.BiliBiliVideo);     ctx.plugin(Service_1.BiliBiliMovie);     ctx.plugin(Service_1.BiliBiliSea",
+          "line": 11,
+          "matched_source": "ctx.plugin(Service_1.BiliBiliLogin)",
+          "member": "package/lib/API/index.js",
+          "member_sha256": "84b0abb6e415b57103af57d0eaf134fccaa02eac97489fce403db6829f6b329e",
+          "member_size_bytes": 3170
+        },
+        "static_service_constructor": {
+          "char_offset": 1081,
+          "excerpt": "; __exportStar(require(\"../BiliBiliAPI/LoginAPI/LoginInfoInterface\"), exports); class BiliBiliLogin extends koishi_1.Service {     constructor(ctx) {         super(ctx, 'BiliBiliLogin', true);         this.ctx = ctx;     }     /**      * 获取Bilibili账号数据      * @returns {Promise<BilibiliAccountData>}     ",
+          "line": 23,
+          "matched_source": "class BiliBiliLogin extends koishi_1.Service {\n    constructor(ctx) {\n        super(ctx, 'BiliBiliLogin'",
+          "member": "package/lib/API/Service/BilibiliLogin.js",
+          "member_sha256": "e360cbb192b0ee0672f32ba4501543382977ea1056a8e9c84b2169f784ef2796",
+          "member_size_bytes": 2108
+        }
+      },
+      "static_required_by_unit_count": 1,
+      "static_required_by_units": [
+        {
+          "package": "koishi-plugin-iirose-media-request",
+          "registry_entry_id": "ko-91a95bc2e58274eb2946f327",
+          "version": "0.5.34"
+        }
+      ]
+    },
+    {
+      "previous_metadata_audit_classification": "unresolved_in_frozen_catalog",
+      "service_name": "BiliBiliMovie",
+      "source_audit_classification": "hash_locked_archive_source_candidate",
+      "source_evidence": {
+        "class_name": "BiliBiliMovie",
+        "package_service_metadata": [],
+        "profile_configuration_frozen_for_remaining_units": false,
+        "required_by_units": [
+          {
+            "package": "koishi-plugin-iirose-media-request",
+            "registry_entry_id": "ko-91a95bc2e58274eb2946f327",
+            "version": "0.5.34"
+          }
+        ],
+        "same_package_self_service_candidate": false,
+        "service_name": "BiliBiliMovie",
+        "static_registration": {
+          "char_offset": 521,
+          "excerpt": "x.plugin(Service_1.BiliBiliLogin);     ctx.plugin(Service_1.BiliBiliVideo);     ctx.plugin(Service_1.BiliBiliMovie);     ctx.plugin(Service_1.BiliBiliSearch);     ctx.plugin(Service_1.BiliBiliLive);     let x;     // const bl = ctx.bil",
+          "line": 13,
+          "matched_source": "ctx.plugin(Service_1.BiliBiliMovie)",
+          "member": "package/lib/API/index.js",
+          "member_sha256": "84b0abb6e415b57103af57d0eaf134fccaa02eac97489fce403db6829f6b329e",
+          "member_size_bytes": 3170
+        },
+        "static_service_constructor": {
+          "char_offset": 1293,
+          "excerpt": "ortStar(require(\"../BiliBiliAPI/BiliBiliMovie/FollowMovieInterface\"), exports); class BiliBiliMovie extends koishi_1.Service {     constructor(ctx) {         super(ctx, 'BiliBiliMovie', true);         this.ctx = ctx;     }     async getBilibiliAccountData() {         const select = new select_database_1",
+          "line": 25,
+          "matched_source": "class BiliBiliMovie extends koishi_1.Service {\n    constructor(ctx) {\n        super(ctx, 'BiliBiliMovie'",
+          "member": "package/lib/API/Service/BiliBiliMovie.js",
+          "member_sha256": "de8575f119848895cbb3675343def0931f1456bfbd9d35a901778c59570cfa15",
+          "member_size_bytes": 6511
+        }
+      },
+      "static_required_by_unit_count": 1,
+      "static_required_by_units": [
+        {
+          "package": "koishi-plugin-iirose-media-request",
+          "registry_entry_id": "ko-91a95bc2e58274eb2946f327",
+          "version": "0.5.34"
+        }
+      ]
+    },
+    {
+      "previous_metadata_audit_classification": "unresolved_in_frozen_catalog",
+      "service_name": "BiliBiliSearch",
+      "source_audit_classification": "hash_locked_archive_source_candidate",
+      "source_evidence": {
+        "class_name": "BiliBiliSearch",
+        "package_service_metadata": [],
+        "profile_configuration_frozen_for_remaining_units": false,
+        "required_by_units": [
+          {
+            "package": "koishi-plugin-nazrin-video-bilibili",
+            "registry_entry_id": "ko-fe82a7f071e43a43d254a378",
+            "version": "0.1.15"
+          }
+        ],
+        "same_package_self_service_candidate": false,
+        "service_name": "BiliBiliSearch",
+        "static_registration": {
+          "char_offset": 562,
+          "excerpt": "x.plugin(Service_1.BiliBiliVideo);     ctx.plugin(Service_1.BiliBiliMovie);     ctx.plugin(Service_1.BiliBiliSearch);     ctx.plugin(Service_1.BiliBiliLive);     let x;     // const bl = ctx.bilibiliLogin     // x = await bl.getNavUserD",
+          "line": 14,
+          "matched_source": "ctx.plugin(Service_1.BiliBiliSearch)",
+          "member": "package/lib/API/index.js",
+          "member_sha256": "84b0abb6e415b57103af57d0eaf134fccaa02eac97489fce403db6829f6b329e",
+          "member_size_bytes": 3170
+        },
+        "static_service_constructor": {
+          "char_offset": 1047,
+          "excerpt": "Star(require(\"../BiliBiliAPI/BiliBiliSearch/SearchRequestInterface\"), exports); class BiliBiliSearch extends koishi_1.Service {     constructor(ctx) {         super(ctx, 'BiliBiliSearch', true);         this.ctx = ctx;     }     /**      * 获取Bilibili账号数据      * @returns {Promise<BilibiliAccountData>}     ",
+          "line": 22,
+          "matched_source": "class BiliBiliSearch extends koishi_1.Service {\n    constructor(ctx) {\n        super(ctx, 'BiliBiliSearch'",
+          "member": "package/lib/API/Service/BiliBiliSearch.js",
+          "member_sha256": "9d740ab8308a051645cb31098b5b48c927f9163e3d979084d08b989ee60691eb",
+          "member_size_bytes": 11242
+        }
+      },
+      "static_required_by_unit_count": 1,
+      "static_required_by_units": [
+        {
+          "package": "koishi-plugin-nazrin-video-bilibili",
+          "registry_entry_id": "ko-fe82a7f071e43a43d254a378",
+          "version": "0.1.15"
+        }
+      ]
+    },
+    {
+      "previous_metadata_audit_classification": "unresolved_in_frozen_catalog",
+      "service_name": "BiliBiliVideo",
+      "source_audit_classification": "hash_locked_archive_source_candidate",
+      "source_evidence": {
+        "class_name": "BiliBiliVideo",
+        "package_service_metadata": [],
+        "profile_configuration_frozen_for_remaining_units": false,
+        "required_by_units": [
+          {
+            "package": "koishi-plugin-iirose-media-request",
+            "registry_entry_id": "ko-91a95bc2e58274eb2946f327",
+            "version": "0.5.34"
+          },
+          {
+            "package": "koishi-plugin-nazrin-video-bilibili",
+            "registry_entry_id": "ko-fe82a7f071e43a43d254a378",
+            "version": "0.1.15"
+          }
+        ],
+        "same_package_self_service_candidate": false,
+        "service_name": "BiliBiliVideo",
+        "static_registration": {
+          "char_offset": 480,
+          "excerpt": "sync function apply(ctx, Config) {     ctx.plugin(Service_1.BiliBiliLogin);     ctx.plugin(Service_1.BiliBiliVideo);     ctx.plugin(Service_1.BiliBiliMovie);     ctx.plugin(Service_1.BiliBiliSearch);     ctx.plugin(Service_1.BiliBiliLi",
+          "line": 12,
+          "matched_source": "ctx.plugin(Service_1.BiliBiliVideo)",
+          "member": "package/lib/API/index.js",
+          "member_sha256": "84b0abb6e415b57103af57d0eaf134fccaa02eac97489fce403db6829f6b329e",
+          "member_size_bytes": 3170
+        },
+        "static_service_constructor": {
+          "char_offset": 2191,
+          "excerpt": "r(require(\"../BiliBiliAPI/BiliBiliVideoAPI/SeasonArchivesInterface\"), exports); class BiliBiliVideo extends koishi_1.Service {     constructor(ctx) {         super(ctx, 'BiliBiliVideo', true);         this.ctx = ctx;     }     async getBilibiliAccountData() {         const select = new select_database_1",
+          "line": 35,
+          "matched_source": "class BiliBiliVideo extends koishi_1.Service {\n    constructor(ctx) {\n        super(ctx, 'BiliBiliVideo'",
+          "member": "package/lib/API/Service/BilibiliVideo.js",
+          "member_sha256": "e3a8732891ce8193d086bc00401e2c339af963e6b3fff5d8ec0974c7ca422890",
+          "member_size_bytes": 25105
+        }
+      },
+      "static_required_by_unit_count": 2,
+      "static_required_by_units": [
+        {
+          "package": "koishi-plugin-iirose-media-request",
+          "registry_entry_id": "ko-91a95bc2e58274eb2946f327",
+          "version": "0.5.34"
+        },
+        {
+          "package": "koishi-plugin-nazrin-video-bilibili",
+          "registry_entry_id": "ko-fe82a7f071e43a43d254a378",
+          "version": "0.1.15"
+        }
+      ]
+    },
+    {
+      "previous_metadata_audit_classification": "unresolved_in_frozen_catalog",
+      "service_name": "QhzySharp",
+      "source_audit_classification": "hash_locked_archive_source_candidate",
+      "source_evidence": {
+        "class_name": "SharpService",
+        "package_service_metadata": [
+          {
+            "path": "koishi.services.implements",
+            "values": [
+              "sharp"
+            ]
+          }
+        ],
+        "profile_configuration_frozen_for_remaining_units": false,
+        "required_by_units": [
+          {
+            "package": "@quanhuzeyu/koishi-plugin-arknights-wiki",
+            "registry_entry_id": "ko-1de6abe87bfca49ed4744042",
+            "version": "0.3.0"
+          },
+          {
+            "package": "@quanhuzeyu/koishi-plugin-gtnh-wiki",
+            "registry_entry_id": "ko-6c826386e32f5f7db40e80eb",
+            "version": "0.1.1"
+          }
+        ],
+        "same_package_self_service_candidate": false,
+        "service_name": "QhzySharp",
+        "static_registration": {
+          "char_offset": 3307,
+          "excerpt": "    logger.error(\"sharp加载失败，请检查node服务\");     });   } }; function apply(ctx) {   ctx.plugin(SharpService); } __name(apply, \"apply\"); // Annotate the CommonJS export names for ESM import in node: 0 && (module.exports = {   Con",
+          "line": 88,
+          "matched_source": "ctx.plugin(SharpService)",
+          "member": "package/lib/index.js",
+          "member_sha256": "760c04fdb57a8fa70685469a256c4a6a1bda7da5eda72dcef1b7ebda1e67531b",
+          "member_size_bytes": 3605
+        },
+        "static_service_constructor": {
+          "char_offset": 2386,
+          "excerpt": ": import_koishi.Schema.string().description(\"指定sharp的版本\").default(\"0.33.5\") }); var SharpService = class extends import_koishi.Service {   static {     __name(this, \"SharpService\");   }   Sharp;   tmpDir = import_path.default.resolve(this.ctx.baseDir, \"data/assets/qhzy/sharp/tmp\");   sharpV = \"0.33.5\";   nodeBinaryPath = \"data/assets/qhzy/sharp\";   construct",
+          "line": 57,
+          "matched_source": "var SharpService = class extends import_koishi.Service {\n  static {\n    __name(this, \"SharpService\");\n  }\n  Sharp;\n  tmpDir = import_path.default.resolve(this.ctx.baseDir, \"data/assets/qhzy/sharp/tmp\");\n  sharpV = \"0.33.5\";\n  nodeBinaryPath = \"data/assets/qhzy/sharp\";\n  constructor(ctx, config) {\n    super(ctx, \"QhzySharp\"",
+          "member": "package/lib/index.js",
+          "member_sha256": "760c04fdb57a8fa70685469a256c4a6a1bda7da5eda72dcef1b7ebda1e67531b",
+          "member_size_bytes": 3605
+        }
+      },
+      "static_required_by_unit_count": 2,
+      "static_required_by_units": [
+        {
+          "package": "@quanhuzeyu/koishi-plugin-arknights-wiki",
+          "registry_entry_id": "ko-1de6abe87bfca49ed4744042",
+          "version": "0.3.0"
+        },
+        {
+          "package": "@quanhuzeyu/koishi-plugin-gtnh-wiki",
+          "registry_entry_id": "ko-6c826386e32f5f7db40e80eb",
+          "version": "0.1.1"
+        }
+      ]
+    },
+    {
+      "previous_metadata_audit_classification": "unresolved_in_frozen_catalog",
+      "service_name": "fonts",
+      "source_audit_classification": "hash_locked_archive_source_candidate",
+      "source_evidence": {
+        "class_name": "Fonts",
+        "package_service_metadata": [
+          {
+            "path": "koishi.implements",
+            "values": [
+              "fonts"
+            ]
+          }
+        ],
+        "profile_configuration_frozen_for_remaining_units": false,
+        "required_by_units": [
+          {
+            "package": "koishi-plugin-fonts4pptr",
+            "registry_entry_id": "ko-6cc09a7c20d31ab46d1a309d",
+            "version": "1.0.1"
+          }
+        ],
+        "same_package_self_service_candidate": false,
+        "service_name": "fonts",
+        "static_registration": {
+          "char_offset": 36403,
+          "excerpt": "uired: [\"database\"],   optional: [\"console\"] }; function apply(ctx, config) {   ctx.plugin(Fonts, config);   ctx.inject([\"console\"], (ctx2) => {     ctx2.console.addEntry({       dev: resolve3(__dirname, \"../client/index.ts\")",
+          "line": 1062,
+          "matched_source": "ctx.plugin(Fonts, config)",
+          "member": "package/lib/index.js",
+          "member_sha256": "9a9b0c992cf6bf4193c80153f92a3e66bc8a9906fc584826eca8ab6363aaeb54",
+          "member_size_bytes": 36742
+        },
+        "static_service_constructor": {
+          "char_offset": 10860,
+          "excerpt": "().length > 0); } __name(isNonEmptyString, \"isNonEmptyString\");  // src/font.ts var Fonts = class _Fonts extends Service {   constructor(ctx, config) {     super(ctx, \"fonts\");     this.config = config;     ctx.model.extend(       \"fonts\",       {         \"id\": { type: \"string\", length: 64, nu",
+          "line": 357,
+          "matched_source": "var Fonts = class _Fonts extends Service {\n  constructor(ctx, config) {\n    super(ctx, \"fonts\"",
+          "member": "package/lib/index.js",
+          "member_sha256": "9a9b0c992cf6bf4193c80153f92a3e66bc8a9906fc584826eca8ab6363aaeb54",
+          "member_size_bytes": 36742
+        }
+      },
+      "static_required_by_unit_count": 1,
+      "static_required_by_units": [
+        {
+          "package": "koishi-plugin-fonts4pptr",
+          "registry_entry_id": "ko-6cc09a7c20d31ab46d1a309d",
+          "version": "1.0.1"
+        }
+      ]
+    },
+    {
+      "previous_metadata_audit_classification": "unresolved_in_frozen_catalog",
+      "service_name": "hajimi",
+      "source_audit_classification": "hash_locked_archive_source_candidate",
+      "source_evidence": {
+        "class_name": "HajimiService",
+        "package_service_metadata": [],
+        "profile_configuration_frozen_for_remaining_units": false,
+        "required_by_units": [
+          {
+            "package": "koishi-plugin-hajimi-lizard",
+            "registry_entry_id": "ko-1713c88871bd1765d4e787e4",
+            "version": "1.1.0"
+          }
+        ],
+        "same_package_self_service_candidate": true,
+        "service_name": "hajimi",
+        "static_registration": {
+          "char_offset": 9533,
+          "excerpt": " force: true });     }     return files;   } }; function apply(ctx, config) {   ctx.plugin(HajimiService, config);   ctx.command(\"猫赛克\", \"处理图片\").action(async ({ session }) => {     const images = session.elements.filter((el) => el.typ",
+          "line": 252,
+          "matched_source": "ctx.plugin(HajimiService, config)",
+          "member": "package/lib/index.js",
+          "member_sha256": "10db9abafdf1c7ed96e6a4e5b41637c6c3c0ca9b9d635ba01cad548eea0807f7",
+          "member_size_bytes": 11335
+        },
+        "static_service_constructor": {
+          "char_offset": 6148,
+          "excerpt": "eHash)(\"sha256\").update(content).digest(\"hex\"); } __name(hashFile, \"hashFile\"); var HajimiService = class extends import_koishi.Service {   static {     __name(this, \"HajimiService\");   }   pythonExec;   inputDir;   outputDir;   hajimiDir;   batchScript;   patternImage;   headImage;   autoClean = true;   constructor(ctx, config) {     super(ctx, \"hajimi\");  ",
+          "line": 162,
+          "matched_source": "var HajimiService = class extends import_koishi.Service {\n  static {\n    __name(this, \"HajimiService\");\n  }\n  pythonExec;\n  inputDir;\n  outputDir;\n  hajimiDir;\n  batchScript;\n  patternImage;\n  headImage;\n  autoClean = true;\n  constructor(ctx, config) {\n    super(ctx, \"hajimi\"",
+          "member": "package/lib/index.js",
+          "member_sha256": "10db9abafdf1c7ed96e6a4e5b41637c6c3c0ca9b9d635ba01cad548eea0807f7",
+          "member_size_bytes": 11335
+        }
+      },
+      "static_required_by_unit_count": 1,
+      "static_required_by_units": [
+        {
+          "package": "koishi-plugin-hajimi-lizard",
+          "registry_entry_id": "ko-1713c88871bd1765d4e787e4",
+          "version": "1.1.0"
+        }
+      ]
+    },
+    {
+      "previous_metadata_audit_classification": "documented_core_api_name",
+      "service_name": "http",
+      "source_audit_classification": "documented_core_builtin_service",
+      "source_evidence": {
+        "document": "https://koishi.chat/en-US/api/",
+        "provider_package_selected": false
+      },
+      "static_required_by_unit_count": 16,
+      "static_required_by_units": [
+        {
+          "package": "koishi-plugin-asmrone",
+          "registry_entry_id": "ko-2fee563c3c31556d31813002",
+          "version": "1.7.4"
+        },
+        {
+          "package": "koishi-plugin-edge-seeker",
+          "registry_entry_id": "ko-33a0475483e19e307e4ea8b8",
+          "version": "1.14.4"
+        },
+        {
+          "package": "koishi-plugin-marketn-refactored",
+          "registry_entry_id": "ko-377670ee298e874d20c33935",
+          "version": "3.0.0"
+        },
+        {
+          "package": "koishi-plugin-navigraph-cycle-alert",
+          "registry_entry_id": "ko-6062c1c558db340f5b4f75e2",
+          "version": "2.0.1"
+        },
+        {
+          "package": "koishi-plugin-sauce-aggregator",
+          "registry_entry_id": "ko-623c5914d3d324504ff55c65",
+          "version": "1.8.5"
+        },
+        {
+          "package": "koishi-plugin-hass",
+          "registry_entry_id": "ko-659f2519662298dfe51620ca",
+          "version": "1.0.1"
+        },
+        {
+          "package": "koishi-plugin-market-next",
+          "registry_entry_id": "ko-749c9328259cb3520c2ec2dd",
+          "version": "3.6.3"
+        },
+        {
+          "package": "koishi-plugin-adapter-bilibili-dm",
+          "registry_entry_id": "ko-8e241d55fc0fcd1d2704806e",
+          "version": "2.8.5"
+        },
+        {
+          "package": "koishi-plugin-fdmcwatcher",
+          "registry_entry_id": "ko-8f784055cddb247f0ff0de8b",
+          "version": "0.0.2"
+        },
+        {
+          "package": "koishi-plugin-nhentai-downloader",
+          "registry_entry_id": "ko-a9ceea08672945107d9da22c",
+          "version": "2.1.2"
+        },
+        {
+          "package": "koishi-plugin-hhs-huatu",
+          "registry_entry_id": "ko-b25166b7c0fae7def42e26ce",
+          "version": "1.3.15"
+        },
+        {
+          "package": "koishi-plugin-adapter-iirose",
+          "registry_entry_id": "ko-cbcb4adecc8efa1c04d4b68f",
+          "version": "0.15.2"
+        },
+        {
+          "package": "koishi-plugin-rina-llevents",
+          "registry_entry_id": "ko-d846b2eb668a140b4f618033",
+          "version": "0.0.2"
+        },
+        {
+          "package": "koishi-plugin-pointmintmarket-ncm",
+          "registry_entry_id": "ko-ded8ca0d2924dd257c29806b",
+          "version": "0.1.2"
+        },
+        {
+          "package": "koishi-plugin-exg-mapcd",
+          "registry_entry_id": "ko-e9406d492eb32e13d82b8c81",
+          "version": "1.3.0"
+        },
+        {
+          "package": "koishi-plugin-get-telegram-sticker",
+          "registry_entry_id": "ko-f4ca99b0be1283705f71b9bc",
+          "version": "0.0.1"
+        }
+      ]
+    },
+    {
+      "previous_metadata_audit_classification": "documented_core_api_name",
+      "service_name": "i18n",
+      "source_audit_classification": "documented_core_builtin_service",
+      "source_evidence": {
+        "document": "https://koishi.chat/en-US/api/",
+        "provider_package_selected": false
+      },
+      "static_required_by_unit_count": 3,
+      "static_required_by_units": [
+        {
+          "package": "koishi-plugin-adapter-bilibili-dm",
+          "registry_entry_id": "ko-8e241d55fc0fcd1d2704806e",
+          "version": "2.8.5"
+        },
+        {
+          "package": "koishi-plugin-adapter-iirose",
+          "registry_entry_id": "ko-cbcb4adecc8efa1c04d4b68f",
+          "version": "0.15.2"
+        },
+        {
+          "package": "koishi-plugin-adapter-github",
+          "registry_entry_id": "ko-f9d0a898369d15d6f9fe0e1a",
+          "version": "1.1.2"
+        }
+      ]
+    },
+    {
+      "previous_metadata_audit_classification": "unresolved_in_frozen_catalog",
+      "service_name": "localstorage",
+      "source_audit_classification": "hash_locked_archive_source_candidate",
+      "source_evidence": {
+        "class_name": "localstorageClass",
+        "package_service_metadata": [],
+        "profile_configuration_frozen_for_remaining_units": false,
+        "required_by_units": [
+          {
+            "package": "koishi-plugin-smmcat-grongvijug",
+            "registry_entry_id": "ko-33040a1dccdeb84e4535c2d2",
+            "version": "0.0.7"
+          },
+          {
+            "package": "koishi-plugin-smmcat-robloxservice",
+            "registry_entry_id": "ko-3ef2a3db0a9841d526ae5c3f",
+            "version": "0.1.105"
+          },
+          {
+            "package": "koishi-plugin-smmcat-openword",
+            "registry_entry_id": "ko-5bd61db9a3ae436584c651ad",
+            "version": "0.1.19"
+          },
+          {
+            "package": "koishi-plugin-smmcat-faqcooking",
+            "registry_entry_id": "ko-6f055df387401b1c06d3ffbf",
+            "version": "0.1.2"
+          },
+          {
+            "package": "koishi-plugin-smmcat-dontstarveapi",
+            "registry_entry_id": "ko-85a0965e8018d814bb169e24",
+            "version": "0.0.6"
+          },
+          {
+            "package": "koishi-plugin-smmcat-setu",
+            "registry_entry_id": "ko-e4f88844c206f342f0c2e000",
+            "version": "0.0.15"
+          },
+          {
+            "package": "koishi-plugin-smmcat-timepiece",
+            "registry_entry_id": "ko-ebc9bc1110ab3f452fc9b337",
+            "version": "0.0.1"
+          },
+          {
+            "package": "koishi-plugin-smmcat-picthesaurus",
+            "registry_entry_id": "ko-fb30c3f4ec905592e6b15432",
+            "version": "0.0.18"
+          }
+        ],
+        "same_package_self_service_candidate": false,
+        "service_name": "localstorage",
+        "static_registration": {
+          "char_offset": 4150,
+          "excerpt": "basePath, key), value);       };     });   } }; function apply(ctx, config) {   ctx.plugin(localstorageClass, config); } __name(apply, \"apply\"); // Annotate the CommonJS export names for ESM import in node: 0 && (module.exports = {   Con",
+          "line": 131,
+          "matched_source": "ctx.plugin(localstorageClass, config)",
+          "member": "package/lib/index.js",
+          "member_sha256": "30cda899ac6cfe159150c305b35c3f6d98714cb5b59f528a81a7d3515d7386ea",
+          "member_size_bytes": 4553
+        },
+        "static_service_constructor": {
+          "char_offset": 3324,
+          "excerpt": ".Schema.string().default(\"./data/localStorage\").description(\"本地存储数据指向的文件夹\") }); var localstorageClass = class extends import_koishi.Service {   static {     __name(this, \"localstorageClass\");   }   basePath;   setItem;   getItem;   constructor(ctx, config) {     super(ctx, \"localstorage\", true);     this.basePath = import_path2.default.join(ctx.baseDir, conf",
+          "line": 103,
+          "matched_source": "var localstorageClass = class extends import_koishi.Service {\n  static {\n    __name(this, \"localstorageClass\");\n  }\n  basePath;\n  setItem;\n  getItem;\n  constructor(ctx, config) {\n    super(ctx, \"localstorage\"",
+          "member": "package/lib/index.js",
+          "member_sha256": "30cda899ac6cfe159150c305b35c3f6d98714cb5b59f528a81a7d3515d7386ea",
+          "member_size_bytes": 4553
+        }
+      },
+      "static_required_by_unit_count": 8,
+      "static_required_by_units": [
+        {
+          "package": "koishi-plugin-smmcat-grongvijug",
+          "registry_entry_id": "ko-33040a1dccdeb84e4535c2d2",
+          "version": "0.0.7"
+        },
+        {
+          "package": "koishi-plugin-smmcat-robloxservice",
+          "registry_entry_id": "ko-3ef2a3db0a9841d526ae5c3f",
+          "version": "0.1.105"
+        },
+        {
+          "package": "koishi-plugin-smmcat-openword",
+          "registry_entry_id": "ko-5bd61db9a3ae436584c651ad",
+          "version": "0.1.19"
+        },
+        {
+          "package": "koishi-plugin-smmcat-faqcooking",
+          "registry_entry_id": "ko-6f055df387401b1c06d3ffbf",
+          "version": "0.1.2"
+        },
+        {
+          "package": "koishi-plugin-smmcat-dontstarveapi",
+          "registry_entry_id": "ko-85a0965e8018d814bb169e24",
+          "version": "0.0.6"
+        },
+        {
+          "package": "koishi-plugin-smmcat-setu",
+          "registry_entry_id": "ko-e4f88844c206f342f0c2e000",
+          "version": "0.0.15"
+        },
+        {
+          "package": "koishi-plugin-smmcat-timepiece",
+          "registry_entry_id": "ko-ebc9bc1110ab3f452fc9b337",
+          "version": "0.0.1"
+        },
+        {
+          "package": "koishi-plugin-smmcat-picthesaurus",
+          "registry_entry_id": "ko-fb30c3f4ec905592e6b15432",
+          "version": "0.0.18"
+        }
+      ]
+    },
+    {
+      "previous_metadata_audit_classification": "unresolved_in_frozen_catalog",
+      "service_name": "nazrin",
+      "source_audit_classification": "hash_locked_archive_source_candidate",
+      "source_evidence": {
+        "class_name": "nazrin",
+        "package_service_metadata": [],
+        "profile_configuration_frozen_for_remaining_units": false,
+        "required_by_units": [
+          {
+            "package": "koishi-plugin-nazrin-video-bilibili",
+            "registry_entry_id": "ko-fe82a7f071e43a43d254a378",
+            "version": "0.1.15"
+          }
+        ],
+        "same_package_self_service_candidate": false,
+        "service_name": "nazrin",
+        "static_registration": {
+          "char_offset": 348,
+          "excerpt": "nazrin-core'; exports.inject = ['puppeteer']; function apply(ctx, config) {     ctx.plugin(Service_1.nazrin);     ctx.inject(['nazrin'], (ctx) => {         ctx.command('nazrin', '聚合搜索核心！！')             .option('music', '-m <keyw",
+          "line": 10,
+          "matched_source": "ctx.plugin(Service_1.nazrin)",
+          "member": "package/lib/Core/index.js",
+          "member_sha256": "345029e9a8fa61b268a4464f155c330130d0b63ba45e2976849e3dd2da7843bd",
+          "member_size_bytes": 1744
+        },
+        "static_service_constructor": {
+          "char_offset": 138,
+          "excerpt": " { value: true }); exports.nazrin = void 0; const koishi_1 = require(\"koishi\"); class nazrin extends koishi_1.Service {     music = [];     video = [];     short_video = [];     acg = [];     movie = [];     comics = [];     picture = [];     film = [];     constructor(ctx) {         // 这样写你就不需要手动给 ctx 赋值了         super(ctx, 'nazrin', true);     } } exports.",
+          "line": 5,
+          "matched_source": "class nazrin extends koishi_1.Service {\n    music = [];\n    video = [];\n    short_video = [];\n    acg = [];\n    movie = [];\n    comics = [];\n    picture = [];\n    film = [];\n    constructor(ctx) {\n        // 这样写你就不需要手动给 ctx 赋值了\n        super(ctx, 'nazrin'",
+          "member": "package/lib/Service/index.js",
+          "member_sha256": "2b466b072c9ee5ab805688ce0a401e85985608cb4faa6c8a2e0b3284e40fbe2c",
+          "member_size_bytes": 463
+        }
+      },
+      "static_required_by_unit_count": 1,
+      "static_required_by_units": [
+        {
+          "package": "koishi-plugin-nazrin-video-bilibili",
+          "registry_entry_id": "ko-fe82a7f071e43a43d254a378",
+          "version": "0.1.15"
+        }
+      ]
+    },
+    {
+      "previous_metadata_audit_classification": "unresolved_in_frozen_catalog",
+      "service_name": "skia",
+      "source_audit_classification": "hash_locked_archive_source_candidate",
+      "source_evidence": {
+        "class_name": "Skia",
+        "package_service_metadata": [
+          {
+            "path": "koishi.services.implements",
+            "values": [
+              "skia"
+            ]
+          }
+        ],
+        "profile_configuration_frozen_for_remaining_units": false,
+        "required_by_units": [
+          {
+            "package": "@gjfleo/koishi-plugin-g2",
+            "registry_entry_id": "ko-724229e8e3a2b17222e72357",
+            "version": "1.0.0"
+          }
+        ],
+        "same_package_self_service_candidate": false,
+        "service_name": "skia",
+        "static_registration": null,
+        "static_service_constructor": {
+          "char_offset": 2143,
+          "excerpt": "-canvas\"; var filter = false; var inject = [\"http\"]; var skiaVersion = \"1.0.2\"; var Skia = class extends import_koishi.Service {   static {     __name(this, \"Skia\");   }   Canvas;   loadImage;   FontLibrary;   Path2D;   Image;   ImageData;   CanvasGradient;   CanvasPattern;   CanvasTexture;   App;   DOMMatrix;   DOMPoint;   DOMRect;   Window;   constructor(c",
+          "line": 52,
+          "matched_source": "var Skia = class extends import_koishi.Service {\n  static {\n    __name(this, \"Skia\");\n  }\n  Canvas;\n  loadImage;\n  FontLibrary;\n  Path2D;\n  Image;\n  ImageData;\n  CanvasGradient;\n  CanvasPattern;\n  CanvasTexture;\n  App;\n  DOMMatrix;\n  DOMPoint;\n  DOMRect;\n  Window;\n  constructor(ctx, config) {\n    super(ctx, \"skia\"",
+          "member": "package/lib/index.js",
+          "member_sha256": "86e8fcc19dd6d7f94442f9c25a5e893fc20f6e75c66417ebeb0c828a6996810f",
+          "member_size_bytes": 12145
+        }
+      },
+      "static_required_by_unit_count": 1,
+      "static_required_by_units": [
+        {
+          "package": "@gjfleo/koishi-plugin-g2",
+          "registry_entry_id": "ko-724229e8e3a2b17222e72357",
+          "version": "1.0.0"
+        }
+      ]
+    }
+  ],
+  "static_scanner_caveats": [
+    {
+      "interpretation": "The scanner matches the text 'export const inject = ['hajimi']' inside the package usage template literal in both generated JS and source TS; these offsets are not executable inject declarations. The same locked package does statically construct/register HajimiService, so treat it as a self-service provider candidate rather than an external required-service dependency.",
+      "package": "koishi-plugin-hajimi-lizard",
+      "registry_entry_id": "ko-1713c88871bd1765d4e787e4",
+      "static_audit_assignments": [
+        {
+          "char_offset": 2582,
+          "inside_usage_template_literal": true,
+          "literal_sha256": "457c68748f7beb94f7270889e069cb39f8dfc4e7a3ba6f1b2a52e614811a51f3",
+          "member": "package/lib/index.js",
+          "member_sha256": "10db9abafdf1c7ed96e6a4e5b41637c6c3c0ca9b9d635ba01cad548eea0807f7",
+          "not_runtime_inject_evidence": true
+        },
+        {
+          "char_offset": 827,
+          "inside_usage_template_literal": true,
+          "literal_sha256": "457c68748f7beb94f7270889e069cb39f8dfc4e7a3ba6f1b2a52e614811a51f3",
+          "member": "package/src/index.ts",
+          "member_sha256": "50aeb7722ee7945a65af1dab6b0793ba7be8ca7c157a341cde297ffce72bf71c",
+          "not_runtime_inject_evidence": true
+        }
+      ]
+    }
+  ],
+  "summary": {
+    "combined_target_entry_locks_frozen": 0,
+    "custom_service_names_in_six_external_provider_archives": 10,
+    "dependency_archives_reverified_for_provider_profiles": 0,
+    "documented_core_builtin_service_names": 2,
+    "hajimi_static_inject_template_false_positive_confirmed": true,
+    "names_with_exact_archive_source_candidates": 11,
+    "previously_unmatched_service_names": 13,
+    "profile_ready": false,
+    "provider_configurations_frozen": 0,
+    "provider_package_archives_hash_verified": 7,
+    "remaining_windows_koishi_units": 167,
+    "same_package_self_service_candidates": 1,
+    "static_required_service_names": 29
+  }
+}
