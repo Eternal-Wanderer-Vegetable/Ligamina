@@ -1,8 +1,8 @@
 # 第三阶段：可靠自动化检测与行为验证
 
-日期：2026-10-20（Asia/Shanghai）。状态：分阶段实施中；P3-01、P3-02 Linux、P3-03 Linux、P3-04 Windows（仅 PSF 签名 CPython 3.12.10 profile）、P3-06 已交付。原 uv 管理 CPython 3.12.14 profile 仍被 Windows App Control 阻止；目录插件 Windows claims 尚未开放。代码基线：`a311ac8`，S2-12 历史裁决保持不变。
+日期：2026-10-20（Asia/Shanghai）。当前状态：分阶段实施中；P3-01、P3-02 Linux、P3-03 Linux、P3-04 Windows（仅 PSF 签名 CPython 3.12.10 profile）、P3-05 执行/归因闭合、P3-06、P3-07、P3-09 已交付。P3-05 仍有 53 个终态 unknown，健康 gate blocked，插件行为兼容 not_evaluated；此处闭合不代表兼容通过。P3-08/P3-10 保持未启动/未裁决。Windows catalog 证据仅来自隔离 Evaluation profile，不宣称 enforcement acceptance。代码基线：`a311ac8`，S2-12 历史裁决保持不变。
 
-## 目标与边界
+原计划状态（2026-10-20）：P3-01、P3-02 Linux、P3-03 Linux、P3-04 Windows（仅 PSF 签名 CPython 3.12.10 profile）、P3-06 已交付。原 uv 管理 CPython 3.12.14 profile 仍被 Windows App Control 阻止；目录插件 Windows claims 尚未开放。代码基线：`a311ac8`，S2-12 历史裁决保持不变。
 
 交付一套能在故障后停止扩散、恢复执行、保留证据，并对明确场景自动判断兼容性的检测流水线。沿用 Rust Core、原生 Hosts、SQLite queue、Docker/Windows Sandbox 和已冻结目录，不引入新的分布式任务平台。
 
@@ -408,3 +408,10 @@ PR 必跑不依赖实验机的 schema/selection/queue/comparator/fixture 校验�
 - 官方 [Core Context API](https://koishi.chat/en-US/api/core/context) 将 HTTP 与 I18n 列为内置服务；其余 11 个未找到目录 `implements` 声明的名称是 BiliBiliLive、BiliBiliLogin、BiliBiliMovie、BiliBiliSearch、BiliBiliVideo、QhzySharp、fonts、hajimi、localstorage、nazrin、skia。它们仍需依据冻结 consumer source/peer 关系逐项归类；目录没有声明不等于服务绝不存在。
 - 审计报告 [provider candidate audit](../../outputs/acceptance/phase3-p305-windows-koishi-provider-candidate-audit-v1-20261026.json)：canonical SHA `7f8e2efcbfa8ca7daa125327f38af21d5b105b5259a09a0dae361f0102703204`，file/sidecar SHA `1425619ed40d45742688b8cf6b942fbda805f8c77a8fd7b527e99bed8699e0be`；复现脚本 [phase3-windows-koishi-provider-candidate-audit.py](../../scripts/phase3-windows-koishi-provider-candidate-audit.py)。服务依赖需按 Koishi 的 [`required` / `optional` / `implements` 元数据](https://koishi.chat/en-US/guide/develop/publish)区分；官方文档说明 service plugins 可提供抽象或直接服务（[service plugins](https://koishi.chat/en-US/market/service)）。
 - 该报告只证明冻结目录中存在符合已锁 artifact/profile 元数据的候选；没有选定通用或逐 entry provider，没有冻结 provider config，也没有为 167 个目标 entry 生成 combined lock（0/167）。`profile_ready=false`。两条 Git SSH source、113 个 lifecycle-script occurrences 与 sqlite3 Windows binding 策略仍未解决；不得派发 Koishi、不得重跑既有终态 campaign。无 npm install、catalog plugin、Worker 或 Sandbox 执行。
+
+
+### P3-05 Overall execution closure（2026-10-26）
+
+P3-05 execution/attribution is closed against the frozen recovery ledger: 2,206 Linux units plus 973 unique Windows affected units, with six Koishi HTTP follow-ups treated as additive re-attribution of existing rows. All 3,179 unique units have terminal outcomes, no unit remains open, and no cleanup is unconfirmed. The aggregate is passed=1,299, failed=688, skipped=1,139, unknown=53. The 39 Linux, 10 Windows pilot, and 4 NoneBot worker-preparation unknowns remain unknown. Health is blocked and behavior compatibility is not_evaluated; Windows SAC Evaluation/Audit Mode is not enforcement acceptance. Do not mark P3-08/P3-10 complete from this closure.
+
+Reproducible reconciliation: `C:\Python314\python.exe scripts/phase3-p305-closure-audit.py`. Evidence: `outputs/acceptance/phase3-p305-overall-closure-20261026.json` (canonical SHA `c6bcaf6841100f5b66afd2356ad4c2891dbf713ec1bdf4bb7120a8e6b8429692`, file SHA `e9dc78cb2da54a7a99476664ee057ec0b029da23cb311a7c22625c1b200dd886`). The original campaign reports and superseded attempts remain immutable.

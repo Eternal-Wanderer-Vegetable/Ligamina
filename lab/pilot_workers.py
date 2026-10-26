@@ -373,7 +373,7 @@ const npmArgs = [...npmPrefixArgs, 'ci', '--ignore-scripts', '--offline', '--no-
 if (npmCache) npmArgs.push('--cache', npmCache)
 const spec = JSON.parse(await readFile(specPath, 'utf8'))
 const probeSemanticsVersion = Number(spec.probe_semantics_version ?? 2)
-if (![1, 2, 3].includes(probeSemanticsVersion)) throw new Error(`Unsupported probe semantics version: ${probeSemanticsVersion}`)
+if (![1, 2, 3, 4, 5].includes(probeSemanticsVersion)) throw new Error(`Unsupported probe semantics version: ${probeSemanticsVersion}`)
 const childEnv = { ...process.env, NODE_OPTIONS: `--require=${npmDiagnostics}` }
 const npm = spawnSync(npmCommand, npmArgs, {
   cwd: project, encoding: 'utf8', timeout: spec.install_timeout_ms, env: childEnv,
@@ -451,22 +451,46 @@ try {
         ? declaredInject
         : (Array.isArray(declaredInject?.required) ? declaredInject.required : [])
       const hostServicePlugins = Array.isArray(spec.host_service_plugins) ? spec.host_service_plugins : []
+      const providedHostServices = []
       for (const service of hostServicePlugins) {
         const serviceModule = await import(service.package)
-        const servicePlugin = serviceModule.default ?? serviceModule.apply ?? serviceModule
-        if (typeof servicePlugin !== 'function') throw new TypeError(`Host service provider ${service.package} does not export a Koishi plugin`)
         const serviceConfig = { ...(service.config ?? {}) }
         if (typeof serviceConfig.path === 'string') {
           serviceConfig.path = resolve(project, serviceConfig.path)
           await mkdir(dirname(serviceConfig.path), { recursive: true })
         }
-        app.plugin(servicePlugin, serviceConfig)
+        if (service.service_kind === 'cordis-service') {
+          const exportName = typeof service.export_name === 'string' ? service.export_name : 'default'
+          const serviceClass = serviceModule[exportName] ?? serviceModule.default?.[exportName]
+          const serviceName = serviceClass?.provide
+          if (typeof serviceClass !== 'function' || typeof serviceName !== 'string') {
+            throw new TypeError(`Host service provider ${service.package} does not export the declared Cordis Service class`)
+          }
+          if (!Array.isArray(service.provides) || !service.provides.includes(serviceName)) {
+            throw new TypeError(`Host service provider ${service.package} service declaration differs from its frozen provides list`)
+          }
+          if (app.get(serviceName) == null) app.plugin(serviceClass, serviceConfig)
+          if (app.get(serviceName) == null) {
+            throw new TypeError(`Cordis Service provider ${service.package} did not register ${serviceName}`)
+          }
+          providedHostServices.push({ package: service.package, service_kind: service.service_kind, service_name: serviceName })
+        } else {
+          const servicePlugin = serviceModule.default ?? serviceModule.apply ?? serviceModule
+          if (typeof servicePlugin !== 'function') throw new TypeError(`Host service provider ${service.package} does not export a Koishi plugin`)
+          app.plugin(servicePlugin, serviceConfig)
+          providedHostServices.push({
+            package: service.package,
+            service_kind: service.service_kind ?? 'koishi-plugin',
+            service_names: Array.isArray(service.provides) ? service.provides : [],
+          })
+        }
       }
       const profileProvidedServices = new Set(hostServicePlugins.flatMap((service) => Array.isArray(service.provides) ? service.provides : []))
       const missingServices = requiredServices.filter((name) => app.get(name) == null && !profileProvidedServices.has(name))
       report.native_load.required_services = requiredServices
       report.native_load.missing_services = missingServices
       report.native_load.host_service_profile_id = spec.host_service_profile_id ?? null
+      report.native_load.provided_host_services = providedHostServices
       if (missingServices.length) {
         report.native_load = {
           ...report.native_load,
@@ -530,7 +554,7 @@ def run_koishi_load_probe(
     host_service_profile_id: str | None = None,
 ) -> dict[str, Any]:
     """Install one exact locked Koishi profile offline and load its package in Docker."""
-    if probe_semantics_version not in {1, 2, 3}:
+    if probe_semantics_version not in {1, 2, 3, 4, 5}:
         raise PilotWorkerError("Koishi probe semantics version is unsupported")
     if (host_service_plugins or host_service_profile_id) and probe_semantics_version < 3:
         raise PilotWorkerError("Koishi host service profiles require probe semantics version 3")
@@ -848,7 +872,7 @@ def run_koishi_windows_load_probe(
     _context: _CatalogContext | None = None,
 ) -> dict[str, Any]:
     """Install one portable Koishi profile and load its entry in Windows Sandbox."""
-    if probe_semantics_version not in {1, 2, 3}:
+    if probe_semantics_version not in {1, 2, 3, 4, 5}:
         raise PilotWorkerError("Koishi probe semantics version is unsupported")
     if (host_service_plugins or host_service_profile_id) and probe_semantics_version < 3:
         raise PilotWorkerError("Koishi host service profiles require probe semantics version 3")

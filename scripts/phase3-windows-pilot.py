@@ -21,7 +21,7 @@ if str(ROOT) not in sys.path:
 
 from lab.automation.selection import object_sha256, validate_manifest
 from lab.pilot_nonebot import _catalog_context, run_nonebot_windows_load_probe
-from lab.pilot_workers import _load_catalog_context, run_koishi_windows_load_probe
+from lab.pilot_workers import _load_catalog_context, _load_npm_lock, run_koishi_windows_load_probe
 
 
 def sha256_file(path: Path) -> str:
@@ -93,6 +93,11 @@ def main() -> int:
     if manifest_kind not in {
         "phase3_p305_windows_pilot_manifest_v2",
         "phase3_p305_windows_affected_manifest_v1",
+        "phase3_p305_windows_koishi_affected_manifest_v1",
+        "phase3_p305_windows_koishi_http_followup_manifest_v1",
+        "phase3_p305_windows_koishi_http_followup_v2_manifest_v1",
+        "phase3_p305_windows_koishi_http_followup_v3_manifest_v1",
+        "phase3_p305_windows_koishi_http_followup_v4_manifest_v1",
     } or manifest.get("platform") != "windows":
         raise ValueError("unexpected pilot manifest kind or platform")
     campaign_id = manifest.get("campaign_id")
@@ -116,12 +121,59 @@ def main() -> int:
     runtime_path = (ROOT / manifest["runtime_admission_path"]).resolve(strict=True)
     if sha256_file(runtime_path) != manifest["runtime_admission_sha256"]:
         raise ValueError("P3-04 Windows admission report hash differs from manifest")
+    if manifest_kind in {
+        "phase3_p305_windows_koishi_http_followup_v2_manifest_v1",
+        "phase3_p305_windows_koishi_http_followup_v3_manifest_v1",
+        "phase3_p305_windows_koishi_http_followup_v4_manifest_v1",
+    }:
+        sources = manifest.get("probe_sources")
+        expected_sources = {
+            "pilot_driver_path": "scripts/phase3-windows-pilot.py",
+            "worker_source_path": "lab/pilot_workers.py",
+        }
+        if not isinstance(sources, dict) or any(sources.get(key) != value for key, value in expected_sources.items()):
+            raise ValueError("Koishi HTTP follow-up does not bind the expected probe source paths")
+        driver_path = (ROOT / sources["pilot_driver_path"]).resolve(strict=True)
+        worker_source_path = (ROOT / sources["worker_source_path"]).resolve(strict=True)
+        if (
+            sha256_file(driver_path) != sources.get("pilot_driver_sha256")
+            or sha256_file(worker_source_path) != sources.get("worker_source_sha256")
+            or manifest.get("probe_semantics_version") != (5 if manifest_kind == "phase3_p305_windows_koishi_http_followup_v4_manifest_v1" else 4)
+        ):
+            raise ValueError("Koishi HTTP follow-up probe source or semantics identity changed")
 
     execution_kind = "phase3_p305_windows_pilot_execution_v2"
-    if manifest_kind == "phase3_p305_windows_affected_manifest_v1":
+    affected_kinds = {
+        "phase3_p305_windows_affected_manifest_v1",
+        "phase3_p305_windows_koishi_affected_manifest_v1",
+        "phase3_p305_windows_koishi_http_followup_manifest_v1",
+        "phase3_p305_windows_koishi_http_followup_v2_manifest_v1",
+        "phase3_p305_windows_koishi_http_followup_v3_manifest_v1",
+        "phase3_p305_windows_koishi_http_followup_v4_manifest_v1",
+    }
+    if manifest_kind in affected_kinds:
         execution_kind = "phase3_p305_windows_affected_execution_v1"
-        if manifest.get("ecosystem") != "nonebot":
-            raise ValueError("Windows affected manifest must select only the NoneBot ecosystem")
+        expected_ecosystem = "koishi" if manifest_kind in {
+            "phase3_p305_windows_koishi_affected_manifest_v1",
+            "phase3_p305_windows_koishi_http_followup_manifest_v1",
+            "phase3_p305_windows_koishi_http_followup_v2_manifest_v1",
+            "phase3_p305_windows_koishi_http_followup_v3_manifest_v1",
+            "phase3_p305_windows_koishi_http_followup_v4_manifest_v1",
+        } else "nonebot"
+        if manifest.get("ecosystem") != expected_ecosystem:
+            raise ValueError(f"Windows affected manifest must select only the {expected_ecosystem} ecosystem")
+        if expected_ecosystem == "koishi":
+            execution_kind = (
+                "phase3_p305_windows_koishi_http_followup_v3_execution_v1"
+                if manifest_kind == "phase3_p305_windows_koishi_http_followup_v3_manifest_v1"
+                else "phase3_p305_windows_koishi_http_followup_v4_execution_v1"
+                if manifest_kind == "phase3_p305_windows_koishi_http_followup_v4_manifest_v1"
+                else "phase3_p305_windows_koishi_http_followup_v2_execution_v1"
+                if manifest_kind == "phase3_p305_windows_koishi_http_followup_v2_manifest_v1"
+                else "phase3_p305_windows_koishi_http_followup_execution_v1"
+                if manifest_kind == "phase3_p305_windows_koishi_http_followup_manifest_v1"
+                else "phase3_p305_windows_koishi_affected_execution_v1"
+            )
         policy_profile = manifest.get("sandbox_policy_profile")
         if not isinstance(policy_profile, dict) or policy_profile.get("profile_id") != "windows-sandbox-default-sac-evaluation-v1":
             raise ValueError("Windows affected manifest has no accepted default Evaluation policy profile")
@@ -154,17 +206,287 @@ def main() -> int:
     selected_ids = [row["identity"]["registry_entry_id"] for row in selection]
     if len(set(selected_ids)) != len(selected_ids):
         raise ValueError("pilot manifest contains duplicate registry identities")
-    if manifest_kind == "phase3_p305_windows_affected_manifest_v1":
-        excluded = manifest.get("exclusions", {}).get("source_identity_sha256", [])
-        selected_source_hashes = [row.get("source_identity_sha256") for row in selection]
-        if (
-            len(selection) != 786
-            or any(row["identity"].get("ecosystem") != "nonebot" for row in selection)
-            or len(excluded) != 10
-            or len(set(excluded)) != 10
-            or set(excluded).intersection(selected_source_hashes)
-        ):
-            raise ValueError("Windows affected selection overlaps the closed pilot or has an unexpected denominator")
+    nonebot_context = _catalog_context(snapshot, platform="windows", profile_lock_path=profile_path)
+    koishi_context = _load_catalog_context(snapshot, "windows", profile_lock_path=profile_path)
+    if manifest_kind in affected_kinds:
+        expected_ecosystem = "koishi" if manifest_kind in {
+            "phase3_p305_windows_koishi_affected_manifest_v1",
+            "phase3_p305_windows_koishi_http_followup_manifest_v1",
+            "phase3_p305_windows_koishi_http_followup_v2_manifest_v1",
+            "phase3_p305_windows_koishi_http_followup_v3_manifest_v1",
+            "phase3_p305_windows_koishi_http_followup_v4_manifest_v1",
+        } else "nonebot"
+        if manifest_kind in {
+            "phase3_p305_windows_koishi_http_followup_manifest_v1",
+            "phase3_p305_windows_koishi_http_followup_v2_manifest_v1",
+            "phase3_p305_windows_koishi_http_followup_v3_manifest_v1",
+            "phase3_p305_windows_koishi_http_followup_v4_manifest_v1",
+        }:
+            follow_up = manifest.get("follow_up")
+            if not isinstance(follow_up, dict) or follow_up.get("reason_code") != "required_host_service_unavailable":
+                raise ValueError("Koishi HTTP follow-up manifest has no frozen prior-skip scope")
+            prior_manifest_path = (ROOT / follow_up["prior_manifest_path"]).resolve(strict=True)
+            prior_report_path = (ROOT / follow_up["prior_report_path"]).resolve(strict=True)
+            prior_manifest = json.loads(prior_manifest_path.read_text(encoding="utf-8"))
+            prior_report = json.loads(prior_report_path.read_text(encoding="utf-8"))
+            verify_sidecar(prior_manifest_path)
+            verify_sidecar(prior_report_path)
+            if (
+                sha256_file(prior_manifest_path) != follow_up.get("prior_manifest_file_sha256")
+                or sha256_file(prior_report_path) != follow_up.get("prior_report_file_sha256")
+                or object_sha256({key: value for key, value in prior_manifest.items() if key != "manifest_sha256"}) != prior_manifest.get("manifest_sha256")
+                or prior_manifest.get("manifest_sha256") != follow_up.get("prior_manifest_sha256")
+                or prior_report.get("status") != "completed"
+                or prior_report.get("campaign_id") != follow_up.get("prior_campaign_id")
+                or prior_report.get("manifest_sha256") != prior_manifest.get("manifest_sha256")
+                or prior_report.get("manifest_file_sha256") != follow_up.get("prior_manifest_file_sha256")
+            ):
+                raise ValueError("Koishi HTTP follow-up source campaign evidence changed or is not closed")
+            if manifest_kind in {
+                "phase3_p305_windows_koishi_http_followup_v2_manifest_v1",
+                "phase3_p305_windows_koishi_http_followup_v3_manifest_v1",
+                "phase3_p305_windows_koishi_http_followup_v4_manifest_v1",
+            }:
+                prior_followup = follow_up.get("prior_followup")
+                prior_followup_manifest_path = (ROOT / prior_followup["manifest_path"]).resolve(strict=True) if isinstance(prior_followup, dict) else None
+                prior_followup_report_path = (ROOT / prior_followup["report_path"]).resolve(strict=True) if isinstance(prior_followup, dict) else None
+                if prior_followup_manifest_path is None or prior_followup_report_path is None:
+                    raise ValueError("Koishi HTTP follow-up v2 has no closed follow-up v1 evidence")
+                prior_followup_manifest = json.loads(prior_followup_manifest_path.read_text(encoding="utf-8"))
+                prior_followup_report = json.loads(prior_followup_report_path.read_text(encoding="utf-8"))
+                verify_sidecar(prior_followup_manifest_path)
+                verify_sidecar(prior_followup_report_path)
+                if (
+                    sha256_file(prior_followup_manifest_path) != prior_followup.get("manifest_file_sha256")
+                    or sha256_file(prior_followup_report_path) != prior_followup.get("report_file_sha256")
+                    or object_sha256({key: value for key, value in prior_followup_manifest.items() if key != "manifest_sha256"}) != prior_followup_manifest.get("manifest_sha256")
+                    or prior_followup_manifest.get("manifest_sha256") != prior_followup.get("manifest_sha256")
+                    or prior_followup_manifest.get("profile_lock_sha256") != prior_followup.get("profile_lock_sha256")
+                    or prior_followup_report.get("campaign_id") != prior_followup.get("campaign_id")
+                    or prior_followup_report.get("manifest_sha256") != prior_followup_manifest.get("manifest_sha256")
+                    or prior_followup_report.get("manifest_file_sha256") != prior_followup.get("manifest_file_sha256")
+                    or prior_followup_report.get("profile_lock_sha256") != prior_followup.get("profile_lock_sha256")
+                    or prior_followup_report.get("status") != "completed"
+                    or prior_followup_report.get("settled_units") != 6
+                    or prior_followup_report.get("remaining_units") != 0
+                    or prior_followup_report.get("unit_counts") != {"passed": 0, "failed": 6, "skipped": 0, "unknown": 0}
+                    or prior_followup_report.get("cleanup_confirmed") != 6
+                    or prior_followup_report.get("cleanup_unconfirmed") != 0
+                    or prior_followup_manifest.get("kind") != "phase3_p305_windows_koishi_http_followup_manifest_v1"
+                ):
+                    raise ValueError("Koishi HTTP follow-up v1 evidence changed or is not closed")
+                v1_rows = {
+                    row.get("result", {}).get("registry_entry_id"): row
+                    for row in prior_followup_report.get("results", [])
+                }
+                v1_manifest_rows = {
+                    row["identity"]["registry_entry_id"]: row
+                    for row in prior_followup_manifest.get("selection", [])
+                }
+                if set(v1_rows) != set(prior_followup.get("eligible_registry_entry_ids", [])) or set(v1_manifest_rows) != set(v1_rows):
+                    raise ValueError("Koishi HTTP follow-up v1 identities differ from the frozen v2 scope")
+                expected_error = "Host service provider @koishijs/plugin-http does not export a Koishi plugin"
+                for entry_id, v1_row in v1_rows.items():
+                    result = v1_row.get("result", {})
+                    worker = result.get("worker")
+                    protocol = worker.get("protocol_report") if isinstance(worker, dict) else None
+                    native = protocol.get("native_load") if isinstance(protocol, dict) else None
+                    native = native if isinstance(native, dict) else {}
+                    if (
+                        result.get("status") != "failed"
+                        or result.get("reason_code") != "native_plugin_load_failed"
+                        or native.get("error_name") != "TypeError"
+                        or expected_error not in native.get("error_tail", "")
+                    ):
+                        raise ValueError(f"Koishi HTTP follow-up v1 result does not match the frozen probe defect: {entry_id}")
+                prior_followup_rows = follow_up.get("prior_followup_results")
+                if (
+                    not isinstance(prior_followup_rows, list)
+                    or len(prior_followup_rows) != len(v1_rows)
+                    or {row.get("registry_entry_id") for row in prior_followup_rows} != set(v1_rows)
+                ):
+                    raise ValueError("Koishi HTTP follow-up v2 has no per-unit v1 supersession ledger")
+                for row in selection:
+                    entry_id = row["identity"]["registry_entry_id"]
+                    old_v1_manifest_row = v1_manifest_rows.get(entry_id)
+                    old_v1_report_row = v1_rows.get(entry_id)
+                    old_v1_result = old_v1_report_row.get("result", {}) if old_v1_report_row else {}
+                    superseded = next((item for item in prior_followup_rows if item.get("registry_entry_id") == entry_id), {})
+                    if (
+                        old_v1_manifest_row is None
+                        or old_v1_report_row is None
+                        or row.get("superseded_followup") != superseded
+                        or superseded.get("result_sha256") != object_sha256(old_v1_result)
+                        or row.get("source_identity") != old_v1_manifest_row.get("source_identity")
+                        or row.get("source_identity_sha256") != old_v1_manifest_row.get("source_identity_sha256")
+                        or row.get("root_evaluation") != old_v1_manifest_row.get("prior_evaluation")
+                    ):
+                        raise ValueError(f"Koishi HTTP follow-up v2 does not preserve v1 and root-unit evidence: {entry_id}")
+                if manifest_kind in {
+                    "phase3_p305_windows_koishi_http_followup_v3_manifest_v1",
+                    "phase3_p305_windows_koishi_http_followup_v4_manifest_v1",
+                }:
+                    failed_freeze = follow_up.get("superseded_freeze_attempt")
+                    if not isinstance(failed_freeze, dict):
+                        raise ValueError("Koishi HTTP follow-up v3 does not bind its blocked v2 validation attempt")
+                    failed_manifest_path = (ROOT / failed_freeze["manifest_path"]).resolve(strict=True)
+                    failed_preflight_path = (ROOT / failed_freeze["preflight_path"]).resolve(strict=True)
+                    failed_manifest = json.loads(failed_manifest_path.read_text(encoding="utf-8"))
+                    failed_preflight = json.loads(failed_preflight_path.read_text(encoding="utf-8"))
+                    verify_sidecar(failed_manifest_path)
+                    verify_sidecar(failed_preflight_path)
+                    if (
+                        sha256_file(failed_manifest_path) != failed_freeze.get("manifest_file_sha256")
+                        or sha256_file(failed_preflight_path) != failed_freeze.get("preflight_file_sha256")
+                        or object_sha256({key: value for key, value in failed_manifest.items() if key != "manifest_sha256"}) != failed_manifest.get("manifest_sha256")
+                        or failed_manifest.get("manifest_sha256") != failed_freeze.get("manifest_sha256")
+                        or failed_manifest.get("campaign_id") != failed_freeze.get("campaign_id")
+                        or failed_preflight.get("campaign_id") != failed_freeze.get("campaign_id")
+                        or failed_preflight.get("status") != "ready_for_validate_only"
+                        or failed_preflight.get("summary", {}).get("worker_started") is not False
+                        or failed_preflight.get("summary", {}).get("catalog_plugin_executed") is not False
+                        or failed_freeze.get("worker_started") is not False
+                        or failed_freeze.get("validation_outcome") != "blocked_before_worker"
+                    ):
+                        raise ValueError("Koishi HTTP follow-up v2 blocked-freeze evidence changed")
+                    for no_run_path in (failed_freeze.get("checkpoint_path"), failed_freeze.get("report_path")):
+                        if not isinstance(no_run_path, str) or (ROOT / no_run_path).exists():
+                            raise ValueError("Koishi HTTP follow-up v2 unexpectedly wrote an execution checkpoint/report")
+                if manifest_kind == "phase3_p305_windows_koishi_http_followup_v4_manifest_v1":
+                    prior_v3 = follow_up.get("prior_execution_v3")
+                    if not isinstance(prior_v3, dict):
+                        raise ValueError("Koishi HTTP follow-up v4 has no closed v3 report binding")
+                    prior_v3_manifest_path = (ROOT / prior_v3["manifest_path"]).resolve(strict=True)
+                    prior_v3_report_path = (ROOT / prior_v3["report_path"]).resolve(strict=True)
+                    prior_v3_profile_path = (ROOT / prior_v3["profile_lock_path"]).resolve(strict=True)
+                    prior_v3_manifest = json.loads(prior_v3_manifest_path.read_text(encoding="utf-8"))
+                    prior_v3_report = json.loads(prior_v3_report_path.read_text(encoding="utf-8"))
+                    verify_sidecar(prior_v3_manifest_path)
+                    verify_sidecar(prior_v3_report_path)
+                    verify_sidecar(prior_v3_profile_path)
+                    prior_v3_rows = {
+                        item.get("result", {}).get("registry_entry_id"): item
+                        for item in prior_v3_report.get("results", [])
+                    }
+                    prior_v3_manifest_rows = {
+                        item["identity"]["registry_entry_id"]: item
+                        for item in prior_v3_manifest.get("selection", [])
+                    }
+                    expected_v3_ids = set(prior_followup.get("eligible_registry_entry_ids", []))
+                    if (
+                        sha256_file(prior_v3_manifest_path) != prior_v3.get("manifest_file_sha256")
+                        or sha256_file(prior_v3_report_path) != prior_v3.get("report_file_sha256")
+                        or sha256_file(prior_v3_profile_path) != prior_v3.get("profile_lock_file_sha256")
+                        or object_sha256({key: value for key, value in prior_v3_manifest.items() if key != "manifest_sha256"}) != prior_v3_manifest.get("manifest_sha256")
+                        or prior_v3_manifest.get("manifest_sha256") != prior_v3.get("manifest_sha256")
+                        or prior_v3_manifest.get("profile_lock_sha256") != prior_v3.get("profile_lock_sha256")
+                        or prior_v3_manifest.get("kind") != "phase3_p305_windows_koishi_http_followup_v3_manifest_v1"
+                        or prior_v3_report.get("campaign_id") != prior_v3.get("campaign_id")
+                        or prior_v3_report.get("manifest_sha256") != prior_v3_manifest.get("manifest_sha256")
+                        or prior_v3_report.get("manifest_file_sha256") != prior_v3.get("manifest_file_sha256")
+                        or prior_v3_report.get("profile_lock_sha256") != prior_v3.get("profile_lock_sha256")
+                        or prior_v3_report.get("status") != "completed"
+                        or prior_v3_report.get("settled_units") != 6
+                        or prior_v3_report.get("remaining_units") != 0
+                        or prior_v3_report.get("unit_counts") != {"passed": 0, "failed": 6, "skipped": 0, "unknown": 0}
+                        or prior_v3_report.get("cleanup_confirmed") != 6
+                        or prior_v3_report.get("cleanup_unconfirmed") != 0
+                        or set(prior_v3_rows) != expected_v3_ids
+                        or set(prior_v3_manifest_rows) != expected_v3_ids
+                    ):
+                        raise ValueError("Koishi HTTP follow-up v3 source evidence changed or is not closed")
+                    prior_v3_results = follow_up.get("prior_v3_results")
+                    if not isinstance(prior_v3_results, list) or {item.get("registry_entry_id") for item in prior_v3_results} != expected_v3_ids:
+                        raise ValueError("Koishi HTTP follow-up v4 has no per-unit v3 supersession ledger")
+                    expected_v3_error = "Cordis Service provider @koishijs/plugin-http did not register http"
+                    for entry_id, v3_row in prior_v3_rows.items():
+                        result = v3_row.get("result", {})
+                        protocol = result.get("worker", {}).get("protocol_report", {})
+                        native = protocol.get("native_load", {})
+                        if (
+                            result.get("status") != "failed"
+                            or result.get("reason_code") != "native_plugin_load_failed"
+                            or native.get("error_name") != "TypeError"
+                            or expected_v3_error not in native.get("error_tail", "")
+                        ):
+                            raise ValueError(f"Koishi HTTP follow-up v3 result differs from the frozen probe defect: {entry_id}")
+                    for row in selection:
+                        entry_id = row["identity"]["registry_entry_id"]
+                        old_v3_row = prior_v3_manifest_rows.get(entry_id)
+                        old_v3_report_row = prior_v3_rows.get(entry_id)
+                        old_v3_result = old_v3_report_row.get("result", {}) if old_v3_report_row else {}
+                        superseded_v3 = next((item for item in prior_v3_results if item.get("registry_entry_id") == entry_id), {})
+                        if (
+                            old_v3_row is None
+                            or old_v3_report_row is None
+                            or row.get("superseded_followup_v3") != superseded_v3
+                            or superseded_v3.get("result_sha256") != object_sha256(old_v3_result)
+                            or superseded_v3.get("selection_identity_sha256") != object_sha256(old_v3_row.get("identity", {}))
+                            or row.get("source_identity") != old_v3_row.get("source_identity")
+                            or row.get("source_identity_sha256") != old_v3_row.get("source_identity_sha256")
+                        ):
+                            raise ValueError(f"Koishi HTTP follow-up v4 does not preserve v3 evidence: {entry_id}")
+            prior_manifest_rows = {
+                row["identity"]["registry_entry_id"]: row
+                for row in prior_manifest.get("selection", [])
+            }
+            prior_report_rows = {
+                row.get("result", {}).get("registry_entry_id"): row
+                for row in prior_report.get("results", [])
+            }
+            candidates = []
+            for entry_id, result_row in prior_report_rows.items():
+                result = result_row.get("result", {})
+                worker = result.get("worker")
+                protocol = worker.get("protocol_report") if isinstance(worker, dict) else None
+                native = protocol.get("native_load") if isinstance(protocol, dict) else None
+                native = native if isinstance(native, dict) else {}
+                if (
+                    result.get("reason_code") == "required_host_service_unavailable"
+                    and result.get("status") == "skipped"
+                    and native.get("missing_services") == ["http"]
+                ):
+                    candidates.append(entry_id)
+            selected_follow_up_ids = [row["identity"]["registry_entry_id"] for row in selection]
+            if (
+                sorted(candidates) != sorted(follow_up.get("eligible_registry_entry_ids", []))
+                or set(selected_follow_up_ids) != set(candidates)
+                or len(selected_follow_up_ids) != len(set(selected_follow_up_ids))
+                or len(selection) != manifest.get("expected_units")
+            ):
+                raise ValueError("Koishi HTTP follow-up selection does not exactly match prior HTTP-service skips")
+            prior_results = follow_up.get("prior_results")
+            if not isinstance(prior_results, list) or {row.get("registry_entry_id") for row in prior_results} != set(candidates):
+                raise ValueError("Koishi HTTP follow-up has no per-unit prior-result identity set")
+            prior_results_by_id = {row["registry_entry_id"]: row for row in prior_results}
+            for row in selection:
+                entry_id = row["identity"]["registry_entry_id"]
+                old_manifest_row = prior_manifest_rows.get(entry_id)
+                old_report_row = prior_report_rows.get(entry_id)
+                prior_meta = prior_results_by_id.get(entry_id, {})
+                if (
+                    old_manifest_row is None
+                    or old_report_row is None
+                    or prior_meta.get("result_sha256") != object_sha256(old_report_row.get("result", {}))
+                    or prior_meta.get("selection_identity_sha256") != object_sha256(old_manifest_row.get("identity", {}))
+                    or row.get("source_identity") != old_manifest_row.get("source_identity")
+                    or row.get("source_identity_sha256") != old_manifest_row.get("source_identity_sha256")
+                    or row.get("prior_evaluation") != prior_meta
+                ):
+                    raise ValueError(f"Koishi HTTP follow-up does not preserve prior unit evidence: {entry_id}")
+        else:
+            excluded = manifest.get("exclusions", {}).get("source_identity_sha256", [])
+            selected_source_hashes = [row.get("source_identity_sha256") for row in selection]
+            expected_units = 167 if manifest_kind == "phase3_p305_windows_koishi_affected_manifest_v1" else 786
+            if (
+                len(selection) != expected_units
+                or len(excluded) != 10
+                or len(set(excluded)) != 10
+                or set(excluded).intersection(selected_source_hashes)
+            ):
+                raise ValueError("Windows affected selection overlaps the closed pilot or has an unexpected denominator")
+        if any(row["identity"].get("ecosystem") != expected_ecosystem for row in selection):
+            raise ValueError("Windows affected selection contains an unexpected ecosystem")
     for row in selection:
         identity = row["identity"]
         if object_sha256(identity) != row.get("identity_sha256"):
@@ -183,14 +505,139 @@ def main() -> int:
                 raise ValueError(f"NoneBot Sandbox profile binding mismatch: {identity.get('registry_entry_id')}")
         binding = row.get("probe_profile", {})
         if identity["ecosystem"] == "koishi":
-            expected_profile = f"koishi-core-only-native-pilot-v1-{identity['registry_entry_id']}"
-            if binding.get("host_service_profile_id") != expected_profile or binding.get("host_service_plugins") != []:
-                raise ValueError(f"Koishi Host-service profile is not explicitly bound: {identity['registry_entry_id']}")
-            if binding.get("probe_semantics_version") != 3:
-                raise ValueError(f"Koishi probe semantics version mismatch: {identity['registry_entry_id']}")
-
-    nonebot_context = _catalog_context(snapshot, platform="windows", profile_lock_path=profile_path)
-    koishi_context = _load_catalog_context(snapshot, "windows", profile_lock_path=profile_path)
+            if manifest_kind in {
+                "phase3_p305_windows_koishi_affected_manifest_v1",
+                "phase3_p305_windows_koishi_http_followup_manifest_v1",
+                "phase3_p305_windows_koishi_http_followup_v2_manifest_v1",
+                "phase3_p305_windows_koishi_http_followup_v3_manifest_v1",
+                "phase3_p305_windows_koishi_http_followup_v4_manifest_v1",
+            }:
+                follow_up = manifest_kind in {
+                    "phase3_p305_windows_koishi_http_followup_manifest_v1",
+                    "phase3_p305_windows_koishi_http_followup_v2_manifest_v1",
+                    "phase3_p305_windows_koishi_http_followup_v3_manifest_v1",
+                    "phase3_p305_windows_koishi_http_followup_v4_manifest_v1",
+                }
+                follow_up_v2 = manifest_kind == "phase3_p305_windows_koishi_http_followup_v2_manifest_v1"
+                follow_up_v3 = manifest_kind == "phase3_p305_windows_koishi_http_followup_v3_manifest_v1"
+                follow_up_v4 = manifest_kind == "phase3_p305_windows_koishi_http_followup_v4_manifest_v1"
+                expected_profile_prefix = (
+                    "koishi-p305-http-followup-v4-host-profile-v1" if follow_up_v4
+                    else
+                    "koishi-p305-http-followup-v3-host-profile-v1" if follow_up_v3
+                    else
+                    "koishi-p305-http-followup-v2-host-profile-v1" if follow_up_v2
+                    else "koishi-p305-http-followup-host-profile-v1" if follow_up
+                    else "koishi-p305-windows-host-profile-v1"
+                )
+                expected_host_profile_prefix = (
+                    "koishi-p305-http-followup-v4-v1" if follow_up_v4
+                    else
+                    "koishi-p305-http-followup-v3-v1" if follow_up_v3
+                    else
+                    "koishi-p305-http-followup-v2-v1" if follow_up_v2
+                    else "koishi-p305-http-followup-v1" if follow_up
+                    else "koishi-p305-host-services-v1"
+                )
+                expected_profile = f"{expected_host_profile_prefix}-{identity['registry_entry_id']}"
+                plugins = binding.get("host_service_plugins")
+                if (
+                    identity.get("platform") != "windows"
+                    or identity.get("profile_lock_sha256") != manifest.get("profile_lock_sha256")
+                    or identity.get("profile_id") != f"{expected_profile_prefix}-{identity['registry_entry_id']}"
+                    or binding.get("host_service_profile_id") != expected_profile
+                    or binding.get("profile_lock_sha256") != manifest.get("profile_lock_sha256")
+                    or binding.get("runtime_admission_sha256") != manifest.get("runtime_admission_sha256")
+                    or binding.get("sandbox_policy_profile_id") != "windows-sandbox-default-sac-evaluation-v1"
+                    or binding.get("probe_semantics_version") != (5 if follow_up_v4 else 4 if follow_up_v2 or follow_up_v3 else 3)
+                    or binding.get("lifecycle_scripts") != "disabled"
+                    or not isinstance(plugins, list)
+                ):
+                    raise ValueError(f"Koishi host profile binding mismatch: {identity['registry_entry_id']}")
+                profile_entry = koishi_context.profiles_by_id.get(identity["registry_entry_id"], {})
+                profile = profile_entry.get("profiles", {}).get("windows-x86_64", {})
+                lock_ref = profile.get("dependency_lock")
+                if (
+                    profile.get("profile_id") != identity.get("profile_id")
+                    or not isinstance(lock_ref, dict)
+                    or lock_ref.get("sha256") != identity.get("dependency_lock_sha256")
+                ):
+                    raise ValueError(f"Koishi target dependency lock differs from its bound identity: {identity['registry_entry_id']}")
+                lock_path = (cache_root / lock_ref["cache_path"]).resolve(strict=True)
+                lock, _ = _load_npm_lock(lock_path, lock_ref)
+                root_dependencies = lock.get("packages", {}).get("", {}).get("dependencies", {})
+                if identity["package"] not in root_dependencies:
+                    raise ValueError(f"Koishi target is absent from combined npm root dependencies: {identity['registry_entry_id']}")
+                provider_ids: set[str] = set()
+                provider_packages: set[str] = set()
+                for provider in plugins:
+                    if not isinstance(provider, dict):
+                        raise ValueError("Koishi host service provider binding is malformed")
+                    provider_id = provider.get("registry_entry_id")
+                    package_name = provider.get("package")
+                    package_version = provider.get("version")
+                    if (
+                        not isinstance(provider_id, str)
+                        or provider_id in provider_ids
+                        or not isinstance(package_name, str)
+                        or package_name in provider_packages
+                        or not isinstance(package_version, str)
+                        or provider.get("config") != {}
+                        or not isinstance(provider.get("provides"), list)
+                    ):
+                        raise ValueError(f"Koishi provider profile has duplicate or invalid provider: {identity['registry_entry_id']}")
+                    catalog_provider = koishi_context.entries_by_id.get(provider_id, {})
+                    provider_profile_entry = koishi_context.profiles_by_id.get(provider_id, {})
+                    provider_profile = provider_profile_entry.get("profiles", {}).get("windows-x86_64", {})
+                    provider_lock_ref = provider_profile.get("dependency_lock")
+                    if (
+                        catalog_provider.get("package") != package_name
+                        or catalog_provider.get("advertised_version") != package_version
+                        or provider.get("artifact_sha256") != provider_profile.get("artifact_sha256")
+                        or not isinstance(provider_lock_ref, dict)
+                        or root_dependencies.get(package_name) != package_version
+                    ):
+                        raise ValueError(f"Koishi provider identity is absent from the catalog or combined root lock: {provider_id}")
+                    provider_ids.add(provider_id)
+                    provider_packages.add(package_name)
+                preterminal = row.get("pre_dispatch_terminal_result")
+                if follow_up and preterminal is None and not any(
+                    provider.get("registry_entry_id") == "ko-bcc8a237e43796843e1c8bc1"
+                    and provider.get("package") == "@koishijs/plugin-http"
+                    and provider.get("version") == "0.6.3"
+                    and provider.get("provides") == ["http"]
+                    and (
+                        (not follow_up_v2 and not follow_up_v3 and not follow_up_v4 and provider.get("service_kind") is None)
+                        or ((follow_up_v2 or follow_up_v3 or follow_up_v4) and provider.get("service_kind") == "cordis-service" and provider.get("export_name") == "HTTP")
+                    )
+                    for provider in plugins
+                ):
+                    raise ValueError(f"Koishi HTTP follow-up profile lacks the exact http service provider: {identity['registry_entry_id']}")
+                if preterminal is not None:
+                    if (
+                        not isinstance(preterminal, dict)
+                        or preterminal.get("status") != "skipped"
+                        or preterminal.get("attempted") is not False
+                        or preterminal.get("result_id") != f"catalog:{identity['registry_entry_id']}|windows"
+                        or preterminal.get("registry_entry_id") != identity["registry_entry_id"]
+                        or preterminal.get("ecosystem") != "koishi"
+                        or preterminal.get("platform") != "windows"
+                        or preterminal.get("reason_code") not in {
+                            "frozen_git_ssh_source_not_worker_allowlisted",
+                            "required_service_provider_peer_conflict",
+                            "required_service_provider_unavailable",
+                            "combined_host_profile_peer_conflict",
+                        }
+                    ):
+                        raise ValueError(f"Koishi pre-dispatch terminal classification is invalid: {identity['registry_entry_id']}")
+                elif not root_dependencies:
+                    raise ValueError(f"Koishi combined dependency root is empty: {identity['registry_entry_id']}")
+            else:
+                expected_profile = f"koishi-core-only-native-pilot-v1-{identity['registry_entry_id']}"
+                if binding.get("host_service_profile_id") != expected_profile or binding.get("host_service_plugins") != []:
+                    raise ValueError(f"Koishi Host-service profile is not explicitly bound: {identity['registry_entry_id']}")
+                if binding.get("probe_semantics_version") != 3:
+                    raise ValueError(f"Koishi probe semantics version mismatch: {identity['registry_entry_id']}")
     expected_results = {f"catalog:{entry_id}|windows" for entry_id in selected_ids}
     if args.validate_only:
         print(json.dumps({
@@ -245,7 +692,7 @@ def main() -> int:
             and item["result"].get("worker", {}).get("cleanup_confirmed") is not True
             for item in rows
         )
-        return {
+        value = {
             "schema_version": 1,
             "date": "2026-10-25",
             "task_id": "P3-05",
@@ -271,17 +718,33 @@ def main() -> int:
             "cleanup_unconfirmed": cleanup_unconfirmed,
             "results": rows,
             **({"sandbox_policy_profile": manifest["sandbox_policy_profile"]}
-               if manifest_kind == "phase3_p305_windows_affected_manifest_v1" else {}),
+               if manifest_kind in affected_kinds else {}),
             "execution_scope": {
                 "worker": "Windows Sandbox only",
                 "concurrency": 1,
                 "nonebot": "offline pip install and native-load probe; no behavior fixture",
-                "koishi": "offline npm install and native-load probe; empty Host-service providers; semantics v3",
+                "koishi": (
+                    "offline npm install and native-load probe; per-entry frozen Host-service providers; Cordis Service registration; semantics v5"
+                    if manifest_kind == "phase3_p305_windows_koishi_http_followup_v4_manifest_v1"
+                    else "offline npm install and native-load probe; per-entry frozen Host-service providers; Cordis Service registration; semantics v4"
+                    if manifest_kind in {
+                        "phase3_p305_windows_koishi_http_followup_v2_manifest_v1",
+                        "phase3_p305_windows_koishi_http_followup_v3_manifest_v1",
+                    }
+                    else "offline npm install and native-load probe; per-entry frozen Host-service providers; semantics v3"
+                ),
                 "behavior": "not executed; no entry-bound fixture in P3-05 pilot",
                 "local_plugin_execution": False,
             },
             "generated_at_utc": datetime.now(timezone.utc).isoformat(),
         }
+        if manifest_kind in {
+            "phase3_p305_windows_koishi_http_followup_v2_manifest_v1",
+            "phase3_p305_windows_koishi_http_followup_v3_manifest_v1",
+            "phase3_p305_windows_koishi_http_followup_v4_manifest_v1",
+        }:
+            value["probe_sources"] = manifest["probe_sources"]
+        return value
 
     done = {item["result"]["result_id"] for item in rows}
     write_json(args.checkpoint, report("in-progress"))
@@ -299,7 +762,10 @@ def main() -> int:
             "generation": 1,
         }
         try:
-            if identity["ecosystem"] == "nonebot":
+            preterminal = row.get("pre_dispatch_terminal_result")
+            if preterminal is not None:
+                result = dict(preterminal)
+            elif identity["ecosystem"] == "nonebot":
                 result = run_nonebot_windows_load_probe(
                     snapshot, entry_id, profile_lock_path=profile_path, cache_root=cache_root,
                     timeout_seconds=1200, context=nonebot_context, worker_labels=labels,
@@ -350,6 +816,12 @@ def main() -> int:
     final = report("completed")
     final["kind"] = execution_kind
     final["driver_source_sha256"] = sha256_file(Path(__file__).resolve())
+    if manifest_kind in {
+        "phase3_p305_windows_koishi_http_followup_v2_manifest_v1",
+        "phase3_p305_windows_koishi_http_followup_v3_manifest_v1",
+        "phase3_p305_windows_koishi_http_followup_v4_manifest_v1",
+    }:
+        final["worker_source_sha256"] = manifest["probe_sources"]["worker_source_sha256"]
     digest = write_json(args.report, final)
     print(json.dumps({"final_report":str(args.report),"report_file_sha256":digest,"manifest_sha256":manifest_sha,"counts":final["unit_counts"]},ensure_ascii=False), flush=True)
     return 0
