@@ -14,7 +14,8 @@ ROOT = Path(__file__).resolve().parents[1]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
-from lab.automation.behavior_campaign import BehaviorCampaignError, build_behavior_accounting_report
+from lab.automation.behavior_campaign import BehaviorCampaignError, behavior_accounting_matches_frozen, build_behavior_accounting_report
+from lab.automation.evidence_hash import matches_text_sha256
 
 
 def _atomic_write(path: Path, value: bytes) -> None:
@@ -39,19 +40,25 @@ def main(argv: list[str] | None = None) -> int:
         path = options.report.expanduser().absolute()
         sidecar = path.with_suffix(path.suffix + ".sha256")
         file_sha = hashlib.sha256(encoded).hexdigest()
+        canonical_sha = report["canonical_sha256"]
         if options.check:
             if not path.is_file() or not sidecar.is_file():
                 raise BehaviorCampaignError("P3-08 report or SHA-256 sidecar is missing")
             sidecar_sha = sidecar.read_text(encoding="ascii").strip().split()[0]
-            if path.read_bytes() != encoded or sidecar_sha != file_sha:
+            frozen = json.loads(path.read_text(encoding="utf-8"))
+            if not matches_text_sha256(path.read_bytes(), sidecar_sha):
+                raise BehaviorCampaignError("P3-08 report file does not match its sidecar")
+            if not behavior_accounting_matches_frozen(report, frozen):
                 raise BehaviorCampaignError("P3-08 report differs from frozen inputs or its sidecar")
+            file_sha = sidecar_sha
+            canonical_sha = frozen["canonical_sha256"]
         else:
             _atomic_write(path, encoded)
             _atomic_write(sidecar, f"{file_sha}  {path.name}\n".encode("ascii"))
         print(json.dumps({
             "status": report["status"],
             "output": str(path),
-            "canonical_sha256": report["canonical_sha256"],
+            "canonical_sha256": canonical_sha,
             "file_sha256": file_sha,
             "positions": report["scope"]["required_positions"],
             "attempt_slots": report["scope"]["planned_attempt_slots"],

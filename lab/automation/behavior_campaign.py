@@ -15,6 +15,7 @@ from pathlib import Path
 from typing import Any
 
 from .behavior import ROOT, SUITE_PATH, validate_behavior_suite
+from .evidence_hash import matches_text_sha256
 
 
 ARTIFACT_CACHE = Path(
@@ -57,6 +58,35 @@ def _canonical(value: Any) -> bytes:
 def _file_record(path: Path) -> dict[str, str]:
     raw = path.read_bytes()
     return {"path": path.relative_to(ROOT).as_posix(), "file_sha256": _sha256(raw)}
+
+
+def behavior_accounting_matches_frozen(rebuilt: dict[str, Any], frozen: dict[str, Any]) -> bool:
+    """Check P3-08 evidence while allowing only source-file line-ending variants."""
+    current = json.loads(json.dumps(rebuilt, ensure_ascii=False))
+    current_sources = current.get("source_evidence", [])
+    frozen_sources = frozen.get("source_evidence", [])
+    if len(current_sources) != len(frozen_sources):
+        return False
+    for source, recorded in zip(current_sources, frozen_sources, strict=True):
+        relative = recorded.get("path")
+        if source.get("path") != relative:
+            return False
+        path = ROOT / relative
+        try:
+            raw = path.read_bytes()
+        except OSError:
+            return False
+        if not matches_text_sha256(raw, recorded.get("file_sha256", "")):
+            return False
+        source["file_sha256"] = recorded["file_sha256"]
+
+    body = {key: value for key, value in current.items() if key != "canonical_sha256"}
+    rebuilt_sha = _sha256(_canonical(body))
+    frozen_body = {key: value for key, value in frozen.items() if key != "canonical_sha256"}
+    if frozen.get("canonical_sha256") != _sha256(_canonical(frozen_body)):
+        return False
+    current["canonical_sha256"] = rebuilt_sha
+    return rebuilt_sha == frozen.get("canonical_sha256") and current == frozen
 
 
 def _verified_cache_blob(lock: dict[str, Any]) -> dict[str, Any]:

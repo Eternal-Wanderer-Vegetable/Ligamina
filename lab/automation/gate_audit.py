@@ -13,7 +13,8 @@ from collections import Counter
 from pathlib import Path
 from typing import Any
 
-from .behavior_campaign import ROOT, build_behavior_accounting_report
+from .behavior_campaign import ROOT, behavior_accounting_matches_frozen, build_behavior_accounting_report
+from .evidence_hash import matches_text_sha256
 
 
 CATALOG = "catalogs/p2-41649744e057d61031d5/catalog.json"
@@ -105,7 +106,7 @@ def _record(relative: str) -> dict[str, Any]:
     sidecar = path.with_suffix(path.suffix + ".sha256")
     if sidecar.exists():
         expected = sidecar.read_text(encoding="ascii").strip().split()[0]
-        if expected != row["file_sha256"]:
+        if not matches_text_sha256(raw, expected):
             raise GateAuditError(f"sidecar mismatch for {relative}")
         row["sidecar_path"] = sidecar.relative_to(ROOT).as_posix()
         row["sidecar_sha256"] = _sha(sidecar.read_bytes())
@@ -300,8 +301,7 @@ def build_gate_audit() -> tuple[dict[str, Any], str]:
     full_entry_os_count = catalog_count * 2
     behavior = _read(P308_BEHAVIOR)
     rebuilt_behavior = build_behavior_accounting_report()
-    behavior_encoded = (json.dumps(rebuilt_behavior, ensure_ascii=False, indent=2) + "\n").encode("utf-8")
-    if (ROOT / P308_BEHAVIOR).read_bytes() != behavior_encoded:
+    if not behavior_accounting_matches_frozen(rebuilt_behavior, behavior):
         raise GateAuditError("P3-08 accounting report is stale against its frozen sources")
     behavior_positions = behavior.get("positions", [])
     if len(behavior_positions) != 120 or behavior.get("scope", {}).get("planned_attempt_slots") != 360:

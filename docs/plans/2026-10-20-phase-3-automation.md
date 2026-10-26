@@ -430,3 +430,10 @@ Reproducible reconciliation: `C:\Python314\python.exe scripts/phase3-p305-closur
 - Gate rulings: P3-ENGINE=`passed_scoped`（仅 Linux admitted Docker Worker 与 Windows CPython 3.12.10 Sandbox runtime admission/benign probes；Windows catalog claims 不准入）；P3-RECOVERY=`blocked`（53 terminal unknown）；P3-AUTOMATION=`blocked`（同一 unknown 且 GitHub hosted/protected self-hosted runner 部署状态未被本地证据验证）；P3-BEHAVIOR=`not_evaluated`（缺 executable fixture、0 dispatch）；P3-FIELD=`not_run`。无新支持项、无真实平台投递结论。
 - [P3-10 audit JSON](../../outputs/acceptance/phase3-p310-gate-audit-20261026.json)：canonical SHA `03b82fc3a4ab5610ab68aa6724bf4ddb8a3195d66cbbccd0b8dd36f8ca0bef3d`，file/sidecar SHA `716efa2e9af8537506e26215c231ef68bf8b30585d61e070bffff76237692b90`；[3,179-row matrix](../../outputs/acceptance/phase3-p310-compatibility-matrix-20261026.md)：file/sidecar SHA `7b777a2e4cc23f499c7b0b5ba49001126fdb87d71d08f1b14d46022e9d130b3d`。
 - P3-10 engineering/reporting deliverable is complete with blocked/unassessed gates disclosed. Reproduce read-only checks with `C:\Python314\python.exe scripts/phase3-p310-gate-audit.py --check` and `node scripts/render-readme.mjs --check`.
+
+### P3-10 跨 checkout 文本证据哈希修复（2026-10-26）
+
+- GitHub CI run `40272507112` 与 Phase 3 Linux self-test `40272506908`（均针对 `fcc18c2`）在 README 生成阶段发现 P3-10 source-evidence raw SHA 依赖 Windows CRLF 工作树，而 Linux clean checkout 使用 LF。Linux manifest 字节 SHA 为 `30b413fcf31d…`，Windows 工作树字节 SHA 为 `91798c872560…`；冻结 canonical manifest 身份相同。
+- `lab/automation/evidence_hash.py` 实现 UTF-8 文本原始 SHA 与 LF/CRLF 两种字节形式的严格比较；仅允许行尾转换。P3-08/P3-10 报告复核、source sidecar 验证及 README rendering 接入该函数。冻结报告、manifest identity 与 gate rulings 均不重写。
+- 新增 4 项 Python 回归，覆盖 LF↔CRLF、内容变化、非法 UTF-8 与孤立 CR；相关 P3-08/P3-10 聚焦回归共 12/12 通过，Python 3.14 `py_compile`、两份 report `--check`、README `--check`、docs（19 documents / 366 links）通过。将 affected manifest 临时归一为 LF 后 P3-08/P3-10 与 README checks 通过；随后恢复了原 Windows CRLF 文件。
+- 本节代码已本地验证；新的 hosted CI 与 Linux self-test 尚待推送后运行。不得把此前失败 run 改写为通过，也不据此改变 P3-05、P3-BEHAVIOR 或其他 gate 裁决。

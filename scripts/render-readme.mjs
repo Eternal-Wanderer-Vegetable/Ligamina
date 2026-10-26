@@ -481,14 +481,12 @@ export async function phase3Block() {
   const matrixBytes = await readFile(path.join(root, matrixPath));
   const auditSidecar = (await readFile(path.join(root, `${auditPath}.sha256`), 'utf8')).trim().split(/\s+/)[0];
   const matrixSidecar = (await readFile(path.join(root, `${matrixPath}.sha256`), 'utf8')).trim().split(/\s+/)[0];
-  const fileSha = (bytes) => createHash('sha256').update(bytes).digest('hex');
   const audit = JSON.parse(auditBytes.toString('utf8'));
-  const matrixSha = fileSha(matrixBytes);
   const auditBody = { ...audit };
   delete auditBody.report_sha256;
-  const auditCanonicalSha = fileSha(Buffer.from(stableJson(auditBody), 'utf8'));
-  if (fileSha(auditBytes) !== auditSidecar || matrixSha !== matrixSidecar
-      || matrixSha !== audit.matrix?.file_sha256 || audit.matrix?.rows !== 3179
+  const auditCanonicalSha = createHash('sha256').update(Buffer.from(stableJson(auditBody), 'utf8')).digest('hex');
+  if (!matchesTextSha256(auditBytes, auditSidecar) || !matchesTextSha256(matrixBytes, matrixSidecar)
+      || !matchesTextSha256(matrixBytes, audit.matrix?.file_sha256 ?? '') || audit.matrix?.rows !== 3179
       || auditCanonicalSha !== audit.report_sha256
       || audit.status !== 'completed_with_blocked_gates' || audit.support_expansion !== false
       || audit.plugin_compatibility !== 'not_evaluated') {
@@ -496,10 +494,14 @@ export async function phase3Block() {
   }
   for (const source of audit.evidence_manifest ?? []) {
     const sourceBytes = await readFile(path.join(root, source.path));
-    if (fileSha(sourceBytes) !== source.file_sha256) throw new Error(`Stale P3-10 source evidence: ${source.path}`);
+    if (!matchesTextSha256(sourceBytes, source.file_sha256)) throw new Error(`Stale P3-10 source evidence: ${source.path}`);
     if (source.sidecar_path) {
-      const sourceSidecar = await readFile(path.join(root, source.sidecar_path), 'utf8');
-      if (sourceSidecar.trim().split(/\s+/)[0] !== source.file_sha256) throw new Error(`Stale P3-10 source sidecar: ${source.path}`);
+      const sourceSidecarBytes = await readFile(path.join(root, source.sidecar_path));
+      const sourceSidecar = sourceSidecarBytes.toString('utf8');
+      if (sourceSidecar.trim().split(/\s+/)[0] !== source.file_sha256
+          || !matchesTextSha256(sourceSidecarBytes, source.sidecar_sha256)) {
+        throw new Error(`Stale P3-10 source sidecar: ${source.path}`);
+      }
     }
   }
   const expectedGates = {
@@ -530,7 +532,7 @@ export async function phase3Block() {
     '| --- | --- | --- |',
     ...gateRows,
     '',
-    `证据：[P3-10 gate audit](${auditPath})、[3,179 单位兼容与执行矩阵](${matrixPath})、[P3-08 行为账本](outputs/acceptance/phase3-p308-behavior-accounting-20261026.json)。审计 SHA-256 \`${fileSha(auditBytes)}\`；矩阵 SHA-256 \`${matrixSha}\`.`,
+    `证据：[P3-10 gate audit](${auditPath})、[3,179 单位兼容与执行矩阵](${matrixPath})、[P3-08 行为账本](outputs/acceptance/phase3-p308-behavior-accounting-20261026.json)。审计 SHA-256 \`${auditSidecar}\`；矩阵 SHA-256 \`${matrixSidecar}\`.`,
     'Windows 结果仅适用于已记录的 Evaluation/Audit Mode Worker profile；没有强制模式、全目录行为兼容或真实平台投递结论。',
     phase3End,
   ].join('\n');
