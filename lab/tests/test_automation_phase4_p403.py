@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import hashlib
 import json
 import tempfile
 import unittest
@@ -7,6 +8,7 @@ from pathlib import Path
 
 from lab.automation.phase4_p403 import (
     Phase4P403Error,
+    _text_file_sha256_matches,
     reconcile_p403_linux_runner_state,
     validate_p403_recovery_manifest,
 )
@@ -15,6 +17,20 @@ from lab.automation.selection import ROOT, object_sha256
 
 MANIFEST = ROOT / "outputs/acceptance/phase4-p403-recovery-manifest-20261027.json"
 EXECUTOR_MANIFEST = ROOT / "outputs/acceptance/phase4-p403-linux-execution-manifest-20261027.json"
+
+
+class Phase4P403TextHashTests(unittest.TestCase):
+    def test_parent_text_hash_accepts_line_ending_conversion_but_rejects_content_changes(self) -> None:
+        lf_bytes = b'{"evidence":"same"}\n'
+        crlf_digest = hashlib.sha256(lf_bytes.replace(b"\n", b"\r\n")).hexdigest()
+
+        with tempfile.TemporaryDirectory() as temporary:
+            path = Path(temporary) / "parent.json"
+            path.write_bytes(lf_bytes)
+            self.assertTrue(_text_file_sha256_matches(path, crlf_digest))
+
+            path.write_bytes(b'{"evidence":"changed"}\n')
+            self.assertFalse(_text_file_sha256_matches(path, crlf_digest))
 
 
 class Phase4P403RecoveryManifestTests(unittest.TestCase):

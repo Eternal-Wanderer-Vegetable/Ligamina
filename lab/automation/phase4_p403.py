@@ -8,6 +8,7 @@ from collections import Counter
 from pathlib import Path
 from typing import Any
 
+from lab.automation.evidence_hash import matches_text_sha256
 from lab.automation.recovery import (
     RecoveryPilotError,
     _build_core_only_host_service_profiles,
@@ -49,6 +50,13 @@ def _json_load(path: Path) -> dict[str, Any]:
 def _file_sha256(path: Path) -> str:
     try:
         return hashlib.sha256(Path(path).read_bytes()).hexdigest()
+    except OSError as error:
+        raise Phase4P403Error(f"required P4-03 evidence file is unavailable: {path}") from error
+
+
+def _text_file_sha256_matches(path: Path, expected: str) -> bool:
+    try:
+        return matches_text_sha256(Path(path).read_bytes(), expected)
     except OSError as error:
         raise Phase4P403Error(f"required P4-03 evidence file is unavailable: {path}") from error
 
@@ -151,7 +159,7 @@ def validate_p403_recovery_manifest(manifest_path: Path, *, verify_sources: bool
     closure_ref = manifest.get("parent_closure", {})
     closure_path = _relative(closure_ref.get("path", ""))
     if verify_sources:
-        if _file_sha256(closure_path) != closure_ref.get("file_sha256"):
+        if not _text_file_sha256_matches(closure_path, closure_ref.get("file_sha256", "")):
             raise Phase4P403Error("P3-05 closure file hash differs from the P4-03 manifest")
     closure = _json_load(closure_path)
     if closure.get("report_sha256") != closure_ref.get("report_sha256"):
@@ -172,13 +180,16 @@ def validate_p403_recovery_manifest(manifest_path: Path, *, verify_sources: bool
                 raise Phase4P403Error(f"P4-03 {cohort} source binding differs from P3-05 closure: {key}")
         report_path = _relative(source_spec["report_path"])
         if verify_sources:
-            if _file_sha256(report_path) != source_spec["report_file_sha256"]:
+            if not _text_file_sha256_matches(report_path, source_spec["report_file_sha256"]):
                 raise Phase4P403Error(f"P4-03 {cohort} report SHA-256 mismatch")
             manifest_file = _relative(source_spec["manifest_path"])
-            if _file_sha256(manifest_file) != source_spec["manifest_file_sha256"]:
+            if not _text_file_sha256_matches(manifest_file, source_spec["manifest_file_sha256"]):
                 raise Phase4P403Error(f"P4-03 {cohort} frozen manifest SHA-256 mismatch")
             if source_spec.get("profile_lock_path"):
-                if _file_sha256(_relative(source_spec["profile_lock_path"])) != source_spec.get("profile_lock_sha256"):
+                if not _text_file_sha256_matches(
+                    _relative(source_spec["profile_lock_path"]),
+                    source_spec.get("profile_lock_sha256", ""),
+                ):
                     raise Phase4P403Error(f"P4-03 {cohort} profile lock SHA-256 mismatch")
         parent_report = _json_load(report_path)
         expected = _expected_unknown_rows(cohort, parent_report)
