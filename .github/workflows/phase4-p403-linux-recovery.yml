@@ -99,6 +99,8 @@ jobs:
         if: always()
         run: bash scripts/phase4-p403-finalize-linux-run.sh
         env:
+          P4_P403_MODE: ${{ needs.dispatch-guard.outputs.mode }}
+          P4_P403_JOB_STATUS: ${{ job.status }}
           UV_PROJECT_ENVIRONMENT: ${{ runner.temp }}/Ligamina-p403-project-venv-${{ github.run_id }}
           UV_CACHE_DIR: ${{ runner.temp }}/Ligamina-p403-uv-cache-${{ github.run_id }}
 

@@ -60,7 +60,7 @@ case "$mode" in
     exit 23
     ;;
   runner_contract_cancel)
-    printf '%s\n' 'P4-03 self-owned runner cancellation probe; cancel this workflow run to exercise traps and always() cleanup.'
+    printf '%s\n' 'P4-03 self-owned runner cancellation probe; cancel this workflow run to exercise external cancellation reconciliation and always() cleanup.'
     while true; do sleep 1; done
     ;;
 esac
