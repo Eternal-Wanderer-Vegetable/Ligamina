@@ -1,0 +1,125 @@
+{
+  "schema_version": 1,
+  "kind": "phase4_p403_github_ci_verification",
+  "task_id": "P4-03",
+  "date": "2026-10-27",
+  "status": "hosted_ci_pass_external_runner_pending",
+  "repository": {
+    "name": "Eternal-Wanderer-Vegetable/Ligamina",
+    "default_branch": "main",
+    "head_branch": "codex/phase4-p403-linux-recovery",
+    "head_commit": "5db0144af04cd5f00b74c71454d1a12833658d90",
+    "pull_request": 4,
+    "pull_request_url": "https://github.com/Eternal-Wanderer-Vegetable/Ligamina/pull/4"
+  },
+  "ci_runs": [
+    {
+      "run_id": 40424578129,
+      "commit": "a7ab171",
+      "status": "failed_then_fixed",
+      "url": "https://github.com/Eternal-Wanderer-Vegetable/Ligamina/actions/runs/40424578129",
+      "findings": [
+        "Raw SHA verification of a historical P3 JSON manifest rejected the equivalent LF Git checkout of CRLF evidence.",
+        "The Windows dispatcher test assumed a fixed 20 ms scheduling window."
+      ]
+    },
+    {
+      "run_id": 40425621346,
+      "commit": "9529ad5",
+      "status": "failed_then_fixed",
+      "url": "https://github.com/Eternal-Wanderer-Vegetable/Ligamina/actions/runs/40425621346",
+      "linux": "passed",
+      "windows": "failed only at the dispatcher scheduling assertion"
+    },
+    {
+      "run_id": 40426598418,
+      "commit": "3f49d963a7c5b3b5ad7999e9d4d527544e99da56",
+      "status": "passed",
+      "url": "https://github.com/Eternal-Wanderer-Vegetable/Ligamina/actions/runs/40426598418",
+      "linux": "passed in 9m06s, including locked checks and container image build",
+      "windows": "passed in 11m16s, including locked checks, G1 smoke, and packaged runtime build"
+    },
+    {
+      "run_id": 40426598422,
+      "commit": "3f49d963a7c5b3b5ad7999e9d4d527544e99da56",
+      "status": "passed",
+      "name": "Linux contracts and automation regressions",
+      "duration": "1m33s",
+      "url": "https://github.com/Eternal-Wanderer-Vegetable/Ligamina/actions/runs/40426598422"
+    },
+    {
+      "run_id": 40428151648,
+      "commit": "3d24ad0",
+      "status": "failed_then_fixed",
+      "url": "https://github.com/Eternal-Wanderer-Vegetable/Ligamina/actions/runs/40428151648",
+      "linux": "passed in 9m04s",
+      "windows": "failed in cargo test at host_session::eof_fails_pending_requests_and_in_flight_limit_is_enforced",
+      "finding": "The test required RpcError::Closed after killing the child process. On the Windows runner, the writer can observe broken-pipe Io before the reader observes stdout EOF Closed. pending_count confirms requests are queued but does not prove the writer has flushed them, so either terminal signal can win.",
+      "repair_commit": "5db0144af04cd5f00b74c71454d1a12833658d90"
+    },
+    {
+      "run_id": 40429421597,
+      "commit": "5db0144af04cd5f00b74c71454d1a12833658d90",
+      "status": "passed",
+      "url": "https://github.com/Eternal-Wanderer-Vegetable/Ligamina/actions/runs/40429421597",
+      "linux": "passed in 8m55s, including locked checks, smoke, and container image build",
+      "windows": "passed in 12m37s, including locked checks, G1 smoke, and packaged runtime build"
+    },
+    {
+      "run_id": 40429421491,
+      "commit": "5db0144af04cd5f00b74c71454d1a12833658d90",
+      "status": "passed",
+      "name": "Linux contracts and automation regressions",
+      "duration": "1m44s",
+      "url": "https://github.com/Eternal-Wanderer-Vegetable/Ligamina/actions/runs/40429421491"
+    }
+  ],
+  "local_verification": {
+    "wsl_command": "UV_PROJECT_ENVIRONMENT=/home/vegetable/ligamina-p402-control-venv uv run --locked --offline --project lab --python 3.12.14 python -m unittest lab.tests.test_automation_phase4_p403 lab.tests.test_automation_recovery lab.tests.test_automation_execution lab.tests.test_automation_dispatcher lab.tests.test_queue -v",
+    "wsl_summary": "56 passed in 89.279s",
+    "windows_command": "uv run --locked --offline --project hosts/nonebot --python 3.12.14 python -m unittest discover -s lab/tests -v",
+    "windows_summary": "222 tests passed; 1 skipped; 61.415s",
+    "dispatcher_repeat": {
+      "runs": 20,
+      "failed": 0
+    },
+    "rust_command": "cargo test --workspace --locked",
+    "rust_summary": "33 Rust tests passed; host_session integration tests 6/6 passed",
+    "rust_format_command": "cargo fmt --all -- --check",
+    "rust_format_summary": "passed",
+    "process_exit_race_repeat": "50/50 passed after accepting either Closed or Io as the winning terminal signal and checking that all pending requests receive the same error",
+    "docs_command": "pwsh -NoProfile -File init.ps1 -Mode docs",
+    "docs_summary": "passed: 20 documents, 429 local links, 12 indexed historic Markdown, 31 features",
+    "evidence_hash_command": "node --test scripts/evidence-hash.test.mjs",
+    "evidence_hash_summary": "4 passed",
+    "harness_command": "node .agents/skills/harness-creator/scripts/validate-harness.mjs --target . --json",
+    "harness_summary": "100/100, no bottleneck"
+  },
+  "repository_configuration": {
+    "environment": "phase4-p403-linux-controlled",
+    "deployment_branches": [
+      "main"
+    ],
+    "required_reviewer": "Eternal-Wanderer-Vegetable",
+    "registered_self_hosted_runners": 0,
+    "variables": {
+      "PHASE4_P403_RUNNER_ENABLED": "false",
+      "PHASE4_P403_LINUX_RECOVERY_ENABLED": "false"
+    }
+  },
+  "acceptance_boundary": {
+    "p403_runner_workflow_executed": false,
+    "plugin_workers_dispatched": false,
+    "historical_unknowns_rewritten": false,
+    "remaining_action": "Register a one-shot isolated Linux runner, pass hosted success/failure/cancel probes and artifact cleanup, then dispatch the bounded 39-row Linux recovery."
+  },
+  "workflow_registration_observation": {
+    "run_id": 40428146558,
+    "event": "push",
+    "conclusion": "failure",
+    "jobs": 0,
+    "url": "https://github.com/Eternal-Wanderer-Vegetable/Ligamina/actions/runs/40428146558",
+    "observation": "The workflow_dispatch-only P4-03 workflow produced a push event run with no jobs. The Actions API exposed no failure reason. No self-hosted runner or plugin Worker was dispatched."
+  },
+  "report_sha256": "b70f5ef4b67ac326b64a8c90689dce066c6c26539cd3903d7128bb368d3c2729"
+}

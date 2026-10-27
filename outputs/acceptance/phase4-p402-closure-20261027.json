@@ -1,0 +1,348 @@
+{
+  "schema_version": 1,
+  "kind": "phase4_p402_closure",
+  "created_at": "2026-10-27",
+  "task_id": "P4-02",
+  "feature_id": "feat-027",
+  "status": "completed_engineering_with_behavior_gates_failed_or_blocked",
+  "scope": "20-entry Linux behavior ledger plus four independent legacy support regressions",
+  "inputs": {
+    "suite": {
+      "path": "contracts/lab/automation/v2/fixtures/behavior-suite.phase4-p402-v2r3.json",
+      "sha256": "fb341959343e44407032391945602e65bd53186f51b3001cf538be0f70592590"
+    },
+    "migration_matrix": {
+      "path": "outputs/acceptance/phase4-p402-migration-matrix-20261026-v2r3.json",
+      "sha256": "021fe1b900bb5e0e0732a2650b2648c85dfe041162d8f82f273120ea40de368e"
+    },
+    "campaign_report": {
+      "path": "outputs/acceptance/phase4-p402-behavior-runs-20261026-v2r3.json",
+      "sha256": "b9fee50451432d7e3eb60d696713f464885ef3e5300f789cd1ea4ce66de5e2d1"
+    },
+    "evidence_manifest": {
+      "path": "outputs/acceptance/phase4-p402-evidence-manifest-20261026-v2r3.json",
+      "sha256": "04fa977c7ea801edfa5e1a6248e2101f3f9b072c3dd4e7351928576e8161fbb4"
+    },
+    "blocked_position_attribution": {
+      "path": "outputs/acceptance/phase4-p402-blocked-attribution-20261027.json",
+      "sha256": "b3a158982795267979a18edc2584e27874d40978a65b5ec23facda37127246cf"
+    },
+    "failure_root_cause_attribution": {
+      "path": "outputs/acceptance/phase4-p402-root-cause-attribution-20261027.json",
+      "sha256": "6c30ab7b9eec13faf6c46053e81a876ad64b81278fc7bcbe178fcf017f540e72"
+    },
+    "historical_s205_report": {
+      "path": "outputs/acceptance/phase2-s205-20261012.json",
+      "sha256": "e5122c52d4c0f4d7519caac7be03fcb24ab8cd102961291575070aa99b1da03a"
+    },
+    "legacy_regression_report": {
+      "path": "outputs/acceptance/phase4-p402-s205-regressions-20261027-v5.json",
+      "sha256": "036b76a2a87aae0fef0618b266399df3722b17d0d89705e0ec7b32ff5e6a9476"
+    }
+  },
+  "linux_behavior": {
+    "campaign_id": "p402-20261026-fixed-four-v2r3",
+    "ledger_complete": true,
+    "ledger_omissions": 0,
+    "ledger_duplicates": 0,
+    "counts": {
+      "positions": 60,
+      "attempt_slots": 180,
+      "queued_stage_jobs": 36,
+      "paired_attempts_started": 36,
+      "side_executions": 72,
+      "unique_worker_count": 72,
+      "cleanup_unconfirmed": 0,
+      "slot_statuses": {
+        "passed": 27,
+        "failed": 9,
+        "unknown": 0,
+        "skipped": 0,
+        "not_dispatched": 144
+      },
+      "queue_statuses": {
+        "queued": 0,
+        "leased": 0,
+        "passed": 27,
+        "failed": 9,
+        "skipped": 0,
+        "unknown": 0,
+        "total": 36
+      }
+    },
+    "gate": {
+      "p4_linux_accounting": "passed",
+      "p4_fixture_gate": "blocked",
+      "p4_linux_behavior_fixed_four": "failed",
+      "p4_linux_behavior": "failed",
+      "p4_linux_behavior_required_blocked_positions": 48,
+      "p4_automation": "not_evaluated"
+    },
+    "reconciled_failure_domains": {
+      "plugin_compatibility": 9
+    },
+    "raw_failure_domain_rollup": {
+      "plugin_behavior": 0,
+      "host_or_harness": 0
+    },
+    "rollup_note": "Immutable failed attempt slots identify plugin_compatibility=9. The campaign roll-up omitted that category; aggregation was repaired and regression-tested after the run. No campaign evidence was rewritten.",
+    "fixed_four_positions": [
+      {
+        "case_id": "nb-nonebot-plugin-help-positive",
+        "status": "failed",
+        "attempt_statuses": [
+          "failed",
+          "failed",
+          "failed"
+        ]
+      },
+      {
+        "case_id": "nb-nonebot-plugin-help-negative",
+        "status": "failed",
+        "attempt_statuses": [
+          "failed",
+          "failed",
+          "failed"
+        ]
+      },
+      {
+        "case_id": "nb-nonebot-plugin-help-isolation",
+        "status": "failed",
+        "attempt_statuses": [
+          "failed",
+          "failed",
+          "failed"
+        ]
+      },
+      {
+        "case_id": "nb-nonebot-plugin-roll-positive",
+        "status": "passed",
+        "attempt_statuses": [
+          "passed",
+          "passed",
+          "passed"
+        ]
+      },
+      {
+        "case_id": "nb-nonebot-plugin-roll-negative",
+        "status": "passed",
+        "attempt_statuses": [
+          "passed",
+          "passed",
+          "passed"
+        ]
+      },
+      {
+        "case_id": "nb-nonebot-plugin-roll-isolation",
+        "status": "passed",
+        "attempt_statuses": [
+          "passed",
+          "passed",
+          "passed"
+        ]
+      },
+      {
+        "case_id": "ko-koishijs-plugin-help-positive",
+        "status": "passed",
+        "attempt_statuses": [
+          "passed",
+          "passed",
+          "passed"
+        ]
+      },
+      {
+        "case_id": "ko-koishijs-plugin-help-negative",
+        "status": "passed",
+        "attempt_statuses": [
+          "passed",
+          "passed",
+          "passed"
+        ]
+      },
+      {
+        "case_id": "ko-koishijs-plugin-help-isolation",
+        "status": "passed",
+        "attempt_statuses": [
+          "passed",
+          "passed",
+          "passed"
+        ]
+      },
+      {
+        "case_id": "ko-koishijs-plugin-echo-positive",
+        "status": "passed",
+        "attempt_statuses": [
+          "passed",
+          "passed",
+          "passed"
+        ]
+      },
+      {
+        "case_id": "ko-koishijs-plugin-echo-negative",
+        "status": "passed",
+        "attempt_statuses": [
+          "passed",
+          "passed",
+          "passed"
+        ]
+      },
+      {
+        "case_id": "ko-koishijs-plugin-echo-isolation",
+        "status": "passed",
+        "attempt_statuses": [
+          "passed",
+          "passed",
+          "passed"
+        ]
+      }
+    ],
+    "blocked_attribution": {
+      "positions": 48,
+      "slots": 144,
+      "all_positions_source_bound": true
+    },
+    "failure_findings": [
+      {
+        "package": "nonebot_plugin_help",
+        "version": "0.6.1",
+        "failure_domain": "plugin_compatibility",
+        "reason_code": "plugin_load_failed",
+        "conclusion": "The exact published plugin fails during import under the frozen NoneBot 2.5.0 / Pydantic 2.14.1 profile. Both Native and Federated sides fail before any behavior stimulus. This is a plugin/profile compatibility failure, not a behavior-oracle result or an infrastructure failure.",
+        "reproduction_status": "failed_before_event_dispatch"
+      },
+      {
+        "package": "@koishijs/plugin-help",
+        "version": "2.4.6",
+        "failure_domain": null,
+        "reason_code": null,
+        "conclusion": "The v1 failures were fixture-input errors, not a demonstrated plugin defect. All three corrected Koishi Help cases passed three fresh paired attempts each in v2r3.",
+        "reproduction_status": null
+      }
+    ]
+  },
+  "legacy_regressions": {
+    "status": "completed",
+    "source_historical_report_sha256": "e5122c52d4c0f4d7519caac7be03fcb24ab8cd102961291575070aa99b1da03a",
+    "runtime_artifact_image": "ligamina-p401-runtime-offline-profile@sha256:2f2aaf3d31b522f31b1dbbc5c5e0109949a86d195e5aa491b2989b7ba9de9c5c",
+    "runtime_artifacts": {
+      "runtime_image_id": "sha256:2f2aaf3d31b522f31b1dbbc5c5e0109949a86d195e5aa491b2989b7ba9de9c5c",
+      "node_sha256": "89af8424dd53e560b1933f87ba650d8bf57c83ca5a04600eefb31f416aabbae7",
+      "core_sha256": "6dc9071961aeb778af4c85904defcd8c8aa3e3d1dd80c56043152c09fb916660"
+    },
+    "profile_images_used": {
+      "nonebot": "ligamina-s205-python-profile@sha256:fcb712608785413b1db90fd2d96031beb1e1a18588b89d6cacdde906ce42ab89",
+      "koishi": "node@sha256:ba849c60be29959425b8734d57b8b4b7d56f98edd9504c9af091d5281095a71e"
+    },
+    "unique_workers": 4,
+    "cleanup_unconfirmed": 0,
+    "samples": [
+      {
+        "sample_id": "nonebot-autohelp",
+        "package": "nonebot-plugin-autohelp",
+        "version": "0.1.7",
+        "artifact_hash": "70faef1a7f05a42a448e4d886a4b4a58611d86260df7d6f6e2e2b9deb0e49472",
+        "lockfile_sha256": "68c7b6dac42d05a564b56e9e5744e21b439ea5ae12e7467aca785199fe4461e1",
+        "profile_sha256": "4b77454753fa5181a90bb3c339de6970bbe1b2f57ff8ff2dc15d63a2bea929a6",
+        "worker_id": "ligamina-e7a71a6ea20b4aa7",
+        "native": "completed",
+        "federated": "completed",
+        "comparison": "passed",
+        "artifact_verification": "passed",
+        "worker_cleanup_confirmed": true,
+        "profile_cleanup": "passed"
+      },
+      {
+        "sample_id": "nonebot-repeater",
+        "package": "nonebot-plugin-repeater",
+        "version": "3.1.4",
+        "artifact_hash": "fe50ad2d4bfc7f1397fcc261ca234d701c4ff02986475ffc5f29647056488d2b",
+        "lockfile_sha256": "949e7e571804cf1bac145dc920f056fefad2a337a54daeba3d77c6f2d0150fcb",
+        "profile_sha256": "4b77454753fa5181a90bb3c339de6970bbe1b2f57ff8ff2dc15d63a2bea929a6",
+        "worker_id": "ligamina-dec95a73c6d4428b",
+        "native": "completed",
+        "federated": "completed",
+        "comparison": "passed",
+        "artifact_verification": "passed",
+        "worker_cleanup_confirmed": true,
+        "profile_cleanup": "passed"
+      },
+      {
+        "sample_id": "koishi-game-mini",
+        "package": "koishi-plugin-game-mini",
+        "version": "0.4.3",
+        "artifact_hash": "sha512-kTovHhKSP9N8gvk1iVjTfA2tYZRji2roxy1vQrvhzw92xs+Y1zduOUVURVtPe18duxDShchrQyGuILJpEKooqA==",
+        "lockfile_sha256": "12a70b2d3c039cf2113ff867d067bbdbc400c33b6aad58813d7a3c7535c2aa45",
+        "profile_sha256": "f7c0fd9fb2c5d50a9bb902b2c05459b13b061d18a42f60a8106b8aba71558b66",
+        "worker_id": "ligamina-3245677db7f8498c",
+        "native": "completed",
+        "federated": "completed",
+        "comparison": "passed",
+        "artifact_verification": "passed",
+        "worker_cleanup_confirmed": true,
+        "profile_cleanup": "passed"
+      },
+      {
+        "sample_id": "koishi-multi-qa",
+        "package": "koishi-plugin-multi-qa",
+        "version": "1.0.8",
+        "artifact_hash": "sha512-gdXhFXMUlhkwDJSFRlHDNXG/4NocLS/pYNDKSrQ3quxgwtNzQcjALMbEZrWFFOOYzu9pv8//u23t9Pt6wktLmg==",
+        "lockfile_sha256": "0acb6bb09ffe80fda5cf5632e0120683ac804d06431b7879f65a1aabf8cc3a55",
+        "profile_sha256": "f7c0fd9fb2c5d50a9bb902b2c05459b13b061d18a42f60a8106b8aba71558b66",
+        "worker_id": "ligamina-d2d7734b6f1144c1",
+        "native": "completed",
+        "federated": "completed",
+        "comparison": "passed",
+        "artifact_verification": "passed",
+        "worker_cleanup_confirmed": true,
+        "profile_cleanup": "passed"
+      }
+    ],
+    "windows_sandbox": {
+      "status": "blocked_before_plugin_start",
+      "win32_error": 4551,
+      "reason": "Windows Sandbox App Control policy blocked the unsigned CPython executable; the failure occurred before the sample runner started.",
+      "evidence": "outputs/acceptance/phase2-s205-windows-blocker-20261012.json"
+    },
+    "limits": [
+      "Fresh four-sample regression ran on Linux only; historical Windows Sandbox App Control error 4551 remains unresolved.",
+      "Gateway receipts are virtual. No real QQ/platform delivery or field acceptance was performed."
+    ]
+  },
+  "implementation_fixes": [
+    {
+      "file": "lab/representative.py",
+      "change": "npm 12 profile resolution allows remote URLs only when declared by generated root package.json; lifecycle scripts remain disabled."
+    },
+    {
+      "file": "lab/baselines/run_s205.py",
+      "change": "profile copies exclude isolated installer home, temp and cache trees to prevent bundling permission-restricted transient data."
+    },
+    {
+      "file": "lab/baselines/koishi/runner.mjs",
+      "change": "Koishi artifact fingerprint follows each frozen sample hash algorithm."
+    },
+    {
+      "file": "lab/baselines/koishi/artifact_fingerprint.mjs",
+      "change": "shared SHA-256 and SRI-SHA512 fingerprint implementation."
+    }
+  ],
+  "verification": {
+    "targeted_tests": {
+      "status": "passed",
+      "tests": 25
+    },
+    "node_syntax": [
+      "node --check lab/baselines/koishi/runner.mjs",
+      "node --check lab/baselines/koishi/artifact_fingerprint.mjs"
+    ],
+    "legacy_rerun_command": "python -m lab.baselines.run_s205 --runtime-image <digest-pinned P4-01 offline runtime> --nonebot-profile-image <digest-pinned S2-05 Python profile> --koishi-profile-image node@sha256:ba849c60be29959425b8734d57b8b4b7d56f98edd9504c9af091d5281095a71e --report outputs/acceptance/phase4-p402-s205-regressions-20261027-v5.json"
+  },
+  "gate_interpretation": {
+    "p4_linux_accounting": "passed",
+    "p4_linux_behavior_fixed_four": "failed",
+    "p4_linux_behavior": "failed",
+    "p4_fixture_gate": "blocked",
+    "p4_automation": "not_evaluated",
+    "support_claim": "No full-catalog or Windows compatibility claim follows from this closure. The four historical versions have fresh Linux paired regression evidence only."
+  }
+}

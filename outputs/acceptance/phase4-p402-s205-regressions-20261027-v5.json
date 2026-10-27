@@ -1,0 +1,2332 @@
+{
+  "schema_version": 1,
+  "task_id": "S2-09",
+  "kind": "phase2_s209_legacy_support_regression",
+  "status": "completed",
+  "source_s205_report": "outputs/acceptance/phase2-s205-20261012.json",
+  "source_s205_report_sha256": "e5122c52d4c0f4d7519caac7be03fcb24ab8cd102961291575070aa99b1da03a",
+  "implementation": {
+    "approach": "unmodified plugin artifact in one exact Linux sample lock, run against stock native framework and production Core/Host/Gateway in a network-disabled Docker Worker",
+    "platform": "linux/amd64",
+    "runtime_images_lock": "lab/baselines/runtime-images.lock.json",
+    "runtime_artifact_image": "ligamina-p401-runtime-offline-profile@sha256:2f2aaf3d31b522f31b1dbbc5c5e0109949a86d195e5aa491b2989b7ba9de9c5c",
+    "runtime_artifacts": {
+      "runtime_image_id": "sha256:2f2aaf3d31b522f31b1dbbc5c5e0109949a86d195e5aa491b2989b7ba9de9c5c",
+      "node_sha256": "89af8424dd53e560b1933f87ba650d8bf57c83ca5a04600eefb31f416aabbae7",
+      "core_sha256": "6dc9071961aeb778af4c85904defcd8c8aa3e3d1dd80c56043152c09fb916660"
+    },
+    "profile_images_used": {
+      "nonebot": "ligamina-s205-python-profile@sha256:fcb712608785413b1db90fd2d96031beb1e1a18588b89d6cacdde906ce42ab89",
+      "koishi": "node@sha256:ba849c60be29959425b8734d57b8b4b7d56f98edd9504c9af091d5281095a71e"
+    },
+    "windows_sandbox_blocker": {
+      "status": "blocked_before_plugin_start",
+      "win32_error": 4551,
+      "reason": "Windows Sandbox App Control policy blocked the unsigned CPython executable; the failure occurred before the sample runner started.",
+      "evidence": "outputs/acceptance/phase2-s205-windows-blocker-20261012.json"
+    },
+    "native_paths": {
+      "nonebot": "stock NoneBot 2.5.0 with official OneBot v11 adapter 2.4.6; inject native OneBot Event through Bot.handle_event and capture Bot API sends",
+      "koishi": "stock Koishi core 4.18.11 Context/Session/Bot; dispatch native Session and capture Bot.sendMessage"
+    },
+    "files": [
+      "lab/baselines/nonebot/runner.py",
+      "lab/baselines/koishi/runner.mjs",
+      "lab/baselines/federated.py",
+      "lab/baselines/paired_worker.py",
+      "lab/native_runner.py",
+      "lab/recipes.py"
+    ],
+    "samples": [
+      {
+        "sample_id": "nonebot-autohelp",
+        "ecosystem": "nonebot",
+        "package": "nonebot-plugin-autohelp",
+        "version": "0.1.7",
+        "artifact_hash": "70faef1a7f05a42a448e4d886a4b4a58611d86260df7d6f6e2e2b9deb0e49472",
+        "profile_prepare": {
+          "status": "passed",
+          "steps": [
+            {
+              "label": "resolve exact Python sample profile",
+              "status": "passed",
+              "command": [
+                "/usr/local/bin/uv",
+                "lock"
+              ],
+              "returncode": 0,
+              "stdout_tail": "",
+              "stderr_tail": "Using CPython 3.12.14 interpreter at: /home/vegetable/.local/bin/python3.12\nResolved 39 packages in 1.85s\n"
+            },
+            {
+              "label": "install locked Python sample profile",
+              "status": "passed",
+              "command": [
+                "/usr/local/bin/uv",
+                "sync",
+                "--locked",
+                "--no-dev",
+                "--no-build",
+                "--python",
+                "3.12.14"
+              ],
+              "returncode": 0,
+              "stdout_tail": "",
+              "stderr_tail": "Using CPython 3.12.14 interpreter at: /home/vegetable/.local/bin/python3.12\nCreating virtual environment at: .venv\nResolved 39 packages in 1ms\nDownloading pydantic-core (2.1MiB)\nDownloading uvloop (4.3MiB)\n Downloaded pydantic-core\n Downloaded uvloop\nPrepared 35 packages in 1.81s\nInstalled 36 packages in 35ms\n + annotated-doc==0.0.5\n + annotated-types==0.8.0\n + anyio==4.15.1\n + attrs==26.1.0\n + click==8.5.0\n + exceptiongroup==1.3.1\n + fastapi==0.162.0\n + h11==0.16.0\n + httptools==0.9.0\n + idna==3.20\n + jsonschema==4.25.1\n + jsonschema-specifications==2025.9.1\n + loguru==0.7.3\n + logzero==1.7.0\n + msgpack==1.2.3\n + multidict==7.2.1\n + nonebot-adapter-onebot==2.4.6\n + nonebot-plugin-autohelp==0.1.7 (from https://files.pythonhosted.org/packages/fc/c0/f6e010f1d0ae8bf2e8fe067ea031b0debb3f764f5480022903f5e5179471/nonebot_plugin_autohelp-0.1.7-py3-none-any.whl)\n + nonebot2==2.5.0\n + opentelemetry-api==1.45.1\n + propcache==0.5.4\n + pydantic==2.14.1\n + pydantic-core==2.50.1\n + pygtrie==2.6.2\n + python-dotenv==1.2.4\n + pyyaml==6.0.3\n + referencing==0.37.0\n + rpds-py==2026.9.1\n + starlette==1.10.0\n + typing-extensions==4.16.0\n + typing-inspection==0.4.4\n + uvicorn==0.54.0\n + uvloop==0.23.0\n + watchfiles==1.3.0\n + websockets==17.3\n + yarl==1.25.1\n"
+            },
+            {
+              "label": "verify installed Python package metadata",
+              "status": "passed",
+              "command": [
+                "/tmp/ligamina-s205-278tzeex/nonebot-autohelp/.venv/bin/python",
+                "-c",
+                "from importlib.metadata import version; import sys; print(version(sys.argv[1]))",
+                "nonebot-plugin-autohelp"
+              ],
+              "returncode": 0,
+              "stdout_tail": "0.1.7\n",
+              "stderr_tail": ""
+            }
+          ],
+          "lock_sha256": "68c7b6dac42d05a564b56e9e5744e21b439ea5ae12e7467aca785199fe4461e1"
+        },
+        "linux_profile_prepare": {
+          "status": "passed",
+          "command": [
+            "/usr/bin/docker",
+            "run",
+            "--user",
+            "1000:1000",
+            "--rm",
+            "--pull=never",
+            "--network",
+            "bridge",
+            "--read-only",
+            "--cap-drop=ALL",
+            "--security-opt=no-new-privileges:true",
+            "--pids-limit",
+            "256",
+            "--memory",
+            "6144m",
+            "--memory-swap",
+            "6144m",
+            "--cpus",
+            "2",
+            "--tmpfs",
+            "/tmp:rw,exec,nosuid,nodev,size=1024m",
+            "--mount",
+            "type=bind,src=/tmp/ligamina-s205-278tzeex/nonebot-autohelp,dst=/profile",
+            "--workdir",
+            "/profile",
+            "--env",
+            "HOME=/tmp/home",
+            "--env",
+            "UV_CACHE_DIR=/tmp/uv-cache",
+            "--env",
+            "npm_config_cache=/tmp/npm-cache",
+            "ligamina-s205-python-profile@sha256:fcb712608785413b1db90fd2d96031beb1e1a18588b89d6cacdde906ce42ab89",
+            "sh",
+            "-lc",
+            "mkdir -p /tmp/home && rm -rf .venv && uv sync --locked --no-dev --no-build --python 3.12.14"
+          ],
+          "returncode": 0,
+          "elapsed_seconds": 3.132,
+          "stdout_tail": "",
+          "stderr_tail": "Using CPython 3.12.14 interpreter at: /usr/local/bin/python3.12\nCreating virtual environment at: .venv\nResolved 39 packages in 297ms\nDownloading pydantic-core (2.1MiB)\nDownloading uvloop (4.3MiB)\n Downloaded pydantic-core\n Downloaded uvloop\nPrepared 35 packages in 1.64s\nwarning: Failed to hardlink files; falling back to full copy. This may lead to degraded performance.\n         If the cache and target directories are on different filesystems, hardlinking may not be supported.\n         If this is intentional, set `export UV_LINK_MODE=copy` or use `--link-mode=copy` to suppress this warning.\nInstalled 36 packages in 269ms\n + annotated-doc==0.0.5\n + annotated-types==0.8.0\n + anyio==4.15.1\n + attrs==26.1.0\n + click==8.5.0\n + exceptiongroup==1.3.1\n + fastapi==0.162.0\n + h11==0.16.0\n + httptools==0.9.0\n + idna==3.20\n + jsonschema==4.25.1\n + jsonschema-specifications==2025.9.1\n + loguru==0.7.3\n + logzero==1.7.0\n + msgpack==1.2.3\n + multidict==7.2.1\n + nonebot-adapter-onebot==2.4.6\n + nonebot-plugin-autohelp==0.1.7 (from https://files.pythonhosted.org/packages/fc/c0/f6e010f1d0ae8bf2e8fe067ea031b0debb3f764f5480022903f5e5179471/nonebot_plugin_autohelp-0.1.7-py3-none-any.whl)\n + nonebot2==2.5.0\n + opentelemetry-api==1.45.1\n + propcache==0.5.4\n + pydantic==2.14.1\n + pydantic-core==2.50.1\n + pygtrie==2.6.2\n + python-dotenv==1.2.4\n + pyyaml==6.0.3\n + referencing==0.37.0\n + rpds-py==2026.9.1\n + starlette==1.10.0\n + typing-extensions==4.16.0\n + typing-inspection==0.4.4\n + uvicorn==0.54.0\n + uvloop==0.23.0\n + watchfiles==1.3.0\n + websockets==17.3\n + yarl==1.25.1\n",
+          "install_scripts": "Python build backends disabled"
+        },
+        "status": "passed",
+        "elapsed_seconds": 8.03,
+        "worker": {
+          "worker_id": "ligamina-e7a71a6ea20b4aa7",
+          "status": "passed",
+          "reason_code": null,
+          "exit_code": 0,
+          "cleanup_confirmed": true,
+          "stdout_sha256": "a2d59d67120c417610480c1d4497c8a80143893ef90d4aff328b1a6b04f545ca",
+          "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "output_truncated": false,
+          "peak_memory_bytes": 264241152,
+          "stderr_tail": ""
+        },
+        "resource_observations": {
+          "worker_input_bytes": 193086034,
+          "plugin_artifact_bytes": 9152,
+          "peak_worker_memory_bytes": 264241152,
+          "worker_elapsed_seconds": 8.02,
+          "memory_measurement": "sampled from Docker stats every 250ms; null means no sample was captured"
+        },
+        "parse_error": null,
+        "pair": {
+          "case_id": "nonebot-autohelp",
+          "native": {
+            "status": "completed",
+            "environment": {
+              "ecosystem": "nonebot",
+              "framework_version": "2.5.0",
+              "runtime_version": "3.12.14",
+              "lockfile_sha256": "68c7b6dac42d05a564b56e9e5744e21b439ea5ae12e7467aca785199fe4461e1",
+              "profile_sha256": "4b77454753fa5181a90bb3c339de6970bbe1b2f57ff8ff2dc15d63a2bea929a6",
+              "artifact_hash": "70faef1a7f05a42a448e4d886a4b4a58611d86260df7d6f6e2e2b9deb0e49472",
+              "config_sha256": "187f5fb1525aaa3682c0ae0f170ac0aa21c9f01d35708de560a3b9bbd46f34b4",
+              "stimulus_sha256": "5e5ba3512ddde7748eaaa6d58f6e7e1e305373c45e94edec52c08e08ec1b7610"
+            },
+            "events": [
+              {
+                "schema_version": "ligamina/0.1",
+                "event_id": "sample-nonebot-autohelp-1",
+                "trace_id": "trace-sample-nonebot-autohelp-1",
+                "platform": "onebot.v11",
+                "account_id": "9000",
+                "conversation": {
+                  "kind": "group",
+                  "id": "4242"
+                },
+                "actor_id": "2323",
+                "timestamp": "2026-10-26T16:17:14.810Z",
+                "target_host": "sample-nonebot-autohelp",
+                "message": [
+                  {
+                    "type": "text",
+                    "text": "help -h"
+                  }
+                ],
+                "extensions": {
+                  "onebot.v11": {
+                    "message_id": "80000",
+                    "sender": {
+                      "nickname": "Ligamina"
+                    }
+                  }
+                }
+              }
+            ],
+            "operations": [
+              {
+                "operation_id": "operation-1",
+                "account_id": "9000",
+                "operation": "send_message",
+                "target": {
+                  "kind": "group",
+                  "id": "4242"
+                },
+                "params": {
+                  "message": [
+                    {
+                      "type": "text",
+                      "text": "usage: help [-h] [-d] [params ...]\n\npositional arguments:\n  params         list of parameters of type str (default: None)\n\noptions:\n  -h, --help     show this help message and exit\n  -d, --details  show __doc__ for each plugin (default: False)\n\n---\n"
+                    }
+                  ]
+                }
+              }
+            ],
+            "operation_receipts": [
+              {
+                "operation_id": "operation-1",
+                "status": "succeeded",
+                "target": {
+                  "kind": "group",
+                  "id": "4242"
+                }
+              }
+            ],
+            "cleanup": {
+              "active_capability_count": 0,
+              "live_processes": []
+            },
+            "stock_native": {
+              "framework": "NoneBot",
+              "adapter": "OneBot v11",
+              "bridge_modules": [],
+              "api_inputs": [
+                {
+                  "api": "send_msg",
+                  "message_type": "Message",
+                  "message": [
+                    {
+                      "type": "text",
+                      "data": {
+                        "text": "usage: help [-h] [-d] [params ...]\n\npositional arguments:\n  params         list of parameters of type str (default: None)\n\noptions:\n  -h, --help     show this help message and exit\n  -d, --details  show __doc__ for each plugin (default: False)\n\n---\n"
+                      }
+                    }
+                  ]
+                }
+              ]
+            },
+            "diagnostics": "10-26 16:16:47 [SUCCESS] nonebot | NoneBot is initializing...\n10-26 16:16:47 [INFO] nonebot | Current Env: prod\n[I 261026 16:16:48 nonebot_plugin_autohelp:45] Loaded plugins: ['nonebot_plugin_autohelp']\n10-26 16:16:48 [SUCCESS] nonebot | Succeeded to load plugin \"nonebot_plugin_autohelp\"\n10-26 16:16:48 [SUCCESS] nonebot | OneBot V11 9000 | [message.group.normal]: Message 80000 from 2323@[群:4242] 'help -h'\n10-26 16:16:48 [INFO] nonebot | Event will be handled by Matcher(type='message', module=nonebot_plugin_autohelp.nonebot_plugin_autohelp, lineno=35)\n[D 261026 16:16:48 nonebot_plugin_autohelp:61]  nonebot_plugin_autohelp entry \n[D 261026 16:16:48 nonebot_plugin_autohelp:62] state: {'_prefix': {'command': None, 'raw_command': None, 'command_arg': None, 'command_start': None, 'command_whitespace': None}}\n[D 261026 16:16:48 nonebot_plugin_autohelp:65] check time interval: 1793031408.1\n[D 261026 16:16:48 nonebot_plugin_autohelp:72] msg: help -h\n[D 261026 16:16:48 nonebot_plugin_autohelp:88] command (str(event.message).strip()): help -h\n[E 261026 16:16:48 parse_cmd:45] SystemExit caught.\n[D 261026 16:16:48 nonebot_plugin_autohelp:91] args: Namespace(details=False, params=[])\n10-26 16:16:48 [INFO] nonebot | Matcher(type='message', module=nonebot_plugin_autohelp.nonebot_plugin_autohelp, lineno=35) running complete\n"
+          },
+          "federated": {
+            "status": "completed",
+            "environment": {
+              "ecosystem": "nonebot",
+              "framework_version": "2.5.0",
+              "runtime_version": "3.12.14",
+              "lockfile_sha256": "68c7b6dac42d05a564b56e9e5744e21b439ea5ae12e7467aca785199fe4461e1",
+              "profile_sha256": "4b77454753fa5181a90bb3c339de6970bbe1b2f57ff8ff2dc15d63a2bea929a6",
+              "artifact_hash": "70faef1a7f05a42a448e4d886a4b4a58611d86260df7d6f6e2e2b9deb0e49472",
+              "config_sha256": "187f5fb1525aaa3682c0ae0f170ac0aa21c9f01d35708de560a3b9bbd46f34b4",
+              "stimulus_sha256": "5e5ba3512ddde7748eaaa6d58f6e7e1e305373c45e94edec52c08e08ec1b7610"
+            },
+            "events": [
+              {
+                "schema_version": "ligamina/0.1",
+                "event_id": "sample-nonebot-autohelp-1",
+                "trace_id": "trace-sample-nonebot-autohelp-1",
+                "platform": "onebot.v11",
+                "account_id": "9000",
+                "conversation": {
+                  "kind": "group",
+                  "id": "4242"
+                },
+                "actor_id": "2323",
+                "timestamp": "2026-10-26T16:17:14.810Z",
+                "target_host": "sample-nonebot-autohelp",
+                "message": [
+                  {
+                    "type": "text",
+                    "text": "help -h"
+                  }
+                ],
+                "extensions": {
+                  "onebot.v11": {
+                    "message_id": "80000",
+                    "sender": {
+                      "nickname": "Ligamina"
+                    }
+                  }
+                }
+              }
+            ],
+            "operations": [
+              {
+                "operation_id": "operation-1",
+                "account_id": "9000",
+                "operation": "send_message",
+                "target": {
+                  "id": "4242",
+                  "kind": "group"
+                },
+                "params": {
+                  "message": [
+                    {
+                      "type": "text",
+                      "text": "usage: help [-h] [-d] [params ...]\n\npositional arguments:\n  params         list of parameters of type str (default: None)\n\noptions:\n  -h, --help     show this help message and exit\n  -d, --details  show __doc__ for each plugin (default: False)\n\n---\n"
+                    }
+                  ]
+                }
+              }
+            ],
+            "operation_receipts": [
+              {
+                "operation_id": "operation-1",
+                "status": "succeeded",
+                "target": {
+                  "id": "4242",
+                  "kind": "group"
+                }
+              }
+            ],
+            "cleanup": {
+              "active_capability_count": 0,
+              "live_processes": []
+            },
+            "federated_trace": {
+              "core_host_route": "passed",
+              "host_pid_reaped": true,
+              "gateway_operation_count": 1
+            }
+          },
+          "comparison": {
+            "status": "passed",
+            "issues": [],
+            "normalized_native": {
+              "events": [
+                {
+                  "account_id": "9000",
+                  "actor_id": "2323",
+                  "conversation": {
+                    "id": "4242",
+                    "kind": "group"
+                  },
+                  "event_id": "sample-nonebot-autohelp-1",
+                  "extensions": {
+                    "onebot.v11": {
+                      "message_id": "80000",
+                      "sender": {
+                        "nickname": "Ligamina"
+                      }
+                    }
+                  },
+                  "message": [
+                    {
+                      "text": "help -h",
+                      "type": "text"
+                    }
+                  ],
+                  "platform": "onebot.v11",
+                  "schema_version": "ligamina/0.1",
+                  "target_host": "sample-nonebot-autohelp",
+                  "timestamp": "2026-10-26T16:17:14.810Z"
+                }
+              ],
+              "operations": [
+                {
+                  "account_id": "9000",
+                  "operation": "send_message",
+                  "operation_id": "operation-1",
+                  "params": {
+                    "message": [
+                      {
+                        "text": "usage: help [-h] [-d] [params ...]\n\npositional arguments:\n  params         list of parameters of type str (default: None)\n\noptions:\n  -h, --help     show this help message and exit\n  -d, --details  show __doc__ for each plugin (default: False)\n\n---\n",
+                        "type": "text"
+                      }
+                    ]
+                  },
+                  "target": {
+                    "id": "4242",
+                    "kind": "group"
+                  }
+                }
+              ],
+              "operation_receipts": [
+                {
+                  "operation_id": "operation-1",
+                  "status": "succeeded",
+                  "target": {
+                    "id": "4242",
+                    "kind": "group"
+                  }
+                }
+              ],
+              "cleanup": {
+                "active_capability_count": 0,
+                "live_processes": []
+              }
+            },
+            "normalized_federated": {
+              "events": [
+                {
+                  "account_id": "9000",
+                  "actor_id": "2323",
+                  "conversation": {
+                    "id": "4242",
+                    "kind": "group"
+                  },
+                  "event_id": "sample-nonebot-autohelp-1",
+                  "extensions": {
+                    "onebot.v11": {
+                      "message_id": "80000",
+                      "sender": {
+                        "nickname": "Ligamina"
+                      }
+                    }
+                  },
+                  "message": [
+                    {
+                      "text": "help -h",
+                      "type": "text"
+                    }
+                  ],
+                  "platform": "onebot.v11",
+                  "schema_version": "ligamina/0.1",
+                  "target_host": "sample-nonebot-autohelp",
+                  "timestamp": "2026-10-26T16:17:14.810Z"
+                }
+              ],
+              "operations": [
+                {
+                  "account_id": "9000",
+                  "operation": "send_message",
+                  "operation_id": "operation-1",
+                  "params": {
+                    "message": [
+                      {
+                        "text": "usage: help [-h] [-d] [params ...]\n\npositional arguments:\n  params         list of parameters of type str (default: None)\n\noptions:\n  -h, --help     show this help message and exit\n  -d, --details  show __doc__ for each plugin (default: False)\n\n---\n",
+                        "type": "text"
+                      }
+                    ]
+                  },
+                  "target": {
+                    "id": "4242",
+                    "kind": "group"
+                  }
+                }
+              ],
+              "operation_receipts": [
+                {
+                  "operation_id": "operation-1",
+                  "status": "succeeded",
+                  "target": {
+                    "id": "4242",
+                    "kind": "group"
+                  }
+                }
+              ],
+              "cleanup": {
+                "active_capability_count": 0,
+                "live_processes": []
+              }
+            }
+          },
+          "execution_integrity": {
+            "status": "passed",
+            "reason_code": null
+          },
+          "sample_id": "nonebot-autohelp",
+          "package": "nonebot-plugin-autohelp",
+          "version": "0.1.7",
+          "artifact_hash": "70faef1a7f05a42a448e4d886a4b4a58611d86260df7d6f6e2e2b9deb0e49472",
+          "lockfile_sha256": "68c7b6dac42d05a564b56e9e5744e21b439ea5ae12e7467aca785199fe4461e1",
+          "profile_sha256": "4b77454753fa5181a90bb3c339de6970bbe1b2f57ff8ff2dc15d63a2bea929a6",
+          "same_artifact_lock_config_stimulus": {
+            "artifact_hash": "70faef1a7f05a42a448e4d886a4b4a58611d86260df7d6f6e2e2b9deb0e49472",
+            "lockfile_sha256": "68c7b6dac42d05a564b56e9e5744e21b439ea5ae12e7467aca785199fe4461e1",
+            "config_sha256": "187f5fb1525aaa3682c0ae0f170ac0aa21c9f01d35708de560a3b9bbd46f34b4",
+            "stimulus_sha256": "5e5ba3512ddde7748eaaa6d58f6e7e1e305373c45e94edec52c08e08ec1b7610"
+          },
+          "federated_trace": {
+            "core_host_route": "passed",
+            "host_pid_reaped": true,
+            "gateway_operation_count": 1
+          },
+          "worker_cleanup_confirmed": true
+        },
+        "artifact_verification": {
+          "status": "passed",
+          "artifact_url": "https://files.pythonhosted.org/packages/fc/c0/f6e010f1d0ae8bf2e8fe067ea031b0debb3f764f5480022903f5e5179471/nonebot_plugin_autohelp-0.1.7-py3-none-any.whl",
+          "artifact_hash_algorithm": "sha256",
+          "expected_artifact_hash": "70faef1a7f05a42a448e4d886a4b4a58611d86260df7d6f6e2e2b9deb0e49472",
+          "actual_artifact_hash": "70faef1a7f05a42a448e4d886a4b4a58611d86260df7d6f6e2e2b9deb0e49472",
+          "actual_sha256": "70faef1a7f05a42a448e4d886a4b4a58611d86260df7d6f6e2e2b9deb0e49472",
+          "size_bytes": 9152,
+          "error": null
+        },
+        "profile_source_cleanup": {
+          "status": "passed",
+          "removed": [
+            ".venv"
+          ],
+          "elapsed_seconds": 0.042
+        }
+      },
+      {
+        "sample_id": "nonebot-repeater",
+        "ecosystem": "nonebot",
+        "package": "nonebot-plugin-repeater",
+        "version": "3.1.4",
+        "artifact_hash": "fe50ad2d4bfc7f1397fcc261ca234d701c4ff02986475ffc5f29647056488d2b",
+        "profile_prepare": {
+          "status": "passed",
+          "steps": [
+            {
+              "label": "resolve exact Python sample profile",
+              "status": "passed",
+              "command": [
+                "/usr/local/bin/uv",
+                "lock"
+              ],
+              "returncode": 0,
+              "stdout_tail": "",
+              "stderr_tail": "Using CPython 3.12.14 interpreter at: /home/vegetable/.local/bin/python3.12\nResolved 38 packages in 164ms\n"
+            },
+            {
+              "label": "install locked Python sample profile",
+              "status": "passed",
+              "command": [
+                "/usr/local/bin/uv",
+                "sync",
+                "--locked",
+                "--no-dev",
+                "--no-build",
+                "--python",
+                "3.12.14"
+              ],
+              "returncode": 0,
+              "stdout_tail": "",
+              "stderr_tail": "Using CPython 3.12.14 interpreter at: /home/vegetable/.local/bin/python3.12\nCreating virtual environment at: .venv\nResolved 38 packages in 1ms\nInstalled 35 packages in 32ms\n + annotated-doc==0.0.5\n + annotated-types==0.8.0\n + anyio==4.15.1\n + attrs==26.1.0\n + click==8.5.0\n + exceptiongroup==1.3.1\n + fastapi==0.162.0\n + h11==0.16.0\n + httptools==0.9.0\n + idna==3.20\n + jsonschema==4.25.1\n + jsonschema-specifications==2025.9.1\n + loguru==0.7.3\n + msgpack==1.2.3\n + multidict==7.2.1\n + nonebot-adapter-onebot==2.4.6\n + nonebot-plugin-repeater==3.1.4 (from https://files.pythonhosted.org/packages/60/4c/2a9539fd7c4e78b94c20dd4aed9d2a10b6f4c44ae5be09d554279c78259c/nonebot_plugin_repeater-3.1.4-py3-none-any.whl)\n + nonebot2==2.5.0\n + opentelemetry-api==1.45.1\n + propcache==0.5.4\n + pydantic==2.14.1\n + pydantic-core==2.50.1\n + pygtrie==2.6.2\n + python-dotenv==1.2.4\n + pyyaml==6.0.3\n + referencing==0.37.0\n + rpds-py==2026.9.1\n + starlette==1.10.0\n + typing-extensions==4.16.0\n + typing-inspection==0.4.4\n + uvicorn==0.54.0\n + uvloop==0.23.0\n + watchfiles==1.3.0\n + websockets==17.3\n + yarl==1.25.1\n"
+            },
+            {
+              "label": "verify installed Python package metadata",
+              "status": "passed",
+              "command": [
+                "/tmp/ligamina-s205-278tzeex/nonebot-repeater/.venv/bin/python",
+                "-c",
+                "from importlib.metadata import version; import sys; print(version(sys.argv[1]))",
+                "nonebot-plugin-repeater"
+              ],
+              "returncode": 0,
+              "stdout_tail": "3.1.4\n",
+              "stderr_tail": ""
+            }
+          ],
+          "lock_sha256": "949e7e571804cf1bac145dc920f056fefad2a337a54daeba3d77c6f2d0150fcb"
+        },
+        "linux_profile_prepare": {
+          "status": "passed",
+          "command": [
+            "/usr/bin/docker",
+            "run",
+            "--user",
+            "1000:1000",
+            "--rm",
+            "--pull=never",
+            "--network",
+            "bridge",
+            "--read-only",
+            "--cap-drop=ALL",
+            "--security-opt=no-new-privileges:true",
+            "--pids-limit",
+            "256",
+            "--memory",
+            "6144m",
+            "--memory-swap",
+            "6144m",
+            "--cpus",
+            "2",
+            "--tmpfs",
+            "/tmp:rw,exec,nosuid,nodev,size=1024m",
+            "--mount",
+            "type=bind,src=/tmp/ligamina-s205-278tzeex/nonebot-repeater,dst=/profile",
+            "--workdir",
+            "/profile",
+            "--env",
+            "HOME=/tmp/home",
+            "--env",
+            "UV_CACHE_DIR=/tmp/uv-cache",
+            "--env",
+            "npm_config_cache=/tmp/npm-cache",
+            "ligamina-s205-python-profile@sha256:fcb712608785413b1db90fd2d96031beb1e1a18588b89d6cacdde906ce42ab89",
+            "sh",
+            "-lc",
+            "mkdir -p /tmp/home && rm -rf .venv && uv sync --locked --no-dev --no-build --python 3.12.14"
+          ],
+          "returncode": 0,
+          "elapsed_seconds": 3.645,
+          "stdout_tail": "",
+          "stderr_tail": "Using CPython 3.12.14 interpreter at: /usr/local/bin/python3.12\nCreating virtual environment at: .venv\nResolved 38 packages in 313ms\nDownloading uvloop (4.3MiB)\nDownloading pydantic-core (2.1MiB)\n Downloaded pydantic-core\n Downloaded uvloop\nPrepared 34 packages in 2.36s\nwarning: Failed to hardlink files; falling back to full copy. This may lead to degraded performance.\n         If the cache and target directories are on different filesystems, hardlinking may not be supported.\n         If this is intentional, set `export UV_LINK_MODE=copy` or use `--link-mode=copy` to suppress this warning.\nInstalled 35 packages in 264ms\n + annotated-doc==0.0.5\n + annotated-types==0.8.0\n + anyio==4.15.1\n + attrs==26.1.0\n + click==8.5.0\n + exceptiongroup==1.3.1\n + fastapi==0.162.0\n + h11==0.16.0\n + httptools==0.9.0\n + idna==3.20\n + jsonschema==4.25.1\n + jsonschema-specifications==2025.9.1\n + loguru==0.7.3\n + msgpack==1.2.3\n + multidict==7.2.1\n + nonebot-adapter-onebot==2.4.6\n + nonebot-plugin-repeater==3.1.4 (from https://files.pythonhosted.org/packages/60/4c/2a9539fd7c4e78b94c20dd4aed9d2a10b6f4c44ae5be09d554279c78259c/nonebot_plugin_repeater-3.1.4-py3-none-any.whl)\n + nonebot2==2.5.0\n + opentelemetry-api==1.45.1\n + propcache==0.5.4\n + pydantic==2.14.1\n + pydantic-core==2.50.1\n + pygtrie==2.6.2\n + python-dotenv==1.2.4\n + pyyaml==6.0.3\n + referencing==0.37.0\n + rpds-py==2026.9.1\n + starlette==1.10.0\n + typing-extensions==4.16.0\n + typing-inspection==0.4.4\n + uvicorn==0.54.0\n + uvloop==0.23.0\n + watchfiles==1.3.0\n + websockets==17.3\n + yarl==1.25.1\n",
+          "install_scripts": "Python build backends disabled"
+        },
+        "status": "passed",
+        "elapsed_seconds": 8.054,
+        "worker": {
+          "worker_id": "ligamina-dec95a73c6d4428b",
+          "status": "passed",
+          "reason_code": null,
+          "exit_code": 0,
+          "cleanup_confirmed": true,
+          "stdout_sha256": "112cd9de4d5b0c00b0102594609ef38f1fb873c3960d92936365aeddfcb05ce8",
+          "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "output_truncated": false,
+          "peak_memory_bytes": 249246515,
+          "stderr_tail": ""
+        },
+        "resource_observations": {
+          "worker_input_bytes": 193067821,
+          "plugin_artifact_bytes": 15983,
+          "peak_worker_memory_bytes": 249246515,
+          "worker_elapsed_seconds": 8.045,
+          "memory_measurement": "sampled from Docker stats every 250ms; null means no sample was captured"
+        },
+        "parse_error": null,
+        "pair": {
+          "case_id": "nonebot-repeater",
+          "native": {
+            "status": "completed",
+            "environment": {
+              "ecosystem": "nonebot",
+              "framework_version": "2.5.0",
+              "runtime_version": "3.12.14",
+              "lockfile_sha256": "949e7e571804cf1bac145dc920f056fefad2a337a54daeba3d77c6f2d0150fcb",
+              "profile_sha256": "4b77454753fa5181a90bb3c339de6970bbe1b2f57ff8ff2dc15d63a2bea929a6",
+              "artifact_hash": "fe50ad2d4bfc7f1397fcc261ca234d701c4ff02986475ffc5f29647056488d2b",
+              "config_sha256": "fe471c40026e8fc960e5acb1e3d742c72d33ccb3c6eb3b83208d87171dd2c75d",
+              "stimulus_sha256": "4764d7ba7a2fc48de43f7f2793b030ced4e208bfdb92c2895956abf728d813c2"
+            },
+            "events": [
+              {
+                "schema_version": "ligamina/0.1",
+                "event_id": "sample-nonebot-repeater-1",
+                "trace_id": "trace-sample-nonebot-repeater-1",
+                "platform": "onebot.v11",
+                "account_id": "9000",
+                "conversation": {
+                  "kind": "group",
+                  "id": "4242"
+                },
+                "actor_id": "2323",
+                "timestamp": "2026-10-26T16:17:00.343Z",
+                "target_host": "sample-nonebot-repeater",
+                "message": [
+                  {
+                    "type": "text",
+                    "text": "ligamina-repeat"
+                  }
+                ],
+                "extensions": {
+                  "onebot.v11": {
+                    "message_id": "80000",
+                    "sender": {
+                      "nickname": "Ligamina"
+                    }
+                  }
+                }
+              },
+              {
+                "schema_version": "ligamina/0.1",
+                "event_id": "sample-nonebot-repeater-2",
+                "trace_id": "trace-sample-nonebot-repeater-2",
+                "platform": "onebot.v11",
+                "account_id": "9000",
+                "conversation": {
+                  "kind": "group",
+                  "id": "4242"
+                },
+                "actor_id": "2323",
+                "timestamp": "2026-10-26T16:17:00.343Z",
+                "target_host": "sample-nonebot-repeater",
+                "message": [
+                  {
+                    "type": "text",
+                    "text": "ligamina-repeat"
+                  }
+                ],
+                "extensions": {
+                  "onebot.v11": {
+                    "message_id": "80001",
+                    "sender": {
+                      "nickname": "Ligamina"
+                    }
+                  }
+                }
+              }
+            ],
+            "operations": [
+              {
+                "operation_id": "operation-1",
+                "account_id": "9000",
+                "operation": "send_message",
+                "target": {
+                  "kind": "group",
+                  "id": "4242"
+                },
+                "params": {
+                  "message": [
+                    {
+                      "type": "text",
+                      "text": "ligamina-repeat"
+                    }
+                  ]
+                }
+              }
+            ],
+            "operation_receipts": [
+              {
+                "operation_id": "operation-1",
+                "status": "succeeded",
+                "target": {
+                  "kind": "group",
+                  "id": "4242"
+                }
+              }
+            ],
+            "cleanup": {
+              "active_capability_count": 0,
+              "live_processes": []
+            },
+            "stock_native": {
+              "framework": "NoneBot",
+              "adapter": "OneBot v11",
+              "bridge_modules": [],
+              "api_inputs": [
+                {
+                  "api": "send_group_msg",
+                  "message_type": "str",
+                  "message": "ligamina-repeat"
+                }
+              ]
+            },
+            "diagnostics": "10-26 16:17:01 [SUCCESS] nonebot | NoneBot is initializing...\n10-26 16:17:01 [INFO] nonebot | Current Env: prod\n10-26 16:17:01 [WARNING] nonebot_plugin_repeater | [复读姬] 未发现配置项 `repeater_min_message_length` , 采用默认值: 1\n10-26 16:17:01 [SUCCESS] nonebot | Succeeded to load plugin \"nonebot_plugin_repeater\"\n10-26 16:17:01 [SUCCESS] nonebot | OneBot V11 9000 | [message.group.normal]: Message 80000 from 2323@[群:4242] 'ligamina-repeat'\n10-26 16:17:01 [INFO] nonebot | Event will be handled by Matcher(type='message', module=nonebot_plugin_repeater, lineno=9)\n10-26 16:17:01 [INFO] nonebot | Matcher(type='message', module=nonebot_plugin_repeater, lineno=9) running complete\n10-26 16:17:01 [SUCCESS] nonebot | OneBot V11 9000 | [message.group.normal]: Message 80001 from 2323@[群:4242] 'ligamina-repeat'\n10-26 16:17:01 [INFO] nonebot | Event will be handled by Matcher(type='message', module=nonebot_plugin_repeater, lineno=9)\n10-26 16:17:01 [INFO] nonebot | Matcher(type='message', module=nonebot_plugin_repeater, lineno=9) running complete\n"
+          },
+          "federated": {
+            "status": "completed",
+            "environment": {
+              "ecosystem": "nonebot",
+              "framework_version": "2.5.0",
+              "runtime_version": "3.12.14",
+              "lockfile_sha256": "949e7e571804cf1bac145dc920f056fefad2a337a54daeba3d77c6f2d0150fcb",
+              "profile_sha256": "4b77454753fa5181a90bb3c339de6970bbe1b2f57ff8ff2dc15d63a2bea929a6",
+              "artifact_hash": "fe50ad2d4bfc7f1397fcc261ca234d701c4ff02986475ffc5f29647056488d2b",
+              "config_sha256": "fe471c40026e8fc960e5acb1e3d742c72d33ccb3c6eb3b83208d87171dd2c75d",
+              "stimulus_sha256": "4764d7ba7a2fc48de43f7f2793b030ced4e208bfdb92c2895956abf728d813c2"
+            },
+            "events": [
+              {
+                "schema_version": "ligamina/0.1",
+                "event_id": "sample-nonebot-repeater-1",
+                "trace_id": "trace-sample-nonebot-repeater-1",
+                "platform": "onebot.v11",
+                "account_id": "9000",
+                "conversation": {
+                  "kind": "group",
+                  "id": "4242"
+                },
+                "actor_id": "2323",
+                "timestamp": "2026-10-26T16:17:00.343Z",
+                "target_host": "sample-nonebot-repeater",
+                "message": [
+                  {
+                    "type": "text",
+                    "text": "ligamina-repeat"
+                  }
+                ],
+                "extensions": {
+                  "onebot.v11": {
+                    "message_id": "80000",
+                    "sender": {
+                      "nickname": "Ligamina"
+                    }
+                  }
+                }
+              },
+              {
+                "schema_version": "ligamina/0.1",
+                "event_id": "sample-nonebot-repeater-2",
+                "trace_id": "trace-sample-nonebot-repeater-2",
+                "platform": "onebot.v11",
+                "account_id": "9000",
+                "conversation": {
+                  "kind": "group",
+                  "id": "4242"
+                },
+                "actor_id": "2323",
+                "timestamp": "2026-10-26T16:17:00.343Z",
+                "target_host": "sample-nonebot-repeater",
+                "message": [
+                  {
+                    "type": "text",
+                    "text": "ligamina-repeat"
+                  }
+                ],
+                "extensions": {
+                  "onebot.v11": {
+                    "message_id": "80001",
+                    "sender": {
+                      "nickname": "Ligamina"
+                    }
+                  }
+                }
+              }
+            ],
+            "operations": [
+              {
+                "operation_id": "operation-1",
+                "account_id": "9000",
+                "operation": "send_message",
+                "target": {
+                  "id": "4242",
+                  "kind": "group"
+                },
+                "params": {
+                  "message": [
+                    {
+                      "type": "text",
+                      "text": "ligamina-repeat"
+                    }
+                  ]
+                }
+              }
+            ],
+            "operation_receipts": [
+              {
+                "operation_id": "operation-1",
+                "status": "succeeded",
+                "target": {
+                  "id": "4242",
+                  "kind": "group"
+                }
+              }
+            ],
+            "cleanup": {
+              "active_capability_count": 0,
+              "live_processes": []
+            },
+            "federated_trace": {
+              "core_host_route": "passed",
+              "host_pid_reaped": true,
+              "gateway_operation_count": 1
+            }
+          },
+          "comparison": {
+            "status": "passed",
+            "issues": [],
+            "normalized_native": {
+              "events": [
+                {
+                  "account_id": "9000",
+                  "actor_id": "2323",
+                  "conversation": {
+                    "id": "4242",
+                    "kind": "group"
+                  },
+                  "event_id": "sample-nonebot-repeater-1",
+                  "extensions": {
+                    "onebot.v11": {
+                      "message_id": "80000",
+                      "sender": {
+                        "nickname": "Ligamina"
+                      }
+                    }
+                  },
+                  "message": [
+                    {
+                      "text": "ligamina-repeat",
+                      "type": "text"
+                    }
+                  ],
+                  "platform": "onebot.v11",
+                  "schema_version": "ligamina/0.1",
+                  "target_host": "sample-nonebot-repeater",
+                  "timestamp": "2026-10-26T16:17:00.343Z"
+                },
+                {
+                  "account_id": "9000",
+                  "actor_id": "2323",
+                  "conversation": {
+                    "id": "4242",
+                    "kind": "group"
+                  },
+                  "event_id": "sample-nonebot-repeater-2",
+                  "extensions": {
+                    "onebot.v11": {
+                      "message_id": "80001",
+                      "sender": {
+                        "nickname": "Ligamina"
+                      }
+                    }
+                  },
+                  "message": [
+                    {
+                      "text": "ligamina-repeat",
+                      "type": "text"
+                    }
+                  ],
+                  "platform": "onebot.v11",
+                  "schema_version": "ligamina/0.1",
+                  "target_host": "sample-nonebot-repeater",
+                  "timestamp": "2026-10-26T16:17:00.343Z"
+                }
+              ],
+              "operations": [
+                {
+                  "account_id": "9000",
+                  "operation": "send_message",
+                  "operation_id": "operation-1",
+                  "params": {
+                    "message": [
+                      {
+                        "text": "ligamina-repeat",
+                        "type": "text"
+                      }
+                    ]
+                  },
+                  "target": {
+                    "id": "4242",
+                    "kind": "group"
+                  }
+                }
+              ],
+              "operation_receipts": [
+                {
+                  "operation_id": "operation-1",
+                  "status": "succeeded",
+                  "target": {
+                    "id": "4242",
+                    "kind": "group"
+                  }
+                }
+              ],
+              "cleanup": {
+                "active_capability_count": 0,
+                "live_processes": []
+              }
+            },
+            "normalized_federated": {
+              "events": [
+                {
+                  "account_id": "9000",
+                  "actor_id": "2323",
+                  "conversation": {
+                    "id": "4242",
+                    "kind": "group"
+                  },
+                  "event_id": "sample-nonebot-repeater-1",
+                  "extensions": {
+                    "onebot.v11": {
+                      "message_id": "80000",
+                      "sender": {
+                        "nickname": "Ligamina"
+                      }
+                    }
+                  },
+                  "message": [
+                    {
+                      "text": "ligamina-repeat",
+                      "type": "text"
+                    }
+                  ],
+                  "platform": "onebot.v11",
+                  "schema_version": "ligamina/0.1",
+                  "target_host": "sample-nonebot-repeater",
+                  "timestamp": "2026-10-26T16:17:00.343Z"
+                },
+                {
+                  "account_id": "9000",
+                  "actor_id": "2323",
+                  "conversation": {
+                    "id": "4242",
+                    "kind": "group"
+                  },
+                  "event_id": "sample-nonebot-repeater-2",
+                  "extensions": {
+                    "onebot.v11": {
+                      "message_id": "80001",
+                      "sender": {
+                        "nickname": "Ligamina"
+                      }
+                    }
+                  },
+                  "message": [
+                    {
+                      "text": "ligamina-repeat",
+                      "type": "text"
+                    }
+                  ],
+                  "platform": "onebot.v11",
+                  "schema_version": "ligamina/0.1",
+                  "target_host": "sample-nonebot-repeater",
+                  "timestamp": "2026-10-26T16:17:00.343Z"
+                }
+              ],
+              "operations": [
+                {
+                  "account_id": "9000",
+                  "operation": "send_message",
+                  "operation_id": "operation-1",
+                  "params": {
+                    "message": [
+                      {
+                        "text": "ligamina-repeat",
+                        "type": "text"
+                      }
+                    ]
+                  },
+                  "target": {
+                    "id": "4242",
+                    "kind": "group"
+                  }
+                }
+              ],
+              "operation_receipts": [
+                {
+                  "operation_id": "operation-1",
+                  "status": "succeeded",
+                  "target": {
+                    "id": "4242",
+                    "kind": "group"
+                  }
+                }
+              ],
+              "cleanup": {
+                "active_capability_count": 0,
+                "live_processes": []
+              }
+            }
+          },
+          "execution_integrity": {
+            "status": "passed",
+            "reason_code": null
+          },
+          "sample_id": "nonebot-repeater",
+          "package": "nonebot-plugin-repeater",
+          "version": "3.1.4",
+          "artifact_hash": "fe50ad2d4bfc7f1397fcc261ca234d701c4ff02986475ffc5f29647056488d2b",
+          "lockfile_sha256": "949e7e571804cf1bac145dc920f056fefad2a337a54daeba3d77c6f2d0150fcb",
+          "profile_sha256": "4b77454753fa5181a90bb3c339de6970bbe1b2f57ff8ff2dc15d63a2bea929a6",
+          "same_artifact_lock_config_stimulus": {
+            "artifact_hash": "fe50ad2d4bfc7f1397fcc261ca234d701c4ff02986475ffc5f29647056488d2b",
+            "lockfile_sha256": "949e7e571804cf1bac145dc920f056fefad2a337a54daeba3d77c6f2d0150fcb",
+            "config_sha256": "fe471c40026e8fc960e5acb1e3d742c72d33ccb3c6eb3b83208d87171dd2c75d",
+            "stimulus_sha256": "4764d7ba7a2fc48de43f7f2793b030ced4e208bfdb92c2895956abf728d813c2"
+          },
+          "federated_trace": {
+            "core_host_route": "passed",
+            "host_pid_reaped": true,
+            "gateway_operation_count": 1
+          },
+          "worker_cleanup_confirmed": true
+        },
+        "artifact_verification": {
+          "status": "passed",
+          "artifact_url": "https://files.pythonhosted.org/packages/60/4c/2a9539fd7c4e78b94c20dd4aed9d2a10b6f4c44ae5be09d554279c78259c/nonebot_plugin_repeater-3.1.4-py3-none-any.whl",
+          "artifact_hash_algorithm": "sha256",
+          "expected_artifact_hash": "fe50ad2d4bfc7f1397fcc261ca234d701c4ff02986475ffc5f29647056488d2b",
+          "actual_artifact_hash": "fe50ad2d4bfc7f1397fcc261ca234d701c4ff02986475ffc5f29647056488d2b",
+          "actual_sha256": "fe50ad2d4bfc7f1397fcc261ca234d701c4ff02986475ffc5f29647056488d2b",
+          "size_bytes": 15983,
+          "error": null
+        },
+        "profile_source_cleanup": {
+          "status": "passed",
+          "removed": [
+            ".venv"
+          ],
+          "elapsed_seconds": 0.041
+        }
+      },
+      {
+        "sample_id": "koishi-game-mini",
+        "ecosystem": "koishi",
+        "package": "koishi-plugin-game-mini",
+        "version": "0.4.3",
+        "artifact_hash": "sha512-kTovHhKSP9N8gvk1iVjTfA2tYZRji2roxy1vQrvhzw92xs+Y1zduOUVURVtPe18duxDShchrQyGuILJpEKooqA==",
+        "profile_prepare": {
+          "status": "passed",
+          "steps": [
+            {
+              "label": "resolve exact Node sample profile",
+              "status": "passed",
+              "command": [
+                "/mnt/c/Program Files/nodejs/npm",
+                "install",
+                "--package-lock-only",
+                "--ignore-scripts",
+                "--no-audit",
+                "--fund=false",
+                "--allow-remote=root"
+              ],
+              "returncode": 0,
+              "stdout_tail": "\nup to date in 8s\n",
+              "stderr_tail": "npm warn EBADENGINE Unsupported engine {\nnpm warn EBADENGINE   package: 'ligamina-sample-koishi-game-mini@0.0.0',\nnpm warn EBADENGINE   required: { node: '24.20.0' },\nnpm warn EBADENGINE   current: { node: 'v24.22.1', npm: '12.0.2' }\nnpm warn EBADENGINE }\n"
+            },
+            {
+              "label": "install locked Node sample profile",
+              "status": "passed",
+              "command": [
+                "/mnt/c/Program Files/nodejs/npm",
+                "ci",
+                "--ignore-scripts",
+                "--no-audit",
+                "--fund=false",
+                "--allow-remote=root"
+              ],
+              "returncode": 0,
+              "stdout_tail": "\nadded 240 packages in 19s\n",
+              "stderr_tail": "npm warn EBADENGINE Unsupported engine {\nnpm warn EBADENGINE   package: 'ligamina-sample-koishi-game-mini@0.0.0',\nnpm warn EBADENGINE   required: { node: '24.20.0' },\nnpm warn EBADENGINE   current: { node: 'v24.22.1', npm: '12.0.2' }\nnpm warn EBADENGINE }\nnpm warn deprecated @koa/router@10.1.1: **IMPORTANT 10x+ PERFORMANCE UPGRADE**: Please upgrade to v12.0.1+ as we have fixed an issue with debuglog causing 10x slower router benchmark performance, see https://github.com/koajs/router/pull/173\n"
+            },
+            {
+              "label": "verify installed Node package metadata",
+              "status": "passed",
+              "command": [
+                "/home/vegetable/.local/bin/node",
+                "-e",
+                "console.log(require(\"/tmp/ligamina-s205-278tzeex/koishi-game-mini/node_modules/koishi-plugin-game-mini/package.json\").version)"
+              ],
+              "returncode": 0,
+              "stdout_tail": "0.4.3\n",
+              "stderr_tail": ""
+            },
+            {
+              "label": "resolve Koishi plugin entry",
+              "status": "passed",
+              "entry_url": "file:///tmp/ligamina-s205-278tzeex/koishi-game-mini/node_modules/koishi-plugin-game-mini/lib/index.js"
+            }
+          ],
+          "lock_sha256": "12a70b2d3c039cf2113ff867d067bbdbc400c33b6aad58813d7a3c7535c2aa45"
+        },
+        "linux_profile_prepare": {
+          "status": "passed",
+          "command": [
+            "/usr/bin/docker",
+            "run",
+            "--user",
+            "1000:1000",
+            "--rm",
+            "--pull=never",
+            "--network",
+            "bridge",
+            "--read-only",
+            "--cap-drop=ALL",
+            "--security-opt=no-new-privileges:true",
+            "--pids-limit",
+            "256",
+            "--memory",
+            "6144m",
+            "--memory-swap",
+            "6144m",
+            "--cpus",
+            "2",
+            "--tmpfs",
+            "/tmp:rw,exec,nosuid,nodev,size=1024m",
+            "--mount",
+            "type=bind,src=/tmp/ligamina-s205-278tzeex/koishi-game-mini,dst=/profile",
+            "--workdir",
+            "/profile",
+            "--env",
+            "HOME=/tmp/home",
+            "--env",
+            "UV_CACHE_DIR=/tmp/uv-cache",
+            "--env",
+            "npm_config_cache=/tmp/npm-cache",
+            "node@sha256:ba849c60be29959425b8734d57b8b4b7d56f98edd9504c9af091d5281095a71e",
+            "npm",
+            "ci",
+            "--ignore-scripts",
+            "--no-audit",
+            "--fund=false"
+          ],
+          "returncode": 0,
+          "elapsed_seconds": 5.054,
+          "stdout_tail": "\nadded 240 packages in 4s\n",
+          "stderr_tail": "npm warn deprecated @koa/router@10.1.1: **IMPORTANT 10x+ PERFORMANCE UPGRADE**: Please upgrade to v12.0.1+ as we have fixed an issue with debuglog causing 10x slower router benchmark performance, see https://github.com/koajs/router/pull/173\nnpm notice\nnpm notice New major version of npm available! 11.19.0 -> 12.2.1\nnpm notice Changelog: https://github.com/npm/cli/releases/tag/v12.2.1\nnpm notice To update run: npm install -g npm@12.2.1\nnpm notice\n",
+          "install_scripts": "disabled"
+        },
+        "status": "passed",
+        "elapsed_seconds": 6.077,
+        "worker": {
+          "worker_id": "ligamina-3245677db7f8498c",
+          "status": "passed",
+          "reason_code": null,
+          "exit_code": 0,
+          "cleanup_confirmed": true,
+          "stdout_sha256": "babf2e74feb57f5971d003e7247d6403274d408b1ebe6af58a24fc38aae00230",
+          "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "output_truncated": false,
+          "peak_memory_bytes": 266443161,
+          "stderr_tail": ""
+        },
+        "resource_observations": {
+          "worker_input_bytes": 209464148,
+          "plugin_artifact_bytes": 12672,
+          "peak_worker_memory_bytes": 266443161,
+          "worker_elapsed_seconds": 6.031,
+          "memory_measurement": "sampled from Docker stats every 250ms; null means no sample was captured"
+        },
+        "parse_error": null,
+        "pair": {
+          "case_id": "koishi-game-mini",
+          "native": {
+            "status": "completed",
+            "environment": {
+              "ecosystem": "koishi",
+              "framework_version": "4.18.11",
+              "runtime_version": "24.20.0",
+              "lockfile_sha256": "12a70b2d3c039cf2113ff867d067bbdbc400c33b6aad58813d7a3c7535c2aa45",
+              "profile_sha256": "f7c0fd9fb2c5d50a9bb902b2c05459b13b061d18a42f60a8106b8aba71558b66",
+              "artifact_hash": "sha512-kTovHhKSP9N8gvk1iVjTfA2tYZRji2roxy1vQrvhzw92xs+Y1zduOUVURVtPe18duxDShchrQyGuILJpEKooqA==",
+              "config_sha256": "0cfab68085a103be4605aa94eb9b7ff120f8bf4bee1871ebe476b064868ceffc",
+              "stimulus_sha256": "5bc7e200cc624adca211eccba48222ecf2c1b83ff8dc1a0898affe336948031b"
+            },
+            "events": [
+              {
+                "schema_version": "ligamina/0.1",
+                "event_id": "sample-koishi-game-mini-1",
+                "trace_id": "trace-sample-koishi-game-mini-1",
+                "platform": "koishi",
+                "account_id": "9000",
+                "conversation": {
+                  "kind": "group",
+                  "id": "4242"
+                },
+                "actor_id": "2323",
+                "timestamp": "2026-10-26T16:17:44.468Z",
+                "target_host": "sample-koishi-game-mini",
+                "message": [
+                  {
+                    "type": "text",
+                    "text": "猜数字 开始"
+                  }
+                ],
+                "extensions": {
+                  "onebot.v11": {
+                    "message_id": "80000",
+                    "sender": {
+                      "nickname": "Ligamina"
+                    }
+                  }
+                }
+              },
+              {
+                "schema_version": "ligamina/0.1",
+                "event_id": "sample-koishi-game-mini-2",
+                "trace_id": "trace-sample-koishi-game-mini-2",
+                "platform": "koishi",
+                "account_id": "9000",
+                "conversation": {
+                  "kind": "group",
+                  "id": "4242"
+                },
+                "actor_id": "2323",
+                "timestamp": "2026-10-26T16:17:44.468Z",
+                "target_host": "sample-koishi-game-mini",
+                "message": [
+                  {
+                    "type": "text",
+                    "text": "猜数字 结束"
+                  }
+                ],
+                "extensions": {
+                  "onebot.v11": {
+                    "message_id": "80001",
+                    "sender": {
+                      "nickname": "Ligamina"
+                    }
+                  }
+                }
+              }
+            ],
+            "operations": [
+              {
+                "operation_id": "operation-1",
+                "account_id": "9000",
+                "operation": "send_message",
+                "target": {
+                  "kind": "group",
+                  "id": "4242"
+                },
+                "params": {
+                  "message": [
+                    {
+                      "type": "text",
+                      "text": "比赛开始！本次共 1 回合～"
+                    }
+                  ]
+                }
+              },
+              {
+                "operation_id": "operation-2",
+                "account_id": "9000",
+                "operation": "send_message",
+                "target": {
+                  "kind": "group",
+                  "id": "4242"
+                },
+                "params": {
+                  "message": [
+                    {
+                      "type": "text",
+                      "text": "猜数字范围：0 - 100"
+                    }
+                  ]
+                }
+              },
+              {
+                "operation_id": "operation-3",
+                "account_id": "9000",
+                "operation": "send_message",
+                "target": {
+                  "kind": "group",
+                  "id": "4242"
+                },
+                "params": {
+                  "message": [
+                    {
+                      "type": "text",
+                      "text": "比赛已停止"
+                    }
+                  ]
+                }
+              }
+            ],
+            "operation_receipts": [
+              {
+                "operation_id": "operation-1",
+                "status": "succeeded",
+                "target": {
+                  "kind": "group",
+                  "id": "4242"
+                }
+              },
+              {
+                "operation_id": "operation-2",
+                "status": "succeeded",
+                "target": {
+                  "kind": "group",
+                  "id": "4242"
+                }
+              },
+              {
+                "operation_id": "operation-3",
+                "status": "succeeded",
+                "target": {
+                  "kind": "group",
+                  "id": "4242"
+                }
+              }
+            ],
+            "cleanup": {
+              "active_capability_count": 0,
+              "live_processes": []
+            },
+            "stock_native": {
+              "framework": "Koishi",
+              "api": "Context/Session/Bot",
+              "bridge_adapter_imported": false
+            },
+            "diagnostics": "[I] sqlite auto creating table user\n[I] sqlite auto creating table binding\n[I] sqlite auto creating table channel\n[I] sqlite auto creating table game_mini_player\n[I] sqlite auto creating table game_mini_state\n"
+          },
+          "federated": {
+            "status": "completed",
+            "environment": {
+              "ecosystem": "koishi",
+              "framework_version": "4.18.11",
+              "runtime_version": "24.20.0",
+              "lockfile_sha256": "12a70b2d3c039cf2113ff867d067bbdbc400c33b6aad58813d7a3c7535c2aa45",
+              "profile_sha256": "f7c0fd9fb2c5d50a9bb902b2c05459b13b061d18a42f60a8106b8aba71558b66",
+              "artifact_hash": "sha512-kTovHhKSP9N8gvk1iVjTfA2tYZRji2roxy1vQrvhzw92xs+Y1zduOUVURVtPe18duxDShchrQyGuILJpEKooqA==",
+              "config_sha256": "0cfab68085a103be4605aa94eb9b7ff120f8bf4bee1871ebe476b064868ceffc",
+              "stimulus_sha256": "5bc7e200cc624adca211eccba48222ecf2c1b83ff8dc1a0898affe336948031b"
+            },
+            "events": [
+              {
+                "schema_version": "ligamina/0.1",
+                "event_id": "sample-koishi-game-mini-1",
+                "trace_id": "trace-sample-koishi-game-mini-1",
+                "platform": "koishi",
+                "account_id": "9000",
+                "conversation": {
+                  "kind": "group",
+                  "id": "4242"
+                },
+                "actor_id": "2323",
+                "timestamp": "2026-10-26T16:17:44.468Z",
+                "target_host": "sample-koishi-game-mini",
+                "message": [
+                  {
+                    "type": "text",
+                    "text": "猜数字 开始"
+                  }
+                ],
+                "extensions": {
+                  "onebot.v11": {
+                    "message_id": "80000",
+                    "sender": {
+                      "nickname": "Ligamina"
+                    }
+                  }
+                }
+              },
+              {
+                "schema_version": "ligamina/0.1",
+                "event_id": "sample-koishi-game-mini-2",
+                "trace_id": "trace-sample-koishi-game-mini-2",
+                "platform": "koishi",
+                "account_id": "9000",
+                "conversation": {
+                  "kind": "group",
+                  "id": "4242"
+                },
+                "actor_id": "2323",
+                "timestamp": "2026-10-26T16:17:44.468Z",
+                "target_host": "sample-koishi-game-mini",
+                "message": [
+                  {
+                    "type": "text",
+                    "text": "猜数字 结束"
+                  }
+                ],
+                "extensions": {
+                  "onebot.v11": {
+                    "message_id": "80001",
+                    "sender": {
+                      "nickname": "Ligamina"
+                    }
+                  }
+                }
+              }
+            ],
+            "operations": [
+              {
+                "operation_id": "operation-1",
+                "account_id": "9000",
+                "operation": "send_message",
+                "target": {
+                  "id": "4242",
+                  "kind": "group"
+                },
+                "params": {
+                  "message": [
+                    {
+                      "type": "text",
+                      "text": "比赛开始！本次共 1 回合～"
+                    }
+                  ]
+                }
+              },
+              {
+                "operation_id": "operation-2",
+                "account_id": "9000",
+                "operation": "send_message",
+                "target": {
+                  "id": "4242",
+                  "kind": "group"
+                },
+                "params": {
+                  "message": [
+                    {
+                      "type": "text",
+                      "text": "猜数字范围：0 - 100"
+                    }
+                  ]
+                }
+              },
+              {
+                "operation_id": "operation-3",
+                "account_id": "9000",
+                "operation": "send_message",
+                "target": {
+                  "id": "4242",
+                  "kind": "group"
+                },
+                "params": {
+                  "message": [
+                    {
+                      "type": "text",
+                      "text": "比赛已停止"
+                    }
+                  ]
+                }
+              }
+            ],
+            "operation_receipts": [
+              {
+                "operation_id": "operation-1",
+                "status": "succeeded",
+                "target": {
+                  "id": "4242",
+                  "kind": "group"
+                }
+              },
+              {
+                "operation_id": "operation-2",
+                "status": "succeeded",
+                "target": {
+                  "id": "4242",
+                  "kind": "group"
+                }
+              },
+              {
+                "operation_id": "operation-3",
+                "status": "succeeded",
+                "target": {
+                  "id": "4242",
+                  "kind": "group"
+                }
+              }
+            ],
+            "cleanup": {
+              "active_capability_count": 0,
+              "live_processes": []
+            },
+            "federated_trace": {
+              "core_host_route": "passed",
+              "host_pid_reaped": true,
+              "gateway_operation_count": 3
+            }
+          },
+          "comparison": {
+            "status": "passed",
+            "issues": [],
+            "normalized_native": {
+              "events": [
+                {
+                  "account_id": "9000",
+                  "actor_id": "2323",
+                  "conversation": {
+                    "id": "4242",
+                    "kind": "group"
+                  },
+                  "event_id": "sample-koishi-game-mini-1",
+                  "extensions": {
+                    "onebot.v11": {
+                      "message_id": "80000",
+                      "sender": {
+                        "nickname": "Ligamina"
+                      }
+                    }
+                  },
+                  "message": [
+                    {
+                      "text": "猜数字 开始",
+                      "type": "text"
+                    }
+                  ],
+                  "platform": "koishi",
+                  "schema_version": "ligamina/0.1",
+                  "target_host": "sample-koishi-game-mini",
+                  "timestamp": "2026-10-26T16:17:44.468Z"
+                },
+                {
+                  "account_id": "9000",
+                  "actor_id": "2323",
+                  "conversation": {
+                    "id": "4242",
+                    "kind": "group"
+                  },
+                  "event_id": "sample-koishi-game-mini-2",
+                  "extensions": {
+                    "onebot.v11": {
+                      "message_id": "80001",
+                      "sender": {
+                        "nickname": "Ligamina"
+                      }
+                    }
+                  },
+                  "message": [
+                    {
+                      "text": "猜数字 结束",
+                      "type": "text"
+                    }
+                  ],
+                  "platform": "koishi",
+                  "schema_version": "ligamina/0.1",
+                  "target_host": "sample-koishi-game-mini",
+                  "timestamp": "2026-10-26T16:17:44.468Z"
+                }
+              ],
+              "operations": [
+                {
+                  "account_id": "9000",
+                  "operation": "send_message",
+                  "operation_id": "operation-1",
+                  "params": {
+                    "message": [
+                      {
+                        "text": "比赛开始！本次共 1 回合～",
+                        "type": "text"
+                      }
+                    ]
+                  },
+                  "target": {
+                    "id": "4242",
+                    "kind": "group"
+                  }
+                },
+                {
+                  "account_id": "9000",
+                  "operation": "send_message",
+                  "operation_id": "operation-2",
+                  "params": {
+                    "message": [
+                      {
+                        "text": "猜数字范围：0 - 100",
+                        "type": "text"
+                      }
+                    ]
+                  },
+                  "target": {
+                    "id": "4242",
+                    "kind": "group"
+                  }
+                },
+                {
+                  "account_id": "9000",
+                  "operation": "send_message",
+                  "operation_id": "operation-3",
+                  "params": {
+                    "message": [
+                      {
+                        "text": "比赛已停止",
+                        "type": "text"
+                      }
+                    ]
+                  },
+                  "target": {
+                    "id": "4242",
+                    "kind": "group"
+                  }
+                }
+              ],
+              "operation_receipts": [
+                {
+                  "operation_id": "operation-1",
+                  "status": "succeeded",
+                  "target": {
+                    "id": "4242",
+                    "kind": "group"
+                  }
+                },
+                {
+                  "operation_id": "operation-2",
+                  "status": "succeeded",
+                  "target": {
+                    "id": "4242",
+                    "kind": "group"
+                  }
+                },
+                {
+                  "operation_id": "operation-3",
+                  "status": "succeeded",
+                  "target": {
+                    "id": "4242",
+                    "kind": "group"
+                  }
+                }
+              ],
+              "cleanup": {
+                "active_capability_count": 0,
+                "live_processes": []
+              }
+            },
+            "normalized_federated": {
+              "events": [
+                {
+                  "account_id": "9000",
+                  "actor_id": "2323",
+                  "conversation": {
+                    "id": "4242",
+                    "kind": "group"
+                  },
+                  "event_id": "sample-koishi-game-mini-1",
+                  "extensions": {
+                    "onebot.v11": {
+                      "message_id": "80000",
+                      "sender": {
+                        "nickname": "Ligamina"
+                      }
+                    }
+                  },
+                  "message": [
+                    {
+                      "text": "猜数字 开始",
+                      "type": "text"
+                    }
+                  ],
+                  "platform": "koishi",
+                  "schema_version": "ligamina/0.1",
+                  "target_host": "sample-koishi-game-mini",
+                  "timestamp": "2026-10-26T16:17:44.468Z"
+                },
+                {
+                  "account_id": "9000",
+                  "actor_id": "2323",
+                  "conversation": {
+                    "id": "4242",
+                    "kind": "group"
+                  },
+                  "event_id": "sample-koishi-game-mini-2",
+                  "extensions": {
+                    "onebot.v11": {
+                      "message_id": "80001",
+                      "sender": {
+                        "nickname": "Ligamina"
+                      }
+                    }
+                  },
+                  "message": [
+                    {
+                      "text": "猜数字 结束",
+                      "type": "text"
+                    }
+                  ],
+                  "platform": "koishi",
+                  "schema_version": "ligamina/0.1",
+                  "target_host": "sample-koishi-game-mini",
+                  "timestamp": "2026-10-26T16:17:44.468Z"
+                }
+              ],
+              "operations": [
+                {
+                  "account_id": "9000",
+                  "operation": "send_message",
+                  "operation_id": "operation-1",
+                  "params": {
+                    "message": [
+                      {
+                        "text": "比赛开始！本次共 1 回合～",
+                        "type": "text"
+                      }
+                    ]
+                  },
+                  "target": {
+                    "id": "4242",
+                    "kind": "group"
+                  }
+                },
+                {
+                  "account_id": "9000",
+                  "operation": "send_message",
+                  "operation_id": "operation-2",
+                  "params": {
+                    "message": [
+                      {
+                        "text": "猜数字范围：0 - 100",
+                        "type": "text"
+                      }
+                    ]
+                  },
+                  "target": {
+                    "id": "4242",
+                    "kind": "group"
+                  }
+                },
+                {
+                  "account_id": "9000",
+                  "operation": "send_message",
+                  "operation_id": "operation-3",
+                  "params": {
+                    "message": [
+                      {
+                        "text": "比赛已停止",
+                        "type": "text"
+                      }
+                    ]
+                  },
+                  "target": {
+                    "id": "4242",
+                    "kind": "group"
+                  }
+                }
+              ],
+              "operation_receipts": [
+                {
+                  "operation_id": "operation-1",
+                  "status": "succeeded",
+                  "target": {
+                    "id": "4242",
+                    "kind": "group"
+                  }
+                },
+                {
+                  "operation_id": "operation-2",
+                  "status": "succeeded",
+                  "target": {
+                    "id": "4242",
+                    "kind": "group"
+                  }
+                },
+                {
+                  "operation_id": "operation-3",
+                  "status": "succeeded",
+                  "target": {
+                    "id": "4242",
+                    "kind": "group"
+                  }
+                }
+              ],
+              "cleanup": {
+                "active_capability_count": 0,
+                "live_processes": []
+              }
+            }
+          },
+          "execution_integrity": {
+            "status": "passed",
+            "reason_code": null
+          },
+          "sample_id": "koishi-game-mini",
+          "package": "koishi-plugin-game-mini",
+          "version": "0.4.3",
+          "artifact_hash": "sha512-kTovHhKSP9N8gvk1iVjTfA2tYZRji2roxy1vQrvhzw92xs+Y1zduOUVURVtPe18duxDShchrQyGuILJpEKooqA==",
+          "lockfile_sha256": "12a70b2d3c039cf2113ff867d067bbdbc400c33b6aad58813d7a3c7535c2aa45",
+          "profile_sha256": "f7c0fd9fb2c5d50a9bb902b2c05459b13b061d18a42f60a8106b8aba71558b66",
+          "same_artifact_lock_config_stimulus": {
+            "artifact_hash": "sha512-kTovHhKSP9N8gvk1iVjTfA2tYZRji2roxy1vQrvhzw92xs+Y1zduOUVURVtPe18duxDShchrQyGuILJpEKooqA==",
+            "lockfile_sha256": "12a70b2d3c039cf2113ff867d067bbdbc400c33b6aad58813d7a3c7535c2aa45",
+            "config_sha256": "0cfab68085a103be4605aa94eb9b7ff120f8bf4bee1871ebe476b064868ceffc",
+            "stimulus_sha256": "5bc7e200cc624adca211eccba48222ecf2c1b83ff8dc1a0898affe336948031b"
+          },
+          "federated_trace": {
+            "core_host_route": "passed",
+            "host_pid_reaped": true,
+            "gateway_operation_count": 3
+          },
+          "worker_cleanup_confirmed": true
+        },
+        "artifact_verification": {
+          "status": "passed",
+          "artifact_url": "https://registry.npmjs.org/koishi-plugin-game-mini/-/koishi-plugin-game-mini-0.4.3.tgz",
+          "artifact_hash_algorithm": "sri-sha512",
+          "expected_artifact_hash": "sha512-kTovHhKSP9N8gvk1iVjTfA2tYZRji2roxy1vQrvhzw92xs+Y1zduOUVURVtPe18duxDShchrQyGuILJpEKooqA==",
+          "actual_artifact_hash": "sha512-kTovHhKSP9N8gvk1iVjTfA2tYZRji2roxy1vQrvhzw92xs+Y1zduOUVURVtPe18duxDShchrQyGuILJpEKooqA==",
+          "actual_sha256": "e15d698285ca47c7b1e546173510fae1bb4e865483033e6f358b7aa6ef31939e",
+          "size_bytes": 12672,
+          "error": null
+        },
+        "profile_source_cleanup": {
+          "status": "passed",
+          "removed": [
+            "node_modules"
+          ],
+          "elapsed_seconds": 0.215
+        }
+      },
+      {
+        "sample_id": "koishi-multi-qa",
+        "ecosystem": "koishi",
+        "package": "koishi-plugin-multi-qa",
+        "version": "1.0.8",
+        "artifact_hash": "sha512-gdXhFXMUlhkwDJSFRlHDNXG/4NocLS/pYNDKSrQ3quxgwtNzQcjALMbEZrWFFOOYzu9pv8//u23t9Pt6wktLmg==",
+        "profile_prepare": {
+          "status": "passed",
+          "steps": [
+            {
+              "label": "resolve exact Node sample profile",
+              "status": "passed",
+              "command": [
+                "/mnt/c/Program Files/nodejs/npm",
+                "install",
+                "--package-lock-only",
+                "--ignore-scripts",
+                "--no-audit",
+                "--fund=false",
+                "--allow-remote=root"
+              ],
+              "returncode": 0,
+              "stdout_tail": "\nup to date in 1s\n",
+              "stderr_tail": "npm warn EBADENGINE Unsupported engine {\nnpm warn EBADENGINE   package: 'ligamina-sample-koishi-multi-qa@0.0.0',\nnpm warn EBADENGINE   required: { node: '24.20.0' },\nnpm warn EBADENGINE   current: { node: 'v24.22.1', npm: '12.0.2' }\nnpm warn EBADENGINE }\n"
+            },
+            {
+              "label": "install locked Node sample profile",
+              "status": "passed",
+              "command": [
+                "/mnt/c/Program Files/nodejs/npm",
+                "ci",
+                "--ignore-scripts",
+                "--no-audit",
+                "--fund=false",
+                "--allow-remote=root"
+              ],
+              "returncode": 0,
+              "stdout_tail": "\nadded 240 packages in 19s\n",
+              "stderr_tail": "npm warn EBADENGINE Unsupported engine {\nnpm warn EBADENGINE   package: 'ligamina-sample-koishi-multi-qa@0.0.0',\nnpm warn EBADENGINE   required: { node: '24.20.0' },\nnpm warn EBADENGINE   current: { node: 'v24.22.1', npm: '12.0.2' }\nnpm warn EBADENGINE }\nnpm warn deprecated @koa/router@10.1.1: **IMPORTANT 10x+ PERFORMANCE UPGRADE**: Please upgrade to v12.0.1+ as we have fixed an issue with debuglog causing 10x slower router benchmark performance, see https://github.com/koajs/router/pull/173\n"
+            },
+            {
+              "label": "verify installed Node package metadata",
+              "status": "passed",
+              "command": [
+                "/home/vegetable/.local/bin/node",
+                "-e",
+                "console.log(require(\"/tmp/ligamina-s205-278tzeex/koishi-multi-qa/node_modules/koishi-plugin-multi-qa/package.json\").version)"
+              ],
+              "returncode": 0,
+              "stdout_tail": "1.0.8\n",
+              "stderr_tail": ""
+            },
+            {
+              "label": "resolve Koishi plugin entry",
+              "status": "passed",
+              "entry_url": "file:///tmp/ligamina-s205-278tzeex/koishi-multi-qa/node_modules/koishi-plugin-multi-qa/lib/index.js"
+            }
+          ],
+          "lock_sha256": "0acb6bb09ffe80fda5cf5632e0120683ac804d06431b7879f65a1aabf8cc3a55"
+        },
+        "linux_profile_prepare": {
+          "status": "passed",
+          "command": [
+            "/usr/bin/docker",
+            "run",
+            "--user",
+            "1000:1000",
+            "--rm",
+            "--pull=never",
+            "--network",
+            "bridge",
+            "--read-only",
+            "--cap-drop=ALL",
+            "--security-opt=no-new-privileges:true",
+            "--pids-limit",
+            "256",
+            "--memory",
+            "6144m",
+            "--memory-swap",
+            "6144m",
+            "--cpus",
+            "2",
+            "--tmpfs",
+            "/tmp:rw,exec,nosuid,nodev,size=1024m",
+            "--mount",
+            "type=bind,src=/tmp/ligamina-s205-278tzeex/koishi-multi-qa,dst=/profile",
+            "--workdir",
+            "/profile",
+            "--env",
+            "HOME=/tmp/home",
+            "--env",
+            "UV_CACHE_DIR=/tmp/uv-cache",
+            "--env",
+            "npm_config_cache=/tmp/npm-cache",
+            "node@sha256:ba849c60be29959425b8734d57b8b4b7d56f98edd9504c9af091d5281095a71e",
+            "npm",
+            "ci",
+            "--ignore-scripts",
+            "--no-audit",
+            "--fund=false"
+          ],
+          "returncode": 0,
+          "elapsed_seconds": 4.634,
+          "stdout_tail": "\nadded 240 packages in 4s\n",
+          "stderr_tail": "npm warn deprecated @koa/router@10.1.1: **IMPORTANT 10x+ PERFORMANCE UPGRADE**: Please upgrade to v12.0.1+ as we have fixed an issue with debuglog causing 10x slower router benchmark performance, see https://github.com/koajs/router/pull/173\nnpm notice\nnpm notice New major version of npm available! 11.19.0 -> 12.2.1\nnpm notice Changelog: https://github.com/npm/cli/releases/tag/v12.2.1\nnpm notice To update run: npm install -g npm@12.2.1\nnpm notice\n",
+          "install_scripts": "disabled"
+        },
+        "status": "passed",
+        "elapsed_seconds": 6.061,
+        "worker": {
+          "worker_id": "ligamina-d2d7734b6f1144c1",
+          "status": "passed",
+          "reason_code": null,
+          "exit_code": 0,
+          "cleanup_confirmed": true,
+          "stdout_sha256": "6da2bd3d3a75fca8b5676d9333c7f339d1d157ca5561586f1d358a4ae992d15a",
+          "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "output_truncated": false,
+          "peak_memory_bytes": 263192576,
+          "stderr_tail": ""
+        },
+        "resource_observations": {
+          "worker_input_bytes": 209414653,
+          "plugin_artifact_bytes": 3942,
+          "peak_worker_memory_bytes": 263192576,
+          "worker_elapsed_seconds": 6.018,
+          "memory_measurement": "sampled from Docker stats every 250ms; null means no sample was captured"
+        },
+        "parse_error": null,
+        "pair": {
+          "case_id": "koishi-multi-qa",
+          "native": {
+            "status": "completed",
+            "environment": {
+              "ecosystem": "koishi",
+              "framework_version": "4.18.11",
+              "runtime_version": "24.20.0",
+              "lockfile_sha256": "0acb6bb09ffe80fda5cf5632e0120683ac804d06431b7879f65a1aabf8cc3a55",
+              "profile_sha256": "f7c0fd9fb2c5d50a9bb902b2c05459b13b061d18a42f60a8106b8aba71558b66",
+              "artifact_hash": "sha512-gdXhFXMUlhkwDJSFRlHDNXG/4NocLS/pYNDKSrQ3quxgwtNzQcjALMbEZrWFFOOYzu9pv8//u23t9Pt6wktLmg==",
+              "config_sha256": "448432e8427921f8fab460de34a09ebffaee496fb4ffe469eb0c271381a728ba",
+              "stimulus_sha256": "1df5aefe3706507952eeaada14149ef915b7f5aa66f278f5a359875bc15b3480"
+            },
+            "events": [
+              {
+                "schema_version": "ligamina/0.1",
+                "event_id": "sample-koishi-multi-qa-1",
+                "trace_id": "trace-sample-koishi-multi-qa-1",
+                "platform": "koishi",
+                "account_id": "9000",
+                "conversation": {
+                  "kind": "group",
+                  "id": "4242"
+                },
+                "actor_id": "2323",
+                "timestamp": "2026-10-26T16:18:47.363Z",
+                "target_host": "sample-koishi-multi-qa",
+                "message": [
+                  {
+                    "type": "text",
+                    "text": "ligamina-probe"
+                  }
+                ],
+                "extensions": {
+                  "onebot.v11": {
+                    "message_id": "80000",
+                    "sender": {
+                      "nickname": "Ligamina"
+                    }
+                  }
+                }
+              }
+            ],
+            "operations": [
+              {
+                "operation_id": "operation-1",
+                "account_id": "9000",
+                "operation": "send_message",
+                "target": {
+                  "kind": "group",
+                  "id": "4242"
+                },
+                "params": {
+                  "message": [
+                    {
+                      "type": "text",
+                      "text": "ligamina-multiqa-ok"
+                    }
+                  ]
+                }
+              }
+            ],
+            "operation_receipts": [
+              {
+                "operation_id": "operation-1",
+                "status": "succeeded",
+                "target": {
+                  "kind": "group",
+                  "id": "4242"
+                }
+              }
+            ],
+            "cleanup": {
+              "active_capability_count": 0,
+              "live_processes": []
+            },
+            "stock_native": {
+              "framework": "Koishi",
+              "api": "Context/Session/Bot",
+              "bridge_adapter_imported": false
+            },
+            "diagnostics": "[I] sqlite auto creating table user\n[I] sqlite auto creating table binding\n[I] sqlite auto creating table channel\n"
+          },
+          "federated": {
+            "status": "completed",
+            "environment": {
+              "ecosystem": "koishi",
+              "framework_version": "4.18.11",
+              "runtime_version": "24.20.0",
+              "lockfile_sha256": "0acb6bb09ffe80fda5cf5632e0120683ac804d06431b7879f65a1aabf8cc3a55",
+              "profile_sha256": "f7c0fd9fb2c5d50a9bb902b2c05459b13b061d18a42f60a8106b8aba71558b66",
+              "artifact_hash": "sha512-gdXhFXMUlhkwDJSFRlHDNXG/4NocLS/pYNDKSrQ3quxgwtNzQcjALMbEZrWFFOOYzu9pv8//u23t9Pt6wktLmg==",
+              "config_sha256": "448432e8427921f8fab460de34a09ebffaee496fb4ffe469eb0c271381a728ba",
+              "stimulus_sha256": "1df5aefe3706507952eeaada14149ef915b7f5aa66f278f5a359875bc15b3480"
+            },
+            "events": [
+              {
+                "schema_version": "ligamina/0.1",
+                "event_id": "sample-koishi-multi-qa-1",
+                "trace_id": "trace-sample-koishi-multi-qa-1",
+                "platform": "koishi",
+                "account_id": "9000",
+                "conversation": {
+                  "kind": "group",
+                  "id": "4242"
+                },
+                "actor_id": "2323",
+                "timestamp": "2026-10-26T16:18:47.363Z",
+                "target_host": "sample-koishi-multi-qa",
+                "message": [
+                  {
+                    "type": "text",
+                    "text": "ligamina-probe"
+                  }
+                ],
+                "extensions": {
+                  "onebot.v11": {
+                    "message_id": "80000",
+                    "sender": {
+                      "nickname": "Ligamina"
+                    }
+                  }
+                }
+              }
+            ],
+            "operations": [
+              {
+                "operation_id": "operation-1",
+                "account_id": "9000",
+                "operation": "send_message",
+                "target": {
+                  "id": "4242",
+                  "kind": "group"
+                },
+                "params": {
+                  "message": [
+                    {
+                      "type": "text",
+                      "text": "ligamina-multiqa-ok"
+                    }
+                  ]
+                }
+              }
+            ],
+            "operation_receipts": [
+              {
+                "operation_id": "operation-1",
+                "status": "succeeded",
+                "target": {
+                  "id": "4242",
+                  "kind": "group"
+                }
+              }
+            ],
+            "cleanup": {
+              "active_capability_count": 0,
+              "live_processes": []
+            },
+            "federated_trace": {
+              "core_host_route": "passed",
+              "host_pid_reaped": true,
+              "gateway_operation_count": 1
+            }
+          },
+          "comparison": {
+            "status": "passed",
+            "issues": [],
+            "normalized_native": {
+              "events": [
+                {
+                  "account_id": "9000",
+                  "actor_id": "2323",
+                  "conversation": {
+                    "id": "4242",
+                    "kind": "group"
+                  },
+                  "event_id": "sample-koishi-multi-qa-1",
+                  "extensions": {
+                    "onebot.v11": {
+                      "message_id": "80000",
+                      "sender": {
+                        "nickname": "Ligamina"
+                      }
+                    }
+                  },
+                  "message": [
+                    {
+                      "text": "ligamina-probe",
+                      "type": "text"
+                    }
+                  ],
+                  "platform": "koishi",
+                  "schema_version": "ligamina/0.1",
+                  "target_host": "sample-koishi-multi-qa",
+                  "timestamp": "2026-10-26T16:18:47.363Z"
+                }
+              ],
+              "operations": [
+                {
+                  "account_id": "9000",
+                  "operation": "send_message",
+                  "operation_id": "operation-1",
+                  "params": {
+                    "message": [
+                      {
+                        "text": "ligamina-multiqa-ok",
+                        "type": "text"
+                      }
+                    ]
+                  },
+                  "target": {
+                    "id": "4242",
+                    "kind": "group"
+                  }
+                }
+              ],
+              "operation_receipts": [
+                {
+                  "operation_id": "operation-1",
+                  "status": "succeeded",
+                  "target": {
+                    "id": "4242",
+                    "kind": "group"
+                  }
+                }
+              ],
+              "cleanup": {
+                "active_capability_count": 0,
+                "live_processes": []
+              }
+            },
+            "normalized_federated": {
+              "events": [
+                {
+                  "account_id": "9000",
+                  "actor_id": "2323",
+                  "conversation": {
+                    "id": "4242",
+                    "kind": "group"
+                  },
+                  "event_id": "sample-koishi-multi-qa-1",
+                  "extensions": {
+                    "onebot.v11": {
+                      "message_id": "80000",
+                      "sender": {
+                        "nickname": "Ligamina"
+                      }
+                    }
+                  },
+                  "message": [
+                    {
+                      "text": "ligamina-probe",
+                      "type": "text"
+                    }
+                  ],
+                  "platform": "koishi",
+                  "schema_version": "ligamina/0.1",
+                  "target_host": "sample-koishi-multi-qa",
+                  "timestamp": "2026-10-26T16:18:47.363Z"
+                }
+              ],
+              "operations": [
+                {
+                  "account_id": "9000",
+                  "operation": "send_message",
+                  "operation_id": "operation-1",
+                  "params": {
+                    "message": [
+                      {
+                        "text": "ligamina-multiqa-ok",
+                        "type": "text"
+                      }
+                    ]
+                  },
+                  "target": {
+                    "id": "4242",
+                    "kind": "group"
+                  }
+                }
+              ],
+              "operation_receipts": [
+                {
+                  "operation_id": "operation-1",
+                  "status": "succeeded",
+                  "target": {
+                    "id": "4242",
+                    "kind": "group"
+                  }
+                }
+              ],
+              "cleanup": {
+                "active_capability_count": 0,
+                "live_processes": []
+              }
+            }
+          },
+          "execution_integrity": {
+            "status": "passed",
+            "reason_code": null
+          },
+          "sample_id": "koishi-multi-qa",
+          "package": "koishi-plugin-multi-qa",
+          "version": "1.0.8",
+          "artifact_hash": "sha512-gdXhFXMUlhkwDJSFRlHDNXG/4NocLS/pYNDKSrQ3quxgwtNzQcjALMbEZrWFFOOYzu9pv8//u23t9Pt6wktLmg==",
+          "lockfile_sha256": "0acb6bb09ffe80fda5cf5632e0120683ac804d06431b7879f65a1aabf8cc3a55",
+          "profile_sha256": "f7c0fd9fb2c5d50a9bb902b2c05459b13b061d18a42f60a8106b8aba71558b66",
+          "same_artifact_lock_config_stimulus": {
+            "artifact_hash": "sha512-gdXhFXMUlhkwDJSFRlHDNXG/4NocLS/pYNDKSrQ3quxgwtNzQcjALMbEZrWFFOOYzu9pv8//u23t9Pt6wktLmg==",
+            "lockfile_sha256": "0acb6bb09ffe80fda5cf5632e0120683ac804d06431b7879f65a1aabf8cc3a55",
+            "config_sha256": "448432e8427921f8fab460de34a09ebffaee496fb4ffe469eb0c271381a728ba",
+            "stimulus_sha256": "1df5aefe3706507952eeaada14149ef915b7f5aa66f278f5a359875bc15b3480"
+          },
+          "federated_trace": {
+            "core_host_route": "passed",
+            "host_pid_reaped": true,
+            "gateway_operation_count": 1
+          },
+          "worker_cleanup_confirmed": true
+        },
+        "artifact_verification": {
+          "status": "passed",
+          "artifact_url": "https://registry.npmjs.org/koishi-plugin-multi-qa/-/koishi-plugin-multi-qa-1.0.8.tgz",
+          "artifact_hash_algorithm": "sri-sha512",
+          "expected_artifact_hash": "sha512-gdXhFXMUlhkwDJSFRlHDNXG/4NocLS/pYNDKSrQ3quxgwtNzQcjALMbEZrWFFOOYzu9pv8//u23t9Pt6wktLmg==",
+          "actual_artifact_hash": "sha512-gdXhFXMUlhkwDJSFRlHDNXG/4NocLS/pYNDKSrQ3quxgwtNzQcjALMbEZrWFFOOYzu9pv8//u23t9Pt6wktLmg==",
+          "actual_sha256": "8beb5b5377f09981ff437f3b1c982fc3f4591582ef966b35c027082aee5f39bb",
+          "size_bytes": 3942,
+          "error": null
+        },
+        "profile_source_cleanup": {
+          "status": "passed",
+          "removed": [
+            "node_modules"
+          ],
+          "elapsed_seconds": 0.218
+        }
+      }
+    ]
+  }
+}

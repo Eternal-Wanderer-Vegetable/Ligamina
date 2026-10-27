@@ -79,11 +79,49 @@ def _fingerprints(context: dict[str, Any], stimulus: dict[str, Any]) -> dict[str
     }
 
 
+def _probe_observation(work: Path, events: list[dict[str, Any]]) -> dict[str, Any]:
+    data_root = (work / "nonebot-data").resolve()
+    path = (data_root / "phase4-probes" / "observations.ndjson").resolve()
+    path.relative_to(data_root)
+    raw = path.read_bytes()
+    rows = [json.loads(line) for line in raw.decode("utf-8").splitlines() if line]
+    event_by_message_id = {
+        str(event.get("extensions", {}).get("onebot.v11", {}).get("message_id", "")): event
+        for event in events
+    }
+    observations = []
+    for row in rows:
+        event = event_by_message_id.get(str(row.get("message_id", "")))
+        if event is None:
+            raise RuntimeError("phase4 observer wrote an unbound OneBot message id")
+        observations.append({
+            "event_id": str(event["event_id"]),
+            "account_id": row["account_id"],
+            "actor_id": row["actor_id"],
+            "conversation": row["conversation"],
+            "timestamp": row["timestamp"],
+        })
+    if len(observations) != len(events):
+        raise RuntimeError("phase4 observer did not persist exactly one record per dispatched OneBot event")
+    source_path = Path(__file__).resolve().parent / "fixtures" / "phase4_probe_observer.py"
+    return {
+        "status": "recorded",
+        "storage": {
+            "relative_path": str(path.relative_to(work.resolve())).replace("\\", "/"),
+            "file_sha256": hashlib.sha256(raw).hexdigest(),
+            "record_count": len(rows),
+            "probe_source_sha256": hashlib.sha256(source_path.read_bytes()).hexdigest(),
+        },
+        "events": observations,
+    }
+
+
 async def _run(request: dict[str, Any]) -> dict[str, Any]:
     case = request
     context = case["context"]
     sample = context["sample"]
-    work = Path(context["work_dir"]).resolve()
+    behavior_fixture = context.get("behavior_fixture")
+    work = Path(context.get("execution", {}).get("workspace", context["work_dir"])).resolve()
     site.addsitedir(str(Path(context["site_packages"]).resolve()))
     os.environ["HOME"] = str(work / "native-home")
     os.environ["TEMP"] = str(work / "native-temp")
@@ -94,13 +132,44 @@ async def _run(request: dict[str, Any]) -> dict[str, Any]:
         if not key.startswith("LIGAMINA_SAMPLE_") or not isinstance(value, str):
             raise ValueError(f"invalid sample environment key: {key!r}")
         os.environ[key] = value
+    if behavior_fixture:
+        if behavior_fixture.get("adapter", {}).get("id") != "nonebot.onebot.v11":
+            raise ValueError("v2 fixture adapter does not match the stock NoneBot runner")
+        config = behavior_fixture["setup"].get("plugin_config", {})
+        package = sample.get("package")
+        nonebot_config: dict[str, Any] = {}
+        if package == "nonebot_plugin_help":
+            if (
+                set(config) != {"help_at_sender", "help_ignore_plugins"}
+                or not isinstance(config["help_at_sender"], bool)
+                or config["help_ignore_plugins"] != ["phase4_random_seed", "phase4_probe_observer"]
+            ):
+                raise ValueError("v2 NoneBot Help config is outside the reviewed allowlist")
+            nonebot_config = config
+            (work / ".env.prod").write_text(
+                "\n".join(f"{key}={json.dumps(value, ensure_ascii=False, separators=(',', ':'))}" for key, value in sorted(config.items())) + "\n",
+                encoding="utf-8",
+            )
+        elif config:
+            if set(config) != {"name", "limit", "name_list"}:
+                raise ValueError("v2 NoneBot plugin config contains keys outside the reviewed allowlist")
+            os.environ["GUESS_NAME"] = str(config["name"])
+            os.environ["GUESS_LIMIT"] = str(config["limit"])
+            os.environ["GUESS_NAME_LIST"] = json.dumps(config["name_list"], ensure_ascii=False)
+        os.environ["LIGAMINA_BEHAVIOR_RANDOM_SEED"] = str(behavior_fixture["determinism"]["random_seed"])
+        data_directory = work / "nonebot-data"
+        os.environ["LIGAMINA_NONEBOT_DATA_DIR"] = str(data_directory)
+        os.environ["LIGAMINA_P4_OBSERVATION_FILE"] = str(data_directory / "phase4-probes" / "observations.ndjson")
+        fixture_plugins = Path(__file__).resolve().parent / "fixtures"
+        site.addsitedir(str(fixture_plugins))
+        sample["preload_plugins"] = [*sample.get("preload_plugins", []), "phase4_random_seed", "phase4_probe_observer"]
 
     import nonebot
     from nonebot.adapters.onebot.v11 import Adapter, Bot
 
     if nonebot.__version__ != context["expected_environment"]["framework_version"]:
         raise RuntimeError(f"NoneBot version mismatch: {nonebot.__version__}")
-    nonebot.init(driver="~fastapi", nickname={"Bot"})
+    nonebot.init(driver="~fastapi", nickname={"Bot"}, **(nonebot_config if behavior_fixture and sample.get("package") == "nonebot_plugin_help" else {}))
     driver = nonebot.get_driver()
     driver.register_adapter(Adapter)
     adapter = driver._adapters[Adapter.get_name()]
@@ -113,6 +182,7 @@ async def _run(request: dict[str, Any]) -> dict[str, Any]:
     operations: list[dict[str, Any]] = []
     receipts: list[dict[str, Any]] = []
     api_inputs: list[dict[str, Any]] = []
+    current_event_id: str | None = None
 
     async def native_api(bot: Any, api: str, **params: Any) -> Any:
         if api == "get_msg":
@@ -120,7 +190,7 @@ async def _run(request: dict[str, Any]) -> dict[str, Any]:
             return {
                 "message_id": message_id,
                 "real_id": message_id,
-                "sender": {"user_id": int(context["account_id"])},
+                "sender": {"user_id": int(bot.self_id)},
                 "time": 0,
                 "message": [],
             }
@@ -143,28 +213,39 @@ async def _run(request: dict[str, Any]) -> dict[str, Any]:
             raise RuntimeError(f"native OneBot API {api!r} omitted a target")
         operation_id = f"operation-{len(operations) + 1}"
         target = {"kind": kind, "id": str(target_id)}
-        operations.append({
+        operation = {
             "operation_id": operation_id,
             "account_id": str(bot.self_id),
             "operation": "send_message",
             "target": target,
             "params": {"message": _message_segments(params.get("message", []))},
-        })
+        }
+        if behavior_fixture:
+            operation["source_event_id"] = current_event_id
+        operations.append(operation)
         receipt = {
             "operation_id": operation_id,
             "status": "succeeded",
             "target": target,
         }
+        if behavior_fixture:
+            receipt["account_id"] = str(bot.self_id)
+            receipt["source_event_id"] = current_event_id
         receipts.append(receipt)
         return {"message_id": f"virtual-message-{len(receipts)}"}
 
     adapter._call_api = native_api
-    bot = Bot(adapter, str(context["account_id"]))
     events = case["stimulus"]["events"]
+    bots: dict[str, Any] = {}
     try:
         async with driver._lifespan:
-            adapter.bot_connect(bot)
             for event in events:
+                account_id = str(event["account_id"])
+                bot = bots.get(account_id)
+                if bot is None:
+                    bot = Bot(adapter, account_id)
+                    adapter.bot_connect(bot)
+                    bots[account_id] = bot
                 conversation = event["conversation"]
                 message_type = "group" if conversation["kind"] == "group" else "private"
                 timestamp = int(datetime.fromisoformat(event["timestamp"].replace("Z", "+00:00")).timestamp())
@@ -190,11 +271,12 @@ async def _run(request: dict[str, Any]) -> dict[str, Any]:
                 native_event = adapter.json_to_event(raw)
                 if native_event is None:
                     raise RuntimeError("stock OneBot adapter rejected the stimulus event")
+                current_event_id = str(event["event_id"])
                 await bot.handle_event(native_event)
-            adapter.bot_disconnect(bot)
     finally:
-        if bot.self_id in adapter.bots:
-            adapter.bot_disconnect(bot)
+        for bot in bots.values():
+            if bot.self_id in adapter.bots:
+                adapter.bot_disconnect(bot)
 
     bridge_modules = sorted(
         name for name in sys.modules
@@ -213,7 +295,7 @@ async def _run(request: dict[str, Any]) -> dict[str, Any]:
     }
     if environment != expected:
         raise RuntimeError(f"stock native fingerprint mismatch: expected {expected}, observed {environment}")
-    return {
+    result = {
         "status": "completed",
         "environment": environment,
         "events": events,
@@ -227,6 +309,20 @@ async def _run(request: dict[str, Any]) -> dict[str, Any]:
             "api_inputs": api_inputs,
         },
     }
+    if behavior_fixture:
+        result["native_trace"] = {"bridge_adapter_imported": False}
+        result["binding"] = context.get("binding")
+        result["capability_probe_observation"] = _probe_observation(work, events)
+        result["plugin_observation"] = {
+            "events": [
+                {"event_id": event["event_id"], "account_id": event["account_id"], "actor_id": event["actor_id"], "conversation": event["conversation"]}
+                for event in events
+            ],
+            "operations": operations,
+            "receipts": receipts,
+            "response_or_operation_count": len(operations),
+        }
+    return result
 
 
 def main() -> int:

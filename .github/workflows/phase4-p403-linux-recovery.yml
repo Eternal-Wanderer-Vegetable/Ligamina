@@ -1,0 +1,118 @@
+name: Phase 4 P4-03 Linux unknown recovery
+
+on:
+  workflow_dispatch:
+    inputs:
+      mode:
+        description: Run self-owned runner success/failure/cancellation contract checks before enabling plugin recovery.
+        type: choice
+        options:
+          - runner_contract_success
+          - runner_contract_failure
+          - runner_contract_cancel
+          - linux_unknown_recovery
+        default: runner_contract_success
+        required: true
+
+permissions:
+  contents: read
+
+concurrency:
+  group: phase4-p403-linux-recovery-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  dispatch-guard:
+    name: Verify P4-03 controlled dispatch context
+    runs-on: ubuntu-24.04
+    outputs:
+      eligible: ${{ steps.guard.outputs.eligible }}
+      mode: ${{ steps.guard.outputs.mode }}
+    steps:
+      - name: Allow only an opted-in dispatch from the default branch
+        id: guard
+        if: >-
+          github.event_name == 'workflow_dispatch' &&
+          github.repository == github.event.repository.full_name &&
+          github.event.repository.fork == false &&
+          github.ref == format('refs/heads/{0}', github.event.repository.default_branch) &&
+          vars.PHASE4_P403_RUNNER_ENABLED == 'true' &&
+          (github.event.inputs.mode != 'linux_unknown_recovery' || vars.PHASE4_P403_LINUX_RECOVERY_ENABLED == 'true')
+        run: |
+          echo "eligible=true" >> "$GITHUB_OUTPUT"
+          echo "mode=${{ inputs.mode }}" >> "$GITHUB_OUTPUT"
+
+      - name: Explain why the controlled runner was not dispatched
+        if: steps.guard.outcome != 'success'
+        run: 'echo "P4-03 controlled runner skipped: verify origin default-branch dispatch and the runner/recovery opt-in variables for the selected mode."'
+
+  p403-controlled-run:
+    name: P4-03 isolated runner contract or Linux recovery
+    needs: dispatch-guard
+    if: needs.dispatch-guard.outputs.eligible == 'true'
+    runs-on: [self-hosted, linux, x64, ligamina-phase3]
+    environment: phase4-p403-linux-controlled
+    timeout-minutes: 180
+    permissions:
+      contents: read
+    env:
+      UV_PROJECT_ENVIRONMENT: ${{ runner.temp }}/Ligamina-p403-project-venv-${{ github.run_id }}
+      UV_CACHE_DIR: ${{ runner.temp }}/Ligamina-p403-uv-cache-${{ github.run_id }}
+    steps:
+      - name: Checkout without persisted credentials
+        uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
+        with:
+          persist-credentials: false
+
+      - name: Install locked Node runtime
+        uses: actions/setup-node@a0853c24544627f65ddf259abe73b1d18a591444 # v5.0.0
+        with:
+          node-version: 24.20.0
+          package-manager-cache: false
+
+      - name: Install locked uv runtime
+        uses: astral-sh/setup-uv@bec219d24cd3e171d82865faccec33120bb574f4 # v10.1.0
+        with:
+          version: 0.12.5
+          enable-cache: false
+          github-token: ${{ github.token }}
+
+      - name: Install pinned CPython into the disposable runner
+        run: uv python install 3.12.14
+
+      - name: Run selected P4-03 runner mode
+        if: needs.dispatch-guard.outputs.mode == 'linux_unknown_recovery'
+        run: bash scripts/phase4-p403-linux-runner.sh
+        env:
+          P4_P403_MODE: ${{ needs.dispatch-guard.outputs.mode }}
+
+      - name: Run self-owned runner contract probe
+        if: needs.dispatch-guard.outputs.mode != 'linux_unknown_recovery'
+        run: bash scripts/phase4-p403-linux-runner.sh
+        env:
+          P4_P403_MODE: ${{ needs.dispatch-guard.outputs.mode }}
+
+      - name: Reconcile exact campaign resources and clean per-run runner state
+        if: always()
+        run: bash scripts/phase4-p403-finalize-linux-run.sh
+
+      - name: Upload P4-03 evidence on success, failure, or cancellation
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: phase4-p403-linux-${{ github.run_id }}
+          path: |
+            outputs/acceptance/phase4-p403-*-run-${{ github.run_id }}.json
+            outputs/acceptance/phase4-p403-*-run-${{ github.run_id }}.log
+            outputs/acceptance/phase4-p403-docker-cleanup-run-${{ github.run_id }}.json
+            outputs/acceptance/phase4-p403-docker-cleanup-run-${{ github.run_id }}.json.sha256
+            outputs/acceptance/phase4-p403-outer-cleanup-run-${{ github.run_id }}.json
+            outputs/acceptance/phase4-p403-outer-cleanup-run-${{ github.run_id }}.json.sha256
+            outputs/acceptance/phase4-p403-linux-execution-manifest-20261027.json
+            outputs/acceptance/phase4-p403-linux-execution-manifest-20261027.json.sha256
+            outputs/acceptance/phase4-p403-runner-state-run-${{ github.run_id }}.tar.gz
+            outputs/acceptance/phase4-p403-runner-self-test-run-${{ github.run_id }}.json
+            ${{ runner.temp }}/Ligamina-p403-evidence-${{ github.run_id }}/**/*
+            ${{ runner.temp }}/Ligamina-p403-queue-${{ github.run_id }}/**/*
+          if-no-files-found: warn
+          retention-days: 90

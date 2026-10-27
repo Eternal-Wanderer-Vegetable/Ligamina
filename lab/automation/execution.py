@@ -118,11 +118,24 @@ def run_behavior_pair(
     """
     if timeout_seconds <= 0:
         raise BehaviorExecutionError("timeout must be greater than zero")
-    if len(case.get("stimuli", [])) != 1:
-        raise BehaviorExecutionError("behavior case must freeze exactly one deterministic stimulus")
-    if not case.get("assertions"):
+    is_v2 = isinstance(case.get("migration"), dict)
+    if is_v2:
+        if case["migration"].get("status") != "executable":
+            raise BehaviorExecutionError("blocked v2 migration cases cannot be executed")
+        stimulus = case.get("stimulus")
+        assertions = case.get("oracle", {}).get("assertions")
+        if not isinstance(stimulus, dict) or not isinstance(stimulus.get("events"), list) or not stimulus["events"]:
+            raise BehaviorExecutionError("v2 behavior case requires a structured event array")
+        if not isinstance(case.get("adapter"), dict) or not isinstance(case.get("setup"), dict) or not isinstance(case.get("determinism"), dict):
+            raise BehaviorExecutionError("v2 behavior case requires a frozen adapter, setup and determinism policy")
+        normalized_case = {**case, "stimuli": [stimulus], "assertions": assertions}
+    else:
+        if len(case.get("stimuli", [])) != 1:
+            raise BehaviorExecutionError("behavior case must freeze exactly one deterministic stimulus")
+        normalized_case = case
+    if not normalized_case.get("assertions"):
         raise BehaviorExecutionError("behavior case has no independent expected assertions")
-    identity = _valid_identity(entry, case, platform)
+    identity = _valid_identity(entry, normalized_case, platform)
     def contains_oracle(value: Any) -> bool:
         if isinstance(value, dict):
             return any(key.casefold() in {"expected", "assertions", "oracle"} or contains_oracle(child) for key, child in value.items())
@@ -132,14 +145,17 @@ def run_behavior_pair(
 
     if contains_oracle(fixture_context or {}):
         raise BehaviorExecutionError("fixture context cannot contain expected oracle data")
-    fixture_sha256 = hashlib.sha256(_canonical({"stimuli": case["stimuli"], "assertions": case["assertions"], "oracle": case.get("oracle")})).hexdigest()
+    fixture_sha256 = hashlib.sha256(_canonical({"stimuli": normalized_case["stimuli"], "assertions": normalized_case["assertions"], "oracle": case.get("oracle")})).hexdigest()
     binding = {**identity, "fixture_sha256": fixture_sha256}
-    stimulus = copy.deepcopy(case["stimuli"][0])
-    deterministic = {
-        "fixture_clock": stimulus.get("fixture_clock"),
-        "random_seed": stimulus.get("random_seed"),
-        "session_scope": stimulus.get("session_scope"),
-    }
+    stimulus = copy.deepcopy(normalized_case["stimuli"][0])
+    if is_v2:
+        deterministic = copy.deepcopy(case["determinism"])
+    else:
+        deterministic = {
+            "fixture_clock": stimulus.get("fixture_clock"),
+            "random_seed": stimulus.get("random_seed"),
+            "session_scope": stimulus.get("session_scope"),
+        }
 
     def run_side(mode: str, command: list[str], workspace: Path) -> dict[str, Any]:
         workspace.mkdir(parents=True, exist_ok=False)
@@ -151,6 +167,15 @@ def run_behavior_pair(
             "fixture_context_sha256": hashlib.sha256(_canonical(fixture_context or {})).hexdigest(),
             "execution": {"mode": mode, "workspace": str(workspace.resolve()), **deterministic},
         })
+        if is_v2:
+            if "behavior_fixture" in context:
+                raise BehaviorExecutionError("fixture context cannot override the frozen v2 behavior fixture")
+            context["behavior_fixture"] = {
+                "adapter": copy.deepcopy(case["adapter"]),
+                "setup": copy.deepcopy(case["setup"]),
+                "determinism": copy.deepcopy(case["determinism"]),
+                "observation": copy.deepcopy(case["observation"]),
+            }
         request = {"case_id": case["case_id"], "stimulus": stimulus, "context": context}
         result = execute_harness(command, request, mode, timeout_seconds, cwd=workspace)
         return result
@@ -177,7 +202,7 @@ def run_behavior_pair(
         if not isinstance(observation, dict):
             issues.append({"code": "observations_missing", "side": side})
             continue
-        issues.extend(_assertions(case, observation, side))
+        issues.extend(_assertions(normalized_case, observation, side))
         cleanup = result.get("cleanup")
         if not isinstance(cleanup, dict) or cleanup.get("worker_cleanup_confirmed") is not True or cleanup.get("active_capability_count") != 0 or cleanup.get("live_processes") != []:
             issues.append({"code": "cleanup_unconfirmed", "side": side})

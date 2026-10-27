@@ -1,0 +1,2506 @@
+{
+  "schema_version": 1,
+  "kind": "phase4_p402_blocked_position_attribution",
+  "created_at": "2026-10-27",
+  "campaign_id": "p402-20261026-fixed-four-v2r3",
+  "campaign_report": {
+    "path": "outputs/acceptance/phase4-p402-behavior-runs-20261026-v2r3.json",
+    "sha256": "b9fee50451432d7e3eb60d696713f464885ef3e5300f789cd1ea4ce66de5e2d1"
+  },
+  "suite": {
+    "path": "contracts/lab/automation/v2/fixtures/behavior-suite.phase4-p402-v2r3.json",
+    "sha256": "fb341959343e44407032391945602e65bd53186f51b3001cf538be0f70592590"
+  },
+  "migration_matrix": {
+    "path": "outputs/acceptance/phase4-p402-migration-matrix-20261026-v2r3.json",
+    "sha256": "021fe1b900bb5e0e0732a2650b2648c85dfe041162d8f82f273120ea40de368e"
+  },
+  "position_count": 48,
+  "slot_count": 144,
+  "state_counts": {
+    "positions_skipped_not_dispatched": 48,
+    "not_dispatched_slots": 144,
+    "cleanup_not_applicable_slots": 144
+  },
+  "positions": [
+    {
+      "position_id": "nb-4528cf6bfb6a315278ba2dd7::nb-nonebot-plugin-strman-positive",
+      "registry_entry_id": "nb-4528cf6bfb6a315278ba2dd7",
+      "package": "nonebot_plugin_strman",
+      "version": "1.2.0",
+      "artifact_sha256": "6adbac521fdf49781c03d0de47107079a3889787ecc89fb25630aefb15328d33",
+      "case_id": "nb-nonebot-plugin-strman-positive",
+      "case_class": "positive",
+      "v1_input": "parse known tag and format {name}",
+      "v1_assertions": [
+        {
+          "path": "plugin_observation.response_or_operation_count",
+          "operator": "in_range",
+          "minimum": 1,
+          "maximum": 1
+        }
+      ],
+      "campaign_status": "skipped",
+      "campaign_reason_code": "structured_adapter_setup_oracle_review_required",
+      "attribution_reason_code": "strman_profile_seed_and_override_oracle_not_frozen",
+      "source_member": "nonebot_plugin_strman/parser.py",
+      "source_member_sha256": "105d42fee3ef2d7b01fd3609169deea2a1b34839318ae8094255c9a921fbfc8d",
+      "source_symbols": [
+        "Parser.__call__",
+        "Parser._tag_parse"
+      ],
+      "fixture_prerequisite": "The reviewed parser reads a profile file from the working directory. Freeze a fixture-owned profile containing a known tag and format, plus a deterministic override case and exact parsed-result oracle.",
+      "case_class_prerequisite": "The positive behavior needs one deterministic seed/config/event and an exact output or state oracle.",
+      "attempt_slots": [
+        {
+          "slot_id": "nb-nonebot-plugin-strman-positive--attempt-01",
+          "status": "not_dispatched",
+          "campaign_reason_code": "structured_adapter_setup_oracle_review_required",
+          "dispatch_state": "not_dispatched",
+          "cleanup": "not_applicable"
+        },
+        {
+          "slot_id": "nb-nonebot-plugin-strman-positive--attempt-02",
+          "status": "not_dispatched",
+          "campaign_reason_code": "structured_adapter_setup_oracle_review_required",
+          "dispatch_state": "not_dispatched",
+          "cleanup": "not_applicable"
+        },
+        {
+          "slot_id": "nb-nonebot-plugin-strman-positive--attempt-03",
+          "status": "not_dispatched",
+          "campaign_reason_code": "structured_adapter_setup_oracle_review_required",
+          "dispatch_state": "not_dispatched",
+          "cleanup": "not_applicable"
+        }
+      ]
+    },
+    {
+      "position_id": "nb-4528cf6bfb6a315278ba2dd7::nb-nonebot-plugin-strman-negative",
+      "registry_entry_id": "nb-4528cf6bfb6a315278ba2dd7",
+      "package": "nonebot_plugin_strman",
+      "version": "1.2.0",
+      "artifact_sha256": "6adbac521fdf49781c03d0de47107079a3889787ecc89fb25630aefb15328d33",
+      "case_id": "nb-nonebot-plugin-strman-negative",
+      "case_class": "negative",
+      "v1_input": "resolve missing tag",
+      "v1_assertions": [
+        {
+          "path": "plugin_observation.response_or_operation_count",
+          "operator": "equals",
+          "value": 0
+        }
+      ],
+      "campaign_status": "skipped",
+      "campaign_reason_code": "structured_adapter_setup_oracle_review_required",
+      "attribution_reason_code": "strman_profile_seed_and_override_oracle_not_frozen",
+      "source_member": "nonebot_plugin_strman/parser.py",
+      "source_member_sha256": "105d42fee3ef2d7b01fd3609169deea2a1b34839318ae8094255c9a921fbfc8d",
+      "source_symbols": [
+        "Parser.__call__",
+        "Parser._tag_parse"
+      ],
+      "fixture_prerequisite": "The reviewed parser reads a profile file from the working directory. Freeze a fixture-owned profile containing a known tag and format, plus a deterministic override case and exact parsed-result oracle.",
+      "case_class_prerequisite": "The negative boundary needs an input that reaches the intended plugin boundary and an independently expected no-op/error result.",
+      "attempt_slots": [
+        {
+          "slot_id": "nb-nonebot-plugin-strman-negative--attempt-01",
+          "status": "not_dispatched",
+          "campaign_reason_code": "structured_adapter_setup_oracle_review_required",
+          "dispatch_state": "not_dispatched",
+          "cleanup": "not_applicable"
+        },
+        {
+          "slot_id": "nb-nonebot-plugin-strman-negative--attempt-02",
+          "status": "not_dispatched",
+          "campaign_reason_code": "structured_adapter_setup_oracle_review_required",
+          "dispatch_state": "not_dispatched",
+          "cleanup": "not_applicable"
+        },
+        {
+          "slot_id": "nb-nonebot-plugin-strman-negative--attempt-03",
+          "status": "not_dispatched",
+          "campaign_reason_code": "structured_adapter_setup_oracle_review_required",
+          "dispatch_state": "not_dispatched",
+          "cleanup": "not_applicable"
+        }
+      ]
+    },
+    {
+      "position_id": "nb-4528cf6bfb6a315278ba2dd7::nb-nonebot-plugin-strman-isolation",
+      "registry_entry_id": "nb-4528cf6bfb6a315278ba2dd7",
+      "package": "nonebot_plugin_strman",
+      "version": "1.2.0",
+      "artifact_sha256": "6adbac521fdf49781c03d0de47107079a3889787ecc89fb25630aefb15328d33",
+      "case_id": "nb-nonebot-plugin-strman-isolation",
+      "case_class": "isolation",
+      "v1_input": "explicit profile override result does not mutate default",
+      "v1_assertions": [
+        {
+          "path": "plugin_observation.scope_leak_count",
+          "operator": "equals",
+          "value": 0
+        }
+      ],
+      "campaign_status": "skipped",
+      "campaign_reason_code": "structured_adapter_setup_oracle_review_required",
+      "attribution_reason_code": "strman_profile_seed_and_override_oracle_not_frozen",
+      "source_member": "nonebot_plugin_strman/parser.py",
+      "source_member_sha256": "105d42fee3ef2d7b01fd3609169deea2a1b34839318ae8094255c9a921fbfc8d",
+      "source_symbols": [
+        "Parser.__call__",
+        "Parser._tag_parse"
+      ],
+      "fixture_prerequisite": "The reviewed parser reads a profile file from the working directory. Freeze a fixture-owned profile containing a known tag and format, plus a deterministic override case and exact parsed-result oracle.",
+      "case_class_prerequisite": "The isolation case needs two independent account/session/state identities and assertions bound to each event and scope.",
+      "attempt_slots": [
+        {
+          "slot_id": "nb-nonebot-plugin-strman-isolation--attempt-01",
+          "status": "not_dispatched",
+          "campaign_reason_code": "structured_adapter_setup_oracle_review_required",
+          "dispatch_state": "not_dispatched",
+          "cleanup": "not_applicable"
+        },
+        {
+          "slot_id": "nb-nonebot-plugin-strman-isolation--attempt-02",
+          "status": "not_dispatched",
+          "campaign_reason_code": "structured_adapter_setup_oracle_review_required",
+          "dispatch_state": "not_dispatched",
+          "cleanup": "not_applicable"
+        },
+        {
+          "slot_id": "nb-nonebot-plugin-strman-isolation--attempt-03",
+          "status": "not_dispatched",
+          "campaign_reason_code": "structured_adapter_setup_oracle_review_required",
+          "dispatch_state": "not_dispatched",
+          "cleanup": "not_applicable"
+        }
+      ]
+    },
+    {
+      "position_id": "nb-5f9a0398ba3644f4256bbe83::nb-nonebot-plugin-guess-positive",
+      "registry_entry_id": "nb-5f9a0398ba3644f4256bbe83",
+      "package": "nonebot_plugin_guess",
+      "version": "0.1.9",
+      "artifact_sha256": "db6b9bfefdcd80d4e9da03f2b136a0d11c7e1a08cad3c378cac8eda573929957",
+      "case_id": "nb-nonebot-plugin-guess-positive",
+      "case_class": "positive",
+      "v1_input": "invoke /guess with fixed seed",
+      "v1_assertions": [
+        {
+          "path": "plugin_observation.response_or_operation_count",
+          "operator": "in_range",
+          "minimum": 1,
+          "maximum": 1
+        }
+      ],
+      "campaign_status": "skipped",
+      "campaign_reason_code": "prior_candidate_failed_preserved",
+      "attribution_reason_code": "prior_candidate_failure_preserved",
+      "source_member": "nonebot_plugin_guess/guess.py",
+      "source_member_sha256": "1f0fa1861e8fbb2bf490ae726011d864f59f517fa5dd1eb226a4cf6e4e418c1e",
+      "source_symbols": [
+        "guess",
+        "process",
+        "handle"
+      ],
+      "fixture_prerequisite": "P4-01 v8 already has positive and negative 3/3 pass, while isolation failed 3/3. P4-02 preserves the failed candidate without re-dispatch; the earlier three case outcomes remain separate evidence and are not counted as P4-02 attempt slots.",
+      "case_class_prerequisite": "The positive behavior needs one deterministic seed/config/event and an exact output or state oracle.",
+      "attempt_slots": [
+        {
+          "slot_id": "nb-nonebot-plugin-guess-positive--attempt-01",
+          "status": "not_dispatched",
+          "campaign_reason_code": "prior_candidate_failed_preserved",
+          "dispatch_state": "not_dispatched",
+          "cleanup": "not_applicable"
+        },
+        {
+          "slot_id": "nb-nonebot-plugin-guess-positive--attempt-02",
+          "status": "not_dispatched",
+          "campaign_reason_code": "prior_candidate_failed_preserved",
+          "dispatch_state": "not_dispatched",
+          "cleanup": "not_applicable"
+        },
+        {
+          "slot_id": "nb-nonebot-plugin-guess-positive--attempt-03",
+          "status": "not_dispatched",
+          "campaign_reason_code": "prior_candidate_failed_preserved",
+          "dispatch_state": "not_dispatched",
+          "cleanup": "not_applicable"
+        }
+      ],
+      "prior_p401_v8_case_status": "passed"
+    },
+    {
+      "position_id": "nb-5f9a0398ba3644f4256bbe83::nb-nonebot-plugin-guess-negative",
+      "registry_entry_id": "nb-5f9a0398ba3644f4256bbe83",
+      "package": "nonebot_plugin_guess",
+      "version": "0.1.9",
+      "artifact_sha256": "db6b9bfefdcd80d4e9da03f2b136a0d11c7e1a08cad3c378cac8eda573929957",
+      "case_id": "nb-nonebot-plugin-guess-negative",
+      "case_class": "negative",
+      "v1_input": "send unrelated text",
+      "v1_assertions": [
+        {
+          "path": "plugin_observation.response_or_operation_count",
+          "operator": "equals",
+          "value": 0
+        }
+      ],
+      "campaign_status": "skipped",
+      "campaign_reason_code": "prior_candidate_failed_preserved",
+      "attribution_reason_code": "prior_candidate_failure_preserved",
+      "source_member": "nonebot_plugin_guess/guess.py",
+      "source_member_sha256": "1f0fa1861e8fbb2bf490ae726011d864f59f517fa5dd1eb226a4cf6e4e418c1e",
+      "source_symbols": [
+        "guess",
+        "process",
+        "handle"
+      ],
+      "fixture_prerequisite": "P4-01 v8 already has positive and negative 3/3 pass, while isolation failed 3/3. P4-02 preserves the failed candidate without re-dispatch; the earlier three case outcomes remain separate evidence and are not counted as P4-02 attempt slots.",
+      "case_class_prerequisite": "The negative boundary needs an input that reaches the intended plugin boundary and an independently expected no-op/error result.",
+      "attempt_slots": [
+        {
+          "slot_id": "nb-nonebot-plugin-guess-negative--attempt-01",
+          "status": "not_dispatched",
+          "campaign_reason_code": "prior_candidate_failed_preserved",
+          "dispatch_state": "not_dispatched",
+          "cleanup": "not_applicable"
+        },
+        {
+          "slot_id": "nb-nonebot-plugin-guess-negative--attempt-02",
+          "status": "not_dispatched",
+          "campaign_reason_code": "prior_candidate_failed_preserved",
+          "dispatch_state": "not_dispatched",
+          "cleanup": "not_applicable"
+        },
+        {
+          "slot_id": "nb-nonebot-plugin-guess-negative--attempt-03",
+          "status": "not_dispatched",
+          "campaign_reason_code": "prior_candidate_failed_preserved",
+          "dispatch_state": "not_dispatched",
+          "cleanup": "not_applicable"
+        }
+      ],
+      "prior_p401_v8_case_status": "passed"
+    },
+    {
+      "position_id": "nb-5f9a0398ba3644f4256bbe83::nb-nonebot-plugin-guess-isolation",
+      "registry_entry_id": "nb-5f9a0398ba3644f4256bbe83",
+      "package": "nonebot_plugin_guess",
+      "version": "0.1.9",
+      "artifact_sha256": "db6b9bfefdcd80d4e9da03f2b136a0d11c7e1a08cad3c378cac8eda573929957",
+      "case_id": "nb-nonebot-plugin-guess-isolation",
+      "case_class": "isolation",
+      "v1_input": "a second session does not inherit active game state",
+      "v1_assertions": [
+        {
+          "path": "plugin_observation.scope_leak_count",
+          "operator": "equals",
+          "value": 0
+        }
+      ],
+      "campaign_status": "skipped",
+      "campaign_reason_code": "prior_candidate_failed_preserved",
+      "attribution_reason_code": "prior_candidate_failure_preserved",
+      "source_member": "nonebot_plugin_guess/guess.py",
+      "source_member_sha256": "1f0fa1861e8fbb2bf490ae726011d864f59f517fa5dd1eb226a4cf6e4e418c1e",
+      "source_symbols": [
+        "guess",
+        "process",
+        "handle"
+      ],
+      "fixture_prerequisite": "P4-01 v8 already has positive and negative 3/3 pass, while isolation failed 3/3. P4-02 preserves the failed candidate without re-dispatch; the earlier three case outcomes remain separate evidence and are not counted as P4-02 attempt slots.",
+      "case_class_prerequisite": "The isolation case needs two independent account/session/state identities and assertions bound to each event and scope.",
+      "attempt_slots": [
+        {
+          "slot_id": "nb-nonebot-plugin-guess-isolation--attempt-01",
+          "status": "not_dispatched",
+          "campaign_reason_code": "prior_candidate_failed_preserved",
+          "dispatch_state": "not_dispatched",
+          "cleanup": "not_applicable"
+        },
+        {
+          "slot_id": "nb-nonebot-plugin-guess-isolation--attempt-02",
+          "status": "not_dispatched",
+          "campaign_reason_code": "prior_candidate_failed_preserved",
+          "dispatch_state": "not_dispatched",
+          "cleanup": "not_applicable"
+        },
+        {
+          "slot_id": "nb-nonebot-plugin-guess-isolation--attempt-03",
+          "status": "not_dispatched",
+          "campaign_reason_code": "prior_candidate_failed_preserved",
+          "dispatch_state": "not_dispatched",
+          "cleanup": "not_applicable"
+        }
+      ],
+      "prior_p401_v8_case_status": "failed"
+    },
+    {
+      "position_id": "nb-85f9d46ff59c96d65dd652c8::nb-nonebot-plugin-abbrreply-positive",
+      "registry_entry_id": "nb-85f9d46ff59c96d65dd652c8",
+      "package": "nonebot_plugin_abbrreply",
+      "version": "1.1.3",
+      "artifact_sha256": "4f568a33fb5a8284324e50d8c79be96a245e2aebebafdb06c9d6bb15464f9347",
+      "case_id": "nb-nonebot-plugin-abbrreply-positive",
+      "case_class": "positive",
+      "v1_input": "invoke 缩写 abc with fixture lookup",
+      "v1_assertions": [
+        {
+          "path": "plugin_observation.response_or_operation_count",
+          "operator": "in_range",
+          "minimum": 1,
+          "maximum": 1
+        }
+      ],
+      "campaign_status": "skipped",
+      "campaign_reason_code": "structured_adapter_setup_oracle_review_required",
+      "attribution_reason_code": "abbrreply_lookup_seed_and_regex_boundary_not_frozen",
+      "source_member": "nonebot_plugin_abbrreply/__init__.py",
+      "source_member_sha256": "fab294f8eab6cb6a6263547c77ff30ac10e12ad14ce8de924711335eae5dd80d",
+      "source_symbols": [
+        "on_regex",
+        "sx"
+      ],
+      "fixture_prerequisite": "The source registers an on_regex matcher for sx/缩写 input. Freeze the lookup data for a known abbreviation, the empty-query boundary, and two independent session queries with exact reply content.",
+      "case_class_prerequisite": "The positive behavior needs one deterministic seed/config/event and an exact output or state oracle.",
+      "attempt_slots": [
+        {
+          "slot_id": "nb-nonebot-plugin-abbrreply-positive--attempt-01",
+          "status": "not_dispatched",
+          "campaign_reason_code": "structured_adapter_setup_oracle_review_required",
+          "dispatch_state": "not_dispatched",
+          "cleanup": "not_applicable"
+        },
+        {
+          "slot_id": "nb-nonebot-plugin-abbrreply-positive--attempt-02",
+          "status": "not_dispatched",
+          "campaign_reason_code": "structured_adapter_setup_oracle_review_required",
+          "dispatch_state": "not_dispatched",
+          "cleanup": "not_applicable"
+        },
+        {
+          "slot_id": "nb-nonebot-plugin-abbrreply-positive--attempt-03",
+          "status": "not_dispatched",
+          "campaign_reason_code": "structured_adapter_setup_oracle_review_required",
+          "dispatch_state": "not_dispatched",
+          "cleanup": "not_applicable"
+        }
+      ]
+    },
+    {
+      "position_id": "nb-85f9d46ff59c96d65dd652c8::nb-nonebot-plugin-abbrreply-negative",
+      "registry_entry_id": "nb-85f9d46ff59c96d65dd652c8",
+      "package": "nonebot_plugin_abbrreply",
+      "version": "1.1.3",
+      "artifact_sha256": "4f568a33fb5a8284324e50d8c79be96a245e2aebebafdb06c9d6bb15464f9347",
+      "case_id": "nb-nonebot-plugin-abbrreply-negative",
+      "case_class": "negative",
+      "v1_input": "send 缩写 without query",
+      "v1_assertions": [
+        {
+          "path": "plugin_observation.response_or_operation_count",
+          "operator": "equals",
+          "value": 0
+        }
+      ],
+      "campaign_status": "skipped",
+      "campaign_reason_code": "structured_adapter_setup_oracle_review_required",
+      "attribution_reason_code": "abbrreply_lookup_seed_and_regex_boundary_not_frozen",
+      "source_member": "nonebot_plugin_abbrreply/__init__.py",
+      "source_member_sha256": "fab294f8eab6cb6a6263547c77ff30ac10e12ad14ce8de924711335eae5dd80d",
+      "source_symbols": [
+        "on_regex",
+        "sx"
+      ],
+      "fixture_prerequisite": "The source registers an on_regex matcher for sx/缩写 input. Freeze the lookup data for a known abbreviation, the empty-query boundary, and two independent session queries with exact reply content.",
+      "case_class_prerequisite": "The negative boundary needs an input that reaches the intended plugin boundary and an independently expected no-op/error result.",
+      "attempt_slots": [
+        {
+          "slot_id": "nb-nonebot-plugin-abbrreply-negative--attempt-01",
+          "status": "not_dispatched",
+          "campaign_reason_code": "structured_adapter_setup_oracle_review_required",
+          "dispatch_state": "not_dispatched",
+          "cleanup": "not_applicable"
+        },
+        {
+          "slot_id": "nb-nonebot-plugin-abbrreply-negative--attempt-02",
+          "status": "not_dispatched",
+          "campaign_reason_code": "structured_adapter_setup_oracle_review_required",
+          "dispatch_state": "not_dispatched",
+          "cleanup": "not_applicable"
+        },
+        {
+          "slot_id": "nb-nonebot-plugin-abbrreply-negative--attempt-03",
+          "status": "not_dispatched",
+          "campaign_reason_code": "structured_adapter_setup_oracle_review_required",
+          "dispatch_state": "not_dispatched",
+          "cleanup": "not_applicable"
+        }
+      ]
+    },
+    {
+      "position_id": "nb-85f9d46ff59c96d65dd652c8::nb-nonebot-plugin-abbrreply-isolation",
+      "registry_entry_id": "nb-85f9d46ff59c96d65dd652c8",
+      "package": "nonebot_plugin_abbrreply",
+      "version": "1.1.3",
+      "artifact_sha256": "4f568a33fb5a8284324e50d8c79be96a245e2aebebafdb06c9d6bb15464f9347",
+      "case_id": "nb-nonebot-plugin-abbrreply-isolation",
+      "case_class": "isolation",
+      "v1_input": "two sessions with distinct query strings return their own lookup",
+      "v1_assertions": [
+        {
+          "path": "plugin_observation.scope_leak_count",
+          "operator": "equals",
+          "value": 0
+        }
+      ],
+      "campaign_status": "skipped",
+      "campaign_reason_code": "structured_adapter_setup_oracle_review_required",
+      "attribution_reason_code": "abbrreply_lookup_seed_and_regex_boundary_not_frozen",
+      "source_member": "nonebot_plugin_abbrreply/__init__.py",
+      "source_member_sha256": "fab294f8eab6cb6a6263547c77ff30ac10e12ad14ce8de924711335eae5dd80d",
+      "source_symbols": [
+        "on_regex",
+        "sx"
+      ],
+      "fixture_prerequisite": "The source registers an on_regex matcher for sx/缩写 input. Freeze the lookup data for a known abbreviation, the empty-query boundary, and two independent session queries with exact reply content.",
+      "case_class_prerequisite": "The isolation case needs two independent account/session/state identities and assertions bound to each event and scope.",
+      "attempt_slots": [
+        {
+          "slot_id": "nb-nonebot-plugin-abbrreply-isolation--attempt-01",
+          "status": "not_dispatched",
+          "campaign_reason_code": "structured_adapter_setup_oracle_review_required",
+          "dispatch_state": "not_dispatched",
+          "cleanup": "not_applicable"
+        },
+        {
+          "slot_id": "nb-nonebot-plugin-abbrreply-isolation--attempt-02",
+          "status": "not_dispatched",
+          "campaign_reason_code": "structured_adapter_setup_oracle_review_required",
+          "dispatch_state": "not_dispatched",
+          "cleanup": "not_applicable"
+        },
+        {
+          "slot_id": "nb-nonebot-plugin-abbrreply-isolation--attempt-03",
+          "status": "not_dispatched",
+          "campaign_reason_code": "structured_adapter_setup_oracle_review_required",
+          "dispatch_state": "not_dispatched",
+          "cleanup": "not_applicable"
+        }
+      ]
+    },
+    {
+      "position_id": "nb-c24c2083f5b189704248845f::nb-nonebot-plugin-localstore-positive",
+      "registry_entry_id": "nb-c24c2083f5b189704248845f",
+      "package": "nonebot_plugin_localstore",
+      "version": "0.7.4",
+      "artifact_sha256": "3b08030878eadcdd8b9ce3d079da0dc2d0e41dc91f0b2d8cf7fa862a27de9090",
+      "case_id": "nb-nonebot-plugin-localstore-positive",
+      "case_class": "positive",
+      "v1_input": "resolve plugin data directory under temporary root",
+      "v1_assertions": [
+        {
+          "path": "plugin_observation.response_or_operation_count",
+          "operator": "in_range",
+          "minimum": 1,
+          "maximum": 1
+        }
+      ],
+      "campaign_status": "skipped",
+      "campaign_reason_code": "structured_adapter_setup_oracle_review_required",
+      "attribution_reason_code": "localstore_plugin_identity_and_root_policy_not_frozen",
+      "source_member": "nonebot_plugin_localstore/__init__.py",
+      "source_member_sha256": "aa05e75e0ec220042ff800ffcaf3c8ca48efa96ee614ceb5c514ff171576874c",
+      "source_symbols": [
+        "get_plugin_cache_dir",
+        "get_plugin_config_dir",
+        "get_plugin_data_dir"
+      ],
+      "fixture_prerequisite": "The source derives data/config/cache paths from caller plugin identity and localstore_use_cwd. Freeze an explicit temporary root, two plugin identities, create/read checks, and a root-escape rejection oracle.",
+      "case_class_prerequisite": "The positive behavior needs one deterministic seed/config/event and an exact output or state oracle.",
+      "attempt_slots": [
+        {
+          "slot_id": "nb-nonebot-plugin-localstore-positive--attempt-01",
+          "status": "not_dispatched",
+          "campaign_reason_code": "structured_adapter_setup_oracle_review_required",
+          "dispatch_state": "not_dispatched",
+          "cleanup": "not_applicable"
+        },
+        {
+          "slot_id": "nb-nonebot-plugin-localstore-positive--attempt-02",
+          "status": "not_dispatched",
+          "campaign_reason_code": "structured_adapter_setup_oracle_review_required",
+          "dispatch_state": "not_dispatched",
+          "cleanup": "not_applicable"
+        },
+        {
+          "slot_id": "nb-nonebot-plugin-localstore-positive--attempt-03",
+          "status": "not_dispatched",
+          "campaign_reason_code": "structured_adapter_setup_oracle_review_required",
+          "dispatch_state": "not_dispatched",
+          "cleanup": "not_applicable"
+        }
+      ]
+    },
+    {
+      "position_id": "nb-c24c2083f5b189704248845f::nb-nonebot-plugin-localstore-negative",
+      "registry_entry_id": "nb-c24c2083f5b189704248845f",
+      "package": "nonebot_plugin_localstore",
+      "version": "0.7.4",
+      "artifact_sha256": "3b08030878eadcdd8b9ce3d079da0dc2d0e41dc91f0b2d8cf7fa862a27de9090",
+      "case_id": "nb-nonebot-plugin-localstore-negative",
+      "case_class": "negative",
+      "v1_input": "resolve path with root escape attempt",
+      "v1_assertions": [
+        {
+          "path": "plugin_observation.response_or_operation_count",
+          "operator": "equals",
+          "value": 0
+        }
+      ],
+      "campaign_status": "skipped",
+      "campaign_reason_code": "structured_adapter_setup_oracle_review_required",
+      "attribution_reason_code": "localstore_plugin_identity_and_root_policy_not_frozen",
+      "source_member": "nonebot_plugin_localstore/__init__.py",
+      "source_member_sha256": "aa05e75e0ec220042ff800ffcaf3c8ca48efa96ee614ceb5c514ff171576874c",
+      "source_symbols": [
+        "get_plugin_cache_dir",
+        "get_plugin_config_dir",
+        "get_plugin_data_dir"
+      ],
+      "fixture_prerequisite": "The source derives data/config/cache paths from caller plugin identity and localstore_use_cwd. Freeze an explicit temporary root, two plugin identities, create/read checks, and a root-escape rejection oracle.",
+      "case_class_prerequisite": "The negative boundary needs an input that reaches the intended plugin boundary and an independently expected no-op/error result.",
+      "attempt_slots": [
+        {
+          "slot_id": "nb-nonebot-plugin-localstore-negative--attempt-01",
+          "status": "not_dispatched",
+          "campaign_reason_code": "structured_adapter_setup_oracle_review_required",
+          "dispatch_state": "not_dispatched",
+          "cleanup": "not_applicable"
+        },
+        {
+          "slot_id": "nb-nonebot-plugin-localstore-negative--attempt-02",
+          "status": "not_dispatched",
+          "campaign_reason_code": "structured_adapter_setup_oracle_review_required",
+          "dispatch_state": "not_dispatched",
+          "cleanup": "not_applicable"
+        },
+        {
+          "slot_id": "nb-nonebot-plugin-localstore-negative--attempt-03",
+          "status": "not_dispatched",
+          "campaign_reason_code": "structured_adapter_setup_oracle_review_required",
+          "dispatch_state": "not_dispatched",
+          "cleanup": "not_applicable"
+        }
+      ]
+    },
+    {
+      "position_id": "nb-c24c2083f5b189704248845f::nb-nonebot-plugin-localstore-isolation",
+      "registry_entry_id": "nb-c24c2083f5b189704248845f",
+      "package": "nonebot_plugin_localstore",
+      "version": "0.7.4",
+      "artifact_sha256": "3b08030878eadcdd8b9ce3d079da0dc2d0e41dc91f0b2d8cf7fa862a27de9090",
+      "case_id": "nb-nonebot-plugin-localstore-isolation",
+      "case_class": "isolation",
+      "v1_input": "two plugin names resolve to distinct directories",
+      "v1_assertions": [
+        {
+          "path": "plugin_observation.scope_leak_count",
+          "operator": "equals",
+          "value": 0
+        }
+      ],
+      "campaign_status": "skipped",
+      "campaign_reason_code": "structured_adapter_setup_oracle_review_required",
+      "attribution_reason_code": "localstore_plugin_identity_and_root_policy_not_frozen",
+      "source_member": "nonebot_plugin_localstore/__init__.py",
+      "source_member_sha256": "aa05e75e0ec220042ff800ffcaf3c8ca48efa96ee614ceb5c514ff171576874c",
+      "source_symbols": [
+        "get_plugin_cache_dir",
+        "get_plugin_config_dir",
+        "get_plugin_data_dir"
+      ],
+      "fixture_prerequisite": "The source derives data/config/cache paths from caller plugin identity and localstore_use_cwd. Freeze an explicit temporary root, two plugin identities, create/read checks, and a root-escape rejection oracle.",
+      "case_class_prerequisite": "The isolation case needs two independent account/session/state identities and assertions bound to each event and scope.",
+      "attempt_slots": [
+        {
+          "slot_id": "nb-nonebot-plugin-localstore-isolation--attempt-01",
+          "status": "not_dispatched",
+          "campaign_reason_code": "structured_adapter_setup_oracle_review_required",
+          "dispatch_state": "not_dispatched",
+          "cleanup": "not_applicable"
+        },
+        {
+          "slot_id": "nb-nonebot-plugin-localstore-isolation--attempt-02",
+          "status": "not_dispatched",
+          "campaign_reason_code": "structured_adapter_setup_oracle_review_required",
+          "dispatch_state": "not_dispatched",
+          "cleanup": "not_applicable"
+        },
+        {
+          "slot_id": "nb-nonebot-plugin-localstore-isolation--attempt-03",
+          "status": "not_dispatched",
+          "campaign_reason_code": "structured_adapter_setup_oracle_review_required",
+          "dispatch_state": "not_dispatched",
+          "cleanup": "not_applicable"
+        }
+      ]
+    },
+    {
+      "position_id": "nb-da100d12327d862b56c82b1a::nb-nonebot-plugin-alias-positive",
+      "registry_entry_id": "nb-da100d12327d862b56c82b1a",
+      "package": "nonebot_plugin_alias",
+      "version": "0.4.0",
+      "artifact_sha256": "382b65ae96140c0b752420d0e6d2f2c4dbee94b381aa2b1cd5af580d7e3e9a49",
+      "case_id": "nb-nonebot-plugin-alias-positive",
+      "case_class": "positive",
+      "v1_input": "create alias in session A and resolve it",
+      "v1_assertions": [
+        {
+          "path": "plugin_observation.response_or_operation_count",
+          "operator": "in_range",
+          "minimum": 1,
+          "maximum": 1
+        }
+      ],
+      "campaign_status": "skipped",
+      "campaign_reason_code": "structured_adapter_setup_oracle_review_required",
+      "attribution_reason_code": "alias_alconna_dependency_and_session_scope_not_frozen",
+      "source_member": "nonebot_plugin_alias/__init__.py",
+      "source_member_sha256": "c7d5d30f11571ad67bfe6ca3f851212d363c1d9026fe581344d47fe877c45185",
+      "source_symbols": [
+        "create_alias_matcher",
+        "alias_matcher",
+        "unalias_matcher"
+      ],
+      "fixture_prerequisite": "The source requires nonebot_plugin_alconna and creates matchers keyed by session_id. Freeze dependency load order, create/resolve/remove events, alias response content, and a cross-session isolation assertion.",
+      "case_class_prerequisite": "The positive behavior needs one deterministic seed/config/event and an exact output or state oracle.",
+      "attempt_slots": [
+        {
+          "slot_id": "nb-nonebot-plugin-alias-positive--attempt-01",
+          "status": "not_dispatched",
+          "campaign_reason_code": "structured_adapter_setup_oracle_review_required",
+          "dispatch_state": "not_dispatched",
+          "cleanup": "not_applicable"
+        },
+        {
+          "slot_id": "nb-nonebot-plugin-alias-positive--attempt-02",
+          "status": "not_dispatched",
+          "campaign_reason_code": "structured_adapter_setup_oracle_review_required",
+          "dispatch_state": "not_dispatched",
+          "cleanup": "not_applicable"
+        },
+        {
+          "slot_id": "nb-nonebot-plugin-alias-positive--attempt-03",
+          "status": "not_dispatched",
+          "campaign_reason_code": "structured_adapter_setup_oracle_review_required",
+          "dispatch_state": "not_dispatched",
+          "cleanup": "not_applicable"
+        }
+      ]
+    },
+    {
+      "position_id": "nb-da100d12327d862b56c82b1a::nb-nonebot-plugin-alias-negative",
+      "registry_entry_id": "nb-da100d12327d862b56c82b1a",
+      "package": "nonebot_plugin_alias",
+      "version": "0.4.0",
+      "artifact_sha256": "382b65ae96140c0b752420d0e6d2f2c4dbee94b381aa2b1cd5af580d7e3e9a49",
+      "case_id": "nb-nonebot-plugin-alias-negative",
+      "case_class": "negative",
+      "v1_input": "remove an absent alias",
+      "v1_assertions": [
+        {
+          "path": "plugin_observation.response_or_operation_count",
+          "operator": "equals",
+          "value": 0
+        }
+      ],
+      "campaign_status": "skipped",
+      "campaign_reason_code": "structured_adapter_setup_oracle_review_required",
+      "attribution_reason_code": "alias_alconna_dependency_and_session_scope_not_frozen",
+      "source_member": "nonebot_plugin_alias/__init__.py",
+      "source_member_sha256": "c7d5d30f11571ad67bfe6ca3f851212d363c1d9026fe581344d47fe877c45185",
+      "source_symbols": [
+        "create_alias_matcher",
+        "alias_matcher",
+        "unalias_matcher"
+      ],
+      "fixture_prerequisite": "The source requires nonebot_plugin_alconna and creates matchers keyed by session_id. Freeze dependency load order, create/resolve/remove events, alias response content, and a cross-session isolation assertion.",
+      "case_class_prerequisite": "The negative boundary needs an input that reaches the intended plugin boundary and an independently expected no-op/error result.",
+      "attempt_slots": [
+        {
+          "slot_id": "nb-nonebot-plugin-alias-negative--attempt-01",
+          "status": "not_dispatched",
+          "campaign_reason_code": "structured_adapter_setup_oracle_review_required",
+          "dispatch_state": "not_dispatched",
+          "cleanup": "not_applicable"
+        },
+        {
+          "slot_id": "nb-nonebot-plugin-alias-negative--attempt-02",
+          "status": "not_dispatched",
+          "campaign_reason_code": "structured_adapter_setup_oracle_review_required",
+          "dispatch_state": "not_dispatched",
+          "cleanup": "not_applicable"
+        },
+        {
+          "slot_id": "nb-nonebot-plugin-alias-negative--attempt-03",
+          "status": "not_dispatched",
+          "campaign_reason_code": "structured_adapter_setup_oracle_review_required",
+          "dispatch_state": "not_dispatched",
+          "cleanup": "not_applicable"
+        }
+      ]
+    },
+    {
+      "position_id": "nb-da100d12327d862b56c82b1a::nb-nonebot-plugin-alias-isolation",
+      "registry_entry_id": "nb-da100d12327d862b56c82b1a",
+      "package": "nonebot_plugin_alias",
+      "version": "0.4.0",
+      "artifact_sha256": "382b65ae96140c0b752420d0e6d2f2c4dbee94b381aa2b1cd5af580d7e3e9a49",
+      "case_id": "nb-nonebot-plugin-alias-isolation",
+      "case_class": "isolation",
+      "v1_input": "alias created in session A is absent from session B",
+      "v1_assertions": [
+        {
+          "path": "plugin_observation.scope_leak_count",
+          "operator": "equals",
+          "value": 0
+        }
+      ],
+      "campaign_status": "skipped",
+      "campaign_reason_code": "structured_adapter_setup_oracle_review_required",
+      "attribution_reason_code": "alias_alconna_dependency_and_session_scope_not_frozen",
+      "source_member": "nonebot_plugin_alias/__init__.py",
+      "source_member_sha256": "c7d5d30f11571ad67bfe6ca3f851212d363c1d9026fe581344d47fe877c45185",
+      "source_symbols": [
+        "create_alias_matcher",
+        "alias_matcher",
+        "unalias_matcher"
+      ],
+      "fixture_prerequisite": "The source requires nonebot_plugin_alconna and creates matchers keyed by session_id. Freeze dependency load order, create/resolve/remove events, alias response content, and a cross-session isolation assertion.",
+      "case_class_prerequisite": "The isolation case needs two independent account/session/state identities and assertions bound to each event and scope.",
+      "attempt_slots": [
+        {
+          "slot_id": "nb-nonebot-plugin-alias-isolation--attempt-01",
+          "status": "not_dispatched",
+          "campaign_reason_code": "structured_adapter_setup_oracle_review_required",
+          "dispatch_state": "not_dispatched",
+          "cleanup": "not_applicable"
+        },
+        {
+          "slot_id": "nb-nonebot-plugin-alias-isolation--attempt-02",
+          "status": "not_dispatched",
+          "campaign_reason_code": "structured_adapter_setup_oracle_review_required",
+          "dispatch_state": "not_dispatched",
+          "cleanup": "not_applicable"
+        },
+        {
+          "slot_id": "nb-nonebot-plugin-alias-isolation--attempt-03",
+          "status": "not_dispatched",
+          "campaign_reason_code": "structured_adapter_setup_oracle_review_required",
+          "dispatch_state": "not_dispatched",
+          "cleanup": "not_applicable"
+        }
+      ]
+    },
+    {
+      "position_id": "nb-85b3294c1381385091eb0488::nb-nonebot-plugin-chatrecorder-positive",
+      "registry_entry_id": "nb-85b3294c1381385091eb0488",
+      "package": "nonebot_plugin_chatrecorder",
+      "version": "0.7.0",
+      "artifact_sha256": "56cfb306cc85c602c8c97e7f1a63328d075ac8fd2349ddefcb501600f416d544",
+      "case_id": "nb-nonebot-plugin-chatrecorder-positive",
+      "case_class": "positive",
+      "v1_input": "record one incoming OneBot message event",
+      "v1_assertions": [
+        {
+          "path": "plugin_observation.response_or_operation_count",
+          "operator": "in_range",
+          "minimum": 1,
+          "maximum": 1
+        }
+      ],
+      "campaign_status": "skipped",
+      "campaign_reason_code": "structured_adapter_setup_oracle_review_required",
+      "attribution_reason_code": "chatrecorder_orm_session_and_database_fixture_not_frozen",
+      "source_member": "nonebot_plugin_chatrecorder/adapters/onebot_v11.py",
+      "source_member_sha256": "c964b2aa817c3670b162ce959c76fef76bac717e4e7232760b9026386c6e60e3",
+      "source_symbols": [
+        "record_recv_msg"
+      ],
+      "fixture_prerequisite": "The OneBot adapter registers an event_postprocessor using nonebot_plugin_orm.get_session and Uninfo. Freeze an ORM database backend, session scope for message events, and persisted record assertions for message/non-message and two-session cases.",
+      "case_class_prerequisite": "The positive behavior needs one deterministic seed/config/event and an exact output or state oracle.",
+      "attempt_slots": [
+        {
+          "slot_id": "nb-nonebot-plugin-chatrecorder-positive--attempt-01",
+          "status": "not_dispatched",
+          "campaign_reason_code": "structured_adapter_setup_oracle_review_required",
+          "dispatch_state": "not_dispatched",
+          "cleanup": "not_applicable"
+        },
+        {
+          "slot_id": "nb-nonebot-plugin-chatrecorder-positive--attempt-02",
+          "status": "not_dispatched",
+          "campaign_reason_code": "structured_adapter_setup_oracle_review_required",
+          "dispatch_state": "not_dispatched",
+          "cleanup": "not_applicable"
+        },
+        {
+          "slot_id": "nb-nonebot-plugin-chatrecorder-positive--attempt-03",
+          "status": "not_dispatched",
+          "campaign_reason_code": "structured_adapter_setup_oracle_review_required",
+          "dispatch_state": "not_dispatched",
+          "cleanup": "not_applicable"
+        }
+      ]
+    },
+    {
+      "position_id": "nb-85b3294c1381385091eb0488::nb-nonebot-plugin-chatrecorder-negative",
+      "registry_entry_id": "nb-85b3294c1381385091eb0488",
+      "package": "nonebot_plugin_chatrecorder",
+      "version": "0.7.0",
+      "artifact_sha256": "56cfb306cc85c602c8c97e7f1a63328d075ac8fd2349ddefcb501600f416d544",
+      "case_id": "nb-nonebot-plugin-chatrecorder-negative",
+      "case_class": "negative",
+      "v1_input": "submit a non-message event",
+      "v1_assertions": [
+        {
+          "path": "plugin_observation.response_or_operation_count",
+          "operator": "equals",
+          "value": 0
+        }
+      ],
+      "campaign_status": "skipped",
+      "campaign_reason_code": "structured_adapter_setup_oracle_review_required",
+      "attribution_reason_code": "chatrecorder_orm_session_and_database_fixture_not_frozen",
+      "source_member": "nonebot_plugin_chatrecorder/adapters/onebot_v11.py",
+      "source_member_sha256": "c964b2aa817c3670b162ce959c76fef76bac717e4e7232760b9026386c6e60e3",
+      "source_symbols": [
+        "record_recv_msg"
+      ],
+      "fixture_prerequisite": "The OneBot adapter registers an event_postprocessor using nonebot_plugin_orm.get_session and Uninfo. Freeze an ORM database backend, session scope for message events, and persisted record assertions for message/non-message and two-session cases.",
+      "case_class_prerequisite": "The negative boundary needs an input that reaches the intended plugin boundary and an independently expected no-op/error result.",
+      "attempt_slots": [
+        {
+          "slot_id": "nb-nonebot-plugin-chatrecorder-negative--attempt-01",
+          "status": "not_dispatched",
+          "campaign_reason_code": "structured_adapter_setup_oracle_review_required",
+          "dispatch_state": "not_dispatched",
+          "cleanup": "not_applicable"
+        },
+        {
+          "slot_id": "nb-nonebot-plugin-chatrecorder-negative--attempt-02",
+          "status": "not_dispatched",
+          "campaign_reason_code": "structured_adapter_setup_oracle_review_required",
+          "dispatch_state": "not_dispatched",
+          "cleanup": "not_applicable"
+        },
+        {
+          "slot_id": "nb-nonebot-plugin-chatrecorder-negative--attempt-03",
+          "status": "not_dispatched",
+          "campaign_reason_code": "structured_adapter_setup_oracle_review_required",
+          "dispatch_state": "not_dispatched",
+          "cleanup": "not_applicable"
+        }
+      ]
+    },
+    {
+      "position_id": "nb-85b3294c1381385091eb0488::nb-nonebot-plugin-chatrecorder-isolation",
+      "registry_entry_id": "nb-85b3294c1381385091eb0488",
+      "package": "nonebot_plugin_chatrecorder",
+      "version": "0.7.0",
+      "artifact_sha256": "56cfb306cc85c602c8c97e7f1a63328d075ac8fd2349ddefcb501600f416d544",
+      "case_id": "nb-nonebot-plugin-chatrecorder-isolation",
+      "case_class": "isolation",
+      "v1_input": "records for two sessions retain distinct session identities",
+      "v1_assertions": [
+        {
+          "path": "plugin_observation.scope_leak_count",
+          "operator": "equals",
+          "value": 0
+        }
+      ],
+      "campaign_status": "skipped",
+      "campaign_reason_code": "structured_adapter_setup_oracle_review_required",
+      "attribution_reason_code": "chatrecorder_orm_session_and_database_fixture_not_frozen",
+      "source_member": "nonebot_plugin_chatrecorder/adapters/onebot_v11.py",
+      "source_member_sha256": "c964b2aa817c3670b162ce959c76fef76bac717e4e7232760b9026386c6e60e3",
+      "source_symbols": [
+        "record_recv_msg"
+      ],
+      "fixture_prerequisite": "The OneBot adapter registers an event_postprocessor using nonebot_plugin_orm.get_session and Uninfo. Freeze an ORM database backend, session scope for message events, and persisted record assertions for message/non-message and two-session cases.",
+      "case_class_prerequisite": "The isolation case needs two independent account/session/state identities and assertions bound to each event and scope.",
+      "attempt_slots": [
+        {
+          "slot_id": "nb-nonebot-plugin-chatrecorder-isolation--attempt-01",
+          "status": "not_dispatched",
+          "campaign_reason_code": "structured_adapter_setup_oracle_review_required",
+          "dispatch_state": "not_dispatched",
+          "cleanup": "not_applicable"
+        },
+        {
+          "slot_id": "nb-nonebot-plugin-chatrecorder-isolation--attempt-02",
+          "status": "not_dispatched",
+          "campaign_reason_code": "structured_adapter_setup_oracle_review_required",
+          "dispatch_state": "not_dispatched",
+          "cleanup": "not_applicable"
+        },
+        {
+          "slot_id": "nb-nonebot-plugin-chatrecorder-isolation--attempt-03",
+          "status": "not_dispatched",
+          "campaign_reason_code": "structured_adapter_setup_oracle_review_required",
+          "dispatch_state": "not_dispatched",
+          "cleanup": "not_applicable"
+        }
+      ]
+    },
+    {
+      "position_id": "nb-10a76db9822976efe2679433::nb-nonebot-plugin-word-bank2-positive",
+      "registry_entry_id": "nb-10a76db9822976efe2679433",
+      "package": "nonebot_plugin_word_bank2",
+      "version": "0.2.1",
+      "artifact_sha256": "d54fb5892e6d3fbaefc28aa1de7a0d5d46fc1bec448709e0582212ebd2dc603e",
+      "case_id": "nb-nonebot-plugin-word-bank2-positive",
+      "case_class": "positive",
+      "v1_input": "match exact per-user bank key",
+      "v1_assertions": [
+        {
+          "path": "plugin_observation.response_or_operation_count",
+          "operator": "in_range",
+          "minimum": 1,
+          "maximum": 1
+        }
+      ],
+      "campaign_status": "skipped",
+      "campaign_reason_code": "structured_adapter_setup_oracle_review_required",
+      "attribution_reason_code": "wordbank_data_file_and_user_scope_seed_not_frozen",
+      "source_member": "nonebot_plugin_word_bank2/data_source.py",
+      "source_member_sha256": "015d37178a4ccc256758c8b9ccb270f28aba1b44e33df2350f277168ee405947",
+      "source_symbols": [
+        "WordBank.match",
+        "WordEntry.match"
+      ],
+      "fixture_prerequisite": "The source reads bank.json from the plugin data directory. Freeze the file bytes with distinct per-user keys, deterministic match/non-match messages, and a user-isolation result oracle.",
+      "case_class_prerequisite": "The positive behavior needs one deterministic seed/config/event and an exact output or state oracle.",
+      "attempt_slots": [
+        {
+          "slot_id": "nb-nonebot-plugin-word-bank2-positive--attempt-01",
+          "status": "not_dispatched",
+          "campaign_reason_code": "structured_adapter_setup_oracle_review_required",
+          "dispatch_state": "not_dispatched",
+          "cleanup": "not_applicable"
+        },
+        {
+          "slot_id": "nb-nonebot-plugin-word-bank2-positive--attempt-02",
+          "status": "not_dispatched",
+          "campaign_reason_code": "structured_adapter_setup_oracle_review_required",
+          "dispatch_state": "not_dispatched",
+          "cleanup": "not_applicable"
+        },
+        {
+          "slot_id": "nb-nonebot-plugin-word-bank2-positive--attempt-03",
+          "status": "not_dispatched",
+          "campaign_reason_code": "structured_adapter_setup_oracle_review_required",
+          "dispatch_state": "not_dispatched",
+          "cleanup": "not_applicable"
+        }
+      ]
+    },
+    {
+      "position_id": "nb-10a76db9822976efe2679433::nb-nonebot-plugin-word-bank2-negative",
+      "registry_entry_id": "nb-10a76db9822976efe2679433",
+      "package": "nonebot_plugin_word_bank2",
+      "version": "0.2.1",
+      "artifact_sha256": "d54fb5892e6d3fbaefc28aa1de7a0d5d46fc1bec448709e0582212ebd2dc603e",
+      "case_id": "nb-nonebot-plugin-word-bank2-negative",
+      "case_class": "negative",
+      "v1_input": "send a message absent from configured keys",
+      "v1_assertions": [
+        {
+          "path": "plugin_observation.response_or_operation_count",
+          "operator": "equals",
+          "value": 0
+        }
+      ],
+      "campaign_status": "skipped",
+      "campaign_reason_code": "structured_adapter_setup_oracle_review_required",
+      "attribution_reason_code": "wordbank_data_file_and_user_scope_seed_not_frozen",
+      "source_member": "nonebot_plugin_word_bank2/data_source.py",
+      "source_member_sha256": "015d37178a4ccc256758c8b9ccb270f28aba1b44e33df2350f277168ee405947",
+      "source_symbols": [
+        "WordBank.match",
+        "WordEntry.match"
+      ],
+      "fixture_prerequisite": "The source reads bank.json from the plugin data directory. Freeze the file bytes with distinct per-user keys, deterministic match/non-match messages, and a user-isolation result oracle.",
+      "case_class_prerequisite": "The negative boundary needs an input that reaches the intended plugin boundary and an independently expected no-op/error result.",
+      "attempt_slots": [
+        {
+          "slot_id": "nb-nonebot-plugin-word-bank2-negative--attempt-01",
+          "status": "not_dispatched",
+          "campaign_reason_code": "structured_adapter_setup_oracle_review_required",
+          "dispatch_state": "not_dispatched",
+          "cleanup": "not_applicable"
+        },
+        {
+          "slot_id": "nb-nonebot-plugin-word-bank2-negative--attempt-02",
+          "status": "not_dispatched",
+          "campaign_reason_code": "structured_adapter_setup_oracle_review_required",
+          "dispatch_state": "not_dispatched",
+          "cleanup": "not_applicable"
+        },
+        {
+          "slot_id": "nb-nonebot-plugin-word-bank2-negative--attempt-03",
+          "status": "not_dispatched",
+          "campaign_reason_code": "structured_adapter_setup_oracle_review_required",
+          "dispatch_state": "not_dispatched",
+          "cleanup": "not_applicable"
+        }
+      ]
+    },
+    {
+      "position_id": "nb-10a76db9822976efe2679433::nb-nonebot-plugin-word-bank2-isolation",
+      "registry_entry_id": "nb-10a76db9822976efe2679433",
+      "package": "nonebot_plugin_word_bank2",
+      "version": "0.2.1",
+      "artifact_sha256": "d54fb5892e6d3fbaefc28aa1de7a0d5d46fc1bec448709e0582212ebd2dc603e",
+      "case_id": "nb-nonebot-plugin-word-bank2-isolation",
+      "case_class": "isolation",
+      "v1_input": "user-specific bank entry does not match another user",
+      "v1_assertions": [
+        {
+          "path": "plugin_observation.scope_leak_count",
+          "operator": "equals",
+          "value": 0
+        }
+      ],
+      "campaign_status": "skipped",
+      "campaign_reason_code": "structured_adapter_setup_oracle_review_required",
+      "attribution_reason_code": "wordbank_data_file_and_user_scope_seed_not_frozen",
+      "source_member": "nonebot_plugin_word_bank2/data_source.py",
+      "source_member_sha256": "015d37178a4ccc256758c8b9ccb270f28aba1b44e33df2350f277168ee405947",
+      "source_symbols": [
+        "WordBank.match",
+        "WordEntry.match"
+      ],
+      "fixture_prerequisite": "The source reads bank.json from the plugin data directory. Freeze the file bytes with distinct per-user keys, deterministic match/non-match messages, and a user-isolation result oracle.",
+      "case_class_prerequisite": "The isolation case needs two independent account/session/state identities and assertions bound to each event and scope.",
+      "attempt_slots": [
+        {
+          "slot_id": "nb-nonebot-plugin-word-bank2-isolation--attempt-01",
+          "status": "not_dispatched",
+          "campaign_reason_code": "structured_adapter_setup_oracle_review_required",
+          "dispatch_state": "not_dispatched",
+          "cleanup": "not_applicable"
+        },
+        {
+          "slot_id": "nb-nonebot-plugin-word-bank2-isolation--attempt-02",
+          "status": "not_dispatched",
+          "campaign_reason_code": "structured_adapter_setup_oracle_review_required",
+          "dispatch_state": "not_dispatched",
+          "cleanup": "not_applicable"
+        },
+        {
+          "slot_id": "nb-nonebot-plugin-word-bank2-isolation--attempt-03",
+          "status": "not_dispatched",
+          "campaign_reason_code": "structured_adapter_setup_oracle_review_required",
+          "dispatch_state": "not_dispatched",
+          "cleanup": "not_applicable"
+        }
+      ]
+    },
+    {
+      "position_id": "nb-7a3163a76a06283efe3bb2c9::nb-nonebot-plugin-morning-positive",
+      "registry_entry_id": "nb-7a3163a76a06283efe3bb2c9",
+      "package": "nonebot_plugin_morning",
+      "version": "0.3.2",
+      "artifact_sha256": "3d3b2b5758255df576ea3621af8fac52e2f1bf397af96efbdd838b2e2d8aa78a",
+      "case_id": "nb-nonebot-plugin-morning-positive",
+      "case_class": "positive",
+      "v1_input": "invoke morning behavior at fixed in-range time",
+      "v1_assertions": [
+        {
+          "path": "plugin_observation.response_or_operation_count",
+          "operator": "in_range",
+          "minimum": 1,
+          "maximum": 1
+        }
+      ],
+      "campaign_status": "skipped",
+      "campaign_reason_code": "structured_adapter_setup_oracle_review_required",
+      "attribution_reason_code": "morning_group_permission_config_and_clock_fixture_not_frozen",
+      "source_member": "nonebot_plugin_morning/__init__.py",
+      "source_member_sha256": "188ad091faf60f7a199b57e80dfe036f0649cd65adaebd679a21a4b4487265a0",
+      "source_symbols": [
+        "morning handlers",
+        "morning_config"
+      ],
+      "fixture_prerequisite": "The source exposes group-permission morning/night matchers and time/config behavior. Freeze the GROUP permission seed, plugin configuration, in-range/out-of-range clock inputs, and per-session response oracle.",
+      "case_class_prerequisite": "The positive behavior needs one deterministic seed/config/event and an exact output or state oracle.",
+      "attempt_slots": [
+        {
+          "slot_id": "nb-nonebot-plugin-morning-positive--attempt-01",
+          "status": "not_dispatched",
+          "campaign_reason_code": "structured_adapter_setup_oracle_review_required",
+          "dispatch_state": "not_dispatched",
+          "cleanup": "not_applicable"
+        },
+        {
+          "slot_id": "nb-nonebot-plugin-morning-positive--attempt-02",
+          "status": "not_dispatched",
+          "campaign_reason_code": "structured_adapter_setup_oracle_review_required",
+          "dispatch_state": "not_dispatched",
+          "cleanup": "not_applicable"
+        },
+        {
+          "slot_id": "nb-nonebot-plugin-morning-positive--attempt-03",
+          "status": "not_dispatched",
+          "campaign_reason_code": "structured_adapter_setup_oracle_review_required",
+          "dispatch_state": "not_dispatched",
+          "cleanup": "not_applicable"
+        }
+      ]
+    },
+    {
+      "position_id": "nb-7a3163a76a06283efe3bb2c9::nb-nonebot-plugin-morning-negative",
+      "registry_entry_id": "nb-7a3163a76a06283efe3bb2c9",
+      "package": "nonebot_plugin_morning",
+      "version": "0.3.2",
+      "artifact_sha256": "3d3b2b5758255df576ea3621af8fac52e2f1bf397af96efbdd838b2e2d8aa78a",
+      "case_id": "nb-nonebot-plugin-morning-negative",
+      "case_class": "negative",
+      "v1_input": "invoke at fixed out-of-range time",
+      "v1_assertions": [
+        {
+          "path": "plugin_observation.response_or_operation_count",
+          "operator": "equals",
+          "value": 0
+        }
+      ],
+      "campaign_status": "skipped",
+      "campaign_reason_code": "structured_adapter_setup_oracle_review_required",
+      "attribution_reason_code": "morning_group_permission_config_and_clock_fixture_not_frozen",
+      "source_member": "nonebot_plugin_morning/__init__.py",
+      "source_member_sha256": "188ad091faf60f7a199b57e80dfe036f0649cd65adaebd679a21a4b4487265a0",
+      "source_symbols": [
+        "morning handlers",
+        "morning_config"
+      ],
+      "fixture_prerequisite": "The source exposes group-permission morning/night matchers and time/config behavior. Freeze the GROUP permission seed, plugin configuration, in-range/out-of-range clock inputs, and per-session response oracle.",
+      "case_class_prerequisite": "The negative boundary needs an input that reaches the intended plugin boundary and an independently expected no-op/error result.",
+      "attempt_slots": [
+        {
+          "slot_id": "nb-nonebot-plugin-morning-negative--attempt-01",
+          "status": "not_dispatched",
+          "campaign_reason_code": "structured_adapter_setup_oracle_review_required",
+          "dispatch_state": "not_dispatched",
+          "cleanup": "not_applicable"
+        },
+        {
+          "slot_id": "nb-nonebot-plugin-morning-negative--attempt-02",
+          "status": "not_dispatched",
+          "campaign_reason_code": "structured_adapter_setup_oracle_review_required",
+          "dispatch_state": "not_dispatched",
+          "cleanup": "not_applicable"
+        },
+        {
+          "slot_id": "nb-nonebot-plugin-morning-negative--attempt-03",
+          "status": "not_dispatched",
+          "campaign_reason_code": "structured_adapter_setup_oracle_review_required",
+          "dispatch_state": "not_dispatched",
+          "cleanup": "not_applicable"
+        }
+      ]
+    },
+    {
+      "position_id": "nb-7a3163a76a06283efe3bb2c9::nb-nonebot-plugin-morning-isolation",
+      "registry_entry_id": "nb-7a3163a76a06283efe3bb2c9",
+      "package": "nonebot_plugin_morning",
+      "version": "0.3.2",
+      "artifact_sha256": "3d3b2b5758255df576ea3621af8fac52e2f1bf397af96efbdd838b2e2d8aa78a",
+      "case_id": "nb-nonebot-plugin-morning-isolation",
+      "case_class": "isolation",
+      "v1_input": "two sessions produce independent responses under same frozen clock",
+      "v1_assertions": [
+        {
+          "path": "plugin_observation.scope_leak_count",
+          "operator": "equals",
+          "value": 0
+        }
+      ],
+      "campaign_status": "skipped",
+      "campaign_reason_code": "structured_adapter_setup_oracle_review_required",
+      "attribution_reason_code": "morning_group_permission_config_and_clock_fixture_not_frozen",
+      "source_member": "nonebot_plugin_morning/__init__.py",
+      "source_member_sha256": "188ad091faf60f7a199b57e80dfe036f0649cd65adaebd679a21a4b4487265a0",
+      "source_symbols": [
+        "morning handlers",
+        "morning_config"
+      ],
+      "fixture_prerequisite": "The source exposes group-permission morning/night matchers and time/config behavior. Freeze the GROUP permission seed, plugin configuration, in-range/out-of-range clock inputs, and per-session response oracle.",
+      "case_class_prerequisite": "The isolation case needs two independent account/session/state identities and assertions bound to each event and scope.",
+      "attempt_slots": [
+        {
+          "slot_id": "nb-nonebot-plugin-morning-isolation--attempt-01",
+          "status": "not_dispatched",
+          "campaign_reason_code": "structured_adapter_setup_oracle_review_required",
+          "dispatch_state": "not_dispatched",
+          "cleanup": "not_applicable"
+        },
+        {
+          "slot_id": "nb-nonebot-plugin-morning-isolation--attempt-02",
+          "status": "not_dispatched",
+          "campaign_reason_code": "structured_adapter_setup_oracle_review_required",
+          "dispatch_state": "not_dispatched",
+          "cleanup": "not_applicable"
+        },
+        {
+          "slot_id": "nb-nonebot-plugin-morning-isolation--attempt-03",
+          "status": "not_dispatched",
+          "campaign_reason_code": "structured_adapter_setup_oracle_review_required",
+          "dispatch_state": "not_dispatched",
+          "cleanup": "not_applicable"
+        }
+      ]
+    },
+    {
+      "position_id": "ko-8be6f0a7682e575c75a4b3e9::ko-koishijs-plugin-database-sqlite-positive",
+      "registry_entry_id": "ko-8be6f0a7682e575c75a4b3e9",
+      "package": "@koishijs/plugin-database-sqlite",
+      "version": "4.7.0",
+      "artifact_sha256": "0febbea51f70d8268e437c81403b5f0c8dffebdc5055c8eea6c729f788b1a592",
+      "case_id": "ko-koishijs-plugin-database-sqlite-positive",
+      "case_class": "positive",
+      "v1_input": "create then read a row in temporary SQLite database",
+      "v1_assertions": [
+        {
+          "path": "plugin_observation.response_or_operation_count",
+          "operator": "in_range",
+          "minimum": 1,
+          "maximum": 1
+        }
+      ],
+      "campaign_status": "skipped",
+      "campaign_reason_code": "structured_adapter_setup_oracle_review_required",
+      "attribution_reason_code": "sqlite_provider_path_and_crud_fixture_not_frozen",
+      "source_member": "package/lib/index.js",
+      "source_member_sha256": "a370cf3224398b6700f3ec05bac020140b5fc0f65b3c89bb64743893261b834b",
+      "source_symbols": [
+        "apply",
+        "SqliteDatabase"
+      ],
+      "fixture_prerequisite": "The source is a SQLite database provider rather than a message plugin. Freeze provider configuration and temporary database path, then execute create/read, missing-row, and independent-key checks through the actual Koishi database API.",
+      "case_class_prerequisite": "The positive behavior needs one deterministic seed/config/event and an exact output or state oracle.",
+      "attempt_slots": [
+        {
+          "slot_id": "ko-koishijs-plugin-database-sqlite-positive--attempt-01",
+          "status": "not_dispatched",
+          "campaign_reason_code": "structured_adapter_setup_oracle_review_required",
+          "dispatch_state": "not_dispatched",
+          "cleanup": "not_applicable"
+        },
+        {
+          "slot_id": "ko-koishijs-plugin-database-sqlite-positive--attempt-02",
+          "status": "not_dispatched",
+          "campaign_reason_code": "structured_adapter_setup_oracle_review_required",
+          "dispatch_state": "not_dispatched",
+          "cleanup": "not_applicable"
+        },
+        {
+          "slot_id": "ko-koishijs-plugin-database-sqlite-positive--attempt-03",
+          "status": "not_dispatched",
+          "campaign_reason_code": "structured_adapter_setup_oracle_review_required",
+          "dispatch_state": "not_dispatched",
+          "cleanup": "not_applicable"
+        }
+      ]
+    },
+    {
+      "position_id": "ko-8be6f0a7682e575c75a4b3e9::ko-koishijs-plugin-database-sqlite-negative",
+      "registry_entry_id": "ko-8be6f0a7682e575c75a4b3e9",
+      "package": "@koishijs/plugin-database-sqlite",
+      "version": "4.7.0",
+      "artifact_sha256": "0febbea51f70d8268e437c81403b5f0c8dffebdc5055c8eea6c729f788b1a592",
+      "case_id": "ko-koishijs-plugin-database-sqlite-negative",
+      "case_class": "negative",
+      "v1_input": "read a missing row",
+      "v1_assertions": [
+        {
+          "path": "plugin_observation.response_or_operation_count",
+          "operator": "equals",
+          "value": 0
+        }
+      ],
+      "campaign_status": "skipped",
+      "campaign_reason_code": "structured_adapter_setup_oracle_review_required",
+      "attribution_reason_code": "sqlite_provider_path_and_crud_fixture_not_frozen",
+      "source_member": "package/lib/index.js",
+      "source_member_sha256": "a370cf3224398b6700f3ec05bac020140b5fc0f65b3c89bb64743893261b834b",
+      "source_symbols": [
+        "apply",
+        "SqliteDatabase"
+      ],
+      "fixture_prerequisite": "The source is a SQLite database provider rather than a message plugin. Freeze provider configuration and temporary database path, then execute create/read, missing-row, and independent-key checks through the actual Koishi database API.",
+      "case_class_prerequisite": "The negative boundary needs an input that reaches the intended plugin boundary and an independently expected no-op/error result.",
+      "attempt_slots": [
+        {
+          "slot_id": "ko-koishijs-plugin-database-sqlite-negative--attempt-01",
+          "status": "not_dispatched",
+          "campaign_reason_code": "structured_adapter_setup_oracle_review_required",
+          "dispatch_state": "not_dispatched",
+          "cleanup": "not_applicable"
+        },
+        {
+          "slot_id": "ko-koishijs-plugin-database-sqlite-negative--attempt-02",
+          "status": "not_dispatched",
+          "campaign_reason_code": "structured_adapter_setup_oracle_review_required",
+          "dispatch_state": "not_dispatched",
+          "cleanup": "not_applicable"
+        },
+        {
+          "slot_id": "ko-koishijs-plugin-database-sqlite-negative--attempt-03",
+          "status": "not_dispatched",
+          "campaign_reason_code": "structured_adapter_setup_oracle_review_required",
+          "dispatch_state": "not_dispatched",
+          "cleanup": "not_applicable"
+        }
+      ]
+    },
+    {
+      "position_id": "ko-8be6f0a7682e575c75a4b3e9::ko-koishijs-plugin-database-sqlite-isolation",
+      "registry_entry_id": "ko-8be6f0a7682e575c75a4b3e9",
+      "package": "@koishijs/plugin-database-sqlite",
+      "version": "4.7.0",
+      "artifact_sha256": "0febbea51f70d8268e437c81403b5f0c8dffebdc5055c8eea6c729f788b1a592",
+      "case_id": "ko-koishijs-plugin-database-sqlite-isolation",
+      "case_class": "isolation",
+      "v1_input": "two primary keys retain independent values",
+      "v1_assertions": [
+        {
+          "path": "plugin_observation.scope_leak_count",
+          "operator": "equals",
+          "value": 0
+        }
+      ],
+      "campaign_status": "skipped",
+      "campaign_reason_code": "structured_adapter_setup_oracle_review_required",
+      "attribution_reason_code": "sqlite_provider_path_and_crud_fixture_not_frozen",
+      "source_member": "package/lib/index.js",
+      "source_member_sha256": "a370cf3224398b6700f3ec05bac020140b5fc0f65b3c89bb64743893261b834b",
+      "source_symbols": [
+        "apply",
+        "SqliteDatabase"
+      ],
+      "fixture_prerequisite": "The source is a SQLite database provider rather than a message plugin. Freeze provider configuration and temporary database path, then execute create/read, missing-row, and independent-key checks through the actual Koishi database API.",
+      "case_class_prerequisite": "The isolation case needs two independent account/session/state identities and assertions bound to each event and scope.",
+      "attempt_slots": [
+        {
+          "slot_id": "ko-koishijs-plugin-database-sqlite-isolation--attempt-01",
+          "status": "not_dispatched",
+          "campaign_reason_code": "structured_adapter_setup_oracle_review_required",
+          "dispatch_state": "not_dispatched",
+          "cleanup": "not_applicable"
+        },
+        {
+          "slot_id": "ko-koishijs-plugin-database-sqlite-isolation--attempt-02",
+          "status": "not_dispatched",
+          "campaign_reason_code": "structured_adapter_setup_oracle_review_required",
+          "dispatch_state": "not_dispatched",
+          "cleanup": "not_applicable"
+        },
+        {
+          "slot_id": "ko-koishijs-plugin-database-sqlite-isolation--attempt-03",
+          "status": "not_dispatched",
+          "campaign_reason_code": "structured_adapter_setup_oracle_review_required",
+          "dispatch_state": "not_dispatched",
+          "cleanup": "not_applicable"
+        }
+      ]
+    },
+    {
+      "position_id": "ko-97f39cf7212bea26b51ea8b3::ko-koishijs-plugin-commands-positive",
+      "registry_entry_id": "ko-97f39cf7212bea26b51ea8b3",
+      "package": "@koishijs/plugin-commands",
+      "version": "3.5.5",
+      "artifact_sha256": "255640bbb0c335e9654ab54c7a7d582f184e9666c3cddd4788055ae838608c6a",
+      "case_id": "ko-koishijs-plugin-commands-positive",
+      "case_class": "positive",
+      "v1_input": "register and resolve a fixture command",
+      "v1_assertions": [
+        {
+          "path": "plugin_observation.response_or_operation_count",
+          "operator": "in_range",
+          "minimum": 1,
+          "maximum": 1
+        }
+      ],
+      "campaign_status": "skipped",
+      "campaign_reason_code": "structured_adapter_setup_oracle_review_required",
+      "attribution_reason_code": "commands_manager_loader_console_and_authority_setup_not_frozen",
+      "source_member": "package/lib/index.js",
+      "source_member_sha256": "267ec69ef3d2141364e1eb3f7749a4e1533148c416cc8f8552ceb11977236101",
+      "source_symbols": [
+        "command_default",
+        "Context.command"
+      ],
+      "fixture_prerequisite": "The source creates authority-4 management commands and registers Console listeners/entries for command updates. Freeze the manager loader and Console service, authority state, command seed, and exact create/resolve/unauthorized behavior.",
+      "case_class_prerequisite": "The positive behavior needs one deterministic seed/config/event and an exact output or state oracle.",
+      "attempt_slots": [
+        {
+          "slot_id": "ko-koishijs-plugin-commands-positive--attempt-01",
+          "status": "not_dispatched",
+          "campaign_reason_code": "structured_adapter_setup_oracle_review_required",
+          "dispatch_state": "not_dispatched",
+          "cleanup": "not_applicable"
+        },
+        {
+          "slot_id": "ko-koishijs-plugin-commands-positive--attempt-02",
+          "status": "not_dispatched",
+          "campaign_reason_code": "structured_adapter_setup_oracle_review_required",
+          "dispatch_state": "not_dispatched",
+          "cleanup": "not_applicable"
+        },
+        {
+          "slot_id": "ko-koishijs-plugin-commands-positive--attempt-03",
+          "status": "not_dispatched",
+          "campaign_reason_code": "structured_adapter_setup_oracle_review_required",
+          "dispatch_state": "not_dispatched",
+          "cleanup": "not_applicable"
+        }
+      ]
+    },
+    {
+      "position_id": "ko-97f39cf7212bea26b51ea8b3::ko-koishijs-plugin-commands-negative",
+      "registry_entry_id": "ko-97f39cf7212bea26b51ea8b3",
+      "package": "@koishijs/plugin-commands",
+      "version": "3.5.5",
+      "artifact_sha256": "255640bbb0c335e9654ab54c7a7d582f184e9666c3cddd4788055ae838608c6a",
+      "case_id": "ko-koishijs-plugin-commands-negative",
+      "case_class": "negative",
+      "v1_input": "resolve an unregistered command",
+      "v1_assertions": [
+        {
+          "path": "plugin_observation.response_or_operation_count",
+          "operator": "equals",
+          "value": 0
+        }
+      ],
+      "campaign_status": "skipped",
+      "campaign_reason_code": "structured_adapter_setup_oracle_review_required",
+      "attribution_reason_code": "commands_manager_loader_console_and_authority_setup_not_frozen",
+      "source_member": "package/lib/index.js",
+      "source_member_sha256": "267ec69ef3d2141364e1eb3f7749a4e1533148c416cc8f8552ceb11977236101",
+      "source_symbols": [
+        "command_default",
+        "Context.command"
+      ],
+      "fixture_prerequisite": "The source creates authority-4 management commands and registers Console listeners/entries for command updates. Freeze the manager loader and Console service, authority state, command seed, and exact create/resolve/unauthorized behavior.",
+      "case_class_prerequisite": "The negative boundary needs an input that reaches the intended plugin boundary and an independently expected no-op/error result.",
+      "attempt_slots": [
+        {
+          "slot_id": "ko-koishijs-plugin-commands-negative--attempt-01",
+          "status": "not_dispatched",
+          "campaign_reason_code": "structured_adapter_setup_oracle_review_required",
+          "dispatch_state": "not_dispatched",
+          "cleanup": "not_applicable"
+        },
+        {
+          "slot_id": "ko-koishijs-plugin-commands-negative--attempt-02",
+          "status": "not_dispatched",
+          "campaign_reason_code": "structured_adapter_setup_oracle_review_required",
+          "dispatch_state": "not_dispatched",
+          "cleanup": "not_applicable"
+        },
+        {
+          "slot_id": "ko-koishijs-plugin-commands-negative--attempt-03",
+          "status": "not_dispatched",
+          "campaign_reason_code": "structured_adapter_setup_oracle_review_required",
+          "dispatch_state": "not_dispatched",
+          "cleanup": "not_applicable"
+        }
+      ]
+    },
+    {
+      "position_id": "ko-97f39cf7212bea26b51ea8b3::ko-koishijs-plugin-commands-isolation",
+      "registry_entry_id": "ko-97f39cf7212bea26b51ea8b3",
+      "package": "@koishijs/plugin-commands",
+      "version": "3.5.5",
+      "artifact_sha256": "255640bbb0c335e9654ab54c7a7d582f184e9666c3cddd4788055ae838608c6a",
+      "case_id": "ko-koishijs-plugin-commands-isolation",
+      "case_class": "isolation",
+      "v1_input": "two command names remain independently addressable",
+      "v1_assertions": [
+        {
+          "path": "plugin_observation.scope_leak_count",
+          "operator": "equals",
+          "value": 0
+        }
+      ],
+      "campaign_status": "skipped",
+      "campaign_reason_code": "structured_adapter_setup_oracle_review_required",
+      "attribution_reason_code": "commands_manager_loader_console_and_authority_setup_not_frozen",
+      "source_member": "package/lib/index.js",
+      "source_member_sha256": "267ec69ef3d2141364e1eb3f7749a4e1533148c416cc8f8552ceb11977236101",
+      "source_symbols": [
+        "command_default",
+        "Context.command"
+      ],
+      "fixture_prerequisite": "The source creates authority-4 management commands and registers Console listeners/entries for command updates. Freeze the manager loader and Console service, authority state, command seed, and exact create/resolve/unauthorized behavior.",
+      "case_class_prerequisite": "The isolation case needs two independent account/session/state identities and assertions bound to each event and scope.",
+      "attempt_slots": [
+        {
+          "slot_id": "ko-koishijs-plugin-commands-isolation--attempt-01",
+          "status": "not_dispatched",
+          "campaign_reason_code": "structured_adapter_setup_oracle_review_required",
+          "dispatch_state": "not_dispatched",
+          "cleanup": "not_applicable"
+        },
+        {
+          "slot_id": "ko-koishijs-plugin-commands-isolation--attempt-02",
+          "status": "not_dispatched",
+          "campaign_reason_code": "structured_adapter_setup_oracle_review_required",
+          "dispatch_state": "not_dispatched",
+          "cleanup": "not_applicable"
+        },
+        {
+          "slot_id": "ko-koishijs-plugin-commands-isolation--attempt-03",
+          "status": "not_dispatched",
+          "campaign_reason_code": "structured_adapter_setup_oracle_review_required",
+          "dispatch_state": "not_dispatched",
+          "cleanup": "not_applicable"
+        }
+      ]
+    },
+    {
+      "position_id": "ko-0a6452b59539c2d91ee57448::ko-koishijs-plugin-config-positive",
+      "registry_entry_id": "ko-0a6452b59539c2d91ee57448",
+      "package": "@koishijs/plugin-config",
+      "version": "2.8.7",
+      "artifact_sha256": "4411a1e80368084ad503c9db25db321e7316a61219e652e37bbe453900e58a09",
+      "case_id": "ko-koishijs-plugin-config-positive",
+      "case_class": "positive",
+      "v1_input": "write fixture plugin config and refresh runtime",
+      "v1_assertions": [
+        {
+          "path": "plugin_observation.response_or_operation_count",
+          "operator": "in_range",
+          "minimum": 1,
+          "maximum": 1
+        }
+      ],
+      "campaign_status": "skipped",
+      "campaign_reason_code": "structured_adapter_setup_oracle_review_required",
+      "attribution_reason_code": "config_console_loader_runtime_fixture_not_frozen",
+      "source_member": "package/lib/shared/index.js",
+      "source_member_sha256": "9998826683d4808d95e38512916d705667ae6cbf4d56bfa9039f104e7cbdf542",
+      "source_symbols": [
+        "ConfigWriter",
+        "refresh",
+        "config/request-runtime"
+      ],
+      "fixture_prerequisite": "The source listens for config/request-runtime and manager reload/unload events through Koishi Console and Loader. Freeze those services, plugin identities/config snapshots, request/refresh outcomes, and separate config-isolation assertions.",
+      "case_class_prerequisite": "The positive behavior needs one deterministic seed/config/event and an exact output or state oracle.",
+      "attempt_slots": [
+        {
+          "slot_id": "ko-koishijs-plugin-config-positive--attempt-01",
+          "status": "not_dispatched",
+          "campaign_reason_code": "structured_adapter_setup_oracle_review_required",
+          "dispatch_state": "not_dispatched",
+          "cleanup": "not_applicable"
+        },
+        {
+          "slot_id": "ko-koishijs-plugin-config-positive--attempt-02",
+          "status": "not_dispatched",
+          "campaign_reason_code": "structured_adapter_setup_oracle_review_required",
+          "dispatch_state": "not_dispatched",
+          "cleanup": "not_applicable"
+        },
+        {
+          "slot_id": "ko-koishijs-plugin-config-positive--attempt-03",
+          "status": "not_dispatched",
+          "campaign_reason_code": "structured_adapter_setup_oracle_review_required",
+          "dispatch_state": "not_dispatched",
+          "cleanup": "not_applicable"
+        }
+      ]
+    },
+    {
+      "position_id": "ko-0a6452b59539c2d91ee57448::ko-koishijs-plugin-config-negative",
+      "registry_entry_id": "ko-0a6452b59539c2d91ee57448",
+      "package": "@koishijs/plugin-config",
+      "version": "2.8.7",
+      "artifact_sha256": "4411a1e80368084ad503c9db25db321e7316a61219e652e37bbe453900e58a09",
+      "case_id": "ko-koishijs-plugin-config-negative",
+      "case_class": "negative",
+      "v1_input": "request config for absent plugin",
+      "v1_assertions": [
+        {
+          "path": "plugin_observation.response_or_operation_count",
+          "operator": "equals",
+          "value": 0
+        }
+      ],
+      "campaign_status": "skipped",
+      "campaign_reason_code": "structured_adapter_setup_oracle_review_required",
+      "attribution_reason_code": "config_console_loader_runtime_fixture_not_frozen",
+      "source_member": "package/lib/shared/index.js",
+      "source_member_sha256": "9998826683d4808d95e38512916d705667ae6cbf4d56bfa9039f104e7cbdf542",
+      "source_symbols": [
+        "ConfigWriter",
+        "refresh",
+        "config/request-runtime"
+      ],
+      "fixture_prerequisite": "The source listens for config/request-runtime and manager reload/unload events through Koishi Console and Loader. Freeze those services, plugin identities/config snapshots, request/refresh outcomes, and separate config-isolation assertions.",
+      "case_class_prerequisite": "The negative boundary needs an input that reaches the intended plugin boundary and an independently expected no-op/error result.",
+      "attempt_slots": [
+        {
+          "slot_id": "ko-koishijs-plugin-config-negative--attempt-01",
+          "status": "not_dispatched",
+          "campaign_reason_code": "structured_adapter_setup_oracle_review_required",
+          "dispatch_state": "not_dispatched",
+          "cleanup": "not_applicable"
+        },
+        {
+          "slot_id": "ko-koishijs-plugin-config-negative--attempt-02",
+          "status": "not_dispatched",
+          "campaign_reason_code": "structured_adapter_setup_oracle_review_required",
+          "dispatch_state": "not_dispatched",
+          "cleanup": "not_applicable"
+        },
+        {
+          "slot_id": "ko-koishijs-plugin-config-negative--attempt-03",
+          "status": "not_dispatched",
+          "campaign_reason_code": "structured_adapter_setup_oracle_review_required",
+          "dispatch_state": "not_dispatched",
+          "cleanup": "not_applicable"
+        }
+      ]
+    },
+    {
+      "position_id": "ko-0a6452b59539c2d91ee57448::ko-koishijs-plugin-config-isolation",
+      "registry_entry_id": "ko-0a6452b59539c2d91ee57448",
+      "package": "@koishijs/plugin-config",
+      "version": "2.8.7",
+      "artifact_sha256": "4411a1e80368084ad503c9db25db321e7316a61219e652e37bbe453900e58a09",
+      "case_id": "ko-koishijs-plugin-config-isolation",
+      "case_class": "isolation",
+      "v1_input": "two plugin configs remain attached to separate plugin identities",
+      "v1_assertions": [
+        {
+          "path": "plugin_observation.scope_leak_count",
+          "operator": "equals",
+          "value": 0
+        }
+      ],
+      "campaign_status": "skipped",
+      "campaign_reason_code": "structured_adapter_setup_oracle_review_required",
+      "attribution_reason_code": "config_console_loader_runtime_fixture_not_frozen",
+      "source_member": "package/lib/shared/index.js",
+      "source_member_sha256": "9998826683d4808d95e38512916d705667ae6cbf4d56bfa9039f104e7cbdf542",
+      "source_symbols": [
+        "ConfigWriter",
+        "refresh",
+        "config/request-runtime"
+      ],
+      "fixture_prerequisite": "The source listens for config/request-runtime and manager reload/unload events through Koishi Console and Loader. Freeze those services, plugin identities/config snapshots, request/refresh outcomes, and separate config-isolation assertions.",
+      "case_class_prerequisite": "The isolation case needs two independent account/session/state identities and assertions bound to each event and scope.",
+      "attempt_slots": [
+        {
+          "slot_id": "ko-koishijs-plugin-config-isolation--attempt-01",
+          "status": "not_dispatched",
+          "campaign_reason_code": "structured_adapter_setup_oracle_review_required",
+          "dispatch_state": "not_dispatched",
+          "cleanup": "not_applicable"
+        },
+        {
+          "slot_id": "ko-koishijs-plugin-config-isolation--attempt-02",
+          "status": "not_dispatched",
+          "campaign_reason_code": "structured_adapter_setup_oracle_review_required",
+          "dispatch_state": "not_dispatched",
+          "cleanup": "not_applicable"
+        },
+        {
+          "slot_id": "ko-koishijs-plugin-config-isolation--attempt-03",
+          "status": "not_dispatched",
+          "campaign_reason_code": "structured_adapter_setup_oracle_review_required",
+          "dispatch_state": "not_dispatched",
+          "cleanup": "not_applicable"
+        }
+      ]
+    },
+    {
+      "position_id": "ko-4fa1f6f3a9cfbddb2c218917::ko-koishi-plugin-guess-number-positive",
+      "registry_entry_id": "ko-4fa1f6f3a9cfbddb2c218917",
+      "package": "koishi-plugin-guess-number",
+      "version": "1.2.1",
+      "artifact_sha256": "86ee947638e72a12a992a68c87419e7c7ec87dcfc2cf0b4e90f41e3c11747544",
+      "case_id": "ko-koishi-plugin-guess-number-positive",
+      "case_class": "positive",
+      "v1_input": "start a game with fixed seed and configuration",
+      "v1_assertions": [
+        {
+          "path": "plugin_observation.response_or_operation_count",
+          "operator": "in_range",
+          "minimum": 1,
+          "maximum": 1
+        }
+      ],
+      "campaign_status": "skipped",
+      "campaign_reason_code": "structured_adapter_setup_oracle_review_required",
+      "attribution_reason_code": "guess_number_command_state_and_random_oracle_not_frozen",
+      "source_member": "package/lib/index.js",
+      "source_member_sha256": "fa174825b96567d12a9cd4776fd5e432bfc11578550ef9afbd38c862bc2fe49e",
+      "source_symbols": [
+        "guess-number command action",
+        "middleware"
+      ],
+      "fixture_prerequisite": "The source stores active game stages by session.cid and combines a command with message middleware. Freeze game configuration, deterministic random draws, mention-mode boundaries, and two-user state isolation.",
+      "case_class_prerequisite": "The positive behavior needs one deterministic seed/config/event and an exact output or state oracle.",
+      "attempt_slots": [
+        {
+          "slot_id": "ko-koishi-plugin-guess-number-positive--attempt-01",
+          "status": "not_dispatched",
+          "campaign_reason_code": "structured_adapter_setup_oracle_review_required",
+          "dispatch_state": "not_dispatched",
+          "cleanup": "not_applicable"
+        },
+        {
+          "slot_id": "ko-koishi-plugin-guess-number-positive--attempt-02",
+          "status": "not_dispatched",
+          "campaign_reason_code": "structured_adapter_setup_oracle_review_required",
+          "dispatch_state": "not_dispatched",
+          "cleanup": "not_applicable"
+        },
+        {
+          "slot_id": "ko-koishi-plugin-guess-number-positive--attempt-03",
+          "status": "not_dispatched",
+          "campaign_reason_code": "structured_adapter_setup_oracle_review_required",
+          "dispatch_state": "not_dispatched",
+          "cleanup": "not_applicable"
+        }
+      ]
+    },
+    {
+      "position_id": "ko-4fa1f6f3a9cfbddb2c218917::ko-koishi-plugin-guess-number-negative",
+      "registry_entry_id": "ko-4fa1f6f3a9cfbddb2c218917",
+      "package": "koishi-plugin-guess-number",
+      "version": "1.2.1",
+      "artifact_sha256": "86ee947638e72a12a992a68c87419e7c7ec87dcfc2cf0b4e90f41e3c11747544",
+      "case_id": "ko-koishi-plugin-guess-number-negative",
+      "case_class": "negative",
+      "v1_input": "send unmentioned direct answer in mention mode",
+      "v1_assertions": [
+        {
+          "path": "plugin_observation.response_or_operation_count",
+          "operator": "equals",
+          "value": 0
+        }
+      ],
+      "campaign_status": "skipped",
+      "campaign_reason_code": "structured_adapter_setup_oracle_review_required",
+      "attribution_reason_code": "guess_number_command_state_and_random_oracle_not_frozen",
+      "source_member": "package/lib/index.js",
+      "source_member_sha256": "fa174825b96567d12a9cd4776fd5e432bfc11578550ef9afbd38c862bc2fe49e",
+      "source_symbols": [
+        "guess-number command action",
+        "middleware"
+      ],
+      "fixture_prerequisite": "The source stores active game stages by session.cid and combines a command with message middleware. Freeze game configuration, deterministic random draws, mention-mode boundaries, and two-user state isolation.",
+      "case_class_prerequisite": "The negative boundary needs an input that reaches the intended plugin boundary and an independently expected no-op/error result.",
+      "attempt_slots": [
+        {
+          "slot_id": "ko-koishi-plugin-guess-number-negative--attempt-01",
+          "status": "not_dispatched",
+          "campaign_reason_code": "structured_adapter_setup_oracle_review_required",
+          "dispatch_state": "not_dispatched",
+          "cleanup": "not_applicable"
+        },
+        {
+          "slot_id": "ko-koishi-plugin-guess-number-negative--attempt-02",
+          "status": "not_dispatched",
+          "campaign_reason_code": "structured_adapter_setup_oracle_review_required",
+          "dispatch_state": "not_dispatched",
+          "cleanup": "not_applicable"
+        },
+        {
+          "slot_id": "ko-koishi-plugin-guess-number-negative--attempt-03",
+          "status": "not_dispatched",
+          "campaign_reason_code": "structured_adapter_setup_oracle_review_required",
+          "dispatch_state": "not_dispatched",
+          "cleanup": "not_applicable"
+        }
+      ]
+    },
+    {
+      "position_id": "ko-4fa1f6f3a9cfbddb2c218917::ko-koishi-plugin-guess-number-isolation",
+      "registry_entry_id": "ko-4fa1f6f3a9cfbddb2c218917",
+      "package": "koishi-plugin-guess-number",
+      "version": "1.2.1",
+      "artifact_sha256": "86ee947638e72a12a992a68c87419e7c7ec87dcfc2cf0b4e90f41e3c11747544",
+      "case_id": "ko-koishi-plugin-guess-number-isolation",
+      "case_class": "isolation",
+      "v1_input": "two users hold independent game state",
+      "v1_assertions": [
+        {
+          "path": "plugin_observation.scope_leak_count",
+          "operator": "equals",
+          "value": 0
+        }
+      ],
+      "campaign_status": "skipped",
+      "campaign_reason_code": "structured_adapter_setup_oracle_review_required",
+      "attribution_reason_code": "guess_number_command_state_and_random_oracle_not_frozen",
+      "source_member": "package/lib/index.js",
+      "source_member_sha256": "fa174825b96567d12a9cd4776fd5e432bfc11578550ef9afbd38c862bc2fe49e",
+      "source_symbols": [
+        "guess-number command action",
+        "middleware"
+      ],
+      "fixture_prerequisite": "The source stores active game stages by session.cid and combines a command with message middleware. Freeze game configuration, deterministic random draws, mention-mode boundaries, and two-user state isolation.",
+      "case_class_prerequisite": "The isolation case needs two independent account/session/state identities and assertions bound to each event and scope.",
+      "attempt_slots": [
+        {
+          "slot_id": "ko-koishi-plugin-guess-number-isolation--attempt-01",
+          "status": "not_dispatched",
+          "campaign_reason_code": "structured_adapter_setup_oracle_review_required",
+          "dispatch_state": "not_dispatched",
+          "cleanup": "not_applicable"
+        },
+        {
+          "slot_id": "ko-koishi-plugin-guess-number-isolation--attempt-02",
+          "status": "not_dispatched",
+          "campaign_reason_code": "structured_adapter_setup_oracle_review_required",
+          "dispatch_state": "not_dispatched",
+          "cleanup": "not_applicable"
+        },
+        {
+          "slot_id": "ko-koishi-plugin-guess-number-isolation--attempt-03",
+          "status": "not_dispatched",
+          "campaign_reason_code": "structured_adapter_setup_oracle_review_required",
+          "dispatch_state": "not_dispatched",
+          "cleanup": "not_applicable"
+        }
+      ]
+    },
+    {
+      "position_id": "ko-aa34b6d87f81a7e263607dbc::ko-koishi-plugin-calculator-positive",
+      "registry_entry_id": "ko-aa34b6d87f81a7e263607dbc",
+      "package": "koishi-plugin-calculator",
+      "version": "1.2.0",
+      "artifact_sha256": "790a2d77a51c28c9c0fc5a10e62e22b1d18f2d38e4bdefbb536293d170648662",
+      "case_id": "ko-koishi-plugin-calculator-positive",
+      "case_class": "positive",
+      "v1_input": "submit valid calculation with seeded value",
+      "v1_assertions": [
+        {
+          "path": "plugin_observation.response_or_operation_count",
+          "operator": "in_range",
+          "minimum": 1,
+          "maximum": 1
+        }
+      ],
+      "campaign_status": "skipped",
+      "campaign_reason_code": "structured_adapter_setup_oracle_review_required",
+      "attribution_reason_code": "calculator_admin_group_mapping_and_database_seed_not_frozen",
+      "source_member": "package/lib/index.js",
+      "source_member_sha256": "151abd6233f34e7eddd9571310111fba1dc4cce40b051ba5463d67ceb4a4db7b",
+      "source_symbols": [
+        "message listener",
+        "calculator_values"
+      ],
+      "fixture_prerequisite": "The source extends calculator_values, reads/writes Koishi database rows, and gates events by admins/groupMappings. Freeze both config lists, initial row/value, arithmetic inputs, and independent group state assertions.",
+      "case_class_prerequisite": "The positive behavior needs one deterministic seed/config/event and an exact output or state oracle.",
+      "attempt_slots": [
+        {
+          "slot_id": "ko-koishi-plugin-calculator-positive--attempt-01",
+          "status": "not_dispatched",
+          "campaign_reason_code": "structured_adapter_setup_oracle_review_required",
+          "dispatch_state": "not_dispatched",
+          "cleanup": "not_applicable"
+        },
+        {
+          "slot_id": "ko-koishi-plugin-calculator-positive--attempt-02",
+          "status": "not_dispatched",
+          "campaign_reason_code": "structured_adapter_setup_oracle_review_required",
+          "dispatch_state": "not_dispatched",
+          "cleanup": "not_applicable"
+        },
+        {
+          "slot_id": "ko-koishi-plugin-calculator-positive--attempt-03",
+          "status": "not_dispatched",
+          "campaign_reason_code": "structured_adapter_setup_oracle_review_required",
+          "dispatch_state": "not_dispatched",
+          "cleanup": "not_applicable"
+        }
+      ]
+    },
+    {
+      "position_id": "ko-aa34b6d87f81a7e263607dbc::ko-koishi-plugin-calculator-negative",
+      "registry_entry_id": "ko-aa34b6d87f81a7e263607dbc",
+      "package": "koishi-plugin-calculator",
+      "version": "1.2.0",
+      "artifact_sha256": "790a2d77a51c28c9c0fc5a10e62e22b1d18f2d38e4bdefbb536293d170648662",
+      "case_id": "ko-koishi-plugin-calculator-negative",
+      "case_class": "negative",
+      "v1_input": "submit plain text",
+      "v1_assertions": [
+        {
+          "path": "plugin_observation.response_or_operation_count",
+          "operator": "equals",
+          "value": 0
+        }
+      ],
+      "campaign_status": "skipped",
+      "campaign_reason_code": "structured_adapter_setup_oracle_review_required",
+      "attribution_reason_code": "calculator_admin_group_mapping_and_database_seed_not_frozen",
+      "source_member": "package/lib/index.js",
+      "source_member_sha256": "151abd6233f34e7eddd9571310111fba1dc4cce40b051ba5463d67ceb4a4db7b",
+      "source_symbols": [
+        "message listener",
+        "calculator_values"
+      ],
+      "fixture_prerequisite": "The source extends calculator_values, reads/writes Koishi database rows, and gates events by admins/groupMappings. Freeze both config lists, initial row/value, arithmetic inputs, and independent group state assertions.",
+      "case_class_prerequisite": "The negative boundary needs an input that reaches the intended plugin boundary and an independently expected no-op/error result.",
+      "attempt_slots": [
+        {
+          "slot_id": "ko-koishi-plugin-calculator-negative--attempt-01",
+          "status": "not_dispatched",
+          "campaign_reason_code": "structured_adapter_setup_oracle_review_required",
+          "dispatch_state": "not_dispatched",
+          "cleanup": "not_applicable"
+        },
+        {
+          "slot_id": "ko-koishi-plugin-calculator-negative--attempt-02",
+          "status": "not_dispatched",
+          "campaign_reason_code": "structured_adapter_setup_oracle_review_required",
+          "dispatch_state": "not_dispatched",
+          "cleanup": "not_applicable"
+        },
+        {
+          "slot_id": "ko-koishi-plugin-calculator-negative--attempt-03",
+          "status": "not_dispatched",
+          "campaign_reason_code": "structured_adapter_setup_oracle_review_required",
+          "dispatch_state": "not_dispatched",
+          "cleanup": "not_applicable"
+        }
+      ]
+    },
+    {
+      "position_id": "ko-aa34b6d87f81a7e263607dbc::ko-koishi-plugin-calculator-isolation",
+      "registry_entry_id": "ko-aa34b6d87f81a7e263607dbc",
+      "package": "koishi-plugin-calculator",
+      "version": "1.2.0",
+      "artifact_sha256": "790a2d77a51c28c9c0fc5a10e62e22b1d18f2d38e4bdefbb536293d170648662",
+      "case_id": "ko-koishi-plugin-calculator-isolation",
+      "case_class": "isolation",
+      "v1_input": "independentMode separates values by group",
+      "v1_assertions": [
+        {
+          "path": "plugin_observation.scope_leak_count",
+          "operator": "equals",
+          "value": 0
+        }
+      ],
+      "campaign_status": "skipped",
+      "campaign_reason_code": "structured_adapter_setup_oracle_review_required",
+      "attribution_reason_code": "calculator_admin_group_mapping_and_database_seed_not_frozen",
+      "source_member": "package/lib/index.js",
+      "source_member_sha256": "151abd6233f34e7eddd9571310111fba1dc4cce40b051ba5463d67ceb4a4db7b",
+      "source_symbols": [
+        "message listener",
+        "calculator_values"
+      ],
+      "fixture_prerequisite": "The source extends calculator_values, reads/writes Koishi database rows, and gates events by admins/groupMappings. Freeze both config lists, initial row/value, arithmetic inputs, and independent group state assertions.",
+      "case_class_prerequisite": "The isolation case needs two independent account/session/state identities and assertions bound to each event and scope.",
+      "attempt_slots": [
+        {
+          "slot_id": "ko-koishi-plugin-calculator-isolation--attempt-01",
+          "status": "not_dispatched",
+          "campaign_reason_code": "structured_adapter_setup_oracle_review_required",
+          "dispatch_state": "not_dispatched",
+          "cleanup": "not_applicable"
+        },
+        {
+          "slot_id": "ko-koishi-plugin-calculator-isolation--attempt-02",
+          "status": "not_dispatched",
+          "campaign_reason_code": "structured_adapter_setup_oracle_review_required",
+          "dispatch_state": "not_dispatched",
+          "cleanup": "not_applicable"
+        },
+        {
+          "slot_id": "ko-koishi-plugin-calculator-isolation--attempt-03",
+          "status": "not_dispatched",
+          "campaign_reason_code": "structured_adapter_setup_oracle_review_required",
+          "dispatch_state": "not_dispatched",
+          "cleanup": "not_applicable"
+        }
+      ]
+    },
+    {
+      "position_id": "ko-f106ee0baf0f51431776f698::ko-koishi-plugin-countdown-clock-positive",
+      "registry_entry_id": "ko-f106ee0baf0f51431776f698",
+      "package": "koishi-plugin-countdown-clock",
+      "version": "1.0.1",
+      "artifact_sha256": "bb2fe8b0f0119f8a7c7086cfb8d9735314d280a0d7e66b2263b3f1e143b3aca6",
+      "case_id": "ko-koishi-plugin-countdown-clock-positive",
+      "case_class": "positive",
+      "v1_input": "create countdown at fixed time",
+      "v1_assertions": [
+        {
+          "path": "plugin_observation.response_or_operation_count",
+          "operator": "in_range",
+          "minimum": 1,
+          "maximum": 1
+        }
+      ],
+      "campaign_status": "skipped",
+      "campaign_reason_code": "structured_adapter_setup_oracle_review_required",
+      "attribution_reason_code": "countdown_database_and_virtual_scheduler_fixture_not_frozen",
+      "source_member": "package/lib/index.js",
+      "source_member_sha256": "cc867a329c3f67d70a026a24ce120519428fd8855f97c50553f7ac5562bd85bd",
+      "source_symbols": [
+        "countdown command",
+        "countdown.cancel",
+        "check"
+      ],
+      "fixture_prerequisite": "The source persists countdown rows and checks them from a one-second interval before sending to a channel. Freeze SQLite state, timer advancement/cancellation semantics, due-time events, and per-channel delivery assertions.",
+      "case_class_prerequisite": "The positive behavior needs one deterministic seed/config/event and an exact output or state oracle.",
+      "attempt_slots": [
+        {
+          "slot_id": "ko-koishi-plugin-countdown-clock-positive--attempt-01",
+          "status": "not_dispatched",
+          "campaign_reason_code": "structured_adapter_setup_oracle_review_required",
+          "dispatch_state": "not_dispatched",
+          "cleanup": "not_applicable"
+        },
+        {
+          "slot_id": "ko-koishi-plugin-countdown-clock-positive--attempt-02",
+          "status": "not_dispatched",
+          "campaign_reason_code": "structured_adapter_setup_oracle_review_required",
+          "dispatch_state": "not_dispatched",
+          "cleanup": "not_applicable"
+        },
+        {
+          "slot_id": "ko-koishi-plugin-countdown-clock-positive--attempt-03",
+          "status": "not_dispatched",
+          "campaign_reason_code": "structured_adapter_setup_oracle_review_required",
+          "dispatch_state": "not_dispatched",
+          "cleanup": "not_applicable"
+        }
+      ]
+    },
+    {
+      "position_id": "ko-f106ee0baf0f51431776f698::ko-koishi-plugin-countdown-clock-negative",
+      "registry_entry_id": "ko-f106ee0baf0f51431776f698",
+      "package": "koishi-plugin-countdown-clock",
+      "version": "1.0.1",
+      "artifact_sha256": "bb2fe8b0f0119f8a7c7086cfb8d9735314d280a0d7e66b2263b3f1e143b3aca6",
+      "case_id": "ko-koishi-plugin-countdown-clock-negative",
+      "case_class": "negative",
+      "v1_input": "cancel when no countdown exists",
+      "v1_assertions": [
+        {
+          "path": "plugin_observation.response_or_operation_count",
+          "operator": "equals",
+          "value": 0
+        }
+      ],
+      "campaign_status": "skipped",
+      "campaign_reason_code": "structured_adapter_setup_oracle_review_required",
+      "attribution_reason_code": "countdown_database_and_virtual_scheduler_fixture_not_frozen",
+      "source_member": "package/lib/index.js",
+      "source_member_sha256": "cc867a329c3f67d70a026a24ce120519428fd8855f97c50553f7ac5562bd85bd",
+      "source_symbols": [
+        "countdown command",
+        "countdown.cancel",
+        "check"
+      ],
+      "fixture_prerequisite": "The source persists countdown rows and checks them from a one-second interval before sending to a channel. Freeze SQLite state, timer advancement/cancellation semantics, due-time events, and per-channel delivery assertions.",
+      "case_class_prerequisite": "The negative boundary needs an input that reaches the intended plugin boundary and an independently expected no-op/error result.",
+      "attempt_slots": [
+        {
+          "slot_id": "ko-koishi-plugin-countdown-clock-negative--attempt-01",
+          "status": "not_dispatched",
+          "campaign_reason_code": "structured_adapter_setup_oracle_review_required",
+          "dispatch_state": "not_dispatched",
+          "cleanup": "not_applicable"
+        },
+        {
+          "slot_id": "ko-koishi-plugin-countdown-clock-negative--attempt-02",
+          "status": "not_dispatched",
+          "campaign_reason_code": "structured_adapter_setup_oracle_review_required",
+          "dispatch_state": "not_dispatched",
+          "cleanup": "not_applicable"
+        },
+        {
+          "slot_id": "ko-koishi-plugin-countdown-clock-negative--attempt-03",
+          "status": "not_dispatched",
+          "campaign_reason_code": "structured_adapter_setup_oracle_review_required",
+          "dispatch_state": "not_dispatched",
+          "cleanup": "not_applicable"
+        }
+      ]
+    },
+    {
+      "position_id": "ko-f106ee0baf0f51431776f698::ko-koishi-plugin-countdown-clock-isolation",
+      "registry_entry_id": "ko-f106ee0baf0f51431776f698",
+      "package": "koishi-plugin-countdown-clock",
+      "version": "1.0.1",
+      "artifact_sha256": "bb2fe8b0f0119f8a7c7086cfb8d9735314d280a0d7e66b2263b3f1e143b3aca6",
+      "case_id": "ko-koishi-plugin-countdown-clock-isolation",
+      "case_class": "isolation",
+      "v1_input": "scheduled rows preserve distinct channel and session values",
+      "v1_assertions": [
+        {
+          "path": "plugin_observation.scope_leak_count",
+          "operator": "equals",
+          "value": 0
+        }
+      ],
+      "campaign_status": "skipped",
+      "campaign_reason_code": "structured_adapter_setup_oracle_review_required",
+      "attribution_reason_code": "countdown_database_and_virtual_scheduler_fixture_not_frozen",
+      "source_member": "package/lib/index.js",
+      "source_member_sha256": "cc867a329c3f67d70a026a24ce120519428fd8855f97c50553f7ac5562bd85bd",
+      "source_symbols": [
+        "countdown command",
+        "countdown.cancel",
+        "check"
+      ],
+      "fixture_prerequisite": "The source persists countdown rows and checks them from a one-second interval before sending to a channel. Freeze SQLite state, timer advancement/cancellation semantics, due-time events, and per-channel delivery assertions.",
+      "case_class_prerequisite": "The isolation case needs two independent account/session/state identities and assertions bound to each event and scope.",
+      "attempt_slots": [
+        {
+          "slot_id": "ko-koishi-plugin-countdown-clock-isolation--attempt-01",
+          "status": "not_dispatched",
+          "campaign_reason_code": "structured_adapter_setup_oracle_review_required",
+          "dispatch_state": "not_dispatched",
+          "cleanup": "not_applicable"
+        },
+        {
+          "slot_id": "ko-koishi-plugin-countdown-clock-isolation--attempt-02",
+          "status": "not_dispatched",
+          "campaign_reason_code": "structured_adapter_setup_oracle_review_required",
+          "dispatch_state": "not_dispatched",
+          "cleanup": "not_applicable"
+        },
+        {
+          "slot_id": "ko-koishi-plugin-countdown-clock-isolation--attempt-03",
+          "status": "not_dispatched",
+          "campaign_reason_code": "structured_adapter_setup_oracle_review_required",
+          "dispatch_state": "not_dispatched",
+          "cleanup": "not_applicable"
+        }
+      ]
+    },
+    {
+      "position_id": "ko-f6dfe45f2f1b06768eb14b06::ko-koishi-plugin-smmcat-guesssong-positive",
+      "registry_entry_id": "ko-f6dfe45f2f1b06768eb14b06",
+      "package": "koishi-plugin-simple-echo",
+      "version": "1.0.4",
+      "artifact_sha256": "81dd9d23b3dce8aaa427de814702a0c428e55b8607bbf89105f4cb28cd6630dd",
+      "case_id": "ko-koishi-plugin-smmcat-guesssong-positive",
+      "case_class": "positive",
+      "v1_input": "invoke template command with fixed message",
+      "v1_assertions": [
+        {
+          "path": "plugin_observation.response_or_operation_count",
+          "operator": "in_range",
+          "minimum": 1,
+          "maximum": 1
+        }
+      ],
+      "campaign_status": "skipped",
+      "campaign_reason_code": "structured_adapter_setup_oracle_review_required",
+      "attribution_reason_code": "simple_echo_parameter_and_template_config_not_frozen",
+      "source_member": "package/lib/index.js",
+      "source_member_sha256": "c77001bd4218ca7ad74fe6c734dac4f3363bb7454c3bbf45f1b39d927fa7cbd5",
+      "source_symbols": [
+        "message middleware",
+        "小艾同学 command"
+      ],
+      "fixture_prerequisite": "The source compares exact message content to config.parameters and registers a template command. Freeze parameter/template values and command input, then assert exact rendered text and target for two sessions.",
+      "case_class_prerequisite": "The positive behavior needs one deterministic seed/config/event and an exact output or state oracle.",
+      "attempt_slots": [
+        {
+          "slot_id": "ko-koishi-plugin-smmcat-guesssong-positive--attempt-01",
+          "status": "not_dispatched",
+          "campaign_reason_code": "structured_adapter_setup_oracle_review_required",
+          "dispatch_state": "not_dispatched",
+          "cleanup": "not_applicable"
+        },
+        {
+          "slot_id": "ko-koishi-plugin-smmcat-guesssong-positive--attempt-02",
+          "status": "not_dispatched",
+          "campaign_reason_code": "structured_adapter_setup_oracle_review_required",
+          "dispatch_state": "not_dispatched",
+          "cleanup": "not_applicable"
+        },
+        {
+          "slot_id": "ko-koishi-plugin-smmcat-guesssong-positive--attempt-03",
+          "status": "not_dispatched",
+          "campaign_reason_code": "structured_adapter_setup_oracle_review_required",
+          "dispatch_state": "not_dispatched",
+          "cleanup": "not_applicable"
+        }
+      ]
+    },
+    {
+      "position_id": "ko-f6dfe45f2f1b06768eb14b06::ko-koishi-plugin-smmcat-guesssong-negative",
+      "registry_entry_id": "ko-f6dfe45f2f1b06768eb14b06",
+      "package": "koishi-plugin-simple-echo",
+      "version": "1.0.4",
+      "artifact_sha256": "81dd9d23b3dce8aaa427de814702a0c428e55b8607bbf89105f4cb28cd6630dd",
+      "case_id": "ko-koishi-plugin-smmcat-guesssong-negative",
+      "case_class": "negative",
+      "v1_input": "send unrelated message outside configured trigger",
+      "v1_assertions": [
+        {
+          "path": "plugin_observation.response_or_operation_count",
+          "operator": "equals",
+          "value": 0
+        }
+      ],
+      "campaign_status": "skipped",
+      "campaign_reason_code": "structured_adapter_setup_oracle_review_required",
+      "attribution_reason_code": "simple_echo_parameter_and_template_config_not_frozen",
+      "source_member": "package/lib/index.js",
+      "source_member_sha256": "c77001bd4218ca7ad74fe6c734dac4f3363bb7454c3bbf45f1b39d927fa7cbd5",
+      "source_symbols": [
+        "message middleware",
+        "小艾同学 command"
+      ],
+      "fixture_prerequisite": "The source compares exact message content to config.parameters and registers a template command. Freeze parameter/template values and command input, then assert exact rendered text and target for two sessions.",
+      "case_class_prerequisite": "The negative boundary needs an input that reaches the intended plugin boundary and an independently expected no-op/error result.",
+      "attempt_slots": [
+        {
+          "slot_id": "ko-koishi-plugin-smmcat-guesssong-negative--attempt-01",
+          "status": "not_dispatched",
+          "campaign_reason_code": "structured_adapter_setup_oracle_review_required",
+          "dispatch_state": "not_dispatched",
+          "cleanup": "not_applicable"
+        },
+        {
+          "slot_id": "ko-koishi-plugin-smmcat-guesssong-negative--attempt-02",
+          "status": "not_dispatched",
+          "campaign_reason_code": "structured_adapter_setup_oracle_review_required",
+          "dispatch_state": "not_dispatched",
+          "cleanup": "not_applicable"
+        },
+        {
+          "slot_id": "ko-koishi-plugin-smmcat-guesssong-negative--attempt-03",
+          "status": "not_dispatched",
+          "campaign_reason_code": "structured_adapter_setup_oracle_review_required",
+          "dispatch_state": "not_dispatched",
+          "cleanup": "not_applicable"
+        }
+      ]
+    },
+    {
+      "position_id": "ko-f6dfe45f2f1b06768eb14b06::ko-koishi-plugin-smmcat-guesssong-isolation",
+      "registry_entry_id": "ko-f6dfe45f2f1b06768eb14b06",
+      "package": "koishi-plugin-simple-echo",
+      "version": "1.0.4",
+      "artifact_sha256": "81dd9d23b3dce8aaa427de814702a0c428e55b8607bbf89105f4cb28cd6630dd",
+      "case_id": "ko-koishi-plugin-smmcat-guesssong-isolation",
+      "case_class": "isolation",
+      "v1_input": "two sessions substitute their own message in the response",
+      "v1_assertions": [
+        {
+          "path": "plugin_observation.scope_leak_count",
+          "operator": "equals",
+          "value": 0
+        }
+      ],
+      "campaign_status": "skipped",
+      "campaign_reason_code": "structured_adapter_setup_oracle_review_required",
+      "attribution_reason_code": "simple_echo_parameter_and_template_config_not_frozen",
+      "source_member": "package/lib/index.js",
+      "source_member_sha256": "c77001bd4218ca7ad74fe6c734dac4f3363bb7454c3bbf45f1b39d927fa7cbd5",
+      "source_symbols": [
+        "message middleware",
+        "小艾同学 command"
+      ],
+      "fixture_prerequisite": "The source compares exact message content to config.parameters and registers a template command. Freeze parameter/template values and command input, then assert exact rendered text and target for two sessions.",
+      "case_class_prerequisite": "The isolation case needs two independent account/session/state identities and assertions bound to each event and scope.",
+      "attempt_slots": [
+        {
+          "slot_id": "ko-koishi-plugin-smmcat-guesssong-isolation--attempt-01",
+          "status": "not_dispatched",
+          "campaign_reason_code": "structured_adapter_setup_oracle_review_required",
+          "dispatch_state": "not_dispatched",
+          "cleanup": "not_applicable"
+        },
+        {
+          "slot_id": "ko-koishi-plugin-smmcat-guesssong-isolation--attempt-02",
+          "status": "not_dispatched",
+          "campaign_reason_code": "structured_adapter_setup_oracle_review_required",
+          "dispatch_state": "not_dispatched",
+          "cleanup": "not_applicable"
+        },
+        {
+          "slot_id": "ko-koishi-plugin-smmcat-guesssong-isolation--attempt-03",
+          "status": "not_dispatched",
+          "campaign_reason_code": "structured_adapter_setup_oracle_review_required",
+          "dispatch_state": "not_dispatched",
+          "cleanup": "not_applicable"
+        }
+      ]
+    },
+    {
+      "position_id": "ko-5076fa7479872fd07f4b4fe9::ko-koishi-plugin-help-md-positive",
+      "registry_entry_id": "ko-5076fa7479872fd07f4b4fe9",
+      "package": "koishi-plugin-help-md",
+      "version": "1.2.0",
+      "artifact_sha256": "21de2451ce483428c9a1066c702e8c0109f6d59f84c1934bdbea73424feccb5c",
+      "case_id": "ko-koishi-plugin-help-md-positive",
+      "case_class": "positive",
+      "v1_input": "invoke registered Markdown help command",
+      "v1_assertions": [
+        {
+          "path": "plugin_observation.response_or_operation_count",
+          "operator": "in_range",
+          "minimum": 1,
+          "maximum": 1
+        }
+      ],
+      "campaign_status": "skipped",
+      "campaign_reason_code": "structured_adapter_setup_oracle_review_required",
+      "attribution_reason_code": "help_md_command_content_and_registration_config_not_frozen",
+      "source_member": "package/lib/index.js",
+      "source_member_sha256": "8365c62b8bd7192a37a9addf9f6f7df80b37689a2c44233f7e37f91c8cac84e4",
+      "source_symbols": [
+        "help-md command action",
+        "help builtin"
+      ],
+      "fixture_prerequisite": "The source registers configured markdownCommands and renders their markdown content. Freeze one registered command with exact Markdown, one display-only entry, and separate-session output/target assertions.",
+      "case_class_prerequisite": "The positive behavior needs one deterministic seed/config/event and an exact output or state oracle.",
+      "attempt_slots": [
+        {
+          "slot_id": "ko-koishi-plugin-help-md-positive--attempt-01",
+          "status": "not_dispatched",
+          "campaign_reason_code": "structured_adapter_setup_oracle_review_required",
+          "dispatch_state": "not_dispatched",
+          "cleanup": "not_applicable"
+        },
+        {
+          "slot_id": "ko-koishi-plugin-help-md-positive--attempt-02",
+          "status": "not_dispatched",
+          "campaign_reason_code": "structured_adapter_setup_oracle_review_required",
+          "dispatch_state": "not_dispatched",
+          "cleanup": "not_applicable"
+        },
+        {
+          "slot_id": "ko-koishi-plugin-help-md-positive--attempt-03",
+          "status": "not_dispatched",
+          "campaign_reason_code": "structured_adapter_setup_oracle_review_required",
+          "dispatch_state": "not_dispatched",
+          "cleanup": "not_applicable"
+        }
+      ]
+    },
+    {
+      "position_id": "ko-5076fa7479872fd07f4b4fe9::ko-koishi-plugin-help-md-negative",
+      "registry_entry_id": "ko-5076fa7479872fd07f4b4fe9",
+      "package": "koishi-plugin-help-md",
+      "version": "1.2.0",
+      "artifact_sha256": "21de2451ce483428c9a1066c702e8c0109f6d59f84c1934bdbea73424feccb5c",
+      "case_id": "ko-koishi-plugin-help-md-negative",
+      "case_class": "negative",
+      "v1_input": "invoke display-only entry as a command",
+      "v1_assertions": [
+        {
+          "path": "plugin_observation.response_or_operation_count",
+          "operator": "equals",
+          "value": 0
+        }
+      ],
+      "campaign_status": "skipped",
+      "campaign_reason_code": "structured_adapter_setup_oracle_review_required",
+      "attribution_reason_code": "help_md_command_content_and_registration_config_not_frozen",
+      "source_member": "package/lib/index.js",
+      "source_member_sha256": "8365c62b8bd7192a37a9addf9f6f7df80b37689a2c44233f7e37f91c8cac84e4",
+      "source_symbols": [
+        "help-md command action",
+        "help builtin"
+      ],
+      "fixture_prerequisite": "The source registers configured markdownCommands and renders their markdown content. Freeze one registered command with exact Markdown, one display-only entry, and separate-session output/target assertions.",
+      "case_class_prerequisite": "The negative boundary needs an input that reaches the intended plugin boundary and an independently expected no-op/error result.",
+      "attempt_slots": [
+        {
+          "slot_id": "ko-koishi-plugin-help-md-negative--attempt-01",
+          "status": "not_dispatched",
+          "campaign_reason_code": "structured_adapter_setup_oracle_review_required",
+          "dispatch_state": "not_dispatched",
+          "cleanup": "not_applicable"
+        },
+        {
+          "slot_id": "ko-koishi-plugin-help-md-negative--attempt-02",
+          "status": "not_dispatched",
+          "campaign_reason_code": "structured_adapter_setup_oracle_review_required",
+          "dispatch_state": "not_dispatched",
+          "cleanup": "not_applicable"
+        },
+        {
+          "slot_id": "ko-koishi-plugin-help-md-negative--attempt-03",
+          "status": "not_dispatched",
+          "campaign_reason_code": "structured_adapter_setup_oracle_review_required",
+          "dispatch_state": "not_dispatched",
+          "cleanup": "not_applicable"
+        }
+      ]
+    },
+    {
+      "position_id": "ko-5076fa7479872fd07f4b4fe9::ko-koishi-plugin-help-md-isolation",
+      "registry_entry_id": "ko-5076fa7479872fd07f4b4fe9",
+      "package": "koishi-plugin-help-md",
+      "version": "1.2.0",
+      "artifact_sha256": "21de2451ce483428c9a1066c702e8c0109f6d59f84c1934bdbea73424feccb5c",
+      "case_id": "ko-koishi-plugin-help-md-isolation",
+      "case_class": "isolation",
+      "v1_input": "help requests in two sessions render their respective targets",
+      "v1_assertions": [
+        {
+          "path": "plugin_observation.scope_leak_count",
+          "operator": "equals",
+          "value": 0
+        }
+      ],
+      "campaign_status": "skipped",
+      "campaign_reason_code": "structured_adapter_setup_oracle_review_required",
+      "attribution_reason_code": "help_md_command_content_and_registration_config_not_frozen",
+      "source_member": "package/lib/index.js",
+      "source_member_sha256": "8365c62b8bd7192a37a9addf9f6f7df80b37689a2c44233f7e37f91c8cac84e4",
+      "source_symbols": [
+        "help-md command action",
+        "help builtin"
+      ],
+      "fixture_prerequisite": "The source registers configured markdownCommands and renders their markdown content. Freeze one registered command with exact Markdown, one display-only entry, and separate-session output/target assertions.",
+      "case_class_prerequisite": "The isolation case needs two independent account/session/state identities and assertions bound to each event and scope.",
+      "attempt_slots": [
+        {
+          "slot_id": "ko-koishi-plugin-help-md-isolation--attempt-01",
+          "status": "not_dispatched",
+          "campaign_reason_code": "structured_adapter_setup_oracle_review_required",
+          "dispatch_state": "not_dispatched",
+          "cleanup": "not_applicable"
+        },
+        {
+          "slot_id": "ko-koishi-plugin-help-md-isolation--attempt-02",
+          "status": "not_dispatched",
+          "campaign_reason_code": "structured_adapter_setup_oracle_review_required",
+          "dispatch_state": "not_dispatched",
+          "cleanup": "not_applicable"
+        },
+        {
+          "slot_id": "ko-koishi-plugin-help-md-isolation--attempt-03",
+          "status": "not_dispatched",
+          "campaign_reason_code": "structured_adapter_setup_oracle_review_required",
+          "dispatch_state": "not_dispatched",
+          "cleanup": "not_applicable"
+        }
+      ]
+    }
+  ]
+}

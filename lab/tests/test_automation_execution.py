@@ -47,6 +47,37 @@ print(json.dumps(result))
     return args
 
 
+def fake_v2_runner(*, wrong_content: bool = False) -> list[str]:
+    script = r'''
+import json, sys
+request = json.load(sys.stdin)
+context = request["context"]
+assert "oracle" not in context
+fixture = context["behavior_fixture"]
+assert fixture["adapter"]["id"] == "nonebot.onebot.v11"
+assert fixture["setup"]["plugin_config"] == {"mode": "fixture"}
+observation = {
+  "response_or_operation_count": 1,
+  "operations": [{"params": {"message": [{"type": "text", "text": "wrong" if "wrong-content" in sys.argv else "right"}]}}],
+}
+result = {
+  "status": "completed",
+  "binding": context["binding"],
+  "plugin_observation": observation,
+  "cleanup": {"worker_cleanup_confirmed": True, "active_capability_count": 0, "live_processes": []},
+}
+if context["execution"]["mode"] == "native":
+  result["native_trace"] = {"bridge_adapter_imported": False}
+else:
+  result["federated_trace"] = {"core_host_route": "passed", "host_pid_reaped": True, "gateway_operation_count": 1}
+print(json.dumps(result))
+'''
+    args = [sys.executable, "-c", script]
+    if wrong_content:
+        args.append("wrong-content")
+    return args
+
+
 def fixture_case() -> tuple[dict, dict]:
     entry = {
         "registry_entry_id": "nb-example",
@@ -128,6 +159,27 @@ class AutomationExecutionTests(unittest.TestCase):
             self.entry, self.case, "linux-x86_64", fake_runner(), fake_runner(bad_cleanup=True),
         )
         self.assertIn("cleanup_unconfirmed", {item["code"] for item in unclean["comparison"]["issues"]})
+
+    def test_v2_fixture_forwards_dispatch_contract_but_not_oracle_and_checks_both_sides(self) -> None:
+        case = {
+            "case_id": "v2-example-positive",
+            "class": "positive",
+            "migration": {"status": "executable"},
+            "adapter": {"id": "nonebot.onebot.v11"},
+            "setup": {"plugin_config": {"mode": "fixture"}},
+            "stimulus": {"events": [{"event_id": "event-1"}]},
+            "determinism": {"clock": "2026-10-26T00:00:00Z", "random_seed": 1},
+            "observation": {"projection": "message_operations"},
+            "oracle": {"assertions": [
+                {"path": "plugin_observation.response_or_operation_count", "operator": "equals", "value": 1},
+                {"path": "plugin_observation.operations.0.params.message.0.text", "operator": "equals", "value": "right"},
+            ]},
+        }
+        passed = run_behavior_pair(self.entry, case, "linux-x86_64", fake_v2_runner(), fake_v2_runner())
+        self.assertEqual(passed["status"], "passed", passed["comparison"]["issues"])
+        failed = run_behavior_pair(self.entry, case, "linux-x86_64", fake_v2_runner(wrong_content=True), fake_v2_runner(wrong_content=True))
+        self.assertEqual(failed["status"], "failed")
+        self.assertIn("oracle_mismatch", {issue["code"] for issue in failed["comparison"]["issues"]})
 
 
 if __name__ == "__main__":

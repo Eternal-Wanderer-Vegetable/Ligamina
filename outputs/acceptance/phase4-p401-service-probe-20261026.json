@@ -1,0 +1,52 @@
+{
+  "schema_version": 1,
+  "kind": "phase4_p401_service_capability_probe",
+  "probe_id": "phase4-service-probe-v1",
+  "capability": "service",
+  "required_hosts": [
+    "native",
+    "federated"
+  ],
+  "status": "passed",
+  "platform": "windows",
+  "runtime": {
+    "node": "v24.20.0",
+    "cargo": "cargo 1.97.1 (c980f4866 2026-06-30)",
+    "rustc": "rustc 1.97.1 (8bab26f4f 2026-07-14)"
+  },
+  "contract": {
+    "route": "NoneBot Host service.invoke -> Rust CapabilityBroker -> Koishi Host ligamina.koishi.math.add",
+    "expected_result": 42,
+    "evidence": "A real NoneBot and Koishi worker pair runs under the Rust HostSession/Core Broker integration test; the caller emits cross-host:42 with the original trace."
+  },
+  "test": {
+    "status": "passed",
+    "command": [
+      "cargo",
+      "test",
+      "--locked",
+      "-p",
+      "ligamina-core",
+      "--test",
+      "host_session",
+      "native_nonebot_to_koishi_capability_call_uses_the_broker_and_current_generations",
+      "--",
+      "--exact",
+      "--nocapture"
+    ],
+    "exit_code": 0,
+    "elapsed_seconds": 1.781,
+    "expected_test_observed": true,
+    "stdout_sha256": "342e0506879e4e1b0d9ae21e7b6c2e1eee22a239c448bf718b9538d56a50945a",
+    "stderr_sha256": "809b8cc0b8dcddc126b7b7162f49ba93d9e96c05cacb6051f0bd487575f51536",
+    "output_bytes": 367
+  },
+  "source_sha256": {
+    "hosts/nonebot/ligamina_nonebot/cross_host_smoke_plugin.py": "117214ea8dedc1fada024549538d27345b469b6ed5655939ec6718a14099db93",
+    "hosts/nonebot/ligamina_nonebot/adapter.py": "09588a14fdec6ae0f33c1d5981f9dc1e471f93bee20bf04a54c6426668107212",
+    "hosts/koishi/src/adapter.ts": "8963b33bf5e6af30341d9f37c67d58dda7319ce6b9c7e8671dadd3a8cff0064a",
+    "hosts/koishi/src/capabilities.ts": "5d3bfd99b30aaef1090f4cdd133e5d67c3ba55cd2ac9fe917fc05d53670b760f",
+    "crates/ligamina-core/src/broker.rs": "216e42c3d7809ed78f3119047befd35731ba097c01386bc4ee6314dabe48b186",
+    "crates/ligamina-core/tests/host_session.rs": "b370a248f4406d96bb60073bad18d299389d1d90294b7063cd2a3a02d2ea3956"
+  }
+}

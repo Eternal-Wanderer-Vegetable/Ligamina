@@ -1,8 +1,8 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-10-26",
-  "active_feature": null,
-  "next_feature": null,
+  "updated_at": "2026-10-27",
+  "active_feature": "feat-028",
+  "next_feature": "feat-029",
   "features": [
     {
       "id": "feat-001",
@@ -1698,6 +1698,156 @@
         "lab/tests/test_automation_evidence_hash.py"
       ],
       "plan_path": "docs/plans/2026-10-20-phase-3-automation.md"
+    },
+    {
+      "id": "feat-025",
+      "task_id": "P4-PLAN",
+      "name": "第四阶段行为兼容与运行就绪计划",
+      "description": "依据分享讨论与 P3 冻结审计制定 P4-01 至 P4-06；本项仅交付计划和可恢复状态。",
+      "dependencies": [
+        "feat-024"
+      ],
+      "status": "done",
+      "done_when": "核对分享原文与源码/证据；计划列出任务依赖、可执行 Fixture、样本/分母、独立 gates、验证命令和阻塞；文档与状态检查通过并保存证据。",
+      "evidence": "2026-10-26 读取分享讨论并核对当前源码及P3冻结报告，交付六项P4任务依赖/准入/分母/独立gates/实施单/估算；docs 20 documents / 399 links / 31 features、evidence-hash 4/4、README --check、harness结构100/100、P3-08/P3-10只读 --check 与git diff --check通过。仅规划，P4 runtime尚未实施；命令及输出见独立planning validation。",
+      "evidence_paths": [
+        "docs/plans/2026-10-26-phase-4-behavior-readiness.md",
+        "outputs/acceptance/phase4-plan-validation-20261026.json",
+        "AGENTS.md",
+        "docs/README.md",
+        "progress.md",
+        "session-handoff.md"
+      ],
+      "plan_path": "docs/plans/2026-10-26-phase-4-behavior-readiness.md"
+    },
+    {
+      "id": "feat-026",
+      "task_id": "P4-01",
+      "name": "可执行 Host 行为 Fixture",
+      "description": "版本化执行合同、二十项迁移矩阵、NoneBot/Koishi 驱动及首两项 Linux 真实闭环。",
+      "dependencies": [
+        "feat-025"
+      ],
+      "status": "done",
+      "done_when": "v2 schema/golden/拒绝场景与20-entry映射完整；service/storage/clock 各有真实 Host/框架探针；首两项全部必选正例/负例/隔离 case 经真实 Linux Native/Federated 各满足独立内容/目标/状态 Oracle，fresh 三次通过且外层清理确认；新 suite/evidence manifest/trace/checkpoint/报告冻结。",
+      "evidence": "P4-01 / feat-026 scoped engineering deliverable complete. Suite/matrix cover 20 entries / 60 cases (6 executable, 54 blocked). User-authorized NoneBot candidate switch preserves Guess v8: the frozen guess.py uses module globals idx/city and failed isolation in all three pairs; no plugin or Oracle was modified. Replacement nonebot_plugin_roll@0.2.3 and Koishi Echo completed the formal v10 campaign: 6 positions / 18 paired attempts / 36 side executions, 18 passed, 0 failed, cleanup_unconfirmed=0. Real Core service probe returned 42 with trace; storage/clock probes validated 54 event records across 36 distinct cleaned Workers. p4_fixture_gate=passed; p4_first_wave_behavior=passed_scoped. Full init passed with pinned Node/npm and an isolated uv environment; all 203 Lab tests ran (1 skipped), Core/Host/client tests and Windows smoke/build passed. Full catalog, Windows enforcement, deployment runner, field and release gates remain outside this scoped completion. See v10 report, terminal evidence manifest and verification report.",
+      "evidence_paths": [
+        "outputs/acceptance/phase4-p401-baseline-20261026.json",
+        "contracts/lab/automation/v2/fixtures/behavior-suite.phase4-v2.json",
+        "outputs/acceptance/phase4-p401-migration-matrix-20261026.json",
+        "outputs/acceptance/phase4-p401-dry-plan-20261026.json",
+        "outputs/acceptance/phase4-p401-linux-worker-probes-20261026-v2.json",
+        "outputs/acceptance/phase4-p401-linux-admission-20261026-v2.json",
+        "outputs/acceptance/phase4-p401-koishi-private-id-fix-probe-20261026.json",
+        "outputs/acceptance/phase4-p401-federated-fix-probe-20261026.json",
+        "outputs/acceptance/phase4-p401-behavior-runs-20261026-v8.json",
+        "outputs/acceptance/phase4-p401-service-probe-20261026.json",
+        "outputs/acceptance/phase4-p401-service-probe-20261026.json.sha256",
+        "outputs/acceptance/phase4-p401-behavior-runs-20261026-v10.json",
+        "outputs/acceptance/phase4-p401-behavior-runs-20261026-v10.json.sha256",
+        "outputs/acceptance/phase4-p401-evidence-manifest-20261026-v10.json",
+        "outputs/acceptance/phase4-p401-evidence-manifest-20261026-v10.json.sha256",
+        "outputs/acceptance/phase4-p401-full-smoke-windows-20261026.json",
+        "outputs/acceptance/phase4-p401-full-smoke-windows-20261026.json.sha256",
+        "outputs/acceptance/phase4-p401-verification-20261026.json",
+        "outputs/acceptance/phase4-p401-verification-20261026.json.sha256"
+      ],
+      "plan_path": "docs/plans/2026-10-26-phase-4-behavior-readiness.md"
+    },
+    {
+      "id": "feat-027",
+      "task_id": "P4-02",
+      "name": "Linux 行为扩面与完整账本",
+      "description": "固定每生态两项后扩展原二十项 Linux 必选行为，不替换失败样本。",
+      "dependencies": [
+        "feat-026"
+      ],
+      "status": "done",
+      "done_when": "原二十项全部预期位置和三次 slots 无漏项/重复；执行或明确依赖归因、失败/未知/未派发及清理证据逐项完整；四个历史支持插件另列回归；工程交付与全套/子集行为 gate 独立裁决。",
+      "evidence": "P4-02 工程账本完成：原 20 项全部 60 positions / 180 slots 无遗漏/重复；36 stage jobs、72 side executions / 72 unique Workers，cleanup_unconfirmed=0。终态为 passed 27、failed 9（NoneBot Help 0.6.1 在 Pydantic 2.14.1 冻结 profile 导入失败，已隔离复现并归因 plugin_compatibility）、unknown 0、not_dispatched 144；48 blocked positions / 144 slots 逐项源码与依赖归因。独立 fresh Linux S2-05 回归四个历史版本 Native/Federated 均通过、artifact 与 profile 锁核验及清理确认。P4 Linux accounting passed；fixed-four/full behavior failed，fixture gate blocked，automation not evaluated；不扩大目录/Windows/真实平台支持声明。",
+      "evidence_paths": [
+        "outputs/acceptance/phase4-p402-closure-20261027.json",
+        "outputs/acceptance/phase4-p402-closure-20261027.json.sha256",
+        "outputs/acceptance/phase4-p402-behavior-runs-20261026-v2r3.json",
+        "outputs/acceptance/phase4-p402-evidence-manifest-20261026-v2r3.json",
+        "outputs/acceptance/phase4-p402-blocked-attribution-20261027.json",
+        "outputs/acceptance/phase4-p402-root-cause-attribution-20261027.json",
+        "outputs/acceptance/phase4-p402-s205-regressions-20261027-v5.json",
+        "outputs/acceptance/phase2-s205-20261012.json"
+      ],
+      "plan_path": "docs/plans/2026-10-26-phase-4-behavior-readiness.md"
+    },
+    {
+      "id": "feat-028",
+      "task_id": "P4-03",
+      "name": "unknown 恢复与受控 runner 部署验收",
+      "description": "53 个历史 unknown 的新身份恢复及真实受控 runner 成功/失败/中断验收。",
+      "dependencies": [
+        "feat-025"
+      ],
+      "status": "in-progress",
+      "done_when": "新 manifest 严格绑定39 Linux/10 Windows pilot/4 preparation父身份；53项诊断/新观察全覆盖且旧unknown不改写；真实受保护 runner 的部署、权限隔离、失败/取消 artifact 和外层清理有证据；未解项及 Windows admission 等待保持 blocked，automation gate 单独裁决。",
+      "evidence": "2026-10-27: frozen P4-03 manifest binds exactly 39 Linux / 10 Windows pilot / 4 Windows preparation parent unknowns without rewriting P3 outcomes. Linux recovery budget is one new campaign attempt per identity; Windows budget is zero pending enforcement/metadata admission. Read-only P3 SQLite/backend evidence binds all 77 unknown attempt reason codes and separate cleanup confirmation; 7 external recovery reports exist but raw per-attempt logs were not found. Local success/failure/TERM-cancel runner shell simulations all produced expected trap outcomes and outer-cleanup confirmed; 55 Python tests, 5 workflow static tests, Bash/YAML syntax, docs gate and harness 100/100 pass; see phase4-p403-verification-20261027.json. Real GitHub runner registration, protected Environment, repo variables, cache/images, cancellation artifact upload and exact 39-unit execution remain outstanding; keep P4-AUTOMATION blocked and this feature in progress.",
+      "evidence_paths": [
+        "outputs/acceptance/phase3-p305-overall-closure-20261026.json",
+        "outputs/acceptance/phase3-p310-gate-audit-20261026.json",
+        "outputs/acceptance/phase4-p403-recovery-manifest-20261027.json",
+        "outputs/acceptance/phase4-p403-linux-execution-manifest-20261027.json",
+        "outputs/acceptance/phase4-p403-diagnostic-20261027.json",
+        "outputs/acceptance/phase4-p403-backend-diagnostic-20261027.json",
+        "outputs/acceptance/phase4-p403-runner-contract-local-20261027.json",
+        "docs/plans/2026-10-26-phase-4-behavior-readiness.md",
+        ".github/workflows/phase4-p403-linux-recovery.yml",
+        "scripts/phase4-p403-linux-runner.sh",
+        "scripts/phase4-p403-finalize-linux-run.sh",
+        "outputs/acceptance/phase4-p403-verification-20261027.json"
+      ],
+      "plan_path": "docs/plans/2026-10-26-phase-4-behavior-readiness.md"
+    },
+    {
+      "id": "feat-029",
+      "task_id": "P4-04",
+      "name": "Windows Enforcement 行为准入",
+      "description": "强制保护 guest 下 native-only、目录安装/加载及双路径行为验收。",
+      "dependencies": [
+        "feat-026"
+      ],
+      "status": "not-started",
+      "done_when": "Enforcement policy/runtime/native证据可归属，新admission明确允许catalog claims；逐项provider/config/combined lock和native闭包冻结；原二十项Windows位置执行或明确归因、清理确认，首批每生态一项三次行为通过；缺少强制模式或目录准入保持blocked，不以audit/归因报告替代验收。",
+      "evidence": "仅计划；尚未实施。工程依赖满足后仍须按计划核验对应运行准入。",
+      "evidence_paths": [],
+      "plan_path": "docs/plans/2026-10-26-phase-4-behavior-readiness.md"
+    },
+    {
+      "id": "feat-030",
+      "task_id": "P4-05",
+      "name": "真实平台端到端验收",
+      "description": "独立 Ligamina Client/Gateway 与 Stella 测试客户的受控真实平台收发。",
+      "dependencies": [
+        "feat-027"
+      ],
+      "status": "not-started",
+      "done_when": "选定Linux插件已通过全部必选行为且非flaky；在明确账号/对象/范围后，每生态至少一项完成正例、隔离、重复/重启及超时/unknown各场景三次；事件到接收端投递链、去重/状态及清理证据齐全，API accepted与可观察投递分别记录。",
+      "evidence": "仅计划；尚未实施。工程依赖满足后仍须按计划核验对应运行准入。",
+      "evidence_paths": [],
+      "plan_path": "docs/plans/2026-10-26-phase-4-behavior-readiness.md"
+    },
+    {
+      "id": "feat-031",
+      "task_id": "P4-06",
+      "name": "候选发行与第四阶段 gate 审计",
+      "description": "限定scope的安装/诊断/回滚候选发行和独立gate审计，不含完整插件管理或新生态。",
+      "dependencies": [
+        "feat-027",
+        "feat-028",
+        "feat-029",
+        "feat-030"
+      ],
+      "status": "not-started",
+      "done_when": "干净环境固定发行物安装/启动/诊断/停止/回滚与数据恢复验收；分母、哈希及精确支持矩阵可复算；六个P4 gates独立裁决，限定发行scope的行为/平台/安全条件实际满足；外部gate阻塞时仅交付审计子项、不宣称全部发行验收完成。",
+      "evidence": "仅计划；尚未实施。工程依赖满足后仍须按计划核验对应运行准入。",
+      "evidence_paths": [],
+      "plan_path": "docs/plans/2026-10-26-phase-4-behavior-readiness.md"
     }
   ]
 }

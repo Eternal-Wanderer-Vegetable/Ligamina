@@ -4,6 +4,7 @@ import unittest
 import subprocess
 import sys
 import os
+import shutil
 import stat
 import tempfile
 from pathlib import Path
@@ -72,6 +73,50 @@ class StockBaselineSourceTests(unittest.TestCase):
             resolver_environment = _registry_environment(input_environment)
         self.assertNotIn("HTTPS_PROXY", input_environment)
         self.assertEqual(resolver_environment["HTTPS_PROXY"], "http://proxy.invalid:8080")
+
+    def test_s205_node_install_only_allows_root_declared_remote_artifacts(self) -> None:
+        from lab.representative import _npm_install_command
+
+        lock = _npm_install_command(["npm"], lock_only=True)
+        install = _npm_install_command(["npm"], lock_only=False)
+
+        self.assertIn("--allow-remote=root", lock)
+        self.assertIn("--allow-remote=root", install)
+        self.assertIn("--ignore-scripts", lock)
+        self.assertIn("--ignore-scripts", install)
+        self.assertNotIn("--allow-remote=all", lock)
+        self.assertNotIn("--allow-remote=all", install)
+
+    def test_s205_profile_copy_excludes_temporary_installer_caches(self) -> None:
+        from lab.baselines.run_s205 import _ignore_node_links, _ignore_nonebot_profile_dirs
+
+        names = ["package.json", "node_modules", ".venv", "isolated-home", "isolated-tmp", "isolated-cache"]
+
+        self.assertEqual(
+            _ignore_node_links("/sample", names),
+            ["isolated-home", "isolated-tmp", "isolated-cache"],
+        )
+        self.assertEqual(
+            _ignore_nonebot_profile_dirs("/sample", names),
+            [".venv", "isolated-home", "isolated-tmp", "isolated-cache"],
+        )
+
+    def test_koishi_artifact_fingerprint_supports_sha256_and_sri(self) -> None:
+        node = shutil.which("node") or shutil.which("node.exe")
+        if not node:
+            self.skipTest("Node.js is unavailable")
+        script = (
+            "import assert from 'node:assert/strict'; import { createHash } from 'node:crypto'; "
+            "import { fingerprintArtifact } from './lab/baselines/koishi/artifact_fingerprint.mjs'; "
+            "const bytes = Buffer.from('Ligamina artifact fingerprint'); "
+            "assert.equal(fingerprintArtifact(bytes, 'sha256'), createHash('sha256').update(bytes).digest('hex')); "
+            "assert.equal(fingerprintArtifact(bytes, 'sri-sha512'), 'sha512-' + createHash('sha512').update(bytes).digest('base64')); "
+            "assert.throws(() => fingerprintArtifact(bytes, 'unknown'), /unsupported artifact fingerprint algorithm/);"
+        )
+        completed = subprocess.run(
+            [node, "--input-type=module", "-e", script], cwd=ROOT, capture_output=True, text=True, check=False,
+        )
+        self.assertEqual(completed.returncode, 0, completed.stderr)
 
 
 if __name__ == "__main__":

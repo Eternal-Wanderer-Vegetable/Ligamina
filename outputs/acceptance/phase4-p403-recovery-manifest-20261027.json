@@ -1,0 +1,3215 @@
+{
+  "schema_version": 1,
+  "kind": "phase4_p403_unknown_recovery_manifest",
+  "created_date": "2026-10-27",
+  "task_id": "P4-03",
+  "status": "prepared_not_dispatched",
+  "parent_closure": {
+    "path": "outputs/acceptance/phase3-p305-overall-closure-20261026.json",
+    "file_sha256": "e9dc78cb2da54a7a99476664ee057ec0b029da23cb311a7c22625c1b200dd886",
+    "report_sha256": "c6bcaf6841100f5b66afd2356ad4c2891dbf713ec1bdf4bb7120a8e6b8429692",
+    "historical_unknown_counts": {
+      "behavior_gate": "not_evaluated",
+      "linux_unknown": 39,
+      "remain_unknown": true,
+      "windows_nonebot_preparation_unknown": 4,
+      "windows_pilot_unknown": 10,
+      "windows_total_unknown": 14
+    }
+  },
+  "denominator": {
+    "total": 53,
+    "by_cohort": {
+      "linux": 39,
+      "windows_pilot": 10,
+      "windows_preparation": 4
+    }
+  },
+  "sources": [
+    {
+      "cohort": "linux",
+      "report_path": "outputs/acceptance/phase3-p305-linux-affected-v3-execution-resume6-20261025.json",
+      "manifest_path": "outputs/acceptance/phase3-p305-linux-affected-v3-manifest-20261025.json",
+      "manifest_file_sha256": "91798c872560306155a5e8330067062f95be3f6d7fee6b566156ebc9f9087cbe",
+      "manifest_canonical_sha256": "961786350b7c0ebdb990650d051203ad82452fff72ac291402a7f46a517173c8",
+      "profile_lock_path": null,
+      "profile_lock_sha256": null,
+      "report_file_sha256": "8b4119e6bc56f2f26f24fc858458aa7c2491f43b0aa42fbc30bc94fe1a19c5f5"
+    },
+    {
+      "cohort": "windows_pilot",
+      "report_path": "outputs/acceptance/phase3-p305-windows-pilot-v2-execution-20261025.json",
+      "manifest_path": "outputs/acceptance/phase3-p305-windows-pilot-manifest-v2-20261025.json",
+      "manifest_file_sha256": "c28dcdddc035df73841e42a811abd4b4fd4c89c6fd795b783ea0214dcf9f21d5",
+      "manifest_canonical_sha256": "0796fad72d14f0e84cfd91b77e63177873a26510dfa3adee55c9a3298feed4fa",
+      "profile_lock_path": "outputs/acceptance/phase3-p305-windows-python31210-profile-lock-pilot-v3-20261025.json",
+      "profile_lock_sha256": "e58651dfa5e46b3ebc8590b7ba89fd7aef86e8dd42d47580c9ed7fb536d880df",
+      "report_file_sha256": "5e1f02f68e65faecf8048a5fc722cf613dda33b55792ae1e0e09a6a35d95d976"
+    },
+    {
+      "cohort": "windows_preparation",
+      "report_path": "outputs/acceptance/phase3-p305-windows-nonebot-evaluation-execution-20261025.json",
+      "manifest_path": "outputs/acceptance/phase3-p305-windows-nonebot-evaluation-manifest-20261025.json",
+      "manifest_file_sha256": "f576591f8854b2758c0b7270499410617dd26af5cbf8d49a3f58d75f0410ce14",
+      "manifest_canonical_sha256": "6c5ffb197dddc1c135117a610560a74cb2bfe669d720dc30bad7e537216dc914",
+      "profile_lock_path": "outputs/acceptance/phase3-p305-windows-nonebot-evaluation-profile-lock-v2-20261025.json",
+      "profile_lock_sha256": "31814e498cab1365fa201497faa9b3918316db701d8f503c212f32d20e9a286a",
+      "report_file_sha256": "7bc048fb4006018213006ad7444ee9bafdf5270a5018ffc7611c6e2ba9e25afd"
+    }
+  ],
+  "runner_admission": {
+    "status": "unverified",
+    "required_workflow": ".github/workflows/phase3-linux-controlled.yml",
+    "requirements": [
+      "default-branch workflow_dispatch",
+      "PHASE3_LINUX_RUNNER_ENABLED=true",
+      "self-hosted linux x64 ligamina-phase3 runner",
+      "phase3-linux-controlled Environment",
+      "contents:read and no persisted checkout credential",
+      "artifact availability on failure/cancellation",
+      "outer worker/evidence cleanup verified"
+    ],
+    "evidence_boundary": "Workflow/source checks do not establish current GitHub runner registration, Environment policy, branch protection, or cleanup."
+  },
+  "rows": [
+    {
+      "recovery_id": "p4-03:linux:ko-0831a0963acd3839ef3cb5f4",
+      "cohort": "linux",
+      "platform": "linux",
+      "ecosystem": "koishi",
+      "registry_entry_id": "ko-0831a0963acd3839ef3cb5f4",
+      "package": "koishi-plugin-opanel",
+      "version": "0.0.1",
+      "identity_sha256": "be8afaf8ba8117a6f8acc871adf9a10dd244d8cc04a244d79c147b3cffca944f",
+      "parent": {
+        "report_path": "outputs/acceptance/phase3-p305-linux-affected-v3-execution-resume6-20261025.json",
+        "report_file_sha256": "8b4119e6bc56f2f26f24fc858458aa7c2491f43b0aa42fbc30bc94fe1a19c5f5",
+        "report_row_sha256": "54b575a37cea570ce0023b403fa4ea5ca408a73af84da62d264b22ccf6a43bcd",
+        "manifest_path": "outputs/acceptance/phase3-p305-linux-affected-v3-manifest-20261025.json",
+        "manifest_file_sha256": "91798c872560306155a5e8330067062f95be3f6d7fee6b566156ebc9f9087cbe",
+        "manifest_canonical_sha256": "961786350b7c0ebdb990650d051203ad82452fff72ac291402a7f46a517173c8",
+        "source_report_path": "outputs/acceptance/phase2-s211-rerun-census-linux-shard215of256-20261014.json",
+        "source_report_sha256": "a9efbe6e0c126b8c61a8da63a9543f5cbe1af35880ba1fece7e4e8fcfd7c1ad7",
+        "source_result_id": "catalog:ko-0831a0963acd3839ef3cb5f4|linux",
+        "parent_unknown_attempts": [
+          {
+            "attempt_id": "50caf51fcf01a3be0b8b5385424463d4954fc6da2e3fdb0c",
+            "unit_id": "ko-0831a0963acd3839ef3cb5f4|linux|catalog|cleanup",
+            "attempt_number": 1,
+            "worker_id": "p3-linux-842f71712e2c-1",
+            "status": "unknown",
+            "reason_code": "worker_lost",
+            "probe_result_sha256": null,
+            "attempt_record_sha256": "6f036887ca174197e9937d29c2d910836cac9d0d4122b3617003a27061ad5962"
+          }
+        ]
+      },
+      "historical_outcome": {
+        "status": "unknown",
+        "reason_code": "worker_cleanup_unconfirmed",
+        "stage_statuses": {
+          "prepare": "passed",
+          "install": "passed",
+          "native": "passed",
+          "cleanup": "unknown"
+        }
+      },
+      "diagnosis": {
+        "class": "linux_worker_attempt_unknown",
+        "attempt_reason_counts": {
+          "worker_lost": 1
+        },
+        "evidence": "P3-05 frozen attempt records and stage projection"
+      },
+      "recovery": {
+        "status": "not_attempted",
+        "retry_budget": 1,
+        "decision": "hold_for_protected_runner_and_bounded_recovery_admission",
+        "stop_condition": "Do not claim a new worker attempt until the isolated protected runner and cleanup evidence path are verified."
+      }
+    },
+    {
+      "recovery_id": "p4-03:linux:ko-106467466a491b911db30f3f",
+      "cohort": "linux",
+      "platform": "linux",
+      "ecosystem": "koishi",
+      "registry_entry_id": "ko-106467466a491b911db30f3f",
+      "package": "koishi-plugin-wfm-helper",
+      "version": "0.1.33",
+      "identity_sha256": "701dde25c61e88a2629e19f9670b9bd8ff62bbbdf470a3dc75f8b429f95f1d0c",
+      "parent": {
+        "report_path": "outputs/acceptance/phase3-p305-linux-affected-v3-execution-resume6-20261025.json",
+        "report_file_sha256": "8b4119e6bc56f2f26f24fc858458aa7c2491f43b0aa42fbc30bc94fe1a19c5f5",
+        "report_row_sha256": "9e9f2da430e5b8d5f0b8e15af6ba44016c6e601d040fffead0e82e924694d632",
+        "manifest_path": "outputs/acceptance/phase3-p305-linux-affected-v3-manifest-20261025.json",
+        "manifest_file_sha256": "91798c872560306155a5e8330067062f95be3f6d7fee6b566156ebc9f9087cbe",
+        "manifest_canonical_sha256": "961786350b7c0ebdb990650d051203ad82452fff72ac291402a7f46a517173c8",
+        "source_report_path": "outputs/acceptance/phase2-s211-rerun-census-linux-shard123of256-20261014.json",
+        "source_report_sha256": "3949df1f718222f112fe410e1e7552b3dc96af9d948268f81cadc5096ed4f577",
+        "source_result_id": "catalog:ko-106467466a491b911db30f3f|linux",
+        "parent_unknown_attempts": [
+          {
+            "attempt_id": "79263113896931fe621ca77530a64d4270430b60f64961b9",
+            "unit_id": "ko-106467466a491b911db30f3f|linux|catalog|cleanup",
+            "attempt_number": 1,
+            "worker_id": "p3-linux-842f71712e2c-1",
+            "status": "unknown",
+            "reason_code": "worker_nonzero_exit",
+            "probe_result_sha256": "35952eec2a2f79d7382d126f4bea675f00aa77d3e64f29a24d553ff0f095c354",
+            "attempt_record_sha256": "e8a8d5ce088345131d468009a00e1dc49d373971e4d5addfaa8cbdad793017dc"
+          },
+          {
+            "attempt_id": "311a13dda4ec7998c6b6ac27966deaae2b395fdfe8e8aad4",
+            "unit_id": "ko-106467466a491b911db30f3f|linux|catalog|install",
+            "attempt_number": 1,
+            "worker_id": "p3-linux-842f71712e2c-1",
+            "status": "unknown",
+            "reason_code": "worker_nonzero_exit",
+            "probe_result_sha256": "35952eec2a2f79d7382d126f4bea675f00aa77d3e64f29a24d553ff0f095c354",
+            "attempt_record_sha256": "f84852885aa78e0ef0b2aa60c3f4980c859ce5419f50bdbc6fd3055e35e851ea"
+          }
+        ]
+      },
+      "historical_outcome": {
+        "status": "unknown",
+        "reason_code": "worker_cleanup_unconfirmed",
+        "stage_statuses": {
+          "prepare": "passed",
+          "install": "unknown",
+          "native": "skipped",
+          "cleanup": "unknown"
+        }
+      },
+      "diagnosis": {
+        "class": "linux_worker_attempt_unknown",
+        "attempt_reason_counts": {
+          "worker_nonzero_exit": 2
+        },
+        "evidence": "P3-05 frozen attempt records and stage projection"
+      },
+      "recovery": {
+        "status": "not_attempted",
+        "retry_budget": 1,
+        "decision": "hold_for_protected_runner_and_bounded_recovery_admission",
+        "stop_condition": "Do not claim a new worker attempt until the isolated protected runner and cleanup evidence path are verified."
+      }
+    },
+    {
+      "recovery_id": "p4-03:linux:ko-129d4b71209939ec05d2e688",
+      "cohort": "linux",
+      "platform": "linux",
+      "ecosystem": "koishi",
+      "registry_entry_id": "ko-129d4b71209939ec05d2e688",
+      "package": "koishi-plugin-rr-su-character-custom",
+      "version": "0.0.1",
+      "identity_sha256": "09ceedd752bc8cc4857b48afccd631e51a796149c8ab394f264271d6adf45b8e",
+      "parent": {
+        "report_path": "outputs/acceptance/phase3-p305-linux-affected-v3-execution-resume6-20261025.json",
+        "report_file_sha256": "8b4119e6bc56f2f26f24fc858458aa7c2491f43b0aa42fbc30bc94fe1a19c5f5",
+        "report_row_sha256": "bd81559ce322ff0999424198493da786071104a8d7ace8e2576c28842d494a9d",
+        "manifest_path": "outputs/acceptance/phase3-p305-linux-affected-v3-manifest-20261025.json",
+        "manifest_file_sha256": "91798c872560306155a5e8330067062f95be3f6d7fee6b566156ebc9f9087cbe",
+        "manifest_canonical_sha256": "961786350b7c0ebdb990650d051203ad82452fff72ac291402a7f46a517173c8",
+        "source_report_path": "outputs/acceptance/phase2-s211-rerun-census-linux-shard253of256-20261014.json",
+        "source_report_sha256": "b5457bb3b50352345cbb24b61fffe23b6b1cadada385f40bcb0e9a8525e0a09b",
+        "source_result_id": "catalog:ko-129d4b71209939ec05d2e688|linux",
+        "parent_unknown_attempts": [
+          {
+            "attempt_id": "0bde9bb5c58982efca881a719689a0796ce4cc05ec2c49ba",
+            "unit_id": "ko-129d4b71209939ec05d2e688|linux|catalog|cleanup",
+            "attempt_number": 1,
+            "worker_id": "p3-linux-842f71712e2c-2",
+            "status": "unknown",
+            "reason_code": "worker_nonzero_exit",
+            "probe_result_sha256": "33ccdadbcae4e5fca7eaf59ef5cb9c9647c427896e81ffa3a28b436e33f5e6a1",
+            "attempt_record_sha256": "b092e15815e94ffda822d398274ca5a62f6e6f68c151cb5758c2eeadbd8195c1"
+          },
+          {
+            "attempt_id": "c23057525cab0aa135844f06bf2c7027a8c5db00270208b0",
+            "unit_id": "ko-129d4b71209939ec05d2e688|linux|catalog|install",
+            "attempt_number": 1,
+            "worker_id": "p3-linux-842f71712e2c-2",
+            "status": "unknown",
+            "reason_code": "worker_nonzero_exit",
+            "probe_result_sha256": "33ccdadbcae4e5fca7eaf59ef5cb9c9647c427896e81ffa3a28b436e33f5e6a1",
+            "attempt_record_sha256": "2ad5c6316d6b4f31eda3befa472f4bb0f62bbb25478e8080565e7d8efda1617c"
+          }
+        ]
+      },
+      "historical_outcome": {
+        "status": "unknown",
+        "reason_code": "worker_cleanup_unconfirmed",
+        "stage_statuses": {
+          "prepare": "passed",
+          "install": "unknown",
+          "native": "skipped",
+          "cleanup": "unknown"
+        }
+      },
+      "diagnosis": {
+        "class": "linux_worker_attempt_unknown",
+        "attempt_reason_counts": {
+          "worker_nonzero_exit": 2
+        },
+        "evidence": "P3-05 frozen attempt records and stage projection"
+      },
+      "recovery": {
+        "status": "not_attempted",
+        "retry_budget": 1,
+        "decision": "hold_for_protected_runner_and_bounded_recovery_admission",
+        "stop_condition": "Do not claim a new worker attempt until the isolated protected runner and cleanup evidence path are verified."
+      }
+    },
+    {
+      "recovery_id": "p4-03:linux:ko-1713c88871bd1765d4e787e4",
+      "cohort": "linux",
+      "platform": "linux",
+      "ecosystem": "koishi",
+      "registry_entry_id": "ko-1713c88871bd1765d4e787e4",
+      "package": "koishi-plugin-hajimi-lizard",
+      "version": "1.1.0",
+      "identity_sha256": "021bbdd4e24ff360d94b64f46c2966b197f57e933a78893cbc9de305442388a2",
+      "parent": {
+        "report_path": "outputs/acceptance/phase3-p305-linux-affected-v3-execution-resume6-20261025.json",
+        "report_file_sha256": "8b4119e6bc56f2f26f24fc858458aa7c2491f43b0aa42fbc30bc94fe1a19c5f5",
+        "report_row_sha256": "c92c10f0655728a2fe0e17c079e92732db345de4333c97535ddcb2be97a04b8e",
+        "manifest_path": "outputs/acceptance/phase3-p305-linux-affected-v3-manifest-20261025.json",
+        "manifest_file_sha256": "91798c872560306155a5e8330067062f95be3f6d7fee6b566156ebc9f9087cbe",
+        "manifest_canonical_sha256": "961786350b7c0ebdb990650d051203ad82452fff72ac291402a7f46a517173c8",
+        "source_report_path": "outputs/acceptance/phase2-s211-rerun-census-linux-shard65of256-20261014.json",
+        "source_report_sha256": "e86baeab21d931ebea1c302a12915ab2f33928be50ab0cb5289cb694b44ad5f7",
+        "source_result_id": "catalog:ko-1713c88871bd1765d4e787e4|linux",
+        "parent_unknown_attempts": [
+          {
+            "attempt_id": "15fe9d739065f5eb1576ea5f91323112f2af48880b84757f",
+            "unit_id": "ko-1713c88871bd1765d4e787e4|linux|catalog|cleanup",
+            "attempt_number": 1,
+            "worker_id": "p3-linux-842f71712e2c-1",
+            "status": "unknown",
+            "reason_code": "worker_nonzero_exit",
+            "probe_result_sha256": "371d8e1c476159dfd989bce7573491bcc961e760c7770b720204d65b9e1c5036",
+            "attempt_record_sha256": "9a4c5b94ad5ef96a071591e92f1da0bc34a5bc28598ae43bcd7c802d703a90e5"
+          },
+          {
+            "attempt_id": "4bc2dcf4510b853204c921ef1a493499411ed3112ee08331",
+            "unit_id": "ko-1713c88871bd1765d4e787e4|linux|catalog|install",
+            "attempt_number": 1,
+            "worker_id": "p3-linux-842f71712e2c-1",
+            "status": "unknown",
+            "reason_code": "worker_nonzero_exit",
+            "probe_result_sha256": "371d8e1c476159dfd989bce7573491bcc961e760c7770b720204d65b9e1c5036",
+            "attempt_record_sha256": "8e93a2e66e5d88721ce2e9de97c6b204b29ff2c146b4963f50746092632bd579"
+          }
+        ]
+      },
+      "historical_outcome": {
+        "status": "unknown",
+        "reason_code": "worker_nonzero_exit",
+        "stage_statuses": {
+          "prepare": "passed",
+          "install": "unknown",
+          "native": "skipped",
+          "cleanup": "unknown"
+        }
+      },
+      "diagnosis": {
+        "class": "linux_worker_attempt_unknown",
+        "attempt_reason_counts": {
+          "worker_nonzero_exit": 2
+        },
+        "evidence": "P3-05 frozen attempt records and stage projection"
+      },
+      "recovery": {
+        "status": "not_attempted",
+        "retry_budget": 1,
+        "decision": "hold_for_protected_runner_and_bounded_recovery_admission",
+        "stop_condition": "Do not claim a new worker attempt until the isolated protected runner and cleanup evidence path are verified."
+      }
+    },
+    {
+      "recovery_id": "p4-03:linux:ko-2126d25bcc1a117a7ff777cb",
+      "cohort": "linux",
+      "platform": "linux",
+      "ecosystem": "koishi",
+      "registry_entry_id": "ko-2126d25bcc1a117a7ff777cb",
+      "package": "koishi-plugin-chatluna-command-tool",
+      "version": "0.0.1",
+      "identity_sha256": "873429c57c331ab030146cdffd7affe4e7e87f120b62297780c622bc544fe877",
+      "parent": {
+        "report_path": "outputs/acceptance/phase3-p305-linux-affected-v3-execution-resume6-20261025.json",
+        "report_file_sha256": "8b4119e6bc56f2f26f24fc858458aa7c2491f43b0aa42fbc30bc94fe1a19c5f5",
+        "report_row_sha256": "36c86c60eda7cfdcda2e9cce0499eb4e72d4a4653cc962cac26b61b38e4c2fa0",
+        "manifest_path": "outputs/acceptance/phase3-p305-linux-affected-v3-manifest-20261025.json",
+        "manifest_file_sha256": "91798c872560306155a5e8330067062f95be3f6d7fee6b566156ebc9f9087cbe",
+        "manifest_canonical_sha256": "961786350b7c0ebdb990650d051203ad82452fff72ac291402a7f46a517173c8",
+        "source_report_path": "outputs/acceptance/phase2-s211-rerun-census-linux-shard152of256-20261014.json",
+        "source_report_sha256": "642bd5c0b2bff5648b39bc1f3bdb744174bcca3e5dbee312e9c71e3df9b21621",
+        "source_result_id": "catalog:ko-2126d25bcc1a117a7ff777cb|linux",
+        "parent_unknown_attempts": [
+          {
+            "attempt_id": "c17e9b053d3cebf9ded661b661b9647ec54b2d447b43648d",
+            "unit_id": "ko-2126d25bcc1a117a7ff777cb|linux|catalog|cleanup",
+            "attempt_number": 1,
+            "worker_id": "p3-linux-842f71712e2c-2",
+            "status": "unknown",
+            "reason_code": "worker_cleanup_unconfirmed",
+            "probe_result_sha256": null,
+            "attempt_record_sha256": "34cc5aa6f87f793719b94ae03d43a27ee9557c23658f7142e4c1d1b1893a865b"
+          },
+          {
+            "attempt_id": "6f4604deb09a82b20fe91c19d157ce12ac3a6e3bfa4da703",
+            "unit_id": "ko-2126d25bcc1a117a7ff777cb|linux|catalog|install",
+            "attempt_number": 1,
+            "worker_id": "p3-linux-842f71712e2c-2",
+            "status": "unknown",
+            "reason_code": "worker_lost",
+            "probe_result_sha256": null,
+            "attempt_record_sha256": "d021f524aebb812bc75a5874d7b42a0cb297b13e9ee6098bbb1ccf225b14ee6b"
+          }
+        ]
+      },
+      "historical_outcome": {
+        "status": "unknown",
+        "reason_code": "worker_cleanup_unconfirmed",
+        "stage_statuses": {
+          "prepare": "passed",
+          "install": "unknown",
+          "native": "skipped",
+          "cleanup": "unknown"
+        }
+      },
+      "diagnosis": {
+        "class": "linux_worker_attempt_unknown",
+        "attempt_reason_counts": {
+          "worker_cleanup_unconfirmed": 1,
+          "worker_lost": 1
+        },
+        "evidence": "P3-05 frozen attempt records and stage projection"
+      },
+      "recovery": {
+        "status": "not_attempted",
+        "retry_budget": 1,
+        "decision": "hold_for_protected_runner_and_bounded_recovery_admission",
+        "stop_condition": "Do not claim a new worker attempt until the isolated protected runner and cleanup evidence path are verified."
+      }
+    },
+    {
+      "recovery_id": "p4-03:linux:ko-21472c0e8fd730713b935598",
+      "cohort": "linux",
+      "platform": "linux",
+      "ecosystem": "koishi",
+      "registry_entry_id": "ko-21472c0e8fd730713b935598",
+      "package": "koishi-plugin-bark",
+      "version": "0.0.1",
+      "identity_sha256": "9ead538a12d77cb1783eb18876ab068a5284052ecabfba9dbf9315382907ffd7",
+      "parent": {
+        "report_path": "outputs/acceptance/phase3-p305-linux-affected-v3-execution-resume6-20261025.json",
+        "report_file_sha256": "8b4119e6bc56f2f26f24fc858458aa7c2491f43b0aa42fbc30bc94fe1a19c5f5",
+        "report_row_sha256": "2927a60d1306bb7666d3bbd31155a4ffbc80f6d12ea889dbfdb2b33dfc6152aa",
+        "manifest_path": "outputs/acceptance/phase3-p305-linux-affected-v3-manifest-20261025.json",
+        "manifest_file_sha256": "91798c872560306155a5e8330067062f95be3f6d7fee6b566156ebc9f9087cbe",
+        "manifest_canonical_sha256": "961786350b7c0ebdb990650d051203ad82452fff72ac291402a7f46a517173c8",
+        "source_report_path": "outputs/acceptance/phase2-s211-rerun-census-linux-shard145of256-20261014.json",
+        "source_report_sha256": "8f5b4db2c76e0207f81bbbe8b22db2f9bff9f22dcd122a477b779386f6bc0d43",
+        "source_result_id": "catalog:ko-21472c0e8fd730713b935598|linux",
+        "parent_unknown_attempts": [
+          {
+            "attempt_id": "363f9bdc4b0dc06b7da9e59d7d6c8217b87e4645701a2d73",
+            "unit_id": "ko-21472c0e8fd730713b935598|linux|catalog|cleanup",
+            "attempt_number": 1,
+            "worker_id": "p3-linux-842f71712e2c-1",
+            "status": "unknown",
+            "reason_code": "worker_cleanup_unconfirmed",
+            "probe_result_sha256": null,
+            "attempt_record_sha256": "a7003221c89c0aba6e8e90739ac9b5b4c87ff6ba32e832853e1b947c6cc97477"
+          },
+          {
+            "attempt_id": "9c43dd5f59cf6f728a2ba713664bca3f6dd38d3ca298b7d3",
+            "unit_id": "ko-21472c0e8fd730713b935598|linux|catalog|install",
+            "attempt_number": 1,
+            "worker_id": "p3-linux-842f71712e2c-1",
+            "status": "unknown",
+            "reason_code": "worker_lost",
+            "probe_result_sha256": null,
+            "attempt_record_sha256": "e44c9259995690978993192cf0f81eded51c7dd237af36136d47c1ad4b31c457"
+          }
+        ]
+      },
+      "historical_outcome": {
+        "status": "unknown",
+        "reason_code": "worker_cleanup_unconfirmed",
+        "stage_statuses": {
+          "prepare": "passed",
+          "install": "unknown",
+          "native": "skipped",
+          "cleanup": "unknown"
+        }
+      },
+      "diagnosis": {
+        "class": "linux_worker_attempt_unknown",
+        "attempt_reason_counts": {
+          "worker_cleanup_unconfirmed": 1,
+          "worker_lost": 1
+        },
+        "evidence": "P3-05 frozen attempt records and stage projection"
+      },
+      "recovery": {
+        "status": "not_attempted",
+        "retry_budget": 1,
+        "decision": "hold_for_protected_runner_and_bounded_recovery_admission",
+        "stop_condition": "Do not claim a new worker attempt until the isolated protected runner and cleanup evidence path are verified."
+      }
+    },
+    {
+      "recovery_id": "p4-03:linux:ko-23ea0fb63b9c2091c32e979b",
+      "cohort": "linux",
+      "platform": "linux",
+      "ecosystem": "koishi",
+      "registry_entry_id": "ko-23ea0fb63b9c2091c32e979b",
+      "package": "koishi-plugin-npm-unused",
+      "version": "1.0.2",
+      "identity_sha256": "63556446212f9802072f72b8b87ff16273f61b53a3c0f152dca3cc00f723fa22",
+      "parent": {
+        "report_path": "outputs/acceptance/phase3-p305-linux-affected-v3-execution-resume6-20261025.json",
+        "report_file_sha256": "8b4119e6bc56f2f26f24fc858458aa7c2491f43b0aa42fbc30bc94fe1a19c5f5",
+        "report_row_sha256": "0da94d6782713939b2d20fb4a2074305bd94847c9e323cf1393f5c62c3f734c4",
+        "manifest_path": "outputs/acceptance/phase3-p305-linux-affected-v3-manifest-20261025.json",
+        "manifest_file_sha256": "91798c872560306155a5e8330067062f95be3f6d7fee6b566156ebc9f9087cbe",
+        "manifest_canonical_sha256": "961786350b7c0ebdb990650d051203ad82452fff72ac291402a7f46a517173c8",
+        "source_report_path": "outputs/acceptance/phase2-s211-rerun-census-linux-shard16of256-20261014.json",
+        "source_report_sha256": "80c0a5e3170e722c1a9e1239aec259d257c477aa74d45497d218f1eb0294b9ac",
+        "source_result_id": "catalog:ko-23ea0fb63b9c2091c32e979b|linux",
+        "parent_unknown_attempts": [
+          {
+            "attempt_id": "01e2661c7ff6045bbe25939d4e5958bbd912078757cad157",
+            "unit_id": "ko-23ea0fb63b9c2091c32e979b|linux|catalog|cleanup",
+            "attempt_number": 1,
+            "worker_id": "p3-linux-842f71712e2c-2",
+            "status": "unknown",
+            "reason_code": "worker_nonzero_exit",
+            "probe_result_sha256": "39b47ace6f18db8a4b3b38ce31664755238ce766c31bea01d55b1c0086ddf783",
+            "attempt_record_sha256": "6f10de7de997d8bd88ef58bd8ba505c18e50151de89b15e80476b16ee4e00a69"
+          },
+          {
+            "attempt_id": "fb3af1ea269d1dc637c69bd01176d9c6a8b5c6ae7ddc90b8",
+            "unit_id": "ko-23ea0fb63b9c2091c32e979b|linux|catalog|install",
+            "attempt_number": 1,
+            "worker_id": "p3-linux-842f71712e2c-2",
+            "status": "unknown",
+            "reason_code": "worker_nonzero_exit",
+            "probe_result_sha256": "39b47ace6f18db8a4b3b38ce31664755238ce766c31bea01d55b1c0086ddf783",
+            "attempt_record_sha256": "049d8e0a93672de5908c67ba2371b65ea24599b688201ddcc797b56217d7c7e8"
+          }
+        ]
+      },
+      "historical_outcome": {
+        "status": "unknown",
+        "reason_code": "worker_nonzero_exit",
+        "stage_statuses": {
+          "prepare": "passed",
+          "install": "unknown",
+          "native": "skipped",
+          "cleanup": "unknown"
+        }
+      },
+      "diagnosis": {
+        "class": "linux_worker_attempt_unknown",
+        "attempt_reason_counts": {
+          "worker_nonzero_exit": 2
+        },
+        "evidence": "P3-05 frozen attempt records and stage projection"
+      },
+      "recovery": {
+        "status": "not_attempted",
+        "retry_budget": 1,
+        "decision": "hold_for_protected_runner_and_bounded_recovery_admission",
+        "stop_condition": "Do not claim a new worker attempt until the isolated protected runner and cleanup evidence path are verified."
+      }
+    },
+    {
+      "recovery_id": "p4-03:linux:ko-35fa632a84da235eb2d7366e",
+      "cohort": "linux",
+      "platform": "linux",
+      "ecosystem": "koishi",
+      "registry_entry_id": "ko-35fa632a84da235eb2d7366e",
+      "package": "koishi-plugin-multi-bot-controller",
+      "version": "1.0.15",
+      "identity_sha256": "8c0a938c4fe0d94b835085c5a6ad0fa50e99992873305f5f92ab3405e66c0f7c",
+      "parent": {
+        "report_path": "outputs/acceptance/phase3-p305-linux-affected-v3-execution-resume6-20261025.json",
+        "report_file_sha256": "8b4119e6bc56f2f26f24fc858458aa7c2491f43b0aa42fbc30bc94fe1a19c5f5",
+        "report_row_sha256": "4368091781bd7eb2c0b7cb6ec13c0e12e0b89c723fa3d865a94995baf404a4fe",
+        "manifest_path": "outputs/acceptance/phase3-p305-linux-affected-v3-manifest-20261025.json",
+        "manifest_file_sha256": "91798c872560306155a5e8330067062f95be3f6d7fee6b566156ebc9f9087cbe",
+        "manifest_canonical_sha256": "961786350b7c0ebdb990650d051203ad82452fff72ac291402a7f46a517173c8",
+        "source_report_path": "outputs/acceptance/phase2-s211-rerun-census-linux-shard25of256-20261014.json",
+        "source_report_sha256": "0135e8d5e16032d77f686f369b9d6d78105bc2f96cce61cb436f847cf2734457",
+        "source_result_id": "catalog:ko-35fa632a84da235eb2d7366e|linux",
+        "parent_unknown_attempts": [
+          {
+            "attempt_id": "7f6abdd0ff026e0f1292a78c1cac5bbbdf165d16a49808f4",
+            "unit_id": "ko-35fa632a84da235eb2d7366e|linux|catalog|cleanup",
+            "attempt_number": 1,
+            "worker_id": "p3-linux-842f71712e2c-2",
+            "status": "unknown",
+            "reason_code": "worker_nonzero_exit",
+            "probe_result_sha256": "649dfd2454a8d60cdeb7a60417493e86671e76d507b40dddc2c541961934f27a",
+            "attempt_record_sha256": "63f96a6236a8af516bc017fc9f2a4a0f690c9751086bab766d33c77c6a547562"
+          },
+          {
+            "attempt_id": "4ebd6f9a057f313e48d9859062e15238ff1b9bd8470dacb7",
+            "unit_id": "ko-35fa632a84da235eb2d7366e|linux|catalog|install",
+            "attempt_number": 1,
+            "worker_id": "p3-linux-842f71712e2c-2",
+            "status": "unknown",
+            "reason_code": "worker_nonzero_exit",
+            "probe_result_sha256": "649dfd2454a8d60cdeb7a60417493e86671e76d507b40dddc2c541961934f27a",
+            "attempt_record_sha256": "d69633ac72605b62cbc66fb71ef62ff3497914924afe6f2dd3931b127963f048"
+          }
+        ]
+      },
+      "historical_outcome": {
+        "status": "unknown",
+        "reason_code": "entry_bound_federated_fixture_missing",
+        "stage_statuses": {
+          "prepare": "passed",
+          "install": "unknown",
+          "native": "skipped",
+          "cleanup": "unknown"
+        }
+      },
+      "diagnosis": {
+        "class": "linux_worker_attempt_unknown",
+        "attempt_reason_counts": {
+          "worker_nonzero_exit": 2
+        },
+        "evidence": "P3-05 frozen attempt records and stage projection"
+      },
+      "recovery": {
+        "status": "not_attempted",
+        "retry_budget": 1,
+        "decision": "hold_for_protected_runner_and_bounded_recovery_admission",
+        "stop_condition": "Do not claim a new worker attempt until the isolated protected runner and cleanup evidence path are verified."
+      }
+    },
+    {
+      "recovery_id": "p4-03:linux:ko-39f93a19f4ae4296dc42d672",
+      "cohort": "linux",
+      "platform": "linux",
+      "ecosystem": "koishi",
+      "registry_entry_id": "ko-39f93a19f4ae4296dc42d672",
+      "package": "koishi-plugin-fei-1a2bplus",
+      "version": "1.0.5",
+      "identity_sha256": "70f2bce3c445ce9be9f5259ad479de9cd2a7bdf16cda8d9aadc51e21ac21db0b",
+      "parent": {
+        "report_path": "outputs/acceptance/phase3-p305-linux-affected-v3-execution-resume6-20261025.json",
+        "report_file_sha256": "8b4119e6bc56f2f26f24fc858458aa7c2491f43b0aa42fbc30bc94fe1a19c5f5",
+        "report_row_sha256": "bfa88c6271263111e3d5faaf738e1a7f95015d00b07d480a73e07bc057ccf793",
+        "manifest_path": "outputs/acceptance/phase3-p305-linux-affected-v3-manifest-20261025.json",
+        "manifest_file_sha256": "91798c872560306155a5e8330067062f95be3f6d7fee6b566156ebc9f9087cbe",
+        "manifest_canonical_sha256": "961786350b7c0ebdb990650d051203ad82452fff72ac291402a7f46a517173c8",
+        "source_report_path": "outputs/acceptance/phase2-s211-rerun-census-linux-shard202of256-20261014.json",
+        "source_report_sha256": "f8c976c63cb086400ef944d5f38370f2a133c7bc6b1f89a46840e4c945b2c572",
+        "source_result_id": "catalog:ko-39f93a19f4ae4296dc42d672|linux",
+        "parent_unknown_attempts": [
+          {
+            "attempt_id": "acecf723ee9725b7c7451dc5b05282f1a57ca6f59e1bc8ba",
+            "unit_id": "ko-39f93a19f4ae4296dc42d672|linux|catalog|cleanup",
+            "attempt_number": 1,
+            "worker_id": "p3-linux-842f71712e2c-2",
+            "status": "unknown",
+            "reason_code": "worker_nonzero_exit",
+            "probe_result_sha256": "50da24337341a6c3d0b980fc229ee96d172377dd1bdbaaab3e647397fa6058a3",
+            "attempt_record_sha256": "356105085edcb587ec2e63708baa62c6557702c1a18b421e6da14ef631ecdde5"
+          },
+          {
+            "attempt_id": "4ec0fbc9990535f139f2c50329647e8a213b621927347c16",
+            "unit_id": "ko-39f93a19f4ae4296dc42d672|linux|catalog|install",
+            "attempt_number": 1,
+            "worker_id": "p3-linux-842f71712e2c-2",
+            "status": "unknown",
+            "reason_code": "worker_nonzero_exit",
+            "probe_result_sha256": "50da24337341a6c3d0b980fc229ee96d172377dd1bdbaaab3e647397fa6058a3",
+            "attempt_record_sha256": "6c40a2bfbb6f051dd80e1cb992dd84b2cbbec252e7a8bd9f491f31776310c015"
+          }
+        ]
+      },
+      "historical_outcome": {
+        "status": "unknown",
+        "reason_code": "worker_cleanup_unconfirmed",
+        "stage_statuses": {
+          "prepare": "passed",
+          "install": "unknown",
+          "native": "skipped",
+          "cleanup": "unknown"
+        }
+      },
+      "diagnosis": {
+        "class": "linux_worker_attempt_unknown",
+        "attempt_reason_counts": {
+          "worker_nonzero_exit": 2
+        },
+        "evidence": "P3-05 frozen attempt records and stage projection"
+      },
+      "recovery": {
+        "status": "not_attempted",
+        "retry_budget": 1,
+        "decision": "hold_for_protected_runner_and_bounded_recovery_admission",
+        "stop_condition": "Do not claim a new worker attempt until the isolated protected runner and cleanup evidence path are verified."
+      }
+    },
+    {
+      "recovery_id": "p4-03:linux:ko-4044db506afb5304ca71ddf0",
+      "cohort": "linux",
+      "platform": "linux",
+      "ecosystem": "koishi",
+      "registry_entry_id": "ko-4044db506afb5304ca71ddf0",
+      "package": "koishi-plugin-dew-bot",
+      "version": "1.0.264",
+      "identity_sha256": "04a733402ae95439d29533884f34d12735d09a9c69287740fa8667e0f209d501",
+      "parent": {
+        "report_path": "outputs/acceptance/phase3-p305-linux-affected-v3-execution-resume6-20261025.json",
+        "report_file_sha256": "8b4119e6bc56f2f26f24fc858458aa7c2491f43b0aa42fbc30bc94fe1a19c5f5",
+        "report_row_sha256": "8d9b56e40f30bda75a394991469385a073460110ebff97b0d017b81fd4886d9a",
+        "manifest_path": "outputs/acceptance/phase3-p305-linux-affected-v3-manifest-20261025.json",
+        "manifest_file_sha256": "91798c872560306155a5e8330067062f95be3f6d7fee6b566156ebc9f9087cbe",
+        "manifest_canonical_sha256": "961786350b7c0ebdb990650d051203ad82452fff72ac291402a7f46a517173c8",
+        "source_report_path": "outputs/acceptance/phase2-s211-rerun-census-linux-shard47of256-20261014.json",
+        "source_report_sha256": "5c63de3b9eedb095480e72ce6ca626c6ec76df2a45fed92e3b43e0d94717d19b",
+        "source_result_id": "catalog:ko-4044db506afb5304ca71ddf0|linux",
+        "parent_unknown_attempts": [
+          {
+            "attempt_id": "285032d2f09d4d2580e63643f7daa85ffb2cd672a5f0aac9",
+            "unit_id": "ko-4044db506afb5304ca71ddf0|linux|catalog|cleanup",
+            "attempt_number": 1,
+            "worker_id": "p3-linux-842f71712e2c-1",
+            "status": "unknown",
+            "reason_code": "worker_nonzero_exit",
+            "probe_result_sha256": "7d2f8b27875a53f90e0a48afce77e7f043873430190b16330613ae339575b02d",
+            "attempt_record_sha256": "ef7dfedbc95e67908a01a92c62dbc8e19ad583febff1991c4d64c70064923da8"
+          },
+          {
+            "attempt_id": "6c0a87a4a3b112def55d9ea3ac10477ddff83ee854ff8668",
+            "unit_id": "ko-4044db506afb5304ca71ddf0|linux|catalog|install",
+            "attempt_number": 1,
+            "worker_id": "p3-linux-842f71712e2c-1",
+            "status": "unknown",
+            "reason_code": "worker_nonzero_exit",
+            "probe_result_sha256": "7d2f8b27875a53f90e0a48afce77e7f043873430190b16330613ae339575b02d",
+            "attempt_record_sha256": "b4fd26381acd43f81ba0b7aa5f0de05b3fd700b6ece358833589e0906a5f5988"
+          }
+        ]
+      },
+      "historical_outcome": {
+        "status": "unknown",
+        "reason_code": "worker_nonzero_exit",
+        "stage_statuses": {
+          "prepare": "passed",
+          "install": "unknown",
+          "native": "skipped",
+          "cleanup": "unknown"
+        }
+      },
+      "diagnosis": {
+        "class": "linux_worker_attempt_unknown",
+        "attempt_reason_counts": {
+          "worker_nonzero_exit": 2
+        },
+        "evidence": "P3-05 frozen attempt records and stage projection"
+      },
+      "recovery": {
+        "status": "not_attempted",
+        "retry_budget": 1,
+        "decision": "hold_for_protected_runner_and_bounded_recovery_admission",
+        "stop_condition": "Do not claim a new worker attempt until the isolated protected runner and cleanup evidence path are verified."
+      }
+    },
+    {
+      "recovery_id": "p4-03:linux:ko-40ba02bd6d2ebe8f5a8f3697",
+      "cohort": "linux",
+      "platform": "linux",
+      "ecosystem": "koishi",
+      "registry_entry_id": "ko-40ba02bd6d2ebe8f5a8f3697",
+      "package": "koishi-plugin-staffban",
+      "version": "0.1.7",
+      "identity_sha256": "67a86edce3f19e24cd4b912cfe56ba39faa8ff183189ad51c667d0634aa37ce8",
+      "parent": {
+        "report_path": "outputs/acceptance/phase3-p305-linux-affected-v3-execution-resume6-20261025.json",
+        "report_file_sha256": "8b4119e6bc56f2f26f24fc858458aa7c2491f43b0aa42fbc30bc94fe1a19c5f5",
+        "report_row_sha256": "24b426b3c00598f7c4096a4ed7e9036fd6bca3be17820bc3fc8f07248f6978a2",
+        "manifest_path": "outputs/acceptance/phase3-p305-linux-affected-v3-manifest-20261025.json",
+        "manifest_file_sha256": "91798c872560306155a5e8330067062f95be3f6d7fee6b566156ebc9f9087cbe",
+        "manifest_canonical_sha256": "961786350b7c0ebdb990650d051203ad82452fff72ac291402a7f46a517173c8",
+        "source_report_path": "outputs/acceptance/phase2-s211-rerun-census-linux-shard75of256-20261014.json",
+        "source_report_sha256": "661831f7b7cbf05a2b5b074f1b9a601309de83f47797c0d886f1c5eba4d22f5d",
+        "source_result_id": "catalog:ko-40ba02bd6d2ebe8f5a8f3697|linux",
+        "parent_unknown_attempts": [
+          {
+            "attempt_id": "bef527aeeaab089be3dbadba1d0b6ac7c1a503d9267e64fe",
+            "unit_id": "ko-40ba02bd6d2ebe8f5a8f3697|linux|catalog|cleanup",
+            "attempt_number": 1,
+            "worker_id": "p3-linux-842f71712e2c-1",
+            "status": "unknown",
+            "reason_code": "worker_nonzero_exit",
+            "probe_result_sha256": "ff8e57106a0c8a7d071eb934dce40522c8aa4c960b07b91798de51ddc7d52cc1",
+            "attempt_record_sha256": "87d01decbaeadf4ab1ee9dfd42ef2cf6beeb4e8ab0ffc45ad2b333f4d4faca0c"
+          },
+          {
+            "attempt_id": "9c32f2e144195c787ebfd63bb362eb7e21a8a5b0f63291cb",
+            "unit_id": "ko-40ba02bd6d2ebe8f5a8f3697|linux|catalog|install",
+            "attempt_number": 1,
+            "worker_id": "p3-linux-842f71712e2c-1",
+            "status": "unknown",
+            "reason_code": "worker_nonzero_exit",
+            "probe_result_sha256": "ff8e57106a0c8a7d071eb934dce40522c8aa4c960b07b91798de51ddc7d52cc1",
+            "attempt_record_sha256": "3510e86410fc974194dc9a91f051e4496fc614d9b9e725f25b948a801bf99084"
+          }
+        ]
+      },
+      "historical_outcome": {
+        "status": "unknown",
+        "reason_code": "worker_nonzero_exit",
+        "stage_statuses": {
+          "prepare": "passed",
+          "install": "unknown",
+          "native": "skipped",
+          "cleanup": "unknown"
+        }
+      },
+      "diagnosis": {
+        "class": "linux_worker_attempt_unknown",
+        "attempt_reason_counts": {
+          "worker_nonzero_exit": 2
+        },
+        "evidence": "P3-05 frozen attempt records and stage projection"
+      },
+      "recovery": {
+        "status": "not_attempted",
+        "retry_budget": 1,
+        "decision": "hold_for_protected_runner_and_bounded_recovery_admission",
+        "stop_condition": "Do not claim a new worker attempt until the isolated protected runner and cleanup evidence path are verified."
+      }
+    },
+    {
+      "recovery_id": "p4-03:linux:ko-40d777335bd344e6532279af",
+      "cohort": "linux",
+      "platform": "linux",
+      "ecosystem": "koishi",
+      "registry_entry_id": "ko-40d777335bd344e6532279af",
+      "package": "koishi-plugin-shulikou-zhoubao",
+      "version": "0.0.3",
+      "identity_sha256": "4827a76f73bf3b82c4b99e5dd45e243f540e1ef9a12130e07a752bd241455393",
+      "parent": {
+        "report_path": "outputs/acceptance/phase3-p305-linux-affected-v3-execution-resume6-20261025.json",
+        "report_file_sha256": "8b4119e6bc56f2f26f24fc858458aa7c2491f43b0aa42fbc30bc94fe1a19c5f5",
+        "report_row_sha256": "088f1d04f29e84ef2334c4d898959c60e83fbb7599e1daa231532dedc1a8ec4d",
+        "manifest_path": "outputs/acceptance/phase3-p305-linux-affected-v3-manifest-20261025.json",
+        "manifest_file_sha256": "91798c872560306155a5e8330067062f95be3f6d7fee6b566156ebc9f9087cbe",
+        "manifest_canonical_sha256": "961786350b7c0ebdb990650d051203ad82452fff72ac291402a7f46a517173c8",
+        "source_report_path": "outputs/acceptance/phase2-s211-rerun-census-linux-shard162of256-20261014.json",
+        "source_report_sha256": "aa5fe5b690d7428274e00da361d183f351a0b054ac6a629178ce6dbd65c8076c",
+        "source_result_id": "catalog:ko-40d777335bd344e6532279af|linux",
+        "parent_unknown_attempts": [
+          {
+            "attempt_id": "3777d0abee4f20132c69fa3f0c06526af438c64a5c7f9071",
+            "unit_id": "ko-40d777335bd344e6532279af|linux|catalog|cleanup",
+            "attempt_number": 1,
+            "worker_id": "p3-linux-842f71712e2c-2",
+            "status": "unknown",
+            "reason_code": "worker_nonzero_exit",
+            "probe_result_sha256": "4db14ac0b5c3fee205980e359288aab62154f12bd144fa7b6c67bb49fb00e465",
+            "attempt_record_sha256": "20ff800e779a803eb525577266c45786196540888fb85e40b0bdbf2c0d928ad7"
+          },
+          {
+            "attempt_id": "8976d39f158d086e4820085f5f2fba58b87ab004cbc06b6f",
+            "unit_id": "ko-40d777335bd344e6532279af|linux|catalog|install",
+            "attempt_number": 1,
+            "worker_id": "p3-linux-842f71712e2c-2",
+            "status": "unknown",
+            "reason_code": "worker_nonzero_exit",
+            "probe_result_sha256": "4db14ac0b5c3fee205980e359288aab62154f12bd144fa7b6c67bb49fb00e465",
+            "attempt_record_sha256": "29a4fe1465a9040141c42d66b88d5dc4c944d8670fe60c4d1f368a881210baf0"
+          }
+        ]
+      },
+      "historical_outcome": {
+        "status": "unknown",
+        "reason_code": "worker_cleanup_unconfirmed",
+        "stage_statuses": {
+          "prepare": "passed",
+          "install": "unknown",
+          "native": "skipped",
+          "cleanup": "unknown"
+        }
+      },
+      "diagnosis": {
+        "class": "linux_worker_attempt_unknown",
+        "attempt_reason_counts": {
+          "worker_nonzero_exit": 2
+        },
+        "evidence": "P3-05 frozen attempt records and stage projection"
+      },
+      "recovery": {
+        "status": "not_attempted",
+        "retry_budget": 1,
+        "decision": "hold_for_protected_runner_and_bounded_recovery_admission",
+        "stop_condition": "Do not claim a new worker attempt until the isolated protected runner and cleanup evidence path are verified."
+      }
+    },
+    {
+      "recovery_id": "p4-03:linux:ko-4a40d0c09fb9514019598bb7",
+      "cohort": "linux",
+      "platform": "linux",
+      "ecosystem": "koishi",
+      "registry_entry_id": "ko-4a40d0c09fb9514019598bb7",
+      "package": "koishi-plugin-vox",
+      "version": "0.0.1",
+      "identity_sha256": "e47c2d661aa5bce7d78429d1350834c57a8f12451a1ab89b51a7c2ea2b43a5a9",
+      "parent": {
+        "report_path": "outputs/acceptance/phase3-p305-linux-affected-v3-execution-resume6-20261025.json",
+        "report_file_sha256": "8b4119e6bc56f2f26f24fc858458aa7c2491f43b0aa42fbc30bc94fe1a19c5f5",
+        "report_row_sha256": "3a84fbeef58d0cb64ebde69575a7b74bcde8442d1689cfc6609862c973f84c6f",
+        "manifest_path": "outputs/acceptance/phase3-p305-linux-affected-v3-manifest-20261025.json",
+        "manifest_file_sha256": "91798c872560306155a5e8330067062f95be3f6d7fee6b566156ebc9f9087cbe",
+        "manifest_canonical_sha256": "961786350b7c0ebdb990650d051203ad82452fff72ac291402a7f46a517173c8",
+        "source_report_path": "outputs/acceptance/phase2-s211-rerun-census-linux-shard197of256-20261014.json",
+        "source_report_sha256": "23fbf83cb4b6d23896cb2533aaff1105dc143fdf08cdfc866cd21ad170593f93",
+        "source_result_id": "catalog:ko-4a40d0c09fb9514019598bb7|linux",
+        "parent_unknown_attempts": [
+          {
+            "attempt_id": "2b9794a49955d4f72cefdd68070da138c71a91e01271037a",
+            "unit_id": "ko-4a40d0c09fb9514019598bb7|linux|catalog|cleanup",
+            "attempt_number": 1,
+            "worker_id": "p3-linux-842f71712e2c-1",
+            "status": "unknown",
+            "reason_code": "worker_nonzero_exit",
+            "probe_result_sha256": "2d27eaeb7a9516a75d24fe0e97b4f755a80c5877a9e91478cd1dadaa10b8759b",
+            "attempt_record_sha256": "47e571645b1de6fdf52cc785966f5eeb493433e19b174c0cf9867ae31eb653da"
+          },
+          {
+            "attempt_id": "98beddbf45949b87c14113ca01816934ef1cd7ac06ae208b",
+            "unit_id": "ko-4a40d0c09fb9514019598bb7|linux|catalog|install",
+            "attempt_number": 1,
+            "worker_id": "p3-linux-842f71712e2c-1",
+            "status": "unknown",
+            "reason_code": "worker_nonzero_exit",
+            "probe_result_sha256": "2d27eaeb7a9516a75d24fe0e97b4f755a80c5877a9e91478cd1dadaa10b8759b",
+            "attempt_record_sha256": "23494c948ff16cca9f46de9a6c708bef5b8cb7aa3e91c00cb1724141e3011725"
+          }
+        ]
+      },
+      "historical_outcome": {
+        "status": "unknown",
+        "reason_code": "worker_cleanup_unconfirmed",
+        "stage_statuses": {
+          "prepare": "passed",
+          "install": "unknown",
+          "native": "skipped",
+          "cleanup": "unknown"
+        }
+      },
+      "diagnosis": {
+        "class": "linux_worker_attempt_unknown",
+        "attempt_reason_counts": {
+          "worker_nonzero_exit": 2
+        },
+        "evidence": "P3-05 frozen attempt records and stage projection"
+      },
+      "recovery": {
+        "status": "not_attempted",
+        "retry_budget": 1,
+        "decision": "hold_for_protected_runner_and_bounded_recovery_admission",
+        "stop_condition": "Do not claim a new worker attempt until the isolated protected runner and cleanup evidence path are verified."
+      }
+    },
+    {
+      "recovery_id": "p4-03:linux:ko-6fe5b7f33ce97eb5093b3005",
+      "cohort": "linux",
+      "platform": "linux",
+      "ecosystem": "koishi",
+      "registry_entry_id": "ko-6fe5b7f33ce97eb5093b3005",
+      "package": "koishi-plugin-capture-website",
+      "version": "1.5.5",
+      "identity_sha256": "818e2eb66775d0f229cf188a0a6d537ca8935320531fa8d4a8f75520dc4d705e",
+      "parent": {
+        "report_path": "outputs/acceptance/phase3-p305-linux-affected-v3-execution-resume6-20261025.json",
+        "report_file_sha256": "8b4119e6bc56f2f26f24fc858458aa7c2491f43b0aa42fbc30bc94fe1a19c5f5",
+        "report_row_sha256": "9debe70a7906dff779e51f892d0d3a50f4ef28fc070938f4a1f5376ae1d1cfb6",
+        "manifest_path": "outputs/acceptance/phase3-p305-linux-affected-v3-manifest-20261025.json",
+        "manifest_file_sha256": "91798c872560306155a5e8330067062f95be3f6d7fee6b566156ebc9f9087cbe",
+        "manifest_canonical_sha256": "961786350b7c0ebdb990650d051203ad82452fff72ac291402a7f46a517173c8",
+        "source_report_path": "outputs/acceptance/phase2-s211-rerun-census-linux-shard218of256-20261014.json",
+        "source_report_sha256": "61b4d3b2950ba4cd3b2fe404dc13c36135053268345b38a72518c115ea48681a",
+        "source_result_id": "catalog:ko-6fe5b7f33ce97eb5093b3005|linux",
+        "parent_unknown_attempts": [
+          {
+            "attempt_id": "39a1423ef0811b06acb75dc36f03b0544962e91f48425463",
+            "unit_id": "ko-6fe5b7f33ce97eb5093b3005|linux|catalog|cleanup",
+            "attempt_number": 1,
+            "worker_id": "p3-linux-842f71712e2c-2",
+            "status": "unknown",
+            "reason_code": "worker_cleanup_unconfirmed",
+            "probe_result_sha256": null,
+            "attempt_record_sha256": "ddbf2122724ae15281a2ca77217e6f3e58b6115423d5ae4aafed18c3b03670b0"
+          },
+          {
+            "attempt_id": "1c631412b1125a2cb3f0a06fd9c7feeb3f2077fdd1bdf314",
+            "unit_id": "ko-6fe5b7f33ce97eb5093b3005|linux|catalog|install",
+            "attempt_number": 1,
+            "worker_id": "p3-linux-842f71712e2c-2",
+            "status": "unknown",
+            "reason_code": "dispatcher_executor_error",
+            "probe_result_sha256": null,
+            "attempt_record_sha256": "fabb18d3a170a41b06200bc568ee02d2cc92f91d67bdef9a440720be7aba8c42"
+          }
+        ]
+      },
+      "historical_outcome": {
+        "status": "unknown",
+        "reason_code": "worker_preparation_failed",
+        "stage_statuses": {
+          "prepare": "passed",
+          "install": "unknown",
+          "native": "skipped",
+          "cleanup": "unknown"
+        }
+      },
+      "diagnosis": {
+        "class": "linux_worker_attempt_unknown",
+        "attempt_reason_counts": {
+          "worker_cleanup_unconfirmed": 1,
+          "dispatcher_executor_error": 1
+        },
+        "evidence": "P3-05 frozen attempt records and stage projection"
+      },
+      "recovery": {
+        "status": "not_attempted",
+        "retry_budget": 1,
+        "decision": "hold_for_protected_runner_and_bounded_recovery_admission",
+        "stop_condition": "Do not claim a new worker attempt until the isolated protected runner and cleanup evidence path are verified."
+      }
+    },
+    {
+      "recovery_id": "p4-03:linux:ko-6fe9d9f97d8b46fc72373dac",
+      "cohort": "linux",
+      "platform": "linux",
+      "ecosystem": "koishi",
+      "registry_entry_id": "ko-6fe9d9f97d8b46fc72373dac",
+      "package": "koishi-plugin-tsugu-external",
+      "version": "0.0.3",
+      "identity_sha256": "930b48d71a06f003162d8f461a7e5d6cb0b0b317b7f64686df1a5b6ce10fab8c",
+      "parent": {
+        "report_path": "outputs/acceptance/phase3-p305-linux-affected-v3-execution-resume6-20261025.json",
+        "report_file_sha256": "8b4119e6bc56f2f26f24fc858458aa7c2491f43b0aa42fbc30bc94fe1a19c5f5",
+        "report_row_sha256": "47addb6540de64e37dd84fcaa21904be1c371dc6ec8598a887b717c7b888fb14",
+        "manifest_path": "outputs/acceptance/phase3-p305-linux-affected-v3-manifest-20261025.json",
+        "manifest_file_sha256": "91798c872560306155a5e8330067062f95be3f6d7fee6b566156ebc9f9087cbe",
+        "manifest_canonical_sha256": "961786350b7c0ebdb990650d051203ad82452fff72ac291402a7f46a517173c8",
+        "source_report_path": "outputs/acceptance/phase2-s211-rerun-census-linux-shard247of256-20261014.json",
+        "source_report_sha256": "261586c01b5ba24a013ed83e583d1dd92009d0bcbbdacce37301e45c0d999588",
+        "source_result_id": "catalog:ko-6fe9d9f97d8b46fc72373dac|linux",
+        "parent_unknown_attempts": [
+          {
+            "attempt_id": "9bb60a4e5000b7f31042f798075cb8ab329e0c160b6a9a22",
+            "unit_id": "ko-6fe9d9f97d8b46fc72373dac|linux|catalog|cleanup",
+            "attempt_number": 1,
+            "worker_id": "p3-linux-842f71712e2c-1",
+            "status": "unknown",
+            "reason_code": "worker_nonzero_exit",
+            "probe_result_sha256": "b066adc702bb50d31a9fa6e2b9fcaa481f38d7640a6e90caaee69c68bea9da34",
+            "attempt_record_sha256": "d69d06d95974967d183fb147858ae9fbfa754b48401c5fe86ed57ff9b1127ad7"
+          },
+          {
+            "attempt_id": "fa4c71c11180253260a8dbadab2809c459cf87333fe01399",
+            "unit_id": "ko-6fe9d9f97d8b46fc72373dac|linux|catalog|install",
+            "attempt_number": 1,
+            "worker_id": "p3-linux-842f71712e2c-1",
+            "status": "unknown",
+            "reason_code": "worker_nonzero_exit",
+            "probe_result_sha256": "b066adc702bb50d31a9fa6e2b9fcaa481f38d7640a6e90caaee69c68bea9da34",
+            "attempt_record_sha256": "16f65dd6308989b2fc029d04549430e6f0006b9a2ee64698863f1cc25e2b1b1b"
+          }
+        ]
+      },
+      "historical_outcome": {
+        "status": "unknown",
+        "reason_code": "worker_cleanup_unconfirmed",
+        "stage_statuses": {
+          "prepare": "passed",
+          "install": "unknown",
+          "native": "skipped",
+          "cleanup": "unknown"
+        }
+      },
+      "diagnosis": {
+        "class": "linux_worker_attempt_unknown",
+        "attempt_reason_counts": {
+          "worker_nonzero_exit": 2
+        },
+        "evidence": "P3-05 frozen attempt records and stage projection"
+      },
+      "recovery": {
+        "status": "not_attempted",
+        "retry_budget": 1,
+        "decision": "hold_for_protected_runner_and_bounded_recovery_admission",
+        "stop_condition": "Do not claim a new worker attempt until the isolated protected runner and cleanup evidence path are verified."
+      }
+    },
+    {
+      "recovery_id": "p4-03:linux:ko-71f2a90afa28ed51610ff4ac",
+      "cohort": "linux",
+      "platform": "linux",
+      "ecosystem": "koishi",
+      "registry_entry_id": "ko-71f2a90afa28ed51610ff4ac",
+      "package": "koishi-plugin-eod-3-forward",
+      "version": "0.0.37",
+      "identity_sha256": "289128e4f0cf1c062c1a05a0219389d4c5b09916d6415250ab612037f4a840a4",
+      "parent": {
+        "report_path": "outputs/acceptance/phase3-p305-linux-affected-v3-execution-resume6-20261025.json",
+        "report_file_sha256": "8b4119e6bc56f2f26f24fc858458aa7c2491f43b0aa42fbc30bc94fe1a19c5f5",
+        "report_row_sha256": "fc78777dfad7b1083428980d7d82cab5961bb193770aee3a18e4038c726f5c90",
+        "manifest_path": "outputs/acceptance/phase3-p305-linux-affected-v3-manifest-20261025.json",
+        "manifest_file_sha256": "91798c872560306155a5e8330067062f95be3f6d7fee6b566156ebc9f9087cbe",
+        "manifest_canonical_sha256": "961786350b7c0ebdb990650d051203ad82452fff72ac291402a7f46a517173c8",
+        "source_report_path": "outputs/acceptance/phase2-s211-rerun-census-linux-shard23of256-20261014.json",
+        "source_report_sha256": "cc963359563fd7e019b262f2f24c5e5380dc9e6bf6be7b9bfa299d4df0423854",
+        "source_result_id": "catalog:ko-71f2a90afa28ed51610ff4ac|linux",
+        "parent_unknown_attempts": [
+          {
+            "attempt_id": "b07e18bd40ea37f1fb1a2f7430987e6d95456c58c0574574",
+            "unit_id": "ko-71f2a90afa28ed51610ff4ac|linux|catalog|cleanup",
+            "attempt_number": 1,
+            "worker_id": "p3-linux-842f71712e2c-1",
+            "status": "unknown",
+            "reason_code": "worker_nonzero_exit",
+            "probe_result_sha256": "91f04a3883e4789bf7c506ddcabe5237cd344cd1459790603cc1e2124382087c",
+            "attempt_record_sha256": "27a31a9e1755365e0e2de30684aeacdfb2f1497149531203b9f0e7f4c13cdb0c"
+          },
+          {
+            "attempt_id": "bf253763cbb153c890bb0702e5823002e0d09c24dd3247ae",
+            "unit_id": "ko-71f2a90afa28ed51610ff4ac|linux|catalog|install",
+            "attempt_number": 1,
+            "worker_id": "p3-linux-842f71712e2c-1",
+            "status": "unknown",
+            "reason_code": "worker_nonzero_exit",
+            "probe_result_sha256": "91f04a3883e4789bf7c506ddcabe5237cd344cd1459790603cc1e2124382087c",
+            "attempt_record_sha256": "b596eb02887a40f9c81fc839b7f3fc22cf6df893c1cdb39b3d7347edc4852c9f"
+          }
+        ]
+      },
+      "historical_outcome": {
+        "status": "unknown",
+        "reason_code": "worker_nonzero_exit",
+        "stage_statuses": {
+          "prepare": "passed",
+          "install": "unknown",
+          "native": "skipped",
+          "cleanup": "unknown"
+        }
+      },
+      "diagnosis": {
+        "class": "linux_worker_attempt_unknown",
+        "attempt_reason_counts": {
+          "worker_nonzero_exit": 2
+        },
+        "evidence": "P3-05 frozen attempt records and stage projection"
+      },
+      "recovery": {
+        "status": "not_attempted",
+        "retry_budget": 1,
+        "decision": "hold_for_protected_runner_and_bounded_recovery_admission",
+        "stop_condition": "Do not claim a new worker attempt until the isolated protected runner and cleanup evidence path are verified."
+      }
+    },
+    {
+      "recovery_id": "p4-03:linux:ko-746ff9aa464c19e1644573f7",
+      "cohort": "linux",
+      "platform": "linux",
+      "ecosystem": "koishi",
+      "registry_entry_id": "ko-746ff9aa464c19e1644573f7",
+      "package": "koishi-plugin-apexrankwatch",
+      "version": "2.1.0",
+      "identity_sha256": "f733afe9b560cd8f95ce5fade41d7e7ae22e6ad397c6270db8bfa4b8153fe360",
+      "parent": {
+        "report_path": "outputs/acceptance/phase3-p305-linux-affected-v3-execution-resume6-20261025.json",
+        "report_file_sha256": "8b4119e6bc56f2f26f24fc858458aa7c2491f43b0aa42fbc30bc94fe1a19c5f5",
+        "report_row_sha256": "6950759aa53a4bea467316c624238cf48c25910007e77eba9cda21abdf86ecb9",
+        "manifest_path": "outputs/acceptance/phase3-p305-linux-affected-v3-manifest-20261025.json",
+        "manifest_file_sha256": "91798c872560306155a5e8330067062f95be3f6d7fee6b566156ebc9f9087cbe",
+        "manifest_canonical_sha256": "961786350b7c0ebdb990650d051203ad82452fff72ac291402a7f46a517173c8",
+        "source_report_path": "outputs/acceptance/phase2-s211-rerun-census-linux-shard82of256-20261014.json",
+        "source_report_sha256": "332e87a4806c7eed03581400527fe8116f73810ad6c29b2e7be3e82ada8b58b7",
+        "source_result_id": "catalog:ko-746ff9aa464c19e1644573f7|linux",
+        "parent_unknown_attempts": [
+          {
+            "attempt_id": "6c42160b25c19ace073f0ae5e28a98ce377963e955678fbc",
+            "unit_id": "ko-746ff9aa464c19e1644573f7|linux|catalog|cleanup",
+            "attempt_number": 1,
+            "worker_id": "p3-linux-842f71712e2c-1",
+            "status": "unknown",
+            "reason_code": "worker_nonzero_exit",
+            "probe_result_sha256": "1f4bdf253e867556715565199a71cdf28904ba6c1adba4f201b3e1ab8beaa61e",
+            "attempt_record_sha256": "e0a6d742c8c2076106c470a840c0bd70dc802abd6a3fa39559681819fc14c873"
+          },
+          {
+            "attempt_id": "67d2f327f9fc68f04d0d254d13d6f21a83c581854d385c55",
+            "unit_id": "ko-746ff9aa464c19e1644573f7|linux|catalog|install",
+            "attempt_number": 1,
+            "worker_id": "p3-linux-842f71712e2c-1",
+            "status": "unknown",
+            "reason_code": "worker_nonzero_exit",
+            "probe_result_sha256": "1f4bdf253e867556715565199a71cdf28904ba6c1adba4f201b3e1ab8beaa61e",
+            "attempt_record_sha256": "f463f0bf2f7024dde838f3800ddd4dc672bc671070d6edb88b610f719b90bfca"
+          }
+        ]
+      },
+      "historical_outcome": {
+        "status": "unknown",
+        "reason_code": "worker_nonzero_exit",
+        "stage_statuses": {
+          "prepare": "passed",
+          "install": "unknown",
+          "native": "skipped",
+          "cleanup": "unknown"
+        }
+      },
+      "diagnosis": {
+        "class": "linux_worker_attempt_unknown",
+        "attempt_reason_counts": {
+          "worker_nonzero_exit": 2
+        },
+        "evidence": "P3-05 frozen attempt records and stage projection"
+      },
+      "recovery": {
+        "status": "not_attempted",
+        "retry_budget": 1,
+        "decision": "hold_for_protected_runner_and_bounded_recovery_admission",
+        "stop_condition": "Do not claim a new worker attempt until the isolated protected runner and cleanup evidence path are verified."
+      }
+    },
+    {
+      "recovery_id": "p4-03:linux:ko-79b16b599ec4f1e0ac0a23e3",
+      "cohort": "linux",
+      "platform": "linux",
+      "ecosystem": "koishi",
+      "registry_entry_id": "ko-79b16b599ec4f1e0ac0a23e3",
+      "package": "koishi-plugin-smmcat-baraffle",
+      "version": "0.1.3",
+      "identity_sha256": "e68c8454f7615a04e6f72b69b0816f37f4d3a17a7518d8746d593257b9c7f76d",
+      "parent": {
+        "report_path": "outputs/acceptance/phase3-p305-linux-affected-v3-execution-resume6-20261025.json",
+        "report_file_sha256": "8b4119e6bc56f2f26f24fc858458aa7c2491f43b0aa42fbc30bc94fe1a19c5f5",
+        "report_row_sha256": "7b59fde99a76530ed4dc1cdec7917e1772d540f2927bfbcbe67c76742cd8ab08",
+        "manifest_path": "outputs/acceptance/phase3-p305-linux-affected-v3-manifest-20261025.json",
+        "manifest_file_sha256": "91798c872560306155a5e8330067062f95be3f6d7fee6b566156ebc9f9087cbe",
+        "manifest_canonical_sha256": "961786350b7c0ebdb990650d051203ad82452fff72ac291402a7f46a517173c8",
+        "source_report_path": "outputs/acceptance/phase2-s211-rerun-census-linux-shard220of256-20261014.json",
+        "source_report_sha256": "00427c3403ddbae30dc1859e53d5c58b30e9e704b9ed7901697b6044a6b772de",
+        "source_result_id": "catalog:ko-79b16b599ec4f1e0ac0a23e3|linux",
+        "parent_unknown_attempts": [
+          {
+            "attempt_id": "1a904c8bee8fffd6a90164a3d4bf075d2bb598a82466a89d",
+            "unit_id": "ko-79b16b599ec4f1e0ac0a23e3|linux|catalog|cleanup",
+            "attempt_number": 1,
+            "worker_id": "p3-linux-842f71712e2c-2",
+            "status": "unknown",
+            "reason_code": "worker_nonzero_exit",
+            "probe_result_sha256": "7e7b6acb57df60a16f397e995bfea36f48af5d63bd6092364763499676fe12c7",
+            "attempt_record_sha256": "9d10948a3a222b3ec1791d6b34a36de0f11a0e766b99e6b515e3aeb73365b2ec"
+          },
+          {
+            "attempt_id": "c9de05226f4e4bf66a4a5fc2b7afae4cae6f9ce9b817f7b7",
+            "unit_id": "ko-79b16b599ec4f1e0ac0a23e3|linux|catalog|install",
+            "attempt_number": 1,
+            "worker_id": "p3-linux-842f71712e2c-2",
+            "status": "unknown",
+            "reason_code": "worker_nonzero_exit",
+            "probe_result_sha256": "7e7b6acb57df60a16f397e995bfea36f48af5d63bd6092364763499676fe12c7",
+            "attempt_record_sha256": "903bf5d269654c76e4d9f7cb1dadde54c5fbc67088fa0d6fb7c2fff3da33a472"
+          }
+        ]
+      },
+      "historical_outcome": {
+        "status": "unknown",
+        "reason_code": "worker_cleanup_unconfirmed",
+        "stage_statuses": {
+          "prepare": "passed",
+          "install": "unknown",
+          "native": "skipped",
+          "cleanup": "unknown"
+        }
+      },
+      "diagnosis": {
+        "class": "linux_worker_attempt_unknown",
+        "attempt_reason_counts": {
+          "worker_nonzero_exit": 2
+        },
+        "evidence": "P3-05 frozen attempt records and stage projection"
+      },
+      "recovery": {
+        "status": "not_attempted",
+        "retry_budget": 1,
+        "decision": "hold_for_protected_runner_and_bounded_recovery_admission",
+        "stop_condition": "Do not claim a new worker attempt until the isolated protected runner and cleanup evidence path are verified."
+      }
+    },
+    {
+      "recovery_id": "p4-03:linux:ko-8149251773bc92fd7bf918a5",
+      "cohort": "linux",
+      "platform": "linux",
+      "ecosystem": "koishi",
+      "registry_entry_id": "ko-8149251773bc92fd7bf918a5",
+      "package": "koishi-plugin-minecraft-news",
+      "version": "1.0.2",
+      "identity_sha256": "8da4272f2443ed1667d8b749157f235951e1f28253691353bd8a70eccb4af43f",
+      "parent": {
+        "report_path": "outputs/acceptance/phase3-p305-linux-affected-v3-execution-resume6-20261025.json",
+        "report_file_sha256": "8b4119e6bc56f2f26f24fc858458aa7c2491f43b0aa42fbc30bc94fe1a19c5f5",
+        "report_row_sha256": "af5313d52277a0678dbabc90157c0e4dee61b7f974cd7ed11445a5fa88f0e7fe",
+        "manifest_path": "outputs/acceptance/phase3-p305-linux-affected-v3-manifest-20261025.json",
+        "manifest_file_sha256": "91798c872560306155a5e8330067062f95be3f6d7fee6b566156ebc9f9087cbe",
+        "manifest_canonical_sha256": "961786350b7c0ebdb990650d051203ad82452fff72ac291402a7f46a517173c8",
+        "source_report_path": "outputs/acceptance/phase2-s211-rerun-census-linux-shard61of256-20261014.json",
+        "source_report_sha256": "16825b3a0b4ce0aa5495d57b5779b8ce63bddc9dc9ba750c65d227afac84a7e5",
+        "source_result_id": "catalog:ko-8149251773bc92fd7bf918a5|linux",
+        "parent_unknown_attempts": [
+          {
+            "attempt_id": "ef43ef43fa4a8013c41aecb20d437e75964a7f220b5b8cdf",
+            "unit_id": "ko-8149251773bc92fd7bf918a5|linux|catalog|cleanup",
+            "attempt_number": 1,
+            "worker_id": "p3-linux-842f71712e2c-1",
+            "status": "unknown",
+            "reason_code": "worker_nonzero_exit",
+            "probe_result_sha256": "1e8dbe774ee1173bf715de87ed8abad722df562e52a0557ecf27f522893ad8b3",
+            "attempt_record_sha256": "89bd149ca67f2de8338f743fc014f7a62422ce9399bfce654cf39850ba5914f4"
+          },
+          {
+            "attempt_id": "7e1f035e6ef101cf5ab3a4f8c82ba9ce4f6cdeee9c7703fa",
+            "unit_id": "ko-8149251773bc92fd7bf918a5|linux|catalog|install",
+            "attempt_number": 1,
+            "worker_id": "p3-linux-842f71712e2c-1",
+            "status": "unknown",
+            "reason_code": "worker_nonzero_exit",
+            "probe_result_sha256": "1e8dbe774ee1173bf715de87ed8abad722df562e52a0557ecf27f522893ad8b3",
+            "attempt_record_sha256": "ffd554e80cd3389ad541be7ce70ef9a399d976c57405b5a10b8a191871afc508"
+          }
+        ]
+      },
+      "historical_outcome": {
+        "status": "unknown",
+        "reason_code": "worker_nonzero_exit",
+        "stage_statuses": {
+          "prepare": "passed",
+          "install": "unknown",
+          "native": "skipped",
+          "cleanup": "unknown"
+        }
+      },
+      "diagnosis": {
+        "class": "linux_worker_attempt_unknown",
+        "attempt_reason_counts": {
+          "worker_nonzero_exit": 2
+        },
+        "evidence": "P3-05 frozen attempt records and stage projection"
+      },
+      "recovery": {
+        "status": "not_attempted",
+        "retry_budget": 1,
+        "decision": "hold_for_protected_runner_and_bounded_recovery_admission",
+        "stop_condition": "Do not claim a new worker attempt until the isolated protected runner and cleanup evidence path are verified."
+      }
+    },
+    {
+      "recovery_id": "p4-03:linux:ko-85b1d0a1b2a2b6d37502dc79",
+      "cohort": "linux",
+      "platform": "linux",
+      "ecosystem": "koishi",
+      "registry_entry_id": "ko-85b1d0a1b2a2b6d37502dc79",
+      "package": "koishi-plugin-wolfx",
+      "version": "1.0.10",
+      "identity_sha256": "32ad4ad3109c566131e192903f0d53ab0d8fdb60cdcc9fc3bc0634511f67bac1",
+      "parent": {
+        "report_path": "outputs/acceptance/phase3-p305-linux-affected-v3-execution-resume6-20261025.json",
+        "report_file_sha256": "8b4119e6bc56f2f26f24fc858458aa7c2491f43b0aa42fbc30bc94fe1a19c5f5",
+        "report_row_sha256": "be1b2430b79b64f218b954194831bed337b0d52aba1aa33bdec4376b6b52c250",
+        "manifest_path": "outputs/acceptance/phase3-p305-linux-affected-v3-manifest-20261025.json",
+        "manifest_file_sha256": "91798c872560306155a5e8330067062f95be3f6d7fee6b566156ebc9f9087cbe",
+        "manifest_canonical_sha256": "961786350b7c0ebdb990650d051203ad82452fff72ac291402a7f46a517173c8",
+        "source_report_path": "outputs/acceptance/phase2-s211-rerun-census-linux-shard95of256-20261014.json",
+        "source_report_sha256": "fff65dea9c736b6637620397c87473fe115381cba8b2521acdc4ff4e761120a8",
+        "source_result_id": "catalog:ko-85b1d0a1b2a2b6d37502dc79|linux",
+        "parent_unknown_attempts": [
+          {
+            "attempt_id": "ba85b91a6b4bdc1799f21d96cfb74c507a8de9fdd505b2eb",
+            "unit_id": "ko-85b1d0a1b2a2b6d37502dc79|linux|catalog|cleanup",
+            "attempt_number": 1,
+            "worker_id": "p3-linux-842f71712e2c-2",
+            "status": "unknown",
+            "reason_code": "worker_nonzero_exit",
+            "probe_result_sha256": "b9f95a83265a0cd5e528cbbf2ec70710319485e61e63f485737d3b57348dbc8c",
+            "attempt_record_sha256": "7b4c12b54d79c10267a3e705d07490b24d80e670dcd15bea5b2a6f57a740408c"
+          },
+          {
+            "attempt_id": "dd57f767529e93beb0e31e18ea12c2a2879d86ee30627614",
+            "unit_id": "ko-85b1d0a1b2a2b6d37502dc79|linux|catalog|install",
+            "attempt_number": 1,
+            "worker_id": "p3-linux-842f71712e2c-2",
+            "status": "unknown",
+            "reason_code": "worker_nonzero_exit",
+            "probe_result_sha256": "b9f95a83265a0cd5e528cbbf2ec70710319485e61e63f485737d3b57348dbc8c",
+            "attempt_record_sha256": "5886ae89f418ed3515c0d11cfb7d048d07f811989d97b4cd038e59d9043d1bb6"
+          }
+        ]
+      },
+      "historical_outcome": {
+        "status": "unknown",
+        "reason_code": "worker_nonzero_exit",
+        "stage_statuses": {
+          "prepare": "passed",
+          "install": "unknown",
+          "native": "skipped",
+          "cleanup": "unknown"
+        }
+      },
+      "diagnosis": {
+        "class": "linux_worker_attempt_unknown",
+        "attempt_reason_counts": {
+          "worker_nonzero_exit": 2
+        },
+        "evidence": "P3-05 frozen attempt records and stage projection"
+      },
+      "recovery": {
+        "status": "not_attempted",
+        "retry_budget": 1,
+        "decision": "hold_for_protected_runner_and_bounded_recovery_admission",
+        "stop_condition": "Do not claim a new worker attempt until the isolated protected runner and cleanup evidence path are verified."
+      }
+    },
+    {
+      "recovery_id": "p4-03:linux:ko-90086bbf1b655358a224fcae",
+      "cohort": "linux",
+      "platform": "linux",
+      "ecosystem": "koishi",
+      "registry_entry_id": "ko-90086bbf1b655358a224fcae",
+      "package": "@sora-nico/koishi-plugin-overwatch-career-data-query",
+      "version": "1.0.4",
+      "identity_sha256": "e896bb37d3fd2b8049c9cba4eb8b3357cc2ac8cb403d172443efc5ca9d4e2163",
+      "parent": {
+        "report_path": "outputs/acceptance/phase3-p305-linux-affected-v3-execution-resume6-20261025.json",
+        "report_file_sha256": "8b4119e6bc56f2f26f24fc858458aa7c2491f43b0aa42fbc30bc94fe1a19c5f5",
+        "report_row_sha256": "8217ab601b60f0a1b574c90b3e593fdc3c85818d1b8213ff13d59dfe5a089da2",
+        "manifest_path": "outputs/acceptance/phase3-p305-linux-affected-v3-manifest-20261025.json",
+        "manifest_file_sha256": "91798c872560306155a5e8330067062f95be3f6d7fee6b566156ebc9f9087cbe",
+        "manifest_canonical_sha256": "961786350b7c0ebdb990650d051203ad82452fff72ac291402a7f46a517173c8",
+        "source_report_path": "outputs/acceptance/phase2-s211-rerun-census-linux-shard180of256-20261014.json",
+        "source_report_sha256": "14fc41cf7f8654f947c755fc9edec4384f2a19c7b4c40a34d848b02085dfa40f",
+        "source_result_id": "catalog:ko-90086bbf1b655358a224fcae|linux",
+        "parent_unknown_attempts": [
+          {
+            "attempt_id": "bdbe6e58795bd66c0ef3b851e05e0051bb60d1d4f11a764c",
+            "unit_id": "ko-90086bbf1b655358a224fcae|linux|catalog|cleanup",
+            "attempt_number": 1,
+            "worker_id": "p3-linux-842f71712e2c-1",
+            "status": "unknown",
+            "reason_code": "worker_nonzero_exit",
+            "probe_result_sha256": "3f587564f6bd75eab697b3260a64bee104c5d0174b584bff3b2620f069a3948b",
+            "attempt_record_sha256": "16b2895f060caac26727888e9528071bebc48ba994c449f177e9ebdc908e4544"
+          },
+          {
+            "attempt_id": "54794d36718df75874d8355ee635d76c6c6b7e8562e30f1b",
+            "unit_id": "ko-90086bbf1b655358a224fcae|linux|catalog|install",
+            "attempt_number": 1,
+            "worker_id": "p3-linux-842f71712e2c-1",
+            "status": "unknown",
+            "reason_code": "worker_nonzero_exit",
+            "probe_result_sha256": "3f587564f6bd75eab697b3260a64bee104c5d0174b584bff3b2620f069a3948b",
+            "attempt_record_sha256": "0a909ce8ced44aea21a1a9039f3e9454090c22c09fe259c1e34219fa492e2d49"
+          }
+        ]
+      },
+      "historical_outcome": {
+        "status": "unknown",
+        "reason_code": "worker_cleanup_unconfirmed",
+        "stage_statuses": {
+          "prepare": "passed",
+          "install": "unknown",
+          "native": "skipped",
+          "cleanup": "unknown"
+        }
+      },
+      "diagnosis": {
+        "class": "linux_worker_attempt_unknown",
+        "attempt_reason_counts": {
+          "worker_nonzero_exit": 2
+        },
+        "evidence": "P3-05 frozen attempt records and stage projection"
+      },
+      "recovery": {
+        "status": "not_attempted",
+        "retry_budget": 1,
+        "decision": "hold_for_protected_runner_and_bounded_recovery_admission",
+        "stop_condition": "Do not claim a new worker attempt until the isolated protected runner and cleanup evidence path are verified."
+      }
+    },
+    {
+      "recovery_id": "p4-03:linux:ko-9365667714b4c3945224c5e3",
+      "cohort": "linux",
+      "platform": "linux",
+      "ecosystem": "koishi",
+      "registry_entry_id": "ko-9365667714b4c3945224c5e3",
+      "package": "koishi-plugin-codex-reset",
+      "version": "0.1.5",
+      "identity_sha256": "1f89aed3af80faa0de2361e67509f892dfdc922f6b410a6b95a373fcc2ed029e",
+      "parent": {
+        "report_path": "outputs/acceptance/phase3-p305-linux-affected-v3-execution-resume6-20261025.json",
+        "report_file_sha256": "8b4119e6bc56f2f26f24fc858458aa7c2491f43b0aa42fbc30bc94fe1a19c5f5",
+        "report_row_sha256": "071662b21b7e05606090c1f2150dcd34502c922a62ee4aaadba1cfad05dc6fb3",
+        "manifest_path": "outputs/acceptance/phase3-p305-linux-affected-v3-manifest-20261025.json",
+        "manifest_file_sha256": "91798c872560306155a5e8330067062f95be3f6d7fee6b566156ebc9f9087cbe",
+        "manifest_canonical_sha256": "961786350b7c0ebdb990650d051203ad82452fff72ac291402a7f46a517173c8",
+        "source_report_path": "outputs/acceptance/phase2-s211-rerun-census-linux-shard92of256-20261014.json",
+        "source_report_sha256": "61f7f07d26c3debb8679eaf81835f32e820ed2b6207eaee888c1f9c8f80c92ed",
+        "source_result_id": "catalog:ko-9365667714b4c3945224c5e3|linux",
+        "parent_unknown_attempts": [
+          {
+            "attempt_id": "526101151fc1380c0b97626fdda2491de5d387575c77edce",
+            "unit_id": "ko-9365667714b4c3945224c5e3|linux|catalog|cleanup",
+            "attempt_number": 1,
+            "worker_id": "p3-linux-842f71712e2c-1",
+            "status": "unknown",
+            "reason_code": "worker_nonzero_exit",
+            "probe_result_sha256": "5a2242352f38b0081a2a34468f3b2a23f9e552d3d9c180a8034daf5e9f52cced",
+            "attempt_record_sha256": "2434245b42349021002f71dbc115f2a6a5dd97ae96c118f79f6976e4a0db1046"
+          },
+          {
+            "attempt_id": "11bdfce7d00d4ab4871d323340a9a18df4c75cf3c06cdd04",
+            "unit_id": "ko-9365667714b4c3945224c5e3|linux|catalog|install",
+            "attempt_number": 1,
+            "worker_id": "p3-linux-842f71712e2c-1",
+            "status": "unknown",
+            "reason_code": "worker_nonzero_exit",
+            "probe_result_sha256": "5a2242352f38b0081a2a34468f3b2a23f9e552d3d9c180a8034daf5e9f52cced",
+            "attempt_record_sha256": "e4f89865a348475ae2b65b9e7a25e226ffef734aa42c14317cefae0dfaa2fc43"
+          }
+        ]
+      },
+      "historical_outcome": {
+        "status": "unknown",
+        "reason_code": "worker_nonzero_exit",
+        "stage_statuses": {
+          "prepare": "passed",
+          "install": "unknown",
+          "native": "skipped",
+          "cleanup": "unknown"
+        }
+      },
+      "diagnosis": {
+        "class": "linux_worker_attempt_unknown",
+        "attempt_reason_counts": {
+          "worker_nonzero_exit": 2
+        },
+        "evidence": "P3-05 frozen attempt records and stage projection"
+      },
+      "recovery": {
+        "status": "not_attempted",
+        "retry_budget": 1,
+        "decision": "hold_for_protected_runner_and_bounded_recovery_admission",
+        "stop_condition": "Do not claim a new worker attempt until the isolated protected runner and cleanup evidence path are verified."
+      }
+    },
+    {
+      "recovery_id": "p4-03:linux:ko-955c6fd1bf22bd37901a4244",
+      "cohort": "linux",
+      "platform": "linux",
+      "ecosystem": "koishi",
+      "registry_entry_id": "ko-955c6fd1bf22bd37901a4244",
+      "package": "koishi-plugin-gfm",
+      "version": "1.0.1",
+      "identity_sha256": "8781ec7d5233161fbcbe86e9d94956b304c307a55059d88500ff399986c2359f",
+      "parent": {
+        "report_path": "outputs/acceptance/phase3-p305-linux-affected-v3-execution-resume6-20261025.json",
+        "report_file_sha256": "8b4119e6bc56f2f26f24fc858458aa7c2491f43b0aa42fbc30bc94fe1a19c5f5",
+        "report_row_sha256": "3f685d4a893f506f22075aa9b3381e3d731f750f0df0a7b0310227ee446f8d24",
+        "manifest_path": "outputs/acceptance/phase3-p305-linux-affected-v3-manifest-20261025.json",
+        "manifest_file_sha256": "91798c872560306155a5e8330067062f95be3f6d7fee6b566156ebc9f9087cbe",
+        "manifest_canonical_sha256": "961786350b7c0ebdb990650d051203ad82452fff72ac291402a7f46a517173c8",
+        "source_report_path": "outputs/acceptance/phase2-s211-rerun-census-linux-shard169of256-20261014.json",
+        "source_report_sha256": "19831cc5e3a3c62447bd248e06dfdacf3855187998b5be36d52e45894bd13157",
+        "source_result_id": "catalog:ko-955c6fd1bf22bd37901a4244|linux",
+        "parent_unknown_attempts": [
+          {
+            "attempt_id": "10128794d75149899f473bcc2e87d0d792177628a1b17b3b",
+            "unit_id": "ko-955c6fd1bf22bd37901a4244|linux|catalog|cleanup",
+            "attempt_number": 1,
+            "worker_id": "p3-linux-842f71712e2c-1",
+            "status": "unknown",
+            "reason_code": "worker_cleanup_unconfirmed",
+            "probe_result_sha256": null,
+            "attempt_record_sha256": "aab4a19d0cfa35712f682b3a6a9349af7efe9d6a128850aa7738e32a3a2aa376"
+          },
+          {
+            "attempt_id": "f7102448192d5c3cc27387d742915f6e8208244967b24d6f",
+            "unit_id": "ko-955c6fd1bf22bd37901a4244|linux|catalog|install",
+            "attempt_number": 1,
+            "worker_id": "p3-linux-842f71712e2c-1",
+            "status": "unknown",
+            "reason_code": "dispatcher_executor_error",
+            "probe_result_sha256": null,
+            "attempt_record_sha256": "0e83e355ba2c125592274f7c4d63edb581a59416341c4ced7e981633f0bc7e42"
+          }
+        ]
+      },
+      "historical_outcome": {
+        "status": "unknown",
+        "reason_code": "worker_preparation_failed",
+        "stage_statuses": {
+          "prepare": "passed",
+          "install": "unknown",
+          "native": "skipped",
+          "cleanup": "unknown"
+        }
+      },
+      "diagnosis": {
+        "class": "linux_worker_attempt_unknown",
+        "attempt_reason_counts": {
+          "worker_cleanup_unconfirmed": 1,
+          "dispatcher_executor_error": 1
+        },
+        "evidence": "P3-05 frozen attempt records and stage projection"
+      },
+      "recovery": {
+        "status": "not_attempted",
+        "retry_budget": 1,
+        "decision": "hold_for_protected_runner_and_bounded_recovery_admission",
+        "stop_condition": "Do not claim a new worker attempt until the isolated protected runner and cleanup evidence path are verified."
+      }
+    },
+    {
+      "recovery_id": "p4-03:linux:ko-a72b5caa2a5ccb735eac5b17",
+      "cohort": "linux",
+      "platform": "linux",
+      "ecosystem": "koishi",
+      "registry_entry_id": "ko-a72b5caa2a5ccb735eac5b17",
+      "package": "koishi-plugin-smmcat-delsetu",
+      "version": "0.1.12",
+      "identity_sha256": "24e12ea77cb2ce2b158e4f7b4e66fa71df8776206050673fe1c8e6e5d975d6a4",
+      "parent": {
+        "report_path": "outputs/acceptance/phase3-p305-linux-affected-v3-execution-resume6-20261025.json",
+        "report_file_sha256": "8b4119e6bc56f2f26f24fc858458aa7c2491f43b0aa42fbc30bc94fe1a19c5f5",
+        "report_row_sha256": "d82e3b2ec89275d3b21569cd0519cbb6df960877fd7634a75223ce8f544ee9f0",
+        "manifest_path": "outputs/acceptance/phase3-p305-linux-affected-v3-manifest-20261025.json",
+        "manifest_file_sha256": "91798c872560306155a5e8330067062f95be3f6d7fee6b566156ebc9f9087cbe",
+        "manifest_canonical_sha256": "961786350b7c0ebdb990650d051203ad82452fff72ac291402a7f46a517173c8",
+        "source_report_path": "outputs/acceptance/phase2-s211-rerun-census-linux-shard4of256-20261014.json",
+        "source_report_sha256": "1a94dca58e01bd7141a8006583cb5482f814bf1bfcbec9b5a694641a532aa0b3",
+        "source_result_id": "catalog:ko-a72b5caa2a5ccb735eac5b17|linux",
+        "parent_unknown_attempts": [
+          {
+            "attempt_id": "49fce71e1ccfe257fcd90119c366e61506e25982496fed21",
+            "unit_id": "ko-a72b5caa2a5ccb735eac5b17|linux|catalog|cleanup",
+            "attempt_number": 1,
+            "worker_id": "p3-linux-842f71712e2c-2",
+            "status": "unknown",
+            "reason_code": "worker_nonzero_exit",
+            "probe_result_sha256": "d1865204821e98e3b87a1a0525eb910e931ecbfbd76c750736fcadd8c39e13f4",
+            "attempt_record_sha256": "6696ba8b00411f3d3ad4f18354de72eaa564a5151896fb7889aa5e113e5b43b6"
+          },
+          {
+            "attempt_id": "bacda42f299793632a5f702f5cc3d1b2b8352b192e1983e4",
+            "unit_id": "ko-a72b5caa2a5ccb735eac5b17|linux|catalog|install",
+            "attempt_number": 1,
+            "worker_id": "p3-linux-842f71712e2c-2",
+            "status": "unknown",
+            "reason_code": "worker_nonzero_exit",
+            "probe_result_sha256": "d1865204821e98e3b87a1a0525eb910e931ecbfbd76c750736fcadd8c39e13f4",
+            "attempt_record_sha256": "6dfc294a97091af436bb332ea40e0338866bcf6f3b59dc6fc3f4d407ed4ed6fa"
+          }
+        ]
+      },
+      "historical_outcome": {
+        "status": "unknown",
+        "reason_code": "worker_nonzero_exit",
+        "stage_statuses": {
+          "prepare": "passed",
+          "install": "unknown",
+          "native": "skipped",
+          "cleanup": "unknown"
+        }
+      },
+      "diagnosis": {
+        "class": "linux_worker_attempt_unknown",
+        "attempt_reason_counts": {
+          "worker_nonzero_exit": 2
+        },
+        "evidence": "P3-05 frozen attempt records and stage projection"
+      },
+      "recovery": {
+        "status": "not_attempted",
+        "retry_budget": 1,
+        "decision": "hold_for_protected_runner_and_bounded_recovery_admission",
+        "stop_condition": "Do not claim a new worker attempt until the isolated protected runner and cleanup evidence path are verified."
+      }
+    },
+    {
+      "recovery_id": "p4-03:linux:ko-a77908164683fead2d9ee80a",
+      "cohort": "linux",
+      "platform": "linux",
+      "ecosystem": "koishi",
+      "registry_entry_id": "ko-a77908164683fead2d9ee80a",
+      "package": "koishi-plugin-vit-nsfw-detect",
+      "version": "0.1.0",
+      "identity_sha256": "97984a0fbf0eef798f46657b4bb8917489eb501fc1cfcea4a5e8456bf7b8b602",
+      "parent": {
+        "report_path": "outputs/acceptance/phase3-p305-linux-affected-v3-execution-resume6-20261025.json",
+        "report_file_sha256": "8b4119e6bc56f2f26f24fc858458aa7c2491f43b0aa42fbc30bc94fe1a19c5f5",
+        "report_row_sha256": "e581c4f296fc3b270b86ff4c34d3d3b32ac9529b6b2caecaf5952a64352c4c3c",
+        "manifest_path": "outputs/acceptance/phase3-p305-linux-affected-v3-manifest-20261025.json",
+        "manifest_file_sha256": "91798c872560306155a5e8330067062f95be3f6d7fee6b566156ebc9f9087cbe",
+        "manifest_canonical_sha256": "961786350b7c0ebdb990650d051203ad82452fff72ac291402a7f46a517173c8",
+        "source_report_path": "outputs/acceptance/phase2-s211-rerun-census-linux-shard32of256-20261014.json",
+        "source_report_sha256": "c55f0b9edd95b2eb509fe6d377b50a11bc9b630b363f82c983ed08018053d6c8",
+        "source_result_id": "catalog:ko-a77908164683fead2d9ee80a|linux",
+        "parent_unknown_attempts": [
+          {
+            "attempt_id": "305f65a3f174177d884e09ecc579b21aad165f07d43c98a9",
+            "unit_id": "ko-a77908164683fead2d9ee80a|linux|catalog|cleanup",
+            "attempt_number": 1,
+            "worker_id": "p3-linux-842f71712e2c-2",
+            "status": "unknown",
+            "reason_code": "worker_nonzero_exit",
+            "probe_result_sha256": "e45202f6846109acfcf2cff8001b7b88dd75f43fab7033b9db47ac2a442aa6ac",
+            "attempt_record_sha256": "b491dbc5c88352d4b50f81bb3d2a92e63884c1b2ff5749f6ac7929732593e71e"
+          },
+          {
+            "attempt_id": "19cdf375a502d925fc1d7f1095d5f2eb0966033fc9ce2bc2",
+            "unit_id": "ko-a77908164683fead2d9ee80a|linux|catalog|install",
+            "attempt_number": 1,
+            "worker_id": "p3-linux-842f71712e2c-2",
+            "status": "unknown",
+            "reason_code": "worker_nonzero_exit",
+            "probe_result_sha256": "e45202f6846109acfcf2cff8001b7b88dd75f43fab7033b9db47ac2a442aa6ac",
+            "attempt_record_sha256": "32e71477a516796066e7b43f8d54aca4f920170c2144ceac5befa07d50e44c73"
+          }
+        ]
+      },
+      "historical_outcome": {
+        "status": "unknown",
+        "reason_code": "worker_nonzero_exit",
+        "stage_statuses": {
+          "prepare": "passed",
+          "install": "unknown",
+          "native": "skipped",
+          "cleanup": "unknown"
+        }
+      },
+      "diagnosis": {
+        "class": "linux_worker_attempt_unknown",
+        "attempt_reason_counts": {
+          "worker_nonzero_exit": 2
+        },
+        "evidence": "P3-05 frozen attempt records and stage projection"
+      },
+      "recovery": {
+        "status": "not_attempted",
+        "retry_budget": 1,
+        "decision": "hold_for_protected_runner_and_bounded_recovery_admission",
+        "stop_condition": "Do not claim a new worker attempt until the isolated protected runner and cleanup evidence path are verified."
+      }
+    },
+    {
+      "recovery_id": "p4-03:linux:ko-ada353a270d04261329abe75",
+      "cohort": "linux",
+      "platform": "linux",
+      "ecosystem": "koishi",
+      "registry_entry_id": "ko-ada353a270d04261329abe75",
+      "package": "koishi-plugin-chatsound",
+      "version": "1.0.2",
+      "identity_sha256": "197c535eaabbfaa287255337f6e6dbaf9551896ecc013cebdcebc01a7bb82609",
+      "parent": {
+        "report_path": "outputs/acceptance/phase3-p305-linux-affected-v3-execution-resume6-20261025.json",
+        "report_file_sha256": "8b4119e6bc56f2f26f24fc858458aa7c2491f43b0aa42fbc30bc94fe1a19c5f5",
+        "report_row_sha256": "b38f971a829a5dfa789f8dfa335250cad246e2df9973a729a084cede2668c4a3",
+        "manifest_path": "outputs/acceptance/phase3-p305-linux-affected-v3-manifest-20261025.json",
+        "manifest_file_sha256": "91798c872560306155a5e8330067062f95be3f6d7fee6b566156ebc9f9087cbe",
+        "manifest_canonical_sha256": "961786350b7c0ebdb990650d051203ad82452fff72ac291402a7f46a517173c8",
+        "source_report_path": "outputs/acceptance/phase2-s211-rerun-census-linux-shard76of256-20261014.json",
+        "source_report_sha256": "843a08edbe1f900b95f895602f0c8d59d040a86bd3528cd9debc72394bdf025f",
+        "source_result_id": "catalog:ko-ada353a270d04261329abe75|linux",
+        "parent_unknown_attempts": [
+          {
+            "attempt_id": "d2a59c851ddfdb8b0d37059d0c07adba616954e6fb1db434",
+            "unit_id": "ko-ada353a270d04261329abe75|linux|catalog|cleanup",
+            "attempt_number": 1,
+            "worker_id": "p3-linux-842f71712e2c-1",
+            "status": "unknown",
+            "reason_code": "worker_nonzero_exit",
+            "probe_result_sha256": "65d4c588fbe232bfc4666648b2a6a29789fa14bc674f6f0b6957836e61581de8",
+            "attempt_record_sha256": "32f3f768fb54d9cc2ab102f57b5046f94f5298e5f9899b3526e41bcba335bd80"
+          },
+          {
+            "attempt_id": "8d75cd835edcabe4cb2ec8dbfb87a8bcaf971f4a4a6f9541",
+            "unit_id": "ko-ada353a270d04261329abe75|linux|catalog|install",
+            "attempt_number": 1,
+            "worker_id": "p3-linux-842f71712e2c-1",
+            "status": "unknown",
+            "reason_code": "worker_nonzero_exit",
+            "probe_result_sha256": "65d4c588fbe232bfc4666648b2a6a29789fa14bc674f6f0b6957836e61581de8",
+            "attempt_record_sha256": "94cffc4fac6d62ddb073f455c3c82120893d1e887353a5adbc820afae93c8331"
+          }
+        ]
+      },
+      "historical_outcome": {
+        "status": "unknown",
+        "reason_code": "worker_nonzero_exit",
+        "stage_statuses": {
+          "prepare": "passed",
+          "install": "unknown",
+          "native": "skipped",
+          "cleanup": "unknown"
+        }
+      },
+      "diagnosis": {
+        "class": "linux_worker_attempt_unknown",
+        "attempt_reason_counts": {
+          "worker_nonzero_exit": 2
+        },
+        "evidence": "P3-05 frozen attempt records and stage projection"
+      },
+      "recovery": {
+        "status": "not_attempted",
+        "retry_budget": 1,
+        "decision": "hold_for_protected_runner_and_bounded_recovery_admission",
+        "stop_condition": "Do not claim a new worker attempt until the isolated protected runner and cleanup evidence path are verified."
+      }
+    },
+    {
+      "recovery_id": "p4-03:linux:ko-c2f6897d7186ed68b5e9c9ef",
+      "cohort": "linux",
+      "platform": "linux",
+      "ecosystem": "koishi",
+      "registry_entry_id": "ko-c2f6897d7186ed68b5e9c9ef",
+      "package": "koishi-plugin-smmcat-photodisk",
+      "version": "0.5.6",
+      "identity_sha256": "c0b7dab24c680ce1377497e9f42f12af90eead8176e49898acdd195daed03fc5",
+      "parent": {
+        "report_path": "outputs/acceptance/phase3-p305-linux-affected-v3-execution-resume6-20261025.json",
+        "report_file_sha256": "8b4119e6bc56f2f26f24fc858458aa7c2491f43b0aa42fbc30bc94fe1a19c5f5",
+        "report_row_sha256": "59a1d39dfd0687dc745ae1eca36c59eefbf991b980905fd6aba5c8d924d29980",
+        "manifest_path": "outputs/acceptance/phase3-p305-linux-affected-v3-manifest-20261025.json",
+        "manifest_file_sha256": "91798c872560306155a5e8330067062f95be3f6d7fee6b566156ebc9f9087cbe",
+        "manifest_canonical_sha256": "961786350b7c0ebdb990650d051203ad82452fff72ac291402a7f46a517173c8",
+        "source_report_path": "outputs/acceptance/phase2-s211-rerun-census-linux-shard228of256-20261014.json",
+        "source_report_sha256": "4483818b276560dedbc82b819565cb55d396eae5e74e94c0d3277bb348f7081c",
+        "source_result_id": "catalog:ko-c2f6897d7186ed68b5e9c9ef|linux",
+        "parent_unknown_attempts": [
+          {
+            "attempt_id": "78eac3928716d00cf78778bbf277568c9643bab384940165",
+            "unit_id": "ko-c2f6897d7186ed68b5e9c9ef|linux|catalog|cleanup",
+            "attempt_number": 1,
+            "worker_id": "p3-linux-842f71712e2c-1",
+            "status": "unknown",
+            "reason_code": "worker_nonzero_exit",
+            "probe_result_sha256": "b331aae9f1c6d6be48fc1d86a96709130c62ead44846631f409193db20d0ad74",
+            "attempt_record_sha256": "2c2e8a8c948cc8373b57e7b7dd1b44def632b149765d897e0cf8129c8b24eed7"
+          },
+          {
+            "attempt_id": "d87b9f988b01baf80b70a11b37e6a569bf123c605738205b",
+            "unit_id": "ko-c2f6897d7186ed68b5e9c9ef|linux|catalog|install",
+            "attempt_number": 1,
+            "worker_id": "p3-linux-842f71712e2c-1",
+            "status": "unknown",
+            "reason_code": "worker_nonzero_exit",
+            "probe_result_sha256": "b331aae9f1c6d6be48fc1d86a96709130c62ead44846631f409193db20d0ad74",
+            "attempt_record_sha256": "6753e32787914342ff8d98424a47aca04d2779c849463c121bbdeb1a5319b632"
+          }
+        ]
+      },
+      "historical_outcome": {
+        "status": "unknown",
+        "reason_code": "worker_cleanup_unconfirmed",
+        "stage_statuses": {
+          "prepare": "passed",
+          "install": "unknown",
+          "native": "skipped",
+          "cleanup": "unknown"
+        }
+      },
+      "diagnosis": {
+        "class": "linux_worker_attempt_unknown",
+        "attempt_reason_counts": {
+          "worker_nonzero_exit": 2
+        },
+        "evidence": "P3-05 frozen attempt records and stage projection"
+      },
+      "recovery": {
+        "status": "not_attempted",
+        "retry_budget": 1,
+        "decision": "hold_for_protected_runner_and_bounded_recovery_admission",
+        "stop_condition": "Do not claim a new worker attempt until the isolated protected runner and cleanup evidence path are verified."
+      }
+    },
+    {
+      "recovery_id": "p4-03:linux:ko-cb8e4f9fc6a20e5f4c62f1f4",
+      "cohort": "linux",
+      "platform": "linux",
+      "ecosystem": "koishi",
+      "registry_entry_id": "ko-cb8e4f9fc6a20e5f4c62f1f4",
+      "package": "koishi-plugin-petpet-http-server",
+      "version": "1.1.3",
+      "identity_sha256": "baf7c5c8c6ba1123daa6e836194a9fc4e6cb907fab0d27cdeb9250d0b6e2c7eb",
+      "parent": {
+        "report_path": "outputs/acceptance/phase3-p305-linux-affected-v3-execution-resume6-20261025.json",
+        "report_file_sha256": "8b4119e6bc56f2f26f24fc858458aa7c2491f43b0aa42fbc30bc94fe1a19c5f5",
+        "report_row_sha256": "e69a9e2e17b9a45c1149a3b6e1d6958d7b091763a01d8bd623b506d1536e0c4b",
+        "manifest_path": "outputs/acceptance/phase3-p305-linux-affected-v3-manifest-20261025.json",
+        "manifest_file_sha256": "91798c872560306155a5e8330067062f95be3f6d7fee6b566156ebc9f9087cbe",
+        "manifest_canonical_sha256": "961786350b7c0ebdb990650d051203ad82452fff72ac291402a7f46a517173c8",
+        "source_report_path": "outputs/acceptance/phase2-s211-rerun-census-linux-shard2of256-20261014.json",
+        "source_report_sha256": "f534ce46a9122afdb8e6c90ad93fb59eca0dcde690d7bcc2add22b6c933d5407",
+        "source_result_id": "catalog:ko-cb8e4f9fc6a20e5f4c62f1f4|linux",
+        "parent_unknown_attempts": [
+          {
+            "attempt_id": "02a84124e5ce9bbd58dc72f4707f41658446bc8581e7e481",
+            "unit_id": "ko-cb8e4f9fc6a20e5f4c62f1f4|linux|catalog|cleanup",
+            "attempt_number": 1,
+            "worker_id": "p3-linux-842f71712e2c-2",
+            "status": "unknown",
+            "reason_code": "worker_nonzero_exit",
+            "probe_result_sha256": "7face0e18df177b25f5870292450a04876dd6a96cb6c2ca0fd49c5c47d4dfda4",
+            "attempt_record_sha256": "08e919256dfbefddf7003d5d6dcd72a42f2cbd861a02a34f01adc6bde9f1197f"
+          },
+          {
+            "attempt_id": "4a8ca30330ffa32e6c7ef59c3dc85f3ff36e06370bcfc1ed",
+            "unit_id": "ko-cb8e4f9fc6a20e5f4c62f1f4|linux|catalog|install",
+            "attempt_number": 1,
+            "worker_id": "p3-linux-842f71712e2c-2",
+            "status": "unknown",
+            "reason_code": "worker_nonzero_exit",
+            "probe_result_sha256": "7face0e18df177b25f5870292450a04876dd6a96cb6c2ca0fd49c5c47d4dfda4",
+            "attempt_record_sha256": "646a2bfa2b5ce321f5794c87c9e39d0d7629909fe4d0d291a656e3b394a4f774"
+          }
+        ]
+      },
+      "historical_outcome": {
+        "status": "unknown",
+        "reason_code": "worker_nonzero_exit",
+        "stage_statuses": {
+          "prepare": "passed",
+          "install": "unknown",
+          "native": "skipped",
+          "cleanup": "unknown"
+        }
+      },
+      "diagnosis": {
+        "class": "linux_worker_attempt_unknown",
+        "attempt_reason_counts": {
+          "worker_nonzero_exit": 2
+        },
+        "evidence": "P3-05 frozen attempt records and stage projection"
+      },
+      "recovery": {
+        "status": "not_attempted",
+        "retry_budget": 1,
+        "decision": "hold_for_protected_runner_and_bounded_recovery_admission",
+        "stop_condition": "Do not claim a new worker attempt until the isolated protected runner and cleanup evidence path are verified."
+      }
+    },
+    {
+      "recovery_id": "p4-03:linux:ko-d30924b90b8e327c6a2e66f3",
+      "cohort": "linux",
+      "platform": "linux",
+      "ecosystem": "koishi",
+      "registry_entry_id": "ko-d30924b90b8e327c6a2e66f3",
+      "package": "koishi-plugin-808ps-max",
+      "version": "0.0.6",
+      "identity_sha256": "8c9fcfe7fae53c025246b66a7e060322a8d77fd51ff3beb2e059082ef8ba4917",
+      "parent": {
+        "report_path": "outputs/acceptance/phase3-p305-linux-affected-v3-execution-resume6-20261025.json",
+        "report_file_sha256": "8b4119e6bc56f2f26f24fc858458aa7c2491f43b0aa42fbc30bc94fe1a19c5f5",
+        "report_row_sha256": "3e39cb56c5e869e016a388fd0743e943353aa874a768477357ceb8a688698ee9",
+        "manifest_path": "outputs/acceptance/phase3-p305-linux-affected-v3-manifest-20261025.json",
+        "manifest_file_sha256": "91798c872560306155a5e8330067062f95be3f6d7fee6b566156ebc9f9087cbe",
+        "manifest_canonical_sha256": "961786350b7c0ebdb990650d051203ad82452fff72ac291402a7f46a517173c8",
+        "source_report_path": "outputs/acceptance/phase2-s211-rerun-census-linux-shard177of256-20261014.json",
+        "source_report_sha256": "ee1d9ad8361b3963ba5a8cc2af96bde8e79ab1c35a36b6a20b8a261c98daff2b",
+        "source_result_id": "catalog:ko-d30924b90b8e327c6a2e66f3|linux",
+        "parent_unknown_attempts": [
+          {
+            "attempt_id": "6a7167cc4d6f8e48a0b8149b11277efb5cbecf49432db9a8",
+            "unit_id": "ko-d30924b90b8e327c6a2e66f3|linux|catalog|cleanup",
+            "attempt_number": 1,
+            "worker_id": "p3-linux-842f71712e2c-2",
+            "status": "unknown",
+            "reason_code": "worker_nonzero_exit",
+            "probe_result_sha256": "3e5c7d6d7b91c3ee2dd3484d9db33401c88aeee3e1541133d0baf66112d610d4",
+            "attempt_record_sha256": "17680fd6635108a63f681b6e98a16fd3a823d235850f2edf86bd8364712d4020"
+          },
+          {
+            "attempt_id": "377b1590a4e37a3cf1196af87d5d2705d028f8f9d27c9772",
+            "unit_id": "ko-d30924b90b8e327c6a2e66f3|linux|catalog|install",
+            "attempt_number": 1,
+            "worker_id": "p3-linux-842f71712e2c-2",
+            "status": "unknown",
+            "reason_code": "worker_nonzero_exit",
+            "probe_result_sha256": "3e5c7d6d7b91c3ee2dd3484d9db33401c88aeee3e1541133d0baf66112d610d4",
+            "attempt_record_sha256": "8dd00867551ababeb21695132fbd7b720c08153b852f0dd391db01d6f2205471"
+          }
+        ]
+      },
+      "historical_outcome": {
+        "status": "unknown",
+        "reason_code": "worker_cleanup_unconfirmed",
+        "stage_statuses": {
+          "prepare": "passed",
+          "install": "unknown",
+          "native": "skipped",
+          "cleanup": "unknown"
+        }
+      },
+      "diagnosis": {
+        "class": "linux_worker_attempt_unknown",
+        "attempt_reason_counts": {
+          "worker_nonzero_exit": 2
+        },
+        "evidence": "P3-05 frozen attempt records and stage projection"
+      },
+      "recovery": {
+        "status": "not_attempted",
+        "retry_budget": 1,
+        "decision": "hold_for_protected_runner_and_bounded_recovery_admission",
+        "stop_condition": "Do not claim a new worker attempt until the isolated protected runner and cleanup evidence path are verified."
+      }
+    },
+    {
+      "recovery_id": "p4-03:linux:ko-da0e363234325e4e53cecc92",
+      "cohort": "linux",
+      "platform": "linux",
+      "ecosystem": "koishi",
+      "registry_entry_id": "ko-da0e363234325e4e53cecc92",
+      "package": "koishi-plugin-opencode",
+      "version": "1.0.5",
+      "identity_sha256": "69a289a6403ce7d5ae4c12cb0e6612311127543ad9c7b3b0c9a7f61da993ca05",
+      "parent": {
+        "report_path": "outputs/acceptance/phase3-p305-linux-affected-v3-execution-resume6-20261025.json",
+        "report_file_sha256": "8b4119e6bc56f2f26f24fc858458aa7c2491f43b0aa42fbc30bc94fe1a19c5f5",
+        "report_row_sha256": "d4f6492c2e107e0aff9d255b54c0aa7cf7090b40cb41b829fe8701576cea5e32",
+        "manifest_path": "outputs/acceptance/phase3-p305-linux-affected-v3-manifest-20261025.json",
+        "manifest_file_sha256": "91798c872560306155a5e8330067062f95be3f6d7fee6b566156ebc9f9087cbe",
+        "manifest_canonical_sha256": "961786350b7c0ebdb990650d051203ad82452fff72ac291402a7f46a517173c8",
+        "source_report_path": "outputs/acceptance/phase2-s211-rerun-census-linux-shard170of256-20261014.json",
+        "source_report_sha256": "04f42c0ba286fe5524fd0ab18184542fb46dab5e22d6f2c6ed2e9be87e440648",
+        "source_result_id": "catalog:ko-da0e363234325e4e53cecc92|linux",
+        "parent_unknown_attempts": [
+          {
+            "attempt_id": "f3ab4740af0160ee4cfd288ca04312e4197174a39b895589",
+            "unit_id": "ko-da0e363234325e4e53cecc92|linux|catalog|cleanup",
+            "attempt_number": 1,
+            "worker_id": "p3-linux-842f71712e2c-1",
+            "status": "unknown",
+            "reason_code": "worker_nonzero_exit",
+            "probe_result_sha256": "595360b2d7313cdaaf7f3995585e46dc1fcae8f447d1c7b03c1c35a31b45076a",
+            "attempt_record_sha256": "52dc82351ad33f29740727f9fe637b3c028cc5ab1d7e29824161b8aa323a19bb"
+          },
+          {
+            "attempt_id": "4f43ddebe72b2c99f6fb0aad0fef11f3e88934a75970675f",
+            "unit_id": "ko-da0e363234325e4e53cecc92|linux|catalog|install",
+            "attempt_number": 1,
+            "worker_id": "p3-linux-842f71712e2c-1",
+            "status": "unknown",
+            "reason_code": "worker_nonzero_exit",
+            "probe_result_sha256": "595360b2d7313cdaaf7f3995585e46dc1fcae8f447d1c7b03c1c35a31b45076a",
+            "attempt_record_sha256": "c36cf4e4af30b16bcbfff4cda37e9e4137b69d8210e77f8b96375d2889a7a754"
+          }
+        ]
+      },
+      "historical_outcome": {
+        "status": "unknown",
+        "reason_code": "worker_cleanup_unconfirmed",
+        "stage_statuses": {
+          "prepare": "passed",
+          "install": "unknown",
+          "native": "skipped",
+          "cleanup": "unknown"
+        }
+      },
+      "diagnosis": {
+        "class": "linux_worker_attempt_unknown",
+        "attempt_reason_counts": {
+          "worker_nonzero_exit": 2
+        },
+        "evidence": "P3-05 frozen attempt records and stage projection"
+      },
+      "recovery": {
+        "status": "not_attempted",
+        "retry_budget": 1,
+        "decision": "hold_for_protected_runner_and_bounded_recovery_admission",
+        "stop_condition": "Do not claim a new worker attempt until the isolated protected runner and cleanup evidence path are verified."
+      }
+    },
+    {
+      "recovery_id": "p4-03:linux:ko-dc8f84689646bfbf646474fb",
+      "cohort": "linux",
+      "platform": "linux",
+      "ecosystem": "koishi",
+      "registry_entry_id": "ko-dc8f84689646bfbf646474fb",
+      "package": "koishi-plugin-smmcat-yhdynamic",
+      "version": "0.1.2",
+      "identity_sha256": "776b7dfe9f24fdd384ede5515580b2774c6fddaf1e9740630817319cfa39c760",
+      "parent": {
+        "report_path": "outputs/acceptance/phase3-p305-linux-affected-v3-execution-resume6-20261025.json",
+        "report_file_sha256": "8b4119e6bc56f2f26f24fc858458aa7c2491f43b0aa42fbc30bc94fe1a19c5f5",
+        "report_row_sha256": "329a60699c65adb1287c502476a96a92b8c6df5f7a1c1e0e668b8b29989472d7",
+        "manifest_path": "outputs/acceptance/phase3-p305-linux-affected-v3-manifest-20261025.json",
+        "manifest_file_sha256": "91798c872560306155a5e8330067062f95be3f6d7fee6b566156ebc9f9087cbe",
+        "manifest_canonical_sha256": "961786350b7c0ebdb990650d051203ad82452fff72ac291402a7f46a517173c8",
+        "source_report_path": "outputs/acceptance/phase2-s211-rerun-census-linux-shard207of256-20261014.json",
+        "source_report_sha256": "7d62b699d08e1dd32311ce829ee2b8968fdb70908c11e6702338c9b535e1c584",
+        "source_result_id": "catalog:ko-dc8f84689646bfbf646474fb|linux",
+        "parent_unknown_attempts": [
+          {
+            "attempt_id": "41d430e55fccd49d1904e496d7cc9cb52827d037620ad140",
+            "unit_id": "ko-dc8f84689646bfbf646474fb|linux|catalog|cleanup",
+            "attempt_number": 1,
+            "worker_id": "p3-linux-842f71712e2c-1",
+            "status": "unknown",
+            "reason_code": "worker_nonzero_exit",
+            "probe_result_sha256": "aed3c551b66ea4b4801277471916f0f7b798d5643723d395d0ddf82cf2bfd546",
+            "attempt_record_sha256": "2a4b0c79a31232e2c97917e5646165db2d48f195837acedf052a1f4cd39bfae5"
+          },
+          {
+            "attempt_id": "89ca192da4067f1c9ade56af894b907b79df65abaef66d60",
+            "unit_id": "ko-dc8f84689646bfbf646474fb|linux|catalog|install",
+            "attempt_number": 1,
+            "worker_id": "p3-linux-842f71712e2c-1",
+            "status": "unknown",
+            "reason_code": "worker_nonzero_exit",
+            "probe_result_sha256": "aed3c551b66ea4b4801277471916f0f7b798d5643723d395d0ddf82cf2bfd546",
+            "attempt_record_sha256": "a05dd3d52d7b1e0e7838812de5837f0a730d89feb81c1919754c0a3ca5e29d95"
+          }
+        ]
+      },
+      "historical_outcome": {
+        "status": "unknown",
+        "reason_code": "worker_cleanup_unconfirmed",
+        "stage_statuses": {
+          "prepare": "passed",
+          "install": "unknown",
+          "native": "skipped",
+          "cleanup": "unknown"
+        }
+      },
+      "diagnosis": {
+        "class": "linux_worker_attempt_unknown",
+        "attempt_reason_counts": {
+          "worker_nonzero_exit": 2
+        },
+        "evidence": "P3-05 frozen attempt records and stage projection"
+      },
+      "recovery": {
+        "status": "not_attempted",
+        "retry_budget": 1,
+        "decision": "hold_for_protected_runner_and_bounded_recovery_admission",
+        "stop_condition": "Do not claim a new worker attempt until the isolated protected runner and cleanup evidence path are verified."
+      }
+    },
+    {
+      "recovery_id": "p4-03:linux:ko-ddd45c02f4048e7bd8e6711e",
+      "cohort": "linux",
+      "platform": "linux",
+      "ecosystem": "koishi",
+      "registry_entry_id": "ko-ddd45c02f4048e7bd8e6711e",
+      "package": "koishi-plugin-mindustry-service-handler",
+      "version": "0.0.3",
+      "identity_sha256": "332d043e292c02b17b815c66c23b612916f8fb4792d46756411dc1e38b2184f9",
+      "parent": {
+        "report_path": "outputs/acceptance/phase3-p305-linux-affected-v3-execution-resume6-20261025.json",
+        "report_file_sha256": "8b4119e6bc56f2f26f24fc858458aa7c2491f43b0aa42fbc30bc94fe1a19c5f5",
+        "report_row_sha256": "de02ac6227db1fb82bdf0e31572bb0d6eb50d80f4391f5ddcfc0eb7e918a5a09",
+        "manifest_path": "outputs/acceptance/phase3-p305-linux-affected-v3-manifest-20261025.json",
+        "manifest_file_sha256": "91798c872560306155a5e8330067062f95be3f6d7fee6b566156ebc9f9087cbe",
+        "manifest_canonical_sha256": "961786350b7c0ebdb990650d051203ad82452fff72ac291402a7f46a517173c8",
+        "source_report_path": "outputs/acceptance/phase2-s211-rerun-census-linux-shard17of256-20261014.json",
+        "source_report_sha256": "3ac024f149eb019f375d51cfd7f095289af191aaed76c13597d49cdc406a7755",
+        "source_result_id": "catalog:ko-ddd45c02f4048e7bd8e6711e|linux",
+        "parent_unknown_attempts": [
+          {
+            "attempt_id": "d550d1e4ebe8d240143b330155a3b4cf9e10d292ef31e372",
+            "unit_id": "ko-ddd45c02f4048e7bd8e6711e|linux|catalog|cleanup",
+            "attempt_number": 1,
+            "worker_id": "p3-linux-842f71712e2c-1",
+            "status": "unknown",
+            "reason_code": "worker_nonzero_exit",
+            "probe_result_sha256": "0b33a64927f5a2cff3c405819ff7b008cac322fcf48b1ec9b8f5ba2fd12af225",
+            "attempt_record_sha256": "075e704302583b0adbbda4721b10f29063676e55849a9922fe39fabdfc052208"
+          },
+          {
+            "attempt_id": "49531672aca5e42d0f6e1f500854ca2165e132ca01997258",
+            "unit_id": "ko-ddd45c02f4048e7bd8e6711e|linux|catalog|install",
+            "attempt_number": 1,
+            "worker_id": "p3-linux-842f71712e2c-1",
+            "status": "unknown",
+            "reason_code": "worker_nonzero_exit",
+            "probe_result_sha256": "0b33a64927f5a2cff3c405819ff7b008cac322fcf48b1ec9b8f5ba2fd12af225",
+            "attempt_record_sha256": "d5280e2c2a7cce0994bb6cb13dc29031d9739b8fb905eed46bef6b0629c9262c"
+          }
+        ]
+      },
+      "historical_outcome": {
+        "status": "unknown",
+        "reason_code": "worker_nonzero_exit",
+        "stage_statuses": {
+          "prepare": "passed",
+          "install": "unknown",
+          "native": "skipped",
+          "cleanup": "unknown"
+        }
+      },
+      "diagnosis": {
+        "class": "linux_worker_attempt_unknown",
+        "attempt_reason_counts": {
+          "worker_nonzero_exit": 2
+        },
+        "evidence": "P3-05 frozen attempt records and stage projection"
+      },
+      "recovery": {
+        "status": "not_attempted",
+        "retry_budget": 1,
+        "decision": "hold_for_protected_runner_and_bounded_recovery_admission",
+        "stop_condition": "Do not claim a new worker attempt until the isolated protected runner and cleanup evidence path are verified."
+      }
+    },
+    {
+      "recovery_id": "p4-03:linux:ko-f05dd8c85b868f37979ec8eb",
+      "cohort": "linux",
+      "platform": "linux",
+      "ecosystem": "koishi",
+      "registry_entry_id": "ko-f05dd8c85b868f37979ec8eb",
+      "package": "koishi-plugin-fanqie",
+      "version": "0.0.1",
+      "identity_sha256": "864291711d257257e7db0f8cf8db9fa44d575426717b0a576414cfe55902dc34",
+      "parent": {
+        "report_path": "outputs/acceptance/phase3-p305-linux-affected-v3-execution-resume6-20261025.json",
+        "report_file_sha256": "8b4119e6bc56f2f26f24fc858458aa7c2491f43b0aa42fbc30bc94fe1a19c5f5",
+        "report_row_sha256": "99da0ea07be0dd747364d01725655e059b364e7adcbf04e5598361e373c2436b",
+        "manifest_path": "outputs/acceptance/phase3-p305-linux-affected-v3-manifest-20261025.json",
+        "manifest_file_sha256": "91798c872560306155a5e8330067062f95be3f6d7fee6b566156ebc9f9087cbe",
+        "manifest_canonical_sha256": "961786350b7c0ebdb990650d051203ad82452fff72ac291402a7f46a517173c8",
+        "source_report_path": "outputs/acceptance/phase2-s211-rerun-census-linux-shard166of256-20261014.json",
+        "source_report_sha256": "3f84b532e2f7732e68ac89da94e0fe4696011b3823d3f6cba1b3c3e00211f3b2",
+        "source_result_id": "catalog:ko-f05dd8c85b868f37979ec8eb|linux",
+        "parent_unknown_attempts": [
+          {
+            "attempt_id": "010d45320d9739fc052925c2f8433ca3d6f2343d2a03c4c0",
+            "unit_id": "ko-f05dd8c85b868f37979ec8eb|linux|catalog|cleanup",
+            "attempt_number": 1,
+            "worker_id": "p3-linux-842f71712e2c-2",
+            "status": "unknown",
+            "reason_code": "worker_nonzero_exit",
+            "probe_result_sha256": "0ee8a1fa2670e83b82aa26af1a91f999e2e9964acd3f84362aeb6e0ed549c130",
+            "attempt_record_sha256": "138d963cb2237327d74ef872629a376df885cf375c9345a8b9f06f34724162a6"
+          },
+          {
+            "attempt_id": "861e6acc31eb74940c261e11bc790d0d555acecbbc50c51e",
+            "unit_id": "ko-f05dd8c85b868f37979ec8eb|linux|catalog|install",
+            "attempt_number": 1,
+            "worker_id": "p3-linux-842f71712e2c-2",
+            "status": "unknown",
+            "reason_code": "worker_nonzero_exit",
+            "probe_result_sha256": "0ee8a1fa2670e83b82aa26af1a91f999e2e9964acd3f84362aeb6e0ed549c130",
+            "attempt_record_sha256": "6b0285bb3894078c2bb6775ad0732496d3fa7cb028f37b88e89b583620c76a20"
+          }
+        ]
+      },
+      "historical_outcome": {
+        "status": "unknown",
+        "reason_code": "worker_cleanup_unconfirmed",
+        "stage_statuses": {
+          "prepare": "passed",
+          "install": "unknown",
+          "native": "skipped",
+          "cleanup": "unknown"
+        }
+      },
+      "diagnosis": {
+        "class": "linux_worker_attempt_unknown",
+        "attempt_reason_counts": {
+          "worker_nonzero_exit": 2
+        },
+        "evidence": "P3-05 frozen attempt records and stage projection"
+      },
+      "recovery": {
+        "status": "not_attempted",
+        "retry_budget": 1,
+        "decision": "hold_for_protected_runner_and_bounded_recovery_admission",
+        "stop_condition": "Do not claim a new worker attempt until the isolated protected runner and cleanup evidence path are verified."
+      }
+    },
+    {
+      "recovery_id": "p4-03:linux:ko-f6cedce8bb699f1384cb13f0",
+      "cohort": "linux",
+      "platform": "linux",
+      "ecosystem": "koishi",
+      "registry_entry_id": "ko-f6cedce8bb699f1384cb13f0",
+      "package": "koishi-plugin-server-status",
+      "version": "1.1.1",
+      "identity_sha256": "738efdde83401fb84058b91fe3458fa82b1a20d9022878291a0d46cf7a4f0cea",
+      "parent": {
+        "report_path": "outputs/acceptance/phase3-p305-linux-affected-v3-execution-resume6-20261025.json",
+        "report_file_sha256": "8b4119e6bc56f2f26f24fc858458aa7c2491f43b0aa42fbc30bc94fe1a19c5f5",
+        "report_row_sha256": "7fb7e5d8ff83de8178f2135c02234fceab899f1ad1ae2e43db39141ca2adda3b",
+        "manifest_path": "outputs/acceptance/phase3-p305-linux-affected-v3-manifest-20261025.json",
+        "manifest_file_sha256": "91798c872560306155a5e8330067062f95be3f6d7fee6b566156ebc9f9087cbe",
+        "manifest_canonical_sha256": "961786350b7c0ebdb990650d051203ad82452fff72ac291402a7f46a517173c8",
+        "source_report_path": "outputs/acceptance/phase2-s211-rerun-census-linux-shard187of256-20261014.json",
+        "source_report_sha256": "c8579646dce85f1dd7516cb3e4f7aea10bb093cf88c34cf0a0d2e22ff5868c2e",
+        "source_result_id": "catalog:ko-f6cedce8bb699f1384cb13f0|linux",
+        "parent_unknown_attempts": [
+          {
+            "attempt_id": "3c503152703435566571cd8b5573eedf9fc663d79f1dda75",
+            "unit_id": "ko-f6cedce8bb699f1384cb13f0|linux|catalog|cleanup",
+            "attempt_number": 1,
+            "worker_id": "p3-linux-842f71712e2c-2",
+            "status": "unknown",
+            "reason_code": "worker_nonzero_exit",
+            "probe_result_sha256": "b007cc1ea894a3a5c71ed900d4d355c926a6f2974bf08b2497dd03e1949e7693",
+            "attempt_record_sha256": "64ce922d34c6ad3f22baf8e345ea0d6368f0a9a8857f21ccb462a7774e0b8a65"
+          },
+          {
+            "attempt_id": "f3c73ded66dc1fcfbe3ee6aff5d7251abe5b2e41047b65b3",
+            "unit_id": "ko-f6cedce8bb699f1384cb13f0|linux|catalog|install",
+            "attempt_number": 1,
+            "worker_id": "p3-linux-842f71712e2c-2",
+            "status": "unknown",
+            "reason_code": "worker_nonzero_exit",
+            "probe_result_sha256": "b007cc1ea894a3a5c71ed900d4d355c926a6f2974bf08b2497dd03e1949e7693",
+            "attempt_record_sha256": "5ecb146c134e06c0295f0ab2e859d099fd0c32b15015de2799341823ee3aff51"
+          }
+        ]
+      },
+      "historical_outcome": {
+        "status": "unknown",
+        "reason_code": "worker_cleanup_unconfirmed",
+        "stage_statuses": {
+          "prepare": "passed",
+          "install": "unknown",
+          "native": "skipped",
+          "cleanup": "unknown"
+        }
+      },
+      "diagnosis": {
+        "class": "linux_worker_attempt_unknown",
+        "attempt_reason_counts": {
+          "worker_nonzero_exit": 2
+        },
+        "evidence": "P3-05 frozen attempt records and stage projection"
+      },
+      "recovery": {
+        "status": "not_attempted",
+        "retry_budget": 1,
+        "decision": "hold_for_protected_runner_and_bounded_recovery_admission",
+        "stop_condition": "Do not claim a new worker attempt until the isolated protected runner and cleanup evidence path are verified."
+      }
+    },
+    {
+      "recovery_id": "p4-03:linux:ko-f930f1b1b7471d4a646beb3a",
+      "cohort": "linux",
+      "platform": "linux",
+      "ecosystem": "koishi",
+      "registry_entry_id": "ko-f930f1b1b7471d4a646beb3a",
+      "package": "koishi-plugin-ammbag1",
+      "version": "0.0.3",
+      "identity_sha256": "f7c5c61237749f2a79de037eb177b8420f144a9610827a06a5ee6e61dff3768c",
+      "parent": {
+        "report_path": "outputs/acceptance/phase3-p305-linux-affected-v3-execution-resume6-20261025.json",
+        "report_file_sha256": "8b4119e6bc56f2f26f24fc858458aa7c2491f43b0aa42fbc30bc94fe1a19c5f5",
+        "report_row_sha256": "b5a8e1e2a34fbabc9bfe26a764298478d707a868f18ce045ac285d661f68093c",
+        "manifest_path": "outputs/acceptance/phase3-p305-linux-affected-v3-manifest-20261025.json",
+        "manifest_file_sha256": "91798c872560306155a5e8330067062f95be3f6d7fee6b566156ebc9f9087cbe",
+        "manifest_canonical_sha256": "961786350b7c0ebdb990650d051203ad82452fff72ac291402a7f46a517173c8",
+        "source_report_path": "outputs/acceptance/phase2-s211-rerun-census-linux-shard15of256-20261014.json",
+        "source_report_sha256": "91e041ba4ea53709b922319b4e2120270a48111315ef507cbe3c253fab161d25",
+        "source_result_id": "catalog:ko-f930f1b1b7471d4a646beb3a|linux",
+        "parent_unknown_attempts": [
+          {
+            "attempt_id": "c117d21fa0373ae8305a7d4b694cad513178a88e126b72e3",
+            "unit_id": "ko-f930f1b1b7471d4a646beb3a|linux|catalog|cleanup",
+            "attempt_number": 1,
+            "worker_id": "p3-linux-842f71712e2c-2",
+            "status": "unknown",
+            "reason_code": "worker_nonzero_exit",
+            "probe_result_sha256": "1e1feb62fcf7ad98c60d1ea22b9cd2ab6de4faeb6daee88130d7b21c00a29056",
+            "attempt_record_sha256": "3d2e18271e2d7968403bfd524d9b00529a58f11e9be2a7d3fd5e60a11ac5da10"
+          },
+          {
+            "attempt_id": "9cf1a407e6c0f3a3eaf60d493e9ec5724321ae73073d1590",
+            "unit_id": "ko-f930f1b1b7471d4a646beb3a|linux|catalog|install",
+            "attempt_number": 1,
+            "worker_id": "p3-linux-842f71712e2c-2",
+            "status": "unknown",
+            "reason_code": "worker_nonzero_exit",
+            "probe_result_sha256": "1e1feb62fcf7ad98c60d1ea22b9cd2ab6de4faeb6daee88130d7b21c00a29056",
+            "attempt_record_sha256": "fc3026051e3f676166f174930aca79fc58ee1904f62dca22a0b1a339d242adc9"
+          }
+        ]
+      },
+      "historical_outcome": {
+        "status": "unknown",
+        "reason_code": "worker_nonzero_exit",
+        "stage_statuses": {
+          "prepare": "passed",
+          "install": "unknown",
+          "native": "skipped",
+          "cleanup": "unknown"
+        }
+      },
+      "diagnosis": {
+        "class": "linux_worker_attempt_unknown",
+        "attempt_reason_counts": {
+          "worker_nonzero_exit": 2
+        },
+        "evidence": "P3-05 frozen attempt records and stage projection"
+      },
+      "recovery": {
+        "status": "not_attempted",
+        "retry_budget": 1,
+        "decision": "hold_for_protected_runner_and_bounded_recovery_admission",
+        "stop_condition": "Do not claim a new worker attempt until the isolated protected runner and cleanup evidence path are verified."
+      }
+    },
+    {
+      "recovery_id": "p4-03:linux:ko-f9d0a898369d15d6f9fe0e1a",
+      "cohort": "linux",
+      "platform": "linux",
+      "ecosystem": "koishi",
+      "registry_entry_id": "ko-f9d0a898369d15d6f9fe0e1a",
+      "package": "koishi-plugin-adapter-github",
+      "version": "1.1.2",
+      "identity_sha256": "0e83c53f290ead69f84bdf0736de851add58d7e870031e2ae3e2774bc73b5358",
+      "parent": {
+        "report_path": "outputs/acceptance/phase3-p305-linux-affected-v3-execution-resume6-20261025.json",
+        "report_file_sha256": "8b4119e6bc56f2f26f24fc858458aa7c2491f43b0aa42fbc30bc94fe1a19c5f5",
+        "report_row_sha256": "f04e2a0b90bb72c1e6a51106a32aab10fd0c0cb000be3390fe121d32fec9f1d5",
+        "manifest_path": "outputs/acceptance/phase3-p305-linux-affected-v3-manifest-20261025.json",
+        "manifest_file_sha256": "91798c872560306155a5e8330067062f95be3f6d7fee6b566156ebc9f9087cbe",
+        "manifest_canonical_sha256": "961786350b7c0ebdb990650d051203ad82452fff72ac291402a7f46a517173c8",
+        "source_report_path": "outputs/acceptance/phase2-s211-rerun-census-linux-shard246of256-20261014.json",
+        "source_report_sha256": "3a6a0c64bae5db2e2593ac8985c3030f71e4c5c970fff9b65c90fe6e6f5d3c93",
+        "source_result_id": "catalog:ko-f9d0a898369d15d6f9fe0e1a|linux",
+        "parent_unknown_attempts": [
+          {
+            "attempt_id": "e6766d4de3c0d3ffe34025b7225475fecc2c01d82018412c",
+            "unit_id": "ko-f9d0a898369d15d6f9fe0e1a|linux|catalog|cleanup",
+            "attempt_number": 1,
+            "worker_id": "p3-linux-842f71712e2c-2",
+            "status": "unknown",
+            "reason_code": "worker_timeout",
+            "probe_result_sha256": "0104591231c19fdc9b516d279e8ecab3ead1ea086349a6b028548b32b7497ac4",
+            "attempt_record_sha256": "f44ed61da0488b128f23be4c123e7664fdd906091ca6bd260dc8352521d88ca7"
+          },
+          {
+            "attempt_id": "0cd6009c21f4017d42790f013ed2a77e7e7129609ff74f6f",
+            "unit_id": "ko-f9d0a898369d15d6f9fe0e1a|linux|catalog|install",
+            "attempt_number": 1,
+            "worker_id": "p3-linux-842f71712e2c-2",
+            "status": "unknown",
+            "reason_code": "worker_timeout",
+            "probe_result_sha256": "0104591231c19fdc9b516d279e8ecab3ead1ea086349a6b028548b32b7497ac4",
+            "attempt_record_sha256": "2d390354c18e8c92d195e9b381790a7d39167938fbe676ec3634d78d8e9c15ee"
+          }
+        ]
+      },
+      "historical_outcome": {
+        "status": "unknown",
+        "reason_code": "worker_cleanup_unconfirmed",
+        "stage_statuses": {
+          "prepare": "passed",
+          "install": "unknown",
+          "native": "skipped",
+          "cleanup": "unknown"
+        }
+      },
+      "diagnosis": {
+        "class": "linux_worker_attempt_unknown",
+        "attempt_reason_counts": {
+          "worker_timeout": 2
+        },
+        "evidence": "P3-05 frozen attempt records and stage projection"
+      },
+      "recovery": {
+        "status": "not_attempted",
+        "retry_budget": 1,
+        "decision": "hold_for_protected_runner_and_bounded_recovery_admission",
+        "stop_condition": "Do not claim a new worker attempt until the isolated protected runner and cleanup evidence path are verified."
+      }
+    },
+    {
+      "recovery_id": "p4-03:linux:ko-fcb6f9e1682c78652b99c2d9",
+      "cohort": "linux",
+      "platform": "linux",
+      "ecosystem": "koishi",
+      "registry_entry_id": "ko-fcb6f9e1682c78652b99c2d9",
+      "package": "koishi-plugin-shulikou",
+      "version": "1.0.0",
+      "identity_sha256": "e44057523c5008d1fab80ef9d3da13eb239c1b90b2b1532de1b02ba5f388dbcf",
+      "parent": {
+        "report_path": "outputs/acceptance/phase3-p305-linux-affected-v3-execution-resume6-20261025.json",
+        "report_file_sha256": "8b4119e6bc56f2f26f24fc858458aa7c2491f43b0aa42fbc30bc94fe1a19c5f5",
+        "report_row_sha256": "7ef92f80acc5a4309e68e1ef95e7ac87727cc52072f9b970e8bd5286d361df94",
+        "manifest_path": "outputs/acceptance/phase3-p305-linux-affected-v3-manifest-20261025.json",
+        "manifest_file_sha256": "91798c872560306155a5e8330067062f95be3f6d7fee6b566156ebc9f9087cbe",
+        "manifest_canonical_sha256": "961786350b7c0ebdb990650d051203ad82452fff72ac291402a7f46a517173c8",
+        "source_report_path": "outputs/acceptance/phase2-s211-rerun-census-linux-shard203of256-20261014.json",
+        "source_report_sha256": "e605286bdb13199f6e0bc70faa1f1115328d26f33b50bd1336913292e6eac0fd",
+        "source_result_id": "catalog:ko-fcb6f9e1682c78652b99c2d9|linux",
+        "parent_unknown_attempts": [
+          {
+            "attempt_id": "6e765f3932dcf64ddf1ea80bf4b53dce2b58bddbd2623cb9",
+            "unit_id": "ko-fcb6f9e1682c78652b99c2d9|linux|catalog|cleanup",
+            "attempt_number": 1,
+            "worker_id": "p3-linux-842f71712e2c-1",
+            "status": "unknown",
+            "reason_code": "worker_nonzero_exit",
+            "probe_result_sha256": "16cd4395c837822b6010569f4d9721bcd6d582a7ced4b0692166c0c3c2cdd575",
+            "attempt_record_sha256": "8de3d5fbc11cc4660fb093498cffce6c814c24fa92f5f42b55b96fc7abf84689"
+          },
+          {
+            "attempt_id": "ae507d7b29601d890c7cdb2df1be5eb824cd0452b8472081",
+            "unit_id": "ko-fcb6f9e1682c78652b99c2d9|linux|catalog|install",
+            "attempt_number": 1,
+            "worker_id": "p3-linux-842f71712e2c-1",
+            "status": "unknown",
+            "reason_code": "worker_nonzero_exit",
+            "probe_result_sha256": "16cd4395c837822b6010569f4d9721bcd6d582a7ced4b0692166c0c3c2cdd575",
+            "attempt_record_sha256": "0721ef8fd6358ea007bdd6d208f11738147ebc1a26077007eb7a20abc042ab3b"
+          }
+        ]
+      },
+      "historical_outcome": {
+        "status": "unknown",
+        "reason_code": "worker_cleanup_unconfirmed",
+        "stage_statuses": {
+          "prepare": "passed",
+          "install": "unknown",
+          "native": "skipped",
+          "cleanup": "unknown"
+        }
+      },
+      "diagnosis": {
+        "class": "linux_worker_attempt_unknown",
+        "attempt_reason_counts": {
+          "worker_nonzero_exit": 2
+        },
+        "evidence": "P3-05 frozen attempt records and stage projection"
+      },
+      "recovery": {
+        "status": "not_attempted",
+        "retry_budget": 1,
+        "decision": "hold_for_protected_runner_and_bounded_recovery_admission",
+        "stop_condition": "Do not claim a new worker attempt until the isolated protected runner and cleanup evidence path are verified."
+      }
+    },
+    {
+      "recovery_id": "p4-03:linux:ko-fe4e257db54e400af043d0f0",
+      "cohort": "linux",
+      "platform": "linux",
+      "ecosystem": "koishi",
+      "registry_entry_id": "ko-fe4e257db54e400af043d0f0",
+      "package": "koishi-plugin-custom-image-api",
+      "version": "0.2.0",
+      "identity_sha256": "1f27f5ab8b99040900e5e8c9ce16f4bceaf34d43e337def333ca2526d902db13",
+      "parent": {
+        "report_path": "outputs/acceptance/phase3-p305-linux-affected-v3-execution-resume6-20261025.json",
+        "report_file_sha256": "8b4119e6bc56f2f26f24fc858458aa7c2491f43b0aa42fbc30bc94fe1a19c5f5",
+        "report_row_sha256": "2a9140db1f738493b9ef3780d98d9fa91062e1bfaa4ed9c845de717ab03061d3",
+        "manifest_path": "outputs/acceptance/phase3-p305-linux-affected-v3-manifest-20261025.json",
+        "manifest_file_sha256": "91798c872560306155a5e8330067062f95be3f6d7fee6b566156ebc9f9087cbe",
+        "manifest_canonical_sha256": "961786350b7c0ebdb990650d051203ad82452fff72ac291402a7f46a517173c8",
+        "source_report_path": "outputs/acceptance/phase2-s211-rerun-census-linux-shard73of256-20261014.json",
+        "source_report_sha256": "0468961b554fa3614c138c2b46cde4fdc7096781ca295adfbb7f155c4d3a7a11",
+        "source_result_id": "catalog:ko-fe4e257db54e400af043d0f0|linux",
+        "parent_unknown_attempts": [
+          {
+            "attempt_id": "b16d86814a30fa8ddf8951aaa014ffc6d38cee38c7900ac4",
+            "unit_id": "ko-fe4e257db54e400af043d0f0|linux|catalog|cleanup",
+            "attempt_number": 1,
+            "worker_id": "p3-linux-842f71712e2c-2",
+            "status": "unknown",
+            "reason_code": "worker_nonzero_exit",
+            "probe_result_sha256": "01f5aa9b8b255d2b8fdb6781ffb9ec4036c6ce7e1e59db76b35340ea540e2b2c",
+            "attempt_record_sha256": "857518a0f06c153061b2ba5f58594974e86b1bbfa160578d1959b98b2f987b7d"
+          },
+          {
+            "attempt_id": "75938f790147990ffa67183c37ebc5a67153da8988ecf8a4",
+            "unit_id": "ko-fe4e257db54e400af043d0f0|linux|catalog|install",
+            "attempt_number": 1,
+            "worker_id": "p3-linux-842f71712e2c-2",
+            "status": "unknown",
+            "reason_code": "worker_nonzero_exit",
+            "probe_result_sha256": "01f5aa9b8b255d2b8fdb6781ffb9ec4036c6ce7e1e59db76b35340ea540e2b2c",
+            "attempt_record_sha256": "c9a501c4150833ee00f361accc20095abc6b8e95660c615f481fa77b9eef874d"
+          }
+        ]
+      },
+      "historical_outcome": {
+        "status": "unknown",
+        "reason_code": "worker_nonzero_exit",
+        "stage_statuses": {
+          "prepare": "passed",
+          "install": "unknown",
+          "native": "skipped",
+          "cleanup": "unknown"
+        }
+      },
+      "diagnosis": {
+        "class": "linux_worker_attempt_unknown",
+        "attempt_reason_counts": {
+          "worker_nonzero_exit": 2
+        },
+        "evidence": "P3-05 frozen attempt records and stage projection"
+      },
+      "recovery": {
+        "status": "not_attempted",
+        "retry_budget": 1,
+        "decision": "hold_for_protected_runner_and_bounded_recovery_admission",
+        "stop_condition": "Do not claim a new worker attempt until the isolated protected runner and cleanup evidence path are verified."
+      }
+    },
+    {
+      "recovery_id": "p4-03:linux:ko-fe65d9e29d49b956eac76973",
+      "cohort": "linux",
+      "platform": "linux",
+      "ecosystem": "koishi",
+      "registry_entry_id": "ko-fe65d9e29d49b956eac76973",
+      "package": "koishi-plugin-qq-http-relay",
+      "version": "0.0.1",
+      "identity_sha256": "5a7d4540ef74af1956fdd81c5f082af71f1b6c6887cf56f4424b17fdb7f93583",
+      "parent": {
+        "report_path": "outputs/acceptance/phase3-p305-linux-affected-v3-execution-resume6-20261025.json",
+        "report_file_sha256": "8b4119e6bc56f2f26f24fc858458aa7c2491f43b0aa42fbc30bc94fe1a19c5f5",
+        "report_row_sha256": "139faf2a88754a6286cde1ef4d5d18d7a8724558ac2ae81348df9be7fa1386f4",
+        "manifest_path": "outputs/acceptance/phase3-p305-linux-affected-v3-manifest-20261025.json",
+        "manifest_file_sha256": "91798c872560306155a5e8330067062f95be3f6d7fee6b566156ebc9f9087cbe",
+        "manifest_canonical_sha256": "961786350b7c0ebdb990650d051203ad82452fff72ac291402a7f46a517173c8",
+        "source_report_path": "outputs/acceptance/phase2-s211-rerun-census-linux-shard202of256-20261014.json",
+        "source_report_sha256": "f8c976c63cb086400ef944d5f38370f2a133c7bc6b1f89a46840e4c945b2c572",
+        "source_result_id": "catalog:ko-fe65d9e29d49b956eac76973|linux",
+        "parent_unknown_attempts": [
+          {
+            "attempt_id": "dbf69ff04674ac73daa48167ce9886533c3f30bcc64916e3",
+            "unit_id": "ko-fe65d9e29d49b956eac76973|linux|catalog|cleanup",
+            "attempt_number": 1,
+            "worker_id": "p3-linux-842f71712e2c-1",
+            "status": "unknown",
+            "reason_code": "worker_nonzero_exit",
+            "probe_result_sha256": "7a9461a09c1f1a0e9637afc2e7c284702df4f55c632e326742233c43169415f3",
+            "attempt_record_sha256": "df20404f6782a0eac2a51680481393ed80b1509fb77738e19c183f0e35998e93"
+          },
+          {
+            "attempt_id": "883692b2105cb10b4a5285e502806be9d348c42ce235ff53",
+            "unit_id": "ko-fe65d9e29d49b956eac76973|linux|catalog|install",
+            "attempt_number": 1,
+            "worker_id": "p3-linux-842f71712e2c-1",
+            "status": "unknown",
+            "reason_code": "worker_nonzero_exit",
+            "probe_result_sha256": "7a9461a09c1f1a0e9637afc2e7c284702df4f55c632e326742233c43169415f3",
+            "attempt_record_sha256": "f4a41f94dad2437aa0132a4b0ddaa45e0ff3e68fd073b8c46b09ea6dc265d007"
+          }
+        ]
+      },
+      "historical_outcome": {
+        "status": "unknown",
+        "reason_code": "worker_cleanup_unconfirmed",
+        "stage_statuses": {
+          "prepare": "passed",
+          "install": "unknown",
+          "native": "skipped",
+          "cleanup": "unknown"
+        }
+      },
+      "diagnosis": {
+        "class": "linux_worker_attempt_unknown",
+        "attempt_reason_counts": {
+          "worker_nonzero_exit": 2
+        },
+        "evidence": "P3-05 frozen attempt records and stage projection"
+      },
+      "recovery": {
+        "status": "not_attempted",
+        "retry_budget": 1,
+        "decision": "hold_for_protected_runner_and_bounded_recovery_admission",
+        "stop_condition": "Do not claim a new worker attempt until the isolated protected runner and cleanup evidence path are verified."
+      }
+    },
+    {
+      "recovery_id": "p4-03:windows_pilot:nb-0051899c326ef8ed00eff8ab",
+      "cohort": "windows_pilot",
+      "platform": "windows",
+      "ecosystem": "nonebot",
+      "registry_entry_id": "nb-0051899c326ef8ed00eff8ab",
+      "package": "criminal_dance",
+      "version": "0.2.0",
+      "identity_sha256": "f64ed1bbecac54891174fd9177257c5b26d9d216c7c07b434ade6cae513a075e",
+      "parent": {
+        "report_path": "outputs/acceptance/phase3-p305-windows-pilot-v2-execution-20261025.json",
+        "report_file_sha256": "5e1f02f68e65faecf8048a5fc722cf613dda33b55792ae1e0e09a6a35d95d976",
+        "report_row_sha256": "49c340bfb0025877ac3b965584f0add5e68d39099e641297b04b1ca3a53c3558",
+        "manifest_path": "outputs/acceptance/phase3-p305-windows-pilot-manifest-v2-20261025.json",
+        "manifest_file_sha256": "c28dcdddc035df73841e42a811abd4b4fd4c89c6fd795b783ea0214dcf9f21d5",
+        "manifest_canonical_sha256": "0796fad72d14f0e84cfd91b77e63177873a26510dfa3adee55c9a3298feed4fa",
+        "profile_lock_path": "outputs/acceptance/phase3-p305-windows-python31210-profile-lock-pilot-v3-20261025.json",
+        "profile_lock_sha256": "e58651dfa5e46b3ebc8590b7ba89fd7aef86e8dd42d47580c9ed7fb536d880df",
+        "parent_attempt_id": "catalog:nb-0051899c326ef8ed00eff8ab|windows",
+        "source_identity_sha256": "8efe604f431d8707f80f9aa87dcb009899660d8158b55592e40399b9590ade6d",
+        "selection_identity_sha256": "f64ed1bbecac54891174fd9177257c5b26d9d216c7c07b434ade6cae513a075e"
+      },
+      "historical_outcome": {
+        "status": "unknown",
+        "reason_code": "windows_native_extension_load_blocked",
+        "attempted": true
+      },
+      "diagnosis": {
+        "class": "windows_native_extension_load_blocked",
+        "profile_kind": "nonebot-windows-offline-native-load-v1",
+        "profile_lock_sha256": "e58651dfa5e46b3ebc8590b7ba89fd7aef86e8dd42d47580c9ed7fb536d880df",
+        "detail": "NoneBot dependencies were installed offline with hashes and the native plugin was loaded using the P3-04 admitted PSF-signed CPython runtime inside Windows Sandbox; no entry-bound behavior fixture exists.",
+        "worker_cleanup": true
+      },
+      "recovery": {
+        "status": "not_attempted",
+        "retry_budget": 0,
+        "decision": "hold_for_p4_04_enforcement_and_event_attribution",
+        "stop_condition": "Keep the P3-05 outcome unknown until a new identity-bound run meets its platform-specific admission."
+      }
+    },
+    {
+      "recovery_id": "p4-03:windows_pilot:nb-0054dd2d400d0361cd6b0277",
+      "cohort": "windows_pilot",
+      "platform": "windows",
+      "ecosystem": "nonebot",
+      "registry_entry_id": "nb-0054dd2d400d0361cd6b0277",
+      "package": "nonebot_plugin_shiro_web_console",
+      "version": "0.2.2",
+      "identity_sha256": "98edaee6cc7eccdfbe376ba0029cd9eede060f8820258ad2a893b4692aaf7ec1",
+      "parent": {
+        "report_path": "outputs/acceptance/phase3-p305-windows-pilot-v2-execution-20261025.json",
+        "report_file_sha256": "5e1f02f68e65faecf8048a5fc722cf613dda33b55792ae1e0e09a6a35d95d976",
+        "report_row_sha256": "125213832c7e2ec0ad2b51a6747f6e2ed2b92f86edc1e13024b53eee505cadbb",
+        "manifest_path": "outputs/acceptance/phase3-p305-windows-pilot-manifest-v2-20261025.json",
+        "manifest_file_sha256": "c28dcdddc035df73841e42a811abd4b4fd4c89c6fd795b783ea0214dcf9f21d5",
+        "manifest_canonical_sha256": "0796fad72d14f0e84cfd91b77e63177873a26510dfa3adee55c9a3298feed4fa",
+        "profile_lock_path": "outputs/acceptance/phase3-p305-windows-python31210-profile-lock-pilot-v3-20261025.json",
+        "profile_lock_sha256": "e58651dfa5e46b3ebc8590b7ba89fd7aef86e8dd42d47580c9ed7fb536d880df",
+        "parent_attempt_id": "catalog:nb-0054dd2d400d0361cd6b0277|windows",
+        "source_identity_sha256": "400233934aa6cf94d8a35f8fdc8b2f475b6d767b3d288812892a8e8cd2c99499",
+        "selection_identity_sha256": "98edaee6cc7eccdfbe376ba0029cd9eede060f8820258ad2a893b4692aaf7ec1"
+      },
+      "historical_outcome": {
+        "status": "unknown",
+        "reason_code": "windows_native_extension_load_blocked",
+        "attempted": true
+      },
+      "diagnosis": {
+        "class": "windows_native_extension_load_blocked",
+        "profile_kind": "nonebot-windows-offline-native-load-v1",
+        "profile_lock_sha256": "e58651dfa5e46b3ebc8590b7ba89fd7aef86e8dd42d47580c9ed7fb536d880df",
+        "detail": "NoneBot dependencies were installed offline with hashes and the native plugin was loaded using the P3-04 admitted PSF-signed CPython runtime inside Windows Sandbox; no entry-bound behavior fixture exists.",
+        "worker_cleanup": true
+      },
+      "recovery": {
+        "status": "not_attempted",
+        "retry_budget": 0,
+        "decision": "hold_for_p4_04_enforcement_and_event_attribution",
+        "stop_condition": "Keep the P3-05 outcome unknown until a new identity-bound run meets its platform-specific admission."
+      }
+    },
+    {
+      "recovery_id": "p4-03:windows_pilot:nb-005f1c44fb0a5194b2cef12b",
+      "cohort": "windows_pilot",
+      "platform": "windows",
+      "ecosystem": "nonebot",
+      "registry_entry_id": "nb-005f1c44fb0a5194b2cef12b",
+      "package": "nonebot_plugin_dicky_pk",
+      "version": "0.7.1",
+      "identity_sha256": "fa3c1ddc3cec8c698a0e8696c77610e2b70ae0725c3281636641ceedae01d1d6",
+      "parent": {
+        "report_path": "outputs/acceptance/phase3-p305-windows-pilot-v2-execution-20261025.json",
+        "report_file_sha256": "5e1f02f68e65faecf8048a5fc722cf613dda33b55792ae1e0e09a6a35d95d976",
+        "report_row_sha256": "f238b3c8337e0f812c99ddd8f961ff70865bc8da734c19a3c7106a400d7a74ab",
+        "manifest_path": "outputs/acceptance/phase3-p305-windows-pilot-manifest-v2-20261025.json",
+        "manifest_file_sha256": "c28dcdddc035df73841e42a811abd4b4fd4c89c6fd795b783ea0214dcf9f21d5",
+        "manifest_canonical_sha256": "0796fad72d14f0e84cfd91b77e63177873a26510dfa3adee55c9a3298feed4fa",
+        "profile_lock_path": "outputs/acceptance/phase3-p305-windows-python31210-profile-lock-pilot-v3-20261025.json",
+        "profile_lock_sha256": "e58651dfa5e46b3ebc8590b7ba89fd7aef86e8dd42d47580c9ed7fb536d880df",
+        "parent_attempt_id": "catalog:nb-005f1c44fb0a5194b2cef12b|windows",
+        "source_identity_sha256": "8ded9331350ead144eff3662654c3d747b02c6922a1b086bbf909d223093fa83",
+        "selection_identity_sha256": "fa3c1ddc3cec8c698a0e8696c77610e2b70ae0725c3281636641ceedae01d1d6"
+      },
+      "historical_outcome": {
+        "status": "unknown",
+        "reason_code": "windows_native_extension_load_blocked",
+        "attempted": true
+      },
+      "diagnosis": {
+        "class": "windows_native_extension_load_blocked",
+        "profile_kind": "nonebot-windows-offline-native-load-v1",
+        "profile_lock_sha256": "e58651dfa5e46b3ebc8590b7ba89fd7aef86e8dd42d47580c9ed7fb536d880df",
+        "detail": "NoneBot dependencies were installed offline with hashes and the native plugin was loaded using the P3-04 admitted PSF-signed CPython runtime inside Windows Sandbox; no entry-bound behavior fixture exists.",
+        "worker_cleanup": true
+      },
+      "recovery": {
+        "status": "not_attempted",
+        "retry_budget": 0,
+        "decision": "hold_for_p4_04_enforcement_and_event_attribution",
+        "stop_condition": "Keep the P3-05 outcome unknown until a new identity-bound run meets its platform-specific admission."
+      }
+    },
+    {
+      "recovery_id": "p4-03:windows_pilot:nb-010263635bbc11e0ba3fef3f",
+      "cohort": "windows_pilot",
+      "platform": "windows",
+      "ecosystem": "nonebot",
+      "registry_entry_id": "nb-010263635bbc11e0ba3fef3f",
+      "package": "nonebot_plugin_cube",
+      "version": "1.0.8",
+      "identity_sha256": "2417bf912252d64099483971efcd932e1757ac0df2ee70cc9674ab3a4e180468",
+      "parent": {
+        "report_path": "outputs/acceptance/phase3-p305-windows-pilot-v2-execution-20261025.json",
+        "report_file_sha256": "5e1f02f68e65faecf8048a5fc722cf613dda33b55792ae1e0e09a6a35d95d976",
+        "report_row_sha256": "ef8b1e9ef70979aa8d493cedc4264088cc1cac0e3ef315871bac34ee5a6a5a45",
+        "manifest_path": "outputs/acceptance/phase3-p305-windows-pilot-manifest-v2-20261025.json",
+        "manifest_file_sha256": "c28dcdddc035df73841e42a811abd4b4fd4c89c6fd795b783ea0214dcf9f21d5",
+        "manifest_canonical_sha256": "0796fad72d14f0e84cfd91b77e63177873a26510dfa3adee55c9a3298feed4fa",
+        "profile_lock_path": "outputs/acceptance/phase3-p305-windows-python31210-profile-lock-pilot-v3-20261025.json",
+        "profile_lock_sha256": "e58651dfa5e46b3ebc8590b7ba89fd7aef86e8dd42d47580c9ed7fb536d880df",
+        "parent_attempt_id": "catalog:nb-010263635bbc11e0ba3fef3f|windows",
+        "source_identity_sha256": "2c85828058e96aa25f855fe15583ce2884bb20112393c04cdd0c2dda2198ad9a",
+        "selection_identity_sha256": "2417bf912252d64099483971efcd932e1757ac0df2ee70cc9674ab3a4e180468"
+      },
+      "historical_outcome": {
+        "status": "unknown",
+        "reason_code": "windows_native_extension_load_blocked",
+        "attempted": true
+      },
+      "diagnosis": {
+        "class": "windows_native_extension_load_blocked",
+        "profile_kind": "nonebot-windows-offline-native-load-v1",
+        "profile_lock_sha256": "e58651dfa5e46b3ebc8590b7ba89fd7aef86e8dd42d47580c9ed7fb536d880df",
+        "detail": "NoneBot dependencies were installed offline with hashes and the native plugin was loaded using the P3-04 admitted PSF-signed CPython runtime inside Windows Sandbox; no entry-bound behavior fixture exists.",
+        "worker_cleanup": true
+      },
+      "recovery": {
+        "status": "not_attempted",
+        "retry_budget": 0,
+        "decision": "hold_for_p4_04_enforcement_and_event_attribution",
+        "stop_condition": "Keep the P3-05 outcome unknown until a new identity-bound run meets its platform-specific admission."
+      }
+    },
+    {
+      "recovery_id": "p4-03:windows_pilot:nb-01491b5cc43100c7f4b75a24",
+      "cohort": "windows_pilot",
+      "platform": "windows",
+      "ecosystem": "nonebot",
+      "registry_entry_id": "nb-01491b5cc43100c7f4b75a24",
+      "package": "nonebot_plugin_boardgamehelper",
+      "version": "1.0.0",
+      "identity_sha256": "dd849c42c9eb4382d60242c5424c40165409e870dd2905df01bc6d2f96b7544f",
+      "parent": {
+        "report_path": "outputs/acceptance/phase3-p305-windows-pilot-v2-execution-20261025.json",
+        "report_file_sha256": "5e1f02f68e65faecf8048a5fc722cf613dda33b55792ae1e0e09a6a35d95d976",
+        "report_row_sha256": "d5655fd15e841c504767b62ae86aeea0453d82e1d48652480ea2ce45707a30dd",
+        "manifest_path": "outputs/acceptance/phase3-p305-windows-pilot-manifest-v2-20261025.json",
+        "manifest_file_sha256": "c28dcdddc035df73841e42a811abd4b4fd4c89c6fd795b783ea0214dcf9f21d5",
+        "manifest_canonical_sha256": "0796fad72d14f0e84cfd91b77e63177873a26510dfa3adee55c9a3298feed4fa",
+        "profile_lock_path": "outputs/acceptance/phase3-p305-windows-python31210-profile-lock-pilot-v3-20261025.json",
+        "profile_lock_sha256": "e58651dfa5e46b3ebc8590b7ba89fd7aef86e8dd42d47580c9ed7fb536d880df",
+        "parent_attempt_id": "catalog:nb-01491b5cc43100c7f4b75a24|windows",
+        "source_identity_sha256": "74ecd973543d8ad9add67d0054d091e58250ebf131ba6f8aa709f5226c7e0bd6",
+        "selection_identity_sha256": "dd849c42c9eb4382d60242c5424c40165409e870dd2905df01bc6d2f96b7544f"
+      },
+      "historical_outcome": {
+        "status": "unknown",
+        "reason_code": "windows_native_extension_load_blocked",
+        "attempted": true
+      },
+      "diagnosis": {
+        "class": "windows_native_extension_load_blocked",
+        "profile_kind": "nonebot-windows-offline-native-load-v1",
+        "profile_lock_sha256": "e58651dfa5e46b3ebc8590b7ba89fd7aef86e8dd42d47580c9ed7fb536d880df",
+        "detail": "NoneBot dependencies were installed offline with hashes and the native plugin was loaded using the P3-04 admitted PSF-signed CPython runtime inside Windows Sandbox; no entry-bound behavior fixture exists.",
+        "worker_cleanup": true
+      },
+      "recovery": {
+        "status": "not_attempted",
+        "retry_budget": 0,
+        "decision": "hold_for_p4_04_enforcement_and_event_attribution",
+        "stop_condition": "Keep the P3-05 outcome unknown until a new identity-bound run meets its platform-specific admission."
+      }
+    },
+    {
+      "recovery_id": "p4-03:windows_pilot:nb-01a8e5406bb44c46fa984e91",
+      "cohort": "windows_pilot",
+      "platform": "windows",
+      "ecosystem": "nonebot",
+      "registry_entry_id": "nb-01a8e5406bb44c46fa984e91",
+      "package": "nonebot_plugin_jm",
+      "version": "0.4.1",
+      "identity_sha256": "d4b0d9a027ed1b6738f4303e6d9b032d55b7bbfea9bc6b4b8a39163c4f6a49f2",
+      "parent": {
+        "report_path": "outputs/acceptance/phase3-p305-windows-pilot-v2-execution-20261025.json",
+        "report_file_sha256": "5e1f02f68e65faecf8048a5fc722cf613dda33b55792ae1e0e09a6a35d95d976",
+        "report_row_sha256": "092989c2ac6d6ee94c080716c30919f6cbc6e09d1f7430a25c8d67b9852042a7",
+        "manifest_path": "outputs/acceptance/phase3-p305-windows-pilot-manifest-v2-20261025.json",
+        "manifest_file_sha256": "c28dcdddc035df73841e42a811abd4b4fd4c89c6fd795b783ea0214dcf9f21d5",
+        "manifest_canonical_sha256": "0796fad72d14f0e84cfd91b77e63177873a26510dfa3adee55c9a3298feed4fa",
+        "profile_lock_path": "outputs/acceptance/phase3-p305-windows-python31210-profile-lock-pilot-v3-20261025.json",
+        "profile_lock_sha256": "e58651dfa5e46b3ebc8590b7ba89fd7aef86e8dd42d47580c9ed7fb536d880df",
+        "parent_attempt_id": "catalog:nb-01a8e5406bb44c46fa984e91|windows",
+        "source_identity_sha256": "18c2918d050860ce2975d960ea56ed6ff7dcff99b70f4063115b8d51b02b99ff",
+        "selection_identity_sha256": "d4b0d9a027ed1b6738f4303e6d9b032d55b7bbfea9bc6b4b8a39163c4f6a49f2"
+      },
+      "historical_outcome": {
+        "status": "unknown",
+        "reason_code": "windows_native_extension_load_blocked",
+        "attempted": true
+      },
+      "diagnosis": {
+        "class": "windows_native_extension_load_blocked",
+        "profile_kind": "nonebot-windows-offline-native-load-v1",
+        "profile_lock_sha256": "e58651dfa5e46b3ebc8590b7ba89fd7aef86e8dd42d47580c9ed7fb536d880df",
+        "detail": "NoneBot dependencies were installed offline with hashes and the native plugin was loaded using the P3-04 admitted PSF-signed CPython runtime inside Windows Sandbox; no entry-bound behavior fixture exists.",
+        "worker_cleanup": true
+      },
+      "recovery": {
+        "status": "not_attempted",
+        "retry_budget": 0,
+        "decision": "hold_for_p4_04_enforcement_and_event_attribution",
+        "stop_condition": "Keep the P3-05 outcome unknown until a new identity-bound run meets its platform-specific admission."
+      }
+    },
+    {
+      "recovery_id": "p4-03:windows_pilot:nb-022d49a5ee2114b84aac6d20",
+      "cohort": "windows_pilot",
+      "platform": "windows",
+      "ecosystem": "nonebot",
+      "registry_entry_id": "nb-022d49a5ee2114b84aac6d20",
+      "package": "nonebot_plugin_aigf_master",
+      "version": "1.6.2",
+      "identity_sha256": "6b064ad12b907eeed9f680ddded101ca488aabbe55a23fdd3af54a5de133612c",
+      "parent": {
+        "report_path": "outputs/acceptance/phase3-p305-windows-pilot-v2-execution-20261025.json",
+        "report_file_sha256": "5e1f02f68e65faecf8048a5fc722cf613dda33b55792ae1e0e09a6a35d95d976",
+        "report_row_sha256": "7a686570b0bbbdc9e007041541328d34a0b77fbaef000c564fbcc152a407f303",
+        "manifest_path": "outputs/acceptance/phase3-p305-windows-pilot-manifest-v2-20261025.json",
+        "manifest_file_sha256": "c28dcdddc035df73841e42a811abd4b4fd4c89c6fd795b783ea0214dcf9f21d5",
+        "manifest_canonical_sha256": "0796fad72d14f0e84cfd91b77e63177873a26510dfa3adee55c9a3298feed4fa",
+        "profile_lock_path": "outputs/acceptance/phase3-p305-windows-python31210-profile-lock-pilot-v3-20261025.json",
+        "profile_lock_sha256": "e58651dfa5e46b3ebc8590b7ba89fd7aef86e8dd42d47580c9ed7fb536d880df",
+        "parent_attempt_id": "catalog:nb-022d49a5ee2114b84aac6d20|windows",
+        "source_identity_sha256": "1c108cc8cc0028936db6f84735f2feb87469e0ccc7e3dc75cc471e91abd435e6",
+        "selection_identity_sha256": "6b064ad12b907eeed9f680ddded101ca488aabbe55a23fdd3af54a5de133612c"
+      },
+      "historical_outcome": {
+        "status": "unknown",
+        "reason_code": "windows_native_extension_load_blocked",
+        "attempted": true
+      },
+      "diagnosis": {
+        "class": "windows_native_extension_load_blocked",
+        "profile_kind": "nonebot-windows-offline-native-load-v1",
+        "profile_lock_sha256": "e58651dfa5e46b3ebc8590b7ba89fd7aef86e8dd42d47580c9ed7fb536d880df",
+        "detail": "NoneBot dependencies were installed offline with hashes and the native plugin was loaded using the P3-04 admitted PSF-signed CPython runtime inside Windows Sandbox; no entry-bound behavior fixture exists.",
+        "worker_cleanup": true
+      },
+      "recovery": {
+        "status": "not_attempted",
+        "retry_budget": 0,
+        "decision": "hold_for_p4_04_enforcement_and_event_attribution",
+        "stop_condition": "Keep the P3-05 outcome unknown until a new identity-bound run meets its platform-specific admission."
+      }
+    },
+    {
+      "recovery_id": "p4-03:windows_pilot:nb-02458ca26cfc2886fef22956",
+      "cohort": "windows_pilot",
+      "platform": "windows",
+      "ecosystem": "nonebot",
+      "registry_entry_id": "nb-02458ca26cfc2886fef22956",
+      "package": "nonebot_plugin_handle",
+      "version": "0.4.4",
+      "identity_sha256": "49715e3bcfeef1ea03d1b41c163abc0ea26a33ad1bca8da4d4af5aee94aa94ec",
+      "parent": {
+        "report_path": "outputs/acceptance/phase3-p305-windows-pilot-v2-execution-20261025.json",
+        "report_file_sha256": "5e1f02f68e65faecf8048a5fc722cf613dda33b55792ae1e0e09a6a35d95d976",
+        "report_row_sha256": "ab9dd54de9f3f0f0ce707486ec9d1930708113d090bb3f474682cbf291aa0682",
+        "manifest_path": "outputs/acceptance/phase3-p305-windows-pilot-manifest-v2-20261025.json",
+        "manifest_file_sha256": "c28dcdddc035df73841e42a811abd4b4fd4c89c6fd795b783ea0214dcf9f21d5",
+        "manifest_canonical_sha256": "0796fad72d14f0e84cfd91b77e63177873a26510dfa3adee55c9a3298feed4fa",
+        "profile_lock_path": "outputs/acceptance/phase3-p305-windows-python31210-profile-lock-pilot-v3-20261025.json",
+        "profile_lock_sha256": "e58651dfa5e46b3ebc8590b7ba89fd7aef86e8dd42d47580c9ed7fb536d880df",
+        "parent_attempt_id": "catalog:nb-02458ca26cfc2886fef22956|windows",
+        "source_identity_sha256": "54ec5b4d86baec1a1be0d69de3e1bbe55d65d79d1c51bd19add56dfcbee8f874",
+        "selection_identity_sha256": "49715e3bcfeef1ea03d1b41c163abc0ea26a33ad1bca8da4d4af5aee94aa94ec"
+      },
+      "historical_outcome": {
+        "status": "unknown",
+        "reason_code": "windows_native_extension_load_blocked",
+        "attempted": true
+      },
+      "diagnosis": {
+        "class": "windows_native_extension_load_blocked",
+        "profile_kind": "nonebot-windows-offline-native-load-v1",
+        "profile_lock_sha256": "e58651dfa5e46b3ebc8590b7ba89fd7aef86e8dd42d47580c9ed7fb536d880df",
+        "detail": "NoneBot dependencies were installed offline with hashes and the native plugin was loaded using the P3-04 admitted PSF-signed CPython runtime inside Windows Sandbox; no entry-bound behavior fixture exists.",
+        "worker_cleanup": true
+      },
+      "recovery": {
+        "status": "not_attempted",
+        "retry_budget": 0,
+        "decision": "hold_for_p4_04_enforcement_and_event_attribution",
+        "stop_condition": "Keep the P3-05 outcome unknown until a new identity-bound run meets its platform-specific admission."
+      }
+    },
+    {
+      "recovery_id": "p4-03:windows_pilot:nb-02b4a3862bbae4a686d8a9c3",
+      "cohort": "windows_pilot",
+      "platform": "windows",
+      "ecosystem": "nonebot",
+      "registry_entry_id": "nb-02b4a3862bbae4a686d8a9c3",
+      "package": "nonebot_plugin_lxns_maimai",
+      "version": "0.1.3",
+      "identity_sha256": "4f6aa0b0993b187e94ecc358878df91e21ca621736c6250059351fab334bb779",
+      "parent": {
+        "report_path": "outputs/acceptance/phase3-p305-windows-pilot-v2-execution-20261025.json",
+        "report_file_sha256": "5e1f02f68e65faecf8048a5fc722cf613dda33b55792ae1e0e09a6a35d95d976",
+        "report_row_sha256": "5c2a3f6697e5e882150bae350d346295b948f837f2d0adbd0f9ad90f92d7618c",
+        "manifest_path": "outputs/acceptance/phase3-p305-windows-pilot-manifest-v2-20261025.json",
+        "manifest_file_sha256": "c28dcdddc035df73841e42a811abd4b4fd4c89c6fd795b783ea0214dcf9f21d5",
+        "manifest_canonical_sha256": "0796fad72d14f0e84cfd91b77e63177873a26510dfa3adee55c9a3298feed4fa",
+        "profile_lock_path": "outputs/acceptance/phase3-p305-windows-python31210-profile-lock-pilot-v3-20261025.json",
+        "profile_lock_sha256": "e58651dfa5e46b3ebc8590b7ba89fd7aef86e8dd42d47580c9ed7fb536d880df",
+        "parent_attempt_id": "catalog:nb-02b4a3862bbae4a686d8a9c3|windows",
+        "source_identity_sha256": "f9735bc074afe2a52e1580699f3d7b7a9668bc145e7520f5d72fc18197a26cd3",
+        "selection_identity_sha256": "4f6aa0b0993b187e94ecc358878df91e21ca621736c6250059351fab334bb779"
+      },
+      "historical_outcome": {
+        "status": "unknown",
+        "reason_code": "windows_native_extension_load_blocked",
+        "attempted": true
+      },
+      "diagnosis": {
+        "class": "windows_native_extension_load_blocked",
+        "profile_kind": "nonebot-windows-offline-native-load-v1",
+        "profile_lock_sha256": "e58651dfa5e46b3ebc8590b7ba89fd7aef86e8dd42d47580c9ed7fb536d880df",
+        "detail": "NoneBot dependencies were installed offline with hashes and the native plugin was loaded using the P3-04 admitted PSF-signed CPython runtime inside Windows Sandbox; no entry-bound behavior fixture exists.",
+        "worker_cleanup": true
+      },
+      "recovery": {
+        "status": "not_attempted",
+        "retry_budget": 0,
+        "decision": "hold_for_p4_04_enforcement_and_event_attribution",
+        "stop_condition": "Keep the P3-05 outcome unknown until a new identity-bound run meets its platform-specific admission."
+      }
+    },
+    {
+      "recovery_id": "p4-03:windows_pilot:nb-031f347fab50945ebffe96d4",
+      "cohort": "windows_pilot",
+      "platform": "windows",
+      "ecosystem": "nonebot",
+      "registry_entry_id": "nb-031f347fab50945ebffe96d4",
+      "package": "nonebot_plugin_picstatus",
+      "version": "2.3.1",
+      "identity_sha256": "a515ba3f2b5c78503d957eba17bb618303a3904006d2ec2400c99fc6ea7b5e6a",
+      "parent": {
+        "report_path": "outputs/acceptance/phase3-p305-windows-pilot-v2-execution-20261025.json",
+        "report_file_sha256": "5e1f02f68e65faecf8048a5fc722cf613dda33b55792ae1e0e09a6a35d95d976",
+        "report_row_sha256": "cd5319d4e34fee4c5306f12e3a7726ec2bbba6971221102a32d87199f6d68e45",
+        "manifest_path": "outputs/acceptance/phase3-p305-windows-pilot-manifest-v2-20261025.json",
+        "manifest_file_sha256": "c28dcdddc035df73841e42a811abd4b4fd4c89c6fd795b783ea0214dcf9f21d5",
+        "manifest_canonical_sha256": "0796fad72d14f0e84cfd91b77e63177873a26510dfa3adee55c9a3298feed4fa",
+        "profile_lock_path": "outputs/acceptance/phase3-p305-windows-python31210-profile-lock-pilot-v3-20261025.json",
+        "profile_lock_sha256": "e58651dfa5e46b3ebc8590b7ba89fd7aef86e8dd42d47580c9ed7fb536d880df",
+        "parent_attempt_id": "catalog:nb-031f347fab50945ebffe96d4|windows",
+        "source_identity_sha256": "ee157f8890a8d91eb35860e7a979bbb9619fbd38c01f1127d36f9d265a61eded",
+        "selection_identity_sha256": "a515ba3f2b5c78503d957eba17bb618303a3904006d2ec2400c99fc6ea7b5e6a"
+      },
+      "historical_outcome": {
+        "status": "unknown",
+        "reason_code": "windows_native_extension_load_blocked",
+        "attempted": true
+      },
+      "diagnosis": {
+        "class": "windows_native_extension_load_blocked",
+        "profile_kind": "nonebot-windows-offline-native-load-v1",
+        "profile_lock_sha256": "e58651dfa5e46b3ebc8590b7ba89fd7aef86e8dd42d47580c9ed7fb536d880df",
+        "detail": "NoneBot dependencies were installed offline with hashes and the native plugin was loaded using the P3-04 admitted PSF-signed CPython runtime inside Windows Sandbox; no entry-bound behavior fixture exists.",
+        "worker_cleanup": true
+      },
+      "recovery": {
+        "status": "not_attempted",
+        "retry_budget": 0,
+        "decision": "hold_for_p4_04_enforcement_and_event_attribution",
+        "stop_condition": "Keep the P3-05 outcome unknown until a new identity-bound run meets its platform-specific admission."
+      }
+    },
+    {
+      "recovery_id": "p4-03:windows_preparation:nb-24a83e9bd4e83ecab464028f",
+      "cohort": "windows_preparation",
+      "platform": "windows",
+      "ecosystem": "nonebot",
+      "registry_entry_id": "nb-24a83e9bd4e83ecab464028f",
+      "package": "nonebot_plugin_cs2match",
+      "version": "1.2.2",
+      "identity_sha256": "1f3a93e788f0402d8d2d23b8faebe6aab32f5e9fd162e853c0badc8aedd8654c",
+      "parent": {
+        "report_path": "outputs/acceptance/phase3-p305-windows-nonebot-evaluation-execution-20261025.json",
+        "report_file_sha256": "7bc048fb4006018213006ad7444ee9bafdf5270a5018ffc7611c6e2ba9e25afd",
+        "report_row_sha256": "15283636079fc80b8a6b8498f2f103990f1af52d441e894cd4b19800943ed0d3",
+        "manifest_path": "outputs/acceptance/phase3-p305-windows-nonebot-evaluation-manifest-20261025.json",
+        "manifest_file_sha256": "f576591f8854b2758c0b7270499410617dd26af5cbf8d49a3f58d75f0410ce14",
+        "manifest_canonical_sha256": "6c5ffb197dddc1c135117a610560a74cb2bfe669d720dc30bad7e537216dc914",
+        "profile_lock_path": "outputs/acceptance/phase3-p305-windows-nonebot-evaluation-profile-lock-v2-20261025.json",
+        "profile_lock_sha256": "31814e498cab1365fa201497faa9b3918316db701d8f503c212f32d20e9a286a",
+        "parent_attempt_id": "catalog:nb-24a83e9bd4e83ecab464028f|windows",
+        "source_identity_sha256": "e03d1b8ea7404001b9ac07e6c5b74668615fce3da42dc945245358222743ad04",
+        "selection_identity_sha256": "1f3a93e788f0402d8d2d23b8faebe6aab32f5e9fd162e853c0badc8aedd8654c"
+      },
+      "historical_outcome": {
+        "status": "unknown",
+        "reason_code": "worker_preparation_failed",
+        "attempted": false
+      },
+      "diagnosis": {
+        "class": "windows_metadata_preparation_io_failure",
+        "detail": "NoneBotPilotError: PyPI release metadata unavailable for ayafileio==2.0.0: <urlopen error [SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in violation of protocol (_ssl.c:1082)>",
+        "dependency_archives": null,
+        "attempted": false
+      },
+      "recovery": {
+        "status": "not_attempted",
+        "retry_budget": 0,
+        "decision": "hold_until_exact_dependency_metadata_and_artifact_hashes_are_frozen",
+        "stop_condition": "Keep the P3-05 outcome unknown until a new identity-bound run meets its platform-specific admission."
+      }
+    },
+    {
+      "recovery_id": "p4-03:windows_preparation:nb-25bb78fcbf78c723c2eb4b8c",
+      "cohort": "windows_preparation",
+      "platform": "windows",
+      "ecosystem": "nonebot",
+      "registry_entry_id": "nb-25bb78fcbf78c723c2eb4b8c",
+      "package": "nonebot_plugin_bililivedm",
+      "version": "0.1.5",
+      "identity_sha256": "a8ea1442e131fccd3d68a80e51a212c9afe9b8f5d74ba8262a5358a8204c795f",
+      "parent": {
+        "report_path": "outputs/acceptance/phase3-p305-windows-nonebot-evaluation-execution-20261025.json",
+        "report_file_sha256": "7bc048fb4006018213006ad7444ee9bafdf5270a5018ffc7611c6e2ba9e25afd",
+        "report_row_sha256": "ef9a92354b141fe8a9be43264d88352632a7a2518600764b6e258c4abefe7dc5",
+        "manifest_path": "outputs/acceptance/phase3-p305-windows-nonebot-evaluation-manifest-20261025.json",
+        "manifest_file_sha256": "f576591f8854b2758c0b7270499410617dd26af5cbf8d49a3f58d75f0410ce14",
+        "manifest_canonical_sha256": "6c5ffb197dddc1c135117a610560a74cb2bfe669d720dc30bad7e537216dc914",
+        "profile_lock_path": "outputs/acceptance/phase3-p305-windows-nonebot-evaluation-profile-lock-v2-20261025.json",
+        "profile_lock_sha256": "31814e498cab1365fa201497faa9b3918316db701d8f503c212f32d20e9a286a",
+        "parent_attempt_id": "catalog:nb-25bb78fcbf78c723c2eb4b8c|windows",
+        "source_identity_sha256": "2b8877089f91996c745b3f5da678f862cc23caa8d7443c58ff119e79a436b464",
+        "selection_identity_sha256": "a8ea1442e131fccd3d68a80e51a212c9afe9b8f5d74ba8262a5358a8204c795f"
+      },
+      "historical_outcome": {
+        "status": "unknown",
+        "reason_code": "worker_preparation_failed",
+        "attempted": false
+      },
+      "diagnosis": {
+        "class": "windows_metadata_preparation_io_failure",
+        "detail": "NoneBotPilotError: PyPI release metadata unavailable for brotli==1.2.1: <urlopen error [SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in violation of protocol (_ssl.c:1082)>",
+        "dependency_archives": null,
+        "attempted": false
+      },
+      "recovery": {
+        "status": "not_attempted",
+        "retry_budget": 0,
+        "decision": "hold_until_exact_dependency_metadata_and_artifact_hashes_are_frozen",
+        "stop_condition": "Keep the P3-05 outcome unknown until a new identity-bound run meets its platform-specific admission."
+      }
+    },
+    {
+      "recovery_id": "p4-03:windows_preparation:nb-4b99624a78f4b7bf003a0a0c",
+      "cohort": "windows_preparation",
+      "platform": "windows",
+      "ecosystem": "nonebot",
+      "registry_entry_id": "nb-4b99624a78f4b7bf003a0a0c",
+      "package": "nonebot_plugin_lazytea_shell_extension",
+      "version": "0.0.1.post1",
+      "identity_sha256": "ed500899ddfa957b9d67811caaddb25c3a3ff82db6fed49ce070e767f3737524",
+      "parent": {
+        "report_path": "outputs/acceptance/phase3-p305-windows-nonebot-evaluation-execution-20261025.json",
+        "report_file_sha256": "7bc048fb4006018213006ad7444ee9bafdf5270a5018ffc7611c6e2ba9e25afd",
+        "report_row_sha256": "97a18ac8c82f2f9702f1c29054e9f4c93ee1777030b9f2afb5bfae77864b8dc8",
+        "manifest_path": "outputs/acceptance/phase3-p305-windows-nonebot-evaluation-manifest-20261025.json",
+        "manifest_file_sha256": "f576591f8854b2758c0b7270499410617dd26af5cbf8d49a3f58d75f0410ce14",
+        "manifest_canonical_sha256": "6c5ffb197dddc1c135117a610560a74cb2bfe669d720dc30bad7e537216dc914",
+        "profile_lock_path": "outputs/acceptance/phase3-p305-windows-nonebot-evaluation-profile-lock-v2-20261025.json",
+        "profile_lock_sha256": "31814e498cab1365fa201497faa9b3918316db701d8f503c212f32d20e9a286a",
+        "parent_attempt_id": "catalog:nb-4b99624a78f4b7bf003a0a0c|windows",
+        "source_identity_sha256": "42e854e824a9f24cd1b449cc7a300c9e5b64c3f25a8533c92ebe92e57aca0768",
+        "selection_identity_sha256": "ed500899ddfa957b9d67811caaddb25c3a3ff82db6fed49ce070e767f3737524"
+      },
+      "historical_outcome": {
+        "status": "unknown",
+        "reason_code": "worker_preparation_failed",
+        "attempted": false
+      },
+      "diagnosis": {
+        "class": "windows_metadata_preparation_io_failure",
+        "detail": "NoneBotPilotError: PyPI release metadata unavailable for pyside6-pdf==6.12.0.140: <urlopen error [SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in violation of protocol (_ssl.c:1082)>",
+        "dependency_archives": null,
+        "attempted": false
+      },
+      "recovery": {
+        "status": "not_attempted",
+        "retry_budget": 0,
+        "decision": "hold_until_exact_dependency_metadata_and_artifact_hashes_are_frozen",
+        "stop_condition": "Keep the P3-05 outcome unknown until a new identity-bound run meets its platform-specific admission."
+      }
+    },
+    {
+      "recovery_id": "p4-03:windows_preparation:nb-6627226d0fc92e2dae1a8eb5",
+      "cohort": "windows_preparation",
+      "platform": "windows",
+      "ecosystem": "nonebot",
+      "registry_entry_id": "nb-6627226d0fc92e2dae1a8eb5",
+      "package": "nonebot_plugin_remind",
+      "version": "0.3.0",
+      "identity_sha256": "5e78b56ffe3a6d5fe748966ad9a5bf3ccee14a1bd97f1ee491580e502540f9bb",
+      "parent": {
+        "report_path": "outputs/acceptance/phase3-p305-windows-nonebot-evaluation-execution-20261025.json",
+        "report_file_sha256": "7bc048fb4006018213006ad7444ee9bafdf5270a5018ffc7611c6e2ba9e25afd",
+        "report_row_sha256": "0d427589c8535b2747b7b1f91035558a2d6bcfbb274a07d5b3f464e307282915",
+        "manifest_path": "outputs/acceptance/phase3-p305-windows-nonebot-evaluation-manifest-20261025.json",
+        "manifest_file_sha256": "f576591f8854b2758c0b7270499410617dd26af5cbf8d49a3f58d75f0410ce14",
+        "manifest_canonical_sha256": "6c5ffb197dddc1c135117a610560a74cb2bfe669d720dc30bad7e537216dc914",
+        "profile_lock_path": "outputs/acceptance/phase3-p305-windows-nonebot-evaluation-profile-lock-v2-20261025.json",
+        "profile_lock_sha256": "31814e498cab1365fa201497faa9b3918316db701d8f503c212f32d20e9a286a",
+        "parent_attempt_id": "catalog:nb-6627226d0fc92e2dae1a8eb5|windows",
+        "source_identity_sha256": "bb2fd78d1136c6c5507ca50a0ddcf845f88f5f0ed3c0f63bf6d1b78d7ef33f74",
+        "selection_identity_sha256": "5e78b56ffe3a6d5fe748966ad9a5bf3ccee14a1bd97f1ee491580e502540f9bb"
+      },
+      "historical_outcome": {
+        "status": "unknown",
+        "reason_code": "worker_preparation_failed",
+        "attempted": false
+      },
+      "diagnosis": {
+        "class": "windows_metadata_preparation_io_failure",
+        "detail": "NoneBotPilotError: PyPI release metadata unavailable for jionlp==1.5.31: The read operation timed out",
+        "dependency_archives": null,
+        "attempted": false
+      },
+      "recovery": {
+        "status": "not_attempted",
+        "retry_budget": 0,
+        "decision": "hold_until_exact_dependency_metadata_and_artifact_hashes_are_frozen",
+        "stop_condition": "Keep the P3-05 outcome unknown until a new identity-bound run meets its platform-specific admission."
+      }
+    }
+  ],
+  "manifest_sha256": "6097a58a2a058fd06d1f65edbea83a47aa8f3d07b31e7c8b679a6313bd51bd97"
+}

@@ -34,6 +34,7 @@ NATIVE_FILES = (
     "representative.py",
     "recipes.py",
 )
+_TRANSIENT_PROFILE_DIRS = {"isolated-home", "isolated-tmp", "isolated-cache"}
 
 
 def _runtime_images() -> dict[str, Any]:
@@ -57,7 +58,7 @@ def _ignore_links(directory: str, names: list[str]) -> list[str]:
 
 
 def _copy_sample_profile(work: Path, destination: Path, ecosystem: str) -> None:
-    ignored = shutil.ignore_patterns(".venv") if ecosystem == "nonebot" else _ignore_node_links
+    ignored = _ignore_nonebot_profile_dirs if ecosystem == "nonebot" else _ignore_node_links
     shutil.copytree(work, destination, dirs_exist_ok=True, symlinks=False, ignore=ignored)
     if ecosystem == "nonebot":
         site_packages = work / ".venv/lib/python3.12/site-packages"
@@ -69,7 +70,12 @@ def _copy_sample_profile(work: Path, destination: Path, ecosystem: str) -> None:
 
 def _ignore_node_links(directory: str, names: list[str]) -> list[str]:
     links = set(_ignore_links(directory, names))
-    return [name for name in names if name == ".bin" or name in links]
+    return [name for name in names if name == ".bin" or name in links or name in _TRANSIENT_PROFILE_DIRS]
+
+
+def _ignore_nonebot_profile_dirs(directory: str, names: list[str]) -> list[str]:
+    links = set(_ignore_links(directory, names))
+    return [name for name in names if name == ".venv" or name in links or name in _TRANSIENT_PROFILE_DIRS]
 
 
 def _prepare_payload(sample: dict[str, Any], fixture: dict[str, Any], entry: str, artifact: Path, work: Path) -> dict[str, Any]:

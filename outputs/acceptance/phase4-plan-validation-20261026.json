@@ -1,0 +1,181 @@
+{
+  "schema_version": 1,
+  "kind": "phase4_planning_validation",
+  "date": "2026-10-26",
+  "timezone": "Asia/Shanghai",
+  "status": "passed_planning_only",
+  "implementation_started": false,
+  "plan_path": "docs/plans/2026-10-26-phase-4-behavior-readiness.md",
+  "source_discussion": {
+    "url": "https://chatgpt.com/share/6adf2885-7b18-83ea-8051-6ed961271c33",
+    "title": "下一步做行为验证",
+    "retrieval": "Read rendered page text with in-app browser after web extractor returned zero lines.",
+    "scope": "Direction for P4-01 through P4-06; verified against current local source and frozen P3 reports."
+  },
+  "base_commit": "9d03728853bfb18a52e1640b2084a624c70501ba",
+  "checks": [
+    {
+      "argv": [
+        "node",
+        "--test",
+        "scripts/evidence-hash.test.mjs"
+      ],
+      "cwd": "E:/stella/Ligamina",
+      "exit_code": 0,
+      "stdout": "✔ accepts the recorded S2-07 report hash from an LF checkout (5.9529ms)\n✔ still rejects text changes beyond line endings (0.2363ms)\n✔ accepts an LF digest from a CRLF checkout (0.1185ms)\n✔ does not normalize invalid UTF-8 bytes (0.0745ms)\nℹ tests 4\nℹ suites 0\nℹ pass 4\nℹ fail 0\nℹ cancelled 0\nℹ skipped 0\nℹ todo 0\nℹ duration_ms 78.5446\n",
+      "stderr": "",
+      "duration_seconds": 0.133
+    },
+    {
+      "argv": [
+        "node",
+        "scripts/render-readme.mjs",
+        "--check"
+      ],
+      "cwd": "E:/stella/Ligamina",
+      "exit_code": 0,
+      "stdout": "README evidence blocks match validated phase-one, phase-two, and phase-three reports.\n",
+      "stderr": "",
+      "duration_seconds": 16.883
+    },
+    {
+      "argv": [
+        "pwsh",
+        "-NoProfile",
+        "-File",
+        "init.ps1",
+        "-Mode",
+        "docs"
+      ],
+      "cwd": "E:/stella/Ligamina",
+      "exit_code": 0,
+      "stdout": "{\n  \"status\": \"passed\",\n  \"documents\": 20,\n  \"local_links\": 399,\n  \"indexed_historical_markdown\": 12,\n  \"features\": 31,\n  \"failures\": []\n}\n",
+      "stderr": "",
+      "duration_seconds": 17.171
+    },
+    {
+      "argv": [
+        "node",
+        ".agents/skills/harness-creator/scripts/validate-harness.mjs",
+        "--target",
+        "."
+      ],
+      "cwd": "E:/stella/Ligamina",
+      "exit_code": 0,
+      "stdout": "Harness validation for E:\\stella\\Ligamina\nOverall: 100/100\nBottleneck: none — all subsystems at full score\n\ninstructions: 5/5 (5/5)\n  PASS Agent instruction file exists\n  PASS Startup workflow documented\n  PASS Definition of done documented\n  PASS Verification commands discoverable\n  PASS State artifacts routed from instructions\n\nstate: 5/5 (5/5)\n  PASS Feature tracker exists\n  PASS Feature tracker is valid and has feature fields\n  PASS Progress log exists\n  PASS Progress log supports restart\n  PASS Handoff captures blockers/files/next step\n\nverification: 5/5 (5/5)\n  PASS Verification entrypoint exists\n  PASS Verification fails fast\n  PASS Test command documented\n  PASS Static/build check documented\n  PASS Verification evidence is recorded\n\nscope: 5/5 (5/5)\n  PASS One-feature-at-a-time rule exists\n  PASS Feature dependencies are tracked\n  PASS Feature status is explicit\n  PASS Scope boundary documented\n  PASS Completion gate limits scope closure\n\nlifecycle: 5/5 (5/5)\n  PASS Startup script exists\n  PASS End-of-session procedure exists\n  PASS Session handoff template exists\n  PASS Session restart markers exist\n  PASS Clean restart path documented\n\n",
+      "stderr": "",
+      "duration_seconds": 0.063
+    },
+    {
+      "argv": [
+        "C:\\Python314\\python.exe",
+        "scripts/phase3-p308-behavior-accounting.py",
+        "--report",
+        "outputs/acceptance/phase3-p308-behavior-accounting-20261026.json",
+        "--check"
+      ],
+      "cwd": "E:/stella/Ligamina",
+      "exit_code": 0,
+      "stdout": "{\"status\": \"accounted_with_dispatch_blockers\", \"output\": \"E:\\\\stella\\\\Ligamina\\\\outputs\\\\acceptance\\\\phase3-p308-behavior-accounting-20261026.json\", \"canonical_sha256\": \"2401714f4fe64d52e9e4ccd07c8ec3b332e3dd3077b1d361d240284e2433b389\", \"file_sha256\": \"3daaf8aa387bb01b26ae72ca0a8bd6db9b1e0ab9f192a5ddd3d054f928e0e1f5\", \"positions\": 120, \"attempt_slots\": 360, \"dispatched_attempts\": 0, \"behavior_compatibility\": \"not_evaluated\"}\n",
+      "stderr": "",
+      "duration_seconds": 0.895
+    },
+    {
+      "argv": [
+        "C:\\Python314\\python.exe",
+        "scripts/phase3-p310-gate-audit.py",
+        "--check"
+      ],
+      "cwd": "E:/stella/Ligamina",
+      "exit_code": 0,
+      "stdout": "{\"status\": \"completed_with_blocked_gates\", \"report\": \"E:/stella/Ligamina/outputs/acceptance/phase3-p310-gate-audit-20261026.json\", \"report_sha256\": \"716efa2e9af8537506e26215c231ef68bf8b30585d61e070bffff76237692b90\", \"matrix\": \"E:/stella/Ligamina/outputs/acceptance/phase3-p310-compatibility-matrix-20261026.md\", \"matrix_sha256\": \"7b777a2e4cc23f499c7b0b5ba49001126fdb87d71d08f1b14d46022e9d130b3d\", \"denominators\": {\"frozen_catalog_entries\": 5690, \"frozen_catalog_entry_os_positions\": 11380, \"p305_linux_unique_units\": 2206, \"p305_windows_unique_units\": 973, \"p305_cross_platform_unique_units\": 3179, \"p305_additive_http_reattributions_excluded\": 6, \"p308_behavior_positions\": 120, \"p308_planned_attempt_slots\": 360, \"p308_dispatched_attempts\": 0}, \"gates\": {\"P3-ENGINE\": \"passed_scoped\", \"P3-RECOVERY\": \"blocked\", \"P3-AUTOMATION\": \"blocked\", \"P3-BEHAVIOR\": \"not_evaluated\", \"P3-FIELD\": \"not_run\"}}\n",
+      "stderr": "",
+      "duration_seconds": 2.419
+    },
+    {
+      "argv": [
+        "git",
+        "diff",
+        "--check"
+      ],
+      "cwd": "E:/stella/Ligamina",
+      "exit_code": 0,
+      "stdout": "",
+      "stderr": "warning: in the working copy of 'feature_list.json', CRLF will be replaced by LF the next time Git touches it\n",
+      "duration_seconds": 0.049
+    },
+    {
+      "phase": "final_tracker_closeout",
+      "argv": [
+        "pwsh",
+        "-NoProfile",
+        "-File",
+        "init.ps1",
+        "-Mode",
+        "docs"
+      ],
+      "cwd": "E:/stella/Ligamina",
+      "exit_code": 0,
+      "stdout": "{\n  \"status\": \"passed\",\n  \"documents\": 20,\n  \"local_links\": 399,\n  \"indexed_historical_markdown\": 12,\n  \"features\": 31,\n  \"failures\": []\n}\n",
+      "stderr": ""
+    },
+    {
+      "phase": "final_tracker_closeout",
+      "argv": [
+        "git",
+        "diff",
+        "--check"
+      ],
+      "cwd": "E:/stella/Ligamina",
+      "exit_code": 0,
+      "stdout": "",
+      "stderr": ""
+    }
+  ],
+  "not_run": [
+    "P4 runtime implementation",
+    "init.ps1 -Mode full",
+    "catalog plugin execution",
+    "OS Worker or Sandbox execution",
+    "GitHub runner deployment/state query",
+    "App Control policy changes",
+    "real-platform messages"
+  ],
+  "preexisting_untracked_paths": [
+    "outputs/acceptance/phase3-p305-windows-python31210-profile-lock-pilot-20261025.json",
+    "outputs/acceptance/phase3-p305-windows-python31210-profile-lock-pilot-20261025.json.sha256",
+    "outputs/acceptance/phase3-p305-windows-python31210-profile-lock-pilot-v2-20261025.json",
+    "outputs/acceptance/phase3-p305-windows-python31210-profile-lock-pilot-v2-20261025.json.sha256",
+    "outputs/acceptance/phase3-p305-windows-python31210-profile-lock-pilot-v3-20261025.json",
+    "outputs/acceptance/phase3-p305-windows-python31210-profile-lock-pilot-v3-20261025.json.sha256"
+  ],
+  "plan_sha256": "50c8893675588194d3bcfbd558cd63f7967dbcdf25f7dfe8ff30a448431fd27e",
+  "preexisting_untracked_sha256": {
+    "outputs/acceptance/phase3-p305-windows-python31210-profile-lock-pilot-20261025.json": "495eb64b1a4ff7d3f19f3905a0abc05bc6513bb0a6da99587d11f50727a24327",
+    "outputs/acceptance/phase3-p305-windows-python31210-profile-lock-pilot-20261025.json.sha256": "ba01f009cdc320f61f5b451c3f8cc7e5734eaca1bd6c378575962ec6684dbfc4",
+    "outputs/acceptance/phase3-p305-windows-python31210-profile-lock-pilot-v2-20261025.json": "1d1131f6067ad39f6661074d6eff7ac7acbf5384e1bf394621a97b3331c90ce1",
+    "outputs/acceptance/phase3-p305-windows-python31210-profile-lock-pilot-v2-20261025.json.sha256": "7f8d52d6e50c4a2ea3f6c5fbafdc20ebba319fd1a0afaf8a9069afd774f0bc1c",
+    "outputs/acceptance/phase3-p305-windows-python31210-profile-lock-pilot-v3-20261025.json": "e58651dfa5e46b3ebc8590b7ba89fd7aef86e8dd42d47580c9ed7fb536d880df",
+    "outputs/acceptance/phase3-p305-windows-python31210-profile-lock-pilot-v3-20261025.json.sha256": "c74d976133ab7ac398165a2620e4d420bf82250fb5c5404e26b8b89cf1902cea"
+  },
+  "tracker_state": {
+    "features": 31,
+    "active_feature": null,
+    "next_feature": "feat-026",
+    "planning_status": "done",
+    "implementation_statuses": {
+      "P4-01": "not-started",
+      "P4-02": "not-started",
+      "P4-03": "not-started",
+      "P4-04": "not-started",
+      "P4-05": "not-started",
+      "P4-06": "not-started"
+    }
+  },
+  "preexisting_untracked_unchanged": true,
+  "frozen_reports_unchanged": {
+    "outputs/acceptance/phase3-p308-behavior-accounting-20261026.json": true,
+    "outputs/acceptance/phase3-p310-gate-audit-20261026.json": true
+  },
+  "meaning": "Planning/document/state validation only. Harness score is structural. No P4 behavior or release acceptance is claimed."
+}
