@@ -72,6 +72,8 @@ test('P4-03 controlled workflow is separately gated and binds only the reviewed 
   assert.match(p403Script, /phase4-p403-runner-self-test\.sh/);
   assert.match(p403Script, /validate-p403-recovery/);
   assert.match(p403Script, /validate-p403-linux-executor/);
+  assert.match(p403Script, /run_step linux_worker_probes uv run --locked --project lab --python 3\.12\.14 python/);
+  assert.doesNotMatch(p403Script, /run_step linux_worker_probes uv run --locked --project hosts\/nonebot/);
   assert.match(p403Script, /execute-p403-linux-recovery/);
   assert.match(p403Script, /linux_unknown_recovery_remaining/);
   assert.match(p403Script, /phase4-p403-linux-execution-manifest-20261027-v4-not-run\.json/);

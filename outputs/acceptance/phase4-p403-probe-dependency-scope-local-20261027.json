@@ -1,0 +1,66 @@
+{
+  "schema_version": 1,
+  "kind": "phase4_p403_probe_dependency_scope_verification",
+  "status": "passed_local_readiness_only",
+  "date": "2026-10-27",
+  "scope": "Run Linux worker admission probes in the lab project environment already warmed by P4-03 validation, avoiding unrelated NoneBot dev/test extras.",
+  "plugin_execution": "not_started",
+  "red_green": {
+    "before_fix": {
+      "command": "node --test scripts/phase3-workflows.test.mjs",
+      "exit_code": 1,
+      "passed": 4,
+      "failed": 1,
+      "failure": "static regression expected the linux_worker_probes command to use --project lab but observed --project hosts/nonebot"
+    },
+    "after_fix": {
+      "command": "node --test scripts/phase3-workflows.test.mjs",
+      "exit_code": 0,
+      "passed": 5,
+      "failed": 0
+    }
+  },
+  "commands": [
+    {
+      "command": "bash -n scripts/phase4-p403-linux-runner.sh",
+      "exit_code": 0,
+      "result": "passed"
+    },
+    {
+      "command": "pwsh -NoProfile -File init.ps1 -Mode docs",
+      "exit_code": 0,
+      "result": "passed",
+      "documents": 20,
+      "local_links": 455,
+      "indexed_historical_markdown": 12,
+      "features": 31,
+      "failures": 0
+    },
+    {
+      "command": "node scripts/render-readme.mjs --check",
+      "exit_code": 0,
+      "result": "passed"
+    },
+    {
+      "command": "node .agents/skills/harness-creator/scripts/validate-harness.mjs --target . --json",
+      "exit_code": 0,
+      "result": "passed",
+      "overall": 100
+    },
+    {
+      "command": "git diff --check",
+      "exit_code": 0,
+      "result": "passed"
+    }
+  ],
+  "source_sha256": {
+    "scripts/phase4-p403-linux-runner.sh": "f57a00ca6fcd4c39507b99b09471b98c0cccf835691f83306f2340a53fcabbfb",
+    "scripts/phase3-workflows.test.mjs": "fd37d519e4fcab0ba0cf35172752aa3e50c2afa0cbe4443b1a1392860b637613",
+    "README.md": "bbaac6cb1152e1a6d0c75ed22639505174aba9f8af53111de2e8a0377c4a6ee3",
+    "docs/plans/2026-10-26-phase-4-behavior-readiness.md": "76be64eb3e6b0c9601cfc10f9caf8c22aff2dba008491550cc9902e01a2d0654",
+    "progress.md": "67aa50bbc2ec8205bbc5122421d6f28051ad1dfc52e0f01b06a3bf9c49aee965",
+    "feature_list.json": "074e47f0b804e2b21df10933cd96b27521a7e0f9147cc003c62551646725ff7f",
+    "session-handoff.md": "c748dabbac1ab05b10f4b4c8b599dee247d90db2bc1e3f9cb5b3ddc48fb326bf"
+  },
+  "hosted_recovery": "not_run_after_fix; requires hosted CI merge and a new protected Environment approval."
+}
