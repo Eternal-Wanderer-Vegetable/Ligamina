@@ -1,0 +1,107 @@
+{
+  "schema_version": 1,
+  "kind": "phase4_p403_hosted_runner_probes",
+  "observed_date": "2026-10-27",
+  "repository": "Eternal-Wanderer-Vegetable/Ligamina",
+  "default_branch": "main",
+  "workflow_commit": "db87417ee41c665c588311cb073ad3cb4f4abd3d",
+  "environment": {
+    "name": "phase4-p403-linux-controlled",
+    "allowed_branch": "main",
+    "owner_review_required": true,
+    "secret_count": 0
+  },
+  "repository_variables": {
+    "PHASE4_P403_RUNNER_ENABLED": true,
+    "PHASE4_P403_LINUX_RECOVERY_ENABLED": false
+  },
+  "ephemeral_runner_inventory_after_probes": 0,
+  "probes": [
+    {
+      "mode": "runner_contract_success",
+      "run_id": "40461965876",
+      "run_conclusion": "success",
+      "runner_id": 21,
+      "runner_name": "ligamina-p403-20261027-0632",
+      "self_test_status": "passed",
+      "expected_exit_code": 0,
+      "actual_exit_code": 0,
+      "probe_expectation_met": true,
+      "plugin_execution": "not_started",
+      "worker_claimed": false,
+      "outer_cleanup_confirmed": true,
+      "removed_runner_temp_paths": 4,
+      "artifact": {
+        "id": "12714638549",
+        "name": "phase4-p403-linux-40461965876",
+        "size_bytes": 27986,
+        "sha256": "f3b3cf81c7a36184b1c3274dc70018c4752e76a3aecd3481a4b0cec04b69c13f"
+      },
+      "url": "https://github.com/Eternal-Wanderer-Vegetable/Ligamina/actions/runs/40461965876"
+    },
+    {
+      "mode": "runner_contract_failure",
+      "run_id": "40462916195",
+      "run_conclusion": "failure_expected",
+      "runner_id": 22,
+      "runner_name": "ligamina-p403-20261027-failure",
+      "self_test_status": "failed",
+      "expected_exit_code": 23,
+      "actual_exit_code": 23,
+      "probe_expectation_met": true,
+      "plugin_execution": "not_started",
+      "worker_claimed": false,
+      "outer_cleanup_confirmed": true,
+      "removed_runner_temp_paths": 4,
+      "artifact": {
+        "id": "12717121361",
+        "name": "phase4-p403-linux-40462916195",
+        "size_bytes": 27992,
+        "sha256": "fece5bb6620dbc83daa6ab36b59cc433575ad8492d3a45b18866c08df6c8e46a"
+      },
+      "url": "https://github.com/Eternal-Wanderer-Vegetable/Ligamina/actions/runs/40462916195"
+    },
+    {
+      "mode": "runner_contract_cancel",
+      "run_id": "40467433065",
+      "run_conclusion": "cancelled",
+      "runner_id": 23,
+      "runner_name": "ligamina-p403-20261027-cancel",
+      "finalizer_step_conclusion": "success",
+      "artifact_upload_step_conclusion": "success",
+      "outer_cleanup_confirmed": true,
+      "removed_runner_temp_paths": 4,
+      "controlled_report_status": "in-progress",
+      "self_test_report_present": false,
+      "probe_expectation_met": false,
+      "plugin_execution": "not_started",
+      "artifact": {
+        "id": "12717510819",
+        "name": "phase4-p403-linux-40467433065",
+        "size_bytes": 26901,
+        "sha256": "a54761b37dd312b8bbaa671a785ec9104cc305b6da29b15700707cac7f2dcd03"
+      },
+      "url": "https://github.com/Eternal-Wanderer-Vegetable/Ligamina/actions/runs/40467433065"
+    }
+  ],
+  "cancellation_report_repair": {
+    "status": "implemented_local_pending_hosted_retest",
+    "repair_files": [
+      ".github/workflows/phase4-p403-linux-recovery.yml",
+      "lab/automation/phase4_p403_reports.py",
+      "scripts/phase4-p403-finalize-linux-run.sh",
+      "scripts/phase4-p403-runner-self-test.sh"
+    ],
+    "local_verification": {
+      "p403_report_unit_tests": "15_passed",
+      "workflow_static_tests": "5_passed",
+      "bash_syntax": "passed",
+      "git_diff_check": "passed"
+    },
+    "mechanism_hypothesis": "The artifact shows the controlled report remained in-progress and the self-test terminal report was absent. This is consistent with cancellation terminating the step process tree before the Bash EXIT trap persisted reports; the earlier finalizer did not receive job.status to reconcile them."
+  },
+  "recovery_campaign": "not_started",
+  "plugin_execution": "not_started",
+  "overall": "cancel_probe_retest_required",
+  "p4_automation_gate": "blocked"
+}

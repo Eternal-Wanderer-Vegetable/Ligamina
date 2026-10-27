@@ -77,6 +77,8 @@ test('P4-03 controlled workflow is separately gated and binds only the reviewed 
   assert.match(p403Script, /Ligamina-p403-queue-/);
   assert.doesNotMatch(p403Script, /execute-recovery-pilot/);
   assert.match(p403FinalizeScript, /reconcile-p403-linux-runner/);
+  assert.match(p403FinalizeScript, /lab\.automation\.phase4_p403_reports/);
+  assert.match(p403, /P4_P403_JOB_STATUS: \$\{\{ job\.status \}\}/);
   assert.match(p403FinalizeScript, /Ligamina-p403-queue-/);
   assert.match(p403FinalizeScript, /Ligamina-p403-evidence-/);
   assert.match(p403FinalizeScript, /rmtree/);

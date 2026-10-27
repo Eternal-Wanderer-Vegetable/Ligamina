@@ -108,6 +108,15 @@ out.with_suffix(out.suffix + ".sha256").write_text(
 print(json.dumps(report, ensure_ascii=False))
 PY
 
+if [[ "${P4_P403_JOB_STATUS:-}" == "cancelled" ]]; then
+  python3 -m lab.automation.phase4_p403_reports \
+    "${P4_P403_MODE:-unknown}" "$P4_P403_JOB_STATUS" \
+    "outputs/acceptance/phase4-p403-linux-controlled-run-${run_id}.json" \
+    "outputs/acceptance/phase4-p403-runner-self-test-run-${run_id}.json" \
+    "outputs/acceptance/phase4-p403-outer-cleanup-run-${run_id}.json" \
+    "outputs/acceptance/phase4-p403-linux-controlled-run-${run_id}.log"
+fi
+
 python3 - "$repo_root/outputs/acceptance/phase4-p403-outer-cleanup-run-${run_id}.json" <<'PY'
 import json
 import pathlib
