@@ -8,7 +8,7 @@
     "name": "Eternal-Wanderer-Vegetable/Ligamina",
     "default_branch": "main",
     "head_branch": "codex/phase4-p403-linux-recovery",
-    "head_commit": "3f49d963a7c5b3b5ad7999e9d4d527544e99da56",
+    "head_commit": "5db0144af04cd5f00b74c71454d1a12833658d90",
     "pull_request": 4,
     "pull_request_url": "https://github.com/Eternal-Wanderer-Vegetable/Ligamina/pull/4"
   },
@@ -46,6 +46,32 @@
       "name": "Linux contracts and automation regressions",
       "duration": "1m33s",
       "url": "https://github.com/Eternal-Wanderer-Vegetable/Ligamina/actions/runs/40426598422"
+    },
+    {
+      "run_id": 40428151648,
+      "commit": "3d24ad0",
+      "status": "failed_then_fixed",
+      "url": "https://github.com/Eternal-Wanderer-Vegetable/Ligamina/actions/runs/40428151648",
+      "linux": "passed in 9m04s",
+      "windows": "failed in cargo test at host_session::eof_fails_pending_requests_and_in_flight_limit_is_enforced",
+      "finding": "The test required RpcError::Closed after killing the child process. On the Windows runner, the writer can observe broken-pipe Io before the reader observes stdout EOF Closed. pending_count confirms requests are queued but does not prove the writer has flushed them, so either terminal signal can win.",
+      "repair_commit": "5db0144af04cd5f00b74c71454d1a12833658d90"
+    },
+    {
+      "run_id": 40429421597,
+      "commit": "5db0144af04cd5f00b74c71454d1a12833658d90",
+      "status": "passed",
+      "url": "https://github.com/Eternal-Wanderer-Vegetable/Ligamina/actions/runs/40429421597",
+      "linux": "passed in 8m55s, including locked checks, smoke, and container image build",
+      "windows": "passed in 12m37s, including locked checks, G1 smoke, and packaged runtime build"
+    },
+    {
+      "run_id": 40429421491,
+      "commit": "5db0144af04cd5f00b74c71454d1a12833658d90",
+      "status": "passed",
+      "name": "Linux contracts and automation regressions",
+      "duration": "1m44s",
+      "url": "https://github.com/Eternal-Wanderer-Vegetable/Ligamina/actions/runs/40429421491"
     }
   ],
   "local_verification": {
@@ -56,7 +82,18 @@
     "dispatcher_repeat": {
       "runs": 20,
       "failed": 0
-    }
+    },
+    "rust_command": "cargo test --workspace --locked",
+    "rust_summary": "33 Rust tests passed; host_session integration tests 6/6 passed",
+    "rust_format_command": "cargo fmt --all -- --check",
+    "rust_format_summary": "passed",
+    "process_exit_race_repeat": "50/50 passed after accepting either Closed or Io as the winning terminal signal and checking that all pending requests receive the same error",
+    "docs_command": "pwsh -NoProfile -File init.ps1 -Mode docs",
+    "docs_summary": "passed: 20 documents, 429 local links, 12 indexed historic Markdown, 31 features",
+    "evidence_hash_command": "node --test scripts/evidence-hash.test.mjs",
+    "evidence_hash_summary": "4 passed",
+    "harness_command": "node .agents/skills/harness-creator/scripts/validate-harness.mjs --target . --json",
+    "harness_summary": "100/100, no bottleneck"
   },
   "repository_configuration": {
     "environment": "phase4-p403-linux-controlled",
@@ -76,5 +113,13 @@
     "historical_unknowns_rewritten": false,
     "remaining_action": "Register a one-shot isolated Linux runner, pass hosted success/failure/cancel probes and artifact cleanup, then dispatch the bounded 39-row Linux recovery."
   },
-  "report_sha256": "4e15d166f02238a6176ea4408c66c4c110d07dd11c512f072463c11e9d93df13"
+  "workflow_registration_observation": {
+    "run_id": 40428146558,
+    "event": "push",
+    "conclusion": "failure",
+    "jobs": 0,
+    "url": "https://github.com/Eternal-Wanderer-Vegetable/Ligamina/actions/runs/40428146558",
+    "observation": "The workflow_dispatch-only P4-03 workflow produced a push event run with no jobs. The Actions API exposed no failure reason. No self-hosted runner or plugin Worker was dispatched."
+  },
+  "report_sha256": "b70f5ef4b67ac326b64a8c90689dce066c6c26539cd3903d7128bb368d3c2729"
 }
