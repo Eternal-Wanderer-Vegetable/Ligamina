@@ -1,0 +1,36 @@
+{
+  "schema_version": 1,
+  "kind": "phase4_p404_windows_host_preflight",
+  "date": "2026-10-27",
+  "status": "host_preflight_only",
+  "host": {
+    "os_caption": "Microsoft Windows 11 Pro for Workstations",
+    "version": "10.0.26200",
+    "build": "26200",
+    "windows_sandbox_executable_present": true,
+    "hypervisor_present": true
+  },
+  "win32_device_guard": {
+    "code_integrity_policy_enforcement_status": 2,
+    "code_integrity_policy_enforcement_interpretation": "Enforced per the Win32_DeviceGuard field definition; captured on the host, not the guest.",
+    "security_services_configured": [2],
+    "security_services_running": [2],
+    "security_services_value_2_interpretation": "Memory Integrity; this does not identify an App Control policy."
+  },
+  "sandbox_optional_feature_query": {
+    "command": "Get-WindowsOptionalFeature -Online -FeatureName Containers-DisposableClientVM",
+    "status": "not_collected",
+    "reason": "The read-only query returned that elevation is required."
+  },
+  "guest_admission": "not_started",
+  "active_app_control_policy_inventory": "not_collected",
+  "guest_code_integrity_events": "not_collected",
+  "catalog_execution": "not_started",
+  "gate": "blocked_pending_disposable_guest_admission",
+  "boundary": "Host observations do not establish the Windows Sandbox guest policy, its enforcement mode, or catalog admission.",
+  "references": [
+    "https://learn.microsoft.com/en-us/windows/security/application-security/application-isolation/windows-sandbox/windows-sandbox-configure-using-wsb-file",
+    "https://learn.microsoft.com/en-us/windows/security/application-security/application-control/app-control-for-business/operations/citool-commands",
+    "https://learn.microsoft.com/en-us/windows/security/threat-protection/device-guard/enable-virtualization-based-protection-of-code-integrity"
+  ]
+}
