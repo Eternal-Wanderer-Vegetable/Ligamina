@@ -339,7 +339,7 @@ async fn oversized_core_request_closes_the_session_and_fails_pending_request() {
 }
 
 #[tokio::test(flavor = "multi_thread", worker_threads = 4)]
-async fn eof_fails_pending_requests_and_in_flight_limit_is_enforced() {
+async fn process_exit_fails_pending_requests_and_in_flight_limit_is_enforced() {
     let mut worker = start_worker("node").await;
     let calls: Vec<_> = (0..MAX_IN_FLIGHT_REQUESTS)
         .map(|_| {
@@ -372,12 +372,16 @@ async fn eof_fails_pending_requests_and_in_flight_limit_is_enforced() {
 
     worker.child.kill().await.unwrap();
     worker.child.wait().await.unwrap();
+    // Either the reader observes stdout EOF first or the writer observes the
+    // closed child stdin first. Both are valid terminal signals for a killed
+    // Host process; every pending request must receive the winning signal.
+    let terminal_error = worker.session.wait_closed().await;
     assert!(matches!(
-        worker.session.wait_closed().await,
-        RpcError::Closed(_)
+        &terminal_error,
+        RpcError::Closed(_) | RpcError::Io(_)
     ));
     for call in calls {
-        assert!(matches!(call.await.unwrap(), Err(RpcError::Closed(_))));
+        assert_eq!(call.await.unwrap(), Err(terminal_error.clone()));
     }
 }
 
