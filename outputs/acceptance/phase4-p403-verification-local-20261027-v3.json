@@ -1,0 +1,116 @@
+{
+  "schema_version": 1,
+  "kind": "phase4_p403_local_readiness_validation",
+  "date": "2026-10-27",
+  "repository": "Eternal-Wanderer-Vegetable/Ligamina",
+  "branch": "codex/phase4-p403-image-source-binding",
+  "base_commit": "a038ce793d05aba4c95d089dae734b12390326e3",
+  "plugin_execution": "not_started",
+  "runner_deployment": "pending",
+  "checks": [
+    {
+      "name": "p403_unit_tests",
+      "command": "UV_PROJECT_ENVIRONMENT=/home/vegetable/ligamina-p402-control-venv uv run --locked --offline --project lab --python 3.12.14 python -m unittest lab.tests.test_automation_phase4_p403 -v",
+      "exit_code": 0,
+      "passed": 10,
+      "failed": 0
+    },
+    {
+      "name": "workflow_static_tests",
+      "command": "node --test scripts/phase3-workflows.test.mjs",
+      "exit_code": 0,
+      "passed": 5,
+      "failed": 0
+    },
+    {
+      "name": "bash_syntax",
+      "command": "bash -n scripts/phase4-p403-linux-runner.sh scripts/phase4-p403-finalize-linux-run.sh scripts/phase4-p403-runner-self-test.sh",
+      "exit_code": 0
+    },
+    {
+      "name": "docs",
+      "command": "bash init.sh docs",
+      "exit_code": 0,
+      "documents": 20,
+      "local_links": 438,
+      "indexed_historical_markdown": 12,
+      "features": 31
+    },
+    {
+      "name": "harness",
+      "command": "node .agents/skills/harness-creator/scripts/validate-harness.mjs --target . --json",
+      "exit_code": 0,
+      "score": 100
+    },
+    {
+      "name": "readme_evidence_check",
+      "command": "node scripts/render-readme.mjs --check",
+      "exit_code": 0
+    },
+    {
+      "name": "targeted_git_diff_check",
+      "command": "git diff --check -- <P4-03 modified files>",
+      "exit_code": 0
+    }
+  ],
+  "executor_manifest": {
+    "path": "outputs/acceptance/phase4-p403-linux-execution-manifest-20261027-v3.json",
+    "campaign_id": "p4-p403-linux-1932fab55a8b",
+    "canonical_sha256": "32c256a21f54b8c1bde758bb2fab54430daf4fb5fc1c3e947817c2af8ddb4cb4",
+    "file_sha256": "dfaa0df6b69209fa62d0d0867b7e4075c521fa60a1139fed4437c1f29681e253",
+    "selected_units": 39,
+    "status": "valid",
+    "sidecar_valid": true
+  },
+  "executor_validation": {
+    "path": "outputs/acceptance/phase4-p403-executor-validation-local-20261027-v3.json",
+    "file_sha256": "70409c41f8f8e048b06e1603640f6d6f0b54e3ef112d4de0809827ce81e13ff1",
+    "sidecar_valid": true
+  },
+  "locked_input_cache": {
+    "v2_path": "outputs/acceptance/phase4-p403-cache-preflight-local-20261027-v2.json",
+    "v2_status": "not_ready",
+    "v2_ready_units": 0,
+    "v3_path": "outputs/acceptance/phase4-p403-cache-preflight-local-20261027-v3.json",
+    "v3_status": "ready",
+    "v3_ready_units": 39,
+    "expected_units": 39,
+    "v2_sidecar_valid": true,
+    "v3_sidecar_valid": true
+  },
+  "worker_images": {
+    "path": "outputs/acceptance/phase4-p403-worker-images-local-20261027-v2.json",
+    "status": "passed",
+    "file_sha256": "d43dd7d8584adcce03d0475342e543ff513a09a106393aec079deb84d10bc295",
+    "sidecar_valid": true
+  },
+  "local_benign_preflight": {
+    "path": "outputs/acceptance/phase4-p403-linux-workers-local-20261027-v2.json",
+    "report_passed": true,
+    "total_cases": 10,
+    "expected_status_counts": {
+      "passed": 5,
+      "failed": 1,
+      "unknown": 4
+    },
+    "cleanup_confirmed": 10,
+    "admission": "admitted",
+    "environment_fingerprint": "e60d2c155d83e023e757fae843c1efb52180bba79ae1b2486988883d512c01cf",
+    "worker_sidecar_valid": true,
+    "admission_sidecar_valid": true
+  },
+  "github_preparation": {
+    "self_hosted_runners": 0,
+    "PHASE4_P403_RUNNER_ENABLED": false,
+    "PHASE4_P403_LINUX_RECOVERY_ENABLED": false,
+    "environment": "phase4-p403-linux-controlled",
+    "environment_requires_owner_review": true,
+    "runner_package_version": "2.338.2",
+    "runner_package_sha256": "baebf204307bac6193480852732f0aba2ae97b6c5597c244f4d5558390147c40",
+    "runner_registered": false,
+    "pr": 7,
+    "initial_commit_ci": "passed",
+    "v3_followup_ci": "pending"
+  },
+  "overall": "passed_local_readiness_only"
+}

@@ -63,7 +63,7 @@ test('P4-03 controlled workflow is separately gated and binds only the reviewed 
   assert.match(p403, /persist-credentials: false/);
   assert.match(p403, /if: always\(\)/);
   assert.match(p403, /cancel-in-progress: false/);
-  assert.match(p403, /phase4-p403-linux-execution-manifest-20261027-v2\.json/);
+  assert.match(p403, /phase4-p403-linux-execution-manifest-20261027-v3\.json/);
   assert.match(p403Script, /phase4-p403-recovery-manifest-20261027\.json/);
   assert.match(p403Script, /P4_P403_MODE/);
   assert.match(p403Script, /phase4-p403-runner-self-test\.sh/);
