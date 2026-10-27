@@ -84,6 +84,9 @@ case "$mode" in
     exit 0
     ;;
   linux_unknown_recovery) ;;
+  linux_unknown_recovery_remaining)
+    executor_manifest="outputs/acceptance/phase4-p403-linux-execution-manifest-20261027-v4-not-run.json"
+    ;;
   *) printf 'unsupported P4-03 mode: %s\n' "$mode" | tee -a "$log" >&2; exit 2 ;;
 esac
 

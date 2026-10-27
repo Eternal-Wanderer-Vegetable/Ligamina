@@ -54,9 +54,11 @@ test('P4-03 controlled workflow is separately gated and binds only the reviewed 
   assert.match(p403, /runner_contract_success/);
   assert.match(p403, /runner_contract_failure/);
   assert.match(p403, /runner_contract_cancel/);
+  assert.match(p403, /linux_unknown_recovery_remaining/);
   assert.doesNotMatch(p403, /pull_request:|schedule:/);
   assert.match(p403, /vars\.PHASE4_P403_RUNNER_ENABLED == 'true'/);
   assert.match(p403, /vars\.PHASE4_P403_LINUX_RECOVERY_ENABLED == 'true'/);
+  assert.match(p403, /mode != 'linux_unknown_recovery_remaining'/);
   assert.match(p403, /runs-on: \[self-hosted, linux, x64, ligamina-phase4-p403\]/);
   assert.match(p403, /environment: phase4-p403-linux-controlled/);
   assert.match(p403, /permissions:\s+contents: read/);
@@ -64,12 +66,15 @@ test('P4-03 controlled workflow is separately gated and binds only the reviewed 
   assert.match(p403, /if: always\(\)/);
   assert.match(p403, /cancel-in-progress: false/);
   assert.match(p403, /phase4-p403-linux-execution-manifest-20261027-v3\.json/);
+  assert.match(p403, /phase4-p403-linux-execution-manifest-20261027-v4-not-run\.json/);
   assert.match(p403Script, /phase4-p403-recovery-manifest-20261027\.json/);
   assert.match(p403Script, /P4_P403_MODE/);
   assert.match(p403Script, /phase4-p403-runner-self-test\.sh/);
   assert.match(p403Script, /validate-p403-recovery/);
   assert.match(p403Script, /validate-p403-linux-executor/);
   assert.match(p403Script, /execute-p403-linux-recovery/);
+  assert.match(p403Script, /linux_unknown_recovery_remaining/);
+  assert.match(p403Script, /phase4-p403-linux-execution-manifest-20261027-v4-not-run\.json/);
   assert.match(p403Script, /trap finish EXIT/);
   assert.match(p403Script, /trap 'exit 130' INT/);
   assert.match(p403Script, /trap 'exit 143' TERM/);
@@ -77,6 +82,7 @@ test('P4-03 controlled workflow is separately gated and binds only the reviewed 
   assert.match(p403Script, /Ligamina-p403-queue-/);
   assert.doesNotMatch(p403Script, /execute-recovery-pilot/);
   assert.match(p403FinalizeScript, /reconcile-p403-linux-runner/);
+  assert.match(p403FinalizeScript, /phase4-p403-linux-execution-manifest-20261027-v4-not-run\.json/);
   assert.match(p403FinalizeScript, /lab\.automation\.phase4_p403_reports/);
   assert.match(p403, /P4_P403_JOB_STATUS: \$\{\{ job\.status \}\}/);
   assert.match(p403FinalizeScript, /Ligamina-p403-queue-/);

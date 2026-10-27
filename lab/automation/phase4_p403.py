@@ -61,9 +61,164 @@ def _text_file_sha256_matches(path: Path, expected: str) -> bool:
         raise Phase4P403Error(f"required P4-03 evidence file is unavailable: {path}") from error
 
 
+def _seal_p403_recovery_report(report: dict[str, Any]) -> dict[str, Any]:
+    report.pop("report_sha256", None)
+    report["report_sha256"] = object_sha256(report)
+    return report
+
+
 def _relative(path_value: str) -> Path:
     path = Path(path_value)
     return path if path.is_absolute() else ROOT / path
+
+
+def _repository_relative(path: Path, label: str) -> str:
+    resolved = Path(path).expanduser().resolve(strict=True)
+    repository = ROOT.resolve(strict=True)
+    if not resolved.is_relative_to(repository):
+        raise Phase4P403Error(f"P4-03 {label} escapes the repository")
+    return resolved.relative_to(repository).as_posix()
+
+
+def _repository_file(path_value: Any, label: str) -> tuple[Path, str]:
+    if not isinstance(path_value, str) or not path_value or Path(path_value).is_absolute():
+        raise Phase4P403Error(f"P4-03 {label} must be a repository-relative path")
+    path = (ROOT / path_value).resolve(strict=True)
+    repository = ROOT.resolve(strict=True)
+    if not path.is_relative_to(repository):
+        raise Phase4P403Error(f"P4-03 {label} escapes the repository")
+    return path, path.relative_to(repository).as_posix()
+
+
+def _validate_p403_prior_linux_recovery(
+    parent: dict[str, Any],
+    parent_validation: dict[str, Any],
+    previous_executor: dict[str, Any],
+    previous_executor_validation: dict[str, Any],
+    previous_report_path: Path,
+    previous_controlled_report_path: Path,
+    previous_executor_manifest_path: Path,
+) -> dict[str, Any]:
+    report = _json_load(previous_report_path)
+    controlled_report = _json_load(previous_controlled_report_path)
+    report_relative = _repository_relative(previous_report_path, "previous recovery report")
+    executor_relative = _repository_relative(previous_executor_manifest_path, "previous executor manifest")
+    controlled_evidence = controlled_report.get("evidence_sha256", {})
+    if not isinstance(controlled_evidence, dict):
+        raise Phase4P403Error("previous controlled report has no evidence hash map")
+    report_file_sha256 = controlled_evidence.get(report_relative)
+    executor_file_sha256 = controlled_evidence.get(executor_relative)
+    previous_selection = {
+        item["identity"]["registry_entry_id"]
+        for item in previous_executor.get("selection", [])
+        if isinstance(item, dict) and isinstance(item.get("identity"), dict)
+    }
+    previous_mode = (
+        "linux_unknown_recovery_remaining"
+        if isinstance(previous_executor.get("phase4_previous_recovery"), dict)
+        else "linux_unknown_recovery"
+    )
+    if (
+        not isinstance(report_file_sha256, str)
+        or not _text_file_sha256_matches(previous_report_path, report_file_sha256)
+        or controlled_report.get("kind") != "phase4_p403_controlled_run"
+        or controlled_report.get("mode") != previous_mode
+        or controlled_report.get("status") != "blocked"
+        or controlled_report.get("exit_code") != 3
+        or controlled_report.get("plugin_execution") != "dispatched"
+        or not controlled_report.get("run_id")
+    ):
+        raise Phase4P403Error("previous controlled report does not bind the interrupted Linux recovery report")
+    if controlled_evidence.get(executor_relative) != _file_sha256(previous_executor_manifest_path):
+        raise Phase4P403Error("previous controlled report does not bind the original executor manifest bytes")
+    if (
+        report.get("kind") != "phase4_p403_linux_unknown_recovery"
+        or report.get("status") != "interrupted"
+        or report.get("queue_state") != "interrupted"
+        or report.get("campaign_id") != previous_executor.get("campaign_id")
+        or report.get("manifest_sha256") != previous_executor_validation.get("executor_manifest_sha256")
+        or report.get("phase4_parent_manifest_sha256") != parent_validation.get("manifest_sha256")
+        or report.get("phase4_executor_manifest_sha256") != previous_executor_validation.get("executor_manifest_sha256")
+        or report.get("parent_unknown_count") != 39
+        or not isinstance(report.get("denominator"), dict)
+        or report["denominator"].get("expected_units") != len(previous_selection)
+        or report.get("selected_parent_count", len(previous_selection)) != len(previous_selection)
+    ):
+        raise Phase4P403Error("previous P4-03 Linux recovery report does not match its interrupted executor selection")
+
+    if executor_file_sha256 != _file_sha256(previous_executor_manifest_path):
+        raise Phase4P403Error("previous controlled report does not bind the original executor manifest bytes")
+    parent_rows = {
+        row["registry_entry_id"]: row
+        for row in parent.get("rows", [])
+        if row.get("cohort") == "linux"
+    }
+    report_rows = report.get("plugin_reports")
+    if not previous_selection or not isinstance(report_rows, list) or len(report_rows) != len(previous_selection):
+        raise Phase4P403Error("previous P4-03 Linux recovery report must cover its exact nonempty executor selection")
+    by_id: dict[str, dict[str, Any]] = {}
+    not_run_ids: set[str] = set()
+    attempted_ids: set[str] = set()
+    for row in report_rows:
+        if not isinstance(row, dict):
+            raise Phase4P403Error("previous P4-03 recovery report contains a non-object row")
+        entry_id = row.get("registry_entry_id")
+        parent_row = parent_rows.get(entry_id)
+        if not isinstance(entry_id, str) or entry_id not in previous_selection or entry_id in by_id or parent_row is None:
+            raise Phase4P403Error("previous P4-03 recovery report has duplicate or unexpected parent identities")
+        p4_parent = row.get("p4_parent", {})
+        if (
+            not isinstance(p4_parent, dict)
+            or p4_parent.get("recovery_id") != parent_row.get("recovery_id")
+            or p4_parent.get("parent_report_row_sha256") != parent_row.get("parent", {}).get("report_row_sha256")
+            or p4_parent.get("parent_unknown_attempt_ids")
+            != [attempt["attempt_id"] for attempt in parent_row.get("parent", {}).get("parent_unknown_attempts", [])]
+        ):
+            raise Phase4P403Error(f"previous P4-03 recovery report lost parent lineage for {entry_id}")
+        status = row.get("recovery_status")
+        attempts = row.get("attempts")
+        if status not in {"recovered", "failed", "unknown", "not_run"} or not isinstance(attempts, list):
+            raise Phase4P403Error(f"previous P4-03 recovery row has an invalid disposition for {entry_id}")
+        if status == "not_run":
+            if attempts:
+                raise Phase4P403Error(f"previously not_run identity already has attempts: {entry_id}")
+            not_run_ids.add(entry_id)
+        else:
+            if not attempts or any(
+                not isinstance(attempt, dict) or attempt.get("attempt_number") != 1
+                for attempt in attempts
+            ):
+                raise Phase4P403Error(f"previous recovery attempt budget is not one for {entry_id}")
+            attempted_ids.add(entry_id)
+        by_id[entry_id] = row
+
+    if set(by_id) != previous_selection or len(attempted_ids) + len(not_run_ids) != len(previous_selection):
+        raise Phase4P403Error("previous P4-03 Linux recovery report does not close the exact executor selection")
+    if not not_run_ids:
+        raise Phase4P403Error("previous P4-03 recovery report has no unattempted identities to select")
+    if previous_mode == "linux_unknown_recovery" and (len(attempted_ids) != 14 or len(not_run_ids) != 25):
+        raise Phase4P403Error("original P4-03 interrupted campaign must contain exactly 14 attempted and 25 not_run identities")
+    counts = report.get("counts", {})
+    if not isinstance(counts, dict):
+        raise Phase4P403Error("previous P4-03 recovery report has no counts object")
+    expected_counts = {
+        "recovered": sum(row["recovery_status"] == "recovered" for row in report_rows),
+        "plugin_or_stage_failed": sum(row["recovery_status"] == "failed" for row in report_rows),
+        "unknown_or_cleanup_unconfirmed": sum(row["recovery_status"] == "unknown" for row in report_rows),
+        "not_run": len(not_run_ids),
+    }
+    if any(counts.get(key) != value for key, value in expected_counts.items()):
+        raise Phase4P403Error("previous P4-03 Linux recovery report counts do not match its row dispositions")
+    return {
+        "report": report,
+        "report_file_sha256": report_file_sha256,
+        "controlled_report": controlled_report,
+        "controlled_report_file_sha256": _file_sha256(previous_controlled_report_path),
+        "run_id": str(controlled_report["run_id"]),
+        "campaign_id": report["campaign_id"],
+        "not_run_ids": sorted(not_run_ids),
+        "attempted_ids": sorted(attempted_ids),
+    }
 
 
 def _verified_p3_linux_worker_images(
@@ -494,6 +649,83 @@ def build_p403_linux_executor_manifest(
     return executor_manifest
 
 
+def build_p403_linux_remaining_executor_manifest(
+    parent_manifest_path: Path,
+    previous_executor_manifest_path: Path,
+    previous_report_path: Path,
+    previous_controlled_report_path: Path,
+) -> dict[str, Any]:
+    """Freeze only the parent identities left not_run by the prior interrupted campaign."""
+    parent_manifest_path = Path(parent_manifest_path).expanduser().resolve(strict=True)
+    previous_executor_manifest_path = Path(previous_executor_manifest_path).expanduser().resolve(strict=True)
+    previous_report_path = Path(previous_report_path).expanduser().resolve(strict=True)
+    previous_controlled_report_path = Path(previous_controlled_report_path).expanduser().resolve(strict=True)
+    parent = _json_load(parent_manifest_path)
+    parent_validation = validate_p403_recovery_manifest(parent_manifest_path)
+    previous_executor = _json_load(previous_executor_manifest_path)
+    previous_executor_validation = validate_p403_linux_executor_manifest(
+        parent_manifest_path, previous_executor_manifest_path,
+    )
+    if previous_executor_validation.get("selected_units") != len(previous_executor.get("selection", [])):
+        raise Phase4P403Error("remaining-selection source executor selection is invalid")
+    prior = _validate_p403_prior_linux_recovery(
+        parent, parent_validation, previous_executor, previous_executor_validation,
+        previous_report_path, previous_controlled_report_path, previous_executor_manifest_path,
+    )
+    report_path = _repository_relative(previous_report_path, "previous recovery report")
+    controlled_report_path = _repository_relative(previous_controlled_report_path, "previous controlled report")
+    executor_path = _repository_relative(previous_executor_manifest_path, "previous executor manifest")
+    parent_rows = {row["identity"]["registry_entry_id"]: row for row in previous_executor["selection"]}
+    selected_ids = set(prior["not_run_ids"])
+    selected = [parent_rows[entry_id] for entry_id in sorted(selected_ids)]
+
+    core = {
+        key: value
+        for key, value in previous_executor.items()
+        if key not in {"campaign_id", "manifest_sha256"}
+    }
+    core["selection"] = selected
+    core["expected_units"] = len(selected)
+    core["recovery_per_ecosystem"] = {
+        ecosystem: sum(row["identity"]["ecosystem"] == ecosystem for row in selected)
+        for ecosystem in ("nonebot", "koishi")
+    }
+    core["failed_controls_per_ecosystem"] = {"nonebot": 0, "koishi": 0}
+    core["selection_algorithm"] = (
+        "P4-03 exact not_run identities from the hash-bound interrupted campaign; "
+        "exclude every identity with a prior P4-03 attempt"
+    )
+    core["host_service_profiles"] = _build_core_only_host_service_profiles(selected)
+    overrides = dict(previous_executor["archive_size_overrides"])
+    overrides["entries"] = [
+        item for item in overrides["entries"]
+        if item.get("registry_entry_id") in selected_ids
+    ]
+    core["archive_size_overrides"] = overrides
+    core["phase4_previous_recovery"] = {
+        "report_path": report_path,
+        "report_file_sha256": prior["report_file_sha256"],
+        "controlled_report_path": controlled_report_path,
+        "controlled_report_file_sha256": prior["controlled_report_file_sha256"],
+        "run_id": prior["run_id"],
+        "campaign_id": prior["campaign_id"],
+        "executor_manifest_path": executor_path,
+        "executor_manifest_sha256": previous_executor_validation["executor_manifest_sha256"],
+        "attempted_parent_count": len(prior["attempted_ids"]),
+        "attempted_parent_ids_sha256": object_sha256(prior["attempted_ids"]),
+        "not_run_parent_count": len(prior["not_run_ids"]),
+        "not_run_parent_ids_sha256": object_sha256(prior["not_run_ids"]),
+    }
+    seed = object_sha256(core)
+    executor_manifest = {"campaign_id": f"p4-p403-linux-remaining-{seed[:12]}", **core}
+    executor_manifest["manifest_sha256"] = object_sha256(executor_manifest)
+    try:
+        validate_linux_pilot_manifest(executor_manifest)
+    except RecoveryPilotError as error:
+        raise Phase4P403Error(f"generated P4-03 remaining Linux manifest is invalid: {error}") from error
+    return executor_manifest
+
+
 def validate_p403_linux_executor_manifest(parent_manifest_path: Path, executor_manifest_path: Path) -> dict[str, Any]:
     parent_manifest_path = Path(parent_manifest_path).expanduser().resolve(strict=True)
     executor_manifest_path = Path(executor_manifest_path).expanduser().resolve(strict=True)
@@ -504,11 +736,28 @@ def validate_p403_linux_executor_manifest(parent_manifest_path: Path, executor_m
         low_level = validate_linux_pilot_manifest(executor)
     except RecoveryPilotError as error:
         raise Phase4P403Error(f"invalid P4-03 Linux executor manifest: {error}") from error
+    selected = executor.get("selection", [])
+    selected_ids_list = [
+        item.get("identity", {}).get("registry_entry_id")
+        for item in selected
+        if isinstance(item, dict)
+    ] if isinstance(selected, list) else []
+    if len(selected_ids_list) != len(selected) or len(set(selected_ids_list)) != len(selected_ids_list):
+        raise Phase4P403Error("P4-03 Linux executor selection has invalid or duplicate identities")
+    selected_ids = set(selected_ids_list)
     worker_images, worker_image_source, archive_size_overrides = _verified_p3_linux_worker_images(parent)
+    previous_binding = executor.get("phase4_previous_recovery")
+    expected_overrides = archive_size_overrides
+    if previous_binding is not None:
+        expected_overrides = dict(archive_size_overrides)
+        expected_overrides["entries"] = [
+            item for item in archive_size_overrides["entries"]
+            if item.get("registry_entry_id") in selected_ids
+        ]
     if (
         executor.get("worker_images") != worker_images
         or executor.get("worker_image_source") != worker_image_source
-        or executor.get("archive_size_overrides") != archive_size_overrides
+        or executor.get("archive_size_overrides") != expected_overrides
     ):
         raise Phase4P403Error("P4-03 Linux executor Worker images or archive sizes are not bound to the verified P3 source run")
     parent_binding = executor.get("phase4_parent_manifest", {})
@@ -520,9 +769,55 @@ def validate_p403_linux_executor_manifest(parent_manifest_path: Path, executor_m
     ):
         raise Phase4P403Error("P4-03 Linux executor manifest is not bound to the current parent manifest")
     parents = {row["registry_entry_id"]: row for row in parent["rows"] if row.get("cohort") == "linux"}
-    selected = executor.get("selection", [])
-    if len(selected) != 39 or {item["identity"]["registry_entry_id"] for item in selected} != set(parents):
-        raise Phase4P403Error("P4-03 Linux executor selection is not the exact 39 parent identities")
+    if previous_binding is None:
+        if len(selected) != 39 or selected_ids != set(parents):
+            raise Phase4P403Error("P4-03 Linux executor selection is not the exact 39 parent identities")
+    else:
+        if not isinstance(previous_binding, dict):
+            raise Phase4P403Error("P4-03 remaining executor previous-report binding is invalid")
+        previous_executor_path, previous_executor_relative = _repository_file(
+            previous_binding.get("executor_manifest_path"), "previous executor manifest",
+        )
+        previous_report_path, previous_report_relative = _repository_file(
+            previous_binding.get("report_path"), "previous recovery report",
+        )
+        previous_controlled_report_path, previous_controlled_report_relative = _repository_file(
+            previous_binding.get("controlled_report_path"), "previous controlled report",
+        )
+        previous_executor = _json_load(previous_executor_path)
+        previous_executor_validation = validate_p403_linux_executor_manifest(
+            parent_manifest_path, previous_executor_path,
+        )
+        if previous_executor_validation.get("selected_units") != len(previous_executor.get("selection", [])):
+            raise Phase4P403Error("P4-03 remaining executor previous selection is invalid")
+        prior = _validate_p403_prior_linux_recovery(
+            parent, parent_validation, previous_executor, previous_executor_validation,
+            previous_report_path, previous_controlled_report_path, previous_executor_path,
+        )
+        expected_previous_binding = {
+            "report_path": previous_report_relative,
+            "report_file_sha256": prior["report_file_sha256"],
+            "controlled_report_path": previous_controlled_report_relative,
+            "controlled_report_file_sha256": prior["controlled_report_file_sha256"],
+            "run_id": prior["run_id"],
+            "campaign_id": prior["campaign_id"],
+            "executor_manifest_path": previous_executor_relative,
+            "executor_manifest_sha256": previous_executor_validation["executor_manifest_sha256"],
+            "attempted_parent_count": len(prior["attempted_ids"]),
+            "attempted_parent_ids_sha256": object_sha256(prior["attempted_ids"]),
+            "not_run_parent_count": len(prior["not_run_ids"]),
+            "not_run_parent_ids_sha256": object_sha256(prior["not_run_ids"]),
+        }
+        if (
+            previous_binding != expected_previous_binding
+            or executor.get("selection_algorithm")
+            != "P4-03 exact not_run identities from the hash-bound interrupted campaign; exclude every identity with a prior P4-03 attempt"
+            or not selected_ids
+            or selected_ids != set(prior["not_run_ids"])
+            or not isinstance(executor.get("campaign_id"), str)
+            or not executor["campaign_id"].startswith("p4-p403-linux-remaining-")
+        ):
+            raise Phase4P403Error("P4-03 remaining executor selection does not exactly match the prior not_run identities")
     for item in selected:
         entry_id = item["identity"]["registry_entry_id"]
         phase4_parent = item.get("phase4_parent", {})
@@ -540,8 +835,9 @@ def validate_p403_linux_executor_manifest(parent_manifest_path: Path, executor_m
         "status": "valid",
         "parent_manifest_sha256": parent_validation["manifest_sha256"],
         "executor_manifest_sha256": low_level["manifest_sha256"],
-        "selected_units": 39,
+        "selected_units": len(selected),
         "ecosystem_counts": low_level["counts"],
+        "previous_recovery_report_file_sha256": previous_binding.get("report_file_sha256") if isinstance(previous_binding, dict) else None,
     }
 
 
@@ -586,10 +882,13 @@ def execute_p403_linux_recovery(
         "phase4_parent_manifest_sha256": binding["parent_manifest_sha256"],
         "phase4_executor_manifest_sha256": binding["executor_manifest_sha256"],
         "parent_unknown_count": 39,
+        "selected_parent_count": len(report.get("plugin_reports", [])),
         "windows_parent_unknowns_not_dispatched": 14,
         "automation_gate": "blocked_pending_linux_results_windows_admission_and_runner_acceptance",
     })
-    report["report_sha256"] = object_sha256(report)
+    if isinstance(executor.get("phase4_previous_recovery"), dict):
+        report["previous_recovery_report_file_sha256"] = executor["phase4_previous_recovery"]["report_file_sha256"]
+    _seal_p403_recovery_report(report)
     return report
 
 
