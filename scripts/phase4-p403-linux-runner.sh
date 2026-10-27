@@ -94,7 +94,8 @@ run_step validate_p403_parent uv run --locked --project lab --python 3.12.14 pyt
   validate-p403-recovery "$manifest" --output "$validation_report"
 run_step validate_p403_executor uv run --locked --project lab --python 3.12.14 python -m lab.automation \
   validate-p403-linux-executor --manifest "$manifest" --executor-manifest "$executor_manifest" --output "$executor_validation"
-run_step linux_worker_probes uv run --locked --project hosts/nonebot --python 3.12.14 python \
+# This probe imports lab.workers only; reuse the warmed lab environment without NoneBot dev extras.
+run_step linux_worker_probes uv run --locked --project lab --python 3.12.14 python \
   deploy/lab/linux/probes/acceptance.py --report "$worker_report"
 run_step linux_worker_admission uv run --locked --project lab --python 3.12.14 python -m lab.automation \
   preflight --platform linux --probe-report "$worker_report" --output "$admission_report"
