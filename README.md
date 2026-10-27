@@ -112,7 +112,7 @@ P3-08 双平台行为账本：120 个位置、360 个三次尝试槽，实际派
 Windows 结果仅适用于已记录的 Evaluation/Audit Mode Worker profile；没有强制模式、全目录行为兼容或真实平台投递结论。
 <!-- ligamina:phase3:end -->
 
-第四阶段按[行为兼容与运行就绪计划](docs/plans/2026-10-26-phase-4-behavior-readiness.md)推进：P4-01 executable Host Fixture 与 P4-02 Linux scoped engineering deliverables 已完成；P4-03 的受控 runner success/failure/cancel 合同 probes 已通过。PR #9 已合并为 main commit 444cf1c，主 Linux/Windows CI 与 Phase 3 self-test 通过。run 40499072419 在 worker claim 前于 Linux worker probe 依赖安装超时，plugin_execution=not_started、attempts=0、outer cleanup confirmed；25 项 v4 identity 仍可重派。probe 现在切到预热过的 lab project，修正等待 hosted CI；[run evidence](outputs/acceptance/phase4-p403-run-40499072419/hosted-run-summary.json)。P4-AUTOMATION 仍 blocked，P4-02 完整行为 gate、Windows Enforcement、真实平台和候选发行验收仍未通过。
+第四阶段按[行为兼容与运行就绪计划](docs/plans/2026-10-26-phase-4-behavior-readiness.md)推进：P4-01 executable Host Fixture 与 P4-02 Linux scoped engineering deliverables 已完成；P4-03 受控 runner success/failure/cancel 合同 probes 已通过。main 当前包含 PR #10（`d0f171f`），Linux、Windows 与 Phase 3 self-test checks 通过。run 40508582084 在 Actions setup 下载 pinned artifact action 时超时，未派发插件；run 40513327262 尝试 9/25 个 v4 identity，9 个均为 unknown、16 个 not_run，Docker/outer cleanup confirmed，plugin compatibility=`not_evaluated`。v5 campaign 仅选择这 16 个未运行身份，validator valid、locked cache ready 16/16；专用 runner mode 等待 PR #11 CI/合并后受控续跑。feat-028 仍 in-progress，P4-AUTOMATION 仍 blocked；Windows Enforcement、P4-02 完整行为、真实平台及候选发行验收仍未通过。
 
 状态见 [功能清单](feature_list.json)、[当前进展](progress.md) 和 [会话交接](session-handoff.md)。
 
