@@ -1787,7 +1787,7 @@
       ],
       "status": "in-progress",
       "done_when": "新 manifest 严格绑定39 Linux/10 Windows pilot/4 preparation父身份；53项诊断/新观察全覆盖且旧unknown不改写；真实受保护 runner 的部署、权限隔离、失败/取消 artifact 和外层清理有证据；未解项及 Windows admission 等待保持 blocked，automation gate 单独裁决。",
-      "evidence": "2026-10-27: frozen P4-03 manifest binds 39 Linux / 10 Windows pilot / 4 Windows preparation parent unknowns without rewriting P3 outcomes. Linux recovery budget is one new attempt per identity; Windows budget is zero pending enforcement/metadata admission. Read-only P3 SQLite/backend evidence binds all 77 unknown attempt reason codes and separate cleanup confirmation; 7 external recovery reports exist but raw per-attempt logs were not found. Local success/failure/TERM-cancel shell simulations passed with outer cleanup confirmed. PR #4 was merged to main at 3362b51276728619a4b008b834b2098075caad23; PR and main CI passed. GitHub API diagnosed a P4 workflow parse failure because job-level env cannot reference runner.temp. PR #5 moved per-run venv/cache paths to step env; Linux, Windows and contracts CI passed and the fix merged at dd0a0206ef9db2a72232c29e4ec23092cee7e59a. Main workflow_dispatch run 40435434502 parsed and passed the dispatch guard; the controlled job skipped as intended because both opt-in variables are false. Current self-hosted runners=0; no GitHub runner probe or plugin Worker ran. Keep P4-AUTOMATION blocked and feat-028 in progress pending one-shot runner provisioning, real contract probes/artifacts/cleanup, and the 39-row recovery.",
+      "evidence": "2026-10-27: frozen P4-03 manifest binds 39 Linux / 10 Windows pilot / 4 Windows preparation parent unknowns without rewriting P3 outcomes. Linux recovery budget is one new attempt per identity; Windows budget is zero pending enforcement/metadata admission. Read-only P3 SQLite/backend evidence binds all 77 unknown attempt reason codes and separate cleanup confirmation; 7 external recovery reports exist but raw per-attempt logs were not found. Local success/failure/TERM-cancel shell simulations passed with outer cleanup confirmed. PR #4 was merged to main at 3362b51276728619a4b008b834b2098075caad23; PR and main CI passed. GitHub API diagnosed a P4 workflow parse failure because job-level env cannot reference runner.temp. PR #5 moved per-run venv/cache paths to step env; Linux, Windows and contracts CI passed and the fix merged at dd0a0206ef9db2a72232c29e4ec23092cee7e59a. Main workflow_dispatch run 40435434502 parsed and passed the dispatch guard; the controlled job skipped as intended because both opt-in variables are false. Current self-hosted runners=0; no GitHub runner probe or plugin Worker ran. Keep P4-AUTOMATION blocked and feat-028 in progress pending one-shot runner provisioning, real contract probes/artifacts/cleanup, and the 39-row recovery. Local P4-03 correction on branch codex/phase4-p403-image-source-binding: executor v2 canonical SHA f3793ae3aef3edc2768cf6b0788e83f78e975d541123d7369a0da022491e9c93 binds Worker images to the completed P3 Linux manifest/report hashes; exact image inspection and offline Node v24.20.0 startup passed in Ubuntu-24.04 WSL2. The 39-unit executor validator is valid; local benign Worker preflight has 10 cases (5 passed, 1 expected failed, 4 expected unknown), report passed with cleanup 10/10 and admission admitted. Focused P4-03 suite 9/9, workflow static checks 5/5, Bash syntax, and docs gate (20 documents/434 links) passed. Workflow now uses a P4-only runner label. GitHub runner probes/artifacts and 39-unit recovery remain pending; variables stay false and no plugin Worker was dispatched.",
       "evidence_paths": [
         "outputs/acceptance/phase3-p305-overall-closure-20261026.json",
         "outputs/acceptance/phase3-p310-gate-audit-20261026.json",
@@ -1800,7 +1800,14 @@
         ".github/workflows/phase4-p403-linux-recovery.yml",
         "scripts/phase4-p403-linux-runner.sh",
         "scripts/phase4-p403-finalize-linux-run.sh",
-        "outputs/acceptance/phase4-p403-verification-20261027.json"
+        "outputs/acceptance/phase4-p403-verification-20261027.json",
+        "outputs/acceptance/phase4-p403-linux-execution-manifest-20261027-v2.json",
+        "outputs/acceptance/phase4-p403-validation-local-20261027-v2.json",
+        "outputs/acceptance/phase4-p403-executor-validation-local-20261027-v2.json",
+        "outputs/acceptance/phase4-p403-worker-images-local-20261027-v2.json",
+        "outputs/acceptance/phase4-p403-linux-workers-local-20261027-v2.json",
+        "outputs/acceptance/phase4-p403-linux-admission-local-20261027-v2.json",
+        "outputs/acceptance/phase4-p403-verification-local-20261027-v2.json"
       ],
       "plan_path": "docs/plans/2026-10-26-phase-4-behavior-readiness.md"
     },

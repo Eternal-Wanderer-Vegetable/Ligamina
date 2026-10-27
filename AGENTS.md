@@ -31,7 +31,7 @@ Ligamina 是独立的插件联邦运行时与兼容性实验室：Rust Core + �
 | CLI/实验报告输出或 README 结果展示 | [输出规范](docs/guides/reporting.md) |
 | 第二阶段实施与任务验收 | [第二阶段计划](docs/plans/2026-10-12-phase-2-full-catalog.md) |
 | 第三阶段自动化、补测与行为检测 | [第三阶段方案](docs/plans/2026-10-20-phase-3-automation.md)；实施前按任务表检查依赖和准入条件 |
-| 第四阶段可执行 Fixture、行为验收、unknown 恢复或运行就绪 | [第四阶段计划](docs/plans/2026-10-26-phase-4-behavior-readiness.md)；按任务表区分工程依赖与运行准入，下一项 P4-02（P4-01 已完成，限定首波范围） |
+| 第四阶段可执行 Fixture、行为验收、unknown 恢复或运行就绪 | [第四阶段计划](docs/plans/2026-10-26-phase-4-behavior-readiness.md)；按任务表区分工程依赖与运行准入，当前 active task 为 P4-03 / feat-028，先完成受保护 runner 验收与 39 项 Linux recovery |
 | 修改文档、指令、状态或历史索引 | [文档维护](docs/guides/documentation.md) |
 | 查第一阶段过程与旧裁决 | [证据索引](docs/evidence/README.md)；只加载相关记录 |
 

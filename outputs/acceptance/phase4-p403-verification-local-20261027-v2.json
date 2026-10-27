@@ -1,0 +1,115 @@
+{
+  "schema_version": 1,
+  "kind": "phase4_p403_local_readiness_validation",
+  "date": "2026-10-27",
+  "repository": "Eternal-Wanderer-Vegetable/Ligamina",
+  "branch": "codex/phase4-p403-image-source-binding",
+  "base_commit": "a038ce793d05aba4c95d089dae734b12390326e3",
+  "plugin_execution": "not_started",
+  "runner_deployment": "pending",
+  "checks": [
+    {
+      "name": "p403_unit_tests",
+      "command": "UV_PROJECT_ENVIRONMENT=/home/vegetable/ligamina-p402-control-venv uv run --locked --offline --project lab --python 3.12.14 python -m unittest lab.tests.test_automation_phase4_p403 -v",
+      "exit_code": 0,
+      "passed": 9,
+      "failed": 0
+    },
+    {
+      "name": "workflow_static_tests",
+      "command": "node --test scripts/phase3-workflows.test.mjs",
+      "exit_code": 0,
+      "passed": 5,
+      "failed": 0
+    },
+    {
+      "name": "bash_syntax",
+      "command": "bash -n scripts/phase4-p403-linux-runner.sh scripts/phase4-p403-finalize-linux-run.sh scripts/phase4-p403-runner-self-test.sh",
+      "exit_code": 0
+    },
+    {
+      "name": "docs",
+      "command": "bash init.sh docs",
+      "exit_code": 0,
+      "documents": 20,
+      "local_links": 434,
+      "indexed_historical_markdown": 12,
+      "features": 31
+    },
+    {
+      "name": "harness",
+      "command": "node .agents/skills/harness-creator/scripts/validate-harness.mjs --target . --json",
+      "exit_code": 0,
+      "score": 100
+    },
+    {
+      "name": "readme_evidence_check",
+      "command": "node scripts/render-readme.mjs --check",
+      "exit_code": 0
+    },
+    {
+      "name": "git_diff_check",
+      "command": "git diff --check",
+      "exit_code": 0
+    }
+  ],
+  "parent_manifest": {
+    "path": "outputs/acceptance/phase4-p403-recovery-manifest-20261027.json",
+    "canonical_sha256": "6097a58a2a058fd06d1f65edbea83a47aa8f3d07b31e7c8b679a6313bd51bd97",
+    "file_sha256": "523272f94689f82ae85204974d52645f0327b3d2d0474aa8ae986652ef2bd7af",
+    "status": "valid",
+    "total": 53,
+    "by_cohort": {
+      "linux": 39,
+      "windows_pilot": 10,
+      "windows_preparation": 4
+    },
+    "sidecar_valid": true
+  },
+  "executor_manifest": {
+    "path": "outputs/acceptance/phase4-p403-linux-execution-manifest-20261027-v2.json",
+    "canonical_sha256": "f3793ae3aef3edc2768cf6b0788e83f78e975d541123d7369a0da022491e9c93",
+    "file_sha256": "3c8d6a70640414653925cea76e828723a07f31a9e7602fece36e7c57fecd5950",
+    "status": "valid",
+    "selected_units": 39,
+    "sidecar_valid": true
+  },
+  "worker_images": {
+    "path": "outputs/acceptance/phase4-p403-worker-images-local-20261027-v2.json",
+    "status": "passed",
+    "file_sha256": "d43dd7d8584adcce03d0475342e543ff513a09a106393aec079deb84d10bc295",
+    "sidecar_valid": true
+  },
+  "local_benign_preflight": {
+    "path": "outputs/acceptance/phase4-p403-linux-workers-local-20261027-v2.json",
+    "report_passed": true,
+    "total_cases": 10,
+    "expected_status_counts": {
+      "passed": 5,
+      "failed": 1,
+      "unknown": 4
+    },
+    "cleanup_confirmed": 10,
+    "admission": "admitted",
+    "environment_fingerprint": "e60d2c155d83e023e757fae843c1efb52180bba79ae1b2486988883d512c01cf",
+    "file_sha256": "6f1706ea1766202c5cf26cf02bc9042de2d908d7f6749ff8e68965c2e7dcad50",
+    "sidecar_valid": true,
+    "admission_file_sha256": "c92eb03f5d732895ebbf9ca33a2cf7ecccd68c1f1f11e406af03dd4fba965d0b",
+    "admission_sidecar_valid": true,
+    "report_sidecar_valid": true
+  },
+  "github_preparation": {
+    "self_hosted_runners": 0,
+    "PHASE4_P403_RUNNER_ENABLED": false,
+    "PHASE4_P403_LINUX_RECOVERY_ENABLED": false,
+    "environment": "phase4-p403-linux-controlled",
+    "environment_requires_owner_review": true
+  },
+  "overall": "passed_local_readiness_only",
+  "executor_validation": {
+    "path": "outputs/acceptance/phase4-p403-executor-validation-local-20261027-v2.json",
+    "file_sha256": "c4941db35fedf6d6264bee29d4f7b4e26ba27f9f75b24ec13ec70454b9f45910",
+    "status": "valid",
+    "sidecar_valid": true
+  }
+}
