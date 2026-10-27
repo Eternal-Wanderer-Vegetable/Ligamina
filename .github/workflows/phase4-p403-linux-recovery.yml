@@ -55,9 +55,6 @@ jobs:
     timeout-minutes: 180
     permissions:
       contents: read
-    env:
-      UV_PROJECT_ENVIRONMENT: ${{ runner.temp }}/Ligamina-p403-project-venv-${{ github.run_id }}
-      UV_CACHE_DIR: ${{ runner.temp }}/Ligamina-p403-uv-cache-${{ github.run_id }}
     steps:
       - name: Checkout without persisted credentials
         uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
@@ -79,22 +76,31 @@ jobs:
 
       - name: Install pinned CPython into the disposable runner
         run: uv python install 3.12.14
+        env:
+          UV_CACHE_DIR: ${{ runner.temp }}/Ligamina-p403-uv-cache-${{ github.run_id }}
 
       - name: Run selected P4-03 runner mode
         if: needs.dispatch-guard.outputs.mode == 'linux_unknown_recovery'
         run: bash scripts/phase4-p403-linux-runner.sh
         env:
           P4_P403_MODE: ${{ needs.dispatch-guard.outputs.mode }}
+          UV_PROJECT_ENVIRONMENT: ${{ runner.temp }}/Ligamina-p403-project-venv-${{ github.run_id }}
+          UV_CACHE_DIR: ${{ runner.temp }}/Ligamina-p403-uv-cache-${{ github.run_id }}
 
       - name: Run self-owned runner contract probe
         if: needs.dispatch-guard.outputs.mode != 'linux_unknown_recovery'
         run: bash scripts/phase4-p403-linux-runner.sh
         env:
           P4_P403_MODE: ${{ needs.dispatch-guard.outputs.mode }}
+          UV_PROJECT_ENVIRONMENT: ${{ runner.temp }}/Ligamina-p403-project-venv-${{ github.run_id }}
+          UV_CACHE_DIR: ${{ runner.temp }}/Ligamina-p403-uv-cache-${{ github.run_id }}
 
       - name: Reconcile exact campaign resources and clean per-run runner state
         if: always()
         run: bash scripts/phase4-p403-finalize-linux-run.sh
+        env:
+          UV_PROJECT_ENVIRONMENT: ${{ runner.temp }}/Ligamina-p403-project-venv-${{ github.run_id }}
+          UV_CACHE_DIR: ${{ runner.temp }}/Ligamina-p403-uv-cache-${{ github.run_id }}
 
       - name: Upload P4-03 evidence on success, failure, or cancellation
         if: always()
