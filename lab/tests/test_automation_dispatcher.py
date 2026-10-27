@@ -115,6 +115,7 @@ class AutomationDispatchTests(unittest.TestCase):
         lock = threading.Lock()
         started = threading.Barrier(2)
         calls = 0
+        first_breaker = BackendCircuitBreaker(clock=time.time)
 
         def flaky_execute(job, lost):
             nonlocal calls
@@ -124,10 +125,11 @@ class AutomationDispatchTests(unittest.TestCase):
             started.wait(timeout=2)
             if call_number == 1:
                 return {"status": "unknown", "reason_code": "worker_backend_unavailable", "cleanup_confirmed": True}
-            time.sleep(.02)
+            deadline = time.monotonic() + 2
+            while first_breaker.state != "open" and time.monotonic() < deadline:
+                time.sleep(.001)
             return {"status": "passed", "cleanup_confirmed": True}
 
-        first_breaker = BackendCircuitBreaker(clock=time.time)
         stopped_for_infrastructure = dispatch_until_idle(
             self.queue, "campaign", "workers", flaky_execute, first_breaker,
             worker_count=2, heartbeat_seconds=.01, lease_seconds=2,
