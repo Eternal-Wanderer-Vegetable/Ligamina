@@ -9,14 +9,16 @@ from pathlib import Path
 from lab.automation.phase4_p403 import (
     Phase4P403Error,
     _text_file_sha256_matches,
+    build_p403_linux_executor_manifest,
     reconcile_p403_linux_runner_state,
+    validate_p403_linux_executor_manifest,
     validate_p403_recovery_manifest,
 )
 from lab.automation.selection import ROOT, object_sha256
 
 
 MANIFEST = ROOT / "outputs/acceptance/phase4-p403-recovery-manifest-20261027.json"
-EXECUTOR_MANIFEST = ROOT / "outputs/acceptance/phase4-p403-linux-execution-manifest-20261027.json"
+EXECUTOR_MANIFEST = ROOT / "outputs/acceptance/phase4-p403-linux-execution-manifest-20261027-v3.json"
 
 
 class Phase4P403TextHashTests(unittest.TestCase):
@@ -41,6 +43,47 @@ class Phase4P403RecoveryManifestTests(unittest.TestCase):
         self.assertEqual(report["total"], 53)
         self.assertEqual(report["by_cohort"], {"linux": 39, "windows_pilot": 10, "windows_preparation": 4})
         self.assertEqual(report["linux_unknown_attempts"], 77)
+
+    def test_executor_inherits_images_from_the_verified_p3_linux_run(self) -> None:
+        executor = build_p403_linux_executor_manifest(MANIFEST)
+
+        self.assertEqual(executor["worker_images"], {
+            "nonebot": "ligamina-s205-python-profile@sha256:fcb712608785413b1db90fd2d96031beb1e1a18588b89d6cacdde906ce42ab89",
+            "koishi": "node@sha256:ba849c60be29959425b8734d57b8b4b7d56f98edd9504c9af091d5281095a71e",
+        })
+        self.assertEqual(executor["worker_image_source"], {
+            "manifest_path": "outputs/acceptance/phase3-p305-linux-affected-v3-manifest-20261025.json",
+            "manifest_file_sha256": "91798c872560306155a5e8330067062f95be3f6d7fee6b566156ebc9f9087cbe",
+            "manifest_sha256": "961786350b7c0ebdb990650d051203ad82452fff72ac291402a7f46a517173c8",
+            "report_path": "outputs/acceptance/phase3-p305-linux-affected-v3-execution-resume6-20261025.json",
+            "report_file_sha256": "8b4119e6bc56f2f26f24fc858458aa7c2491f43b0aa42fbc30bc94fe1a19c5f5",
+            "campaign_id": "p3-recovery-linux-842f71712e2c",
+        })
+        self.assertEqual(executor["archive_size_overrides"]["base_artifact_lock_sha256"], "8dcec5da7cd81b9ed7d0f4e8aead8e76ef15cd7e17dfcdc4fa6f7b8944b83d4a")
+        self.assertEqual(len(executor["archive_size_overrides"]["entries"]), 39)
+        self.assertEqual(executor["archive_size_overrides"]["entries"][0]["registry_entry_id"], "ko-0831a0963acd3839ef3cb5f4")
+        self.assertEqual(executor["archive_size_overrides"]["entries"][0]["archive_size_bytes"], 4787)
+        self.assertEqual(executor["expected_units"], 39)
+
+    def test_executor_rejects_stale_worker_image_digest(self) -> None:
+        data = json.loads(EXECUTOR_MANIFEST.read_text(encoding="utf-8"))
+        data["worker_images"]["nonebot"] = "ligamina-s205-python-profile@sha256:88bc85522c681966347809c702e0ae7fcf6fba4d8860161e77d7aa877a04488e"
+        data["manifest_sha256"] = object_sha256({key: value for key, value in data.items() if key != "manifest_sha256"})
+        with tempfile.TemporaryDirectory() as temporary:
+            path = Path(temporary) / "executor.json"
+            path.write_text(json.dumps(data), encoding="utf-8")
+            with self.assertRaisesRegex(Phase4P403Error, "not bound to the verified P3 source run"):
+                validate_p403_linux_executor_manifest(MANIFEST, path)
+
+    def test_executor_rejects_archive_size_override_not_bound_to_p3_evidence(self) -> None:
+        data = json.loads(EXECUTOR_MANIFEST.read_text(encoding="utf-8"))
+        data["archive_size_overrides"]["entries"][0]["archive_size_bytes"] += 1
+        data["manifest_sha256"] = object_sha256({key: value for key, value in data.items() if key != "manifest_sha256"})
+        with tempfile.TemporaryDirectory() as temporary:
+            path = Path(temporary) / "executor.json"
+            path.write_text(json.dumps(data), encoding="utf-8")
+            with self.assertRaisesRegex(Phase4P403Error, "archive sizes are not bound"):
+                validate_p403_linux_executor_manifest(MANIFEST, path)
 
     def test_missing_parent_unknown_cannot_be_rebalanced(self) -> None:
         data = json.loads(MANIFEST.read_text(encoding="utf-8"))

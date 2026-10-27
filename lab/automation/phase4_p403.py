@@ -66,6 +66,149 @@ def _relative(path_value: str) -> Path:
     return path if path.is_absolute() else ROOT / path
 
 
+def _verified_p3_linux_worker_images(
+    parent: dict[str, Any],
+) -> tuple[dict[str, str], dict[str, Any], dict[str, Any]]:
+    sources = [source for source in parent.get("sources", []) if source.get("cohort") == "linux"]
+    if len(sources) != 1:
+        raise Phase4P403Error("P4-03 must bind exactly one P3 Linux recovery source")
+    source = sources[0]
+
+    def verified_repo_file(path_value: Any, expected_sha256: Any, label: str) -> tuple[Path, str]:
+        if not isinstance(path_value, str) or not path_value:
+            raise Phase4P403Error(f"P3 Linux {label} path is missing")
+        if not isinstance(expected_sha256, str) or len(expected_sha256) != 64 or any(
+            char not in "0123456789abcdef" for char in expected_sha256
+        ):
+            raise Phase4P403Error(f"P3 Linux {label} SHA-256 is invalid")
+        path = _relative(path_value).resolve(strict=True)
+        try:
+            relative_path = path.relative_to(ROOT.resolve(strict=True)).as_posix()
+        except ValueError as error:
+            raise Phase4P403Error(f"P3 Linux {label} escapes the repository") from error
+        if not _text_file_sha256_matches(path, expected_sha256):
+            raise Phase4P403Error(f"P3 Linux {label} SHA-256 mismatch: {relative_path}")
+        return path, relative_path
+
+    manifest_path, manifest_relative = verified_repo_file(
+        source.get("manifest_path"), source.get("manifest_file_sha256"), "worker image manifest",
+    )
+    report_path, report_relative = verified_repo_file(
+        source.get("report_path"), source.get("report_file_sha256"), "worker image report",
+    )
+    source_manifest = _json_load(manifest_path)
+    source_report = _json_load(report_path)
+    manifest_sha256 = source.get("manifest_canonical_sha256")
+    if (
+        not isinstance(manifest_sha256, str)
+        or source_manifest.get("manifest_sha256") != manifest_sha256
+        or source_report.get("manifest_sha256") != manifest_sha256
+        or source_report.get("campaign_id") != source_manifest.get("campaign_id")
+        or source_report.get("status") != "completed"
+    ):
+        raise Phase4P403Error("P3 Linux recovery source report is not bound to its completed manifest")
+    try:
+        validate_linux_pilot_manifest(source_manifest)
+    except RecoveryPilotError as error:
+        raise Phase4P403Error(f"P3 Linux recovery source manifest is invalid: {error}") from error
+
+    worker_images = source_manifest.get("worker_images")
+    if not isinstance(worker_images, dict) or set(worker_images) != {"nonebot", "koishi"}:
+        raise Phase4P403Error("P3 Linux recovery manifest must pin both Worker images")
+    inventory = source_report.get("worker_image_inventory")
+    if not isinstance(inventory, list):
+        raise Phase4P403Error("P3 Linux recovery report has no Worker image inventory")
+    inventory_by_ecosystem = {
+        item.get("ecosystem"): item for item in inventory if isinstance(item, dict)
+    }
+    if len(inventory_by_ecosystem) != len(inventory) or set(inventory_by_ecosystem) != set(worker_images):
+        raise Phase4P403Error("P3 Linux recovery Worker image inventory is incomplete or duplicated")
+    for ecosystem, reference in worker_images.items():
+        if not isinstance(reference, str) or "@sha256:" not in reference:
+            raise Phase4P403Error(f"P3 Linux {ecosystem} Worker image is not digest pinned")
+        digest = reference.rsplit("@sha256:", 1)[1]
+        if len(digest) != 64 or any(char not in "0123456789abcdef" for char in digest):
+            raise Phase4P403Error(f"P3 Linux {ecosystem} Worker image digest is invalid")
+        image = inventory_by_ecosystem[ecosystem]
+        if (
+            image.get("status") != "present"
+            or image.get("reference") != reference
+            or image.get("image_id") != f"sha256:{digest}"
+        ):
+            raise Phase4P403Error(f"P3 Linux {ecosystem} Worker image inventory does not match its pinned digest")
+
+    artifact_lock_path = ROOT / "catalogs/p2-41649744e057d61031d5/artifacts.lock.json"
+    artifact_lock = _json_load(artifact_lock_path)
+    artifact_lock_sha256 = _file_sha256(artifact_lock_path)
+    source_identity = source_manifest.get("source_identity", {})
+    override_contract = source_manifest.get("archive_size_overrides")
+    override_rows = override_contract.get("entries") if isinstance(override_contract, dict) else None
+    source_selection = {
+        row["identity"]["registry_entry_id"]: row for row in source_manifest.get("selection", [])
+        if isinstance(row, dict) and isinstance(row.get("identity"), dict)
+    }
+    overrides_by_id = {
+        row.get("registry_entry_id"): row for row in override_rows if isinstance(row, dict)
+    } if isinstance(override_rows, list) else {}
+    if (
+        not isinstance(override_contract, dict)
+        or override_contract.get("schema_version") != 1
+        or override_contract.get("base_artifact_lock_sha256") != artifact_lock_sha256
+        or source_identity.get("artifact_lock_sha256") != artifact_lock_sha256
+        or not isinstance(override_rows, list)
+        or len(overrides_by_id) != len(override_rows)
+        or set(overrides_by_id) != set(source_selection)
+    ):
+        raise Phase4P403Error("P3 Linux recovery archive-size overrides are not bound to the frozen artifact lock and selection")
+    locked_artifacts = {row["registry_entry_id"]: row for row in artifact_lock.get("entries", [])}
+    parent_linux_ids = {
+        row["registry_entry_id"] for row in parent.get("rows", []) if row.get("cohort") == "linux"
+    }
+    p3_overrides = []
+    for entry_id in sorted(parent_linux_ids):
+        selection = source_selection.get(entry_id)
+        override = overrides_by_id.get(entry_id)
+        if selection is None or override is None:
+            raise Phase4P403Error(f"P3 Linux archive-size override is missing for P4 parent {entry_id}")
+        identity = selection["identity"]
+        artifact_entry = locked_artifacts.get(entry_id, {})
+        artifact_platform = "all" if identity.get("ecosystem") == "koishi" else "linux-x86_64"
+        artifact_record = next(
+            (item for item in artifact_entry.get("artifacts", []) if item.get("platform") == artifact_platform), {},
+        )
+        artifact = artifact_record.get("artifact") or {}
+        cache_path = artifact.get("cache_path")
+        metadata_size = artifact.get("size_bytes")
+        if (
+            identity.get("artifact_sha256") != artifact.get("computed_digests", {}).get("sha256")
+            or override.get("artifact_sha256") != identity.get("artifact_sha256")
+            or override.get("cache_path") != cache_path
+            or override.get("metadata_size_bytes") != metadata_size
+            or not isinstance(cache_path, str)
+            or Path(cache_path).is_absolute()
+            or ".." in Path(cache_path).parts
+            or not isinstance(override.get("archive_size_bytes"), int)
+            or override["archive_size_bytes"] < 1
+        ):
+            raise Phase4P403Error(f"P3 Linux archive-size override does not match frozen artifact identity for {entry_id}")
+        p3_overrides.append(dict(override))
+
+    binding = {
+        "manifest_path": manifest_relative,
+        "manifest_file_sha256": source["manifest_file_sha256"],
+        "manifest_sha256": manifest_sha256,
+        "report_path": report_relative,
+        "report_file_sha256": source["report_file_sha256"],
+        "campaign_id": source_report["campaign_id"],
+    }
+    p4_archive_size_overrides = {
+        "schema_version": 1,
+        "base_artifact_lock_sha256": artifact_lock_sha256,
+        "entries": p3_overrides,
+    }
+    return dict(worker_images), binding, p4_archive_size_overrides
+
+
 def _closure_sources(closure: dict[str, Any]) -> dict[str, dict[str, Any]]:
     campaign_for = {"linux": "linux", "windows_pilot": "pilot", "windows_preparation": "nonebot"}
     result: dict[str, dict[str, Any]] = {}
@@ -290,11 +433,13 @@ def build_p403_linux_executor_manifest(
     source_manifest_path = _relative(source_info.get("source_manifest_path", ""))
     if _file_sha256(source_manifest_path) != source_info.get("source_manifest_file_sha256"):
         raise Phase4P403Error("P3-01 recovery source manifest hash mismatch")
+    worker_images, worker_image_source, archive_size_overrides = _verified_p3_linux_worker_images(parent)
     base = build_linux_pilot_manifest(
         source_manifest_path,
         snapshot_dir=snapshot_dir,
         reports_dir=reports_dir,
         worker_policy_id=worker_policy_id,
+        worker_images=worker_images,
         worker_timeout_seconds=worker_timeout_seconds,
         probe_semantics_version=3,
         selection_scope="affected-linux",
@@ -336,6 +481,8 @@ def build_p403_linux_executor_manifest(
             "closure_file_sha256": parent["parent_closure"]["file_sha256"],
             "expected_linux_parent_count": 39,
         },
+        "worker_image_source": worker_image_source,
+        "archive_size_overrides": archive_size_overrides,
     })
     seed = object_sha256(core)
     executor_manifest = {"campaign_id": f"p4-p403-linux-{seed[:12]}", **core}
@@ -357,6 +504,13 @@ def validate_p403_linux_executor_manifest(parent_manifest_path: Path, executor_m
         low_level = validate_linux_pilot_manifest(executor)
     except RecoveryPilotError as error:
         raise Phase4P403Error(f"invalid P4-03 Linux executor manifest: {error}") from error
+    worker_images, worker_image_source, archive_size_overrides = _verified_p3_linux_worker_images(parent)
+    if (
+        executor.get("worker_images") != worker_images
+        or executor.get("worker_image_source") != worker_image_source
+        or executor.get("archive_size_overrides") != archive_size_overrides
+    ):
+        raise Phase4P403Error("P4-03 Linux executor Worker images or archive sizes are not bound to the verified P3 source run")
     parent_binding = executor.get("phase4_parent_manifest", {})
     if (
         parent_binding.get("file_sha256") != parent_validation["manifest_file_sha256"]
