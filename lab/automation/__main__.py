@@ -26,6 +26,7 @@ from .phase4_p402_campaign import execute_phase4_p402_campaign, write_phase4_p40
 from .phase4_p403 import (
     Phase4P403Error,
     build_p403_linux_executor_manifest,
+    build_p403_linux_remaining_executor_manifest,
     execute_p403_linux_recovery,
     reconcile_p403_linux_runner_state,
     validate_p403_linux_executor_manifest,
@@ -140,6 +141,12 @@ def main(argv: list[str] | None = None) -> int:
     p403_plan.add_argument("--reports", type=Path, default=ROOT / "outputs/acceptance")
     p403_plan.add_argument("--worker-timeout-seconds", type=int, default=240)
     p403_plan.add_argument("--output", type=Path, required=True)
+    p403_plan_remaining = commands.add_parser("plan-p403-linux-not-run", help="freeze only the parent identities not attempted by a hash-bound interrupted P4-03 campaign")
+    p403_plan_remaining.add_argument("--manifest", type=Path, required=True)
+    p403_plan_remaining.add_argument("--executor-manifest", type=Path, required=True)
+    p403_plan_remaining.add_argument("--previous-report", type=Path, required=True)
+    p403_plan_remaining.add_argument("--previous-controlled-report", type=Path, required=True)
+    p403_plan_remaining.add_argument("--output", type=Path, required=True)
     p403_validate_executor = commands.add_parser("validate-p403-linux-executor", help="verify a P4-03 Linux execution manifest is bound to all 39 parent rows")
     p403_validate_executor.add_argument("--manifest", type=Path, required=True)
     p403_validate_executor.add_argument("--executor-manifest", type=Path, required=True)
@@ -329,6 +336,15 @@ def main(argv: list[str] | None = None) -> int:
             executor_manifest = build_p403_linux_executor_manifest(
                 options.manifest, snapshot_dir=options.snapshot, reports_dir=options.reports,
                 worker_timeout_seconds=options.worker_timeout_seconds,
+            )
+            _write_json_with_sha(options.output, executor_manifest)
+            validation = validate_p403_linux_executor_manifest(options.manifest, options.output)
+            print(json.dumps({**validation, "output": str(options.output.resolve()), "campaign_id": executor_manifest["campaign_id"]}, ensure_ascii=False))
+            return 0
+        if options.command == "plan-p403-linux-not-run":
+            executor_manifest = build_p403_linux_remaining_executor_manifest(
+                options.manifest, options.executor_manifest, options.previous_report,
+                options.previous_controlled_report,
             )
             _write_json_with_sha(options.output, executor_manifest)
             validation = validate_p403_linux_executor_manifest(options.manifest, options.output)

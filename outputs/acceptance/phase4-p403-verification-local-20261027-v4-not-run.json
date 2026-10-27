@@ -1,0 +1,97 @@
+{
+  "schema_version": 1,
+  "kind": "phase4_p403_local_verification",
+  "date": "2026-10-27",
+  "status": "passed_local_readiness_only",
+  "branch": "codex/p403-runner-evidence-followup",
+  "base_head": "aecb55dabbf4bb2a349b60cda3a3ef37d189dd82",
+  "campaign_id": "p4-p403-linux-remaining-16652ce93b5d",
+  "executor_manifest_sha256": "8b458f0ed4607170dbb69ce592234f45ff07780f618be5c0e5c6319f0e7df9b0",
+  "executor_manifest_file_sha256": "06b6b7f11df2bbbd361a49bd0ca191aae6c6defe2f0c6ec1e5ea6a31b120dd39",
+  "selected_units": 25,
+  "checks": [
+    {
+      "name": "phase4-p403-focused-unit-tests",
+      "command": "UV_PROJECT_ENVIRONMENT=/tmp/Ligamina-p403-impl-venv-20261027 UV_CACHE_DIR=/home/vegetable/.cache/uv uv run --locked --project lab --python 3.12.14 python -m unittest lab.tests.test_automation_phase4_p403 -v",
+      "status": "passed",
+      "tests": 14,
+      "passed": 14
+    },
+    {
+      "name": "workflow-static-tests",
+      "command": "node --test scripts/phase3-workflows.test.mjs",
+      "status": "passed",
+      "tests": 5,
+      "passed": 5
+    },
+    {
+      "name": "runner-shell-syntax",
+      "command": "bash -n scripts/phase4-p403-linux-runner.sh scripts/phase4-p403-finalize-linux-run.sh",
+      "status": "passed"
+    },
+    {
+      "name": "executor-binding-validation",
+      "command": "python -m lab.automation validate-p403-linux-executor --manifest outputs/acceptance/phase4-p403-recovery-manifest-20261027.json --executor-manifest outputs/acceptance/phase4-p403-linux-execution-manifest-20261027-v4-not-run.json --output outputs/acceptance/phase4-p403-executor-validation-local-20261027-v4-not-run.json",
+      "status": "valid",
+      "selected_units": 25
+    },
+    {
+      "name": "locked-input-cache-preflight",
+      "command": "_locked_input_inventory against v4 selection, frozen catalog locks, archive-size overrides, and local content-addressed cache",
+      "status": "ready",
+      "ready_units": 25,
+      "expected_units": 25
+    },
+    {
+      "name": "documentation-gate",
+      "command": "pwsh -NoProfile -File init.ps1 -Mode docs",
+      "status": "passed",
+      "documents": 20,
+      "local_links": 450,
+      "indexed_historical_markdown": 12,
+      "features": 31
+    },
+    {
+      "name": "readme-evidence",
+      "command": "node scripts/render-readme.mjs --check",
+      "status": "passed"
+    },
+    {
+      "name": "harness-validation",
+      "command": "node .agents/skills/harness-creator/scripts/validate-harness.mjs --target .",
+      "status": "passed",
+      "score": 100
+    },
+    {
+      "name": "git-diff-check",
+      "command": "git diff --check",
+      "status": "passed"
+    }
+  ],
+  "source_evidence_sha256": {
+    "outputs/acceptance/phase4-p403-recovery-manifest-20261027.json": "523272f94689f82ae85204974d52645f0327b3d2d0474aa8ae986652ef2bd7af",
+    "outputs/acceptance/phase4-p403-linux-execution-manifest-20261027-v3.json": "dfaa0df6b69209fa62d0d0867b7e4075c521fa60a1139fed4437c1f29681e253",
+    "outputs/acceptance/phase4-p403-linux-execution-manifest-20261027-v4-not-run.json": "06b6b7f11df2bbbd361a49bd0ca191aae6c6defe2f0c6ec1e5ea6a31b120dd39",
+    "outputs/acceptance/phase4-p403-linux-execution-manifest-20261027-v4-not-run.json.sha256": "8cd1a20056d65e9387a9333db9adce88ea7047395b0cf05469bd6941bdae55df",
+    "outputs/acceptance/phase4-p403-linux-controlled-run-40479738802.json": "6bf2076224f7e445c51160f1d513e67ea1604fd9f7469db9681abe3c2199f5df",
+    "outputs/acceptance/phase4-p403-linux-recovery-run-40479738802.json": "87256bf520ec8a9267a6e71e8b37aa4cc1412b7a0b521690f6a3a36d9c1c0f2b",
+    "outputs/acceptance/phase4-p403-executor-validation-local-20261027-v4-not-run.json": "b1b29bdd7cb1acbe7a38d128aeae576f2400fab73cb166182f13885b56b1c2a3",
+    "outputs/acceptance/phase4-p403-cache-preflight-local-20261027-v4-not-run.json": "b9c180786b28436d3d853f1586c0c7e1fd7f93c0c2d7611bc14529620ac3ea4b",
+    "outputs/acceptance/phase4-p403-cache-preflight-local-20261027-v4-not-run.json.sha256": "9542842e6b8877acf089a2393f2ec0c956a86346f9b42ea4c038b75af5858e24"
+  },
+  "plugin_execution": "not_started",
+  "hosted_ci": "pending",
+  "remaining_recovery": "not_dispatched",
+  "gate": "blocked_pending_25_item_linux_recovery_unknown_resolution_and_windows_admission",
+  "implementation_file_sha256": {
+    ".github/workflows/phase4-p403-linux-recovery.yml": "23f47e95a936dba3146b8d4878feb33703e914fa821a12dc2f282845bc379b5b",
+    "lab/automation/__main__.py": "b709ae0c1c9f4b54c89ee28816c13f500319b5366bae8867a3afe056a831e746",
+    "lab/automation/phase4_p403.py": "87debb86a148066d737c4eeced29398be3b3fb550b8926e281e7642ceb3d6a6d",
+    "lab/tests/test_automation_phase4_p403.py": "34eb934db0428a2655cea53390ebd7335a85765507440e96b33d037b62ae0b9e",
+    "scripts/phase3-workflows.test.mjs": "f4fbdd5f4239349c22011b5de974dca2216099a9689ee8aa6b9bbe1f74a2a6f5",
+    "scripts/phase4-p403-finalize-linux-run.sh": "9f49868241590a2d54524e2a6804630f9f03bf04fcfbfeec10b14de2fb2692aa",
+    "scripts/phase4-p403-linux-runner.sh": "bfb3ada42f02eaa4da817799d7ccdb2691ad884396fb5cd6e21be3980e40e5b7",
+    "README.md": "423387b2b031d7b8dce6ef3c1d55ef4c86618bff2ecfa979cea2c29980472733",
+    "feature_list.json": "659ce61e74972863a5cfa489a587c77a0a35acf5b5592738446f0f7cf9c6e8a0"
+  }
+}

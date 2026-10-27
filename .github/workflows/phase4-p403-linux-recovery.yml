@@ -4,13 +4,14 @@ on:
   workflow_dispatch:
     inputs:
       mode:
-        description: Run self-owned runner success/failure/cancellation contract checks before enabling plugin recovery.
+        description: Run self-owned runner contract checks or one frozen Linux recovery selection.
         type: choice
         options:
           - runner_contract_success
           - runner_contract_failure
           - runner_contract_cancel
           - linux_unknown_recovery
+          - linux_unknown_recovery_remaining
         default: runner_contract_success
         required: true
 
@@ -37,7 +38,7 @@ jobs:
           github.event.repository.fork == false &&
           github.ref == format('refs/heads/{0}', github.event.repository.default_branch) &&
           vars.PHASE4_P403_RUNNER_ENABLED == 'true' &&
-          (github.event.inputs.mode != 'linux_unknown_recovery' || vars.PHASE4_P403_LINUX_RECOVERY_ENABLED == 'true')
+          ((github.event.inputs.mode != 'linux_unknown_recovery' && github.event.inputs.mode != 'linux_unknown_recovery_remaining') || vars.PHASE4_P403_LINUX_RECOVERY_ENABLED == 'true')
         run: |
           echo "eligible=true" >> "$GITHUB_OUTPUT"
           echo "mode=${{ inputs.mode }}" >> "$GITHUB_OUTPUT"
@@ -80,7 +81,7 @@ jobs:
           UV_CACHE_DIR: ${{ runner.temp }}/Ligamina-p403-uv-cache-${{ github.run_id }}
 
       - name: Run selected P4-03 runner mode
-        if: needs.dispatch-guard.outputs.mode == 'linux_unknown_recovery'
+        if: needs.dispatch-guard.outputs.mode == 'linux_unknown_recovery' || needs.dispatch-guard.outputs.mode == 'linux_unknown_recovery_remaining'
         run: bash scripts/phase4-p403-linux-runner.sh
         env:
           P4_P403_MODE: ${{ needs.dispatch-guard.outputs.mode }}
@@ -88,7 +89,7 @@ jobs:
           UV_CACHE_DIR: ${{ runner.temp }}/Ligamina-p403-uv-cache-${{ github.run_id }}
 
       - name: Run self-owned runner contract probe
-        if: needs.dispatch-guard.outputs.mode != 'linux_unknown_recovery'
+        if: needs.dispatch-guard.outputs.mode != 'linux_unknown_recovery' && needs.dispatch-guard.outputs.mode != 'linux_unknown_recovery_remaining'
         run: bash scripts/phase4-p403-linux-runner.sh
         env:
           P4_P403_MODE: ${{ needs.dispatch-guard.outputs.mode }}
@@ -118,6 +119,8 @@ jobs:
             outputs/acceptance/phase4-p403-outer-cleanup-run-${{ github.run_id }}.json.sha256
             outputs/acceptance/phase4-p403-linux-execution-manifest-20261027-v3.json
             outputs/acceptance/phase4-p403-linux-execution-manifest-20261027-v3.json.sha256
+            outputs/acceptance/phase4-p403-linux-execution-manifest-20261027-v4-not-run.json
+            outputs/acceptance/phase4-p403-linux-execution-manifest-20261027-v4-not-run.json.sha256
             outputs/acceptance/phase4-p403-runner-state-run-${{ github.run_id }}.tar.gz
             outputs/acceptance/phase4-p403-runner-self-test-run-${{ github.run_id }}.json
             ${{ runner.temp }}/Ligamina-p403-evidence-${{ github.run_id }}/**/*

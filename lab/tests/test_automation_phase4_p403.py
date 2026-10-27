@@ -8,8 +8,10 @@ from pathlib import Path
 
 from lab.automation.phase4_p403 import (
     Phase4P403Error,
+    _seal_p403_recovery_report,
     _text_file_sha256_matches,
     build_p403_linux_executor_manifest,
+    build_p403_linux_remaining_executor_manifest,
     reconcile_p403_linux_runner_state,
     validate_p403_linux_executor_manifest,
     validate_p403_recovery_manifest,
@@ -19,6 +21,9 @@ from lab.automation.selection import ROOT, object_sha256
 
 MANIFEST = ROOT / "outputs/acceptance/phase4-p403-recovery-manifest-20261027.json"
 EXECUTOR_MANIFEST = ROOT / "outputs/acceptance/phase4-p403-linux-execution-manifest-20261027-v3.json"
+REMAINING_EXECUTOR_MANIFEST = ROOT / "outputs/acceptance/phase4-p403-linux-execution-manifest-20261027-v4-not-run.json"
+INTERRUPTED_REPORT = ROOT / "outputs/acceptance/phase4-p403-linux-recovery-run-40479738802.json"
+INTERRUPTED_CONTROLLED_REPORT = ROOT / "outputs/acceptance/phase4-p403-linux-controlled-run-40479738802.json"
 
 
 class Phase4P403TextHashTests(unittest.TestCase):
@@ -33,6 +38,11 @@ class Phase4P403TextHashTests(unittest.TestCase):
 
             path.write_bytes(b'{"evidence":"changed"}\n')
             self.assertFalse(_text_file_sha256_matches(path, crlf_digest))
+
+    def test_recovery_report_seal_excludes_a_stale_embedded_digest(self) -> None:
+        report = {"kind": "phase4_p403_linux_unknown_recovery", "report_sha256": "stale"}
+        _seal_p403_recovery_report(report)
+        self.assertEqual(report["report_sha256"], object_sha256({"kind": report["kind"]}))
 
 
 class Phase4P403RecoveryManifestTests(unittest.TestCase):
@@ -127,6 +137,129 @@ class Phase4P403RecoveryManifestTests(unittest.TestCase):
             path.write_text(json.dumps(data), encoding="utf-8")
             with self.assertRaisesRegex(Phase4P403Error, "retry budget/status invalid"):
                 validate_p403_recovery_manifest(path)
+
+    def test_remaining_executor_selects_only_prior_not_run_identities(self) -> None:
+        prior_report = json.loads(INTERRUPTED_REPORT.read_text(encoding="utf-8"))
+        expected_not_run = {
+            row["registry_entry_id"]
+            for row in prior_report["plugin_reports"]
+            if row["recovery_status"] == "not_run"
+        }
+        previously_attempted = {
+            row["registry_entry_id"]
+            for row in prior_report["plugin_reports"]
+            if row["attempts"]
+        }
+
+        executor = build_p403_linux_remaining_executor_manifest(
+            MANIFEST, EXECUTOR_MANIFEST, INTERRUPTED_REPORT, INTERRUPTED_CONTROLLED_REPORT,
+        )
+        selected = {row["identity"]["registry_entry_id"] for row in executor["selection"]}
+        self.assertEqual(len(expected_not_run), 25)
+        self.assertEqual(len(previously_attempted), 14)
+        self.assertEqual(selected, expected_not_run)
+        self.assertFalse(selected & previously_attempted)
+        self.assertEqual(executor["expected_units"], 25)
+        self.assertEqual(executor["phase4_previous_recovery"]["campaign_id"], "p4-p403-linux-1932fab55a8b")
+        self.assertEqual(executor["phase4_previous_recovery"]["not_run_parent_count"], 25)
+        self.assertEqual(executor["phase4_previous_recovery"]["run_id"], "40479738802")
+
+        with tempfile.TemporaryDirectory() as temporary:
+            path = Path(temporary) / "remaining-executor.json"
+            path.write_text(json.dumps(executor), encoding="utf-8")
+            validation = validate_p403_linux_executor_manifest(MANIFEST, path)
+        self.assertEqual(validation["status"], "valid")
+        self.assertEqual(validation["selected_units"], 25)
+        self.assertEqual(
+            validation["previous_recovery_report_file_sha256"],
+            executor["phase4_previous_recovery"]["report_file_sha256"],
+        )
+
+    def test_remaining_executor_rejects_previous_not_run_set_replacement(self) -> None:
+        executor = build_p403_linux_remaining_executor_manifest(
+            MANIFEST, EXECUTOR_MANIFEST, INTERRUPTED_REPORT, INTERRUPTED_CONTROLLED_REPORT,
+        )
+        executor["phase4_previous_recovery"]["not_run_parent_ids_sha256"] = "0" * 64
+        executor["manifest_sha256"] = object_sha256({key: value for key, value in executor.items() if key != "manifest_sha256"})
+        with tempfile.TemporaryDirectory() as temporary:
+            path = Path(temporary) / "remaining-executor.json"
+            path.write_text(json.dumps(executor), encoding="utf-8")
+            with self.assertRaisesRegex(Phase4P403Error, "does not exactly match the prior not_run identities"):
+                validate_p403_linux_executor_manifest(MANIFEST, path)
+
+    def test_remaining_executor_can_continue_a_later_interrupted_selection(self) -> None:
+        parent = json.loads(MANIFEST.read_text(encoding="utf-8"))
+        remaining_executor = json.loads(REMAINING_EXECUTOR_MANIFEST.read_text(encoding="utf-8"))
+        source_report = json.loads(INTERRUPTED_REPORT.read_text(encoding="utf-8"))
+        selected_ids = {
+            row["identity"]["registry_entry_id"]
+            for row in remaining_executor["selection"]
+        }
+        report_rows = [
+            json.loads(json.dumps(row))
+            for row in source_report["plugin_reports"]
+            if row["registry_entry_id"] in selected_ids
+        ]
+        for row in report_rows:
+            row["recovery_status"] = "not_run"
+            row["attempts"] = []
+        report = {
+            "schema_version": 1,
+            "kind": "phase4_p403_linux_unknown_recovery",
+            "status": "interrupted",
+            "queue_state": "interrupted",
+            "campaign_id": remaining_executor["campaign_id"],
+            "manifest_sha256": remaining_executor["manifest_sha256"],
+            "phase4_parent_manifest_sha256": remaining_executor["phase4_parent_manifest"]["manifest_sha256"],
+            "phase4_executor_manifest_sha256": remaining_executor["manifest_sha256"],
+            "parent_unknown_count": 39,
+            "selected_parent_count": len(selected_ids),
+            "denominator": {"expected_units": len(selected_ids)},
+            "counts": {
+                "recovered": 0,
+                "plugin_or_stage_failed": 0,
+                "unknown_or_cleanup_unconfirmed": 0,
+                "not_run": len(selected_ids),
+            },
+            "plugin_reports": report_rows,
+        }
+        _seal_p403_recovery_report(report)
+        executor_relative = REMAINING_EXECUTOR_MANIFEST.relative_to(ROOT).as_posix()
+
+        with tempfile.TemporaryDirectory(dir=ROOT, prefix=".p403-recursive-") as temporary:
+            temporary_path = Path(temporary)
+            report_path = temporary_path / "recovery.json"
+            controlled_path = temporary_path / "controlled.json"
+            report_path.write_text(json.dumps(report, ensure_ascii=False), encoding="utf-8")
+            report_relative = report_path.relative_to(ROOT).as_posix()
+            controlled = {
+                "schema_version": 1,
+                "kind": "phase4_p403_controlled_run",
+                "mode": "linux_unknown_recovery_remaining",
+                "status": "blocked",
+                "exit_code": 3,
+                "plugin_execution": "dispatched",
+                "run_id": "synthetic-later-interruption",
+                "evidence_sha256": {
+                    report_relative: hashlib.sha256(report_path.read_bytes()).hexdigest(),
+                    executor_relative: hashlib.sha256(REMAINING_EXECUTOR_MANIFEST.read_bytes()).hexdigest(),
+                },
+            }
+            controlled_path.write_text(json.dumps(controlled, ensure_ascii=False), encoding="utf-8")
+            next_executor = build_p403_linux_remaining_executor_manifest(
+                MANIFEST, REMAINING_EXECUTOR_MANIFEST, report_path, controlled_path,
+            )
+            next_path = temporary_path / "next-executor.json"
+            next_path.write_text(json.dumps(next_executor), encoding="utf-8")
+            validation = validate_p403_linux_executor_manifest(MANIFEST, next_path)
+
+        self.assertEqual(validation["status"], "valid")
+        self.assertEqual(validation["selected_units"], 25)
+        self.assertNotEqual(next_executor["campaign_id"], remaining_executor["campaign_id"])
+        self.assertEqual(
+            {row["identity"]["registry_entry_id"] for row in next_executor["selection"]},
+            selected_ids,
+        )
 
     def test_outer_reconciliation_is_not_applicable_without_a_claimed_queue(self) -> None:
         with tempfile.TemporaryDirectory() as temporary:

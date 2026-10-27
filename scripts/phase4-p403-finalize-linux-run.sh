@@ -8,6 +8,9 @@ cd "$repo_root"
 run_id="${GITHUB_RUN_ID:?GITHUB_RUN_ID is required}"
 manifest="outputs/acceptance/phase4-p403-recovery-manifest-20261027.json"
 executor_manifest="outputs/acceptance/phase4-p403-linux-execution-manifest-20261027-v3.json"
+if [[ "${P4_P403_MODE:-}" == "linux_unknown_recovery_remaining" ]]; then
+  executor_manifest="outputs/acceptance/phase4-p403-linux-execution-manifest-20261027-v4-not-run.json"
+fi
 cleanup_report="outputs/acceptance/phase4-p403-docker-cleanup-run-${run_id}.json"
 queue_root="${RUNNER_TEMP:?RUNNER_TEMP is required}/Ligamina-p403-queue-${run_id}"
 evidence_root="${RUNNER_TEMP}/Ligamina-p403-evidence-${run_id}"

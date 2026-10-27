@@ -112,7 +112,7 @@ P3-08 双平台行为账本：120 个位置、360 个三次尝试槽，实际派
 Windows 结果仅适用于已记录的 Evaluation/Audit Mode Worker profile；没有强制模式、全目录行为兼容或真实平台投递结论。
 <!-- ligamina:phase3:end -->
 
-第四阶段按[行为兼容与运行就绪计划](docs/plans/2026-10-26-phase-4-behavior-readiness.md)推进：P4-01 executable Host Fixture 与 P4-02 Linux scoped engineering deliverables 已完成；P4-03 的受控 runner success/failure/cancel 合同 probes 已通过，39 项 Linux unknown recovery run `40479738802` 已通过 dispatch guard，等待 protected Environment owner approval。P4-02 完整行为 gate 仍未通过；Windows Enforcement、真实平台和候选发行验收仍未完成。
+第四阶段按[行为兼容与运行就绪计划](docs/plans/2026-10-26-phase-4-behavior-readiness.md)推进：P4-01 executable Host Fixture 与 P4-02 Linux scoped engineering deliverables 已完成；P4-03 的受控 runner success/failure/cancel 合同 probes 已通过。Linux recovery run `40479738802` 失败中断，3/39 recovered、11 unknown、25 not_run；v4 已冻结仅含 25 个未尝试身份的新 campaign，等待 CI 后再派发。P4-02 完整行为 gate 仍未通过；Windows Enforcement、真实平台和候选发行验收仍未完成。
 
 状态见 [功能清单](feature_list.json)、[当前进展](progress.md) 和 [会话交接](session-handoff.md)。
 
