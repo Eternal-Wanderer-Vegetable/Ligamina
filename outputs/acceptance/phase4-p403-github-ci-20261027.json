@@ -12,7 +12,12 @@
     "pull_request": 4,
     "pull_request_url": "https://github.com/Eternal-Wanderer-Vegetable/Ligamina/pull/4",
     "merge_commit": "3362b51276728619a4b008b834b2098075caad23",
-    "merged_at": "2026-10-27T01:25:23Z"
+    "merged_at": "2026-10-27T01:25:23Z",
+    "follow_up_pull_request": 5,
+    "follow_up_pull_request_url": "https://github.com/Eternal-Wanderer-Vegetable/Ligamina/pull/5",
+    "follow_up_merge_commit": "dd0a0206ef9db2a72232c29e4ec23092cee7e59a",
+    "follow_up_merged_at": "2026-10-27T01:55:35Z",
+    "default_branch_head_commit": "dd0a0206ef9db2a72232c29e4ec23092cee7e59a"
   },
   "ci_runs": [
     {
@@ -135,11 +140,22 @@
     },
     "dispatch_parse_diagnostic": {
       "method": "gh workflow run .github/workflows/phase4-p403-linux-recovery.yml --ref main -f mode=runner_contract_success",
-      "status": "repaired_on_branch_guard_validation_passed",
+      "status": "repaired_and_merged",
       "http_status": 422,
       "finding": "GitHub rejected job-level env references to runner.temp at workflow lines 59 and 60 as an unrecognized named value. The runner context is unavailable in a job-level env block.",
       "repair_branch": "codex/phase4-p403-postmerge-evidence",
       "repair": "Moved the run-scoped UV_PROJECT_ENVIRONMENT and UV_CACHE_DIR values to the individual steps that use them, preserving paths under runner.temp."
+    },
+    "main_dispatch_validation": {
+      "run_id": 40435434502,
+      "event": "workflow_dispatch",
+      "ref": "main",
+      "commit": "dd0a0206ef9db2a72232c29e4ec23092cee7e59a",
+      "conclusion": "success",
+      "url": "https://github.com/Eternal-Wanderer-Vegetable/Ligamina/actions/runs/40435434502",
+      "dispatch_guard_job": "passed",
+      "controlled_runner_job": "skipped_as_intended",
+      "observation": "The default-branch workflow parsed and the guard passed. The controlled job did not start because PHASE4_P403_RUNNER_ENABLED and PHASE4_P403_LINUX_RECOVERY_ENABLED remain false. No self-hosted runner or plugin Worker was dispatched."
     }
   },
   "post_merge_ci_runs": [
@@ -169,5 +185,34 @@
     "controlled_runner_job": "skipped_as_intended",
     "observation": "The repaired workflow parsed and ran its dispatch-guard on a non-default branch. The controlled self-hosted job was skipped because dispatch is restricted to the default branch and both repository opt-in variables remain false. No self-hosted runner or plugin Worker was started."
   },
-  "report_sha256": "7a07cc0f84d69c6b60a6050c7e9145fe1262f683bd296f90a74ea18d8556b0ca"
+  "repair_pr_ci_runs": [
+    {
+      "run_id": 40434531078,
+      "commit": "a31352730735263430a04591cf0ead85b9ee354b",
+      "status": "passed",
+      "url": "https://github.com/Eternal-Wanderer-Vegetable/Ligamina/actions/runs/40434531078",
+      "linux": "passed in 6m14s",
+      "windows": "passed in 8m58s"
+    },
+    {
+      "run_id": 40434531058,
+      "commit": "a31352730735263430a04591cf0ead85b9ee354b",
+      "status": "passed",
+      "name": "Linux contracts and automation regressions",
+      "duration": "1m44s",
+      "url": "https://github.com/Eternal-Wanderer-Vegetable/Ligamina/actions/runs/40434531058"
+    }
+  ],
+  "main_workflow_dispatch_validation": {
+    "run_id": 40435434502,
+    "event": "workflow_dispatch",
+    "ref": "main",
+    "commit": "dd0a0206ef9db2a72232c29e4ec23092cee7e59a",
+    "conclusion": "success",
+    "url": "https://github.com/Eternal-Wanderer-Vegetable/Ligamina/actions/runs/40435434502",
+    "dispatch_guard_job": "passed",
+    "controlled_runner_job": "skipped_as_intended",
+    "observation": "The default-branch workflow parsed and the guard passed. The controlled job did not start because PHASE4_P403_RUNNER_ENABLED and PHASE4_P403_LINUX_RECOVERY_ENABLED remain false. No self-hosted runner or plugin Worker was dispatched."
+  },
+  "report_sha256": "3de3b7c3295530476a66dedaee46dc03ac4dcf4f11f92370bd413aa561fd0afc"
 }
