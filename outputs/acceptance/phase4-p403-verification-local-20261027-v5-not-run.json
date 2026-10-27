@@ -1,0 +1,75 @@
+{
+  "schema_version": 1,
+  "kind": "phase4_p403_local_readiness",
+  "date": "2026-10-27",
+  "branch": "codex/p403-runner-cache-recovery",
+  "base_commit": "d0f171fdcecfe8490604b3fe7335a52d34b18c0e",
+  "status": "passed_local_readiness_only",
+  "campaign_id": "p4-p403-linux-remaining-0d659cb25128",
+  "plugin_execution": "not_started",
+  "manifest": {
+    "path": "outputs/acceptance/phase4-p403-linux-execution-manifest-20261027-v5-not-run.json",
+    "canonical_sha256": "b5b51ee7c019b8dd869f914003ab86341216f4b6573fe51120ff42b2c90764c0",
+    "file_sha256": "9f4081696b39c4bf9022bf89fd9298e61494c8b4a932bd79190afe777679817e",
+    "selected_units": 16,
+    "previous_report_sha256": "8d657d9e282fd8284626f3dccd7d9f2f774edc227199045f309e5f7e8a56909b"
+  },
+  "executor_validation": {
+    "status": "valid",
+    "selected_units": 16,
+    "koishi_affected_recovery": 16
+  },
+  "locked_input_cache": {
+    "status": "ready",
+    "ready_units": 16,
+    "expected_units": 16
+  },
+  "checks": [
+    {
+      "command": "uv run --locked --project lab --python 3.12.14 python -m unittest lab.tests.test_automation_phase4_p403 lab.tests.test_phase4_p403_runner_reports -v",
+      "exit_code": 0,
+      "result": "19 tests passed"
+    },
+    {
+      "command": "node --test scripts/phase3-workflows.test.mjs",
+      "exit_code": 0,
+      "result": "5 tests passed"
+    },
+    {
+      "command": "bash -n scripts/phase4-p403-linux-runner.sh scripts/phase4-p403-finalize-linux-run.sh",
+      "exit_code": 0,
+      "result": "passed in WSL"
+    },
+    {
+      "command": "pwsh -NoProfile -File init.ps1 -Mode docs",
+      "exit_code": 0,
+      "result": "20 documents, 462 local links, 12 indexed historical Markdown files, 31 features"
+    },
+    {
+      "command": "node scripts/render-readme.mjs --check",
+      "exit_code": 0,
+      "result": "validated README evidence blocks match current phase reports"
+    },
+    {
+      "command": "node .agents/skills/harness-creator/scripts/validate-harness.mjs --target . --json",
+      "exit_code": 0,
+      "result": "100/100"
+    },
+    {
+      "command": "git diff --check",
+      "exit_code": 0,
+      "result": "passed"
+    }
+  ],
+  "evidence": {
+    "controlled_run_405133_json_sha256": "874a5e3dfb254fc9af0d480f92cc8a1ee6a663f24b1fafcc010694c4e6eafb25",
+    "recovery_run_405133_json_sha256": "8d657d9e282fd8284626f3dccd7d9f2f774edc227199045f309e5f7e8a56909b",
+    "actions_run_log_405133_sha256": "0c8893b7d7727cbe11e51fb2788f786d4b6c26c3bea18ae604e893fc6c89f79f",
+    "setup_failure_summary_405085_sha256": "ddb93e92e190eb632a9d846e3d9783687247ece64466e1f05a6b252c6fc3152e"
+  },
+  "pending": [
+    "PR hosted checks and merge",
+    "protected v5 Linux recovery run",
+    "P4-04 Windows admission and P4-AUTOMATION gate"
+  ]
+}
