@@ -135,7 +135,7 @@ P4-03 可完成 Linux 调查与 runner 子项；Windows 10 项的进一步执行
 
 专用 runner 验收必须取得真实部署证据：repo/default branch/ref/commit、runner labels、Environment protection、变量、锁定镜像和新鲜 benign preflight。先在隔离实验机上用自有探针验证成功、失败和取消后的 artifact/日志/精确清理；再派发新 manifest。现有 P3 controlled workflow 固定历史 campaign，P4 必须新建可审阅的 campaign 入口，不能直接启用旧任务重跑。
 
-fork/PR 只能运行非特权自测；目录 Worker 维持源仓库默认分支、显式启用、受保护 Environment、只读权限、无持久 checkout 凭证。故障注入包含 daemon 不可用、lease 过期、旧 generation 回执及并发 SQLite 锁；WSL 活动队列位于原生 Linux 文件系统。runner 的注册/权限变更是后续部署动作，本轮不执行。
+fork/PR 只能运行非特权自测；目录 Worker 维持源仓库默认分支、显式启用、受保护 Environment、只读权限、无持久 checkout 凭证。故障注入包含 daemon 不可用、lease 过期、旧 generation 回执及并发 SQLite 锁；WSL 活动队列位于原生 Linux 文件系统。2026-10-27 已用 `gh` 创建 `phase4-p403-linux-controlled` Environment，部署分支仅 `main`，要求 owner reviewer，不含 secrets；两个 dispatch variables 均设为 `false`。仓库 runner inventory 为 0；一次性隔离 runner 注册、合同 workflow/artifact/清理验收和 39 项恢复派发仍待执行。
 
 P4-AUTOMATION 只在新 scope 无未解决 harness/infrastructure failure、unknown、必选未派发或清理不明，且真实 runner 验收完整时通过；已证实插件失败不伪装成基础设施故障。P3 的 gate 不回写。
 
