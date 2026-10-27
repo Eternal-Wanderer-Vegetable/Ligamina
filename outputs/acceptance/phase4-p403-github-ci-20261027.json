@@ -10,7 +10,9 @@
     "head_branch": "codex/phase4-p403-linux-recovery",
     "head_commit": "5db0144af04cd5f00b74c71454d1a12833658d90",
     "pull_request": 4,
-    "pull_request_url": "https://github.com/Eternal-Wanderer-Vegetable/Ligamina/pull/4"
+    "pull_request_url": "https://github.com/Eternal-Wanderer-Vegetable/Ligamina/pull/4",
+    "merge_commit": "3362b51276728619a4b008b834b2098075caad23",
+    "merged_at": "2026-10-27T01:25:23Z"
   },
   "ci_runs": [
     {
@@ -111,15 +113,51 @@
     "p403_runner_workflow_executed": false,
     "plugin_workers_dispatched": false,
     "historical_unknowns_rewritten": false,
-    "remaining_action": "Register a one-shot isolated Linux runner, pass hosted success/failure/cancel probes and artifact cleanup, then dispatch the bounded 39-row Linux recovery."
+    "remaining_action": "Merge and verify the P4-03 workflow parse repair with a safe non-default-branch dispatch-guard run; provision/register the one-shot isolated Linux runner, pass hosted success/failure/cancel probes and artifact cleanup, then dispatch the bounded 39-row Linux recovery. Keep both repository opt-in variables false until the isolated runner is ready."
   },
   "workflow_registration_observation": {
-    "run_id": 40428146558,
-    "event": "push",
-    "conclusion": "failure",
-    "jobs": 0,
-    "url": "https://github.com/Eternal-Wanderer-Vegetable/Ligamina/actions/runs/40428146558",
-    "observation": "The workflow_dispatch-only P4-03 workflow produced a push event run with no jobs. The Actions API exposed no failure reason. No self-hosted runner or plugin Worker was dispatched."
+    "prior_observation": {
+      "run_id": 40428146558,
+      "event": "push",
+      "conclusion": "failure",
+      "jobs": 0,
+      "url": "https://github.com/Eternal-Wanderer-Vegetable/Ligamina/actions/runs/40428146558",
+      "observation": "The workflow_dispatch-only P4-03 workflow produced a push event run with no jobs. The Actions API exposed no failure reason. No self-hosted runner or plugin Worker was dispatched."
+    },
+    "post_merge_observation": {
+      "run_id": 40432474103,
+      "event": "push",
+      "conclusion": "failure",
+      "jobs": 0,
+      "check_runs": 0,
+      "url": "https://github.com/Eternal-Wanderer-Vegetable/Ligamina/actions/runs/40432474103",
+      "observation": "The main push produced a workflow-file failure with no jobs or check runs; no self-hosted runner or plugin Worker was dispatched."
+    },
+    "dispatch_parse_diagnostic": {
+      "method": "gh workflow run .github/workflows/phase4-p403-linux-recovery.yml --ref main -f mode=runner_contract_success",
+      "status": "rejected_before_dispatch",
+      "http_status": 422,
+      "finding": "GitHub rejected job-level env references to runner.temp at workflow lines 59 and 60 as an unrecognized named value. The runner context is unavailable in a job-level env block.",
+      "repair_branch": "codex/phase4-p403-postmerge-evidence",
+      "repair": "Moved the run-scoped UV_PROJECT_ENVIRONMENT and UV_CACHE_DIR values to the individual steps that use them, preserving paths under runner.temp."
+    }
   },
-  "report_sha256": "b70f5ef4b67ac326b64a8c90689dce066c6c26539cd3903d7128bb368d3c2729"
+  "post_merge_ci_runs": [
+    {
+      "run_id": 40432475256,
+      "commit": "3362b51276728619a4b008b834b2098075caad23",
+      "status": "passed",
+      "url": "https://github.com/Eternal-Wanderer-Vegetable/Ligamina/actions/runs/40432475256",
+      "windows": "passed",
+      "linux": "passed"
+    },
+    {
+      "run_id": 40432475334,
+      "commit": "3362b51276728619a4b008b834b2098075caad23",
+      "status": "passed",
+      "name": "Phase 3 Linux self-test",
+      "url": "https://github.com/Eternal-Wanderer-Vegetable/Ligamina/actions/runs/40432475334"
+    }
+  ],
+  "report_sha256": "0f89e36546d63f14f00b18619a5b09399bb9c85ca1b0b4be44747ad6dd2aecb4"
 }
