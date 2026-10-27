@@ -35,6 +35,11 @@ class WorkerPolicyTests(unittest.TestCase):
             spec = WorkerSpec("run-1", "entry-1", ("python", "-c", "print('ok')"), input_dir)
             worker = self.docker_worker()
             command = worker.command(spec, worker_id="ligamina-test")
+            direct = WorkerSpec(
+                "run-2", "entry-2", ("/usr/local/bin/python", "-c", "print('direct')"), input_dir,
+                entrypoint="/usr/bin/env",
+            )
+            direct_command = worker.command(direct, worker_id="ligamina-direct")
 
         self.assertIn("--network=none", command)
         self.assertIn("--read-only", command)
@@ -51,6 +56,10 @@ class WorkerPolicyTests(unittest.TestCase):
         self.assertTrue(mount.endswith(",readonly"))
         self.assertNotIn(str(REPOSITORY_ROOT), mount)
         self.assertEqual(command[-3:], ["python", "-c", "print('ok')"])
+
+        entrypoint_index = direct_command.index("--entrypoint")
+        self.assertEqual(direct_command[entrypoint_index + 1], "/usr/bin/env")
+        self.assertEqual(direct_command[-3:], ["/usr/local/bin/python", "-c", "print('direct')"])
 
     def test_docker_backend_rejects_unpinned_image_and_repository_input(self) -> None:
         with self.assertRaises(ValueError):

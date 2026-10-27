@@ -1,0 +1,100 @@
+{
+  "schema_version": 1,
+  "kind": "phase4_p401_baseline",
+  "task_id": "P4-01",
+  "date": "2026-10-26",
+  "timezone": "Asia/Shanghai",
+  "status": "passed_with_environment_deviation",
+  "base_commit": "9d03728853bfb18a52e1640b2084a624c70501ba",
+  "branch": "codex/p4-01-executable-host-behavior-fixtures",
+  "cwd": "E:/stella/Ligamina",
+  "preexisting_dirty_paths": [
+    "AGENTS.md",
+    "README.md",
+    "docs/README.md",
+    "feature_list.json",
+    "progress.md",
+    "session-handoff.md",
+    "docs/plans/2026-10-26-phase-4-behavior-readiness.md",
+    "outputs/acceptance/phase3-p305-windows-python31210-profile-lock-pilot-20261025.json",
+    "outputs/acceptance/phase3-p305-windows-python31210-profile-lock-pilot-20261025.json.sha256",
+    "outputs/acceptance/phase3-p305-windows-python31210-profile-lock-pilot-v2-20261025.json",
+    "outputs/acceptance/phase3-p305-windows-python31210-profile-lock-pilot-v2-20261025.json.sha256",
+    "outputs/acceptance/phase4-plan-validation-20261026.json",
+    "outputs/acceptance/phase4-plan-validation-20261026.json.sha256"
+  ],
+  "toolchains": {
+    "git_head": "9d03728853bfb18a52e1640b2084a624c70501ba",
+    "uv": "0.12.5",
+    "python_lab": "CPython 3.12.14",
+    "python_readonly_audits": "CPython 3.14.7",
+    "node": "24.22.1",
+    "npm": "12.0.2",
+    "koishi_declared_node": "24.20.0"
+  },
+  "checks": [
+    {
+      "argv": ["pwsh", "-NoProfile", "-File", "init.ps1", "-Mode", "docs"],
+      "exit_code": 0,
+      "summary": "20 documents, 399 local links, 12 indexed historical Markdown files, 31 features; no failures."
+    },
+    {
+      "argv": ["node", "--test", "scripts/evidence-hash.test.mjs"],
+      "exit_code": 0,
+      "summary": "4 passed, 0 failed."
+    },
+    {
+      "argv": ["node", ".agents/skills/harness-creator/scripts/validate-harness.mjs", "--target", "."],
+      "exit_code": 0,
+      "summary": "Harness validation 100/100."
+    },
+    {
+      "argv": ["C:\\Python314\\python.exe", "scripts/phase3-p308-behavior-accounting.py", "--report", "outputs/acceptance/phase3-p308-behavior-accounting-20261026.json", "--check"],
+      "exit_code": 0,
+      "summary": "120 positions, 360 attempt slots, 0 dispatched; frozen file SHA 3daaf8aa387bb01b26ae72ca0a8bd6db9b1e0ab9f192a5ddd3d054f928e0e1f5 unchanged."
+    },
+    {
+      "argv": ["C:\\Python314\\python.exe", "scripts/phase3-p310-gate-audit.py", "--check"],
+      "exit_code": 0,
+      "summary": "Five P3 gates reproduced; audit SHA 716efa2e9af8537506e26215c231ef68bf8b30585d61e070bffff76237692b90 and matrix SHA 7b777a2e4cc23f499c7b0b5ba49001126fdb87d71d08f1b14d46022e9d130b3d unchanged."
+    },
+    {
+      "argv": ["uv", "run", "--locked", "--project", "lab", "--python", "3.12.14", "python", "-m", "lab.automation", "validate-behavior"],
+      "exit_code": 1,
+      "summary": "uv could not remove pre-existing lab/.venv/lib64 reparse point (OS error 5, access denied); the path was preserved."
+    },
+    {
+      "argv": ["uv", "run", "--locked", "--project", "lab", "--python", "3.12.14", "python", "-m", "lab.automation", "validate-behavior"],
+      "environment": {"UV_PROJECT_ENVIRONMENT": ".work/phase4-baseline-lab-venv"},
+      "exit_code": 0,
+      "summary": "Existing phase3-entry-behavior-v1 validates: 20 entries, 60 required cases, 40 platform positions, 4 legacy regressions; no platforms executed."
+    },
+    {
+      "argv": ["uv", "run", "--locked", "--project", "lab", "--python", "3.12.14", "python", "-m", "unittest", "discover", "-s", "lab/tests", "-v"],
+      "environment": {"UV_PROJECT_ENVIRONMENT": ".work/phase4-baseline-lab-venv"},
+      "exit_code": 0,
+      "summary": "189 tests passed; 1 Linux host-lock test skipped on Windows."
+    },
+    {
+      "argv": ["uv", "run", "--locked", "--project", "hosts/nonebot", "--python", "3.12.14", "pytest", "-q", "hosts/nonebot/tests"],
+      "environment": {"UV_PROJECT_ENVIRONMENT": ".work/phase4-baseline-nonebot-venv"},
+      "exit_code": 0,
+      "summary": "3 passed."
+    },
+    {
+      "argv": ["npm", "test", "--prefix", "hosts/koishi"],
+      "exit_code": 0,
+      "summary": "7 passed, including native Koishi Session dispatch and stdio worker lifecycle. Node 24.22.1 was used while package.json declares 24.20.0."
+    }
+  ],
+  "not_run": [
+    "init.ps1 -Mode full (planned for final verification)",
+    "Docker/WSL Linux admission and Worker probe",
+    "third-party plugin execution, Sandbox, deployment or real-platform traffic"
+  ],
+  "scope_notes": [
+    "No P3 report or source lock was modified.",
+    "The P3-08/P3-10 audits remain read-only and preserve their frozen identities.",
+    "No P4 Linux attempt was dispatched; plugin artifacts have not been executed."
+  ]
+}

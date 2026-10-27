@@ -1,0 +1,156 @@
+{
+  "schema_version": 1,
+  "kind": "phase4_p403_unknown_recovery_diagnostic",
+  "task_id": "P4-03",
+  "created_date": "2026-10-27",
+  "status": "local_ready_blocked_pending_protected_runner",
+  "manifest_path": "outputs/acceptance/phase4-p403-recovery-manifest-20261027.json",
+  "manifest_file_sha256": "523272f94689f82ae85204974d52645f0327b3d2d0474aa8ae986652ef2bd7af",
+  "manifest_canonical_sha256": "6097a58a2a058fd06d1f65edbea83a47aa8f3d07b31e7c8b679a6313bd51bd97",
+  "parent_unknown_coverage": {
+    "expected": 53,
+    "mapped": 53,
+    "missing": 0,
+    "duplicate": 0,
+    "by_cohort": {
+      "linux": 39,
+      "windows_pilot": 10,
+      "windows_preparation": 4
+    },
+    "historical_unknowns_preserved": true,
+    "retry_budget_by_cohort": {
+      "linux": 1,
+      "windows_pilot": 0,
+      "windows_preparation": 0
+    }
+  },
+  "diagnosis_counts": {
+    "linux:worker_cleanup_unconfirmed": 20,
+    "linux:worker_nonzero_exit": 16,
+    "linux:entry_bound_federated_fixture_missing": 1,
+    "linux:worker_preparation_failed": 2,
+    "windows_pilot:windows_native_extension_load_blocked": 10,
+    "windows_preparation:worker_preparation_failed": 4
+  },
+  "linux_unknown_attempt_reason_counts": {
+    "worker_lost": 3,
+    "worker_nonzero_exit": 66,
+    "worker_cleanup_unconfirmed": 4,
+    "dispatcher_executor_error": 2,
+    "worker_timeout": 2
+  },
+  "findings": [
+    {
+      "scope": "linux",
+      "count": 39,
+      "finding": "P3-05 Linux queue is completed with 39 parent identities still unknown at cleanup and 38 at install. Its 77 unknown attempts are 66 worker_nonzero_exit, 4 worker_cleanup_unconfirmed, 3 worker_lost, 2 dispatcher_executor_error, and 2 worker_timeout. Read-only SQLite evidence shows cleanup confirmation either in attempt result or exact-label reconciliation for all 77, but the missing terminal stage receipts remain unknown. No raw per-attempt log was found, so no new root-cause classification is inferred."
+    },
+    {
+      "scope": "windows_pilot",
+      "count": 10,
+      "finding": "All remain unknown. Existing Windows evidence is Evaluation/Audit scoped; the P3-05 validation says the native DLL block was not attributed to an App Control policy. P4-04 must establish Enforcement and correlated policy evidence before execution."
+    },
+    {
+      "scope": "windows_preparation",
+      "count": 4,
+      "finding": "All four failed before plugin execution on pinned metadata retrieval (three SSL EOF and one read timeout). Retry budget remains zero until exact metadata/artifact inputs and Windows admission are frozen."
+    },
+    {
+      "scope": "runner",
+      "count": null,
+      "finding": "P4-03 workflow, exact 39-row executor, dual opt-in gate, self-owned success/failure/cancel modes, always-run finalizer and artifact upload are implemented. Local WSL shell simulations passed with cleanup confirmed, but this checkout is on codex/p4-01-executable-host-behavior-fixtures and the workflow has no current GitHub deployment evidence. Real runner registration, protected Environment, variables, cache/images, GitHub cancellation and uploaded artifacts remain unverified."
+    }
+  ],
+  "input_files": [
+    {
+      "path": "outputs/acceptance/phase3-p305-overall-closure-20261026.json",
+      "file_sha256": "e9dc78cb2da54a7a99476664ee057ec0b029da23cb311a7c22625c1b200dd886",
+      "report_sha256": "c6bcaf6841100f5b66afd2356ad4c2891dbf713ec1bdf4bb7120a8e6b8429692"
+    },
+    {
+      "path": "outputs/acceptance/phase3-p310-gate-audit-20261026.json",
+      "file_sha256": "716efa2e9af8537506e26215c231ef68bf8b30585d61e070bffff76237692b90"
+    },
+    {
+      "path": "outputs/acceptance/phase4-p403-backend-diagnostic-20261027.json",
+      "file_sha256": "625b1239c5aef6be9ddb1980f92df07f606c7b9060dc7156f5b68efbf51af40f"
+    },
+    {
+      "path": "outputs/acceptance/phase4-p403-runner-contract-local-20261027.json",
+      "file_sha256": "a3725158e133a7c06ef9e5286429f909b10cb225d2bf0d97742933bb385535f6"
+    },
+    {
+      "path": "outputs/acceptance/phase4-p403-linux-execution-manifest-20261027.json",
+      "file_sha256": "7b8aff06417005507829e1c44b6eabed0437de054bd49a6d9bcd42656d29a35c"
+    },
+    {
+      "path": "outputs/acceptance/phase3-p304-windows-admission-python31210-20261025.json",
+      "file_sha256": "3a1a1d5755df58ed8097a58b924cb683b278f475102c11be5de57fad3fca7d70"
+    },
+    {
+      "path": "outputs/acceptance/phase3-p304-windows-runtime-diagnostic-20261025.json",
+      "file_sha256": "e5ca6f109508bf24df6e391e26e11e8ffe567db558bc1ecae680193f36b666ac"
+    },
+    {
+      "path": "outputs/acceptance/phase3-p305-windows-pilot-v2-validation-20261025.json",
+      "file_sha256": "be533da05f680795011eaf35cf5c60de44a6b30b573ceeed71df8eae6da3379b"
+    }
+  ],
+  "executor_manifest": {
+    "path": "outputs/acceptance/phase4-p403-linux-execution-manifest-20261027.json",
+    "file_sha256": "7b8aff06417005507829e1c44b6eabed0437de054bd49a6d9bcd42656d29a35c",
+    "canonical_sha256": "ac86124f3fe1faa91d7075a3e93f562defd396a25229520df7543b402e11c72a",
+    "campaign_id": "p4-p403-linux-28e74e1b3d27",
+    "selected_units": 39,
+    "ecosystems": {
+      "koishi": 39,
+      "nonebot": 0
+    },
+    "retry_budget_per_linux_identity": 1
+  },
+  "backend_diagnostic": {
+    "path": "outputs/acceptance/phase4-p403-backend-diagnostic-20261027.json",
+    "file_sha256": "625b1239c5aef6be9ddb1980f92df07f606c7b9060dc7156f5b68efbf51af40f",
+    "campaign_id": "p3-recovery-linux-842f71712e2c",
+    "queue_state": "completed",
+    "unknown_attempts": 77,
+    "attempt_cleanup_or_reconciliation_confirmed": 77,
+    "historical_unknowns_preserved": true,
+    "raw_per_attempt_logs_found": 0
+  },
+  "runner_contract_local": {
+    "path": "outputs/acceptance/phase4-p403-runner-contract-local-20261027.json",
+    "file_sha256": "a3725158e133a7c06ef9e5286429f909b10cb225d2bf0d97742933bb385535f6",
+    "success_failure_cancel": "all three local WSL shell scenarios matched the expected outcome",
+    "outer_cleanup_confirmed": 3,
+    "real_github_runner_acceptance": "not_verified"
+  },
+  "required_runner_inputs": {
+    "publish_to_default_branch": true,
+    "runner_labels": [
+      "self-hosted",
+      "linux",
+      "x64",
+      "ligamina-phase3"
+    ],
+    "environment": "phase4-p403-linux-controlled",
+    "repository_variables": {
+      "PHASE4_P403_RUNNER_ENABLED": "true for contract probes",
+      "PHASE4_P403_LINUX_RECOVERY_ENABLED": "true only after probe artifact review"
+    },
+    "docker_images": {
+      "nonebot": "ligamina-s205-python-profile@sha256:88bc85522c681966347809c702e0ae7fcf6fba4d8860161e77d7aa877a04488e",
+      "koishi": "node@sha256:ba849c60be29959425b8734d57b8b4b7d56f98edd9504c9af091d5281095a71e"
+    },
+    "frozen_artifact_cache": "Ligamina-artifact-cache at the path expected by the runner script",
+    "recovery_dispatch": "default branch only, after success/failure/cancel contract artifacts and cleanup have been reviewed"
+  },
+  "windows_admission_context": {
+    "windows_sandbox_host_executable_present": true,
+    "guest_enforcement_baseline_verified": false,
+    "host_policy_changed": false,
+    "p305_policy_attribution": "unconfirmed_by_frozen_validation",
+    "catalog_plugin_execution": false
+  },
+  "report_sha256": "ee6cd4c29c63ede510971499667056aad3745779011f44383d75e8e053d62ba5"
+}

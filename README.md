@@ -112,6 +112,8 @@ P3-08 双平台行为账本：120 个位置、360 个三次尝试槽，实际派
 Windows 结果仅适用于已记录的 Evaluation/Audit Mode Worker profile；没有强制模式、全目录行为兼容或真实平台投递结论。
 <!-- ligamina:phase3:end -->
 
+下一阶段见[第四阶段行为兼容与运行就绪计划](docs/plans/2026-10-26-phase-4-behavior-readiness.md)：先实现可执行 Host Fixture 和 Linux 双路径行为闭环，再推进 unknown 恢复、Windows 强制模式、真实平台与候选发行验收。当前仅计划交付，P4 尚未实施。
+
 状态见 [功能清单](feature_list.json)、[当前进展](progress.md) 和 [会话交接](session-handoff.md)。
 
 ## 文档与来源

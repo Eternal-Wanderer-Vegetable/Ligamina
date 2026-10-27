@@ -307,6 +307,18 @@ def _registry_environment(environment: dict[str, str]) -> dict[str, str]:
     return result
 
 
+def _npm_install_command(npm_prefix: list[str], *, lock_only: bool) -> list[str]:
+    """Allow only the exact tarball URLs declared by the sample's root package.json."""
+    if lock_only:
+        return [
+            *npm_prefix, "install", "--package-lock-only", "--ignore-scripts", "--no-audit", "--fund=false",
+            "--allow-remote=root",
+        ]
+    return [
+        *npm_prefix, "ci", "--ignore-scripts", "--no-audit", "--fund=false", "--allow-remote=root",
+    ]
+
+
 def remove_temporary_tree(path: Path) -> dict[str, Any]:
     if not path.name.startswith("ligamina-representative-"):
         return {"status": "refused", "path": str(path), "error": "temporary directory name does not match the runner prefix"}
@@ -398,9 +410,12 @@ def install_sample(sample: dict[str, Any], work: Path, cache_root: Path | None =
     npm = shutil.which("npm.cmd" if os.name == "nt" else "npm") or ("npm.cmd" if os.name == "nt" else "npm")
     npm_prefix = [os.environ.get("COMSPEC", "cmd.exe"), "/d", "/c", npm] if os.name == "nt" else [npm]
     registry_env = _registry_environment(environment)
-    lock = command_step("resolve exact Node sample profile", [*npm_prefix, "install", "--package-lock-only", "--ignore-scripts", "--no-audit", "--fund=false"], cwd=work, timeout=1200, env=registry_env)
+    lock = command_step(
+        "resolve exact Node sample profile", _npm_install_command(npm_prefix, lock_only=True),
+        cwd=work, timeout=1200, env=registry_env,
+    )
     sync = command_step(
-        "install locked Node sample profile", [*npm_prefix, "ci", "--ignore-scripts", "--no-audit", "--fund=false"],
+        "install locked Node sample profile", _npm_install_command(npm_prefix, lock_only=False),
         cwd=work, timeout=1200, env=registry_env,
     ) if lock["status"] == "passed" else {"label": "install locked Node sample profile", "status": "skipped"}
     if sync["status"] == "passed":
@@ -704,7 +719,10 @@ def api_request(base_url: str, method: str, path: str, token: str, body: Any = N
     return json.loads(raw) if raw else None
 
 
-def run_federated(sample: dict[str, Any], work: Path, host_environment: dict[str, str], events: list[dict[str, Any]]) -> dict[str, Any]:
+def run_federated(
+    sample: dict[str, Any], work: Path, host_environment: dict[str, str], events: list[dict[str, Any]],
+    *, profile_work: Path | None = None,
+) -> dict[str, Any]:
     configured_executable = host_environment.get("LIGAMINA_CORE_EXECUTABLE")
     executable = (
         Path(configured_executable)
@@ -713,27 +731,39 @@ def run_federated(sample: dict[str, Any], work: Path, host_environment: dict[str
     )
     if not executable.is_file():
         raise FileNotFoundError(f"Core daemon binary is missing: {executable}")
+    profile_work = (profile_work or work).resolve()
     sample_id = sample["sample_id"]
     host_id = f"sample-{sample_id}"
     client_id = "ligamina-sample-client"
     client_token = __import__("secrets").token_hex(32)
     admin_token = __import__("secrets").token_hex(32)
-    registration_token = __import__("secrets").token_hex(32)
-    operation_grant = {"id": f"{sample_id}-client-send", "account_id": ACCOUNT_ID, "operations": ["send_message"], "targets": None}
-    host_grant = {
-        "id": f"{sample_id}-host-send", "client_id": client_id, "account_id": ACCOUNT_ID,
-        "operations": ["send_message"], "targets": None,
-    }
+    account_ids = sorted({str(event.get("account_id", ACCOUNT_ID)) for event in events}) or [ACCOUNT_ID]
+    operation_grants = [
+        {"id": f"{sample_id}-client-send-{index}", "account_id": account_id, "operations": ["send_message"], "targets": None}
+        for index, account_id in enumerate(account_ids, start=1)
+    ]
+    host_grants = [
+        {"id": f"{sample_id}-host-send-{index}", "client_id": client_id, "account_id": account_id,
+         "operations": ["send_message"], "targets": None}
+        for index, account_id in enumerate(account_ids, start=1)
+    ]
+    gateway_ids = {account_id: f"sample-gateway-{index}" for index, account_id in enumerate(account_ids, start=1)}
+    registration_tokens = {account_id: __import__("secrets").token_hex(32) for account_id in account_ids}
     host_env = {
         "LIGAMINA_NONEBOT_PLUGINS": ",".join([*sample.get("preload_plugins", []), sample["_entry"]]),
         "LIGAMINA_NONEBOT_NICKNAMES": "Bot",
         "LIGAMINA_NONEBOT_DATA_DIR": str(work / "nonebot-data"),
+        "LIGAMINA_P4_OBSERVATION_FILE": host_environment.get("LIGAMINA_P4_OBSERVATION_FILE", ""),
         "LIGAMINA_KOISHI_PLUGINS": host_environment.get("LIGAMINA_KOISHI_PLUGINS", ""),
         "LIGAMINA_KOISHI_PLUGIN_CONFIG": host_environment.get("LIGAMINA_KOISHI_PLUGIN_CONFIG", "{}"),
         "LIGAMINA_KOISHI_NICKNAMES": "Bot",
         "LIGAMINA_KOISHI_DATA_DIR": str(work / "koishi-data"),
         "PYTHONPATH": host_environment.get("PYTHONPATH", str(ROOT / "hosts/nonebot")),
+        "LIGAMINA_BEHAVIOR_RANDOM_SEED": host_environment.get("LIGAMINA_BEHAVIOR_RANDOM_SEED", ""),
     }
+    for key in ("GUESS_NAME", "GUESS_LIMIT", "GUESS_NAME_LIST"):
+        if key in host_environment:
+            host_env[key] = host_environment[key]
     if sample["ecosystem"] == "nonebot":
         python_executable = host_environment.get("LIGAMINA_PYTHON_EXECUTABLE")
         if python_executable:
@@ -742,20 +772,24 @@ def run_federated(sample: dict[str, Any], work: Path, host_environment: dict[str
         else:
             program = shutil.which("uv") or "uv"
             args = ["run", "--locked", "--project", str(work), "--python", "3.12.14", "python", "-m", "ligamina_nonebot.worker"]
-        current_dir = work
+        current_dir = profile_work
     else:
         program = host_environment.get("LIGAMINA_NODE_EXECUTABLE", shutil.which("node") or "node")
-        args = [str(work / "ligamina-koishi-host/dist/worker.js")]
-        current_dir = work
+        args = [str(profile_work / "ligamina-koishi-host/dist/worker.js")]
+        current_dir = profile_work
     config = {
         "listen": "127.0.0.1:0", "database_path": str(work / "core.sqlite"), "admin_token": admin_token,
         "mcp_client_id": client_id,
-        "clients": [{"id": client_id, "token": client_token, "capabilities": [], "operation_grants": [operation_grant]}],
-        "gateways": [{"id": "sample-gateway", "client_id": client_id, "account_id": ACCOUNT_ID, "registration_token": registration_token}],
+        "clients": [{"id": client_id, "token": client_token, "capabilities": [], "operation_grants": operation_grants}],
+        "gateways": [
+            {"id": gateway_ids[account_id], "client_id": client_id, "account_id": account_id,
+             "registration_token": registration_tokens[account_id]}
+            for account_id in account_ids
+        ],
         "hosts": [{
             "id": host_id, "enabled": True, "program": program, "args": args, "current_dir": str(current_dir),
             "environment": host_env, "max_restarts": 0, "restart_backoff_ms": 100,
-            "startup_timeout_ms": 90000, "shutdown_timeout_ms": 10000, "operation_grants": [host_grant],
+            "startup_timeout_ms": 90000, "shutdown_timeout_ms": 10000, "operation_grants": host_grants,
         }],
         "router": {"max_pending_per_conversation": 16, "max_outstanding_events": 64,
                    "max_tracked_conversations": 64, "max_concurrent_conversations": 8,
@@ -804,15 +838,22 @@ def run_federated(sample: dict[str, Any], work: Path, host_environment: dict[str
             raise RuntimeError(f"sample Host did not become active: {host_status}")
         result["host_status"] = host_status
         result["cleanup"]["host_pid"] = host_status.get("pid")
-        lease = api_request(base_url, "POST", "/v1/gateways/sample-gateway/lease", registration_token, {"ttl_ms": 300000})
-        credential = lease["token"]
+        leases = {}
+        for account_id in account_ids:
+            gateway_id = gateway_ids[account_id]
+            leases[account_id] = api_request(
+                base_url, "POST", f"/v1/gateways/{gateway_id}/lease", registration_tokens[account_id], {"ttl_ms": 300000}
+            )
 
-        def gateway_loop() -> None:
+        def gateway_loop(account_id: str) -> None:
             nonlocal gateway_counter
+            gateway_id = gateway_ids[account_id]
+            lease = leases[account_id]
+            credential = lease["token"]
             while not gateway_stop.is_set():
                 try:
                     operation = api_request(
-                        base_url, "POST", "/v1/gateways/sample-gateway/actions/claim", credential,
+                        base_url, "POST", f"/v1/gateways/{gateway_id}/actions/claim", credential,
                         lease, timeout=5,
                     )
                     if operation is None:
@@ -831,7 +872,7 @@ def run_federated(sample: dict[str, Any], work: Path, host_environment: dict[str
                     }
                     completed = api_request(
                         base_url, "POST",
-                        f"/v1/gateways/sample-gateway/actions/{urllib.parse.quote(operation['key']['operation_id'], safe='')}/result",
+                        f"/v1/gateways/{gateway_id}/actions/{urllib.parse.quote(operation['key']['operation_id'], safe='')}/result",
                         credential, {"credential": lease, "result": receipt},
                     )
                     result["gateway_operations"].append({
@@ -842,8 +883,12 @@ def run_federated(sample: dict[str, Any], work: Path, host_environment: dict[str
                     gateway_errors.append(f"{type(error).__name__}: {error}")
                     gateway_stop.set()
 
-        gateway_thread = threading.Thread(target=gateway_loop, name="sample-gateway", daemon=True)
-        gateway_thread.start()
+        gateway_threads = [
+            threading.Thread(target=gateway_loop, args=(account_id,), name=f"sample-gateway-{index}", daemon=True)
+            for index, account_id in enumerate(account_ids, start=1)
+        ]
+        for gateway_thread in gateway_threads:
+            gateway_thread.start()
         statuses = []
         for event in events:
             accepted = api_request(base_url, "POST", "/v1/events", client_token, event, expected=(202,))
@@ -861,7 +906,14 @@ def run_federated(sample: dict[str, Any], work: Path, host_environment: dict[str
                 time.sleep(0.05)
             statuses.append({"accepted": accepted, "final": status})
             if not status or status.get("status") != "completed":
-                raise RuntimeError(f"federated event did not complete: {status}")
+                diagnostic = {
+                    "event_id": str(event["event_id"]),
+                    "status": status.get("status") if isinstance(status, dict) else None,
+                    "error": status.get("error") if isinstance(status, dict) else "status_unavailable",
+                    "gateway_operation_count": len(result["gateway_operations"]),
+                    "gateway_errors": gateway_errors[-3:],
+                }
+                raise RuntimeError(f"federated event did not complete: {json.dumps(diagnostic, ensure_ascii=False, sort_keys=True)}")
         result["event_statuses"] = statuses
         wait_until = time.monotonic() + 3
         while time.monotonic() < wait_until and not gateway_errors:
@@ -870,8 +922,7 @@ def run_federated(sample: dict[str, Any], work: Path, host_environment: dict[str
             raise RuntimeError("virtual gateway failed: " + "; ".join(gateway_errors))
     finally:
         gateway_stop.set()
-        thread = locals().get("gateway_thread")
-        if thread:
+        for thread in locals().get("gateway_threads", []):
             thread.join(timeout=5)
         if process.poll() is None:
             try:

@@ -1,0 +1,180 @@
+{
+  "schema_version": 1,
+  "kind": "phase4_p403_local_verification",
+  "task_id": "P4-03",
+  "date": "2026-10-27",
+  "status": "local_engineering_ready_external_acceptance_pending",
+  "repository": {
+    "root": "E:\\stella\\Ligamina",
+    "branch": "codex/p4-01-executable-host-behavior-fixtures",
+    "head": "9d03728853bfb18a52e1640b2084a624c70501ba",
+    "dirty_path_count": 212,
+    "committed_or_published_by_this_task": false
+  },
+  "baseline": {
+    "command": "wsl.exe -d Ubuntu-24.04 -- bash -lc \"cd /mnt/e/stella/Ligamina && UV_PROJECT_ENVIRONMENT=/home/vegetable/ligamina-p402-control-venv uv run --locked --offline --project lab --python 3.12.14 python -m unittest lab.tests.test_automation_recovery lab.tests.test_automation_execution -v\"",
+    "exit_code": 0,
+    "summary": "23 tests passed in 76.341s before P4-03 changes."
+  },
+  "verification_commands": [
+    {
+      "command": "wsl.exe -d Ubuntu-24.04 -- bash -lc \"cd /mnt/e/stella/Ligamina && UV_PROJECT_ENVIRONMENT=/home/vegetable/ligamina-p402-control-venv uv run --locked --offline --project lab --python 3.12.14 python -m unittest lab.tests.test_automation_phase4_p403 lab.tests.test_automation_recovery lab.tests.test_automation_execution lab.tests.test_automation_dispatcher lab.tests.test_queue -v\"",
+      "exit_code": 0,
+      "summary": "55 tests passed in 86.658s."
+    },
+    {
+      "command": "node --test scripts/phase3-workflows.test.mjs",
+      "exit_code": 0,
+      "summary": "5 passed, 0 failed."
+    },
+    {
+      "command": "wsl.exe -d Ubuntu-24.04 -- bash -lc \"cd /mnt/e/stella/Ligamina && bash -n scripts/phase4-p403-runner-self-test.sh scripts/phase4-p403-linux-runner.sh scripts/phase4-p403-finalize-linux-run.sh\"",
+      "exit_code": 0,
+      "summary": "Bash syntax passed for all 3 scripts."
+    },
+    {
+      "command": "PyYAML 6.0.1 yaml.compose workflow syntax check",
+      "exit_code": 0,
+      "summary": "phase4-p403-linux-recovery.yml parsed."
+    },
+    {
+      "command": "uv run --locked --offline --project lab --python 3.12.14 python -m lab.automation validate-p403-recovery outputs/acceptance/phase4-p403-recovery-manifest-20261027.json --output outputs/acceptance/phase4-p403-validation-verification-20261027.json",
+      "exit_code": 0,
+      "summary": "valid; 53 mapped (39/10/4); 77 Linux unknown attempts."
+    },
+    {
+      "command": "uv run --locked --offline --project lab --python 3.12.14 python -m lab.automation validate-p403-linux-executor --manifest outputs/acceptance/phase4-p403-recovery-manifest-20261027.json --executor-manifest outputs/acceptance/phase4-p403-linux-execution-manifest-20261027.json --output outputs/acceptance/phase4-p403-executor-validation-verification-20261027.json",
+      "exit_code": 0,
+      "summary": "valid; exactly 39 Koishi parent identities."
+    },
+    {
+      "command": "uv run --locked --offline --project lab --python 3.12.14 python -m lab.automation plan-p403-linux-recovery --manifest outputs/acceptance/phase4-p403-recovery-manifest-20261027.json --output outputs/acceptance/phase4-p403-linux-execution-manifest-20261027.json",
+      "exit_code": 0,
+      "summary": "valid; campaign p4-p403-linux-28e74e1b3d27; selected 39."
+    },
+    {
+      "command": "pwsh -NoProfile -File init.ps1 -Mode docs",
+      "exit_code": 0,
+      "summary": "passed; 20 documents, 427 local links, 12 indexed historical Markdown, 31 features."
+    },
+    {
+      "command": "node .agents/skills/harness-creator/scripts/validate-harness.mjs --target . --json",
+      "exit_code": 0,
+      "summary": "overall 100/100; 25 checks passed; no bottleneck."
+    },
+    {
+      "command": "git diff --check",
+      "exit_code": 0,
+      "summary": "passed; Git reported CRLF-to-LF normalization warnings for feature_list.json, progress.md, session-handoff.md."
+    }
+  ],
+  "evidence_artifacts": {
+    "parent_manifest": {
+      "path": "outputs/acceptance/phase4-p403-recovery-manifest-20261027.json",
+      "sha256": "523272f94689f82ae85204974d52645f0327b3d2d0474aa8ae986652ef2bd7af",
+      "sidecar_sha256": "523272f94689f82ae85204974d52645f0327b3d2d0474aa8ae986652ef2bd7af",
+      "sidecar_matches": true
+    },
+    "linux_executor_manifest": {
+      "path": "outputs/acceptance/phase4-p403-linux-execution-manifest-20261027.json",
+      "sha256": "7b8aff06417005507829e1c44b6eabed0437de054bd49a6d9bcd42656d29a35c",
+      "sidecar_sha256": "7b8aff06417005507829e1c44b6eabed0437de054bd49a6d9bcd42656d29a35c",
+      "sidecar_matches": true
+    },
+    "parent_validation": {
+      "path": "outputs/acceptance/phase4-p403-validation-verification-20261027.json",
+      "sha256": "422e959eac65e4a73319585a89b9d5de7db9181e8a8016704265e402525bacd2",
+      "sidecar_sha256": "422e959eac65e4a73319585a89b9d5de7db9181e8a8016704265e402525bacd2",
+      "sidecar_matches": true
+    },
+    "executor_validation": {
+      "path": "outputs/acceptance/phase4-p403-executor-validation-verification-20261027.json",
+      "sha256": "d8e22a2034c6639946c3b5b94327c2e44c6521e9a0561b6c587099bda835307c",
+      "sidecar_sha256": "d8e22a2034c6639946c3b5b94327c2e44c6521e9a0561b6c587099bda835307c",
+      "sidecar_matches": true
+    },
+    "backend_diagnostic": {
+      "path": "outputs/acceptance/phase4-p403-backend-diagnostic-20261027.json",
+      "sha256": "625b1239c5aef6be9ddb1980f92df07f606c7b9060dc7156f5b68efbf51af40f",
+      "sidecar_sha256": "625b1239c5aef6be9ddb1980f92df07f606c7b9060dc7156f5b68efbf51af40f",
+      "sidecar_matches": true
+    },
+    "local_runner_contract": {
+      "path": "outputs/acceptance/phase4-p403-runner-contract-local-20261027.json",
+      "sha256": "841bccafb85f0c02bc95bc3e4ae3ece6b735587aeba8a0585aa10941baae2a99",
+      "sidecar_sha256": "841bccafb85f0c02bc95bc3e4ae3ece6b735587aeba8a0585aa10941baae2a99",
+      "sidecar_matches": true
+    },
+    "phase4_p403_diagnostic": {
+      "path": "outputs/acceptance/phase4-p403-diagnostic-20261027.json",
+      "sha256": "4902ae42138aa6ea75a8b5a49f2fede882c707afd8704148f4ada6a16ef1c9e4",
+      "sidecar_sha256": "4902ae42138aa6ea75a8b5a49f2fede882c707afd8704148f4ada6a16ef1c9e4",
+      "sidecar_matches": true
+    }
+  },
+  "source_and_state_sha256": [
+    {
+      "path": "lab/automation/phase4_p403.py",
+      "sha256": "fb4bf2d90e4a2c09f720bd06c5610612bc007198907c38e5994b43490c7e95b5"
+    },
+    {
+      "path": "lab/automation/__main__.py",
+      "sha256": "42555227cb54b6770a55fc24a6079d634c950737a57333d38ed7d293261480a5"
+    },
+    {
+      "path": "lab/tests/test_automation_phase4_p403.py",
+      "sha256": "fcb997ad6f7eb844f48dd033ec6b0de207f34ffd27306c9220bde0365f0f50a1"
+    },
+    {
+      "path": "scripts/phase3-workflows.test.mjs",
+      "sha256": "380f48ba5c4109a43852330151dab9d97b071e1b2c1a338b2724e1f3d08acd6f"
+    },
+    {
+      "path": "scripts/phase4-p403-runner-self-test.sh",
+      "sha256": "766a93549f582f6ea1183b70e23adc2a19e826c8795b3e2f82789e32ee25a64e"
+    },
+    {
+      "path": "scripts/phase4-p403-linux-runner.sh",
+      "sha256": "60a9207d3109a2d3c179a90fc96f56451c796502c83612a591ec8cd50b2dd278"
+    },
+    {
+      "path": "scripts/phase4-p403-finalize-linux-run.sh",
+      "sha256": "e997bbac37d63a55a8fb81e7f7ed37ebaf18b7f9156c0233df117950e4759c39"
+    },
+    {
+      "path": ".github/workflows/phase4-p403-linux-recovery.yml",
+      "sha256": "df92b8b70b868e3c7103379b381e88999e74d0e07b2e10a4cd78ce9ab65187aa"
+    },
+    {
+      "path": "docs/plans/2026-10-26-phase-4-behavior-readiness.md",
+      "sha256": "0d8353a6fde10076787033f6d2db364a936cb264375d0074c73bc9ce1a4513d7"
+    },
+    {
+      "path": "feature_list.json",
+      "sha256": "8960f671f54440792aa7ec258f0edad8ef6902f3e564c997c337bce33f6c478a"
+    },
+    {
+      "path": "progress.md",
+      "sha256": "4bc8b92cb4ec4ec9ae23d70a43ea4283ea94c41df4e1764c54854f1b4789974c"
+    },
+    {
+      "path": "session-handoff.md",
+      "sha256": "203ada9677e6a8c6b6e134bd60a02e8754ba384051d3661945e81ece66d8c25e"
+    }
+  ],
+  "acceptance_boundary": {
+    "plugin_workers_claimed": false,
+    "p403_linux_recovery_dispatched": false,
+    "protected_github_runner_verified": false,
+    "github_success_failure_cancel_artifacts_verified": false,
+    "windows_enforcement_admission_verified": false,
+    "windows_parent_rows_dispatched": 0,
+    "automation_gate": "blocked_pending_real_protected_runner_and_artifact_acceptance"
+  },
+  "notes": [
+    "Local runner-contract success/failure/cancellation shell simulations are not GitHub Actions runner or artifact-upload evidence.",
+    "The checkout remains uncommitted and unpublished; the workflow accepts only default-branch workflow_dispatch.",
+    "The first local finalizer invocation omitted UV_PROJECT_ENVIRONMENT and uv recreated ignored lab/.venv; tracked files were unaffected, but prior ignored environment contents may have been replaced. Later commands used an isolated environment and the finalizer now defaults to per-run RUNNER_TEMP paths."
+  ],
+  "report_sha256": "89291a62411d32fd870890c1cfb9d57e5eb7bb6127d8b4d91afcfafa7f7eeef0"
+}

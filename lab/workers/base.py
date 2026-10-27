@@ -41,12 +41,15 @@ class WorkerSpec:
     attempt_id: str | None = None
     generation: int | None = None
     job_id: str | None = None
+    entrypoint: str | None = None
 
     def __post_init__(self) -> None:
         if not self.run_id or not self.entry_id:
             raise ValueError("run_id and entry_id are required")
         if not self.command or any(not isinstance(arg, str) for arg in self.command):
             raise ValueError("command must be a non-empty string argument list")
+        if self.entrypoint is not None and (not self.entrypoint.startswith("/") or "\x00" in self.entrypoint):
+            raise ValueError("entrypoint must be an absolute container path")
         if not self.input_dir.is_dir():
             raise ValueError("input_dir must be an existing directory")
         if (self.attempt_id is None) != (self.generation is None):

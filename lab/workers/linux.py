@@ -95,6 +95,7 @@ class DockerWorker:
             "PATH=/usr/local/bin:/usr/bin:/bin",
             "--env",
             "LANG=C.UTF-8",
+            *(["--entrypoint", spec.entrypoint] if spec.entrypoint is not None else []),
             self.image_digest,
             *spec.command,
         ]

@@ -37,6 +37,8 @@ COPY --from=python-host /opt/ligamina/hosts/nonebot /opt/ligamina/hosts/nonebot
 COPY --from=koishi-host /usr/local/bin/node /usr/local/bin/node
 COPY --from=koishi-host /opt/ligamina/hosts/koishi/dist /opt/ligamina/hosts/koishi/dist
 COPY --from=koishi-host /opt/ligamina/hosts/koishi/node_modules /opt/ligamina/hosts/koishi/node_modules
+COPY --from=koishi-host /opt/ligamina/hosts/koishi/package.json /opt/ligamina/hosts/koishi/package.json
+COPY --from=koishi-host /opt/ligamina/hosts/koishi/package-lock.json /opt/ligamina/hosts/koishi/package-lock.json
 COPY contracts ./contracts
 COPY deploy/linux/entrypoint.py deploy/linux/healthcheck.py /opt/ligamina/deploy/linux/
 COPY deploy/linux/daemon.example.json /etc/ligamina/daemon.example.json

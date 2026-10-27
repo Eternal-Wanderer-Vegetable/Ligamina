@@ -1,0 +1,213 @@
+{
+  "schema_version": 1,
+  "kind": "phase4_p401_koishi_private_id_fixture_probe",
+  "run_id": "p401-koishi-private-id-probe-v8",
+  "created_at_utc": "2026-10-26T12:43:12Z",
+  "source_campaign": {
+    "path": "outputs/acceptance/phase4-p401-behavior-runs-20261026-v7.json",
+    "sha256": "1aef1b3de91cf7a14fc05f15f2d903251e409ff90a0d8466ac2289e683923dee"
+  },
+  "source_suite_sha256": "b88f096862ec5fb5b98a8df203f0ff54a394cd9a4422e949af40026fd086ca48",
+  "runtime_image": "ligamina-p401-runtime-offline-profile@sha256:2f2aaf3d31b522f31b1dbbc5c5e0109949a86d195e5aa491b2989b7ba9de9c5c",
+  "registry_entry_id": "ko-163c3bd4cf87c72c24210251",
+  "case_id": "ko-koishijs-plugin-echo-isolation",
+  "attempt_id": "ko-koishijs-plugin-echo-isolation-extra-private-id-probe",
+  "private_identity": {
+    "actor_id": "77",
+    "conversation_id": "77",
+    "authority_seed": 3
+  },
+  "diagnostic_only_excluded_from_campaign_denominator": true,
+  "raw_stderr_saved": false,
+  "native": {
+    "status": "completed",
+    "cleanup": {
+      "active_capability_count": 0,
+      "live_processes": [],
+      "worker_cleanup_confirmed": true
+    },
+    "observation": {
+      "events": [
+        {
+          "event_id": "ko-echo-group",
+          "account_id": "9001",
+          "actor_id": "23",
+          "conversation": {
+            "kind": "group",
+            "id": "77"
+          }
+        },
+        {
+          "event_id": "ko-echo-private",
+          "account_id": "9002",
+          "actor_id": "77",
+          "conversation": {
+            "kind": "private",
+            "id": "77"
+          }
+        }
+      ],
+      "operations": [
+        {
+          "operation_id": "operation-1",
+          "account_id": "9001",
+          "operation": "send_message",
+          "target": {
+            "kind": "group",
+            "id": "77"
+          },
+          "params": {
+            "message": [
+              {
+                "type": "text",
+                "text": "group-message"
+              }
+            ]
+          },
+          "source_event_id": "ko-echo-group"
+        },
+        {
+          "operation_id": "operation-2",
+          "account_id": "9002",
+          "operation": "send_message",
+          "target": {
+            "kind": "private",
+            "id": "77"
+          },
+          "params": {
+            "message": [
+              {
+                "type": "text",
+                "text": "private-message"
+              }
+            ]
+          },
+          "source_event_id": "ko-echo-private"
+        }
+      ],
+      "receipts": [
+        {
+          "operation_id": "operation-1",
+          "status": "succeeded",
+          "target": {
+            "kind": "group",
+            "id": "77"
+          },
+          "account_id": "9001",
+          "source_event_id": "ko-echo-group"
+        },
+        {
+          "operation_id": "operation-2",
+          "status": "succeeded",
+          "target": {
+            "kind": "private",
+            "id": "77"
+          },
+          "account_id": "9002",
+          "source_event_id": "ko-echo-private"
+        }
+      ],
+      "response_or_operation_count": 2
+    }
+  },
+  "federated": {
+    "status": "completed",
+    "cleanup": {
+      "active_capability_count": 0,
+      "live_processes": [],
+      "worker_cleanup_confirmed": true
+    },
+    "federated_trace": {
+      "core_host_route": "passed",
+      "host_pid_reaped": true,
+      "gateway_operation_count": 2
+    },
+    "observation": {
+      "events": [
+        {
+          "event_id": "ko-echo-group",
+          "account_id": "9001",
+          "actor_id": "23",
+          "conversation": {
+            "kind": "group",
+            "id": "77"
+          }
+        },
+        {
+          "event_id": "ko-echo-private",
+          "account_id": "9002",
+          "actor_id": "77",
+          "conversation": {
+            "kind": "private",
+            "id": "77"
+          }
+        }
+      ],
+      "operations": [
+        {
+          "operation_id": "operation-1",
+          "account_id": "9001",
+          "operation": "send_message",
+          "target": {
+            "id": "77",
+            "kind": "group"
+          },
+          "params": {
+            "message": [
+              {
+                "type": "text",
+                "text": "group-message"
+              }
+            ]
+          },
+          "source_event_id": "ko-echo-group"
+        },
+        {
+          "operation_id": "operation-2",
+          "account_id": "9002",
+          "operation": "send_message",
+          "target": {
+            "id": "77",
+            "kind": "private"
+          },
+          "params": {
+            "message": [
+              {
+                "type": "text",
+                "text": "private-message"
+              }
+            ]
+          },
+          "source_event_id": "ko-echo-private"
+        }
+      ],
+      "receipts": [
+        {
+          "operation_id": "operation-1",
+          "status": "succeeded",
+          "target": {
+            "id": "77",
+            "kind": "group"
+          },
+          "account_id": "9001",
+          "source_event_id": "ko-echo-group"
+        },
+        {
+          "operation_id": "operation-2",
+          "status": "succeeded",
+          "target": {
+            "id": "77",
+            "kind": "private"
+          },
+          "account_id": "9002",
+          "source_event_id": "ko-echo-private"
+        }
+      ],
+      "response_or_operation_count": 2
+    }
+  },
+  "comparison": {
+    "status": "passed",
+    "issues": []
+  }
+}

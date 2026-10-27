@@ -1,0 +1,2015 @@
+{
+  "schema_version": 1,
+  "kind": "phase4_p401_terminal_evidence_manifest",
+  "manifest_status": "complete_scoped",
+  "materialized_after_campaign": true,
+  "campaign": {
+    "campaign_id": "p401-1793024837",
+    "report_path": "outputs/acceptance/phase4-p401-behavior-runs-20261026-v10.json",
+    "report_sha256": "a13a7e66f2d0de921e763427dc57463a2e3c34c5a4e81b41dacc9729dd265747",
+    "started_at_utc": "2026-10-26T14:27:17Z",
+    "completed_at_utc": "2026-10-26T14:30:08Z"
+  },
+  "inputs": {
+    "suite_path": "contracts/lab/automation/v2/fixtures/behavior-suite.phase4-v2.json",
+    "suite_sha256": "18c1da4bacc2b754cfec4dcafc9c18614c8418cd05eeffa698b1c7b8197d459f",
+    "migration_matrix_path": "outputs/acceptance/phase4-p401-migration-matrix-20261026.json",
+    "migration_matrix_sha256": "2ad07738d483caf3b4e5928e2cc1bc7d03ec18b7d76a449563a119f7963a4598",
+    "migration_matrix_validation": {
+      "status": "validated",
+      "p4_fixture_gate": "blocked",
+      "suite_id": "phase4-entry-behavior-v2",
+      "entries": 20,
+      "cases": 60,
+      "executable_cases": 6,
+      "blocked_cases": 54,
+      "capability_probes": {
+        "service": "required",
+        "storage": "required",
+        "clock": "required"
+      },
+      "plugins_executed": false
+    },
+    "candidate_selection_revision": {
+      "authorized_by_user": true,
+      "reason": "The original NoneBot candidate failed its isolation oracle in all three fresh Native/Federated pairs; retain that result and substitute another exact locked entry after source review.",
+      "previous_candidate": {
+        "registry_entry_id": "nb-5f9a0398ba3644f4256bbe83",
+        "report_path": "outputs/acceptance/phase4-p401-behavior-runs-20261026-v8.json",
+        "report_sha256": "18ba1928a64ef06519a5c7af93568a63dec42e791b69a5668eec3172bc500568",
+        "case_id": "nb-nonebot-plugin-guess-isolation",
+        "failed_attempts": 3,
+        "side_executions": 6,
+        "classification": "confirmed_third_party_behavior_mismatch"
+      },
+      "selected_candidate": {
+        "registry_entry_id": "nb-16c80a826ca035f6c49ad69a",
+        "package": "nonebot_plugin_roll",
+        "version": "0.2.3",
+        "artifact_sha256": "3a5ead2404f26711c9d41604ddcbb2e141df8a950fc53d32536aa7980fab1a2c",
+        "source_member": "nonebot_plugin_roll/__init__.py",
+        "source_member_sha256": "65835efdf2bfbaeb237df005c459610a068c55a8edd53fcae971e0976d5409d2",
+        "linux_profile_id": "nonebot-2.5.0-onebot-2.4.6-py3.12.14-linux-x86_64",
+        "linux_dependency_lock_sha256": "792fe11f2fd3581e888b15a23bc0c49f76b3b0d2399fc728dbfcff3d436214df"
+      }
+    },
+    "admission_path": "outputs/acceptance/phase4-p401-linux-admission-20261026-v2.json",
+    "admission_sha256": "a8a06648382a5c61b854ce1e0db7746588ecd376d5cbc45947734b4318b3bea5",
+    "service_probe_path": "outputs/acceptance/phase4-p401-service-probe-20261026.json",
+    "service_probe_sha256": "d41717194a8e9233a911ef565dc2c68359bd40f3e319c0cabdfe6b7c2f0366fa",
+    "runtime_image": "ligamina-p401-runtime-offline-profile@sha256:2f2aaf3d31b522f31b1dbbc5c5e0109949a86d195e5aa491b2989b7ba9de9c5c",
+    "asset_root": "/home/vegetable/ligamina-p401-bundles-20261026-capability-complete-v1",
+    "bundle_summary": {
+      "bundle_root": "/home/vegetable/ligamina-p401-bundles-20261026-capability-complete-v1",
+      "entries": [
+        {
+          "path": "/home/vegetable/ligamina-p401-bundles-20261026-capability-complete-v1/nonebot",
+          "registry_entry_id": "nb-16c80a826ca035f6c49ad69a",
+          "ecosystem": "nonebot",
+          "artifact_sha256": "3a5ead2404f26711c9d41604ddcbb2e141df8a950fc53d32536aa7980fab1a2c",
+          "profile_lock_sha256": "792fe11f2fd3581e888b15a23bc0c49f76b3b0d2399fc728dbfcff3d436214df",
+          "artifact_path": "/home/vegetable/ligamina-p401-bundles-20261026-capability-complete-v1/nonebot/project/sample/artifact.bin",
+          "lock_path": "/home/vegetable/ligamina-p401-bundles-20261026-capability-complete-v1/nonebot/project/sample/requirements.txt",
+          "asset_report": {
+            "schema_version": 1,
+            "kind": "phase4_p401_locked_profile_assets",
+            "status": "passed",
+            "ecosystem": "nonebot",
+            "profile_lock_sha256": "792fe11f2fd3581e888b15a23bc0c49f76b3b0d2399fc728dbfcff3d436214df",
+            "wheel_count": 35,
+            "wheel_sha256": {
+              "annotated_doc-0.0.5-py3-none-any.whl": "117bac03a25ede5df5440e855b32d556049ca169ead221505badf432fed4b101",
+              "annotated_types-0.8.0-py3-none-any.whl": "f072f4d804ea359e4eaf198b1af7a8b0943881a87f31bb764f8bf219bb9419e0",
+              "anyio-4.15.1-py3-none-any.whl": "6152fdbbf9a77fdec97731721bebf7c4c44f7c29b424b0065826173efc7ed101",
+              "attrs-26.1.0-py3-none-any.whl": "c647aa4a12dfbad9333ca4e71fe62ddc36f4e63b2d260a37a8b83d2f043ac309",
+              "click-8.5.0-py3-none-any.whl": "255bc9599cf7748b4b1a446ccc735421bd08a2ae529a8b88597d3de5664ee360",
+              "exceptiongroup-1.3.1-py3-none-any.whl": "a7a39a3bd276781e98394987d3a5701d0c4edffb633bb7a5144577f82c773598",
+              "fastapi-0.143.0-py3-none-any.whl": "3e9395fd35276425b61b516a31fdd7c77fe2af83e41b4da22e30696fb1304c5d",
+              "h11-0.16.0-py3-none-any.whl": "63cf8bbe7522de3bf65932fda1d9c2772064ffb3dae62d55932da54b31cb6c86",
+              "httptools-0.9.0-cp312-cp312-manylinux1_x86_64.manylinux_2_28_x86_64.manylinux_2_5_x86_64.whl": "3e3201fe4d46e0d15d7ff9fafc94a605da9eb82d2c5b9837f0368acb325481f1",
+              "idna-3.20-py3-none-any.whl": "ab7ae7122974553370f0bdb919e1a960b2cd1bc1ef0276416d896db81c14582c",
+              "jsonschema-4.25.1-py3-none-any.whl": "3fba0169e345c7175110351d456342c364814cfcf3b964ba4587f22915230a63",
+              "jsonschema_specifications-2025.9.1-py3-none-any.whl": "98802fee3a11ee76ecaca44429fda8a41bff98b00a0f2838151b113f210cc6fe",
+              "loguru-0.7.3-py3-none-any.whl": "31a33c10c8e1e10422bfd431aeb5d351c7cf7fa671e3c4df004162264b28220c",
+              "msgpack-1.2.3-cp312-cp312-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl": "ede33b2892ceb976283e009ad12fa1834cfdf1f9c43ee9c97849fc588d00a618",
+              "multidict-7.1.0-cp312-cp312-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl": "fed6b7705d49dd07e5e0dd5f5c873fc44047e92d714299b13245b5fecac49d01",
+              "nonebot2-2.5.0-py3-none-any.whl": "12380d396a3d5126eeeae0a1aa53af45e9d99b63896e3e2dd6340ee436869e36",
+              "nonebot_adapter_onebot-2.4.6-py3-none-any.whl": "b1ec7023fd83d731f63b513217327a57d12893a261944934b9195f79173791ad",
+              "nonebot_plugin_roll-0.2.3-py3-none-any.whl": "3a5ead2404f26711c9d41604ddcbb2e141df8a950fc53d32536aa7980fab1a2c",
+              "opentelemetry_api-1.45.1-py3-none-any.whl": "b31553efa588ae44bc306f863c785c5333a9ecc091248c6ee68b4b6c87fdedfb",
+              "propcache-0.5.4-cp312-cp312-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl": "2814ecd8e818f487bee4b0f921bc4d1c176cc5fc71ac0f072d0fa67eda4ac14b",
+              "pydantic-2.14.1-py3-none-any.whl": "9195d967ec791692a04438115466764fb8b9a27b31f14a760437694f40d6b454",
+              "pydantic_core-2.50.1-cp312-cp312-manylinux_2_17_x86_64.manylinux2014_x86_64.whl": "93ba4e9d8210d941c200431a56b2c0400b131865947903937ed3ec5404307d2e",
+              "pygtrie-2.6.2-py3-none-any.whl": "51dcc50ecb8291238e261b4e9f8ecca7313b763da258dd320d208ca2bc86b5f4",
+              "python_dotenv-1.2.4-py3-none-any.whl": "42269a8a5b3fd54ffa6f3d84b18abed50064717576b4ecf03dc4a55d8aa04fdc",
+              "pyyaml-6.0.3-cp312-cp312-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl": "ba1cc08a7ccde2d2ec775841541641e4548226580ab850948cbfda66a1befcdc",
+              "referencing-0.37.0-py3-none-any.whl": "381329a9f99628c9069361716891d34ad94af76e461dcb0335825aecc7692231",
+              "rpds_py-2026.9.1-cp312-cp312-manylinux_2_17_x86_64.manylinux2014_x86_64.whl": "addeda51556dac7c1a2f14cda62db8b621cd12afba3091d03a96c72932387eab",
+              "starlette-1.7.0-py3-none-any.whl": "67f8e99895493dd2911a03f11314af6ceebeae4e704bb9f43dfc6a9db151c93e",
+              "typing_extensions-4.16.0-py3-none-any.whl": "481caa481374e813c1b176ada14e97f1f67a4539ce9cfeb3f350d78d6370c2e8",
+              "typing_inspection-0.4.4-py3-none-any.whl": "65b8397ba37ccbce054456aaccddfc91e6e3083c92824df348d96ca832f3f147",
+              "uvicorn-0.54.0-py3-none-any.whl": "505bdb0f318731d45f1f712071fc781a8981f6847a31c902c9f5e652d4f67faf",
+              "uvloop-0.23.0-cp312-cp312-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl": "090865d8ce7a03986755a3ce711b7dd0d4b44eb14ab74368b717f3fad1180208",
+              "watchfiles-1.3.0-cp310-abi3-manylinux_2_17_x86_64.manylinux2014_x86_64.whl": "b5768b49e426fd5b550b012c866db347cdf15c398ef98dc557b6e6b72fa74cd1",
+              "websockets-17.2-cp312-cp312-manylinux1_x86_64.manylinux_2_28_x86_64.manylinux_2_5_x86_64.whl": "6627b913b8586b1c06db9516b31dd0dfbc621de3bb9312616d92a7e44f268a5b",
+              "yarl-1.25.1-cp312-cp312-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl": "c6f117789d22dce188e5754e8bc65b7e6ebf8cb73963b9fa761f672a5883769d"
+            },
+            "container_image": "python@sha256:f77ac9e44ae96ef2c90b8053ea08c31f8be030f824196b0ae4db6d462c84e51f",
+            "network_mode": "bridge",
+            "pip_require_hashes": true,
+            "only_binary": true,
+            "source_plugin_execution": false,
+            "lifecycle_scripts": "not_applicable",
+            "preparation": {
+              "downloaded_bytes": 0,
+              "downloaded_archives": 0,
+              "cache_hits": 35,
+              "archive_bytes": 12245579,
+              "locked_package_count": 35,
+              "unique_archive_count": 35,
+              "profile_lock_sha256": "792fe11f2fd3581e888b15a23bc0c49f76b3b0d2399fc728dbfcff3d436214df",
+              "wheel_manifest_sha256": "f84aa7631504ef15d0b184462a2993e98a1732a4e62fe8a11c7d91b1406eb346",
+              "metadata_response_count": 34,
+              "metadata_download_bytes": 0,
+              "metadata_cache_hits": 34,
+              "metadata_response_sha256": "a7ad8a882d9809a9b580f69459212f623a9a8227fa1f299ae56d7f125037494f"
+            },
+            "wheelhouse_file_sha256": {
+              "annotated_doc-0.0.5-py3-none-any.whl": "117bac03a25ede5df5440e855b32d556049ca169ead221505badf432fed4b101",
+              "annotated_types-0.8.0-py3-none-any.whl": "f072f4d804ea359e4eaf198b1af7a8b0943881a87f31bb764f8bf219bb9419e0",
+              "anyio-4.15.1-py3-none-any.whl": "6152fdbbf9a77fdec97731721bebf7c4c44f7c29b424b0065826173efc7ed101",
+              "attrs-26.1.0-py3-none-any.whl": "c647aa4a12dfbad9333ca4e71fe62ddc36f4e63b2d260a37a8b83d2f043ac309",
+              "click-8.5.0-py3-none-any.whl": "255bc9599cf7748b4b1a446ccc735421bd08a2ae529a8b88597d3de5664ee360",
+              "exceptiongroup-1.3.1-py3-none-any.whl": "a7a39a3bd276781e98394987d3a5701d0c4edffb633bb7a5144577f82c773598",
+              "fastapi-0.143.0-py3-none-any.whl": "3e9395fd35276425b61b516a31fdd7c77fe2af83e41b4da22e30696fb1304c5d",
+              "h11-0.16.0-py3-none-any.whl": "63cf8bbe7522de3bf65932fda1d9c2772064ffb3dae62d55932da54b31cb6c86",
+              "httptools-0.9.0-cp312-cp312-manylinux1_x86_64.manylinux_2_28_x86_64.manylinux_2_5_x86_64.whl": "3e3201fe4d46e0d15d7ff9fafc94a605da9eb82d2c5b9837f0368acb325481f1",
+              "idna-3.20-py3-none-any.whl": "ab7ae7122974553370f0bdb919e1a960b2cd1bc1ef0276416d896db81c14582c",
+              "jsonschema-4.25.1-py3-none-any.whl": "3fba0169e345c7175110351d456342c364814cfcf3b964ba4587f22915230a63",
+              "jsonschema_specifications-2025.9.1-py3-none-any.whl": "98802fee3a11ee76ecaca44429fda8a41bff98b00a0f2838151b113f210cc6fe",
+              "loguru-0.7.3-py3-none-any.whl": "31a33c10c8e1e10422bfd431aeb5d351c7cf7fa671e3c4df004162264b28220c",
+              "msgpack-1.2.3-cp312-cp312-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl": "ede33b2892ceb976283e009ad12fa1834cfdf1f9c43ee9c97849fc588d00a618",
+              "multidict-7.1.0-cp312-cp312-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl": "fed6b7705d49dd07e5e0dd5f5c873fc44047e92d714299b13245b5fecac49d01",
+              "nonebot2-2.5.0-py3-none-any.whl": "12380d396a3d5126eeeae0a1aa53af45e9d99b63896e3e2dd6340ee436869e36",
+              "nonebot_adapter_onebot-2.4.6-py3-none-any.whl": "b1ec7023fd83d731f63b513217327a57d12893a261944934b9195f79173791ad",
+              "nonebot_plugin_roll-0.2.3-py3-none-any.whl": "3a5ead2404f26711c9d41604ddcbb2e141df8a950fc53d32536aa7980fab1a2c",
+              "opentelemetry_api-1.45.1-py3-none-any.whl": "b31553efa588ae44bc306f863c785c5333a9ecc091248c6ee68b4b6c87fdedfb",
+              "propcache-0.5.4-cp312-cp312-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl": "2814ecd8e818f487bee4b0f921bc4d1c176cc5fc71ac0f072d0fa67eda4ac14b",
+              "pydantic-2.14.1-py3-none-any.whl": "9195d967ec791692a04438115466764fb8b9a27b31f14a760437694f40d6b454",
+              "pydantic_core-2.50.1-cp312-cp312-manylinux_2_17_x86_64.manylinux2014_x86_64.whl": "93ba4e9d8210d941c200431a56b2c0400b131865947903937ed3ec5404307d2e",
+              "pygtrie-2.6.2-py3-none-any.whl": "51dcc50ecb8291238e261b4e9f8ecca7313b763da258dd320d208ca2bc86b5f4",
+              "python_dotenv-1.2.4-py3-none-any.whl": "42269a8a5b3fd54ffa6f3d84b18abed50064717576b4ecf03dc4a55d8aa04fdc",
+              "pyyaml-6.0.3-cp312-cp312-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl": "ba1cc08a7ccde2d2ec775841541641e4548226580ab850948cbfda66a1befcdc",
+              "referencing-0.37.0-py3-none-any.whl": "381329a9f99628c9069361716891d34ad94af76e461dcb0335825aecc7692231",
+              "rpds_py-2026.9.1-cp312-cp312-manylinux_2_17_x86_64.manylinux2014_x86_64.whl": "addeda51556dac7c1a2f14cda62db8b621cd12afba3091d03a96c72932387eab",
+              "starlette-1.7.0-py3-none-any.whl": "67f8e99895493dd2911a03f11314af6ceebeae4e704bb9f43dfc6a9db151c93e",
+              "typing_extensions-4.16.0-py3-none-any.whl": "481caa481374e813c1b176ada14e97f1f67a4539ce9cfeb3f350d78d6370c2e8",
+              "typing_inspection-0.4.4-py3-none-any.whl": "65b8397ba37ccbce054456aaccddfc91e6e3083c92824df348d96ca832f3f147",
+              "uvicorn-0.54.0-py3-none-any.whl": "505bdb0f318731d45f1f712071fc781a8981f6847a31c902c9f5e652d4f67faf",
+              "uvloop-0.23.0-cp312-cp312-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl": "090865d8ce7a03986755a3ce711b7dd0d4b44eb14ab74368b717f3fad1180208",
+              "watchfiles-1.3.0-cp310-abi3-manylinux_2_17_x86_64.manylinux2014_x86_64.whl": "b5768b49e426fd5b550b012c866db347cdf15c398ef98dc557b6e6b72fa74cd1",
+              "websockets-17.2-cp312-cp312-manylinux1_x86_64.manylinux_2_28_x86_64.manylinux_2_5_x86_64.whl": "6627b913b8586b1c06db9516b31dd0dfbc621de3bb9312616d92a7e44f268a5b",
+              "yarl-1.25.1-cp312-cp312-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl": "c6f117789d22dce188e5754e8bc65b7e6ebf8cb73963b9fa761f672a5883769d"
+            }
+          },
+          "host_lock_sha256": null
+        },
+        {
+          "path": "/home/vegetable/ligamina-p401-bundles-20261026-capability-complete-v1/koishi",
+          "registry_entry_id": "ko-163c3bd4cf87c72c24210251",
+          "ecosystem": "koishi",
+          "artifact_sha256": "79da39692ba8fce04ea597ff85696a0fe193cd89a95a91a0d459ea40ab592265",
+          "profile_lock_sha256": "33e0897b794134c39215e7824a47edec3eb4acc79fcb9f4df00a03c1455f616b",
+          "artifact_path": "/home/vegetable/ligamina-p401-bundles-20261026-capability-complete-v1/koishi/project/sample/artifact.bin",
+          "lock_path": "/home/vegetable/ligamina-p401-bundles-20261026-capability-complete-v1/koishi/project/sample/package-lock.json",
+          "asset_report": {
+            "schema_version": 1,
+            "kind": "phase4_p401_locked_profile_assets",
+            "status": "passed",
+            "ecosystem": "koishi",
+            "profile_lock_sha256": "33e0897b794134c39215e7824a47edec3eb4acc79fcb9f4df00a03c1455f616b",
+            "host_lock_sha256": "5e3df82b0c353a8ded6c32708a8a591d9854182a38c6af9924c3e2671862bbcb",
+            "npm_cache_sha256": "0696b71e71bf9453fa2533867f53b731b4f87d8dcedb0dbdaa22e89f50e70c9b",
+            "npm_cache_size_bytes": 3784710,
+            "container_image": "node@sha256:6642ef280aebc09c4541bee0b15c9f89f0f3f3c247ddee79ae1d37eddfdcbbaa",
+            "network_mode": "bridge",
+            "npm_ci_ignore_scripts": true,
+            "source_plugin_execution": false
+          },
+          "host_lock_sha256": "5e3df82b0c353a8ded6c32708a8a591d9854182a38c6af9924c3e2671862bbcb"
+        }
+      ]
+    }
+  },
+  "denominator": {
+    "positions": 6,
+    "attempts": 18,
+    "side_executions": 36
+  },
+  "counts": {
+    "positions": 6,
+    "attempts": 18,
+    "side_executions": 36,
+    "passed_attempts": 18,
+    "failed_attempts": 0,
+    "cleanup_unconfirmed": 0
+  },
+  "capability_probes": {
+    "service": {
+      "status": "passed",
+      "path": "/mnt/e/stella/Ligamina/outputs/acceptance/phase4-p401-service-probe-20261026.json",
+      "sha256": "d41717194a8e9233a911ef565dc2c68359bd40f3e319c0cabdfe6b7c2f0366fa",
+      "probe_id": "phase4-service-probe-v1"
+    },
+    "storage": {
+      "status": "passed",
+      "probe_id": "phase4-storage-probe-v1",
+      "expected_side_runs": 36,
+      "observed_side_runs": 36,
+      "record_count": 54,
+      "unique_worker_count": 36,
+      "all_workers_cleaned": true
+    },
+    "clock": {
+      "status": "passed",
+      "probe_id": "phase4-clock-probe-v1",
+      "expected_side_runs": 36,
+      "observed_side_runs": 36,
+      "matched_event_count": 54
+    }
+  },
+  "gate": {
+    "p4_fixture_gate": "passed",
+    "p4_first_wave_behavior": "passed_scoped"
+  },
+  "positions": [
+    {
+      "registry_entry_id": "ko-163c3bd4cf87c72c24210251",
+      "package": "@koishijs/plugin-echo",
+      "version": "2.2.5",
+      "artifact_sha256": "79da39692ba8fce04ea597ff85696a0fe193cd89a95a91a0d459ea40ab592265",
+      "profile_id": "koishi-core-4.18.11-node-24.20.0-x86_64-portable-lock",
+      "profile_lock_sha256": "33e0897b794134c39215e7824a47edec3eb4acc79fcb9f4df00a03c1455f616b",
+      "case_id": "ko-koishijs-plugin-echo-positive",
+      "case_class": "positive",
+      "oracle_sha256": "19a25cf7f7cf74dd69974b95354128eb6a44a4e33ecf80e7afbb27d1b8b1daf7",
+      "status": "passed",
+      "attempt_ids": [
+        "ko-koishijs-plugin-echo-positive-a1",
+        "ko-koishijs-plugin-echo-positive-a2",
+        "ko-koishijs-plugin-echo-positive-a3"
+      ]
+    },
+    {
+      "registry_entry_id": "ko-163c3bd4cf87c72c24210251",
+      "package": "@koishijs/plugin-echo",
+      "version": "2.2.5",
+      "artifact_sha256": "79da39692ba8fce04ea597ff85696a0fe193cd89a95a91a0d459ea40ab592265",
+      "profile_id": "koishi-core-4.18.11-node-24.20.0-x86_64-portable-lock",
+      "profile_lock_sha256": "33e0897b794134c39215e7824a47edec3eb4acc79fcb9f4df00a03c1455f616b",
+      "case_id": "ko-koishijs-plugin-echo-negative",
+      "case_class": "negative",
+      "oracle_sha256": "43d9885cb5b28680f7b8d6ef3deedd49f72c4223498f328c93252847cfd0d22d",
+      "status": "passed",
+      "attempt_ids": [
+        "ko-koishijs-plugin-echo-negative-a1",
+        "ko-koishijs-plugin-echo-negative-a2",
+        "ko-koishijs-plugin-echo-negative-a3"
+      ]
+    },
+    {
+      "registry_entry_id": "ko-163c3bd4cf87c72c24210251",
+      "package": "@koishijs/plugin-echo",
+      "version": "2.2.5",
+      "artifact_sha256": "79da39692ba8fce04ea597ff85696a0fe193cd89a95a91a0d459ea40ab592265",
+      "profile_id": "koishi-core-4.18.11-node-24.20.0-x86_64-portable-lock",
+      "profile_lock_sha256": "33e0897b794134c39215e7824a47edec3eb4acc79fcb9f4df00a03c1455f616b",
+      "case_id": "ko-koishijs-plugin-echo-isolation",
+      "case_class": "isolation",
+      "oracle_sha256": "2533780951e7b7dd10b03a65b79cedc7c435b4832eb26845462e19ca807c1a4d",
+      "status": "passed",
+      "attempt_ids": [
+        "ko-koishijs-plugin-echo-isolation-a1",
+        "ko-koishijs-plugin-echo-isolation-a2",
+        "ko-koishijs-plugin-echo-isolation-a3"
+      ]
+    },
+    {
+      "registry_entry_id": "nb-16c80a826ca035f6c49ad69a",
+      "package": "nonebot_plugin_roll",
+      "version": "0.2.3",
+      "artifact_sha256": "3a5ead2404f26711c9d41604ddcbb2e141df8a950fc53d32536aa7980fab1a2c",
+      "profile_id": "nonebot-2.5.0-onebot-2.4.6-py3.12.14-linux-x86_64",
+      "profile_lock_sha256": "792fe11f2fd3581e888b15a23bc0c49f76b3b0d2399fc728dbfcff3d436214df",
+      "case_id": "nb-nonebot-plugin-roll-positive",
+      "case_class": "positive",
+      "oracle_sha256": "07c015a247e450c726f44a7d45f0b32020c6c9d61de1616dcb61992d451c0068",
+      "status": "passed",
+      "attempt_ids": [
+        "nb-nonebot-plugin-roll-positive-a1",
+        "nb-nonebot-plugin-roll-positive-a2",
+        "nb-nonebot-plugin-roll-positive-a3"
+      ]
+    },
+    {
+      "registry_entry_id": "nb-16c80a826ca035f6c49ad69a",
+      "package": "nonebot_plugin_roll",
+      "version": "0.2.3",
+      "artifact_sha256": "3a5ead2404f26711c9d41604ddcbb2e141df8a950fc53d32536aa7980fab1a2c",
+      "profile_id": "nonebot-2.5.0-onebot-2.4.6-py3.12.14-linux-x86_64",
+      "profile_lock_sha256": "792fe11f2fd3581e888b15a23bc0c49f76b3b0d2399fc728dbfcff3d436214df",
+      "case_id": "nb-nonebot-plugin-roll-negative",
+      "case_class": "negative",
+      "oracle_sha256": "a38dd3f238627f2ab14ef3c6a6ddd638a788d6118248aa02a04101c1393d9f69",
+      "status": "passed",
+      "attempt_ids": [
+        "nb-nonebot-plugin-roll-negative-a1",
+        "nb-nonebot-plugin-roll-negative-a2",
+        "nb-nonebot-plugin-roll-negative-a3"
+      ]
+    },
+    {
+      "registry_entry_id": "nb-16c80a826ca035f6c49ad69a",
+      "package": "nonebot_plugin_roll",
+      "version": "0.2.3",
+      "artifact_sha256": "3a5ead2404f26711c9d41604ddcbb2e141df8a950fc53d32536aa7980fab1a2c",
+      "profile_id": "nonebot-2.5.0-onebot-2.4.6-py3.12.14-linux-x86_64",
+      "profile_lock_sha256": "792fe11f2fd3581e888b15a23bc0c49f76b3b0d2399fc728dbfcff3d436214df",
+      "case_id": "nb-nonebot-plugin-roll-isolation",
+      "case_class": "isolation",
+      "oracle_sha256": "26e272be227b4fc0d9e970716416b3265a7ae2cace28cf4f52e72c020eccb6a4",
+      "status": "passed",
+      "attempt_ids": [
+        "nb-nonebot-plugin-roll-isolation-a1",
+        "nb-nonebot-plugin-roll-isolation-a2",
+        "nb-nonebot-plugin-roll-isolation-a3"
+      ]
+    }
+  ],
+  "attempt_ledger": [
+    {
+      "attempt_id": "ko-koishijs-plugin-echo-positive-a1",
+      "case_id": "ko-koishijs-plugin-echo-positive",
+      "comparison": {
+        "status": "passed",
+        "issues": []
+      },
+      "sides": {
+        "native": {
+          "status": "completed",
+          "worker_id": "ligamina-8f015fe6dd174150",
+          "worker_cleanup_confirmed": true,
+          "worker_stdout_sha256": "092bf735852fa48fc6710547324ba6ba0ba049f6c8b4ac535a93b6752eff6868",
+          "worker_stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "environment": {
+            "ecosystem": "koishi",
+            "framework_version": "4.18.11",
+            "runtime_version": "24.20.0",
+            "lockfile_sha256": "33e0897b794134c39215e7824a47edec3eb4acc79fcb9f4df00a03c1455f616b",
+            "profile_sha256": "f7c0fd9fb2c5d50a9bb902b2c05459b13b061d18a42f60a8106b8aba71558b66",
+            "artifact_hash": "79da39692ba8fce04ea597ff85696a0fe193cd89a95a91a0d459ea40ab592265",
+            "config_sha256": "61a7b7238635d93b6f2d4c8759a10aaf6f91977c549585a781f882eb0332c653",
+            "stimulus_sha256": "4a20effb3655562dca55b1df5f0b6cd22a975858494bd07dbd335faaf9a8b995"
+          },
+          "trace": {
+            "bridge_adapter_imported": false
+          }
+        },
+        "federated": {
+          "status": "completed",
+          "worker_id": "ligamina-247b9390a81e4cf4",
+          "worker_cleanup_confirmed": true,
+          "worker_stdout_sha256": "63549f8f1eb1254ca9beed67cf23f4e8f0f3f0ea5c033e75bf152ca8bc810cae",
+          "worker_stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "environment": {
+            "ecosystem": "koishi",
+            "framework_version": "4.18.11",
+            "runtime_version": "24.20.0",
+            "lockfile_sha256": "33e0897b794134c39215e7824a47edec3eb4acc79fcb9f4df00a03c1455f616b",
+            "profile_sha256": "f7c0fd9fb2c5d50a9bb902b2c05459b13b061d18a42f60a8106b8aba71558b66",
+            "artifact_hash": "79da39692ba8fce04ea597ff85696a0fe193cd89a95a91a0d459ea40ab592265",
+            "config_sha256": "61a7b7238635d93b6f2d4c8759a10aaf6f91977c549585a781f882eb0332c653",
+            "stimulus_sha256": "4a20effb3655562dca55b1df5f0b6cd22a975858494bd07dbd335faaf9a8b995"
+          },
+          "trace": {
+            "core_host_route": "passed",
+            "host_pid_reaped": true,
+            "gateway_operation_count": 1
+          }
+        }
+      }
+    },
+    {
+      "attempt_id": "ko-koishijs-plugin-echo-positive-a2",
+      "case_id": "ko-koishijs-plugin-echo-positive",
+      "comparison": {
+        "status": "passed",
+        "issues": []
+      },
+      "sides": {
+        "native": {
+          "status": "completed",
+          "worker_id": "ligamina-a79dfc5a936543e7",
+          "worker_cleanup_confirmed": true,
+          "worker_stdout_sha256": "092bf735852fa48fc6710547324ba6ba0ba049f6c8b4ac535a93b6752eff6868",
+          "worker_stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "environment": {
+            "ecosystem": "koishi",
+            "framework_version": "4.18.11",
+            "runtime_version": "24.20.0",
+            "lockfile_sha256": "33e0897b794134c39215e7824a47edec3eb4acc79fcb9f4df00a03c1455f616b",
+            "profile_sha256": "f7c0fd9fb2c5d50a9bb902b2c05459b13b061d18a42f60a8106b8aba71558b66",
+            "artifact_hash": "79da39692ba8fce04ea597ff85696a0fe193cd89a95a91a0d459ea40ab592265",
+            "config_sha256": "61a7b7238635d93b6f2d4c8759a10aaf6f91977c549585a781f882eb0332c653",
+            "stimulus_sha256": "4a20effb3655562dca55b1df5f0b6cd22a975858494bd07dbd335faaf9a8b995"
+          },
+          "trace": {
+            "bridge_adapter_imported": false
+          }
+        },
+        "federated": {
+          "status": "completed",
+          "worker_id": "ligamina-d76e7d8aed10432e",
+          "worker_cleanup_confirmed": true,
+          "worker_stdout_sha256": "63549f8f1eb1254ca9beed67cf23f4e8f0f3f0ea5c033e75bf152ca8bc810cae",
+          "worker_stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "environment": {
+            "ecosystem": "koishi",
+            "framework_version": "4.18.11",
+            "runtime_version": "24.20.0",
+            "lockfile_sha256": "33e0897b794134c39215e7824a47edec3eb4acc79fcb9f4df00a03c1455f616b",
+            "profile_sha256": "f7c0fd9fb2c5d50a9bb902b2c05459b13b061d18a42f60a8106b8aba71558b66",
+            "artifact_hash": "79da39692ba8fce04ea597ff85696a0fe193cd89a95a91a0d459ea40ab592265",
+            "config_sha256": "61a7b7238635d93b6f2d4c8759a10aaf6f91977c549585a781f882eb0332c653",
+            "stimulus_sha256": "4a20effb3655562dca55b1df5f0b6cd22a975858494bd07dbd335faaf9a8b995"
+          },
+          "trace": {
+            "core_host_route": "passed",
+            "host_pid_reaped": true,
+            "gateway_operation_count": 1
+          }
+        }
+      }
+    },
+    {
+      "attempt_id": "ko-koishijs-plugin-echo-positive-a3",
+      "case_id": "ko-koishijs-plugin-echo-positive",
+      "comparison": {
+        "status": "passed",
+        "issues": []
+      },
+      "sides": {
+        "native": {
+          "status": "completed",
+          "worker_id": "ligamina-8d311ae124e6442e",
+          "worker_cleanup_confirmed": true,
+          "worker_stdout_sha256": "092bf735852fa48fc6710547324ba6ba0ba049f6c8b4ac535a93b6752eff6868",
+          "worker_stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "environment": {
+            "ecosystem": "koishi",
+            "framework_version": "4.18.11",
+            "runtime_version": "24.20.0",
+            "lockfile_sha256": "33e0897b794134c39215e7824a47edec3eb4acc79fcb9f4df00a03c1455f616b",
+            "profile_sha256": "f7c0fd9fb2c5d50a9bb902b2c05459b13b061d18a42f60a8106b8aba71558b66",
+            "artifact_hash": "79da39692ba8fce04ea597ff85696a0fe193cd89a95a91a0d459ea40ab592265",
+            "config_sha256": "61a7b7238635d93b6f2d4c8759a10aaf6f91977c549585a781f882eb0332c653",
+            "stimulus_sha256": "4a20effb3655562dca55b1df5f0b6cd22a975858494bd07dbd335faaf9a8b995"
+          },
+          "trace": {
+            "bridge_adapter_imported": false
+          }
+        },
+        "federated": {
+          "status": "completed",
+          "worker_id": "ligamina-05901814ffdb4fdf",
+          "worker_cleanup_confirmed": true,
+          "worker_stdout_sha256": "63549f8f1eb1254ca9beed67cf23f4e8f0f3f0ea5c033e75bf152ca8bc810cae",
+          "worker_stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "environment": {
+            "ecosystem": "koishi",
+            "framework_version": "4.18.11",
+            "runtime_version": "24.20.0",
+            "lockfile_sha256": "33e0897b794134c39215e7824a47edec3eb4acc79fcb9f4df00a03c1455f616b",
+            "profile_sha256": "f7c0fd9fb2c5d50a9bb902b2c05459b13b061d18a42f60a8106b8aba71558b66",
+            "artifact_hash": "79da39692ba8fce04ea597ff85696a0fe193cd89a95a91a0d459ea40ab592265",
+            "config_sha256": "61a7b7238635d93b6f2d4c8759a10aaf6f91977c549585a781f882eb0332c653",
+            "stimulus_sha256": "4a20effb3655562dca55b1df5f0b6cd22a975858494bd07dbd335faaf9a8b995"
+          },
+          "trace": {
+            "core_host_route": "passed",
+            "host_pid_reaped": true,
+            "gateway_operation_count": 1
+          }
+        }
+      }
+    },
+    {
+      "attempt_id": "ko-koishijs-plugin-echo-negative-a1",
+      "case_id": "ko-koishijs-plugin-echo-negative",
+      "comparison": {
+        "status": "passed",
+        "issues": []
+      },
+      "sides": {
+        "native": {
+          "status": "completed",
+          "worker_id": "ligamina-8e5b9a1cf0ed4f21",
+          "worker_cleanup_confirmed": true,
+          "worker_stdout_sha256": "e88677487bd8f07fb4f8947ef7fc1f21b8d03a262b0ea11a45847fb986abf6c7",
+          "worker_stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "environment": {
+            "ecosystem": "koishi",
+            "framework_version": "4.18.11",
+            "runtime_version": "24.20.0",
+            "lockfile_sha256": "33e0897b794134c39215e7824a47edec3eb4acc79fcb9f4df00a03c1455f616b",
+            "profile_sha256": "f7c0fd9fb2c5d50a9bb902b2c05459b13b061d18a42f60a8106b8aba71558b66",
+            "artifact_hash": "79da39692ba8fce04ea597ff85696a0fe193cd89a95a91a0d459ea40ab592265",
+            "config_sha256": "61a7b7238635d93b6f2d4c8759a10aaf6f91977c549585a781f882eb0332c653",
+            "stimulus_sha256": "dde6375acf749cfdf6125801cca7d0d056a9103374ef4da1a469bf011ab20983"
+          },
+          "trace": {
+            "bridge_adapter_imported": false
+          }
+        },
+        "federated": {
+          "status": "completed",
+          "worker_id": "ligamina-b7316c14fae44f07",
+          "worker_cleanup_confirmed": true,
+          "worker_stdout_sha256": "812039675e5bfa1638d494d028da8e9c2d22400e034cf53f9a231ea9888a52f9",
+          "worker_stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "environment": {
+            "ecosystem": "koishi",
+            "framework_version": "4.18.11",
+            "runtime_version": "24.20.0",
+            "lockfile_sha256": "33e0897b794134c39215e7824a47edec3eb4acc79fcb9f4df00a03c1455f616b",
+            "profile_sha256": "f7c0fd9fb2c5d50a9bb902b2c05459b13b061d18a42f60a8106b8aba71558b66",
+            "artifact_hash": "79da39692ba8fce04ea597ff85696a0fe193cd89a95a91a0d459ea40ab592265",
+            "config_sha256": "61a7b7238635d93b6f2d4c8759a10aaf6f91977c549585a781f882eb0332c653",
+            "stimulus_sha256": "dde6375acf749cfdf6125801cca7d0d056a9103374ef4da1a469bf011ab20983"
+          },
+          "trace": {
+            "core_host_route": "passed",
+            "host_pid_reaped": true,
+            "gateway_operation_count": 1
+          }
+        }
+      }
+    },
+    {
+      "attempt_id": "ko-koishijs-plugin-echo-negative-a2",
+      "case_id": "ko-koishijs-plugin-echo-negative",
+      "comparison": {
+        "status": "passed",
+        "issues": []
+      },
+      "sides": {
+        "native": {
+          "status": "completed",
+          "worker_id": "ligamina-f578c414c64a4317",
+          "worker_cleanup_confirmed": true,
+          "worker_stdout_sha256": "e88677487bd8f07fb4f8947ef7fc1f21b8d03a262b0ea11a45847fb986abf6c7",
+          "worker_stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "environment": {
+            "ecosystem": "koishi",
+            "framework_version": "4.18.11",
+            "runtime_version": "24.20.0",
+            "lockfile_sha256": "33e0897b794134c39215e7824a47edec3eb4acc79fcb9f4df00a03c1455f616b",
+            "profile_sha256": "f7c0fd9fb2c5d50a9bb902b2c05459b13b061d18a42f60a8106b8aba71558b66",
+            "artifact_hash": "79da39692ba8fce04ea597ff85696a0fe193cd89a95a91a0d459ea40ab592265",
+            "config_sha256": "61a7b7238635d93b6f2d4c8759a10aaf6f91977c549585a781f882eb0332c653",
+            "stimulus_sha256": "dde6375acf749cfdf6125801cca7d0d056a9103374ef4da1a469bf011ab20983"
+          },
+          "trace": {
+            "bridge_adapter_imported": false
+          }
+        },
+        "federated": {
+          "status": "completed",
+          "worker_id": "ligamina-f3103d4f2c8b4b8c",
+          "worker_cleanup_confirmed": true,
+          "worker_stdout_sha256": "812039675e5bfa1638d494d028da8e9c2d22400e034cf53f9a231ea9888a52f9",
+          "worker_stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "environment": {
+            "ecosystem": "koishi",
+            "framework_version": "4.18.11",
+            "runtime_version": "24.20.0",
+            "lockfile_sha256": "33e0897b794134c39215e7824a47edec3eb4acc79fcb9f4df00a03c1455f616b",
+            "profile_sha256": "f7c0fd9fb2c5d50a9bb902b2c05459b13b061d18a42f60a8106b8aba71558b66",
+            "artifact_hash": "79da39692ba8fce04ea597ff85696a0fe193cd89a95a91a0d459ea40ab592265",
+            "config_sha256": "61a7b7238635d93b6f2d4c8759a10aaf6f91977c549585a781f882eb0332c653",
+            "stimulus_sha256": "dde6375acf749cfdf6125801cca7d0d056a9103374ef4da1a469bf011ab20983"
+          },
+          "trace": {
+            "core_host_route": "passed",
+            "host_pid_reaped": true,
+            "gateway_operation_count": 1
+          }
+        }
+      }
+    },
+    {
+      "attempt_id": "ko-koishijs-plugin-echo-negative-a3",
+      "case_id": "ko-koishijs-plugin-echo-negative",
+      "comparison": {
+        "status": "passed",
+        "issues": []
+      },
+      "sides": {
+        "native": {
+          "status": "completed",
+          "worker_id": "ligamina-73d0c3af33d645ba",
+          "worker_cleanup_confirmed": true,
+          "worker_stdout_sha256": "e88677487bd8f07fb4f8947ef7fc1f21b8d03a262b0ea11a45847fb986abf6c7",
+          "worker_stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "environment": {
+            "ecosystem": "koishi",
+            "framework_version": "4.18.11",
+            "runtime_version": "24.20.0",
+            "lockfile_sha256": "33e0897b794134c39215e7824a47edec3eb4acc79fcb9f4df00a03c1455f616b",
+            "profile_sha256": "f7c0fd9fb2c5d50a9bb902b2c05459b13b061d18a42f60a8106b8aba71558b66",
+            "artifact_hash": "79da39692ba8fce04ea597ff85696a0fe193cd89a95a91a0d459ea40ab592265",
+            "config_sha256": "61a7b7238635d93b6f2d4c8759a10aaf6f91977c549585a781f882eb0332c653",
+            "stimulus_sha256": "dde6375acf749cfdf6125801cca7d0d056a9103374ef4da1a469bf011ab20983"
+          },
+          "trace": {
+            "bridge_adapter_imported": false
+          }
+        },
+        "federated": {
+          "status": "completed",
+          "worker_id": "ligamina-6a4854e559ba44bf",
+          "worker_cleanup_confirmed": true,
+          "worker_stdout_sha256": "812039675e5bfa1638d494d028da8e9c2d22400e034cf53f9a231ea9888a52f9",
+          "worker_stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "environment": {
+            "ecosystem": "koishi",
+            "framework_version": "4.18.11",
+            "runtime_version": "24.20.0",
+            "lockfile_sha256": "33e0897b794134c39215e7824a47edec3eb4acc79fcb9f4df00a03c1455f616b",
+            "profile_sha256": "f7c0fd9fb2c5d50a9bb902b2c05459b13b061d18a42f60a8106b8aba71558b66",
+            "artifact_hash": "79da39692ba8fce04ea597ff85696a0fe193cd89a95a91a0d459ea40ab592265",
+            "config_sha256": "61a7b7238635d93b6f2d4c8759a10aaf6f91977c549585a781f882eb0332c653",
+            "stimulus_sha256": "dde6375acf749cfdf6125801cca7d0d056a9103374ef4da1a469bf011ab20983"
+          },
+          "trace": {
+            "core_host_route": "passed",
+            "host_pid_reaped": true,
+            "gateway_operation_count": 1
+          }
+        }
+      }
+    },
+    {
+      "attempt_id": "ko-koishijs-plugin-echo-isolation-a1",
+      "case_id": "ko-koishijs-plugin-echo-isolation",
+      "comparison": {
+        "status": "passed",
+        "issues": []
+      },
+      "sides": {
+        "native": {
+          "status": "completed",
+          "worker_id": "ligamina-be5887b6036b49e7",
+          "worker_cleanup_confirmed": true,
+          "worker_stdout_sha256": "c68fc0fedcc1d3948671916697ae5bc88395ca91b842e29f36d43314caad19c8",
+          "worker_stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "environment": {
+            "ecosystem": "koishi",
+            "framework_version": "4.18.11",
+            "runtime_version": "24.20.0",
+            "lockfile_sha256": "33e0897b794134c39215e7824a47edec3eb4acc79fcb9f4df00a03c1455f616b",
+            "profile_sha256": "f7c0fd9fb2c5d50a9bb902b2c05459b13b061d18a42f60a8106b8aba71558b66",
+            "artifact_hash": "79da39692ba8fce04ea597ff85696a0fe193cd89a95a91a0d459ea40ab592265",
+            "config_sha256": "61a7b7238635d93b6f2d4c8759a10aaf6f91977c549585a781f882eb0332c653",
+            "stimulus_sha256": "1b908458e79005182a23beee0810b41e1ec83ae1fc1afd630dd2d48004e29066"
+          },
+          "trace": {
+            "bridge_adapter_imported": false
+          }
+        },
+        "federated": {
+          "status": "completed",
+          "worker_id": "ligamina-7a1066e891e34123",
+          "worker_cleanup_confirmed": true,
+          "worker_stdout_sha256": "0ec442b7e7a6b43338961cfab8fefd22a47bc335924e747451b9809f176935b6",
+          "worker_stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "environment": {
+            "ecosystem": "koishi",
+            "framework_version": "4.18.11",
+            "runtime_version": "24.20.0",
+            "lockfile_sha256": "33e0897b794134c39215e7824a47edec3eb4acc79fcb9f4df00a03c1455f616b",
+            "profile_sha256": "f7c0fd9fb2c5d50a9bb902b2c05459b13b061d18a42f60a8106b8aba71558b66",
+            "artifact_hash": "79da39692ba8fce04ea597ff85696a0fe193cd89a95a91a0d459ea40ab592265",
+            "config_sha256": "61a7b7238635d93b6f2d4c8759a10aaf6f91977c549585a781f882eb0332c653",
+            "stimulus_sha256": "1b908458e79005182a23beee0810b41e1ec83ae1fc1afd630dd2d48004e29066"
+          },
+          "trace": {
+            "core_host_route": "passed",
+            "host_pid_reaped": true,
+            "gateway_operation_count": 2
+          }
+        }
+      }
+    },
+    {
+      "attempt_id": "ko-koishijs-plugin-echo-isolation-a2",
+      "case_id": "ko-koishijs-plugin-echo-isolation",
+      "comparison": {
+        "status": "passed",
+        "issues": []
+      },
+      "sides": {
+        "native": {
+          "status": "completed",
+          "worker_id": "ligamina-badd2e19bf8b4a63",
+          "worker_cleanup_confirmed": true,
+          "worker_stdout_sha256": "c68fc0fedcc1d3948671916697ae5bc88395ca91b842e29f36d43314caad19c8",
+          "worker_stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "environment": {
+            "ecosystem": "koishi",
+            "framework_version": "4.18.11",
+            "runtime_version": "24.20.0",
+            "lockfile_sha256": "33e0897b794134c39215e7824a47edec3eb4acc79fcb9f4df00a03c1455f616b",
+            "profile_sha256": "f7c0fd9fb2c5d50a9bb902b2c05459b13b061d18a42f60a8106b8aba71558b66",
+            "artifact_hash": "79da39692ba8fce04ea597ff85696a0fe193cd89a95a91a0d459ea40ab592265",
+            "config_sha256": "61a7b7238635d93b6f2d4c8759a10aaf6f91977c549585a781f882eb0332c653",
+            "stimulus_sha256": "1b908458e79005182a23beee0810b41e1ec83ae1fc1afd630dd2d48004e29066"
+          },
+          "trace": {
+            "bridge_adapter_imported": false
+          }
+        },
+        "federated": {
+          "status": "completed",
+          "worker_id": "ligamina-680cd3b6b56d49cc",
+          "worker_cleanup_confirmed": true,
+          "worker_stdout_sha256": "0ec442b7e7a6b43338961cfab8fefd22a47bc335924e747451b9809f176935b6",
+          "worker_stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "environment": {
+            "ecosystem": "koishi",
+            "framework_version": "4.18.11",
+            "runtime_version": "24.20.0",
+            "lockfile_sha256": "33e0897b794134c39215e7824a47edec3eb4acc79fcb9f4df00a03c1455f616b",
+            "profile_sha256": "f7c0fd9fb2c5d50a9bb902b2c05459b13b061d18a42f60a8106b8aba71558b66",
+            "artifact_hash": "79da39692ba8fce04ea597ff85696a0fe193cd89a95a91a0d459ea40ab592265",
+            "config_sha256": "61a7b7238635d93b6f2d4c8759a10aaf6f91977c549585a781f882eb0332c653",
+            "stimulus_sha256": "1b908458e79005182a23beee0810b41e1ec83ae1fc1afd630dd2d48004e29066"
+          },
+          "trace": {
+            "core_host_route": "passed",
+            "host_pid_reaped": true,
+            "gateway_operation_count": 2
+          }
+        }
+      }
+    },
+    {
+      "attempt_id": "ko-koishijs-plugin-echo-isolation-a3",
+      "case_id": "ko-koishijs-plugin-echo-isolation",
+      "comparison": {
+        "status": "passed",
+        "issues": []
+      },
+      "sides": {
+        "native": {
+          "status": "completed",
+          "worker_id": "ligamina-5eecf928d14d46b5",
+          "worker_cleanup_confirmed": true,
+          "worker_stdout_sha256": "c68fc0fedcc1d3948671916697ae5bc88395ca91b842e29f36d43314caad19c8",
+          "worker_stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "environment": {
+            "ecosystem": "koishi",
+            "framework_version": "4.18.11",
+            "runtime_version": "24.20.0",
+            "lockfile_sha256": "33e0897b794134c39215e7824a47edec3eb4acc79fcb9f4df00a03c1455f616b",
+            "profile_sha256": "f7c0fd9fb2c5d50a9bb902b2c05459b13b061d18a42f60a8106b8aba71558b66",
+            "artifact_hash": "79da39692ba8fce04ea597ff85696a0fe193cd89a95a91a0d459ea40ab592265",
+            "config_sha256": "61a7b7238635d93b6f2d4c8759a10aaf6f91977c549585a781f882eb0332c653",
+            "stimulus_sha256": "1b908458e79005182a23beee0810b41e1ec83ae1fc1afd630dd2d48004e29066"
+          },
+          "trace": {
+            "bridge_adapter_imported": false
+          }
+        },
+        "federated": {
+          "status": "completed",
+          "worker_id": "ligamina-25d981373dfd426f",
+          "worker_cleanup_confirmed": true,
+          "worker_stdout_sha256": "0ec442b7e7a6b43338961cfab8fefd22a47bc335924e747451b9809f176935b6",
+          "worker_stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "environment": {
+            "ecosystem": "koishi",
+            "framework_version": "4.18.11",
+            "runtime_version": "24.20.0",
+            "lockfile_sha256": "33e0897b794134c39215e7824a47edec3eb4acc79fcb9f4df00a03c1455f616b",
+            "profile_sha256": "f7c0fd9fb2c5d50a9bb902b2c05459b13b061d18a42f60a8106b8aba71558b66",
+            "artifact_hash": "79da39692ba8fce04ea597ff85696a0fe193cd89a95a91a0d459ea40ab592265",
+            "config_sha256": "61a7b7238635d93b6f2d4c8759a10aaf6f91977c549585a781f882eb0332c653",
+            "stimulus_sha256": "1b908458e79005182a23beee0810b41e1ec83ae1fc1afd630dd2d48004e29066"
+          },
+          "trace": {
+            "core_host_route": "passed",
+            "host_pid_reaped": true,
+            "gateway_operation_count": 2
+          }
+        }
+      }
+    },
+    {
+      "attempt_id": "nb-nonebot-plugin-roll-positive-a1",
+      "case_id": "nb-nonebot-plugin-roll-positive",
+      "comparison": {
+        "status": "passed",
+        "issues": []
+      },
+      "sides": {
+        "native": {
+          "status": "completed",
+          "worker_id": "ligamina-ef6857122574499b",
+          "worker_cleanup_confirmed": true,
+          "worker_stdout_sha256": "99cac720055d9cb0dce0f6a922df153f35f494a5d20aa928dd45ac0617837014",
+          "worker_stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "environment": {
+            "ecosystem": "nonebot",
+            "framework_version": "2.5.0",
+            "runtime_version": "3.12.14",
+            "lockfile_sha256": "792fe11f2fd3581e888b15a23bc0c49f76b3b0d2399fc728dbfcff3d436214df",
+            "profile_sha256": "4b77454753fa5181a90bb3c339de6970bbe1b2f57ff8ff2dc15d63a2bea929a6",
+            "artifact_hash": "3a5ead2404f26711c9d41604ddcbb2e141df8a950fc53d32536aa7980fab1a2c",
+            "config_sha256": "038fa7f0e40eed015a21abf019c3acbe78d98630813ac3861b405e195f45a0ba",
+            "stimulus_sha256": "9c99b652320a12e1dc0145df5b522ca118be6defca38d1121a25e9636a49b738"
+          },
+          "trace": {
+            "bridge_adapter_imported": false
+          }
+        },
+        "federated": {
+          "status": "completed",
+          "worker_id": "ligamina-c6f21dbe81cc401b",
+          "worker_cleanup_confirmed": true,
+          "worker_stdout_sha256": "0f0ed35802fe7d6a309a20790a5644f53665b4ed1653b31ce6424fab614e181e",
+          "worker_stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "environment": {
+            "ecosystem": "nonebot",
+            "framework_version": "2.5.0",
+            "runtime_version": "3.12.14",
+            "lockfile_sha256": "792fe11f2fd3581e888b15a23bc0c49f76b3b0d2399fc728dbfcff3d436214df",
+            "profile_sha256": "4b77454753fa5181a90bb3c339de6970bbe1b2f57ff8ff2dc15d63a2bea929a6",
+            "artifact_hash": "3a5ead2404f26711c9d41604ddcbb2e141df8a950fc53d32536aa7980fab1a2c",
+            "config_sha256": "038fa7f0e40eed015a21abf019c3acbe78d98630813ac3861b405e195f45a0ba",
+            "stimulus_sha256": "9c99b652320a12e1dc0145df5b522ca118be6defca38d1121a25e9636a49b738"
+          },
+          "trace": {
+            "core_host_route": "passed",
+            "host_pid_reaped": true,
+            "gateway_operation_count": 1
+          }
+        }
+      }
+    },
+    {
+      "attempt_id": "nb-nonebot-plugin-roll-positive-a2",
+      "case_id": "nb-nonebot-plugin-roll-positive",
+      "comparison": {
+        "status": "passed",
+        "issues": []
+      },
+      "sides": {
+        "native": {
+          "status": "completed",
+          "worker_id": "ligamina-7fe03756f4ef43e0",
+          "worker_cleanup_confirmed": true,
+          "worker_stdout_sha256": "8d2a8452869be1b5e418b53189aba7cc27ead77433ed49f0b47b0ac464197d35",
+          "worker_stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "environment": {
+            "ecosystem": "nonebot",
+            "framework_version": "2.5.0",
+            "runtime_version": "3.12.14",
+            "lockfile_sha256": "792fe11f2fd3581e888b15a23bc0c49f76b3b0d2399fc728dbfcff3d436214df",
+            "profile_sha256": "4b77454753fa5181a90bb3c339de6970bbe1b2f57ff8ff2dc15d63a2bea929a6",
+            "artifact_hash": "3a5ead2404f26711c9d41604ddcbb2e141df8a950fc53d32536aa7980fab1a2c",
+            "config_sha256": "038fa7f0e40eed015a21abf019c3acbe78d98630813ac3861b405e195f45a0ba",
+            "stimulus_sha256": "9c99b652320a12e1dc0145df5b522ca118be6defca38d1121a25e9636a49b738"
+          },
+          "trace": {
+            "bridge_adapter_imported": false
+          }
+        },
+        "federated": {
+          "status": "completed",
+          "worker_id": "ligamina-6b68cc14b4a74a68",
+          "worker_cleanup_confirmed": true,
+          "worker_stdout_sha256": "0f0ed35802fe7d6a309a20790a5644f53665b4ed1653b31ce6424fab614e181e",
+          "worker_stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "environment": {
+            "ecosystem": "nonebot",
+            "framework_version": "2.5.0",
+            "runtime_version": "3.12.14",
+            "lockfile_sha256": "792fe11f2fd3581e888b15a23bc0c49f76b3b0d2399fc728dbfcff3d436214df",
+            "profile_sha256": "4b77454753fa5181a90bb3c339de6970bbe1b2f57ff8ff2dc15d63a2bea929a6",
+            "artifact_hash": "3a5ead2404f26711c9d41604ddcbb2e141df8a950fc53d32536aa7980fab1a2c",
+            "config_sha256": "038fa7f0e40eed015a21abf019c3acbe78d98630813ac3861b405e195f45a0ba",
+            "stimulus_sha256": "9c99b652320a12e1dc0145df5b522ca118be6defca38d1121a25e9636a49b738"
+          },
+          "trace": {
+            "core_host_route": "passed",
+            "host_pid_reaped": true,
+            "gateway_operation_count": 1
+          }
+        }
+      }
+    },
+    {
+      "attempt_id": "nb-nonebot-plugin-roll-positive-a3",
+      "case_id": "nb-nonebot-plugin-roll-positive",
+      "comparison": {
+        "status": "passed",
+        "issues": []
+      },
+      "sides": {
+        "native": {
+          "status": "completed",
+          "worker_id": "ligamina-3b91c35f320142de",
+          "worker_cleanup_confirmed": true,
+          "worker_stdout_sha256": "f8de1cf1e373c4de972b9939d63a419e2402a84b892243c28f7bfe86f2c1d2a0",
+          "worker_stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "environment": {
+            "ecosystem": "nonebot",
+            "framework_version": "2.5.0",
+            "runtime_version": "3.12.14",
+            "lockfile_sha256": "792fe11f2fd3581e888b15a23bc0c49f76b3b0d2399fc728dbfcff3d436214df",
+            "profile_sha256": "4b77454753fa5181a90bb3c339de6970bbe1b2f57ff8ff2dc15d63a2bea929a6",
+            "artifact_hash": "3a5ead2404f26711c9d41604ddcbb2e141df8a950fc53d32536aa7980fab1a2c",
+            "config_sha256": "038fa7f0e40eed015a21abf019c3acbe78d98630813ac3861b405e195f45a0ba",
+            "stimulus_sha256": "9c99b652320a12e1dc0145df5b522ca118be6defca38d1121a25e9636a49b738"
+          },
+          "trace": {
+            "bridge_adapter_imported": false
+          }
+        },
+        "federated": {
+          "status": "completed",
+          "worker_id": "ligamina-2a515e01833c4b49",
+          "worker_cleanup_confirmed": true,
+          "worker_stdout_sha256": "0f0ed35802fe7d6a309a20790a5644f53665b4ed1653b31ce6424fab614e181e",
+          "worker_stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "environment": {
+            "ecosystem": "nonebot",
+            "framework_version": "2.5.0",
+            "runtime_version": "3.12.14",
+            "lockfile_sha256": "792fe11f2fd3581e888b15a23bc0c49f76b3b0d2399fc728dbfcff3d436214df",
+            "profile_sha256": "4b77454753fa5181a90bb3c339de6970bbe1b2f57ff8ff2dc15d63a2bea929a6",
+            "artifact_hash": "3a5ead2404f26711c9d41604ddcbb2e141df8a950fc53d32536aa7980fab1a2c",
+            "config_sha256": "038fa7f0e40eed015a21abf019c3acbe78d98630813ac3861b405e195f45a0ba",
+            "stimulus_sha256": "9c99b652320a12e1dc0145df5b522ca118be6defca38d1121a25e9636a49b738"
+          },
+          "trace": {
+            "core_host_route": "passed",
+            "host_pid_reaped": true,
+            "gateway_operation_count": 1
+          }
+        }
+      }
+    },
+    {
+      "attempt_id": "nb-nonebot-plugin-roll-negative-a1",
+      "case_id": "nb-nonebot-plugin-roll-negative",
+      "comparison": {
+        "status": "passed",
+        "issues": []
+      },
+      "sides": {
+        "native": {
+          "status": "completed",
+          "worker_id": "ligamina-fc833128cdc340a6",
+          "worker_cleanup_confirmed": true,
+          "worker_stdout_sha256": "3ad68813520922a949fb3762307af9f955a5734e7fe036e601ec7832d544c8c5",
+          "worker_stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "environment": {
+            "ecosystem": "nonebot",
+            "framework_version": "2.5.0",
+            "runtime_version": "3.12.14",
+            "lockfile_sha256": "792fe11f2fd3581e888b15a23bc0c49f76b3b0d2399fc728dbfcff3d436214df",
+            "profile_sha256": "4b77454753fa5181a90bb3c339de6970bbe1b2f57ff8ff2dc15d63a2bea929a6",
+            "artifact_hash": "3a5ead2404f26711c9d41604ddcbb2e141df8a950fc53d32536aa7980fab1a2c",
+            "config_sha256": "038fa7f0e40eed015a21abf019c3acbe78d98630813ac3861b405e195f45a0ba",
+            "stimulus_sha256": "f435c635804b6120f19d561a933b87ab9a522d9f05a286eb153091b76324a141"
+          },
+          "trace": {
+            "bridge_adapter_imported": false
+          }
+        },
+        "federated": {
+          "status": "completed",
+          "worker_id": "ligamina-db9df36e6ec14467",
+          "worker_cleanup_confirmed": true,
+          "worker_stdout_sha256": "c934662b8c8e323546b91c25a0311f97359c6b0a68caa12e5f7b52f1af1bb5e2",
+          "worker_stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "environment": {
+            "ecosystem": "nonebot",
+            "framework_version": "2.5.0",
+            "runtime_version": "3.12.14",
+            "lockfile_sha256": "792fe11f2fd3581e888b15a23bc0c49f76b3b0d2399fc728dbfcff3d436214df",
+            "profile_sha256": "4b77454753fa5181a90bb3c339de6970bbe1b2f57ff8ff2dc15d63a2bea929a6",
+            "artifact_hash": "3a5ead2404f26711c9d41604ddcbb2e141df8a950fc53d32536aa7980fab1a2c",
+            "config_sha256": "038fa7f0e40eed015a21abf019c3acbe78d98630813ac3861b405e195f45a0ba",
+            "stimulus_sha256": "f435c635804b6120f19d561a933b87ab9a522d9f05a286eb153091b76324a141"
+          },
+          "trace": {
+            "core_host_route": "passed",
+            "host_pid_reaped": true,
+            "gateway_operation_count": 1
+          }
+        }
+      }
+    },
+    {
+      "attempt_id": "nb-nonebot-plugin-roll-negative-a2",
+      "case_id": "nb-nonebot-plugin-roll-negative",
+      "comparison": {
+        "status": "passed",
+        "issues": []
+      },
+      "sides": {
+        "native": {
+          "status": "completed",
+          "worker_id": "ligamina-4d05424adc5a4aed",
+          "worker_cleanup_confirmed": true,
+          "worker_stdout_sha256": "6fab71f13b3b0c31f4f437c7b7830cd85898bda39fc96ccf2f6dd315adfd76f2",
+          "worker_stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "environment": {
+            "ecosystem": "nonebot",
+            "framework_version": "2.5.0",
+            "runtime_version": "3.12.14",
+            "lockfile_sha256": "792fe11f2fd3581e888b15a23bc0c49f76b3b0d2399fc728dbfcff3d436214df",
+            "profile_sha256": "4b77454753fa5181a90bb3c339de6970bbe1b2f57ff8ff2dc15d63a2bea929a6",
+            "artifact_hash": "3a5ead2404f26711c9d41604ddcbb2e141df8a950fc53d32536aa7980fab1a2c",
+            "config_sha256": "038fa7f0e40eed015a21abf019c3acbe78d98630813ac3861b405e195f45a0ba",
+            "stimulus_sha256": "f435c635804b6120f19d561a933b87ab9a522d9f05a286eb153091b76324a141"
+          },
+          "trace": {
+            "bridge_adapter_imported": false
+          }
+        },
+        "federated": {
+          "status": "completed",
+          "worker_id": "ligamina-3e2c57229b9b43c4",
+          "worker_cleanup_confirmed": true,
+          "worker_stdout_sha256": "c934662b8c8e323546b91c25a0311f97359c6b0a68caa12e5f7b52f1af1bb5e2",
+          "worker_stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "environment": {
+            "ecosystem": "nonebot",
+            "framework_version": "2.5.0",
+            "runtime_version": "3.12.14",
+            "lockfile_sha256": "792fe11f2fd3581e888b15a23bc0c49f76b3b0d2399fc728dbfcff3d436214df",
+            "profile_sha256": "4b77454753fa5181a90bb3c339de6970bbe1b2f57ff8ff2dc15d63a2bea929a6",
+            "artifact_hash": "3a5ead2404f26711c9d41604ddcbb2e141df8a950fc53d32536aa7980fab1a2c",
+            "config_sha256": "038fa7f0e40eed015a21abf019c3acbe78d98630813ac3861b405e195f45a0ba",
+            "stimulus_sha256": "f435c635804b6120f19d561a933b87ab9a522d9f05a286eb153091b76324a141"
+          },
+          "trace": {
+            "core_host_route": "passed",
+            "host_pid_reaped": true,
+            "gateway_operation_count": 1
+          }
+        }
+      }
+    },
+    {
+      "attempt_id": "nb-nonebot-plugin-roll-negative-a3",
+      "case_id": "nb-nonebot-plugin-roll-negative",
+      "comparison": {
+        "status": "passed",
+        "issues": []
+      },
+      "sides": {
+        "native": {
+          "status": "completed",
+          "worker_id": "ligamina-1d68831a85574683",
+          "worker_cleanup_confirmed": true,
+          "worker_stdout_sha256": "a09b9db9b761179413534593f33a5544278e65ddaf73af941ed12dc3782bb23a",
+          "worker_stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "environment": {
+            "ecosystem": "nonebot",
+            "framework_version": "2.5.0",
+            "runtime_version": "3.12.14",
+            "lockfile_sha256": "792fe11f2fd3581e888b15a23bc0c49f76b3b0d2399fc728dbfcff3d436214df",
+            "profile_sha256": "4b77454753fa5181a90bb3c339de6970bbe1b2f57ff8ff2dc15d63a2bea929a6",
+            "artifact_hash": "3a5ead2404f26711c9d41604ddcbb2e141df8a950fc53d32536aa7980fab1a2c",
+            "config_sha256": "038fa7f0e40eed015a21abf019c3acbe78d98630813ac3861b405e195f45a0ba",
+            "stimulus_sha256": "f435c635804b6120f19d561a933b87ab9a522d9f05a286eb153091b76324a141"
+          },
+          "trace": {
+            "bridge_adapter_imported": false
+          }
+        },
+        "federated": {
+          "status": "completed",
+          "worker_id": "ligamina-70f232bf0db342f4",
+          "worker_cleanup_confirmed": true,
+          "worker_stdout_sha256": "c934662b8c8e323546b91c25a0311f97359c6b0a68caa12e5f7b52f1af1bb5e2",
+          "worker_stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "environment": {
+            "ecosystem": "nonebot",
+            "framework_version": "2.5.0",
+            "runtime_version": "3.12.14",
+            "lockfile_sha256": "792fe11f2fd3581e888b15a23bc0c49f76b3b0d2399fc728dbfcff3d436214df",
+            "profile_sha256": "4b77454753fa5181a90bb3c339de6970bbe1b2f57ff8ff2dc15d63a2bea929a6",
+            "artifact_hash": "3a5ead2404f26711c9d41604ddcbb2e141df8a950fc53d32536aa7980fab1a2c",
+            "config_sha256": "038fa7f0e40eed015a21abf019c3acbe78d98630813ac3861b405e195f45a0ba",
+            "stimulus_sha256": "f435c635804b6120f19d561a933b87ab9a522d9f05a286eb153091b76324a141"
+          },
+          "trace": {
+            "core_host_route": "passed",
+            "host_pid_reaped": true,
+            "gateway_operation_count": 1
+          }
+        }
+      }
+    },
+    {
+      "attempt_id": "nb-nonebot-plugin-roll-isolation-a1",
+      "case_id": "nb-nonebot-plugin-roll-isolation",
+      "comparison": {
+        "status": "passed",
+        "issues": []
+      },
+      "sides": {
+        "native": {
+          "status": "completed",
+          "worker_id": "ligamina-ac614ce740f84184",
+          "worker_cleanup_confirmed": true,
+          "worker_stdout_sha256": "d07f3cd6218b120d97e9a9b77232a8e9c696d479e0eafe7ec0c571e0f34311d9",
+          "worker_stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "environment": {
+            "ecosystem": "nonebot",
+            "framework_version": "2.5.0",
+            "runtime_version": "3.12.14",
+            "lockfile_sha256": "792fe11f2fd3581e888b15a23bc0c49f76b3b0d2399fc728dbfcff3d436214df",
+            "profile_sha256": "4b77454753fa5181a90bb3c339de6970bbe1b2f57ff8ff2dc15d63a2bea929a6",
+            "artifact_hash": "3a5ead2404f26711c9d41604ddcbb2e141df8a950fc53d32536aa7980fab1a2c",
+            "config_sha256": "038fa7f0e40eed015a21abf019c3acbe78d98630813ac3861b405e195f45a0ba",
+            "stimulus_sha256": "a79c9ae1efbf36ad23e2a5357718c5576637c60950d907013efb70f352577898"
+          },
+          "trace": {
+            "bridge_adapter_imported": false
+          }
+        },
+        "federated": {
+          "status": "completed",
+          "worker_id": "ligamina-465b0cd1cc57418a",
+          "worker_cleanup_confirmed": true,
+          "worker_stdout_sha256": "2dbda53fa7f8a62116d0d9455eb4004848751b758ac232c02f8bee32a35a7be5",
+          "worker_stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "environment": {
+            "ecosystem": "nonebot",
+            "framework_version": "2.5.0",
+            "runtime_version": "3.12.14",
+            "lockfile_sha256": "792fe11f2fd3581e888b15a23bc0c49f76b3b0d2399fc728dbfcff3d436214df",
+            "profile_sha256": "4b77454753fa5181a90bb3c339de6970bbe1b2f57ff8ff2dc15d63a2bea929a6",
+            "artifact_hash": "3a5ead2404f26711c9d41604ddcbb2e141df8a950fc53d32536aa7980fab1a2c",
+            "config_sha256": "038fa7f0e40eed015a21abf019c3acbe78d98630813ac3861b405e195f45a0ba",
+            "stimulus_sha256": "a79c9ae1efbf36ad23e2a5357718c5576637c60950d907013efb70f352577898"
+          },
+          "trace": {
+            "core_host_route": "passed",
+            "host_pid_reaped": true,
+            "gateway_operation_count": 3
+          }
+        }
+      }
+    },
+    {
+      "attempt_id": "nb-nonebot-plugin-roll-isolation-a2",
+      "case_id": "nb-nonebot-plugin-roll-isolation",
+      "comparison": {
+        "status": "passed",
+        "issues": []
+      },
+      "sides": {
+        "native": {
+          "status": "completed",
+          "worker_id": "ligamina-82b4bef654c04e3f",
+          "worker_cleanup_confirmed": true,
+          "worker_stdout_sha256": "94a8c1061ce79031b0f4a273a6b652ed08f8be1818cc8cfe33eda8c0c911fc71",
+          "worker_stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "environment": {
+            "ecosystem": "nonebot",
+            "framework_version": "2.5.0",
+            "runtime_version": "3.12.14",
+            "lockfile_sha256": "792fe11f2fd3581e888b15a23bc0c49f76b3b0d2399fc728dbfcff3d436214df",
+            "profile_sha256": "4b77454753fa5181a90bb3c339de6970bbe1b2f57ff8ff2dc15d63a2bea929a6",
+            "artifact_hash": "3a5ead2404f26711c9d41604ddcbb2e141df8a950fc53d32536aa7980fab1a2c",
+            "config_sha256": "038fa7f0e40eed015a21abf019c3acbe78d98630813ac3861b405e195f45a0ba",
+            "stimulus_sha256": "a79c9ae1efbf36ad23e2a5357718c5576637c60950d907013efb70f352577898"
+          },
+          "trace": {
+            "bridge_adapter_imported": false
+          }
+        },
+        "federated": {
+          "status": "completed",
+          "worker_id": "ligamina-f6d936fcebaf483c",
+          "worker_cleanup_confirmed": true,
+          "worker_stdout_sha256": "2dbda53fa7f8a62116d0d9455eb4004848751b758ac232c02f8bee32a35a7be5",
+          "worker_stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "environment": {
+            "ecosystem": "nonebot",
+            "framework_version": "2.5.0",
+            "runtime_version": "3.12.14",
+            "lockfile_sha256": "792fe11f2fd3581e888b15a23bc0c49f76b3b0d2399fc728dbfcff3d436214df",
+            "profile_sha256": "4b77454753fa5181a90bb3c339de6970bbe1b2f57ff8ff2dc15d63a2bea929a6",
+            "artifact_hash": "3a5ead2404f26711c9d41604ddcbb2e141df8a950fc53d32536aa7980fab1a2c",
+            "config_sha256": "038fa7f0e40eed015a21abf019c3acbe78d98630813ac3861b405e195f45a0ba",
+            "stimulus_sha256": "a79c9ae1efbf36ad23e2a5357718c5576637c60950d907013efb70f352577898"
+          },
+          "trace": {
+            "core_host_route": "passed",
+            "host_pid_reaped": true,
+            "gateway_operation_count": 3
+          }
+        }
+      }
+    },
+    {
+      "attempt_id": "nb-nonebot-plugin-roll-isolation-a3",
+      "case_id": "nb-nonebot-plugin-roll-isolation",
+      "comparison": {
+        "status": "passed",
+        "issues": []
+      },
+      "sides": {
+        "native": {
+          "status": "completed",
+          "worker_id": "ligamina-c62c0f069a844d9c",
+          "worker_cleanup_confirmed": true,
+          "worker_stdout_sha256": "c75f8ee1a94f76bf2f74362f32d8bc32e7b7d56e99c989c4224e291a673261e3",
+          "worker_stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "environment": {
+            "ecosystem": "nonebot",
+            "framework_version": "2.5.0",
+            "runtime_version": "3.12.14",
+            "lockfile_sha256": "792fe11f2fd3581e888b15a23bc0c49f76b3b0d2399fc728dbfcff3d436214df",
+            "profile_sha256": "4b77454753fa5181a90bb3c339de6970bbe1b2f57ff8ff2dc15d63a2bea929a6",
+            "artifact_hash": "3a5ead2404f26711c9d41604ddcbb2e141df8a950fc53d32536aa7980fab1a2c",
+            "config_sha256": "038fa7f0e40eed015a21abf019c3acbe78d98630813ac3861b405e195f45a0ba",
+            "stimulus_sha256": "a79c9ae1efbf36ad23e2a5357718c5576637c60950d907013efb70f352577898"
+          },
+          "trace": {
+            "bridge_adapter_imported": false
+          }
+        },
+        "federated": {
+          "status": "completed",
+          "worker_id": "ligamina-ada24ebaff7d4ef9",
+          "worker_cleanup_confirmed": true,
+          "worker_stdout_sha256": "2dbda53fa7f8a62116d0d9455eb4004848751b758ac232c02f8bee32a35a7be5",
+          "worker_stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "environment": {
+            "ecosystem": "nonebot",
+            "framework_version": "2.5.0",
+            "runtime_version": "3.12.14",
+            "lockfile_sha256": "792fe11f2fd3581e888b15a23bc0c49f76b3b0d2399fc728dbfcff3d436214df",
+            "profile_sha256": "4b77454753fa5181a90bb3c339de6970bbe1b2f57ff8ff2dc15d63a2bea929a6",
+            "artifact_hash": "3a5ead2404f26711c9d41604ddcbb2e141df8a950fc53d32536aa7980fab1a2c",
+            "config_sha256": "038fa7f0e40eed015a21abf019c3acbe78d98630813ac3861b405e195f45a0ba",
+            "stimulus_sha256": "a79c9ae1efbf36ad23e2a5357718c5576637c60950d907013efb70f352577898"
+          },
+          "trace": {
+            "core_host_route": "passed",
+            "host_pid_reaped": true,
+            "gateway_operation_count": 3
+          }
+        }
+      }
+    }
+  ],
+  "side_probe_evidence": [
+    {
+      "attempt_id": "ko-koishijs-plugin-echo-positive-a1",
+      "side": "native",
+      "ecosystem": "koishi",
+      "worker_id": "ligamina-8f015fe6dd174150",
+      "worker_completed": true,
+      "cleanup_confirmed": true,
+      "observation_count": 1,
+      "storage": {
+        "valid": true,
+        "relative_path": "native-koishi-data/phase4-probes/observations.ndjson",
+        "file_sha256": "481113d95726e4746088e23bf6ed8134092239c4d66095c573476cd9e5ebba7b",
+        "probe_source_sha256": "3c749f71d9a1dda0ea19e6b2d12ac45e54d6a5d6808ea6dbe3d11ecaa19e3515"
+      },
+      "clock_scope": {
+        "valid": true,
+        "matched_events": 1
+      },
+      "issues": []
+    },
+    {
+      "attempt_id": "ko-koishijs-plugin-echo-positive-a1",
+      "side": "federated",
+      "ecosystem": "koishi",
+      "worker_id": "ligamina-247b9390a81e4cf4",
+      "worker_completed": true,
+      "cleanup_confirmed": true,
+      "observation_count": 1,
+      "storage": {
+        "valid": true,
+        "relative_path": "koishi-data/phase4-probes/observations.ndjson",
+        "file_sha256": "481113d95726e4746088e23bf6ed8134092239c4d66095c573476cd9e5ebba7b",
+        "probe_source_sha256": "3c749f71d9a1dda0ea19e6b2d12ac45e54d6a5d6808ea6dbe3d11ecaa19e3515"
+      },
+      "clock_scope": {
+        "valid": true,
+        "matched_events": 1
+      },
+      "issues": []
+    },
+    {
+      "attempt_id": "ko-koishijs-plugin-echo-positive-a2",
+      "side": "native",
+      "ecosystem": "koishi",
+      "worker_id": "ligamina-a79dfc5a936543e7",
+      "worker_completed": true,
+      "cleanup_confirmed": true,
+      "observation_count": 1,
+      "storage": {
+        "valid": true,
+        "relative_path": "native-koishi-data/phase4-probes/observations.ndjson",
+        "file_sha256": "481113d95726e4746088e23bf6ed8134092239c4d66095c573476cd9e5ebba7b",
+        "probe_source_sha256": "3c749f71d9a1dda0ea19e6b2d12ac45e54d6a5d6808ea6dbe3d11ecaa19e3515"
+      },
+      "clock_scope": {
+        "valid": true,
+        "matched_events": 1
+      },
+      "issues": []
+    },
+    {
+      "attempt_id": "ko-koishijs-plugin-echo-positive-a2",
+      "side": "federated",
+      "ecosystem": "koishi",
+      "worker_id": "ligamina-d76e7d8aed10432e",
+      "worker_completed": true,
+      "cleanup_confirmed": true,
+      "observation_count": 1,
+      "storage": {
+        "valid": true,
+        "relative_path": "koishi-data/phase4-probes/observations.ndjson",
+        "file_sha256": "481113d95726e4746088e23bf6ed8134092239c4d66095c573476cd9e5ebba7b",
+        "probe_source_sha256": "3c749f71d9a1dda0ea19e6b2d12ac45e54d6a5d6808ea6dbe3d11ecaa19e3515"
+      },
+      "clock_scope": {
+        "valid": true,
+        "matched_events": 1
+      },
+      "issues": []
+    },
+    {
+      "attempt_id": "ko-koishijs-plugin-echo-positive-a3",
+      "side": "native",
+      "ecosystem": "koishi",
+      "worker_id": "ligamina-8d311ae124e6442e",
+      "worker_completed": true,
+      "cleanup_confirmed": true,
+      "observation_count": 1,
+      "storage": {
+        "valid": true,
+        "relative_path": "native-koishi-data/phase4-probes/observations.ndjson",
+        "file_sha256": "481113d95726e4746088e23bf6ed8134092239c4d66095c573476cd9e5ebba7b",
+        "probe_source_sha256": "3c749f71d9a1dda0ea19e6b2d12ac45e54d6a5d6808ea6dbe3d11ecaa19e3515"
+      },
+      "clock_scope": {
+        "valid": true,
+        "matched_events": 1
+      },
+      "issues": []
+    },
+    {
+      "attempt_id": "ko-koishijs-plugin-echo-positive-a3",
+      "side": "federated",
+      "ecosystem": "koishi",
+      "worker_id": "ligamina-05901814ffdb4fdf",
+      "worker_completed": true,
+      "cleanup_confirmed": true,
+      "observation_count": 1,
+      "storage": {
+        "valid": true,
+        "relative_path": "koishi-data/phase4-probes/observations.ndjson",
+        "file_sha256": "481113d95726e4746088e23bf6ed8134092239c4d66095c573476cd9e5ebba7b",
+        "probe_source_sha256": "3c749f71d9a1dda0ea19e6b2d12ac45e54d6a5d6808ea6dbe3d11ecaa19e3515"
+      },
+      "clock_scope": {
+        "valid": true,
+        "matched_events": 1
+      },
+      "issues": []
+    },
+    {
+      "attempt_id": "ko-koishijs-plugin-echo-negative-a1",
+      "side": "native",
+      "ecosystem": "koishi",
+      "worker_id": "ligamina-8e5b9a1cf0ed4f21",
+      "worker_completed": true,
+      "cleanup_confirmed": true,
+      "observation_count": 1,
+      "storage": {
+        "valid": true,
+        "relative_path": "native-koishi-data/phase4-probes/observations.ndjson",
+        "file_sha256": "c3e5e714a7e192178b4796849ba538801fc28032c599c2ef43147ec82f77f4a0",
+        "probe_source_sha256": "3c749f71d9a1dda0ea19e6b2d12ac45e54d6a5d6808ea6dbe3d11ecaa19e3515"
+      },
+      "clock_scope": {
+        "valid": true,
+        "matched_events": 1
+      },
+      "issues": []
+    },
+    {
+      "attempt_id": "ko-koishijs-plugin-echo-negative-a1",
+      "side": "federated",
+      "ecosystem": "koishi",
+      "worker_id": "ligamina-b7316c14fae44f07",
+      "worker_completed": true,
+      "cleanup_confirmed": true,
+      "observation_count": 1,
+      "storage": {
+        "valid": true,
+        "relative_path": "koishi-data/phase4-probes/observations.ndjson",
+        "file_sha256": "c3e5e714a7e192178b4796849ba538801fc28032c599c2ef43147ec82f77f4a0",
+        "probe_source_sha256": "3c749f71d9a1dda0ea19e6b2d12ac45e54d6a5d6808ea6dbe3d11ecaa19e3515"
+      },
+      "clock_scope": {
+        "valid": true,
+        "matched_events": 1
+      },
+      "issues": []
+    },
+    {
+      "attempt_id": "ko-koishijs-plugin-echo-negative-a2",
+      "side": "native",
+      "ecosystem": "koishi",
+      "worker_id": "ligamina-f578c414c64a4317",
+      "worker_completed": true,
+      "cleanup_confirmed": true,
+      "observation_count": 1,
+      "storage": {
+        "valid": true,
+        "relative_path": "native-koishi-data/phase4-probes/observations.ndjson",
+        "file_sha256": "c3e5e714a7e192178b4796849ba538801fc28032c599c2ef43147ec82f77f4a0",
+        "probe_source_sha256": "3c749f71d9a1dda0ea19e6b2d12ac45e54d6a5d6808ea6dbe3d11ecaa19e3515"
+      },
+      "clock_scope": {
+        "valid": true,
+        "matched_events": 1
+      },
+      "issues": []
+    },
+    {
+      "attempt_id": "ko-koishijs-plugin-echo-negative-a2",
+      "side": "federated",
+      "ecosystem": "koishi",
+      "worker_id": "ligamina-f3103d4f2c8b4b8c",
+      "worker_completed": true,
+      "cleanup_confirmed": true,
+      "observation_count": 1,
+      "storage": {
+        "valid": true,
+        "relative_path": "koishi-data/phase4-probes/observations.ndjson",
+        "file_sha256": "c3e5e714a7e192178b4796849ba538801fc28032c599c2ef43147ec82f77f4a0",
+        "probe_source_sha256": "3c749f71d9a1dda0ea19e6b2d12ac45e54d6a5d6808ea6dbe3d11ecaa19e3515"
+      },
+      "clock_scope": {
+        "valid": true,
+        "matched_events": 1
+      },
+      "issues": []
+    },
+    {
+      "attempt_id": "ko-koishijs-plugin-echo-negative-a3",
+      "side": "native",
+      "ecosystem": "koishi",
+      "worker_id": "ligamina-73d0c3af33d645ba",
+      "worker_completed": true,
+      "cleanup_confirmed": true,
+      "observation_count": 1,
+      "storage": {
+        "valid": true,
+        "relative_path": "native-koishi-data/phase4-probes/observations.ndjson",
+        "file_sha256": "c3e5e714a7e192178b4796849ba538801fc28032c599c2ef43147ec82f77f4a0",
+        "probe_source_sha256": "3c749f71d9a1dda0ea19e6b2d12ac45e54d6a5d6808ea6dbe3d11ecaa19e3515"
+      },
+      "clock_scope": {
+        "valid": true,
+        "matched_events": 1
+      },
+      "issues": []
+    },
+    {
+      "attempt_id": "ko-koishijs-plugin-echo-negative-a3",
+      "side": "federated",
+      "ecosystem": "koishi",
+      "worker_id": "ligamina-6a4854e559ba44bf",
+      "worker_completed": true,
+      "cleanup_confirmed": true,
+      "observation_count": 1,
+      "storage": {
+        "valid": true,
+        "relative_path": "koishi-data/phase4-probes/observations.ndjson",
+        "file_sha256": "c3e5e714a7e192178b4796849ba538801fc28032c599c2ef43147ec82f77f4a0",
+        "probe_source_sha256": "3c749f71d9a1dda0ea19e6b2d12ac45e54d6a5d6808ea6dbe3d11ecaa19e3515"
+      },
+      "clock_scope": {
+        "valid": true,
+        "matched_events": 1
+      },
+      "issues": []
+    },
+    {
+      "attempt_id": "ko-koishijs-plugin-echo-isolation-a1",
+      "side": "native",
+      "ecosystem": "koishi",
+      "worker_id": "ligamina-be5887b6036b49e7",
+      "worker_completed": true,
+      "cleanup_confirmed": true,
+      "observation_count": 2,
+      "storage": {
+        "valid": true,
+        "relative_path": "native-koishi-data/phase4-probes/observations.ndjson",
+        "file_sha256": "8a071749dc6526da62545e7e4f10424c6033774b3e5fb91ec03872c07642941c",
+        "probe_source_sha256": "3c749f71d9a1dda0ea19e6b2d12ac45e54d6a5d6808ea6dbe3d11ecaa19e3515"
+      },
+      "clock_scope": {
+        "valid": true,
+        "matched_events": 2
+      },
+      "issues": []
+    },
+    {
+      "attempt_id": "ko-koishijs-plugin-echo-isolation-a1",
+      "side": "federated",
+      "ecosystem": "koishi",
+      "worker_id": "ligamina-7a1066e891e34123",
+      "worker_completed": true,
+      "cleanup_confirmed": true,
+      "observation_count": 2,
+      "storage": {
+        "valid": true,
+        "relative_path": "koishi-data/phase4-probes/observations.ndjson",
+        "file_sha256": "8a071749dc6526da62545e7e4f10424c6033774b3e5fb91ec03872c07642941c",
+        "probe_source_sha256": "3c749f71d9a1dda0ea19e6b2d12ac45e54d6a5d6808ea6dbe3d11ecaa19e3515"
+      },
+      "clock_scope": {
+        "valid": true,
+        "matched_events": 2
+      },
+      "issues": []
+    },
+    {
+      "attempt_id": "ko-koishijs-plugin-echo-isolation-a2",
+      "side": "native",
+      "ecosystem": "koishi",
+      "worker_id": "ligamina-badd2e19bf8b4a63",
+      "worker_completed": true,
+      "cleanup_confirmed": true,
+      "observation_count": 2,
+      "storage": {
+        "valid": true,
+        "relative_path": "native-koishi-data/phase4-probes/observations.ndjson",
+        "file_sha256": "8a071749dc6526da62545e7e4f10424c6033774b3e5fb91ec03872c07642941c",
+        "probe_source_sha256": "3c749f71d9a1dda0ea19e6b2d12ac45e54d6a5d6808ea6dbe3d11ecaa19e3515"
+      },
+      "clock_scope": {
+        "valid": true,
+        "matched_events": 2
+      },
+      "issues": []
+    },
+    {
+      "attempt_id": "ko-koishijs-plugin-echo-isolation-a2",
+      "side": "federated",
+      "ecosystem": "koishi",
+      "worker_id": "ligamina-680cd3b6b56d49cc",
+      "worker_completed": true,
+      "cleanup_confirmed": true,
+      "observation_count": 2,
+      "storage": {
+        "valid": true,
+        "relative_path": "koishi-data/phase4-probes/observations.ndjson",
+        "file_sha256": "8a071749dc6526da62545e7e4f10424c6033774b3e5fb91ec03872c07642941c",
+        "probe_source_sha256": "3c749f71d9a1dda0ea19e6b2d12ac45e54d6a5d6808ea6dbe3d11ecaa19e3515"
+      },
+      "clock_scope": {
+        "valid": true,
+        "matched_events": 2
+      },
+      "issues": []
+    },
+    {
+      "attempt_id": "ko-koishijs-plugin-echo-isolation-a3",
+      "side": "native",
+      "ecosystem": "koishi",
+      "worker_id": "ligamina-5eecf928d14d46b5",
+      "worker_completed": true,
+      "cleanup_confirmed": true,
+      "observation_count": 2,
+      "storage": {
+        "valid": true,
+        "relative_path": "native-koishi-data/phase4-probes/observations.ndjson",
+        "file_sha256": "8a071749dc6526da62545e7e4f10424c6033774b3e5fb91ec03872c07642941c",
+        "probe_source_sha256": "3c749f71d9a1dda0ea19e6b2d12ac45e54d6a5d6808ea6dbe3d11ecaa19e3515"
+      },
+      "clock_scope": {
+        "valid": true,
+        "matched_events": 2
+      },
+      "issues": []
+    },
+    {
+      "attempt_id": "ko-koishijs-plugin-echo-isolation-a3",
+      "side": "federated",
+      "ecosystem": "koishi",
+      "worker_id": "ligamina-25d981373dfd426f",
+      "worker_completed": true,
+      "cleanup_confirmed": true,
+      "observation_count": 2,
+      "storage": {
+        "valid": true,
+        "relative_path": "koishi-data/phase4-probes/observations.ndjson",
+        "file_sha256": "8a071749dc6526da62545e7e4f10424c6033774b3e5fb91ec03872c07642941c",
+        "probe_source_sha256": "3c749f71d9a1dda0ea19e6b2d12ac45e54d6a5d6808ea6dbe3d11ecaa19e3515"
+      },
+      "clock_scope": {
+        "valid": true,
+        "matched_events": 2
+      },
+      "issues": []
+    },
+    {
+      "attempt_id": "nb-nonebot-plugin-roll-positive-a1",
+      "side": "native",
+      "ecosystem": "nonebot",
+      "worker_id": "ligamina-ef6857122574499b",
+      "worker_completed": true,
+      "cleanup_confirmed": true,
+      "observation_count": 1,
+      "storage": {
+        "valid": true,
+        "relative_path": "nonebot-data/phase4-probes/observations.ndjson",
+        "file_sha256": "fc8dabd064fa423ef587f656f380c68663eaca00da5ed687577e506f94e17662",
+        "probe_source_sha256": "b1499cb002a3fdefb6ebf73d8438cdb4329972f0de61e4dd6ff07937490bf723"
+      },
+      "clock_scope": {
+        "valid": true,
+        "matched_events": 1
+      },
+      "issues": []
+    },
+    {
+      "attempt_id": "nb-nonebot-plugin-roll-positive-a1",
+      "side": "federated",
+      "ecosystem": "nonebot",
+      "worker_id": "ligamina-c6f21dbe81cc401b",
+      "worker_completed": true,
+      "cleanup_confirmed": true,
+      "observation_count": 1,
+      "storage": {
+        "valid": true,
+        "relative_path": "nonebot-data/phase4-probes/observations.ndjson",
+        "file_sha256": "fc8dabd064fa423ef587f656f380c68663eaca00da5ed687577e506f94e17662",
+        "probe_source_sha256": "b1499cb002a3fdefb6ebf73d8438cdb4329972f0de61e4dd6ff07937490bf723"
+      },
+      "clock_scope": {
+        "valid": true,
+        "matched_events": 1
+      },
+      "issues": []
+    },
+    {
+      "attempt_id": "nb-nonebot-plugin-roll-positive-a2",
+      "side": "native",
+      "ecosystem": "nonebot",
+      "worker_id": "ligamina-7fe03756f4ef43e0",
+      "worker_completed": true,
+      "cleanup_confirmed": true,
+      "observation_count": 1,
+      "storage": {
+        "valid": true,
+        "relative_path": "nonebot-data/phase4-probes/observations.ndjson",
+        "file_sha256": "fc8dabd064fa423ef587f656f380c68663eaca00da5ed687577e506f94e17662",
+        "probe_source_sha256": "b1499cb002a3fdefb6ebf73d8438cdb4329972f0de61e4dd6ff07937490bf723"
+      },
+      "clock_scope": {
+        "valid": true,
+        "matched_events": 1
+      },
+      "issues": []
+    },
+    {
+      "attempt_id": "nb-nonebot-plugin-roll-positive-a2",
+      "side": "federated",
+      "ecosystem": "nonebot",
+      "worker_id": "ligamina-6b68cc14b4a74a68",
+      "worker_completed": true,
+      "cleanup_confirmed": true,
+      "observation_count": 1,
+      "storage": {
+        "valid": true,
+        "relative_path": "nonebot-data/phase4-probes/observations.ndjson",
+        "file_sha256": "fc8dabd064fa423ef587f656f380c68663eaca00da5ed687577e506f94e17662",
+        "probe_source_sha256": "b1499cb002a3fdefb6ebf73d8438cdb4329972f0de61e4dd6ff07937490bf723"
+      },
+      "clock_scope": {
+        "valid": true,
+        "matched_events": 1
+      },
+      "issues": []
+    },
+    {
+      "attempt_id": "nb-nonebot-plugin-roll-positive-a3",
+      "side": "native",
+      "ecosystem": "nonebot",
+      "worker_id": "ligamina-3b91c35f320142de",
+      "worker_completed": true,
+      "cleanup_confirmed": true,
+      "observation_count": 1,
+      "storage": {
+        "valid": true,
+        "relative_path": "nonebot-data/phase4-probes/observations.ndjson",
+        "file_sha256": "fc8dabd064fa423ef587f656f380c68663eaca00da5ed687577e506f94e17662",
+        "probe_source_sha256": "b1499cb002a3fdefb6ebf73d8438cdb4329972f0de61e4dd6ff07937490bf723"
+      },
+      "clock_scope": {
+        "valid": true,
+        "matched_events": 1
+      },
+      "issues": []
+    },
+    {
+      "attempt_id": "nb-nonebot-plugin-roll-positive-a3",
+      "side": "federated",
+      "ecosystem": "nonebot",
+      "worker_id": "ligamina-2a515e01833c4b49",
+      "worker_completed": true,
+      "cleanup_confirmed": true,
+      "observation_count": 1,
+      "storage": {
+        "valid": true,
+        "relative_path": "nonebot-data/phase4-probes/observations.ndjson",
+        "file_sha256": "fc8dabd064fa423ef587f656f380c68663eaca00da5ed687577e506f94e17662",
+        "probe_source_sha256": "b1499cb002a3fdefb6ebf73d8438cdb4329972f0de61e4dd6ff07937490bf723"
+      },
+      "clock_scope": {
+        "valid": true,
+        "matched_events": 1
+      },
+      "issues": []
+    },
+    {
+      "attempt_id": "nb-nonebot-plugin-roll-negative-a1",
+      "side": "native",
+      "ecosystem": "nonebot",
+      "worker_id": "ligamina-fc833128cdc340a6",
+      "worker_completed": true,
+      "cleanup_confirmed": true,
+      "observation_count": 1,
+      "storage": {
+        "valid": true,
+        "relative_path": "nonebot-data/phase4-probes/observations.ndjson",
+        "file_sha256": "45becc41db30b7921128ac4d4d894444e73a2997719730c5b3ba79161b264d09",
+        "probe_source_sha256": "b1499cb002a3fdefb6ebf73d8438cdb4329972f0de61e4dd6ff07937490bf723"
+      },
+      "clock_scope": {
+        "valid": true,
+        "matched_events": 1
+      },
+      "issues": []
+    },
+    {
+      "attempt_id": "nb-nonebot-plugin-roll-negative-a1",
+      "side": "federated",
+      "ecosystem": "nonebot",
+      "worker_id": "ligamina-db9df36e6ec14467",
+      "worker_completed": true,
+      "cleanup_confirmed": true,
+      "observation_count": 1,
+      "storage": {
+        "valid": true,
+        "relative_path": "nonebot-data/phase4-probes/observations.ndjson",
+        "file_sha256": "45becc41db30b7921128ac4d4d894444e73a2997719730c5b3ba79161b264d09",
+        "probe_source_sha256": "b1499cb002a3fdefb6ebf73d8438cdb4329972f0de61e4dd6ff07937490bf723"
+      },
+      "clock_scope": {
+        "valid": true,
+        "matched_events": 1
+      },
+      "issues": []
+    },
+    {
+      "attempt_id": "nb-nonebot-plugin-roll-negative-a2",
+      "side": "native",
+      "ecosystem": "nonebot",
+      "worker_id": "ligamina-4d05424adc5a4aed",
+      "worker_completed": true,
+      "cleanup_confirmed": true,
+      "observation_count": 1,
+      "storage": {
+        "valid": true,
+        "relative_path": "nonebot-data/phase4-probes/observations.ndjson",
+        "file_sha256": "45becc41db30b7921128ac4d4d894444e73a2997719730c5b3ba79161b264d09",
+        "probe_source_sha256": "b1499cb002a3fdefb6ebf73d8438cdb4329972f0de61e4dd6ff07937490bf723"
+      },
+      "clock_scope": {
+        "valid": true,
+        "matched_events": 1
+      },
+      "issues": []
+    },
+    {
+      "attempt_id": "nb-nonebot-plugin-roll-negative-a2",
+      "side": "federated",
+      "ecosystem": "nonebot",
+      "worker_id": "ligamina-3e2c57229b9b43c4",
+      "worker_completed": true,
+      "cleanup_confirmed": true,
+      "observation_count": 1,
+      "storage": {
+        "valid": true,
+        "relative_path": "nonebot-data/phase4-probes/observations.ndjson",
+        "file_sha256": "45becc41db30b7921128ac4d4d894444e73a2997719730c5b3ba79161b264d09",
+        "probe_source_sha256": "b1499cb002a3fdefb6ebf73d8438cdb4329972f0de61e4dd6ff07937490bf723"
+      },
+      "clock_scope": {
+        "valid": true,
+        "matched_events": 1
+      },
+      "issues": []
+    },
+    {
+      "attempt_id": "nb-nonebot-plugin-roll-negative-a3",
+      "side": "native",
+      "ecosystem": "nonebot",
+      "worker_id": "ligamina-1d68831a85574683",
+      "worker_completed": true,
+      "cleanup_confirmed": true,
+      "observation_count": 1,
+      "storage": {
+        "valid": true,
+        "relative_path": "nonebot-data/phase4-probes/observations.ndjson",
+        "file_sha256": "45becc41db30b7921128ac4d4d894444e73a2997719730c5b3ba79161b264d09",
+        "probe_source_sha256": "b1499cb002a3fdefb6ebf73d8438cdb4329972f0de61e4dd6ff07937490bf723"
+      },
+      "clock_scope": {
+        "valid": true,
+        "matched_events": 1
+      },
+      "issues": []
+    },
+    {
+      "attempt_id": "nb-nonebot-plugin-roll-negative-a3",
+      "side": "federated",
+      "ecosystem": "nonebot",
+      "worker_id": "ligamina-70f232bf0db342f4",
+      "worker_completed": true,
+      "cleanup_confirmed": true,
+      "observation_count": 1,
+      "storage": {
+        "valid": true,
+        "relative_path": "nonebot-data/phase4-probes/observations.ndjson",
+        "file_sha256": "45becc41db30b7921128ac4d4d894444e73a2997719730c5b3ba79161b264d09",
+        "probe_source_sha256": "b1499cb002a3fdefb6ebf73d8438cdb4329972f0de61e4dd6ff07937490bf723"
+      },
+      "clock_scope": {
+        "valid": true,
+        "matched_events": 1
+      },
+      "issues": []
+    },
+    {
+      "attempt_id": "nb-nonebot-plugin-roll-isolation-a1",
+      "side": "native",
+      "ecosystem": "nonebot",
+      "worker_id": "ligamina-ac614ce740f84184",
+      "worker_completed": true,
+      "cleanup_confirmed": true,
+      "observation_count": 3,
+      "storage": {
+        "valid": true,
+        "relative_path": "nonebot-data/phase4-probes/observations.ndjson",
+        "file_sha256": "ea41dcac858e6c8f85146bb7467fc38400b7000754a4eace5b80cac49c348661",
+        "probe_source_sha256": "b1499cb002a3fdefb6ebf73d8438cdb4329972f0de61e4dd6ff07937490bf723"
+      },
+      "clock_scope": {
+        "valid": true,
+        "matched_events": 3
+      },
+      "issues": []
+    },
+    {
+      "attempt_id": "nb-nonebot-plugin-roll-isolation-a1",
+      "side": "federated",
+      "ecosystem": "nonebot",
+      "worker_id": "ligamina-465b0cd1cc57418a",
+      "worker_completed": true,
+      "cleanup_confirmed": true,
+      "observation_count": 3,
+      "storage": {
+        "valid": true,
+        "relative_path": "nonebot-data/phase4-probes/observations.ndjson",
+        "file_sha256": "ea41dcac858e6c8f85146bb7467fc38400b7000754a4eace5b80cac49c348661",
+        "probe_source_sha256": "b1499cb002a3fdefb6ebf73d8438cdb4329972f0de61e4dd6ff07937490bf723"
+      },
+      "clock_scope": {
+        "valid": true,
+        "matched_events": 3
+      },
+      "issues": []
+    },
+    {
+      "attempt_id": "nb-nonebot-plugin-roll-isolation-a2",
+      "side": "native",
+      "ecosystem": "nonebot",
+      "worker_id": "ligamina-82b4bef654c04e3f",
+      "worker_completed": true,
+      "cleanup_confirmed": true,
+      "observation_count": 3,
+      "storage": {
+        "valid": true,
+        "relative_path": "nonebot-data/phase4-probes/observations.ndjson",
+        "file_sha256": "ea41dcac858e6c8f85146bb7467fc38400b7000754a4eace5b80cac49c348661",
+        "probe_source_sha256": "b1499cb002a3fdefb6ebf73d8438cdb4329972f0de61e4dd6ff07937490bf723"
+      },
+      "clock_scope": {
+        "valid": true,
+        "matched_events": 3
+      },
+      "issues": []
+    },
+    {
+      "attempt_id": "nb-nonebot-plugin-roll-isolation-a2",
+      "side": "federated",
+      "ecosystem": "nonebot",
+      "worker_id": "ligamina-f6d936fcebaf483c",
+      "worker_completed": true,
+      "cleanup_confirmed": true,
+      "observation_count": 3,
+      "storage": {
+        "valid": true,
+        "relative_path": "nonebot-data/phase4-probes/observations.ndjson",
+        "file_sha256": "ea41dcac858e6c8f85146bb7467fc38400b7000754a4eace5b80cac49c348661",
+        "probe_source_sha256": "b1499cb002a3fdefb6ebf73d8438cdb4329972f0de61e4dd6ff07937490bf723"
+      },
+      "clock_scope": {
+        "valid": true,
+        "matched_events": 3
+      },
+      "issues": []
+    },
+    {
+      "attempt_id": "nb-nonebot-plugin-roll-isolation-a3",
+      "side": "native",
+      "ecosystem": "nonebot",
+      "worker_id": "ligamina-c62c0f069a844d9c",
+      "worker_completed": true,
+      "cleanup_confirmed": true,
+      "observation_count": 3,
+      "storage": {
+        "valid": true,
+        "relative_path": "nonebot-data/phase4-probes/observations.ndjson",
+        "file_sha256": "ea41dcac858e6c8f85146bb7467fc38400b7000754a4eace5b80cac49c348661",
+        "probe_source_sha256": "b1499cb002a3fdefb6ebf73d8438cdb4329972f0de61e4dd6ff07937490bf723"
+      },
+      "clock_scope": {
+        "valid": true,
+        "matched_events": 3
+      },
+      "issues": []
+    },
+    {
+      "attempt_id": "nb-nonebot-plugin-roll-isolation-a3",
+      "side": "federated",
+      "ecosystem": "nonebot",
+      "worker_id": "ligamina-ada24ebaff7d4ef9",
+      "worker_completed": true,
+      "cleanup_confirmed": true,
+      "observation_count": 3,
+      "storage": {
+        "valid": true,
+        "relative_path": "nonebot-data/phase4-probes/observations.ndjson",
+        "file_sha256": "ea41dcac858e6c8f85146bb7467fc38400b7000754a4eace5b80cac49c348661",
+        "probe_source_sha256": "b1499cb002a3fdefb6ebf73d8438cdb4329972f0de61e4dd6ff07937490bf723"
+      },
+      "clock_scope": {
+        "valid": true,
+        "matched_events": 3
+      },
+      "issues": []
+    }
+  ],
+  "terminal_checkpoint": {
+    "status": "completed",
+    "pending_positions": 0,
+    "pending_attempts": 0,
+    "cleanup_unconfirmed": 0
+  }
+}

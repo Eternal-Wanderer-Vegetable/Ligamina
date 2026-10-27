@@ -3,8 +3,10 @@ import { mkdir, readFile } from 'node:fs/promises'
 import { createRequire } from 'node:module'
 import { dirname, resolve } from 'node:path'
 import process from 'node:process'
+import { pathToFileURL } from 'node:url'
 import { Adapter, Bot, Context, h, Universal, version } from '@koishijs/core'
 import SQLiteDriver from '@minatojs/driver-sqlite'
+import { fingerprintArtifact } from './artifact_fingerprint.mjs'
 
 const protocolWrite = process.stdout.write.bind(process.stdout)
 Reflect.set(process.stdout, 'write', (...args) => process.stderr.write(...args))
@@ -42,6 +44,26 @@ async function digest(path) {
   return createHash('sha256').update(await readFile(path)).digest('hex')
 }
 
+async function readProbeObservation(dataDirectory, events, sourcePath) {
+  const path = resolve(dataDirectory, 'phase4-probes', 'observations.ndjson')
+  const raw = await readFile(path)
+  const rows = raw.toString('utf8').split(/\r?\n/).filter(Boolean).map((line) => JSON.parse(line))
+  if (rows.length !== events.length) throw new Error('Phase 4 observer did not persist exactly one record per dispatched Koishi Session')
+  if (rows.map((row) => row.event_id).join('\0') !== events.map((event) => String(event.event_id)).join('\0')) {
+    throw new Error('Phase 4 observer event ids differ from the ordered Koishi stimulus')
+  }
+  return {
+    status: 'recorded',
+    storage: {
+      relative_path: 'native-koishi-data/phase4-probes/observations.ndjson',
+      file_sha256: createHash('sha256').update(raw).digest('hex'),
+      record_count: rows.length,
+      probe_source_sha256: await digest(sourcePath),
+    },
+    events: rows,
+  }
+}
+
 function nativeElements(event) {
   return (event.message ?? []).map((segment) => {
     if (segment.type === 'text') return h.text(segment.text ?? '')
@@ -60,10 +82,11 @@ function messageSegments(content) {
 class NativeAdapter extends Adapter {}
 
 class NativeBot extends Bot {
-  constructor(ctx, operations, receipts, accountId) {
+  constructor(ctx, operations, receipts, accountId, captureSourceEventId = false) {
     super(ctx, {}, 'onebot.v11')
     this.operations = operations
     this.receipts = receipts
+    this.captureSourceEventId = captureSourceEventId
     this.pendingSends = []
     this.update({ selfId: accountId, user: { id: accountId, name: 'Bot' }, status: Universal.Status.OFFLINE })
   }
@@ -80,12 +103,14 @@ class NativeBot extends Bot {
       operation: 'send_message',
       target,
       params: { message: messageSegments(content) },
+      ...(this.captureSourceEventId && session?.referrer ? { source_event_id: String(session.referrer) } : {}),
     })
     const platformMessageId = `virtual-message-${this.receipts.length + 1}`
     this.receipts.push({
       operation_id: operationId,
       status: 'succeeded',
       target,
+      ...(this.captureSourceEventId ? { account_id: this.selfId, source_event_id: String(session?.referrer ?? '') } : {}),
     })
     const pending = Promise.resolve([platformMessageId])
     this.pendingSends.push(pending)
@@ -97,37 +122,60 @@ async function main() {
   const request = await readRequest()
   const context = request.context
   const sample = context.sample
-  const work = resolve(context.work_dir)
+  const behaviorFixture = context.behavior_fixture
+  const work = resolve(context.execution?.workspace ?? context.work_dir)
+  const profileWork = resolve(context.work_dir)
   const operations = []
   const receipts = []
   const app = new Context({ nickname: ['Bot'] })
-  let removeBotDisposeListener
-  let bot
+  const removeBotDisposeListeners = []
+  const bots = new Map()
 
-  await mkdir(resolve(work, 'native-koishi-data'), { recursive: true })
-  app.plugin(SQLiteDriver, { path: resolve(work, 'native-koishi-data', 'koishi.sqlite') })
+  const nativeDataDirectory = resolve(work, 'native-koishi-data')
+  await mkdir(nativeDataDirectory, { recursive: true })
+  process.env.LIGAMINA_KOISHI_DATA_DIR = nativeDataDirectory
+  app.plugin(SQLiteDriver, { path: resolve(nativeDataDirectory, 'koishi.sqlite') })
   const pluginModule = await import(context.koishi_entry_url)
-  app.plugin(pluginModule.default ?? pluginModule.apply ?? pluginModule, sample.fixture?.plugin_config ?? {})
+  const pluginConfig = behaviorFixture?.setup?.plugin_config ?? sample.fixture?.plugin_config ?? {}
+  if (behaviorFixture && behaviorFixture.adapter?.id !== 'koishi.onebot.v11') {
+    throw new Error('v2 fixture adapter does not match the stock Koishi runner')
+  }
+  app.plugin(pluginModule.default ?? pluginModule.apply ?? pluginModule, pluginConfig)
+  const probeSourcePath = resolve(context.repo_root, 'lab/baselines/koishi/phase4_probe_plugin.mjs')
+  if (behaviorFixture) {
+    const probeModule = await import(pathToFileURL(probeSourcePath).href)
+    app.plugin(probeModule.default, {})
+  }
   const adapter = new NativeAdapter(app)
   const originalOn = app.on
   app.on = function (event, ...args) {
     const dispose = originalOn.call(this, event, ...args)
-    if (event === 'dispose' && !removeBotDisposeListener) removeBotDisposeListener = dispose
+    if (event === 'dispose' && dispose) removeBotDisposeListeners.push(dispose)
     return dispose
   }
-  try {
-    bot = new NativeBot(app, operations, receipts, String(context.account_id ?? '9000'))
-  } finally {
-    app.on = originalOn
+  const events = request.stimulus.events
+  for (const accountId of [...new Set(events.map((event) => String(event.account_id)))]) {
+    const bot = new NativeBot(app, operations, receipts, accountId, Boolean(behaviorFixture))
+    bots.set(accountId, bot)
+    adapter.fork(app, bot)
   }
-  adapter.fork(app, bot)
+  app.on = originalOn
   await app.start()
-  bot.online()
+  for (const bot of bots.values()) bot.online()
+  for (const [key, authority] of Object.entries(behaviorFixture?.setup?.user_authority ?? {})) {
+    const [platform, userId] = key.split(':', 2)
+    if (platform !== 'onebot.v11' || !userId || !Number.isInteger(authority) || authority < 0 || authority > 5) {
+      throw new Error(`invalid v2 Koishi authority seed ${key}`)
+    }
+    await app.database.createUser(platform, userId, { authority })
+  }
 
   try {
-    for (const event of request.stimulus.events) {
+    for (const event of events) {
       const isPrivate = event.conversation.kind === 'private'
       const elements = nativeElements(event)
+      const bot = bots.get(String(event.account_id))
+      if (!bot) throw new Error(`fixture account ${event.account_id} has no native Koishi Bot`)
       const session = bot.session({
         type: 'message',
         platform: 'onebot.v11',
@@ -153,23 +201,26 @@ async function main() {
       await Promise.allSettled(bot.pendingSends.splice(0))
     }
   } finally {
-    removeBotDisposeListener?.()
-    await bot?.dispose()
+    for (const remove of removeBotDisposeListeners) remove()
+    for (const bot of bots.values()) await bot.dispose()
     await app.stop()
   }
 
-  const packageRequire = createRequire(resolve(work, 'package.json'))
+  const packageRequire = createRequire(resolve(profileWork, 'package.json'))
   const runtimeVersion = process.version.replace(/^v/, '')
   const lockfileHash = await digest(context.fingerprint_paths.lockfile)
   const profileHash = await digest(context.fingerprint_paths.profile)
-  const artifactHash = createHash('sha512').update(await readFile(context.fingerprint_paths.artifact)).digest('base64')
+  const artifactHash = fingerprintArtifact(
+    await readFile(context.fingerprint_paths.artifact),
+    sample._artifact_hash_algorithm,
+  )
   const environment = {
     ecosystem: 'koishi',
     framework_version: version,
     runtime_version: runtimeVersion,
     lockfile_sha256: lockfileHash,
     profile_sha256: profileHash,
-    artifact_hash: `sha512-${artifactHash}`,
+    artifact_hash: artifactHash,
     config_sha256: createHash('sha256').update(canonical(context.config), 'utf8').digest('hex'),
     stimulus_sha256: createHash('sha256').update(canonical(request.stimulus), 'utf8').digest('hex'),
   }
@@ -184,11 +235,27 @@ async function main() {
   const report = {
     status: 'completed',
     environment,
-    events: request.stimulus.events,
+    events,
     operations,
     operation_receipts: receipts,
     cleanup: { active_capability_count: 0, live_processes: [] },
     stock_native: { framework: 'Koishi', api: 'Context/Session/Bot', bridge_adapter_imported: false },
+  }
+  if (behaviorFixture) {
+    report.native_trace = { bridge_adapter_imported: false }
+    report.binding = context.binding
+    report.capability_probe_observation = await readProbeObservation(nativeDataDirectory, events, probeSourcePath)
+    report.plugin_observation = {
+      events: events.map((event) => ({
+        event_id: event.event_id,
+        account_id: event.account_id,
+        actor_id: event.actor_id,
+        conversation: event.conversation,
+      })),
+      operations,
+      receipts,
+      response_or_operation_count: operations.length,
+    }
   }
   protocolWrite(`${JSON.stringify(report)}\n`)
 }
