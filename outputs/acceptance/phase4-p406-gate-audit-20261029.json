@@ -1,0 +1,146 @@
+{
+  "schema_version": 1,
+  "kind": "phase4_p406_gate_audit_only",
+  "created_at_utc": "2026-10-29T00:55:01Z",
+  "status": "completed_audit_only",
+  "scope": "independent adjudication of six Phase 4 gates from immutable local evidence; no release candidate install, start, health, stop, rollback, or data recovery was executed",
+  "activation_basis": "P4 plan states that when external gates remain blocked, only P4-06 audit subitems may be delivered; this does not satisfy P4-RELEASE.",
+  "dependency_state": {
+    "feat_028_p4_03": "blocked",
+    "feat_029_p4_04": "blocked",
+    "feat_030_p4_05": "blocked",
+    "release_installation_prerequisites_satisfied": false
+  },
+  "denominator_audit": {
+    "p4_01_scoped": {
+      "positions": 6,
+      "paired_attempts": 18,
+      "side_executions": 36,
+      "passed_attempts": 18,
+      "scope": "two Linux candidates, first-wave only"
+    },
+    "p4_02_global": {
+      "positions": 60,
+      "attempt_slots": 180,
+      "passed": 27,
+      "failed": 9,
+      "blocked_positions": 48,
+      "not_dispatched_slots": 144,
+      "cleanup_unconfirmed": 0
+    },
+    "p4_03_linux_recovery": {
+      "retry_budget_identities": 39,
+      "recovered": 3,
+      "unknown": 36,
+      "budget_exhausted": true,
+      "plugin_compatibility": "not_evaluated"
+    },
+    "p4_04_windows": {
+      "koishi_native_cases_with_three_passes_each": 3,
+      "federated_parity": false,
+      "catalog_admission": "not_evaluated",
+      "catalog_plugin_claims_allowed": false
+    },
+    "p4_05_field": {
+      "fresh_outbound_canaries": 3,
+      "api_accepted": 0,
+      "receiver_observed": 0,
+      "core_operations_unknown": 3
+    }
+  },
+  "gates": [
+    {
+      "id": "P4-FIXTURE",
+      "status": "blocked",
+      "scoped_result": "P4-01 first-wave fixture gate passed for its exact two-plugin subset",
+      "reason": "P4-02 closure records the global fixture gate blocked and 48 required positions lack execution."
+    },
+    {
+      "id": "P4-LINUX-BEHAVIOR",
+      "status": "failed",
+      "scoped_result": "P4-01 first wave passed_scoped",
+      "reason": "P4-02 global behavior failed: 9 failed positions, 48 required positions blocked, and 144 slots not dispatched."
+    },
+    {
+      "id": "P4-AUTOMATION",
+      "status": "blocked",
+      "scoped_result": "Linux 39-identity recovery budget fully observed",
+      "reason": "Only 3 recovered; 36 remain unknown. Windows admission and full controlled-runner acceptance remain outstanding."
+    },
+    {
+      "id": "P4-WINDOWS-BEHAVIOR",
+      "status": "blocked",
+      "scoped_result": "Three Koishi Native cases have three scoped passes each; runner-only child evidence remains scoped",
+      "reason": "Full Enforcement inventory/admission is incomplete, NoneBot native-load result remains unknown, and Federated parity/full behavior matrix are absent."
+    },
+    {
+      "id": "P4-FIELD",
+      "status": "blocked",
+      "scoped_result": "Three authorized outbound canaries are accounted",
+      "reason": "All received QQ result=120 with empty errMsg; no API acceptance or receiver observation; all three Core operations remain unknown."
+    },
+    {
+      "id": "P4-RELEASE",
+      "status": "blocked",
+      "execution_status": "not_run",
+      "reason": "No fixed release scope has passed install/start/diagnostic/stop/rollback/data-recovery acceptance; upstream behavior/security gates remain blocked."
+    }
+  ],
+  "support_matrix": {
+    "exact_candidate_subsets_remain_narrow": true,
+    "full_catalog_claim_allowed": false,
+    "windows_catalog_claim_allowed": false,
+    "field_delivery_claim_allowed": false,
+    "release_readiness": "blocked",
+    "note": "P4-01 Linux passes are scoped; P4-02 global Linux gate failed; P4-03 unknowns, P4-04 Windows admission, and P4-05 delivery remain unresolved."
+  },
+  "source_artifacts": [
+    {
+      "path": "outputs/acceptance/phase4-p401-behavior-runs-20261026-v10.json",
+      "sha256": "a13a7e66f2d0de921e763427dc57463a2e3c34c5a4e81b41dacc9729dd265747"
+    },
+    {
+      "path": "outputs/acceptance/phase4-p402-closure-20261027.json",
+      "sha256": "ad9607f641c2ae38228435d0b4d06d3b2515d931f7fd162f573475a2063f4a76"
+    },
+    {
+      "path": "outputs/acceptance/phase4-p403-run-40525975905/phase4-p403-linux-40525975905/Ligamina/Ligamina/outputs/acceptance/phase4-p403-linux-recovery-run-40525975905.json",
+      "sha256": "cdeb891fda052f7c6fe5df859db4f94cf846f4c7d12ee3ea949111e91b74a54f"
+    },
+    {
+      "path": "outputs/acceptance/phase4-p404-policy-preflight-20261028-v3.json",
+      "sha256": "910c87ad1c5eae4a999ea859146cb06723d57062b4b770e9ac25fd5f6242f728"
+    },
+    {
+      "path": "outputs/acceptance/phase4-p405-live-20261029/phase4-p405-live-platform-diagnostic-20261029.json",
+      "sha256": "604372e7ed7102cb553592d442dbd1618caeeb4b0a2083a90b6f0d8ee9f1b973"
+    },
+    {
+      "path": "outputs/acceptance/phase4-p405-live-20261029/phase4-p405-platform-self-permission-20261029.json",
+      "sha256": "31448a02f7c55154628dc88bf40434767a6d210b7aaff8d5c2ae4892bb165a03"
+    },
+    {
+      "path": "outputs/acceptance/phase4-p405-live-20261029/phase4-p405-koishi-live-canary-20261029-c32cfb00.json",
+      "sha256": "1a3e3c6de1dafe343da808d8d4caf934510dc2fecfa100f0276e86811f2380b2"
+    },
+    {
+      "path": "outputs/acceptance/phase4-p405-live-20261029/phase4-p405-koishi-live-canary-20261029-8b3f6c77.json",
+      "sha256": "20d2a571961e38a4e7358b954821f85c2f0348b1f7b88a2b66c205a72d8a124f"
+    },
+    {
+      "path": "outputs/acceptance/phase4-p405-live-20261029/phase4-p405-koishi-live-canary-20261029-1c443d0c.json",
+      "sha256": "21d77f7f331975e70a6551b4f869f1c14f525eb6d36b401dd5ab4d76ad84e685"
+    },
+    {
+      "path": "outputs/acceptance/phase4-p405-live-20261029/phase4-p405-result120-diagnosis-20261029.json",
+      "sha256": "8d6aa7b278bb9e782bb35e46cd7a2689ab093ad93f6ca4f7f394c176a275d98c"
+    }
+  ],
+  "next_action": "Resume P4-05 only after an explanatory QQ result/code mapping is available; resume P4-04 after policy-accepted signing identity or reviewed versioned Sandbox-only policy and exact event attribution; recovery of P4-03 unknowns requires a newly justified profile/identity scope. Only then freeze a release candidate and run clean-environment install/rollback acceptance.",
+  "privacy": {
+    "raw_account_ids_included": false,
+    "raw_group_ids_included": false,
+    "credentials_included": false,
+    "platform_message_content_included": false
+  }
+}

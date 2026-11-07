@@ -1,0 +1,59 @@
+{
+  "schema_version": 1,
+  "kind": "phase4_p405_stella_apply_path_assessment",
+  "created_at_local": "2026-10-30T09:26:41+08:00",
+  "scope": "Find a safe, non-console path to apply the exact pending Stella desired revision.",
+  "user_constraint": "The Stella WebUI page has no Console, and the user cannot execute JavaScript there.",
+  "source_review": [
+    {
+      "path": "E:/stella/stella_project/dashboard/src/components/AdvancedConfigSettings.vue",
+      "lines": "149-174",
+      "finding": "The Save button is disabled unless the form is dirty. Save returns when no fields changed; otherwise it PUTs only changed keys to /api/v1/config and then calls system.applyRevision(nextRevision). This applies a revision created or returned by that save, not an arbitrary existing desired revision."
+    },
+    {
+      "path": "E:/stella/stella_project/dashboard/src/stores/system.ts",
+      "lines": "202-250",
+      "finding": "Startup recovery retries only a pending apply already recorded in sessionStorage. applyRevision calls the authenticated system API; source search found no standalone UI action selecting the existing desired revision."
+    },
+    {
+      "path": "E:/stella/stella_project/corona/config_api.py",
+      "lines": "529-543",
+      "finding": "POST /api/v1/system/apply accepts a revision_id and uses require_auth."
+    },
+    {
+      "path": "E:/stella/stella_project/webui/auth.py",
+      "lines": "68-98",
+      "finding": "require_auth requires a trusted internal JWT actor or a Bearer/JWT cookie; the apply endpoint does not accept an unauthenticated loopback request."
+    }
+  ],
+  "cli_check": {
+    "command": "python -m deploy --help",
+    "exit_code": 0,
+    "available_commands": [
+      "doctor", "init", "start", "status", "stop", "config-schema", "migrate", "upgrade", "bootstrap", "space-merge", "plugin-check", "plugin-scaffold", "capabilities", "mcp", "manifest", "packages", "runtime", "paths"
+    ],
+    "apply_command_found": false
+  },
+  "runtime_status_check": {
+    "command": "python -m deploy status --json",
+    "exit_code": 0,
+    "selected_result": {
+      "managed": true,
+      "alive": true,
+      "api_reachable": true,
+      "controller_reachable": true,
+      "core_phase": "ready",
+      "core_pid": 30740,
+      "core_revision_id": "nmzdFZbbvPABKGwGkt69kA69v85K-V1-"
+    },
+    "desired_applied_and_last_operation_fields_exposed": false
+  },
+  "automation": {
+    "surface": "mcp__cua_repl.js",
+    "step": "getState",
+    "result": "failed_before_browser_state_or_ui_action",
+    "error": "failed to write kernel assets: system path not found (OS error 3)"
+  },
+  "conclusion": "No standalone WebUI apply button or deploy CLI apply command was found. A Settings Save would create/use a new revision after an actual configuration edit; that would add an unrelated configuration change, so it was not used. The exact apply route needs an authenticated browser-context request or a supported UI automation session. No configuration, credentials, or messages were changed/accessed/sent in this check.",
+  "next_action": "Use Microsoft Edge browser developer tools on the authenticated same-origin Stella page to POST the exact pending revision, or restore a supported UI automation runtime. After an apply response, verify desired/applied equality, bridge enabled groups=1, and active Gateway lease before any fresh marker message."
+}

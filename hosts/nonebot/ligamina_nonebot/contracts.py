@@ -19,6 +19,9 @@ _OPERATION_VALIDATOR = Draft202012Validator(
 _CAPABILITY_VALIDATOR = Draft202012Validator(
     json.loads((_CONTRACTS / "capability-descriptor.schema.json").read_text(encoding="utf-8"))
 )
+_COMMAND_VALIDATOR = Draft202012Validator(
+    json.loads((_REPO_ROOT / "contracts" / "v0.2" / "command-descriptor.schema.json").read_text(encoding="utf-8"))
+)
 SUPPORTED_OPERATIONS = frozenset({"send_message", "get_message", "get_self_info"})
 
 
@@ -39,6 +42,10 @@ def validate_operation(value: Any) -> list[str]:
 
 def validate_capability_descriptor(value: Any) -> list[str]:
     return sorted(error.message for error in _CAPABILITY_VALIDATOR.iter_errors(value))
+
+
+def validate_command_descriptor(value: Any) -> list[str]:
+    return sorted(error.message for error in _COMMAND_VALIDATOR.iter_errors(value))
 
 
 def classify_operation_reuse(existing: dict[str, Any], incoming: dict[str, Any]) -> str:

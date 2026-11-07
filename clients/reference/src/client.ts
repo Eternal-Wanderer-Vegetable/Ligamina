@@ -84,23 +84,29 @@ export class LigaminaClient {
     });
   }
 
-  claimGatewayAction<T = unknown>(gatewayId: string, leaseToken: string): Promise<T> {
-    return this.#request<T>(`/v1/gateways/${encodeURIComponent(gatewayId)}/actions/claim`, {
+  /**
+   * Claims the next pending action. The Core authenticates the lease token and also
+   * requires the full lease credential in the body, exactly as returned by
+   * {@link acquireGatewayLease}. Resolves to `null` when nothing is pending.
+   */
+  claimGatewayAction<T = unknown>(gatewayId: string, lease: GatewayLease): Promise<T | null> {
+    return this.#request<T | null>(`/v1/gateways/${encodeURIComponent(gatewayId)}/actions/claim`, {
       method: "POST",
-      token: leaseToken,
-      body: "{}",
+      token: lease.token,
+      body: JSON.stringify(lease),
     });
   }
 
+  /** Reports the platform result of a claimed action, bound to the same lease. */
   reportGatewayResult<T = unknown>(
     gatewayId: string,
     operationId: string,
-    leaseToken: string,
+    lease: GatewayLease,
     result: unknown,
   ): Promise<T> {
     return this.#request<T>(
       `/v1/gateways/${encodeURIComponent(gatewayId)}/actions/${encodeURIComponent(operationId)}/result`,
-      { method: "POST", token: leaseToken, body: JSON.stringify(result) },
+      { method: "POST", token: lease.token, body: JSON.stringify({ credential: lease, result }) },
     );
   }
 

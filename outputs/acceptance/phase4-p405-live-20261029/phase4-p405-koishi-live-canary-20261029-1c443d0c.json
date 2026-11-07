@@ -1,0 +1,98 @@
+{
+  "schema_version": 1,
+  "kind": "phase4_p405_koishi_live_outbound_canary",
+  "created_at": "2026-10-29T00:45:13.801Z",
+  "run_id": "1c443d0c-b1da-4513-a0e9-322bf4a687cd",
+  "ingress": {
+    "source": "synthetic_event_envelope",
+    "real_platform_ingress_observed": false
+  },
+  "candidate": {
+    "registry_entry_id": "ko-163c3bd4cf87c72c24210251",
+    "package": "@koishijs/plugin-echo",
+    "version": "2.2.5",
+    "artifact_sha256": "79da39692ba8fce04ea597ff85696a0fe193cd89a95a91a0d459ea40ab592265",
+    "profile_lock_sha256": "33e0897b794134c39215e7824a47edec3eb4acc79fcb9f4df00a03c1455f616b",
+    "host_provider_lock_sha256": "5e3df82b0c353a8ded6c32708a8a591d9854182a38c6af9924c3e2671862bbcb"
+  },
+  "containment": {
+    "docker_image": "ligamina-p405-koishi-profile:20261029",
+    "worker_network": "none",
+    "worker_root_filesystem": "read_only",
+    "capability_drop": "ALL",
+    "no_new_privileges": true,
+    "worker_user": "10001:10001",
+    "install_scripts": "disabled",
+    "docker_image_id": "sha256:5d35fea26296986651cf398ae7df48d22afb582e9d2de6ed6ec1bb32c5f1dbaf"
+  },
+  "scenario": {
+    "id": "positive-group-echo-canary",
+    "sends_requested": 1,
+    "marker": "[Ligamina P4-05 TEST] fa2376dc-f9a1-4ab6-94ef-3fa636a5a98d"
+  },
+  "result": "failed_or_incomplete",
+  "cleanup": {
+    "daemon_stopped": true,
+    "labeled_worker_containers_remaining": 0,
+    "koishi_volume_removed": true
+  },
+  "scope": {
+    "account_fingerprint": "98b2a09fcf2417e2",
+    "configured_group_count": 5,
+    "joined_group_count": 11,
+    "matching_group_count": 5,
+    "selected_group_ordinal": 1,
+    "selected_group_fingerprint": "a45573c3a7d79814"
+  },
+  "profile_assets": {
+    "profile_package_lock_sha256": "cd7dce2e2e3e1bdced95faf6c423139f00d250cdd81b6730525d6222edb53d9e",
+    "original_offline_cache_sha256": "d1a77d19ab0f934cb10a38c17bc2bd3eb308753ea2f87da48e2f49dd6e1c6a77",
+    "supplemental_offline_cache_sha256": "1613fbdb5256c2d528139a24a4e16d5a9192805819b762ecc58d687be6159123"
+  },
+  "platform": {
+    "gateway": "SnowLuma OneBot HTTP",
+    "runtime_version": "1.14.19"
+  },
+  "host_setup": {
+    "fresh_sqlite_volume": true,
+    "synthetic_actor_authority": 3,
+    "authority_seed_verified": true
+  },
+  "core": {
+    "ready": true,
+    "listen_scope": "loopback_only"
+  },
+  "correlation": {
+    "event_id": "8cbe2870-c259-4b2f-a63e-0439f07b6959",
+    "trace_id": "5bfa9cc4-c273-4637-aec4-c6634720ea93",
+    "operation_id": "1c24eb08-edc6-454c-88d0-28a8cc1f9681",
+    "operation_fingerprint": "ed1d00e220f91dbada8a4ee8906ad5c735257a8e7c79e4c3690afd983ce98112",
+    "target_matches_exact_grant": true,
+    "outgoing_content_sha256": "dd71a3be8753f4c6695d1fc6c19fc5b23278f636270dcbd87cd2e3e7b8a8c1b5"
+  },
+  "event": {
+    "api_accepted": true,
+    "disposition": "accepted",
+    "core_receipt_fingerprint": "700be50ac86f0fa76d22f44b065592a8149d6042797a95f6ae35c9a3dce378ce",
+    "ingress_is_synthetic": true,
+    "status": "completed",
+    "error_present": false
+  },
+  "authorization": {
+    "host_grant_id": "p405-host-exact-group-send",
+    "client_read_grant_id": "p405-client-operation-read",
+    "grant_ids_are_distinct": true,
+    "both_targets_are_exact_group_scope": true
+  },
+  "platform_send": {
+    "api_accepted": false,
+    "outcome": "failed_or_uncertain",
+    "error_code": "onebot_send_group_msg_retcode_100_platform_result_120"
+  },
+  "operation": {
+    "status": "unknown",
+    "host_epoch": 2,
+    "core_epoch_created": "d11114f7-896a-4488-911e-ca8f71e53462",
+    "receipt_status": "unknown"
+  }
+}

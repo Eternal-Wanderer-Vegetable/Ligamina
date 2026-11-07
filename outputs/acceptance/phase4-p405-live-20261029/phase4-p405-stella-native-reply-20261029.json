@@ -1,0 +1,101 @@
+{
+  "schema_version": 1,
+  "kind": "phase4_p405_stella_native_reply_observation",
+  "created_at_utc": "2026-10-29T11:01:58Z",
+  "status": "stella_native_reply_positive_scoped_only",
+  "test_input": {
+    "observed_text": "晚上好",
+    "mentioned_stella": true,
+    "ingress_at_utc": "2026-10-29T10:56:20.854Z",
+    "trigger_check_allowed": true,
+    "message_body_read_for_correlation": true,
+    "message_body_retained_in_report": false,
+    "raw_identity_values_retained_or_reported": false
+  },
+  "primary_trace": {
+    "root_kind": "qq_passive",
+    "process_kind": "qq_passive",
+    "outcome": "delivered",
+    "status": "closed",
+    "complete": true,
+    "persisted_events": 135,
+    "source_key_matched_ingress_log": true,
+    "chat_runtime": "succeeded",
+    "send_prepare": "succeeded",
+    "send_segment": "succeeded",
+    "send_aggregate": "succeeded",
+    "send_segment_completed_at_utc": "2026-10-29T10:56:34.524Z",
+    "integration_flow_nodes_present": false
+  },
+  "outbound_observations": [
+    {
+      "at_utc": "2026-10-29T10:56:34.524Z",
+      "status": "accepted",
+      "adapter": "onebot-v11",
+      "scene": "group",
+      "segment_kinds": "reply:1,text:1",
+      "part_count": 1,
+      "accepted_parts": 1,
+      "failed_parts": 0,
+      "unknown_parts": 0,
+      "receipt_count": 1,
+      "error_category": "none"
+    },
+    {
+      "at_utc": "2026-10-29T10:56:57.098Z",
+      "status": "accepted",
+      "adapter": "onebot-v11",
+      "scene": "group",
+      "segment_kinds": "reply:1,text:1",
+      "part_count": 1,
+      "accepted_parts": 1,
+      "failed_parts": 0,
+      "unknown_parts": 0,
+      "receipt_count": 1,
+      "error_category": "none"
+    }
+  ],
+  "second_trigger": {
+    "trace_started_at_utc": "2026-10-29T10:56:44.295Z",
+    "root_kind": "qq_passive",
+    "outcome": "delivered",
+    "status": "closed",
+    "complete": true,
+    "source_key_present": true,
+    "source_key_differs_from_greeting": true,
+    "body_or_identity_read": false,
+    "recipient_observation": "not_confirmed"
+  },
+  "recipient_observation": {
+    "first_reply": "user_reported_expected_reply_received",
+    "automated_receiver_record": "not_collected"
+  },
+  "path_assessment": {
+    "observed_path": "Stella ai_gateway normal group trigger -> _run_turn_via_engine -> core.transport.outbound OneBot v11",
+    "source": "E:/stella/stella_project/stella_project/plugins/bot_main/ai_gateway.py",
+    "source_positions": "normal group generation around line 1727; send preparation around line 1809; send segment around line 1842",
+    "ligamina_client_gateway_host_operation_nodes_present": false,
+    "p4_05_integration_path_proven": false
+  },
+  "logger_limit": {
+    "prefix": "[OutboundDelivery]",
+    "message_body_logged": false,
+    "available_fields": "delivery status, adapter, scene, segment kinds/counts, receipt count, categorized error and elapsed time"
+  },
+  "remaining_blockers": [
+    "This successful turn uses Stella native ai_gateway and does not traverse the Ligamina Client/Gateway/Host operation path required by P4-05.",
+    "No event ID -> Core receipt -> Host trace -> operation ID -> Gateway receipt -> recipient observation chain was captured.",
+    "One normal text reply does not cover positive, isolation, duplicate/restart, timeout and unknown scenarios three fresh times each.",
+    "The prior three direct-SnowLuma result=120 operations remain unknown and are not changed by this Stella-native success."
+  ],
+  "decision": {
+    "p4_field_gate": "blocked",
+    "feat_030": "in-progress",
+    "scoped_conclusion": "Stella native normal-group text reply passed once with user-reported receipt; a second distinct trigger had adapter accepted evidence only.",
+    "next_step": "Exercise the Ligamina-mediated Client/Gateway integration while retaining Stella as the real OneBot sender. If no such adapter/route is deployed, that missing integration is the immediate P4-05 implementation prerequisite. Then complete the required three fresh runs for each scenario and preserve the end-to-end correlation chain."
+  },
+  "reproducible_checks": [
+    "Read StellaData/logs/stella.jsonl entries from 2026-10-29T10:56:15Z through 10:57:10Z; extract only the user-identified greeting trigger and OutboundDelivery allowlisted fields, omit identifiers.",
+    "Read-only SQLite query of flow_events joined to message_traces in the same timestamp window; compare ingress source key with each send trace and enumerate chat.* / send.* node status only."
+  ]
+}

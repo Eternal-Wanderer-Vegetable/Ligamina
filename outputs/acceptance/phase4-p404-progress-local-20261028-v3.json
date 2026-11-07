@@ -1,0 +1,68 @@
+{
+  "schema_version": 1,
+  "kind": "phase4_p404_local_verification",
+  "verified_at_utc": "2026-10-28T00:35:13.5283603Z",
+  "commit": "810b814430f045ac64631408ec56e2298f9683c5",
+  "tracked_workspace_dirty": true,
+  "feature_state": {
+    "active_feature": null,
+    "next_feature": "feat-030",
+    "feat_028": "blocked",
+    "feat_029": "blocked",
+    "p4_automation": "blocked",
+    "p4_05": "not_started",
+    "p4_06": "not_started"
+  },
+  "commands": [
+    {
+      "argv": "node scripts/render-readme.mjs",
+      "exit_code": 0,
+      "result": "README evidence blocks rendered"
+    },
+    {
+      "argv": "pwsh -NoProfile -File init.ps1 -Mode docs",
+      "exit_code": 0,
+      "result": "20 documents; 458 local links; 13 indexed historical Markdown; 31 features; no failures"
+    },
+    {
+      "argv": "node .agents/skills/harness-creator/scripts/validate-harness.mjs --target .",
+      "exit_code": 0,
+      "result": "100/100 structural validation"
+    },
+    {
+      "argv": "node scripts/render-readme.mjs --check",
+      "exit_code": 0,
+      "result": "README evidence blocks match validated reports"
+    },
+    {
+      "argv": "git diff --check",
+      "exit_code": 0,
+      "result": "clean diff whitespace check; Git printed CRLF-to-LF normalization warnings for feature_list.json and progress.md"
+    },
+    {
+      "argv": "PowerShell parser + WSB XML + evidence sidecar/hash binding validation",
+      "exit_code": 0,
+      "result": "4 PowerShell scripts parsed; WSB XML valid and maps the empty v3 run folder; 16 sidecars match; one Event 3077 and two correlated Event 3089 records match exact PE flat SHA-256"
+    },
+    {
+      "argv": "wsb.exe list --raw",
+      "exit_code": 0,
+      "result": "0 active Windows Sandbox sessions"
+    }
+  ],
+  "not_run": [
+    "full runtime suite",
+    "unit tests",
+    "catalog plugin execution",
+    "Windows behavior matrix"
+  ],
+  "native_probe": {
+    "result": "blocked_before_entry_by_enforced_App_Control",
+    "sha256": "2b55b31fdb72609e7533a98ca7b5cb492305f5f5629b247282437f55d02772c5",
+    "blocking_event_id": 3077,
+    "policy": "VerifiedAndReputableDesktop",
+    "admission": "not_evaluated",
+    "catalog_plugin_claims_allowed": false
+  },
+  "next_required_action": "Administrator reviews the exact-hash Sandbox-only signed policy or trusted-binary proposal and rollback plan; no host policy mutation authorized or performed."
+}

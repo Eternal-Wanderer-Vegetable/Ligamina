@@ -1,0 +1,57 @@
+{
+  "schema_version": 1,
+  "kind": "phase4_p405_stella_path_preflight",
+  "created_at_utc": "2026-10-29T01:49:53Z",
+  "status": "preflight_complete_real_group_ingress_required",
+  "scope": {
+    "user_requested_sender_path": "existing Stella process",
+    "direct_snowluma_api_called": false,
+    "message_sent": false,
+    "stella_restarted": false,
+    "credentials_read": false,
+    "target_scope": "Stella configured test groups only; identifiers omitted",
+    "private_message_tested": false
+  },
+  "observed": {
+    "process": {
+      "pid": 15352,
+      "executable": "python.exe",
+      "launch_entry": "bot.py",
+      "application_version": "6.3.0",
+      "status_endpoint": "GET /stella/status",
+      "http_status": 200,
+      "allowed_group_count": 5,
+      "onebot_connected": true,
+      "onebot_healthy": true
+    },
+    "management_status": {
+      "deploy_status_desired": "stopped",
+      "deploy_status_alive": false,
+      "stella_status_runtime_desired": "running",
+      "reported_component_pid": 35028,
+      "reported_component_pid_present": false,
+      "interpretation": "manager snapshots disagree; endpoint process/link status is presence evidence only, not managed readiness"
+    }
+  },
+  "route_review": {
+    "normal_qq_reply": "group ingress -> ai_gateway turn pipeline -> generated reply -> existing Stella Bot send path",
+    "webchat_post": "/api/v1/chat uses the isolated WebChat virtual conversation (group id -1)",
+    "authenticated_qq_send_endpoint_found": false,
+    "replay_used": false,
+    "required_trigger": "A new real group ingress event from a non-Stella member account is needed to make the existing Stella process generate and send a QQ reply."
+  },
+  "decision": {
+    "p4_field_gate": "blocked",
+    "feat_030": "in-progress",
+    "prior_three_result_120_operations": "remain unknown and were not replayed",
+    "direct_snowluma_canaries": "not valid evidence for Stella-process end-to-end send",
+    "acceptance_claim": "none",
+    "next_step": "After one unique @Stella input arrives in a configured test group, inspect its fresh Stella trace and separately verify recipient observation."
+  },
+  "privacy": {
+    "raw_group_ids_omitted": true,
+    "account_ids_omitted": true,
+    "message_contents_read": false,
+    "credentials_read": false
+  }
+}

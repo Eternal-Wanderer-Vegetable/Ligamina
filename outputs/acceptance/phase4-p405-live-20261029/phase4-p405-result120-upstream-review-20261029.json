@@ -1,0 +1,86 @@
+{
+  "schema_version": 1,
+  "kind": "phase4_p405_result120_upstream_review",
+  "created_at_utc": "2026-10-29T01:37:33Z",
+  "status": "completed_read_only_review",
+  "scope": {
+    "live_send_performed": false,
+    "credentials_read": false,
+    "private_message_tested": false,
+    "existing_three_unknown_operations_replayed": false,
+    "gateway_under_test": "SnowLuma 1.14.19-node / OneBot v11",
+    "upstream_comparison_only": "SnowLuma v2.2.1 source; not installed or tested"
+  },
+  "existing_field_observation": {
+    "distinct_outbound_canaries": 3,
+    "qq_response_result": 120,
+    "snowluma_err_msg": "",
+    "onebot_api_accepted": 0,
+    "receiver_marker_observed": 0,
+    "core_operations": "unknown",
+    "same_operation_retries": 0
+  },
+  "external_observation": {
+    "source_class": "third_party integration project design note; author-reported field observation, not QQ or SnowLuma documentation",
+    "url": "https://github.com/CCYellowStar2/dsh-astrbot-ingress/blob/1cb088103c64d033ab91cc87da5d06e7e6be4904/docs/design-notes.md",
+    "source_commit": "1cb088103c64d033ab91cc87da5d06e7e6be4904",
+    "source_committed_at_utc": "2026-09-13T06:46:08Z",
+    "reported_symptom": "Occasional QQNT group send rejection with result=120 and empty errMsg; note reports about 1.7% in its own traffic and says a later send often succeeds.",
+    "reported_version_sample_size_and_raw_trace": "not specified in the cited note",
+    "diagnostic_weight": "supports a transient-rejection hypothesis as a lead only; does not define result 120 or establish applicability to this account, group, content, or gateway build"
+  },
+  "upstream_source_review": {
+    "current_release_reviewed": "SnowLuma v2.2.1",
+    "current_group_send_behavior": "The code still throws the generic 'send group message rejected: result=<n> err=<text>' for every nonzero decoded SendMessageResponse.result; no result-120 mapping was found in that branch.",
+    "current_group_send_source": "https://github.com/SnowLuma/SnowLuma/blob/v2.2.1/packages/core/src/bridge/apis/message.ts#L2928-L2935",
+    "separate_receipt_change": "A later SnowLuma change rejects a group send with result zero but no positive groupSequence receipt, and says to check the conversation before retrying. This is a separate case from nonzero result=120.",
+    "receipt_change_source": "https://github.com/SnowLuma/SnowLuma/commit/2c7d9b63",
+    "meaningful_result_120_mapping_found": false
+  },
+  "hypothesis_update": [
+    {
+      "id": "transient_platform_rejection",
+      "rank_after_review": 1,
+      "verdict": "supported_as_unverified_lead",
+      "evidence": "A third-party project reports the same numeric result and empty errMsg as an occasional QQNT group-send rejection; its sample details and applicability are not established."
+    },
+    {
+      "id": "account_or_group_policy",
+      "rank_after_review": 2,
+      "verdict": "unresolved",
+      "evidence": "The current self-member query found member and not-muted; that does not rule out other account or group constraints."
+    },
+    {
+      "id": "target_mapping_or_scope",
+      "rank_after_review": 3,
+      "verdict": "reduced_but_not_ruled_out",
+      "evidence": "The captured OneBot request target matched the exact configured group grant; no independent QQ-side target mapping trace is available."
+    },
+    {
+      "id": "content_policy",
+      "rank_after_review": 4,
+      "verdict": "unresolved",
+      "evidence": "No controlled content differential was run, and the captured responses contain no reason text."
+    },
+    {
+      "id": "rate_limit_or_session_condition",
+      "rank_after_review": 5,
+      "verdict": "unresolved",
+      "evidence": "The three failures are consecutive in this sample; no authoritative rate-limit or session-state code mapping was found."
+    }
+  ],
+  "decision": {
+    "p4_field_gate": "blocked",
+    "reason": "The third-party observation is not an explanatory QQ code mapping and does not resolve why all three scoped sends were rejected.",
+    "next_live_action": "none_until_a_reason_mapping_or_redacted_platform_trace_can_distinguish_the_rejection",
+    "preserve_unknown_operations": true,
+    "no_plugin_compatibility_claim": true
+  },
+  "privacy": {
+    "raw_account_ids_included": false,
+    "raw_group_ids_included": false,
+    "message_content_or_markers_included": false,
+    "credentials_included": false,
+    "raw_packet_payload_included": false
+  }
+}

@@ -1,0 +1,74 @@
+{
+  "schema_version": 1,
+  "kind": "phase4_p405_stella_ingress_observation",
+  "created_at_utc": "2026-10-29T02:00:21Z",
+  "status": "ingress_observed_no_generated_reply",
+  "scope": {
+    "query_cutoff_utc": "2026-10-29T01:56:42Z",
+    "stella_trace_source": "E:/stella/stella_project/StellaData/turn_trace.db",
+    "read_only": true,
+    "indexed_time_query": true,
+    "message_content_read": false,
+    "raw_account_or_group_ids_read_or_reported": false,
+    "message_sent_by_this_check": false,
+    "direct_snowluma_send_called": false
+  },
+  "observed": {
+    "trace_counts_since_cutoff": {
+      "qq_passive_passive_only": 40,
+      "proactive_timer_closed": 3,
+      "delivered": 0
+    },
+    "latest_trace": {
+      "started_at_utc": "2026-10-29T01:59:39.660+00:00",
+      "root_kind": "qq_passive",
+      "platform": "qq",
+      "outcome": "passive_only",
+      "status": "closed",
+      "complete": true,
+      "flow": [
+        {
+          "node": "ingress.receive",
+          "status": "succeeded"
+        },
+        {
+          "node": "ingress.passive.filter",
+          "status": "succeeded"
+        },
+        {
+          "node": "ingress.passive.persist",
+          "status": "skipped",
+          "reason_code": "capture_closed"
+        },
+        {
+          "node": "ingress.plugin",
+          "status": "succeeded"
+        }
+      ],
+      "chat_generation_observed": false,
+      "send_segment_observed": false
+    },
+    "source_rule": {
+      "path": "stella_project/plugins/bot_main/ai_gateway.py",
+      "function": "is_chat_trigger",
+      "requirement": "enabled group plus @ mention plus non-empty text, or image when vision is available"
+    }
+  },
+  "correlation": {
+    "specific_user_message_attributed": false,
+    "reason": "The read-only query did not inspect message content or identifiers, and no unique message marker was supplied for matching.",
+    "receiver_observation": "not_performed"
+  },
+  "decision": {
+    "p4_field_gate": "blocked",
+    "feat_030": "in-progress",
+    "acceptance_claim": "none",
+    "next_step": "Send one fresh unique @Stella message with non-empty text in an enabled test group; then check for a new chat generation and send trace and separately confirm the recipient observed the reply."
+  },
+  "privacy": {
+    "message_contents_read": false,
+    "account_ids_omitted": true,
+    "group_ids_omitted": true,
+    "credentials_read": false
+  }
+}

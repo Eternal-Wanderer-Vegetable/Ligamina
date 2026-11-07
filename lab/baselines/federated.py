@@ -200,13 +200,17 @@ def run(request: dict[str, Any]) -> dict[str, Any]:
     profile_work = Path(context["work_dir"]).resolve()
     environment = dict(context["host_environment"])
     behavior_fixture = context.get("behavior_fixture")
-    fixture_events = request["stimulus"]["events"]
+    # Tool mode (TOOL-04): call the plugin's native commands as MCP tools instead of
+    # sending platform events. Tool sessions run as a fresh, unprivileged actor.
+    tool_calls = request["stimulus"].get("tool_calls")
+    fixture_events = [] if tool_calls is not None else request["stimulus"]["events"]
     if behavior_fixture:
         if behavior_fixture.get("adapter", {}).get("id") != f"{sample['ecosystem']}.onebot.v11":
             raise ValueError("v2 fixture adapter does not match the selected Federated Host")
         sample["sample_id"] = f"phase4-{context['binding']['registry_entry_id']}-{request['case_id'].rsplit('-', 1)[-1]}"
         if sample["ecosystem"] == "nonebot":
-            sample["preload_plugins"] = [*sample.get("preload_plugins", []), "phase4_random_seed", "phase4_probe_observer"]
+            probes = ["phase4_random_seed"] if tool_calls is not None else ["phase4_random_seed", "phase4_probe_observer"]
+            sample["preload_plugins"] = [*sample.get("preload_plugins", []), *probes]
             environment["LIGAMINA_BEHAVIOR_RANDOM_SEED"] = str(behavior_fixture["determinism"]["random_seed"])
             data_directory = work / "nonebot-data"
             environment["LIGAMINA_NONEBOT_DATA_DIR"] = str(data_directory)
@@ -250,10 +254,15 @@ def run(request: dict[str, Any]) -> dict[str, Any]:
             sample["fixture"] = {"plugin_config": config}
             module_url = context["koishi_entry_url"]
             probe_url = (root / "lab/baselines/koishi/phase4_probe_plugin.mjs").resolve().as_uri()
-            environment["LIGAMINA_KOISHI_PLUGINS"] = ",".join((module_url, probe_url))
-            environment["LIGAMINA_KOISHI_PLUGIN_CONFIG"] = json.dumps({module_url: config, probe_url: {}}, ensure_ascii=False)
+            if tool_calls is not None:
+                environment["LIGAMINA_KOISHI_PLUGINS"] = module_url
+                environment["LIGAMINA_KOISHI_PLUGIN_CONFIG"] = json.dumps({module_url: config}, ensure_ascii=False)
+            else:
+                environment["LIGAMINA_KOISHI_PLUGINS"] = ",".join((module_url, probe_url))
+                environment["LIGAMINA_KOISHI_PLUGIN_CONFIG"] = json.dumps({module_url: config, probe_url: {}}, ensure_ascii=False)
             users = []
-            for key, authority in behavior_fixture["setup"].get("user_authority", {}).items():
+            seeded = {} if tool_calls is not None else behavior_fixture["setup"].get("user_authority", {})
+            for key, authority in seeded.items():
                 platform, separator, user_id = key.partition(":")
                 if not separator or platform != "onebot.v11" or not user_id or not isinstance(authority, int) or isinstance(authority, bool) or not 0 <= authority <= 5:
                     raise ValueError("v2 Koishi authority setup is outside the reviewed allowlist")
@@ -284,7 +293,7 @@ def run(request: dict[str, Any]) -> dict[str, Any]:
         config = sample.get("fixture", {}).get("plugin_config")
         if config:
             environment["LIGAMINA_KOISHI_PLUGIN_CONFIG"] = json.dumps({module_url: config}, ensure_ascii=False)
-    trace = run_federated(sample, work, environment, events, profile_work=profile_work)
+    trace = run_federated(sample, work, environment, events, profile_work=profile_work, tool_calls=tool_calls)
     if trace.get("cleanup", {}).get("host_alive_after_shutdown") is not False:
         raise RuntimeError("federated Host process cleanup was not confirmed")
 
@@ -338,6 +347,14 @@ def run(request: dict[str, Any]) -> dict[str, Any]:
             "gateway_operation_count": len(messages),
         },
     }
+    if tool_calls is not None:
+        result["binding"] = context.get("binding")
+        result["federated_trace"]["route"] = "core_mcp_tool_session"
+        result["plugin_observation"] = {
+            "tool_calls": trace.get("tool_calls"),
+            "gateway_operation_count": len(messages),
+        }
+        return result
     if behavior_fixture:
         result["binding"] = context.get("binding")
         result["capability_probe_observation"] = _phase4_probe_observation(sample["ecosystem"], work, fixture_events)

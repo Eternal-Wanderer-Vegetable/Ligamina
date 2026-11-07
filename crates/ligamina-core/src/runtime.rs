@@ -11,6 +11,10 @@ use crate::{
     broker::{
         BrokerError, CapabilityBroker, CapabilityDescriptor, CapabilityInfo, InvocationContext,
     },
+    commands::{
+        CommandCatalog, CommandInfo, ToolScope, ToolSessions, ToolTranscript, is_tool_account,
+        tool_identity, transcript_text,
+    },
     platform::PlatformGateway,
     policy::{Grant, Principal},
     router::{EventRouter, RouterError, RouterLimits},
@@ -25,6 +29,7 @@ use crate::{
 const HOST_REQUEST_DEADLINE: Duration = Duration::from_secs(30);
 const OPERATION_WAIT_DEADLINE: Duration = Duration::from_secs(60);
 const GENERATION_POLL_INTERVAL: Duration = Duration::from_millis(100);
+const MAX_COMMAND_ARGUMENTS_BYTES: usize = 4096;
 
 #[derive(Clone)]
 pub struct ManagedHost {
@@ -60,6 +65,63 @@ pub enum CoreRuntimeError {
     Invalid(String),
 }
 
+#[derive(Debug, Error, PartialEq, Eq)]
+pub enum CommandError {
+    #[error("unknown or inactive command {command_id} on Host {host_id}")]
+    UnknownCommand { host_id: String, command_id: String },
+    #[error("command arguments are invalid: {0}")]
+    InvalidArguments(String),
+    #[error("tool sessions are not yet supported for {0} Hosts")]
+    UnsupportedFramework(String),
+    #[error("Host {0} is unavailable")]
+    HostUnavailable(String),
+    #[error("Host {0} restarted while the command was running")]
+    StaleEpoch(String),
+    #[error("command did not finish within {0:?}")]
+    TimedOut(Duration),
+    #[error("command dispatch failed: {0}")]
+    Dispatch(String),
+}
+
+/// Result of running a native command in a virtual tool conversation.
+#[derive(Debug, Clone, PartialEq)]
+pub struct CommandOutcome {
+    pub host_id: String,
+    pub command_id: String,
+    pub trace_id: String,
+    pub transcript: ToolTranscript,
+}
+
+impl CommandOutcome {
+    pub fn text(&self) -> String {
+        transcript_text(&self.transcript)
+    }
+
+    pub fn to_json(&self) -> Value {
+        let messages = self
+            .transcript
+            .messages
+            .iter()
+            .map(|segments| {
+                let single = ToolTranscript {
+                    messages: vec![segments.clone()],
+                    refused: Vec::new(),
+                };
+                json!({ "segments": segments, "text": transcript_text(&single) })
+            })
+            .collect::<Vec<_>>();
+        json!({
+            "host_id": self.host_id,
+            "command_id": self.command_id,
+            "trace_id": self.trace_id,
+            "dispatch": "completed",
+            "messages": messages,
+            "refused_operations": self.transcript.refused,
+            "note": "Only replies sent while the Host handled the command are collected; later timer or callback sends are not included.",
+        })
+    }
+}
+
 #[derive(Clone)]
 pub struct CoreRuntime {
     store: Arc<Store>,
@@ -67,6 +129,8 @@ pub struct CoreRuntime {
     supervisor: HostSupervisor,
     broker: CapabilityBroker,
     router: EventRouter,
+    commands: CommandCatalog,
+    tool_sessions: ToolSessions,
     active_generations: Arc<Mutex<HashMap<String, u64>>>,
     lifecycle_stop: CancellationToken,
 }
@@ -81,6 +145,22 @@ impl CoreRuntime {
         let mut host_ids = Vec::with_capacity(config.hosts.len());
         let mut host_grants = HashMap::new();
         let mut grants = Vec::new();
+        if config
+            .client_grants
+            .iter()
+            .chain(config.hosts.iter().flat_map(|host| &host.operation_grants))
+            .any(|grant| is_tool_account(&grant.account_id))
+            || config
+                .gateways
+                .iter()
+                .any(|gateway| is_tool_account(&gateway.registration.account_id))
+        {
+            return Err(CoreRuntimeError::Invalid(format!(
+                "accounts {} and {} are reserved for command tool sessions",
+                crate::commands::TOOL_ACCOUNT_ID,
+                crate::commands::TOOL_ONEBOT_ACCOUNT_ID
+            )));
+        }
         for host in &config.hosts {
             host_ids.push(host.config.id.clone());
             for grant in &host.operation_grants {
@@ -168,6 +248,8 @@ impl CoreRuntime {
             },
         );
 
+        let tool_sessions = ToolSessions::new();
+        let tool_sessions_for_hosts = tool_sessions.clone();
         let broker_for_hosts = broker_slot.clone();
         let store_for_hosts = store.clone();
         let platform_for_hosts = platform.clone();
@@ -179,6 +261,7 @@ impl CoreRuntime {
                 let store = store_for_hosts.clone();
                 let platform = platform_for_hosts.clone();
                 let host_grants = grants_for_hosts.clone();
+                let tool_sessions = tool_sessions_for_hosts.clone();
                 async move {
                     match method.as_str() {
                         "service.invoke" => {
@@ -212,6 +295,11 @@ impl CoreRuntime {
                         }
                         "platform.execute" => {
                             let operation = params;
+                            if let Some(result) =
+                                tool_sessions.intercept(&host_id, epoch, &operation)
+                            {
+                                return Ok(result);
+                            }
                             let account_id = required_string(&operation, "account_id")
                                 .map_err(|error| remote_error(-32602, error))?;
                             let grant_id = host_grants
@@ -283,6 +371,8 @@ impl CoreRuntime {
             supervisor,
             broker,
             router,
+            commands: CommandCatalog::new(),
+            tool_sessions,
             active_generations: Arc::new(Mutex::new(HashMap::new())),
             lifecycle_stop: CancellationToken::new(),
         };
@@ -303,6 +393,122 @@ impl CoreRuntime {
 
     pub fn broker(&self) -> &CapabilityBroker {
         &self.broker
+    }
+
+    pub fn commands(&self) -> &CommandCatalog {
+        &self.commands
+    }
+
+    /// Tool-session operations refused after their command had already returned.
+    pub fn late_tool_refusals(&self) -> u64 {
+        self.tool_sessions.closed_refusals()
+    }
+
+    /// Runs a native plugin command in a fresh virtual private conversation and
+    /// returns the replies the plugin sent while handling it (ADR 0002).
+    pub async fn invoke_command(
+        &self,
+        host_id: &str,
+        command_id: &str,
+        arguments: &str,
+    ) -> Result<CommandOutcome, CommandError> {
+        self.invoke_command_with_deadline(host_id, command_id, arguments, HOST_REQUEST_DEADLINE)
+            .await
+    }
+
+    /// [`Self::invoke_command`] with an explicit Host deadline. Replies sent after the
+    /// deadline reach a closed tool session and are refused, never delivered.
+    pub async fn invoke_command_with_deadline(
+        &self,
+        host_id: &str,
+        command_id: &str,
+        arguments: &str,
+        deadline: Duration,
+    ) -> Result<CommandOutcome, CommandError> {
+        if arguments.len() > MAX_COMMAND_ARGUMENTS_BYTES {
+            return Err(CommandError::InvalidArguments(format!(
+                "arguments exceed {MAX_COMMAND_ARGUMENTS_BYTES} bytes"
+            )));
+        }
+        let info: CommandInfo = self
+            .commands
+            .get(host_id, command_id)
+            .await
+            .ok_or_else(|| CommandError::UnknownCommand {
+                host_id: host_id.to_owned(),
+                command_id: command_id.to_owned(),
+            })?;
+        let call = uuid::Uuid::new_v4();
+        let identity = tool_identity(&info.descriptor.framework, call)
+            .ok_or_else(|| CommandError::UnsupportedFramework(info.descriptor.framework.clone()))?;
+        let handle = self
+            .supervisor
+            .handle(host_id)
+            .await
+            .map_err(|_| CommandError::HostUnavailable(host_id.to_owned()))?;
+        if handle.epoch() != info.host_epoch {
+            return Err(CommandError::StaleEpoch(host_id.to_owned()));
+        }
+
+        let call_id = call.simple().to_string();
+        let trace_id = format!("tool-{call_id}");
+        let actor_id = identity.actor_id.clone();
+        let text = if arguments.trim().is_empty() {
+            info.descriptor.invocation.clone()
+        } else {
+            format!("{} {}", info.descriptor.invocation, arguments.trim())
+        };
+        let mut extensions = serde_json::Map::new();
+        extensions.insert(
+            identity.platform.to_owned(),
+            json!({ "message_id": identity.message_id }),
+        );
+        let event = json!({
+            "schema_version": ligamina_contracts::PROTOCOL_VERSION,
+            "event_id": format!("tool-event-{call_id}"),
+            "trace_id": trace_id,
+            "platform": identity.platform,
+            "account_id": identity.account_id,
+            "conversation": { "kind": "private", "id": actor_id },
+            "actor_id": actor_id,
+            "timestamp": current_timestamp(),
+            "target_host": host_id,
+            "message": [{ "type": "text", "text": text }],
+            "extensions": extensions,
+        });
+        ligamina_contracts::validate_event(&event)
+            .map_err(|error| CommandError::InvalidArguments(error.to_string()))?;
+
+        self.tool_sessions.open(ToolScope {
+            host_id: host_id.to_owned(),
+            host_epoch: info.host_epoch,
+            trace_id: trace_id.clone(),
+            account_id: identity.account_id.to_owned(),
+            conversation_kind: "private".to_owned(),
+            conversation_id: actor_id,
+        });
+        let result = handle
+            .request("event.dispatch", json!({ "event": event }), deadline)
+            .await;
+        let transcript = self.tool_sessions.close(&trace_id);
+        let result = result.map_err(|error| match error {
+            // HostHandle flattens RpcError::DeadlineExceeded into its display text.
+            SupervisorError::Rpc(message) if message.ends_with("exceeded its deadline") => {
+                CommandError::TimedOut(deadline)
+            }
+            other => CommandError::Dispatch(other.to_string()),
+        })?;
+        if result.get("accepted") != Some(&Value::Bool(true)) {
+            return Err(CommandError::Dispatch(format!(
+                "Host did not accept the command event: {result}"
+            )));
+        }
+        Ok(CommandOutcome {
+            host_id: host_id.to_owned(),
+            command_id: command_id.to_owned(),
+            trace_id,
+            transcript,
+        })
     }
 
     pub async fn host_status(&self) -> Vec<HostStatus> {
@@ -359,6 +565,7 @@ impl CoreRuntime {
             .collect::<Vec<_>>();
         for (host_id, epoch) in active {
             self.broker.deactivate_host(&host_id, epoch).await;
+            self.commands.deactivate_host(&host_id, epoch).await;
         }
     }
 
@@ -379,6 +586,7 @@ impl CoreRuntime {
             for (host_id, epoch) in inactive {
                 generations.remove(&host_id);
                 self.broker.deactivate_host(&host_id, epoch).await;
+                self.commands.deactivate_host(&host_id, epoch).await;
             }
         }
 
@@ -397,6 +605,7 @@ impl CoreRuntime {
             }
             if let Some(old_epoch) = current {
                 self.broker.deactivate_host(&status.id, old_epoch).await;
+                self.commands.deactivate_host(&status.id, old_epoch).await;
             }
             self.broker.activate_host(&status.id, status.epoch).await?;
             let handle = self.supervisor.handle(&status.id).await?;
@@ -419,6 +628,19 @@ impl CoreRuntime {
             self.broker
                 .register_snapshot(&status.id, status.epoch, descriptors)
                 .await?;
+            // Hosts before contract v0.2 omit `commands`; they simply expose none.
+            let commands = result
+                .get("commands")
+                .and_then(Value::as_array)
+                .cloned()
+                .unwrap_or_default();
+            for rejected in self
+                .commands
+                .register_snapshot(&status.id, status.epoch, &commands)
+                .await
+            {
+                eprintln!("Host {} command omitted: {rejected}", status.id);
+            }
             self.active_generations
                 .lock()
                 .await
@@ -570,6 +792,30 @@ fn operation_status_name(status: OperationStatus) -> &'static str {
         OperationStatus::Failed => "failed",
         OperationStatus::Unknown => "unknown",
     }
+}
+
+/// Current UTC time as an RFC 3339 timestamp with millisecond precision.
+fn current_timestamp() -> String {
+    let millis = PlatformGateway::current_time_ms();
+    let secs = millis.div_euclid(1000);
+    let (days, rem) = (secs.div_euclid(86_400), secs.rem_euclid(86_400));
+    // civil_from_days (Howard Hinnant), proleptic Gregorian calendar.
+    let z = days + 719_468;
+    let era = z.div_euclid(146_097);
+    let doe = z - era * 146_097;
+    let yoe = (doe - doe / 1460 + doe / 36_524 - doe / 146_096) / 365;
+    let doy = doe - (365 * yoe + yoe / 4 - yoe / 100);
+    let mp = (5 * doy + 2) / 153;
+    let day = doy - (153 * mp + 2) / 5 + 1;
+    let month = if mp < 10 { mp + 3 } else { mp - 9 };
+    let year = yoe + era * 400 + i64::from(month <= 2);
+    format!(
+        "{year:04}-{month:02}-{day:02}T{:02}:{:02}:{:02}.{:03}Z",
+        rem / 3600,
+        (rem % 3600) / 60,
+        rem % 60,
+        millis.rem_euclid(1000)
+    )
 }
 
 fn remote_error(code: i64, message: impl Into<String>) -> RpcError {

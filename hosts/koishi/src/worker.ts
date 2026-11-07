@@ -3,6 +3,8 @@ import { randomUUID } from 'node:crypto'
 import { HostLifecycle, parseList, parsePluginConfig } from './lifecycle.js'
 import { EventEnvelope, PlatformOperation } from './adapter.js'
 import { CapabilityError, capabilityDescriptors, invokeCapability } from './capabilities.js'
+import { describeCommands } from './commands.js'
+import { validateCommandDescriptor } from './contracts.js'
 
 const PROTOCOL_VERSION = '0.1'
 const MAX_FRAME_BYTES = 1024 * 1024
@@ -91,7 +93,7 @@ class Worker {
         })
         await this.lifecycle.start()
         this.ready = true
-        result = { ready: true, protocol_version: PROTOCOL_VERSION, capabilities: capabilityDescriptors() }
+        result = { ready: true, protocol_version: PROTOCOL_VERSION, capabilities: capabilityDescriptors(), commands: this.commands() }
       } else if (method === 'event.dispatch') {
         this.requireReady()
         const envelope = (params.event ?? params) as EventEnvelope
@@ -111,7 +113,7 @@ class Worker {
         result = { ready: this.ready && !this.draining && !this.stopping, host_id: this.hostId, epoch: this.epoch, protocol_version: PROTOCOL_VERSION }
       } else if (method === 'runtime.capabilities') {
         this.requireReady()
-        result = { capabilities: capabilityDescriptors() }
+        result = { capabilities: capabilityDescriptors(), commands: this.commands() }
       } else if (method === 'runtime.stop' || method === 'host.shutdown') {
         this.draining = true
         const activeEvents = [...this.requests.entries()]
@@ -171,6 +173,15 @@ class Worker {
     const promise = new Promise<unknown>((resolve, reject) => this.pending.set(id, { resolve, reject }))
     await this.send({ jsonrpc: '2.0', id, method: 'service.invoke', params: invocation })
     return promise
+  }
+
+  /** Native commands that pass the v0.2 contract; invalid entries are logged and omitted. */
+  private commands() {
+    return describeCommands(this.lifecycle?.app).filter((descriptor) => {
+      const errors = validateCommandDescriptor(descriptor)
+      if (errors.length) this.log(`Host omitted command ${descriptor.command_id}: ${errors.join('; ')}`)
+      return errors.length === 0
+    })
   }
 
   private requireReady(allowDraining = false) {

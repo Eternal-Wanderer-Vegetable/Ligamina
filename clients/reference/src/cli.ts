@@ -1,12 +1,23 @@
 import { readFile } from "node:fs/promises";
-import { LigaminaClient } from "./client.js";
+import { GatewayLease, LigaminaClient } from "./client.js";
 
 function usage(): string {
   return [
     "Usage: ligamina-reference <status|host-set|event|event-status|gateway-lease|gateway-claim|gateway-result|operation-status> [args]",
-    "Authentication is read from LIGAMINA_TOKEN and the gateway-specific token environment variables.",
+    "Authentication is read from LIGAMINA_TOKEN, LIGAMINA_GATEWAY_REGISTRATION_TOKEN (gateway-lease) and LIGAMINA_GATEWAY_LEASE (gateway-claim/gateway-result: the lease JSON printed by gateway-lease).",
     "JSON request bodies are read from files; credentials are not accepted as command-line arguments.",
   ].join("\n");
+}
+
+/** The full lease JSON printed by `gateway-lease`, passed through LIGAMINA_GATEWAY_LEASE. */
+function leaseFromEnvironment(env: NodeJS.ProcessEnv): GatewayLease {
+  const raw = env.LIGAMINA_GATEWAY_LEASE;
+  if (!raw) throw new Error(usage());
+  const lease = JSON.parse(raw) as GatewayLease;
+  if (!lease || typeof lease.token !== "string" || typeof lease.lease_id !== "string") {
+    throw new Error("LIGAMINA_GATEWAY_LEASE must hold the lease JSON returned by gateway-lease");
+  }
+  return lease;
 }
 
 async function readJson(path: string): Promise<unknown> {
@@ -37,17 +48,15 @@ async function run(args: string[], env = process.env): Promise<unknown> {
       return client.acquireGatewayLease(values[0]!, registrationToken, 60_000);
     }
     case "gateway-claim": {
-      const leaseToken = env.LIGAMINA_GATEWAY_LEASE_TOKEN;
-      if (values.length !== 1 || !leaseToken) throw new Error(usage());
-      return client.claimGatewayAction(values[0]!, leaseToken);
+      if (values.length !== 1) throw new Error(usage());
+      return client.claimGatewayAction(values[0]!, leaseFromEnvironment(env));
     }
     case "gateway-result": {
-      const leaseToken = env.LIGAMINA_GATEWAY_LEASE_TOKEN;
-      if (values.length !== 3 || !leaseToken) throw new Error(usage());
+      if (values.length !== 3) throw new Error(usage());
       return client.reportGatewayResult(
         values[0]!,
         values[1]!,
-        leaseToken,
+        leaseFromEnvironment(env),
         await readJson(values[2]!),
       );
     }

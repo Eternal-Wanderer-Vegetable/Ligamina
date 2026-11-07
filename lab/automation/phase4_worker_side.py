@@ -248,7 +248,7 @@ def run_side(request: dict[str, Any]) -> dict[str, Any]:
     if not isinstance(context, dict):
         raise ValueError("side request must contain a context object")
     mode = context.get("execution", {}).get("mode")
-    if mode not in {"native", "federated"}:
+    if mode not in {"native", "federated", "tool"}:
         raise ValueError("side request does not select a registered execution mode")
     ecosystem = context.get("sample", {}).get("ecosystem")
     setup_evidence = _prepare_profile(request)
@@ -265,6 +265,7 @@ def run_side(request: dict[str, Any]) -> dict[str, Any]:
     )
     Path("/work/side").mkdir(parents=True, exist_ok=True)
     if ecosystem == "nonebot":
+        # Tool mode reuses the Federated harness: same Core/Host, MCP tool calls instead of events.
         runner = "/input/project/lab/baselines/nonebot/runner.py" if mode == "native" else "/input/project/lab/baselines/federated.py"
         command = [sys.executable, runner]
     else:
@@ -272,7 +273,7 @@ def run_side(request: dict[str, Any]) -> dict[str, Any]:
             "/usr/local/bin/node",
             str(Path("/work/profile/.ligamina/koishi/runner.mjs") if mode == "native" else Path("/input/project/lab/baselines/federated.py")),
         ]
-        if mode == "federated":
+        if mode in {"federated", "tool"}:
             command = [sys.executable, "/input/project/lab/baselines/federated.py"]
     result = execute_harness(command, request, mode, 180, cwd=Path("/work/side"))
     for key in ("diagnostics", "stderr"):

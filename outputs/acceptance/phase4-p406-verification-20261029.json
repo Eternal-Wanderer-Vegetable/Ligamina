@@ -1,0 +1,164 @@
+{
+  "schema_version": 1,
+  "kind": "phase4_p406_local_verification",
+  "created_at_utc": "2026-10-29T00:59:47Z",
+  "status": "passed_documentation_and_evidence_integrity_only",
+  "commands": [
+    {
+      "command": "pwsh -NoProfile -File init.ps1 -Mode docs",
+      "exit_code": 0,
+      "result": "passed",
+      "documents": 20,
+      "local_links": 543,
+      "indexed_historical_markdown": 15,
+      "features": 31
+    },
+    {
+      "command": "node scripts/check-docs.mjs",
+      "exit_code": 0,
+      "result": "passed",
+      "documents": 20,
+      "local_links": 543,
+      "indexed_historical_markdown": 15,
+      "features": 31
+    },
+    {
+      "command": "node .agents/skills/harness-creator/scripts/validate-harness.mjs --target .",
+      "exit_code": 0,
+      "result": "passed",
+      "overall": 100,
+      "instructions": 5,
+      "state": 5,
+      "verification": 5,
+      "scope": 5,
+      "lifecycle": 5
+    },
+    {
+      "command": "node --test scripts/evidence-hash.test.mjs",
+      "exit_code": 0,
+      "passed": 4,
+      "failed": 0,
+      "skipped": 0
+    },
+    {
+      "command": "node scripts/render-readme.mjs --check",
+      "exit_code": 0,
+      "result": "passed"
+    },
+    {
+      "command": "git diff --check",
+      "exit_code": 0,
+      "result": "passed",
+      "notes": "Git emitted existing CRLF-to-LF working-copy notices for feature_list.json, progress.md, and session-handoff.md; no whitespace errors."
+    },
+    {
+      "command": "read-only report hash and sidecar reconciliation",
+      "exit_code": 0,
+      "p406_audit_sources": "10/10",
+      "p405_preflight_sources": "3/3",
+      "relevant_report_sidecars": "10/10 after serialization",
+      "result": "passed"
+    }
+  ],
+  "source_artifact_hashes": {
+    "expected": 10,
+    "matched": 10,
+    "all_match": true,
+    "artifacts": [
+      {
+        "path": "outputs/acceptance/phase4-p401-behavior-runs-20261026-v10.json",
+        "verified": true,
+        "sha256": "a13a7e66f2d0de921e763427dc57463a2e3c34c5a4e81b41dacc9729dd265747"
+      },
+      {
+        "path": "outputs/acceptance/phase4-p402-closure-20261027.json",
+        "verified": true,
+        "sha256": "ad9607f641c2ae38228435d0b4d06d3b2515d931f7fd162f573475a2063f4a76"
+      },
+      {
+        "path": "outputs/acceptance/phase4-p403-run-40525975905/phase4-p403-linux-40525975905/Ligamina/Ligamina/outputs/acceptance/phase4-p403-linux-recovery-run-40525975905.json",
+        "verified": true,
+        "sha256": "cdeb891fda052f7c6fe5df859db4f94cf846f4c7d12ee3ea949111e91b74a54f"
+      },
+      {
+        "path": "outputs/acceptance/phase4-p404-policy-preflight-20261028-v3.json",
+        "verified": true,
+        "sha256": "910c87ad1c5eae4a999ea859146cb06723d57062b4b770e9ac25fd5f6242f728"
+      },
+      {
+        "path": "outputs/acceptance/phase4-p405-live-20261029/phase4-p405-live-platform-diagnostic-20261029.json",
+        "verified": true,
+        "sha256": "604372e7ed7102cb553592d442dbd1618caeeb4b0a2083a90b6f0d8ee9f1b973"
+      },
+      {
+        "path": "outputs/acceptance/phase4-p405-live-20261029/phase4-p405-platform-self-permission-20261029.json",
+        "verified": true,
+        "sha256": "31448a02f7c55154628dc88bf40434767a6d210b7aaff8d5c2ae4892bb165a03"
+      },
+      {
+        "path": "outputs/acceptance/phase4-p405-live-20261029/phase4-p405-koishi-live-canary-20261029-c32cfb00.json",
+        "verified": true,
+        "sha256": "1a3e3c6de1dafe343da808d8d4caf934510dc2fecfa100f0276e86811f2380b2"
+      },
+      {
+        "path": "outputs/acceptance/phase4-p405-live-20261029/phase4-p405-koishi-live-canary-20261029-8b3f6c77.json",
+        "verified": true,
+        "sha256": "20d2a571961e38a4e7358b954821f85c2f0348b1f7b88a2b66c205a72d8a124f"
+      },
+      {
+        "path": "outputs/acceptance/phase4-p405-live-20261029/phase4-p405-koishi-live-canary-20261029-1c443d0c.json",
+        "verified": true,
+        "sha256": "21d77f7f331975e70a6551b4f869f1c14f525eb6d36b401dd5ab4d76ad84e685"
+      },
+      {
+        "path": "outputs/acceptance/phase4-p405-live-20261029/phase4-p405-result120-diagnosis-20261029.json",
+        "verified": true,
+        "sha256": "8d6aa7b278bb9e782bb35e46cd7a2689ab093ad93f6ca4f7f394c176a275d98c"
+      }
+    ]
+  },
+  "new_report_sidecars": {
+    "expected": 3,
+    "matched": 3,
+    "all_match": true,
+    "reports": [
+      {
+        "path": "outputs/acceptance/phase4-p405-live-20261029/phase4-p405-result120-diagnosis-20261029.json",
+        "sha256": "8d6aa7b278bb9e782bb35e46cd7a2689ab093ad93f6ca4f7f394c176a275d98c",
+        "sidecar_matches": true
+      },
+      {
+        "path": "outputs/acceptance/phase4-p406-gate-audit-20261029.json",
+        "sha256": "0f73913be94e76bb86a3f83128f568abba9511c1dc091ba980d85fea10bef56b",
+        "sidecar_matches": true
+      },
+      {
+        "path": "outputs/acceptance/phase4-p405-live-20261029/phase4-p405-preflight-accounting-20261029.json",
+        "sha256": "10855d4f510c89f3cb3d0250316b226278a218bc6234230f24d918f8757902fc",
+        "sidecar_matches": true
+      }
+    ]
+  },
+  "tracker_state": {
+    "active_feature": null,
+    "next_feature": null,
+    "feat_030": "blocked",
+    "feat_031": "blocked",
+    "feat_031_audit_subtask": "completed",
+    "p4_release": "blocked_not_run"
+  },
+  "scope": "local docs, tracker, harness, and evidence integrity only; no live platform message, Windows Enforcement, release installation, or rollback was executed.",
+  "p405_preflight_accounting": {
+    "report": "outputs/acceptance/phase4-p405-live-20261029/phase4-p405-preflight-accounting-20261029.json",
+    "sha256": "10855d4f510c89f3cb3d0250316b226278a218bc6234230f24d918f8757902fc",
+    "preflight_reports": 3,
+    "non_canary_reports_counted_as_live_sends": 0,
+    "source_sidecars_matched": 3,
+    "current_residuals": "no Windows/WSL Ligamina CLI, P4-05 worker container, or P4-05 named volume"
+  },
+  "final_integrity_summary": {
+    "p406_audit_source_hashes": "10/10",
+    "p405_preflight_source_sidecars": "3/3",
+    "relevant_report_sidecars": "10/10 including this verification report after serialization"
+  }
+}

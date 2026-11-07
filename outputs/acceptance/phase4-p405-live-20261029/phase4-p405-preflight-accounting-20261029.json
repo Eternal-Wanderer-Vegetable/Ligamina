@@ -1,0 +1,77 @@
+{
+  "schema_version": 1,
+  "kind": "phase4_p405_preflight_accounting",
+  "created_at_utc": "2026-10-29T01:04:13Z",
+  "status": "completed_read_only_accounting",
+  "live_send_performed": false,
+  "additional_live_send_performed": false,
+  "accounted_preflight_reports": [
+    {
+      "path": "outputs/acceptance/phase4-p405-live-20261029/phase4-p405-koishi-live-canary-20261029.json",
+      "sha256": "27854d0e80a4011c17e635c482713afb10383aab7184f6ff01fbac6b33a32fc7",
+      "sidecar_matches": true,
+      "created_at_utc": "2026-10-29T00:24:54.297Z",
+      "core_ready": true,
+      "event_status": "completed",
+      "event_disposition": "accepted",
+      "operation_status": null,
+      "platform_send_outcome": null,
+      "cleanup_daemon_stopped": false,
+      "cleanup_workers": 0,
+      "cleanup_volume_removed": null
+    },
+    {
+      "path": "outputs/acceptance/phase4-p405-live-20261029/phase4-p405-koishi-live-canary-20261029-6fee0c3a.json",
+      "sha256": "cf81b2784b1979870bc1f5357f2a5f9cfdd86c7be0cbe218b1b2417c364e1785",
+      "sidecar_matches": true,
+      "created_at_utc": "2026-10-29T00:27:55.309Z",
+      "core_ready": true,
+      "event_status": "completed",
+      "event_disposition": "accepted",
+      "operation_status": null,
+      "platform_send_outcome": null,
+      "cleanup_daemon_stopped": true,
+      "cleanup_workers": 0,
+      "cleanup_volume_removed": true
+    },
+    {
+      "path": "outputs/acceptance/phase4-p405-live-20261029/phase4-p405-koishi-live-canary-20261029-ce4882b4.json",
+      "sha256": "39b5d2af8dec4ee5d418766940e379ac6dc680bd2a0d08d289b26fc9a70783eb",
+      "sidecar_matches": true,
+      "created_at_utc": "2026-10-29T00:28:04.576Z",
+      "core_ready": false,
+      "event_status": null,
+      "event_disposition": null,
+      "operation_status": null,
+      "platform_send_outcome": null,
+      "cleanup_daemon_stopped": false,
+      "cleanup_workers": 0,
+      "cleanup_volume_removed": true
+    }
+  ],
+  "classification": {
+    "core_event_accepted_without_operation_or_platform_send_record": 2,
+    "host_setup_failed_before_core_ready": 1,
+    "these_reports_count_as_live_outbound_canaries": 0,
+    "three_confirmed_snowluma_send_actions_are_counted_in_the_existing_diagnostic": true,
+    "rule": "Incomplete preflight runs are retained but not counted as live platform canaries or plugin behavior outcomes.",
+    "setup_failure": "One profile setup report records missing @minatojs/driver-sqlite before Core readiness; worker count was zero and the run volume was removed.",
+    "accepted_ingress_runs": "Two reports show accepted synthetic Core ingress but omit operation and platform_send outcomes; the SnowLuma log snapshot contains only the three separately reported send_group_msg actions. Their platform-send outcome is not promoted to pass/fail."
+  },
+  "cleanup": {
+    "first_report_daemon_stop_flag": false,
+    "historical_cleanup_claim_preserved": true,
+    "current_windows_ligamina_cli_processes": 0,
+    "current_wsl_ligamina_cli_process": false,
+    "current_p405_worker_containers": 0,
+    "current_p405_named_volumes": 0,
+    "current_residual_reconciliation": "no matching Ligamina CLI process or P4-05 Docker resource found at verification time",
+    "historical_cleanup_status": "unconfirmed for the first preflight report despite no matching residual found now"
+  },
+  "privacy": {
+    "raw_account_ids_included": false,
+    "raw_group_ids_included": false,
+    "credentials_included": false,
+    "message_content_included": false
+  }
+}

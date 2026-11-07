@@ -1,0 +1,100 @@
+{
+  "schema_version": 1,
+  "kind": "phase4_p404_selfsigned_core_followup_verification",
+  "checked_at_utc": "2026-10-28T23:44:51.5659712Z",
+  "latest_review": {
+    "path": "outputs/acceptance/phase4-p404-selfsigned-core-20261029-v8-guest-trust/selfsigned-core-review.json",
+    "sha256": "276b55c334540f3450554284ed702d58521c86b63429bd715d60225b45e8ed87",
+    "status": "blocked_by_enforcement_win32_4551_event_attribution_incomplete",
+    "signed_copy_sha256": "593914a2e2b59589f53b39164419a1d1fe5595ef293a887f78643ee27a702b09"
+  },
+  "checks": [
+    {
+      "command": "pwsh -NoProfile -File init.ps1 -Mode docs",
+      "exit_code": 0,
+      "result": "passed",
+      "documents": 20,
+      "local_links": 519,
+      "indexed_historical_markdown": 15,
+      "features": 31
+    },
+    {
+      "command": "node --test scripts/evidence-hash.test.mjs",
+      "exit_code": 0,
+      "result": "passed",
+      "passed": 4,
+      "failed": 0
+    },
+    {
+      "command": "node scripts/render-readme.mjs --check",
+      "exit_code": 0,
+      "result": "passed"
+    },
+    {
+      "command": "PowerShell AST parse for Run-SelfSignedCoreProbe.ps1 and Run-SelfSignedCoreProbe-Guest.ps1",
+      "exit_code": 0,
+      "result": "passed",
+      "files": 2
+    },
+    {
+      "command": "Verify v8 SHA-256 sidecars",
+      "exit_code": 0,
+      "result": "passed",
+      "matched": 5,
+      "total": 5
+    },
+    {
+      "command": "Check test certificate across host CurrentUser/LocalMachine My, Root, TrustedPublisher",
+      "exit_code": 0,
+      "result": "passed",
+      "matching_stores": 0,
+      "stores_checked": 6
+    },
+    {
+      "command": "wsb list --raw",
+      "exit_code": 0,
+      "result": "passed",
+      "active_guests": 0
+    },
+    {
+      "command": "git diff --check",
+      "exit_code": 0,
+      "result": "passed",
+      "notes": "Git reported existing CRLF-to-LF normalization notices for feature_list.json, progress.md, and session-handoff.md; no whitespace errors."
+    }
+  ],
+  "source_core": {
+    "path": "target/release/ligamina-cli.exe",
+    "sha256": "6c6d0a390916df63ab27080fd85a9e880785854cec63c43f1ac7a0b120dbdd28",
+    "authenticode": "NotSigned",
+    "unchanged": true
+  },
+  "guest_cleanup": {
+    "confirmed": false,
+    "my_store_removed": true,
+    "root_store_removed": false,
+    "trusted_publisher_removed": true,
+    "root_error": "The operation was canceled by the user",
+    "sandbox_teardown_confirmed": true
+  },
+  "host": {
+    "certificate_stores_modified": false,
+    "app_control_policy_modified": false,
+    "matching_test_thumbprint_stores": 0,
+    "stores_checked": 6,
+    "active_sandboxes": 0
+  },
+  "claims": {
+    "p4_04": "in-progress",
+    "p4_windows_behavior": "blocked",
+    "catalog_admission": "not_evaluated",
+    "catalog_plugin_claims_allowed": false,
+    "catalog_plugin_or_behavior_executed": false
+  },
+  "limitations": [
+    "Guest-only trust allowed SignTool verification but did not permit Core process start under the current policy (Win32 4551).",
+    "No target-matching post-start Code Integrity event or Activity ID was captured; CiTool returned HRESULT 0x80073BC3.",
+    "Guest CurrentUser Root certificate removal was not confirmed; the disposable Sandbox was destroyed and no matching certificate was found in any checked host store.",
+    "This report validates local documentation and evidence integrity only; it does not establish Windows plugin compatibility or admission."
+  ]
+}

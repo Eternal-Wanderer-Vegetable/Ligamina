@@ -12,12 +12,13 @@
 | Core runtime | [runtime.rs](../../crates/ligamina-core/src/runtime.rs)：组合 supervisor、broker、router、store 和授权 |
 | 生命周期 | [supervisor.rs](../../crates/ligamina-core/src/supervisor.rs)：Host readiness、epoch、退出、重启和进程树回收 |
 | 能力 | [broker.rs](../../crates/ligamina-core/src/broker.rs)：按 Host generation 替换能力，校验输入与输出 |
+| 命令工具 | [commands.rs](../../crates/ligamina-core/src/commands.rs)：Host 上报的原生命令目录（[v0.2 合同](../../contracts/v0.2/command-descriptor.schema.json)）与虚拟会话 tool sink；MCP `cmd.*` 工具见 [mcp.rs](../../crates/ligamina-cli/src/mcp.rs)，决策见 [ADR 0002](../adr/0002-plugins-as-tools.md) |
 | 事件 | [router](../../crates/ligamina-core/src/router/mod.rs)：持久化回执、按会话排序与背压 |
 | 平台动作 | [platform.rs](../../crates/ligamina-core/src/platform.rs) / [store](../../crates/ligamina-core/src/store/mod.rs)：授权、幂等、租约、回执和 unknown 恢复 |
 | HTTP/MCP | [daemon](../../crates/ligamina-cli/src/daemon.rs) / [HTTP](../../crates/ligamina-cli/src/http.rs) / [MCP](../../crates/ligamina-cli/src/mcp.rs) |
 | NoneBot | [Host README](../../hosts/nonebot/README.md)：OneBot v11 转换、Bot.handle_event 与框架生命周期 |
 | Koishi | [Host README](../../hosts/koishi/README.md)：原生 Session/dispatch、插件服务依赖与 SQLite |
-| Reference Client | [说明](../../clients/reference/README.md)：typed HTTP、独立 MCP SDK 与虚拟平台 |
+| Reference Client | [说明](../../clients/reference/README.md)：typed HTTP、独立 MCP SDK、虚拟平台与平台中立的 [OneBot v11 Gateway](../../clients/reference/src/onebot-gateway.ts)（接入见 [Bot 与 Agent 接入](bot-integration.md)） |
 | 实验室 | [run.py](../../lab/run.py)、[representative.py](../../lab/representative.py)、[独立原生基线](../../lab/baselines/paired_worker.py)、[比较器](../../lab/compare.py) |
 
 ## 边界与不变量
@@ -26,6 +27,7 @@
 - stdout 是协议通道，stderr 是日志通道；请求按字符串 ID 关联，Host epoch 隔离旧进程结果。
 - 账号、群聊/私聊、会话 ID 共同限定事件与动作作用域。保持字符串 ID，覆盖大数与群/私同 ID。
 - 已派发且失去回执的动作保持 unknown；重启不能证明真实发送成功。
+- 命令工具调用使用保留账号（Koishi `ligamina-tool`，NoneBot/OneBot `0`）和 Core 生成的 trace；这类操作只在 Core 内完成或拒绝，绝不进入 ledger/Gateway，工具结果也不是平台投递证据。
 - Bridge 平台能力有限，未支持 API 返回 unsupported_api；扩展必须补授权、schema、作用域和差分验证。
 - NoneBot 2.5.0、Koishi core 4.18.11 是锁定 profile。Koishi 元包/loader、浏览器/控制台等需求使用独立 profile。
 - S2-05 stock baseline 在不导入 Ligamina Bridge 的独立进程中调用原生 Bot/Session API；配对 Worker 固定 artifact、lock、config、stimulus 指纹后分别验证 Native 与 Federated 输出。

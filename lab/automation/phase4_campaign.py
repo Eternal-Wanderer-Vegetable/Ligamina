@@ -62,6 +62,7 @@ def _copy_python_sources(project: Path) -> None:
         "lab/recipes.py",
         "lab/native_runner.py",
         "lab/representative.py",
+        "lab/mcp_http.py",
         "lab/baselines/federated.py",
         "lab/baselines/nonebot/runner.py",
         "lab/baselines/nonebot/fixtures/phase4_random_seed.py",
@@ -72,6 +73,7 @@ def _copy_python_sources(project: Path) -> None:
         "hosts/nonebot/ligamina_nonebot/__init__.py",
         "hosts/nonebot/ligamina_nonebot/adapter.py",
         "hosts/nonebot/ligamina_nonebot/capabilities.py",
+        "hosts/nonebot/ligamina_nonebot/commands.py",
         "hosts/nonebot/ligamina_nonebot/contracts.py",
         "hosts/nonebot/ligamina_nonebot/lifecycle.py",
         "hosts/nonebot/ligamina_nonebot/worker.py",
@@ -80,6 +82,7 @@ def _copy_python_sources(project: Path) -> None:
         "contracts/v0.1/event-envelope.schema.json",
         "contracts/v0.1/platform-operation.schema.json",
         "contracts/v0.1/capability-descriptor.schema.json",
+        "contracts/v0.2/command-descriptor.schema.json",
     )
     for relative in files:
         _copy_file(ROOT / relative, project / relative)

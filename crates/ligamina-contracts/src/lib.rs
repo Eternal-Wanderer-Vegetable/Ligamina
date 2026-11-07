@@ -13,6 +13,8 @@ const OPERATION_SCHEMA_SOURCE: &str =
     include_str!("../../../contracts/v0.1/platform-operation.schema.json");
 const CAPABILITY_SCHEMA_SOURCE: &str =
     include_str!("../../../contracts/v0.1/capability-descriptor.schema.json");
+const COMMAND_SCHEMA_SOURCE: &str =
+    include_str!("../../../contracts/v0.2/command-descriptor.schema.json");
 const LAB_CATALOG_SCHEMA_SOURCE: &str =
     include_str!("../../../contracts/lab/v1/catalog.schema.json");
 const LAB_RUN_SCHEMA_SOURCE: &str = include_str!("../../../contracts/lab/v1/run.schema.json");
@@ -35,6 +37,12 @@ static CAPABILITY_VALIDATOR: LazyLock<Validator> = LazyLock::new(|| {
     let schema: Value =
         serde_json::from_str(CAPABILITY_SCHEMA_SOURCE).expect("capability schema is valid JSON");
     jsonschema::validator_for(&schema).expect("capability schema is valid JSON Schema")
+});
+
+static COMMAND_VALIDATOR: LazyLock<Validator> = LazyLock::new(|| {
+    let schema: Value =
+        serde_json::from_str(COMMAND_SCHEMA_SOURCE).expect("command schema is valid JSON");
+    jsonschema::validator_for(&schema).expect("command schema is valid JSON Schema")
 });
 
 static LAB_SCHEMA_REGISTRY: LazyLock<Registry> = LazyLock::new(|| {
@@ -119,6 +127,11 @@ pub fn validate_capability_descriptor(value: &Value) -> Result<(), ContractError
     validate_against(&CAPABILITY_VALIDATOR, value)
 }
 
+/// Validates a v0.2 command descriptor reported by a Host framework.
+pub fn validate_command_descriptor(value: &Value) -> Result<(), ContractError> {
+    validate_against(&COMMAND_VALIDATOR, value)
+}
+
 pub fn validate_lab_document(kind: &str, value: &Value) -> Result<(), ContractError> {
     let source = match kind {
         "catalog" => LAB_CATALOG_SCHEMA_SOURCE,
@@ -195,6 +208,30 @@ mod tests {
             .join(name);
         serde_json::from_slice(&fs::read(path).expect("lab fixture is readable"))
             .expect("lab fixture is JSON")
+    }
+
+    #[test]
+    fn command_descriptor_fixtures_validate() {
+        let dir = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../../contracts/v0.2/fixtures");
+        let load = |name: &str| -> Value {
+            serde_json::from_slice(&fs::read(dir.join(name)).unwrap()).unwrap()
+        };
+        assert_eq!(
+            validate_command_descriptor(&load("command.koishi-echo.json")),
+            Ok(())
+        );
+        for invalid in ["command.invalid-framework.json", "command.extra-field.json"] {
+            assert!(
+                validate_command_descriptor(&load(invalid)).is_err(),
+                "{invalid}"
+            );
+        }
+        assert!(
+            validate_command_descriptor(&json!({
+                "command_id": "has space", "invocation": "x", "framework": "koishi"
+            }))
+            .is_err()
+        );
     }
 
     #[test]

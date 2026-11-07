@@ -112,7 +112,7 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--entry-id", required=True)
     parser.add_argument("--attempt-id", required=True)
     parser.add_argument("--generation", required=True, type=int)
-    parser.add_argument("--side", choices=("native", "federated"), required=True)
+    parser.add_argument("--side", choices=("native", "federated", "tool"), required=True)
     options = parser.parse_args(argv)
     try:
         request = json.load(sys.stdin)
