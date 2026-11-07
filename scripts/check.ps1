@@ -31,6 +31,7 @@ try {
     Invoke-Checked uv @('run', '--locked', '--project', 'hosts/nonebot', '--python', '3.12.14', 'python', 'hosts/nonebot/tests/native_smoke.py')
     Invoke-Checked uv @('run', '--locked', '--project', 'hosts/nonebot', '--python', '3.12.14', 'python', 'hosts/nonebot/tests/native_bridge.py')
     Invoke-Checked uv @('run', '--locked', '--project', 'hosts/nonebot', '--python', '3.12.14', 'python', 'hosts/nonebot/tests/command_tools.py')
+    Invoke-Checked uv @('run', '--locked', '--project', 'hosts/astrbot', '--python', '3.12.14', 'python', 'hosts/astrbot/tests/bridge_smoke.py')
     Invoke-Checked uv @('run', '--locked', '--project', 'hosts/nonebot', '--python', '3.12.14', 'python', 'hosts/nonebot/tests/worker_smoke.py')
 
     Push-Location hosts/koishi
