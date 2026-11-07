@@ -1,0 +1,97 @@
+{
+  "schema_version": 1,
+  "kind": "phase4_p405_stella_ligamina_bridge_implementation",
+  "created_at_utc": "2026-10-29T11:48:27Z",
+  "status": "staged_pending_private_configuration_and_existing_process_reload",
+  "scope": {
+    "feature_id": "feat-030",
+    "task_id": "P4-05",
+    "p4_field_gate": "blocked",
+    "extension_source": "clients/stella/ligamina_bridge/__init__.py",
+    "extension_staged": "E:/stella/stella_project/extensions/ligamina_bridge",
+    "stella_checkout_status": "untracked_extension_only"
+  },
+  "files": [
+    {
+      "path": "clients/stella/ligamina_bridge/__init__.py",
+      "sha256": "5b9d78383f7077d711b8dc9d9df9e7049e04fc8d07ba8fc5cf73ab6566143782"
+    },
+    {
+      "path": "clients/stella/tests/test_ligamina_bridge.py",
+      "sha256": "b60fd5279a465462f8f6e6dff16b457ffb754cc2e1c60385c9ce0be4c35d3839"
+    },
+    {
+      "path": "clients/stella/README.md",
+      "sha256": "371ebb9453795994fd73bdb42434da2327fda5a47894c6c430315e501bfb8862"
+    },
+    {
+      "path": "E:/stella/stella_project/extensions/ligamina_bridge/__init__.py",
+      "sha256": "5b9d78383f7077d711b8dc9d9df9e7049e04fc8d07ba8fc5cf73ab6566143782"
+    }
+  ],
+  "implementation": {
+    "enabled_by_default": false,
+    "ingress": "Existing Stella normal group trigger with explicit !ligamina marker; native reply matcher is blocked for this marker to avoid duplicate send",
+    "core_contract": "loopback Core event, Gateway lease, claim and result routes",
+    "outbound": "Stella core.transport.outbound.OutboundService with the active matching OneBot Bot; no direct SnowLuma calls",
+    "target_scope": "configured client/account/Host and intersection of explicit bridge groups with Stella ALLOWED_GROUPS",
+    "payload": "text-only group messages",
+    "unknown_policy": "partial, timeout, exception, and unknown outcomes remain unknown and are not replayed",
+    "correlation_logs": "operation begin, outbound begin, and terminal logs include sanitized operation/event/trace identifiers; no group ID, message body, or credentials"
+  },
+  "verification": {
+    "targeted_pytest": {
+      "command": "PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 python -m pytest clients/stella/tests/test_ligamina_bridge.py -q",
+      "status": "passed",
+      "passed": 13,
+      "failed": 0
+    },
+    "stella_runtime": {
+      "runtime": "CPython 3.12.10",
+      "commands": [
+        "python -m py_compile clients/stella/ligamina_bridge/__init__.py E:/stella/stella_project/extensions/ligamina_bridge/__init__.py",
+        "disabled stdlib-only import from Ligamina client path"
+      ],
+      "status": "passed"
+    },
+    "feature_tracker": {
+      "command": "python -c import json; json.loads(feature_list.json)",
+      "status": "passed",
+      "feature_count": 31
+    },
+    "git_diff_check": {
+      "command": "git diff --check",
+      "status": "passed",
+      "notes": "CRLF normalization warnings only for pre-existing modified feature_list.json, progress.md and session-handoff.md"
+    },
+    "documentation_gate": {
+      "status": "passed",
+      "command": "pwsh -NoProfile -File init.ps1 -Mode docs",
+      "exit_code": 0,
+      "output": {
+        "documents": 20,
+        "local_links": 556,
+        "indexed_historical_markdown": 15,
+        "features": 31,
+        "failures": 0
+      }
+    }
+  },
+  "runtime_observation": {
+    "extension_copied_to_stella_checkout": true,
+    "source_and_staged_hash_equal": true,
+    "runtime_loaded": false,
+    "existing_stella_process_restarted": false,
+    "local_environment_read_or_written": false,
+    "credentials_read_or_written": false,
+    "live_ligamina_message_sent": false,
+    "previous_three_direct_snowluma_result120_operations_replayed": false
+  },
+  "next_action": "In private local launch configuration, set the documented STELLA_LIGAMINA_* values using the registered Core client and Gateway credentials; ensure the loopback Core and selected target Host are ready; restart the existing Stella process to load the staged extension; then send one fresh authorized @Stella !ligamina echo <unique-marker> group message and capture Core, Host, operation, Stella outbound, receiver and cleanup evidence.",
+  "decision": {
+    "feat_030": "in-progress",
+    "p4_field_gate": "blocked",
+    "conclusion": "The connector is locally verified and staged, but private configuration and a controlled reload are still required. Stella-native reply evidence is not Ligamina field acceptance.",
+    "old_unknown_operations": "remain unknown and unreplayed"
+  }
+}

@@ -9,7 +9,8 @@ import sys
 import uuid
 from typing import Any
 
-from .contracts import event_error_code
+from .commands import describe_commands
+from .contracts import event_error_code, validate_command_descriptor
 from .capabilities import CapabilityError, capability_descriptors, invoke_capability
 from .lifecycle import HostLifecycle, configured_plugins
 
@@ -126,6 +127,7 @@ class Worker:
                 "ready": True,
                 "protocol_version": PROTOCOL_VERSION,
                 "capabilities": capability_descriptors(),
+                "commands": self._commands(),
             }
         if method == "event.dispatch":
             self._require_ready()
@@ -154,7 +156,7 @@ class Worker:
             }
         if method == "runtime.capabilities":
             self._require_ready()
-            return {"capabilities": capability_descriptors()}
+            return {"capabilities": capability_descriptors(), "commands": self._commands()}
         if method in {"runtime.stop", "host.shutdown"}:
             self._draining = True
             current = asyncio.current_task()
@@ -166,6 +168,20 @@ class Worker:
                 self._ready = False
             return {"stopping": True}
         raise WorkerError("method_not_found", f"unsupported Host method: {method}")
+
+    def _commands(self) -> list[dict[str, Any]]:
+        """Native command matchers that pass the v0.2 contract; invalid ones are logged."""
+        driver = self._lifecycle.driver if self._lifecycle is not None else None
+        if driver is None:
+            return []
+        valid = []
+        for descriptor in describe_commands(driver):
+            errors = validate_command_descriptor(descriptor)
+            if errors:
+                print(f"Host omitted command {descriptor.get('command_id')!r}: {'; '.join(errors)}", file=sys.stderr, flush=True)
+            else:
+                valid.append(descriptor)
+        return valid
 
     def _require_ready(self, *, allow_draining: bool = False) -> None:
         if not self._ready or self._stopping or (self._draining and not allow_draining):

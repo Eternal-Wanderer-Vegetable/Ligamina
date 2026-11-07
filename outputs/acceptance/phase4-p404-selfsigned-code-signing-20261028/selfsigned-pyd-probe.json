@@ -1,0 +1,95 @@
+{
+    "schema_version":  1,
+    "kind":  "phase4_p404_selfsigned_pyd_signing_probe",
+    "collected_at_utc":  "2026-10-28T11:56:15.9965900Z",
+    "status":  "unknown_policy_or_load_result",
+    "scope":  "Native LoadLibrary of the locally self-signed pydantic-core 2.50.1 Windows extension in the exact P4-04 Windows Sandbox profile; no catalog plugin behavior.",
+    "source":  {
+                   "package":  "pydantic-core",
+                   "version":  "2.50.1",
+                   "python_tag":  "cp312-cp312-win_amd64",
+                   "wheel_filename":  "pydantic_core-2.50.1-cp312-cp312-win_amd64.whl",
+                   "wheel_sha256":  "132529c83901437ff642f585216831bf5fd7a91df66829907e155192ead62498",
+                   "wheel_member":  "pydantic_core/_pydantic_core.cp312-win_amd64.pyd",
+                   "original_pyd_sha256":  "d38e098d798d381cc44f867162bc6da2ebc5d77bf444f0dd00d42a1bc8484297",
+                   "signed_copy_sha256":  "bbb78eb03d6d720709829bbe5e5c18b96cd68d73967aa3fde5b74e03d410f7e2",
+                   "host_input_report":  "host-inputs.json"
+               },
+    "runtime":  {
+                    "path":  "C:\\P404Input\\runtime\\python.exe",
+                    "version":  "3.12.10",
+                    "sha256":  "4d6f5f81a4bca11191c4c7c6b43632694d0a4ce74e068619d8fdc161d469859a",
+                    "locked_sha256":  "4d6f5f81a4bca11191c4c7c6b43632694d0a4ce74e068619d8fdc161d469859a",
+                    "authenticode_status":  "Valid",
+                    "signer":  "CN=Python Software Foundation, O=Python Software Foundation, L=Beaverton, S=Oregon, C=US"
+                },
+    "certificate":  {
+                        "subject":  "CN=Ligamina P4-04 Disposable Self-Signed Test",
+                        "issuer":  "CN=Ligamina P4-04 Disposable Self-Signed Test",
+                        "thumbprint":  "3521DF91D8C1FCC95B5A02E299039D6A87C79831",
+                        "not_after_utc":  "2026-10-29T11:49:00.0000000Z",
+                        "self_issued":  true,
+                        "public_certificate_only_imported":  true,
+                        "private_key_exported":  false
+                    },
+    "signature":  {
+                      "embedded_signer":  "CN=Ligamina P4-04 Disposable Self-Signed Test",
+                      "status_after_guest_local_trust":  "Valid",
+                      "signtool_verification_after_guest_local_trust":  {
+                                                                            "exit_code":  0,
+                                                                            "output":  "\n\nVerifying: C:\\P404Output\\signed-pyd\\_pydantic_core.cp312-win_amd64.pyd\n\n\nSignature Index: 0 (Primary Signature)\nHash of file (sha256): 05315178CA992AD30BF44660FF795795F29191C8B0F58172C3799FC9DDF4F669\n\nSigning Certificate Chain:\n    Issued to: Ligamina P4-04 Disposable Self-Signed Test\n\n    Issued by: Ligamina P4-04 Disposable Self-Signed Test\n\n    Expires:   Thu Oct 29 19:49:00 2026\n\n    SHA1 hash: 3521DF91D8C1FCC95B5A02E299039D6A87C79831\n\n\nFile is not timestamped.\n\n\nSuccessfully verified: C:\\P404Output\\signed-pyd\\_pydantic_core.cp312-win_amd64.pyd\n\n\nNumber of files successfully Verified: 1\n\nNumber of warnings: 0\n\nNumber of errors: 0\n"
+                                                                        },
+                      "trust_scope":  [
+                                          "CurrentUser\\Root",
+                                          "CurrentUser\\TrustedPublisher"
+                                      ],
+                      "trust_store_cleanup_confirmed":  true
+                  },
+    "execution":  {
+                      "started":  true,
+                      "exit_code":  0,
+                      "stdout":  "{\"error\": \"[WinError 4551] Ӧ�ó�����Ʋ�������ֹ���ļ���\", \"error_type\": \"OSError\", \"loaded\": false, \"path\": \"C:\\\\Users\\\\WDAGUtilityAccount\\\\AppData\\\\Local\\\\Temp\\\\LigaminaP404SelfSignedRetry\\\\_pydantic_core.cp312-win_amd64.pyd\", \"sha256\": \"bbb78eb03d6d720709829bbe5e5c18b96cd68d73967aa3fde5b74e03d410f7e2\"}",
+                      "stderr":  "",
+                      "timed_out":  false
+                  },
+    "guest":  {
+                  "identity":  "72D94808-28C5-4\\WDAGUtilityAccount",
+                  "os":  "Microsoft Windows 11 企业版",
+                  "build":  "26100",
+                  "device_guard":  {
+                                       "code_integrity_policy_enforcement_status":  2,
+                                       "user_mode_code_integrity_policy_enforcement_status":  2
+                                   },
+                  "enforcement_policy_activation_events":  [
+
+                                                           ],
+                  "matching_target_events":  [
+
+                                             ],
+                  "all_code_integrity_events":  {
+                                                    "since_utc":  "2026-10-28T11:51:04.2458946Z",
+                                                    "records":  [
+
+                                                                ],
+                                                    "errors":  [
+
+                                                               ]
+                                                }
+              },
+    "isolation":  {
+                      "networking_disabled_by_wsb_profile":  true,
+                      "app_control_policy_changed":  false,
+                      "guest_current_user_trust_stores_changed_temporarily":  true,
+                      "private_key_exported":  false,
+                      "plugin_behavior_executed":  false,
+                      "native_load_only":  true,
+                      "guest_scratch_cleanup_confirmed":  true,
+                      "guest_teardown_required":  true
+                  },
+    "limitations":  [
+                        "This run tests one hash-locked native dependency using an experimental self-signed derivative; it does not modify or replace the frozen wheel.",
+                        "Local guest trust does not establish that the self-signed issuer belongs to the Microsoft Trusted Root Program or that the original dependency profile is admitted.",
+                        "Even an allowed native load is not plugin behavior compatibility or release evidence."
+                    ],
+    "failure":  null
+}

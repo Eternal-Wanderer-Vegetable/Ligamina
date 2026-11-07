@@ -1,0 +1,38 @@
+{
+  "schema_version": 1,
+  "kind": "phase4_p405_reference_client_local_preflight",
+  "recorded_at_utc": "2026-10-28T23:54:14Z",
+  "status": "passed_scoped",
+  "command": {
+    "value": "npm test",
+    "working_directory": "clients/reference",
+    "exit_code": 0
+  },
+  "environment": {
+    "node": "v24.22.1",
+    "npm": "12.0.2",
+    "package": "@ligamina/reference-client@0.1.0",
+    "package_lock_sha256": "2a6bfd208047b9f18e05c19ab498aabec5f275d44d7b71a3fe9e3d76f6e73f70"
+  },
+  "verification": {
+    "typescript_build": "passed",
+    "tests": {
+      "total": 5,
+      "passed": 5,
+      "failed": 0,
+      "names": [
+        "reference client keeps tokens in authorization headers and encodes route IDs",
+        "gateway operations use the registration token and rotated lease token for separate calls",
+        "reference client maps structured HTTP errors without exposing credentials",
+        "virtual platform sends idempotently and serves scoped history with message segments intact",
+        "independent TypeScript MCP SDK completes the legacy stdio lifecycle"
+      ]
+    }
+  },
+  "scope_limits": [
+    "HTTP client checks use injected fetch; the VirtualPlatform is an in-memory test double.",
+    "The MCP lifecycle test invokes the local CLI stdio endpoint; no live Core HTTP daemon or customer Gateway was exercised.",
+    "No platform credentials were read or configured and no real platform message was sent.",
+    "This report is local client-contract evidence only; P4-FIELD remains not_run."
+  ]
+}

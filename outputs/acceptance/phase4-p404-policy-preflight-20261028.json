@@ -1,0 +1,195 @@
+{
+  "scope": "Original App Control Enforcement profile; read-only guest policy and candidate identity review only",
+  "status": "blocked_preflight",
+  "source_files": [
+    {
+      "path": "outputs/acceptance/phase4-p404-guest-admission-20261028-v3/guest-admission.json",
+      "sha256": "287223d44b4ae692c8af431c8a8e610a71390ccc810513d82d9c092b34893194",
+      "sidecar_matches": true
+    },
+    {
+      "path": "outputs/acceptance/phase4-p404-guest-admission-20261028-v3/codeintegrity-events.json",
+      "sha256": "3626605dd4ea5349a3fa165fec0d9e1dba17067c385bc2341df3edd3557fd177",
+      "sidecar_matches": true
+    }
+  ],
+  "actions": {
+    "post_stop_wsb_list": "[]",
+    "native_probe": "not_started",
+    "catalog_execution": "not_started",
+    "public_certificate_used": false,
+    "sandbox_closed": true,
+    "app_control_policy_changed": false
+  },
+  "device_guard": {
+    "enforced_policy_ids": null,
+    "kernel_status": 2,
+    "user_mode_status": 2,
+    "audit_policy_ids": null
+  },
+  "limitations": [
+    "CiTool -lp -json returned HRESULT 0x80073BC3 as WDAGUtilityAccount and as SYSTEM; full policy inventory and exact base-policy mapping remain unknown.",
+    "Current guest Win32_DeviceGuard kernel/user fields are 2, and boot 3099 activations were captured, but the runtime probe did not produce post-start 3076/3077/3089/3099 records.",
+    "The selected Windows profile locks and package archives are in the external cache, not inside the catalog snapshot; exact artifact and profile-lock hashes were verified.",
+    "Koishi profile archive closure is hash-verified, but catalog installation and behavior have not run.",
+    "The Python 3.12.14 runtime is unsigned and historically blocked with Win32 error 4551; Python.org 3.12.14 is a source-only release with no Windows binary installer.",
+    "No catalog plugin was executed."
+  ],
+  "schema_version": 1,
+  "policy_inventory": {
+    "admission": "not_evaluated",
+    "latest_event_3099_policy_activations": [
+      {
+        "audit_mode_enabled": false,
+        "status": "0x0",
+        "time_created_utc": "2026-10-28T07:44:04.4957599Z",
+        "options": "0xd1882304",
+        "event_hash": "140CE61A30A209A23B5D43906C9BF0E8AFCD7C2CFA952F5CD04E8058EBBFAFE2",
+        "name": "VerifiedAndReputableDesktopFlightSupplemental",
+        "version": "27766.241221-1700",
+        "policy_guid": "{1678656c-05ef-481f-bc5b-ebd8c991502d}"
+      },
+      {
+        "audit_mode_enabled": false,
+        "status": "0x0",
+        "time_created_utc": "2026-10-28T07:44:04.4957233Z",
+        "options": "0xb18c2714",
+        "event_hash": "2668895A5B233A80432D00D67251D7B7F52686A3FB13780F4B242C5A1F937A01",
+        "name": "VerifiedAndReputableDesktop",
+        "version": "27555.1000.240208",
+        "policy_guid": "{0283ac0f-fff1-49ae-ada1-8a933130cad6}"
+      }
+    ],
+    "citool_user_stdout": "{\"OperationResult\":-2147009597}",
+    "event_id_counts": {
+      "id_3077": 0,
+      "id_3099": 20,
+      "id_3089": 0,
+      "id_3076": 0
+    },
+    "citool_inventory_complete": false,
+    "citool_system_exit_code": -2147009597,
+    "citool_user_exit_code": -2147009597,
+    "base_policy_mapping": "unknown",
+    "event_window_total": 20
+  },
+  "next_action": "Keep catalog plugin execution paused until the enforcing guest policy identity is reconciled from a supported read-only source. Then proceed with the Koishi locked profile in the same unchanged Enforcement baseline. NoneBot requires a distinct signed CPython 3.12.10 profile and lock, or a future signed CPython 3.12.14 runtime; do not relabel or substitute the current unsigned 3.12.14 profile.",
+  "guest": {
+    "computer_name": "72D94808-28C5-4",
+    "manufacturer": "Microsoft Corporation",
+    "model": "Virtual Machine",
+    "os_caption": "Microsoft Windows 11 企业版",
+    "version": "10.0.26100",
+    "build": "26100",
+    "architecture": "64 位",
+    "powershell_version": "5.1.26100.9711",
+    "current_identity": "72D94808-28C5-4\\WDAGUtilityAccount"
+  },
+  "collected_at_utc": "2026-10-28T07:44:15.169054Z",
+  "kind": "phase4_p404_read_only_policy_preflight",
+  "candidate_preflight": {
+    "samples": [
+      {
+        "dependency_lock_cache_path": "E:\\stella\\Ligamina-artifact-cache\\profile-locks\\nonebot\\sha256\\50\\500cfb266d89f49f1cfabf874c0db17ed7e097d2a2eda4c5c51c4c27ad47efca",
+        "dependency_lock_sha256": "500cfb266d89f49f1cfabf874c0db17ed7e097d2a2eda4c5c51c4c27ad47efca",
+        "registry_entry_id": "nb-16c80a826ca035f6c49ad69a",
+        "package": "nonebot_plugin_roll",
+        "artifact_sha256": "3a5ead2404f26711c9d41604ddcbb2e141df8a950fc53d32536aa7980fab1a2c",
+        "windows_profile_id": "nonebot-2.5.0-onebot-2.4.6-py3.12.14-windows-x86_64",
+        "status": "locked",
+        "version": "0.2.3",
+        "dependency_lock_materialized_in_snapshot": false,
+        "dependency_count": 36,
+        "dependency_lock_cache_present": true,
+        "dependency_lock_cache_sha256_matches": true,
+        "artifact_cache_path": "E:\\stella\\Ligamina-artifact-cache\\sha256\\3a\\3a5ead2404f26711c9d41604ddcbb2e141df8a950fc53d32536aa7980fab1a2c",
+        "artifact_cache_present": true,
+        "artifact_sha256_matches": true
+      },
+      {
+        "dependency_lock_cache_path": "E:\\stella\\Ligamina-artifact-cache\\profile-locks\\koishi\\sha256\\33\\33e0897b794134c39215e7824a47edec3eb4acc79fcb9f4df00a03c1455f616b",
+        "dependency_lock_sha256": "33e0897b794134c39215e7824a47edec3eb4acc79fcb9f4df00a03c1455f616b",
+        "registry_entry_id": "ko-163c3bd4cf87c72c24210251",
+        "package": "@koishijs/plugin-echo",
+        "artifact_sha256": "79da39692ba8fce04ea597ff85696a0fe193cd89a95a91a0d459ea40ab592265",
+        "windows_profile_id": "koishi-core-4.18.11-node-24.20.0-x86_64-portable-lock",
+        "status": "locked",
+        "version": "2.2.5",
+        "dependency_lock_materialized_in_snapshot": false,
+        "dependency_count": 172,
+        "dependency_lock_cache_present": true,
+        "dependency_lock_cache_sha256_matches": true,
+        "artifact_cache_path": "E:\\stella\\Ligamina-artifact-cache\\dependency-archives\\npm\\sha512\\545d7523258c67c85d72b2e831e2e2e9f3c14f51158de0f5635fa607a519abe0f3829cf105c956fe2e5b8343aeaae766d38ed0198084f63d6fedfbd1fb856db3",
+        "artifact_cache_present": true,
+        "artifact_sha256_matches": true
+      }
+    ],
+    "p4_first_wave": {
+      "manifest_sha256": "aa994dedb2e0d59fc32db2fde9ecc62a199dbeba180c60c5e8573d7302814c1d",
+      "attempts": 18,
+      "platform": "Linux evidence only",
+      "manifest_path": "outputs\\acceptance\\phase4-p401-evidence-manifest-20261026-v10.json",
+      "side_executions": 36,
+      "gate": {
+        "p4_fixture_gate": "passed",
+        "p4_first_wave_behavior": "passed_scoped"
+      },
+      "positions": 6
+    },
+    "windows_profiles_lock_path": "catalogs\\p2-41649744e057d61031d5\\profiles.lock.json",
+    "runtime_signature_status": "not_verified_in_this_preflight",
+    "native_dependency_closure": {
+      "koishi": {
+        "status": "static_archive_scan_complete",
+        "locked_packages": 172,
+        "sha512_verified": 172,
+        "native_payloads_found": 0,
+        "install_scripts_found": 0,
+        "plugin_artifact_native_payloads": 0
+      },
+      "nonebot": {
+        "status": "not_materialized_for_enforcement",
+        "locked_packages": 36,
+        "notable_native_wheel_candidates": [
+          "httptools",
+          "multidict",
+          "propcache",
+          "pydantic-core",
+          "rpds-py",
+          "watchfiles",
+          "yarl"
+        ]
+      }
+    },
+    "windows_profiles_lock_sha256": "68a7391620a06e7141d949519333a1f4fc5ccee7abd84dc036c46d09fdae8d38",
+    "runtime": {
+      "koishi": {
+        "path": "E:\\stella\\Ligamina-artifact-cache\\p305-koishi-lock-runtime\\node.exe",
+        "sha256": "5c976096e04e5c2c1f091938926234cc9fbebfe9787ddd149351b3b0ecc707b5",
+        "authenticode_status": "Valid",
+        "signer": "CN=OpenJS Foundation, O=OpenJS Foundation, L=San Francisco, S=California, C=US",
+        "guest_probe_report": "outputs/acceptance/phase4-p404-signed-runtime-20261028/signed-runtime-probe.json",
+        "guest_probe_status": "passed_runtime_only"
+      },
+      "nonebot": {
+        "path": "C:\\Users\\Vegetable\\AppData\\Roaming\\uv\\python\\cpython-3.12.14-windows-x86_64-none\\python.exe",
+        "sha256": "4eb51b7d5963d9e0dc356bd209b1d55360c73db39d8d458ceee084610ca48fd1",
+        "authenticode_status": "NotSigned",
+        "historical_win32_error": 4551,
+        "official_3_12_14_windows_binary": "not_provided"
+      }
+    }
+  },
+  "signed_runtime_review": {
+    "path": "outputs/acceptance/phase4-p404-signed-runtime-review-20261028.json",
+    "sha256": "505b7b962958191a8244e98e1042695ef4058181f7c7dfe641d9da223d9599f7",
+    "sidecar_matches": true,
+    "status": "passed_runtime_only",
+    "sandbox_id": "a06a3cea-01a4-4ffa-8688-cb06c7380a31",
+    "post_stop_active_sandboxes": 0
+  },
+  "sources": [
+    "https://www.python.org/downloads/release/python-31214/",
+    "https://www.python.org/downloads/release/python-31210/"
+  ]
+}

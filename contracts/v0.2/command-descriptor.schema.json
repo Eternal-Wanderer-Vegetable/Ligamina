@@ -1,0 +1,48 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ligamina.dev/contracts/v0.2/command-descriptor.schema.json",
+  "title": "Ligamina v0.2 command descriptor",
+  "description": "A chat command registered natively by a Host framework plugin. Commands are not pure capabilities; Core exposes them as tools that run inside an ephemeral virtual conversation.",
+  "type": "object",
+  "required": ["command_id", "invocation", "framework"],
+  "properties": {
+    "command_id": { "type": "string", "minLength": 1, "maxLength": 96, "pattern": "^\\S+$" },
+    "invocation": { "type": "string", "minLength": 1, "maxLength": 256 },
+    "framework": { "enum": ["koishi", "nonebot", "astrbot"] },
+    "description": { "type": "string", "maxLength": 2048 },
+    "usage": { "type": "string", "maxLength": 1024 },
+    "aliases": { "type": "array", "maxItems": 64, "items": { "type": "string", "minLength": 1, "maxLength": 256 } },
+    "arguments": {
+      "type": "array",
+      "maxItems": 64,
+      "items": {
+        "type": "object",
+        "required": ["name", "required"],
+        "properties": {
+          "name": { "type": "string", "minLength": 1, "maxLength": 128 },
+          "required": { "type": "boolean" },
+          "variadic": { "type": "boolean" },
+          "type": { "type": "string", "maxLength": 64 },
+          "description": { "type": "string", "maxLength": 1024 }
+        },
+        "additionalProperties": false
+      }
+    },
+    "options": {
+      "type": "array",
+      "maxItems": 64,
+      "items": {
+        "type": "object",
+        "required": ["name"],
+        "properties": {
+          "name": { "type": "string", "minLength": 1, "maxLength": 128 },
+          "syntax": { "type": "string", "maxLength": 256 },
+          "type": { "type": "string", "maxLength": 64 },
+          "description": { "type": "string", "maxLength": 1024 }
+        },
+        "additionalProperties": false
+      }
+    }
+  },
+  "additionalProperties": false
+}

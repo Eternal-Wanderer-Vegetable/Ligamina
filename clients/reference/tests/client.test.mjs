@@ -29,11 +29,17 @@ test("gateway operations use the registration token and rotated lease token for 
       return Response.json({ ok: true });
     },
   });
+  const lease = { lease_id: "lease-1", token: "lease-secret", lease_epoch: 2, core_epoch: "epoch-1", expires_at_ms: 1 };
   await client.acquireGatewayLease("gateway A", "registration-secret", 60_000);
-  await client.claimGatewayAction("gateway A", "lease-secret");
+  await client.claimGatewayAction("gateway A", lease);
+  await client.reportGatewayResult("gateway A", "op/1", lease, { status: "succeeded" });
   assert.equal(requests[0].init.headers.get("authorization"), "Bearer registration-secret");
   assert.equal(requests[1].init.headers.get("authorization"), "Bearer lease-secret");
   assert.match(requests[1].url, /gateway%20A/);
+  // The Core requires the full lease credential in the claim body and wraps results with it.
+  assert.deepEqual(JSON.parse(requests[1].init.body), lease);
+  assert.match(requests[2].url, /actions\/op%2F1\/result$/);
+  assert.deepEqual(JSON.parse(requests[2].init.body), { credential: lease, result: { status: "succeeded" } });
 });
 
 test("reference client maps structured HTTP errors without exposing credentials", async () => {

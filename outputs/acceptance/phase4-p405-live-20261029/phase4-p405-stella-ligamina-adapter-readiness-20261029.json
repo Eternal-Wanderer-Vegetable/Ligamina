@@ -1,0 +1,119 @@
+{
+  "schema_version": 1,
+  "kind": "phase4_p405_stella_ligamina_adapter_readiness",
+  "created_at_utc": "2026-10-29T11:15:33Z",
+  "status": "blocked_missing_stella_connector",
+  "scope": {
+    "feature_id": "feat-030",
+    "task_id": "P4-05",
+    "repositories": [
+      {
+        "name": "Ligamina",
+        "head": "810b814",
+        "working_tree_dirty": true,
+        "tracked_or_untracked_status_entries": 132
+      },
+      {
+        "name": "Stella_project",
+        "head": "cf63061",
+        "working_tree_dirty": true,
+        "tracked_or_untracked_status_entries": 6
+      }
+    ]
+  },
+  "source_evidence": [
+    {
+      "repo": "Ligamina",
+      "path": "clients/reference/src/client.ts",
+      "sha256": "c29541886c1ff9de44c6d9e7ac4804add8283a4fdac9b2e81a32a936bebc22e0",
+      "findings": [
+        "The typed client provides submitEvent, acquireGatewayLease, claimGatewayAction, and reportGatewayResult.",
+        "A targeted source search found no Stella-specific adapter in clients/reference/src, hosts, or crates/ligamina-cli/src."
+      ]
+    },
+    {
+      "repo": "Ligamina",
+      "path": "clients/reference/src/virtual-platform.ts",
+      "sha256": "0a596308241c96ee9ce9285f35fdf287946aba0df6e1562d78a299cac2d42525",
+      "findings": [
+        "VirtualPlatform is an in-memory test double and does not connect to a real platform."
+      ]
+    },
+    {
+      "repo": "Ligamina",
+      "path": "crates/ligamina-cli/src/http.rs",
+      "sha256": "484430b4b76322f24d9788dc9c4dae6a955e2279841d8ec5a0a11379faac6844",
+      "findings": [
+        "Core HTTP routes exist for event submission and Gateway lease, claim, and result reporting."
+      ]
+    },
+    {
+      "repo": "Stella_project",
+      "path": "extensions/__init__.py",
+      "sha256": "eec183d6851067131d5167d534f811f0c6ce96d0bbae4259a50c50540161828a",
+      "findings": [
+        "The extension loader imports extensions that expose setup(pipeline).",
+        "The only project extension package currently present is extensions/link_monitor; source search found no Ligamina reference under stella_project, extensions, or core Python sources."
+      ]
+    },
+    {
+      "repo": "Stella_project",
+      "path": "stella_project/plugins/bot_main/ai_gateway.py",
+      "sha256": "dff75037d944c0473b273349305be8d31b3461e50070e7d5d08c2ecc6b227a3a",
+      "findings": [
+        "Normal group handler handle_chat runs _run_turn_via_engine, then its reply segment calls Stella core.transport.outbound OutboundService.send with the active Bot.",
+        "The normal group path has no Ligamina Client event submission, Gateway claim/result, or Ligamina operation correlation."
+      ]
+    },
+    {
+      "repo": "Stella_project",
+      "path": "core/transport/outbound.py",
+      "sha256": "7c21abfd1e36d87c4ea37d7b968de457755ffe0767093305064b4495ac9e6e2c",
+      "findings": [
+        "Stella provides an in-process outbound service seam that can send through its active Bot and report delivery results."
+      ]
+    }
+  ],
+  "runtime_observation": {
+    "prior_report_path": "outputs/acceptance/phase4-p405-live-20261029/phase4-p405-stella-native-reply-20261029.json",
+    "prior_report_sha256": "35412ba3925ac57ae94b23bfd9003bedd7df5f8035a2979063dc7e58a47bf1bd",
+    "summary": "The user-confirmed native Stella group reply succeeded through ai_gateway and OneBot v11, but the trace contained no Ligamina Client, Gateway, Host, or operation nodes.",
+    "this_turn": {
+      "message_sent": false,
+      "operation_replayed": false,
+      "credentials_or_chat_content_read": false,
+      "stella_process_restarted": false,
+      "runtime_code_changed": false
+    }
+  },
+  "graph_index": {
+    "tool": "GitNexus CLI 1.6.12",
+    "repo": "Stella_project",
+    "indexed_commit": "cf63061",
+    "indexed_at_utc": "2026-10-29T11:12:06Z",
+    "nodes": 30372,
+    "edges": 133440,
+    "clusters": 1231,
+    "flows": 800,
+    "completeness": "truncated",
+    "limitations": "Analyzer reported 3328 of 3528 candidate entry points unranked and additional walks cut by budget. The adapter-absence finding is based on targeted source inventory and call-site inspection, not a missing GitNexus flow."
+  },
+  "required_connector_contract": [
+    "Map the existing Stella group ingress event into a Ligamina EventEnvelope with a stable correlation to the native turn.",
+    "Route the chosen Host operation through an authenticated Ligamina Gateway adapter in the same Stella process.",
+    "Bind the Gateway sender to Stella core.transport.outbound with the exact active Bot; do not call SnowLuma directly.",
+    "Prevent duplicate delivery between native ai_gateway and the Ligamina-mediated Gateway path.",
+    "Record event, Host trace, operation, Gateway receipt, delivery status, and receiver observation without persisting credentials or private message bodies in acceptance reports."
+  ],
+  "decision": {
+    "p4_field_gate": "blocked",
+    "feat_030": "in-progress",
+    "scoped_conclusion": "Stella native send is verified once with user-reported receipt; the P4-05 test is blocked by a missing Stella-owned Client/Gateway connector, not by the native Stella reply path.",
+    "next_step": "Implement and locally verify the Stella-owned connector at the normal group ingress and outbound seams, then deploy it to the existing process and run only fresh, authorized scenarios. Keep the three old direct-SnowLuma operations unknown and unreplayed."
+  },
+  "reproducible_checks": [
+    "In Stella_project: rg -n -i ligamina stella_project extensions core -g '*.py' (no matches).",
+    "In Ligamina: rg -n -i stella clients/reference/src hosts crates/ligamina-cli/src -g '*.ts' -g '*.rs' (no matches).",
+    "Inspect ai_gateway.py around handle_chat and its _run_turn_via_engine / OutboundService.send calls; inspect extensions/__init__.py and the extensions directory inventory."
+  ]
+}

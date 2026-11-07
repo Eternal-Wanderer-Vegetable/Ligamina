@@ -1,0 +1,48 @@
+{
+  "schema_version": 1,
+  "kind": "phase4_p404_guest_admission_launch_attempt",
+  "launched_at_utc": "2026-10-28T00:01:26Z",
+  "process_snapshot_at_utc": "2026-10-28T00:11:56.1895264Z",
+  "branch": "codex/p404-guest-admission",
+  "base_commit": "810b814",
+  "configuration": "deploy/windows/phase4-p404-guest-admission/phase4-p404-guest-admission.wsb",
+  "launch": {
+    "windows_sandbox_pid": 26876,
+    "client_pid": 8064,
+    "client_created_local": "2026-10-28T08:01:26.830453+08:00",
+    "client_closed": true,
+    "client_created_guest_worker": false,
+    "result_directory": "outputs/acceptance/phase4-p404-guest-admission-20261028-v2",
+    "result_files": []
+  },
+  "registered_hyperv_vm_count": 0,
+  "workers_remaining_at_snapshot": [
+    {
+      "name": "vmwp.exe",
+      "pid": 48444,
+      "parent_pid": 5032,
+      "created": "2026-10-27T14:06:59.518186+08:00"
+    }
+  ],
+  "owned_clients_closed": [
+    {
+      "name": "WindowsSandboxRemoteSession.exe",
+      "pid": 46408
+    },
+    {
+      "name": "WindowsSandboxRemoteSession.exe",
+      "pid": 8064
+    },
+    {
+      "name": "WindowsSandboxServer.exe",
+      "pid": 1216
+    }
+  ],
+  "elevation": "ordinary Stop-Process denied for system-owned workers; Start-Process -Verb RunAs request rejected by execution policy before launching",
+  "result": "client_started_without_guest_worker",
+  "admission": "not_evaluated",
+  "native_probe": "not_started",
+  "catalog_execution": "not_started",
+  "next_action": "Run outputs/acceptance/phase4-p404-stop-stale-sandbox-workers.ps1 in Administrator PowerShell; after it verifies the reviewed worker set is gone, retry the updated WSB.",
+  "boundary": "No host policy changes, native probe, or catalog plugin execution."
+}
