@@ -1,0 +1,268 @@
+{
+  "schema_version": 1,
+  "suite_id": "tool-surface-linux-v1",
+  "description": "TOOL-04 tool-level behavior cases. Each case calls a frozen catalog plugin's native command through the MCP command-tool surface inside an admitted Linux Docker Worker. Oracles stay on the orchestrator side and are never copied into Worker input. Expected reply texts cite the parent Oracle text they come from as `case_id#operation_index`; the orchestrator verifies each cited text against the frozen parent suite before dispatch.",
+  "parent_suite": "contracts/lab/automation/v2/fixtures/behavior-suite.phase4-v2.json",
+  "platform": "linux-x86_64",
+  "attempts_per_case": 3,
+  "global_oracle": {
+    "rationale": "Tool sessions complete replies inside Core: the virtual Gateway must receive no operation, every call must finish without a protocol error, and no operation may be refused unless a case says so.",
+    "gateway_operation_count": 0,
+    "dispatch": "completed"
+  },
+  "entries": [
+    {
+      "registry_entry_id": "ko-163c3bd4cf87c72c24210251",
+      "package": "@koishijs/plugin-echo",
+      "version": "2.2.5",
+      "command_id": "echo",
+      "cases": [
+        {
+          "case_id": "tool-ko-koishijs-plugin-echo-positive",
+          "class": "positive",
+          "parent_case_id": "ko-koishijs-plugin-echo-positive",
+          "stimulus": {
+            "tool_calls": [
+              [
+                {
+                  "command_id": "echo",
+                  "arguments": {
+                    "message": "alpha"
+                  }
+                }
+              ]
+            ]
+          },
+          "oracle": {
+            "rationale": "Structured input composes to `echo alpha`; the command replies with only its parsed text to the calling tool session.",
+            "calls": [
+              [
+                {
+                  "replies": [
+                    "alpha"
+                  ],
+                  "refused_operations": 0,
+                  "reply_sources": [
+                    "ko-koishijs-plugin-echo-positive#0"
+                  ]
+                }
+              ]
+            ]
+          }
+        },
+        {
+          "case_id": "tool-ko-koishijs-plugin-echo-negative",
+          "class": "negative",
+          "parent_case_id": "ko-koishijs-plugin-echo-negative",
+          "stimulus": {
+            "tool_calls": [
+              [
+                {
+                  "command_id": "echo",
+                  "arguments": {}
+                }
+              ]
+            ]
+          },
+          "oracle": {
+            "rationale": "Without text the required-argument path returns the localized prompt and forwards nothing.",
+            "calls": [
+              [
+                {
+                  "replies": [
+                    "请输入要发送的文本。"
+                  ],
+                  "refused_operations": 0,
+                  "reply_sources": [
+                    "ko-koishijs-plugin-echo-negative#0"
+                  ]
+                }
+              ]
+            ]
+          }
+        },
+        {
+          "case_id": "tool-ko-koishijs-plugin-echo-isolation",
+          "class": "isolation",
+          "parent_case_id": null,
+          "stimulus": {
+            "tool_calls": [
+              [
+                {
+                  "command_id": "echo",
+                  "arguments": {
+                    "message": "group-message"
+                  }
+                },
+                {
+                  "command_id": "echo",
+                  "arguments": {
+                    "message": "private-message"
+                  }
+                },
+                {
+                  "command_id": "echo",
+                  "arguments": {
+                    "arguments": "-u onebot.v11:77 leaked-message"
+                  }
+                }
+              ]
+            ]
+          },
+          "oracle": {
+            "rationale": "Three concurrent calls each get only their own reply. The third tries the authority-3 redirect option from an unprivileged tool session; it must not deliver its text anywhere, inside or outside the session.",
+            "calls": [
+              [
+                {
+                  "replies": [
+                    "group-message"
+                  ],
+                  "refused_operations": 0
+                },
+                {
+                  "replies": [
+                    "private-message"
+                  ],
+                  "refused_operations": 0
+                },
+                {
+                  "reply_count": 1,
+                  "replies_must_not_contain": "leaked-message",
+                  "refused_operations": 0
+                }
+              ]
+            ]
+          },
+          "derived_from_case_id": "ko-koishijs-plugin-echo-isolation",
+          "setup_case_id": "ko-koishijs-plugin-echo-positive"
+        }
+      ]
+    },
+    {
+      "registry_entry_id": "nb-16c80a826ca035f6c49ad69a",
+      "package": "nonebot_plugin_roll",
+      "version": "0.2.3",
+      "command_id": "rd",
+      "cases": [
+        {
+          "case_id": "tool-nb-nonebot-plugin-roll-positive",
+          "class": "positive",
+          "parent_case_id": "nb-nonebot-plugin-roll-positive",
+          "stimulus": {
+            "tool_calls": [
+              [
+                {
+                  "command_id": "rd",
+                  "arguments": {
+                    "arguments": "1d6"
+                  }
+                }
+              ]
+            ]
+          },
+          "oracle": {
+            "rationale": "With the parent case's reviewed random seed, the first 1d6 roll produces the source-derived result.",
+            "calls": [
+              [
+                {
+                  "replies": [
+                    "你掷出了1个6面骰子, 点数为【1】"
+                  ],
+                  "refused_operations": 0,
+                  "reply_sources": [
+                    "nb-nonebot-plugin-roll-positive#0"
+                  ]
+                }
+              ]
+            ]
+          }
+        },
+        {
+          "case_id": "tool-nb-nonebot-plugin-roll-negative",
+          "class": "negative",
+          "parent_case_id": "nb-nonebot-plugin-roll-negative",
+          "stimulus": {
+            "tool_calls": [
+              [
+                {
+                  "command_id": "rd",
+                  "arguments": {
+                    "arguments": "0d6"
+                  }
+                }
+              ]
+            ]
+          },
+          "oracle": {
+            "rationale": "A zero-dice expression gets the explicit invalid-dice reply and no roll.",
+            "calls": [
+              [
+                {
+                  "replies": [
+                    "错误！你掷出了不存在的骰子, 只有上帝知道结果是多少🤔"
+                  ],
+                  "refused_operations": 0,
+                  "reply_sources": [
+                    "nb-nonebot-plugin-roll-negative#0"
+                  ]
+                }
+              ]
+            ]
+          }
+        },
+        {
+          "case_id": "tool-nb-nonebot-plugin-roll-isolation",
+          "class": "isolation",
+          "parent_case_id": null,
+          "stimulus": {
+            "tool_calls": [
+              [
+                {
+                  "command_id": "rd",
+                  "arguments": {}
+                }
+              ],
+              [
+                {
+                  "command_id": "rd",
+                  "arguments": {
+                    "arguments": "1d6"
+                  }
+                }
+              ]
+            ]
+          },
+          "oracle": {
+            "rationale": "The first call leaves a pending Matcher.got prompt in its own virtual conversation. The second call runs in a new conversation, so that prompt must not capture it: it starts a fresh roll and, under the seed, gets the first draw.",
+            "calls": [
+              [
+                {
+                  "replies": [
+                    "你还没掷骰子呢：rd [x]d[y]"
+                  ],
+                  "refused_operations": 0,
+                  "reply_sources": [
+                    "nb-nonebot-plugin-roll-isolation#0"
+                  ]
+                }
+              ],
+              [
+                {
+                  "replies": [
+                    "你掷出了1个6面骰子, 点数为【1】"
+                  ],
+                  "refused_operations": 0,
+                  "reply_sources": [
+                    "nb-nonebot-plugin-roll-positive#0"
+                  ]
+                }
+              ]
+            ]
+          },
+          "derived_from_case_id": "nb-nonebot-plugin-roll-isolation",
+          "setup_case_id": "nb-nonebot-plugin-roll-positive"
+        }
+      ]
+    }
+  ]
+}
