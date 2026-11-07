@@ -347,13 +347,16 @@ async fn call_command_tool(
         Ok(outcome) => {
             let structured = outcome.to_json();
             let reply = outcome.text();
-            let mut result = CallToolResult::structured(structured);
             let reply = if reply.is_empty() {
                 "(the command sent no reply)".to_owned()
             } else {
                 reply
             };
-            result.content.insert(0, ContentBlock::text(reply));
+            // The text content is only the plugin's reply. Bots that forward tool text
+            // verbatim must not post a JSON dump into the chat; clients that want the
+            // details read `structuredContent`.
+            let mut result = CallToolResult::structured(structured);
+            result.content = vec![ContentBlock::text(reply)];
             Ok(result.into())
         }
         Err(error @ CommandError::InvalidArguments(_)) => {

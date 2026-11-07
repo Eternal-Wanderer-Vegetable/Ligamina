@@ -21,10 +21,15 @@ pub fn input_schema(descriptor: &CommandDescriptor) -> Value {
     let raw = json!({
         "type": "string",
         "maxLength": RAW_MAX_BYTES,
-        "description": "Text after the command name, parsed natively by the plugin framework. Use either this field or the structured fields, not both.",
+        "description": "Text after the command name, parsed natively by the plugin framework; pass an empty string when the command takes no arguments. Use either this field or the structured fields, not both.",
     });
     let mut properties = Map::new();
     properties.insert(RAW_FIELD.to_owned(), raw);
+    // Clients use `required` to decide whether a call needs arguments at all; with
+    // nothing required, some bots call the tool directly with `{}` and lose the
+    // user's input. Free-text commands therefore require the raw field (an empty
+    // string means "no arguments"); typed commands require their declared arguments.
+    let mut required: Vec<Value> = Vec::new();
     if supports_structured(descriptor) {
         for argument in arguments(descriptor) {
             let mut schema = json_type(argument.kind);
@@ -37,6 +42,9 @@ pub fn input_schema(descriptor: &CommandDescriptor) -> Value {
                     text.push_str(&format!(": {description}"));
                 }
                 object.insert("description".to_owned(), Value::String(text));
+            }
+            if argument.required {
+                required.push(Value::String(argument.name.to_owned()));
             }
             properties.insert(argument.name.to_owned(), schema);
         }
@@ -61,8 +69,15 @@ pub fn input_schema(descriptor: &CommandDescriptor) -> Value {
                 }),
             );
         }
+    } else {
+        required.push(Value::String(RAW_FIELD.to_owned()));
     }
-    json!({ "type": "object", "properties": properties, "additionalProperties": false })
+    let mut schema =
+        json!({ "type": "object", "properties": properties, "additionalProperties": false });
+    if !required.is_empty() {
+        schema["required"] = Value::Array(required);
+    }
+    schema
 }
 
 /// Turns tool input into the text after the command name.
@@ -325,6 +340,7 @@ mod tests {
             "number"
         );
         assert_eq!(schema["additionalProperties"], false);
+        assert_eq!(schema["required"], json!(["name"]));
     }
 
     #[test]
@@ -385,6 +401,8 @@ mod tests {
         .unwrap();
         let schema = input_schema(&nonebot);
         assert_eq!(schema["properties"].as_object().unwrap().len(), 1);
+        // Free-text commands must say input is required, or clients may call them with `{}`.
+        assert_eq!(schema["required"], json!([RAW_FIELD]));
         assert!(compose(&nonebot, &input(json!({ "dice": "1d6" }))).is_err());
         assert_eq!(
             compose(&nonebot, &input(json!({ RAW_FIELD: "1d6" }))).unwrap(),

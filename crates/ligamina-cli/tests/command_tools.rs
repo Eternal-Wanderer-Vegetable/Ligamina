@@ -175,6 +175,11 @@ async fn koishi_commands_are_listed_and_callable_as_mcp_tools_without_a_gateway(
     .unwrap();
     assert_eq!(result.is_error, Some(false));
     assert_eq!(first_text(&result), "HELLO TOOLS");
+    assert_eq!(
+        result.content.len(),
+        1,
+        "tool text carries only the plugin reply, no JSON dump"
+    );
     let structured = result.structured_content.clone().unwrap();
     assert_eq!(structured["messages"].as_array().unwrap().len(), 1);
     assert_eq!(
@@ -487,6 +492,8 @@ async fn nonebot_commands_are_callable_as_mcp_tools_with_onebot_identities() {
         .expect("NoneBot echo command is listed");
     let description = echo.description.as_deref().unwrap_or_default();
     assert!(description.contains("nonebot"), "{description}");
+    // Free-text NoneBot commands require `arguments`, so clients never call them with `{}`.
+    assert_eq!(echo.input_schema["required"], json!(["arguments"]));
     assert!(
         description.contains("Echo commands for the command tool surface"),
         "{description}"
