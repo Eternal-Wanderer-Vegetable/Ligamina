@@ -52,7 +52,7 @@
 ### 3.2 Core：命令目录与 tool sink
 
 - **命令目录**（新模块 `crates/ligamina-core/src/commands.rs`）：沿用 `sync_host_generations` 的轮询，在 Host 新 generation 激活时读取 `commands`，按 `(host_id, epoch)` 整体替换；Host 退出即移除；变化时广播，供 MCP 发出 `tools/list_changed`。
-- **虚拟会话**：每次调用生成随机 `trace_id` / `event_id`，以及保留身份：私聊会话，会话 ID 与 actor ID 均为本次调用生成的 ID。Koishi 使用 `platform=ligamina.tool`、账号 `ligamina-tool`。NoneBot 适配器只接受 `onebot.v11` 和数字 ID，由 TOOL-02 按框架选择身份格式。事件直接通过 Host 句柄发送 `event.dispatch`，不进入持久事件队列，因为工具调用是一次性的，没有会话顺序要求。
+- **虚拟会话**：每次调用生成随机 `trace_id` / `event_id`，以及按框架构造的保留身份：私聊会话，会话 ID 与 actor ID 相同且每次不同。Koishi 使用 `platform=ligamina.tool`、账号 `ligamina-tool`、字符串 ID；NoneBot 适配器只接受 `onebot.v11` 与数字 ID，因此使用账号 `0`（真实 QQ/OneBot 账号不会是 0）和大数随机 actor/message ID。sink 返回的 `platform_message_id` 一律为数字，两种 Host 都能解析。两个保留账号都不得出现在任何 grant 或 Gateway 配置中，Core 与 daemon 启动时校验。事件直接通过 Host 句柄发送 `event.dispatch`，不进入持久事件队列，因为工具调用是一次性的，没有会话顺序要求。
 - **tool sink**：Core 处理 Host 的 `platform.execute` 时，先检查 `trace_id` 是否属于正在进行的工具调用。只有 `trace_id`、账号和目标会话三者都与该调用一致，才进入 sink：
   - `send_message`：记录消息段，立即返回 `succeeded` 和合成的 `platform_message_id`；
   - `get_self_info`：返回虚拟账号信息；
@@ -80,12 +80,19 @@
 | 任务 / feature | 依赖 | 交付 | 完成标准 |
 | --- | --- | --- | --- |
 | TOOL-01 / feat-032 | P4-01 工程交付 | v0.2 命令合同；Koishi 命令发现；Core 命令目录与 tool sink；MCP 命令工具；Rust 单测与真实 Koishi Host 端到端测试 | 默认关闭时既有测试全部不变地通过；开启后 MCP 列出并调用 Koishi 命令，收到插件原生回复；越权操作、未知命令、超时、sink 隔离均有负例 |
-| TOOL-02 / feat-033 | TOOL-01 | NoneBot 命令发现（`on_command` 的 `CommandRule`、别名、`on_alconna` 若存在），虚拟会话用 OneBot 合法数字 ID | NoneBot 插件经同一 MCP 工具面可调用；`nonebot_plugin_roll@0.2.3` 等已冻结样本工具级正/负例通过 |
+| TOOL-02 / feat-033 | TOOL-01 | NoneBot 命令发现（`on_command` / `on_shell_command` 的命令规则与别名，按 `command_start` / `command_sep` 生成调用文本）与 OneBot 合法 ID 的虚拟会话 | NoneBot 命令经同一 MCP 工具面可调用，含并发与超时负例。2026-11-07 已完成；原写在此处的冻结样本 `nonebot_plugin_roll@0.2.3` 工具级验收属于第三方目录插件执行，按 AGENTS.md 必须在 OS 隔离 Worker 中进行，已移入 TOOL-04 |
 | TOOL-03 / feat-034 | TOOL-01 | 结构化参数 schema（Koishi 声明 → JSON Schema），服务端按框架语法拼接命令文本 | 生成的 schema 与框架声明一致，原样文本入口保留 |
-| TOOL-04 / feat-035 | TOOL-02 | 工具级行为验收：复用第四阶段冻结的 echo / roll 等样本与独立 Oracle，在 Linux Worker 中三次 fresh 运行 | 结果单独记为 `tool-surface` scope，不与 Native/Federated 或 field 结论混用 |
+| TOOL-04 / feat-035 | TOOL-02 | 工具级行为验收：复用第四阶段冻结的 `@koishijs/plugin-echo@2.2.5`、`nonebot_plugin_roll@0.2.3` 等样本与独立 Oracle，在 Linux Worker 中三次 fresh 运行 | 结果单独记为 `tool-surface` scope，不与 Native/Federated 或 field 结论混用 |
 | TOOL-05 / feat-036 | TOOL-01 | 平台中立的 bot 接入参考：reference client 的 Gateway 示例与接入文档（以 OneBot v11 为例，不绑定具体 bot） | 任意支持 OneBot v11 的 bot 可按文档接入；替代原 P4-05 的 stella 专用路径 |
 
 AstrBot Host 仍留在第五阶段，但命令描述合同已按三框架设计，加入时只需新增 Host。
+
+### 3.5 NoneBot 命令识别规则（TOOL-02）
+
+- 只识别带 `CommandRule` / `ShellCommandRule` 的 matcher；关键词、正则和普通消息 hook 不是命令，不暴露。
+- `on_command` 把主命令和别名合并进一个无序集合，原始主名无法恢复。为保证每次启动工具名稳定，取段数最多的名字为 `command_id`，同段数按文本排序，其余作为别名。
+- 调用文本 = 配置中排序后的第一个 `command_start`（若含空串则不加前缀）+ 以第一个 `command_sep` 连接的命令段。描述取插件 `PluginMetadata` 的 description 与 usage。
+- `on_alconna` 等第三方命令框架尚未识别；如需支持，在 TOOL-03 结构化参数时一并处理。
 
 ## 5. 对第四阶段的影响
 

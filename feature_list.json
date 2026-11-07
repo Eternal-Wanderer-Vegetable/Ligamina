@@ -2,7 +2,7 @@
   "schema_version": 1,
   "updated_at": "2026-11-07",
   "active_feature": null,
-  "next_feature": "feat-034",
+  "next_feature": "feat-035",
   "features": [
     {
       "id": "feat-001",
@@ -2115,10 +2115,14 @@
       "dependencies": [
         "feat-032"
       ],
-      "status": "not-started",
-      "done_when": "NoneBot 插件经同一 MCP 工具面可调用；冻结样本 nonebot_plugin_roll@0.2.3 工具级正/负例通过。",
-      "evidence": "",
-      "evidence_paths": []
+      "status": "done",
+      "done_when": "NoneBot 命令经同一 MCP 工具面可调用（含别名、并发与超时负例），保留账号校验覆盖 OneBot 身份。冻结样本 nonebot_plugin_roll@0.2.3 的工具级验收按 AGENTS.md 须在 OS 隔离 Worker 中执行，2026-11-07 移入 TOOL-04 / feat-035。",
+      "evidence": "2026-11-07：ligamina_nonebot/commands.py 识别 CommandRule/ShellCommandRule matcher，主名按段数与文本确定性选取（修复了 Python 哈希随机化导致的主名/别名漂移）；Core 按框架构造工具身份，NoneBot 使用 onebot.v11、保留账号 0 与大数 ID，sink 返回数字 platform_message_id。hosts/nonebot/tests/command_tools.py 在 4 个 PYTHONHASHSEED 下通过；cargo test command_tools 3/3（新增真实 NoneBot Host 经 MCP 调用 echo/twice/别名、并发与超时迟到回复被拒）连续 3 次通过；全部 Rust 套件、Koishi npm test 9/9、NoneBot pytest 3/3 及 native_smoke/native_bridge/worker_smoke 通过；clippy 无新增警告。",
+      "evidence_paths": [
+        "hosts/nonebot/ligamina_nonebot/commands.py",
+        "hosts/nonebot/tests/command_tools.py",
+        "crates/ligamina-cli/tests/command_tools.rs"
+      ]
     },
     {
       "id": "feat-034",
@@ -2142,7 +2146,7 @@
         "feat-033"
       ],
       "status": "not-started",
-      "done_when": "选定样本工具级正例/负例/隔离三次通过且清理确认；不与 Native/Federated 或 field 结论混用。",
+      "done_when": "选定样本（至少 @koishijs/plugin-echo@2.2.5 与 nonebot_plugin_roll@0.2.3）工具级正例/负例/隔离在 OS 隔离 Worker 中三次通过且清理确认；不与 Native/Federated 或 field 结论混用。",
       "evidence": "",
       "evidence_paths": []
     },

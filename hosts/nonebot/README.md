@@ -23,4 +23,6 @@ uv run --locked --python 3.12.14 python tests/native_bridge.py
 uv run --locked --python 3.12.14 python tests/worker_smoke.py
 ```
 
+The Host also reports its native command matchers (`on_command` / `on_shell_command`) in `host.initialize` and `runtime.capabilities` using the [v0.2 command contract](../../contracts/v0.2/command-descriptor.schema.json), so Core can expose them as MCP tools (see [ADR 0002](../../docs/adr/0002-plugins-as-tools.md)). `tests/command_tools.py` checks discovery and dispatch in a virtual tool session.
+
 The commands above run from this Host directory; from the repository root, use the exact paths in [scripts/check.ps1](../../scripts/check.ps1) or [check.sh](../../scripts/check.sh). Third-party support remains limited to the audited exact versions and fixtures, with virtual gateway receipts. Full official-catalog testing is [planned for phase two](../../docs/plans/2026-10-12-phase-2-full-catalog.md).

@@ -23,6 +23,7 @@ Ligamina 的目标是把 Koishi、NoneBot（以及长期计划中的 AstrBot）�
 
 ## 后果
 
+- 工具会话使用保留账号：Koishi 为 `ligamina-tool`，NoneBot（OneBot v11 需要数字 ID）为 `0`。两者都不能出现在 grant 或 Gateway 配置中。
 - 工具调用默认不暴露：守护进程必须显式开启命令工具，并可用 allowlist 精确限定。
 - 只收集分发窗口内发往本次虚拟会话的 `send_message`。插件在中间件结束后才发送的消息（定时器、延迟回调）不计入结果，结果会如实标注。`get_message` 等需要真实平台数据的操作在虚拟会话中失败，并返回 `unsupported_in_tool_session`。
 - 虚拟会话的结果不是平台投递证据，不计入 P4-FIELD；它进入新的工具行为验收（见计划）。

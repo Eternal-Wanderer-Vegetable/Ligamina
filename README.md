@@ -116,7 +116,7 @@ Windows 结果仅适用于已记录的 Evaluation/Audit Mode Worker profile；�
 
 ## 插件工具面（当前 active）
 
-按 [插件工具面计划](docs/plans/2026-11-07-plugin-tool-surface.md)，原生插件命令统一暴露为 MCP 工具，任何 MCP 客户端（Claude Code 等 Coding Agent、LLM 型 bot）都用同一种方式加载。每次调用，Core 都新建一个临时虚拟私聊会话，用框架原生路径分发命令，并把插件的回复作为工具结果返回；整个过程不经过 Gateway，也不需要平台账号。目前已支持 Koishi Host；NoneBot（TOOL-02）与 AstrBot（第五阶段）待接入。
+按 [插件工具面计划](docs/plans/2026-11-07-plugin-tool-surface.md)，原生插件命令统一暴露为 MCP 工具，任何 MCP 客户端（Claude Code 等 Coding Agent、LLM 型 bot）都用同一种方式加载。每次调用，Core 都新建一个临时虚拟私聊会话，用框架原生路径分发命令，并把插件的回复作为工具结果返回；整个过程不经过 Gateway，也不需要平台账号。目前已支持 Koishi 与 NoneBot Host（NoneBot 识别 `on_command` / `on_shell_command` 命令，按机器人配置的命令前缀调用）；AstrBot 留待第五阶段。
 
 守护进程配置中显式开启（默认关闭）：
 
