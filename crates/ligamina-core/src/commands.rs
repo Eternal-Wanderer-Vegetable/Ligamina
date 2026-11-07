@@ -15,10 +15,57 @@ use serde::{Deserialize, Serialize};
 use serde_json::{Value, json};
 use tokio::sync::{RwLock, broadcast};
 
-/// Account ID used by every tool session. No grant or Gateway may use it.
+/// Account ID used by tool sessions on Hosts that accept string IDs (Koishi).
 pub const TOOL_ACCOUNT_ID: &str = "ligamina-tool";
+/// Account ID used by tool sessions on OneBot v11 Hosts, which need numeric IDs.
+/// Real QQ/OneBot accounts are never 0.
+pub const TOOL_ONEBOT_ACCOUNT_ID: &str = "0";
 /// Platform name for tool sessions of Hosts that accept arbitrary platforms.
 pub const TOOL_PLATFORM: &str = "ligamina.tool";
+/// Platform of NoneBot's locked OneBot v11 Bridge Adapter.
+pub const ONEBOT_PLATFORM: &str = "onebot.v11";
+
+/// Whether an account is reserved for tool sessions. No grant or Gateway may use one.
+pub fn is_tool_account(account_id: &str) -> bool {
+    account_id == TOOL_ACCOUNT_ID || account_id == TOOL_ONEBOT_ACCOUNT_ID
+}
+
+/// Identity of one tool call's virtual private conversation, shaped for the Host framework.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct ToolIdentity {
+    pub platform: &'static str,
+    pub account_id: &'static str,
+    pub actor_id: String,
+    pub message_id: String,
+}
+
+/// Builds a fresh identity for a framework, or `None` when tool sessions are unsupported.
+pub fn tool_identity(framework: &str, call: uuid::Uuid) -> Option<ToolIdentity> {
+    match framework {
+        "koishi" => {
+            let id = call.simple().to_string();
+            Some(ToolIdentity {
+                platform: TOOL_PLATFORM,
+                account_id: TOOL_ACCOUNT_ID,
+                actor_id: format!("tool-actor-{id}"),
+                message_id: format!("tool-message-{id}"),
+            })
+        }
+        "nonebot" => {
+            // OneBot v11 IDs are non-negative i64 values; keep them large and distinct.
+            let bits = call.as_u128();
+            let actor = 1_000_000_000_000_000 + (bits as u64 % 4_000_000_000_000_000);
+            let message = 5_000_000_000_000_000 + ((bits >> 64) as u64 % 4_000_000_000_000_000);
+            Some(ToolIdentity {
+                platform: ONEBOT_PLATFORM,
+                account_id: TOOL_ONEBOT_ACCOUNT_ID,
+                actor_id: actor.to_string(),
+                message_id: message.to_string(),
+            })
+        }
+        _ => None,
+    }
+}
 /// Error code returned for operations a tool session cannot perform.
 pub const UNSUPPORTED_IN_TOOL_SESSION: &str = "unsupported_in_tool_session";
 
@@ -205,6 +252,7 @@ struct SessionState {
 pub struct ToolSessions {
     sessions: Arc<std::sync::Mutex<HashMap<String, SessionState>>>,
     closed_refusals: Arc<std::sync::atomic::AtomicU64>,
+    message_counter: Arc<std::sync::atomic::AtomicU64>,
 }
 
 impl ToolSessions {
@@ -251,7 +299,7 @@ impl ToolSessions {
         let mut sessions = self.sessions.lock().expect("tool session lock");
         let state = trace_id.and_then(|trace| sessions.get_mut(trace));
         let Some(state) = state else {
-            if account_id != Some(TOOL_ACCOUNT_ID) {
+            if !account_id.is_some_and(is_tool_account) {
                 return None;
             }
             self.closed_refusals
@@ -280,9 +328,13 @@ impl ToolSessions {
                     .cloned()
                     .unwrap_or_else(|| json!([]));
                 state.transcript.messages.push(message);
+                // Numeric so OneBot v11 Hosts can parse it; unique within this Core.
+                let sequence = self
+                    .message_counter
+                    .fetch_add(1, std::sync::atomic::Ordering::Relaxed);
                 json!({
                     "status": "succeeded",
-                    "platform_message_id": format!("tool-{}-{}", scope.trace_id, state.transcript.messages.len()),
+                    "platform_message_id": (9_000_000_000_000_000_u64 + sequence).to_string(),
                 })
             }
             "get_self_info" if account_id == Some(scope.account_id.as_str()) => json!({
@@ -393,7 +445,7 @@ mod tests {
             )
             .unwrap();
         assert_eq!(ok["status"], "succeeded");
-        assert_eq!(ok["platform_message_id"], "tool-trace-1-1");
+        assert_eq!(ok["platform_message_id"], "9000000000000000");
 
         let other_target = sessions
             .intercept(
@@ -457,6 +509,24 @@ mod tests {
             .unwrap();
         assert_eq!(hijack["status"], "failed");
         assert!(sessions.close("trace-1").messages.is_empty());
+    }
+
+    #[test]
+    fn tool_identities_fit_each_framework() {
+        let call = uuid::Uuid::new_v4();
+        let koishi = tool_identity("koishi", call).unwrap();
+        assert_eq!(koishi.platform, TOOL_PLATFORM);
+        assert!(is_tool_account(koishi.account_id));
+        let nonebot = tool_identity("nonebot", call).unwrap();
+        assert_eq!(nonebot.platform, ONEBOT_PLATFORM);
+        assert!(is_tool_account(nonebot.account_id));
+        for id in [&nonebot.actor_id, &nonebot.message_id] {
+            let value: u64 = id.parse().expect("numeric OneBot ID");
+            assert!(value <= i64::MAX as u64);
+        }
+        assert_ne!(nonebot.actor_id, nonebot.message_id);
+        assert!(tool_identity("astrbot", call).is_none());
+        assert!(!is_tool_account("10001"));
     }
 
     #[tokio::test]

@@ -341,24 +341,28 @@ fn validate_config(config: &DaemonConfig) -> anyhow::Result<()> {
             }
         }
     }
-    let reserved = ligamina_core::commands::TOOL_ACCOUNT_ID;
+    let reserved = ligamina_core::commands::is_tool_account;
     if config
         .gateways
         .iter()
-        .any(|gateway| gateway.account_id == reserved)
+        .any(|gateway| reserved(&gateway.account_id))
         || config.clients.iter().any(|client| {
             client
                 .operation_grants
                 .iter()
-                .any(|grant| grant.account_id == reserved)
+                .any(|grant| reserved(&grant.account_id))
         })
         || config.hosts.iter().any(|host| {
             host.operation_grants
                 .iter()
-                .any(|grant| grant.account_id == reserved)
+                .any(|grant| reserved(&grant.account_id))
         })
     {
-        bail!("account {reserved} is reserved for command tool sessions");
+        bail!(
+            "accounts {} and {} are reserved for command tool sessions",
+            ligamina_core::commands::TOOL_ACCOUNT_ID,
+            ligamina_core::commands::TOOL_ONEBOT_ACCOUNT_ID
+        );
     }
     for gateway in &config.gateways {
         if !client_ids.contains(gateway.client_id.as_str())
@@ -494,11 +498,16 @@ mod tests {
             "unknown command_tools fields are rejected"
         );
 
-        let parsed: DaemonConfig = serde_json::from_value(config(
+        for reserved in [
             ligamina_core::commands::TOOL_ACCOUNT_ID,
-            serde_json::Value::Null,
-        ))
-        .unwrap();
-        assert!(validate_config(&parsed).is_err());
+            ligamina_core::commands::TOOL_ONEBOT_ACCOUNT_ID,
+        ] {
+            let parsed: DaemonConfig =
+                serde_json::from_value(config(reserved, serde_json::Value::Null)).unwrap();
+            assert!(
+                validate_config(&parsed).is_err(),
+                "{reserved} must be rejected"
+            );
+        }
     }
 }

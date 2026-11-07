@@ -12,8 +12,8 @@ use crate::{
         BrokerError, CapabilityBroker, CapabilityDescriptor, CapabilityInfo, InvocationContext,
     },
     commands::{
-        CommandCatalog, CommandInfo, TOOL_ACCOUNT_ID, TOOL_PLATFORM, ToolScope, ToolSessions,
-        ToolTranscript, transcript_text,
+        CommandCatalog, CommandInfo, ToolScope, ToolSessions, ToolTranscript, is_tool_account,
+        tool_identity, transcript_text,
     },
     platform::PlatformGateway,
     policy::{Grant, Principal},
@@ -149,14 +149,16 @@ impl CoreRuntime {
             .client_grants
             .iter()
             .chain(config.hosts.iter().flat_map(|host| &host.operation_grants))
-            .any(|grant| grant.account_id == TOOL_ACCOUNT_ID)
+            .any(|grant| is_tool_account(&grant.account_id))
             || config
                 .gateways
                 .iter()
-                .any(|gateway| gateway.registration.account_id == TOOL_ACCOUNT_ID)
+                .any(|gateway| is_tool_account(&gateway.registration.account_id))
         {
             return Err(CoreRuntimeError::Invalid(format!(
-                "account {TOOL_ACCOUNT_ID} is reserved for command tool sessions"
+                "accounts {} and {} are reserved for command tool sessions",
+                crate::commands::TOOL_ACCOUNT_ID,
+                crate::commands::TOOL_ONEBOT_ACCOUNT_ID
             )));
         }
         for host in &config.hosts {
@@ -436,11 +438,9 @@ impl CoreRuntime {
                 host_id: host_id.to_owned(),
                 command_id: command_id.to_owned(),
             })?;
-        if info.descriptor.framework != "koishi" {
-            return Err(CommandError::UnsupportedFramework(
-                info.descriptor.framework.clone(),
-            ));
-        }
+        let call = uuid::Uuid::new_v4();
+        let identity = tool_identity(&info.descriptor.framework, call)
+            .ok_or_else(|| CommandError::UnsupportedFramework(info.descriptor.framework.clone()))?;
         let handle = self
             .supervisor
             .handle(host_id)
@@ -450,9 +450,9 @@ impl CoreRuntime {
             return Err(CommandError::StaleEpoch(host_id.to_owned()));
         }
 
-        let call_id = uuid::Uuid::new_v4().simple().to_string();
+        let call_id = call.simple().to_string();
         let trace_id = format!("tool-{call_id}");
-        let actor_id = format!("tool-actor-{call_id}");
+        let actor_id = identity.actor_id.clone();
         let text = if arguments.trim().is_empty() {
             info.descriptor.invocation.clone()
         } else {
@@ -460,15 +460,15 @@ impl CoreRuntime {
         };
         let mut extensions = serde_json::Map::new();
         extensions.insert(
-            TOOL_PLATFORM.to_owned(),
-            json!({ "message_id": format!("tool-message-{call_id}") }),
+            identity.platform.to_owned(),
+            json!({ "message_id": identity.message_id }),
         );
         let event = json!({
             "schema_version": ligamina_contracts::PROTOCOL_VERSION,
             "event_id": format!("tool-event-{call_id}"),
             "trace_id": trace_id,
-            "platform": TOOL_PLATFORM,
-            "account_id": TOOL_ACCOUNT_ID,
+            "platform": identity.platform,
+            "account_id": identity.account_id,
             "conversation": { "kind": "private", "id": actor_id },
             "actor_id": actor_id,
             "timestamp": current_timestamp(),
@@ -483,7 +483,7 @@ impl CoreRuntime {
             host_id: host_id.to_owned(),
             host_epoch: info.host_epoch,
             trace_id: trace_id.clone(),
-            account_id: TOOL_ACCOUNT_ID.to_owned(),
+            account_id: identity.account_id.to_owned(),
             conversation_kind: "private".to_owned(),
             conversation_id: actor_id,
         });
