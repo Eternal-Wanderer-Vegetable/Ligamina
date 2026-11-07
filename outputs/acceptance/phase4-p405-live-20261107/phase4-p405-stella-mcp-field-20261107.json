@@ -1,0 +1,57 @@
+{
+  "schema_version": 1,
+  "kind": "phase4_p405_mcp_field_run",
+  "date": "2026-11-07",
+  "authorization": "User authorized all groups configured in Stella as test subjects and starting Stella (2026-11-07).",
+  "path": "QQ group -> Stella (built-in MCP client, Streamable HTTP) -> Ligamina Core command tools -> NoneBot Host in network-disabled WSL Docker -> frozen nonebot_plugin_roll@0.2.3 -> reply -> Stella OneBot sender",
+  "bot_specific_code_in_kestrelby": false,
+  "components": {
+    "core": "ligamina-cli daemon (debug build of PR #13 head), loopback 127.0.0.1:63900, command_tools allow=[cmd.field-nonebot-roll.rd]",
+    "host": "ligamina-tool04-runtime@sha256:9c1280e40a0bfa7fb2a7135a58316624a9999ad5333ad66938eb363f7213b6b5, --network none --read-only --cap-drop=ALL, offline hash-locked install of the frozen P4-01 roll bundle",
+    "stella_config": "two added files (StellaData/config/mcp.toml, capabilities/plugin-tools.toml); process env overrides MCP_ENABLED, token env, NO_PROXY loopback, retired bridge disabled; StellaData/.env unchanged",
+    "model": "Strata local OpenAI-compatible endpoint on 127.0.0.1:8081 (already running)"
+  },
+  "attempts": [
+    {
+      "local_time": "2026-11-07T22:36",
+      "trigger": "@Stella natural-language request to roll two six-sided dice",
+      "route": "keyword capability dice.roll, direct call",
+      "tool_call": "called with {} (no arguments)",
+      "plugin_reply": "no-dice prompt",
+      "stella_prepared_reply": "plugin prompt plus a JSON dump of the tool result",
+      "qq_observed": "user reported no proper reply",
+      "outcome": "failed",
+      "Ligamina_causes": [
+        "free-text tool schema had no required field, so the client called it without arguments",
+        "tool text content carried a serialized JSON block"
+      ],
+      "fix": "fbf3797 (arguments required for free-text commands; tool text is the reply only)"
+    },
+    {
+      "local_time": "2026-11-07T22:55",
+      "trigger": "same request after the fix",
+      "route": "keyword capability dice.roll, agent call (model filled arguments)",
+      "tool_call": "succeeded, 2 tool calls",
+      "plugin_reply": "rolled 2d6, total 10",
+      "stella_prepared_reply": "掷骰结果：投掷2个六面骰子，点数为【10】。",
+      "stella_flow_trace": [
+        "prepare.direct succeeded hook_reply",
+        "send.plan blocked invalid_delivery_plan: delivery source not permitted",
+        "trace_end delivery_plan_rejected"
+      ],
+      "qq_observed": "user reported no reply",
+      "outcome": "blocked_by_bot_delivery_gate",
+      "bot_side_cause": "Stella sets no delivery_source_kind on capability direct replies; its delivery plan gate rejects source 'unknown'. Reported in Stella docs/reports/2026-11-07-capability-tool-reply-delivery-rejected.md; not fixed."
+    }
+  ],
+  "side_findings": [
+    "Stella's httpx sends loopback MCP traffic through the Windows system proxy (502) unless NO_PROXY covers 127.0.0.1",
+    "stopping only Stella's main process left its Cometa worker alive; process-tree stop needed"
+  ],
+  "gate": {
+    "p4_field": "blocked",
+    "reason": "plugin result reached the bot's send stage but the bot's own delivery gate dropped it; no platform delivery observed"
+  },
+  "Ligamina_link_status": "established: tool discovery, argument filling by the bot's model, isolated plugin execution and reply return all observed",
+  "old_direct_snowluma_operations": "three result=120 operations remain unknown and were not replayed"
+}
