@@ -2,7 +2,7 @@
   "schema_version": 1,
   "updated_at": "2026-11-07",
   "active_feature": null,
-  "next_feature": null,
+  "next_feature": "feat-038",
   "features": [
     {
       "id": "feat-001",
@@ -2179,6 +2179,76 @@
         "clients/reference/tests/onebot-gateway.test.mjs",
         "clients/reference/tests-live/onebot-gateway.live.mjs"
       ]
+    },
+    {
+      "id": "feat-037",
+      "task_id": "AB-01",
+      "name": "AstrBot Host 与工具面",
+      "description": "在未修改的 AstrBot 4.29.1 中运行插件：无头生命周期、ligamina_bridge 平台适配器、命令发现、stdio worker；Core 的 AstrBot 工具身份与结构化参数。",
+      "dependencies": [
+        "feat-034"
+      ],
+      "status": "done",
+      "done_when": "真实 AstrBot 在 Core 下经 MCP 列出并调用自写插件命令（类型化参数、整行参数、多条发送、并发、群/私聊），内置 star 不暴露。",
+      "evidence": "2026-11-07：hosts/astrbot/tests/bridge_smoke.py 通过（命令发现 3 项且不含内置 star；/ligamina_add 2 40 → sum:42；GreedyStr、别名、两条发送、群聊目标）；Rust 端到端 astrbot_commands_are_callable_as_mcp_tools_through_the_real_framework 通过；Core 单元测试含 AstrBot 分词规则；其余 Rust 套件通过，clippy 无新增警告。修正了导入顺序导致 AstrBot 在仓库目录写入 data/ 的问题。",
+      "evidence_paths": [
+        "hosts/astrbot/README.md",
+        "docs/plans/2026-11-07-phase-5-astrbot-host.md",
+        "hosts/astrbot/tests/bridge_smoke.py",
+        "crates/ligamina-cli/tests/command_tools.rs"
+      ]
+    },
+    {
+      "id": "feat-038",
+      "task_id": "AB-02",
+      "name": "AstrBot 事件路径对齐",
+      "description": "@ 与引用、图片、管理员与权限过滤、经账本的主动发送、平台适配器类型兼容策略。",
+      "dependencies": [
+        "feat-037"
+      ],
+      "status": "not-started",
+      "done_when": "每项有原生语义测试；不支持的 API 显式 unsupported_api。",
+      "evidence": "",
+      "evidence_paths": []
+    },
+    {
+      "id": "feat-039",
+      "task_id": "AB-03",
+      "name": "冻结 AstrBot 插件目录",
+      "description": "市场快照、自行计算的下载包 SHA-256、按插件依赖锁、不可复现条目的明确终态。",
+      "dependencies": [
+        "feat-037"
+      ],
+      "status": "not-started",
+      "done_when": "与第二阶段目录合同同等的可复核快照与锁；不执行插件。",
+      "evidence": "",
+      "evidence_paths": []
+    },
+    {
+      "id": "feat-040",
+      "task_id": "AB-04",
+      "name": "AstrBot Linux Worker 普查与 pilot",
+      "description": "禁网 Docker Worker 中预装依赖的安装/加载普查，禁止运行时 pip。",
+      "dependencies": [
+        "feat-039"
+      ],
+      "status": "not-started",
+      "done_when": "账本闭合、清理确认；失败与 unknown 按既有规则留账。",
+      "evidence": "",
+      "evidence_paths": []
+    },
+    {
+      "id": "feat-041",
+      "task_id": "AB-05",
+      "name": "AstrBot 插件行为验收",
+      "description": "选定插件的工具级与 Native/Federated 行为验收。",
+      "dependencies": [
+        "feat-040"
+      ],
+      "status": "not-started",
+      "done_when": "独立 Oracle、三次 fresh 运行、清理确认；结果单列。",
+      "evidence": "",
+      "evidence_paths": []
     }
   ]
 }

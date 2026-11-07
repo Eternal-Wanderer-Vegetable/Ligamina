@@ -42,7 +42,8 @@ pub struct ToolIdentity {
 /// Builds a fresh identity for a framework, or `None` when tool sessions are unsupported.
 pub fn tool_identity(framework: &str, call: uuid::Uuid) -> Option<ToolIdentity> {
     match framework {
-        "koishi" => {
+        // Koishi and AstrBot accept arbitrary string IDs on any platform name.
+        "koishi" | "astrbot" => {
             let id = call.simple().to_string();
             Some(ToolIdentity {
                 platform: TOOL_PLATFORM,
@@ -525,7 +526,11 @@ mod tests {
             assert!(value <= i64::MAX as u64);
         }
         assert_ne!(nonebot.actor_id, nonebot.message_id);
-        assert!(tool_identity("astrbot", call).is_none());
+        assert_eq!(
+            tool_identity("astrbot", call).unwrap().platform,
+            TOOL_PLATFORM
+        );
+        assert!(tool_identity("unknown-framework", call).is_none());
         assert!(!is_tool_account("10001"));
     }
 
