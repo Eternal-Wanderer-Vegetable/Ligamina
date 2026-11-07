@@ -374,3 +374,156 @@ async fn command_tools_report_timeouts_refuse_late_replies_and_survive_host_rest
     runtime.shutdown().await;
     let _ = std::fs::remove_dir_all(&work);
 }
+
+#[tokio::test(flavor = "multi_thread", worker_threads = 2)]
+async fn nonebot_commands_are_callable_as_mcp_tools_with_onebot_identities() {
+    let repository_root = PathBuf::from(env!("CARGO_MANIFEST_DIR"))
+        .join("../..")
+        .canonicalize()
+        .unwrap();
+    let work =
+        std::env::temp_dir().join(format!("ligamina-nonebot-tools-{}", uuid::Uuid::new_v4()));
+    std::fs::create_dir_all(&work).unwrap();
+
+    let mut command = LocalCommand::new("uv");
+    command.args = [
+        "run",
+        "--locked",
+        "--project",
+        "hosts/nonebot",
+        "--python",
+        "3.12.14",
+        "python",
+        "-m",
+        "ligamina_nonebot.worker",
+    ]
+    .into_iter()
+    .map(Into::into)
+    .collect();
+    command.current_dir = Some(repository_root.clone());
+    command.environment.insert(
+        "PYTHONPATH".into(),
+        repository_root.join("hosts/nonebot").into_os_string(),
+    );
+    command.environment.insert(
+        "LIGAMINA_NONEBOT_PLUGINS".into(),
+        "ligamina_nonebot.tool_smoke_plugin".into(),
+    );
+    command.startup_timeout = Duration::from_secs(120);
+    let runtime = CoreRuntime::start(CoreRuntimeConfig {
+        database_path: work.join("core.sqlite3"),
+        hosts: vec![ManagedHost {
+            config: HostConfig::new("nonebot-tools", command),
+            operation_grants: Vec::new(),
+        }],
+        gateways: Vec::new(),
+        client_grants: Vec::new(),
+        router_limits: RouterLimits {
+            max_pending_per_conversation: 8,
+            max_outstanding_events: 64,
+            max_tracked_conversations: 64,
+            max_concurrent_conversations: 4,
+            processing_timeout: Duration::from_secs(30),
+        },
+    })
+    .await
+    .expect("Core runtime starts with the NoneBot Host (requires uv and the locked environment)");
+
+    let deadline = tokio::time::Instant::now() + Duration::from_secs(60);
+    while runtime
+        .commands()
+        .get("nonebot-tools", "ligamina.echo")
+        .await
+        .is_none()
+    {
+        if tokio::time::Instant::now() >= deadline {
+            panic!(
+                "NoneBot commands were not discovered: hosts={:?} commands={:?}",
+                runtime.host_status().await,
+                runtime.commands().list().await
+            );
+        }
+        tokio::time::sleep(Duration::from_millis(100)).await;
+    }
+
+    let (server_transport, client_transport) = tokio::io::duplex(64 * 1024);
+    let server = LigaminaMcp::new(runtime.broker().clone()).with_command_tools(CommandTools::new(
+        runtime.clone(),
+        Some(vec!["cmd.nonebot-tools.*".to_owned()]),
+    ));
+    let server_task = tokio::spawn(async move { server.serve(server_transport).await });
+    let client = TestClient.serve(client_transport).await.unwrap();
+
+    let tools = client.peer().list_tools(None).await.unwrap().tools;
+    let echo = tools
+        .iter()
+        .find(|tool| tool.name == "cmd.nonebot-tools.ligamina.echo")
+        .expect("NoneBot echo command is listed");
+    let description = echo.description.as_deref().unwrap_or_default();
+    assert!(description.contains("nonebot"), "{description}");
+    assert!(
+        description.contains("Echo commands for the command tool surface"),
+        "{description}"
+    );
+
+    let result = call(
+        &client,
+        "cmd.nonebot-tools.ligamina.echo",
+        json!({ "arguments": "hello nonebot" }),
+    )
+    .await
+    .unwrap();
+    assert_eq!(result.is_error, Some(false));
+    assert_eq!(first_text(&result), "HELLO NONEBOT");
+
+    let result = call(
+        &client,
+        "cmd.nonebot-tools.ligamina.twice",
+        json!({ "arguments": "y" }),
+    )
+    .await
+    .unwrap();
+    assert_eq!(first_text(&result), "first:y\nsecond:y");
+
+    let (left, right) = tokio::join!(
+        call(
+            &client,
+            "cmd.nonebot-tools.ligamina.echo",
+            json!({ "arguments": "left" })
+        ),
+        call(
+            &client,
+            "cmd.nonebot-tools.ligamina.echo",
+            json!({ "arguments": "right" })
+        ),
+    );
+    assert_eq!(first_text(&left.unwrap()), "LEFT");
+    assert_eq!(first_text(&right.unwrap()), "RIGHT");
+    client.cancel().await.unwrap();
+    let _ = server_task.await;
+
+    let error = runtime
+        .invoke_command_with_deadline(
+            "nonebot-tools",
+            "ligamina.slow",
+            "1500",
+            Duration::from_millis(300),
+        )
+        .await
+        .unwrap_err();
+    assert_eq!(
+        error,
+        ligamina_core::runtime::CommandError::TimedOut(Duration::from_millis(300))
+    );
+    let deadline = tokio::time::Instant::now() + Duration::from_secs(10);
+    while runtime.late_tool_refusals() == 0 {
+        assert!(
+            tokio::time::Instant::now() < deadline,
+            "late NoneBot reply was not refused"
+        );
+        tokio::time::sleep(Duration::from_millis(50)).await;
+    }
+
+    runtime.shutdown().await;
+    let _ = std::fs::remove_dir_all(&work);
+}
