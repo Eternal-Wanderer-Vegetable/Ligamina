@@ -2132,10 +2132,13 @@
       "dependencies": [
         "feat-032"
       ],
-      "status": "not-started",
+      "status": "done",
       "done_when": "生成的 schema 与框架声明一致，原样文本入口仍可用。",
-      "evidence": "",
-      "evidence_paths": []
+      "evidence": "2026-11-07：crates/ligamina-core/src/command_args.rs 由 Koishi 参数/选项声明生成工具 JSON Schema，并把结构化输入按 Koishi 语法拼成命令文本（选项在前、按需加引号、拒绝无法表达的引号值）；原样 arguments 字段保留且与结构化字段互斥，NoneBot 仅原样文本。单元测试 4 项通过；command_tools 端到端测试用结构化输入经 Koishi 原生解析得到 STRUCTURED -U TEXT；全部 Rust 套件通过，clippy 无新增警告。",
+      "evidence_paths": [
+        "crates/ligamina-core/src/command_args.rs",
+        "crates/ligamina-cli/tests/command_tools.rs"
+      ]
     },
     {
       "id": "feat-035",

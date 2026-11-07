@@ -87,6 +87,13 @@
 
 AstrBot Host 仍留在第五阶段，但命令描述合同已按三框架设计，加入时只需新增 Host。
 
+### 3.4.1 结构化参数（TOOL-03，2026-11-07 完成）
+
+- 实现在 `crates/ligamina-core/src/command_args.rs`。Koishi 命令有参数或选项声明时，工具 schema 在原样 `arguments` 字段之外，为每个位置参数生成同名字段（`number`/`integer`/`posint`/`natural`/`boolean` 映射为对应 JSON 类型，其余为字符串），选项放在 `options` 对象中。
+- 原样文本与结构化字段二选一，同时提供即拒绝。参数名与保留字段 `arguments` / `options` 冲突时只提供原样文本。NoneBot 没有类型化声明，只提供原样文本。
+- 拼接规则：选项按声明顺序放在最前（Koishi 末尾的 `text` 参数会吞掉其后的整行，包括形似选项的内容）；布尔选项为 true 时输出 `--name`，false 省略；位置参数按声明顺序，缺必填参数或跳过前面的可选参数即报错；含空白、为空或以 `-` 开头的值加双引号。Koishi 的 argv 解析器不支持引号内转义，所以需要加引号且含 `"` 的值会被拒绝，提示改用原样文本。
+- 验证：4 项单元测试覆盖 schema、拼接、拒绝场景和 NoneBot；Koishi 端到端测试用结构化输入调用 `ligamina.echo`，Koishi 原生解析得到预期回复。
+
 ### 3.5 NoneBot 命令识别规则（TOOL-02）
 
 - 只识别带 `CommandRule` / `ShellCommandRule` 的 matcher；关键词、正则和普通消息 hook 不是命令，不暴露。

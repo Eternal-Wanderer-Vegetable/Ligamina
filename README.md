@@ -124,7 +124,7 @@ Windows 结果仅适用于已记录的 Evaluation/Audit Mode Worker profile；�
 "command_tools": { "enabled": true, "allow": ["cmd.koishi.*"] }
 ```
 
-工具名为 `cmd.<host>.<command>`，输入为 `{"arguments": "<命令名之后的文本>"}`。MCP 端点是 `http://127.0.0.1:<port>/mcp`，使用 `mcp_client_id` 对应客户端的 Bearer token。例如用 Claude Code 接入：
+工具名为 `cmd.<host>.<command>`。输入可以是原样文本 `{"arguments": "<命令名之后的文本>"}`；Koishi 命令还可按声明的参数和选项传结构化字段，例如 `{"value": "hi", "options": {"upper": true}}`，由 Core 拼成框架能解析的命令文本。MCP 端点是 `http://127.0.0.1:<port>/mcp`，使用 `mcp_client_id` 对应客户端的 Bearer token。例如用 Claude Code 接入：
 
 ```powershell
 claude mcp add --transport http plugins http://127.0.0.1:<port>/mcp --header "Authorization: Bearer <client token>"
