@@ -82,8 +82,8 @@
 | TOOL-01 / feat-032 | P4-01 工程交付 | v0.2 命令合同；Koishi 命令发现；Core 命令目录与 tool sink；MCP 命令工具；Rust 单测与真实 Koishi Host 端到端测试 | 默认关闭时既有测试全部不变地通过；开启后 MCP 列出并调用 Koishi 命令，收到插件原生回复；越权操作、未知命令、超时、sink 隔离均有负例 |
 | TOOL-02 / feat-033 | TOOL-01 | NoneBot 命令发现（`on_command` / `on_shell_command` 的命令规则与别名，按 `command_start` / `command_sep` 生成调用文本）与 OneBot 合法 ID 的虚拟会话 | NoneBot 命令经同一 MCP 工具面可调用，含并发与超时负例。2026-11-07 已完成；原写在此处的冻结样本 `nonebot_plugin_roll@0.2.3` 工具级验收属于第三方目录插件执行，按 AGENTS.md 必须在 OS 隔离 Worker 中进行，已移入 TOOL-04 |
 | TOOL-03 / feat-034 | TOOL-01 | 结构化参数 schema（Koishi 声明 → JSON Schema），服务端按框架语法拼接命令文本 | 生成的 schema 与框架声明一致，原样文本入口保留 |
-| TOOL-04 / feat-035 | TOOL-02 | 工具级行为验收：复用第四阶段冻结的 `@koishijs/plugin-echo@2.2.5`、`nonebot_plugin_roll@0.2.3` 等样本与独立 Oracle，在 Linux Worker 中三次 fresh 运行 | 结果单独记为 `tool-surface` scope，不与 Native/Federated 或 field 结论混用 |
-| TOOL-05 / feat-036 | TOOL-01 | 平台中立的 bot 接入参考：reference client 的 Gateway 示例与接入文档（以 OneBot v11 为例，不绑定具体 bot） | 任意支持 OneBot v11 的 bot 可按文档接入；替代原 P4-05 的 stella 专用路径 |
+| TOOL-04 / feat-035 | TOOL-02 | 工具级行为验收：冻结的 `@koishijs/plugin-echo@2.2.5`、`nonebot_plugin_roll@0.2.3` 经工具面在 Linux Worker 中三次 fresh 运行 | 2026-11-07 完成：18/18 通过、清理全部确认，`tool_surface_linux=passed_scoped`（见 3.6，含 authority 路径未覆盖的说明） |
+| TOOL-05 / feat-036 | TOOL-01 | 平台中立的 bot 接入：接入说明、参考客户端修复与 OneBot v11 Gateway | 2026-11-07 完成：单元与本地端到端测试通过（见 3.7）；真实平台验收仍属 P4-05 |
 
 AstrBot Host 仍留在第五阶段，但命令描述合同已按三框架设计，加入时只需新增 Host。
 
@@ -93,6 +93,22 @@ AstrBot Host 仍留在第五阶段，但命令描述合同已按三框架设计�
 - 原样文本与结构化字段二选一，同时提供即拒绝。参数名与保留字段 `arguments` / `options` 冲突时只提供原样文本。NoneBot 没有类型化声明，只提供原样文本。
 - 拼接规则：选项按声明顺序放在最前（Koishi 末尾的 `text` 参数会吞掉其后的整行，包括形似选项的内容）；布尔选项为 true 时输出 `--name`，false 省略；位置参数按声明顺序，缺必填参数或跳过前面的可选参数即报错；含空白、为空或以 `-` 开头的值加双引号。Koishi 的 argv 解析器不支持引号内转义，所以需要加引号且含 `"` 的值会被拒绝，提示改用原样文本。
 - 验证：4 项单元测试覆盖 schema、拼接、拒绝场景和 NoneBot；Koishi 端到端测试用结构化输入调用 `ligamina.echo`，Koishi 原生解析得到预期回复。
+
+### 3.6 工具级行为验收（TOOL-04，2026-11-07 完成）
+
+- 用例：[tool-surface-cases.json](../../contracts/lab/automation/tools/v1/tool-surface-cases.json)，冻结 `@koishijs/plugin-echo@2.2.5` 与 `nonebot_plugin_roll@0.2.3` 各 3 个用例（正例、负例、隔离）。每个期望回复都标注其来源的父 Phase 4 Oracle 文本（`case_id#operation`），编排器在派发前逐条比对冻结父套件，文本漂移即拒绝。Oracle 只留在编排器侧。
+- 执行：`lab/automation/tool_surface_campaign.py` 每个用例 3 次，每次一个全新的已准入、禁网 Docker Worker（`phase4_docker_side.py --side tool`）。Worker 内复用 Federated 测试框架的工具模式：同一冻结 artifact、依赖锁、插件配置和随机种子，经 MCP 调用插件原生命令，虚拟 Gateway 照常运行但必须保持空闲。
+- 运行镜像：[tool-surface-runtime.Dockerfile](../../deploy/lab/linux/tool-surface-runtime.Dockerfile) 在已准入的 P4-01 镜像之上只替换 Core 二进制与 Koishi Host 构建产物，只复制线协议合同；镜像 `ligamina-tool04-runtime@sha256:9c1280e40a0bfa7fb2a7135a58316624a9999ad5333ad66938eb363f7213b6b5`，运行时探针通过（Python 3.12.14、Node 24.20.0、禁网、无 Oracle 合同、Koishi Host 锁哈希不变）。
+- 准入：[benign probes](../../outputs/acceptance/tool04-linux-worker-probes-20261107.json) 10/10 符合预期且全部清理确认；[admission](../../outputs/acceptance/tool04-linux-admission-20261107.json) 为 admitted（SHA-256 `c6642b4eabebebb28cc7e08e1b85d4ec095b152cdfbadd3afe6aede2fa97732c`）。
+- 结果：[campaign report](../../outputs/acceptance/tool04-tool-surface-linux-20261107-v1.json)，SHA-256 `a1453dffec0095547eb00737efd583ee1f74fa96a5778a415d0625805d0f41fd`。6 个位置、18 次尝试、18 个不同 Worker 全部通过，清理全部确认，Gateway 操作数均为 0，运行后无残留容器。gate `tool_surface_linux=passed_scoped`；该结果单列 tool-surface scope，不改变 Native/Federated 行为、field 或 release 结论。
+- 如实记录的发现：echo 隔离用例第三个调用 `-u onebot.v11:77 leaked-message` 原本意在验证无特权会话无法使用 authority 3 的转发选项。实际回复是“选项 user 输入无效，请指定正确的用户。”，即 Koishi 在参数校验阶段就拒绝了，authority 检查并未被触发。Oracle 断言的“不泄漏、不越界”成立，但 **authority 拒绝路径尚未被证明**；后续可用当前工具会话平台内的合法用户 ID 补一个专门用例。
+
+### 3.7 平台中立的 bot 接入（TOOL-05，2026-11-07 完成）
+
+- 接入说明：[Bot 与 Agent 接入](../guides/bot-integration.md)。两条路径对所有 bot 相同：MCP 命令工具，或事件 + Gateway。
+- 修复：参考客户端的 Gateway 调用此前无法对接真实 Core——claim 发送空 `{}`，而 Core 要求请求体是完整租约凭据；result 也缺少 `{credential, result}` 外层。其单元测试使用注入的 fetch，所以一直未暴露。现已修正，CLI 改为从 `LIGAMINA_GATEWAY_LEASE` 读取完整租约 JSON。
+- 参考实现：[onebot-gateway.ts](../../clients/reference/src/onebot-gateway.ts)。`OneBotGateway` 领取 Core 操作并调用任意 OneBot v11 HTTP API，`toEventEnvelope` 转换入站消息事件。网络错误、超时、异步受理、缺少 `message_id` 一律回写 `unknown` 且不重试。
+- 验证：单元测试 7 项（成功、四类未知、明确失败、空队列、事件与消息段映射）；`npm run test:live` 启动真实守护进程与 Koishi Host，用假 OneBot HTTP 服务代替平台，OneBot 群消息进入插件、回复以 `send_group_msg` 发回、事件状态 completed。这是本地接线证据，不是真实平台投递证据。
 
 ### 3.5 NoneBot 命令识别规则（TOOL-02）
 

@@ -68,4 +68,8 @@
 - [P4-04 self-signed Core runtime probe package](../../deploy/windows/phase4-p404-selfsigned-core-probe/README.md)：records bounded v1-v8 attempts; [latest machine review](../../outputs/acceptance/phase4-p404-selfsigned-core-20261029-v8-guest-trust/selfsigned-core-review.json) shows guest-only Root/TrustedPublisher trust made SignTool verification pass but Core startup remained blocked with Win32 4551. Target file-event attribution is incomplete; guest Root-store deletion was not confirmed, while Sandbox teardown and host-store absence were confirmed. This does not satisfy Windows admission or behavior acceptance.
 - The v8 local integrity checks are summarized in [follow-up verification](../../outputs/acceptance/phase4-p404-selfsigned-core-followup-verification-20261029.json), SHA-256 `4233b763b8ab23d59236e3d86f1b5eb095d5dd070c11e6022e814e2104c662fa`; these checks do not change the Enforcement gate.
 
+## 插件工具面
+
+- [TOOL-04 tool-surface Linux campaign](../../outputs/acceptance/tool04-tool-surface-linux-20261107-v1.json)（SHA-256 `a1453dffec0095547eb00737efd583ee1f74fa96a5778a415d0625805d0f41fd`）：冻结 echo 与 roll 经 MCP 命令工具在 18 个全新禁网 Worker 中 18/18 通过，清理全部确认，Gateway 操作 0；准入见 [admission](../../outputs/acceptance/tool04-linux-admission-20261107.json)。authority 拒绝路径未被触发，详见[插件工具面计划](../plans/2026-11-07-plugin-tool-surface.md) 3.6。
+
 其他 JSON、锁和 traces 保留在 outputs/acceptance 下，由相应报告和历史文档引用；S2-11 复跑使用独立文件名和 SQLite 队列，不能覆盖旧 S2-10 acceptance。

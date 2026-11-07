@@ -124,6 +124,8 @@ Windows 结果仅适用于已记录的 Evaluation/Audit Mode Worker profile；�
 "command_tools": { "enabled": true, "allow": ["cmd.koishi.*"] }
 ```
 
+完整接入方式（含不用 MCP、让群消息直接进入插件的 OneBot v11 Gateway）见 [Bot 与 Agent 接入](docs/guides/bot-integration.md)。冻结的目录插件已在禁网 Linux Worker 中经工具面通过 18/18 次运行（TOOL-04）。
+
 工具名为 `cmd.<host>.<command>`。输入可以是原样文本 `{"arguments": "<命令名之后的文本>"}`；Koishi 命令还可按声明的参数和选项传结构化字段，例如 `{"value": "hi", "options": {"upper": true}}`，由 Core 拼成框架能解析的命令文本。MCP 端点是 `http://127.0.0.1:<port>/mcp`，使用 `mcp_client_id` 对应客户端的 Bearer token。例如用 Claude Code 接入：
 
 ```powershell
