@@ -17,7 +17,11 @@ const operationSchema = JSON.parse(
 const capabilitySchema = JSON.parse(
   readFileSync(`${contractDirectory}/capability-descriptor.schema.json`, "utf8"),
 );
+const commandSchema = JSON.parse(
+  readFileSync(fileURLToPath(new URL("../../../contracts/v0.2/command-descriptor.schema.json", import.meta.url)), "utf8"),
+);
 const validateEventValue = ajv.compile(eventSchema);
+const validateCommandDescriptorValue = ajv.compile(commandSchema);
 const validateOperationValue = ajv.compile(operationSchema);
 const validateCapabilityDescriptorValue = ajv.compile(capabilitySchema);
 
@@ -73,6 +77,12 @@ export function validateCapabilityDescriptor(value: unknown): string[] {
   return validateCapabilityDescriptorValue(value)
     ? []
     : (validateCapabilityDescriptorValue.errors ?? []).map((error) => error.message ?? "invalid capability descriptor").sort();
+}
+
+export function validateCommandDescriptor(value: unknown): string[] {
+  return validateCommandDescriptorValue(value)
+    ? []
+    : (validateCommandDescriptorValue.errors ?? []).map((error) => error.message ?? "invalid command descriptor").sort();
 }
 
 export function classifyOperationReuse(
