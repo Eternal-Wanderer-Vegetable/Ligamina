@@ -112,7 +112,23 @@ P3-08 双平台行为账本：120 个位置、360 个三次尝试槽，实际派
 Windows 结果仅适用于已记录的 Evaluation/Audit Mode Worker profile；没有强制模式、全目录行为兼容或真实平台投递结论。
 <!-- ligamina:phase3:end -->
 
-第四阶段按[行为兼容与运行就绪计划](docs/plans/2026-10-26-phase-4-behavior-readiness.md)推进：P4-01 executable Host Fixture 与 P4-02 Linux scoped engineering deliverables 已完成；P4-03 受控 runner success/failure/cancel 合同 probes 已通过。main 当前包含 PR #10（`d0f171f`），Linux、Windows 与 Phase 3 self-test checks 通过。run 40508582084 在 Actions setup 下载 pinned artifact action 时超时，未派发插件；run 40513327262 尝试 9/25 个 v4 identity，9 个均为 unknown、16 个 not_run，Docker/outer cleanup confirmed，plugin compatibility=`not_evaluated`。v5 campaign 仅选择这 16 个未运行身份，validator valid、locked cache ready 16/16；专用 runner mode 等待 PR #11 CI/合并后受控续跑。feat-028 仍 in-progress，P4-AUTOMATION 仍 blocked；Windows Enforcement、P4-02 完整行为、真实平台及候选发行验收仍未通过。
+第四阶段按[行为兼容与运行就绪计划](docs/plans/2026-10-26-phase-4-behavior-readiness.md)推进。P4-02 全局行为 gate 仍为 failed，P4-03 Linux 仍有 36 个 unknown，P4-04 Windows Enforcement 仍 blocked，P4-06 只完成审计子项、release 未运行。三次旧 direct-SnowLuma `result=120` operation 保持 unknown，不重放。2026-11-07 起，P4-05 的 stella 专用 connector 按 [ADR 0002](docs/adr/0002-plugins-as-tools.md) 退役，真实平台验收改为通过平台中立的接入方式执行（`P4-FIELD=blocked`）。
+
+## 插件工具面（当前 active）
+
+按 [插件工具面计划](docs/plans/2026-11-07-plugin-tool-surface.md)，原生插件命令统一暴露为 MCP 工具，任何 MCP 客户端（Claude Code 等 Coding Agent、LLM 型 bot）都用同一种方式加载。每次调用，Core 都新建一个临时虚拟私聊会话，用框架原生路径分发命令，并把插件的回复作为工具结果返回；整个过程不经过 Gateway，也不需要平台账号。目前已支持 Koishi Host；NoneBot（TOOL-02）与 AstrBot（第五阶段）待接入。
+
+守护进程配置中显式开启（默认关闭）：
+
+```json
+"command_tools": { "enabled": true, "allow": ["cmd.koishi.*"] }
+```
+
+工具名为 `cmd.<host>.<command>`，输入为 `{"arguments": "<命令名之后的文本>"}`。MCP 端点是 `http://127.0.0.1:<port>/mcp`，使用 `mcp_client_id` 对应客户端的 Bearer token。例如用 Claude Code 接入：
+
+```powershell
+claude mcp add --transport http plugins http://127.0.0.1:<port>/mcp --header "Authorization: Bearer <client token>"
+```
 
 状态见 [功能清单](feature_list.json)、[当前进展](progress.md) 和 [会话交接](session-handoff.md)。
 

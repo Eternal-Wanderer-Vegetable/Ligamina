@@ -10,7 +10,8 @@
 | 解读状态、日志、实验输出 | [输出规范](guides/reporting.md) |
 | 实施第二阶段 | [全量目录测试计划](plans/2026-10-12-phase-2-full-catalog.md) |
 | 复核第三阶段自动化与审计 | [第三阶段工程方案及执行记录](plans/2026-10-20-phase-3-automation.md)（工程交付完成，gate 仍有阻塞） |
-| 实施第四阶段行为兼容与运行就绪 | [第四阶段计划](plans/2026-10-26-phase-4-behavior-readiness.md)（计划交付；下一项 P4-01，尚未实施） |
+| 实施第四阶段行为兼容与运行就绪 | [第四阶段计划](plans/2026-10-26-phase-4-behavior-readiness.md)（P4-05 的 stella 专用接入已按 ADR 0002 退役；field gate 等待平台中立接入） |
+| 插件统一为 MCP 工具（当前 active） | [插件工具面计划](plans/2026-11-07-plugin-tool-surface.md)、[ADR 0002](adr/0002-plugins-as-tools.md) |
 | 维护入口、指南与状态 | [文档维护](guides/documentation.md) |
 | 查阅旧设计、验收和裁决 | [证据索引](evidence/README.md) |
 
