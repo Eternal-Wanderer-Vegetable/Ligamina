@@ -1,6 +1,7 @@
 //! Core runtime primitives.
 
 pub mod broker;
+pub mod commands;
 pub mod deployment;
 pub mod platform;
 pub mod policy;

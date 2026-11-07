@@ -53,7 +53,20 @@ pub struct HttpState {
     pub clients: Arc<HashMap<String, ApiClient>>,
     pub gateways: Arc<HashMap<String, GatewayClient>>,
     pub mcp_client_id: String,
+    /// Native plugin commands exposed as MCP tools; `None` keeps them hidden.
+    pub command_tools: Option<CommandToolsConfig>,
     pub shutdown: CancellationToken,
+}
+
+/// Opt-in exposure of native plugin commands as MCP tools (ADR 0002).
+#[derive(Debug, Clone, Default, serde::Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct CommandToolsConfig {
+    #[serde(default)]
+    pub enabled: bool,
+    /// Exact tool names (`cmd.<host>.<command>`) or `cmd.<host>.*`; omitted means all.
+    #[serde(default)]
+    pub allow: Option<Vec<String>>,
 }
 
 #[derive(Debug)]
@@ -148,12 +161,21 @@ pub fn build_router(state: HttpState) -> Router {
         .as_ref()
         .map(|client| client.capabilities.iter().cloned().collect::<Vec<_>>())
         .unwrap_or_default();
+    let command_tools = state
+        .command_tools
+        .as_ref()
+        .filter(|config| config.enabled)
+        .map(|config| crate::mcp::CommandTools::new(state.runtime.clone(), config.allow.clone()));
     let mcp_service = StreamableHttpService::new(
         move || {
-            Ok(crate::mcp::LigaminaMcp::with_allowed_capabilities(
+            let server = crate::mcp::LigaminaMcp::with_allowed_capabilities(
                 broker.clone(),
                 capabilities.clone(),
-            ))
+            );
+            Ok(match &command_tools {
+                Some(tools) => server.with_command_tools(tools.clone()),
+                None => server,
+            })
         },
         Arc::new(LocalSessionManager::default()),
         StreamableHttpServerConfig::default()

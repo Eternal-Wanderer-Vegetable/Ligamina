@@ -37,6 +37,8 @@ pub struct DaemonConfig {
     pub hosts: Vec<HostConfigFile>,
     #[serde(default)]
     pub router: RouterConfig,
+    #[serde(default)]
+    pub command_tools: Option<crate::http::CommandToolsConfig>,
 }
 
 #[derive(Debug, Deserialize)]
@@ -266,6 +268,7 @@ pub async fn run(config_path: PathBuf) -> anyhow::Result<()> {
         clients: Arc::new(clients),
         gateways: Arc::new(gateways),
         mcp_client_id: config.mcp_client_id,
+        command_tools: config.command_tools,
         shutdown: shutdown.clone(),
     };
     println!(
@@ -337,6 +340,25 @@ fn validate_config(config: &DaemonConfig) -> anyhow::Result<()> {
                 bail!("client operation grants require an ID and at least one operation");
             }
         }
+    }
+    let reserved = ligamina_core::commands::TOOL_ACCOUNT_ID;
+    if config
+        .gateways
+        .iter()
+        .any(|gateway| gateway.account_id == reserved)
+        || config.clients.iter().any(|client| {
+            client
+                .operation_grants
+                .iter()
+                .any(|grant| grant.account_id == reserved)
+        })
+        || config.hosts.iter().any(|host| {
+            host.operation_grants
+                .iter()
+                .any(|grant| grant.account_id == reserved)
+        })
+    {
+        bail!("account {reserved} is reserved for command tool sessions");
     }
     for gateway in &config.gateways {
         if !client_ids.contains(gateway.client_id.as_str())
@@ -426,5 +448,57 @@ mod tests {
         assert!(validate_config(&config).is_err());
         config.allow_non_loopback_listen = true;
         assert!(validate_config(&config).is_ok());
+    }
+
+    fn config(gateway_account: &str, command_tools: serde_json::Value) -> serde_json::Value {
+        serde_json::json!({
+            "listen": "127.0.0.1:0",
+            "database_path": "unused.sqlite3",
+            "admin_token": "a".repeat(32),
+            "mcp_client_id": "client",
+            "clients": [{ "id": "client", "token": "t".repeat(32) }],
+            "gateways": [{
+                "id": "gateway", "client_id": "client", "account_id": gateway_account,
+                "registration_token": "r".repeat(40)
+            }],
+            "hosts": [{ "id": "koishi", "program": "node" }],
+            "command_tools": command_tools,
+        })
+    }
+
+    #[test]
+    fn command_tools_config_is_optional_strict_and_reserved_account_is_rejected() {
+        let parsed: DaemonConfig =
+            serde_json::from_value(config("10001", serde_json::Value::Null)).unwrap();
+        assert!(parsed.command_tools.is_none());
+        validate_config(&parsed).unwrap();
+
+        let parsed: DaemonConfig = serde_json::from_value(config(
+            "10001",
+            serde_json::json!({ "enabled": true, "allow": ["cmd.koishi.*"] }),
+        ))
+        .unwrap();
+        let tools = parsed.command_tools.as_ref().unwrap();
+        assert!(tools.enabled);
+        assert_eq!(
+            tools.allow.as_deref(),
+            Some(&["cmd.koishi.*".to_owned()][..])
+        );
+
+        assert!(
+            serde_json::from_value::<DaemonConfig>(config(
+                "10001",
+                serde_json::json!({ "enabled": true, "expose": "all" }),
+            ))
+            .is_err(),
+            "unknown command_tools fields are rejected"
+        );
+
+        let parsed: DaemonConfig = serde_json::from_value(config(
+            ligamina_core::commands::TOOL_ACCOUNT_ID,
+            serde_json::Value::Null,
+        ))
+        .unwrap();
+        assert!(validate_config(&parsed).is_err());
     }
 }
