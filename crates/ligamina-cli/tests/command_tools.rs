@@ -183,6 +183,32 @@ async fn koishi_commands_are_listed_and_callable_as_mcp_tools_without_a_gateway(
     );
     assert_eq!(structured["dispatch"], "completed");
 
+    // Structured input (TOOL-03): declared arguments and options are composed into
+    // command text that Koishi's own parser reads back.
+    assert_eq!(echo.input_schema["properties"]["value"]["type"], "string");
+    assert_eq!(
+        echo.input_schema["properties"]["options"]["properties"]["upper"]["type"],
+        "boolean"
+    );
+    let result = call(
+        &client,
+        "cmd.koishi-tools.ligamina.echo",
+        json!({ "value": "structured -u text", "options": { "upper": true } }),
+    )
+    .await
+    .unwrap();
+    assert_eq!(first_text(&result), "STRUCTURED -U TEXT");
+    assert!(
+        call(
+            &client,
+            "cmd.koishi-tools.ligamina.echo",
+            json!({ "arguments": "x", "value": "y" }),
+        )
+        .await
+        .is_err(),
+        "raw and structured input together are rejected"
+    );
+
     let result = call(
         &client,
         "cmd.koishi-tools.ligamina.twice",

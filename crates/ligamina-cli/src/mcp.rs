@@ -105,17 +105,7 @@ fn command_tool(name: &str, info: &CommandInfo) -> Tool {
     if let Some(usage) = &descriptor.usage {
         description.push_str(&format!(" Usage: {usage}."));
     }
-    let input_schema = json!({
-        "type": "object",
-        "properties": {
-            "arguments": {
-                "type": "string",
-                "maxLength": 4096,
-                "description": "Text after the command name, parsed natively by the plugin framework (positional arguments and options)."
-            }
-        },
-        "additionalProperties": false
-    });
+    let input_schema = ligamina_core::command_args::input_schema(descriptor);
     let Value::Object(input_schema) = input_schema else {
         unreachable!("schema literal is an object")
     };
@@ -347,22 +337,11 @@ async fn call_command_tool(
         ));
     };
     let arguments = request.arguments.clone().unwrap_or_default();
-    if let Some(extra) = arguments.keys().find(|key| key.as_str() != "arguments") {
-        return Err(McpError::invalid_params(
-            format!("unexpected argument field: {extra}"),
-            None,
-        ));
-    }
-    let text = match arguments.get("arguments") {
-        None => "",
-        Some(Value::String(text)) => text.as_str(),
-        Some(_) => {
-            return Err(McpError::invalid_params("arguments must be a string", None));
-        }
-    };
+    let text = ligamina_core::command_args::compose(&info.descriptor, &arguments)
+        .map_err(|error| McpError::invalid_params(error, None))?;
     match command_tools
         .runtime
-        .invoke_command(&info.host_id, &info.descriptor.command_id, text)
+        .invoke_command(&info.host_id, &info.descriptor.command_id, &text)
         .await
     {
         Ok(outcome) => {
