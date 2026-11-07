@@ -1,0 +1,56 @@
+{
+  "schema_version": 1,
+  "kind": "phase4_p405_koishi_live_outbound_canary",
+  "created_at": "2026-10-29T00:28:04.576Z",
+  "run_id": "ce4882b4-322e-4fcc-aa66-1c703b76a66e",
+  "ingress": {
+    "source": "synthetic_event_envelope",
+    "real_platform_ingress_observed": false
+  },
+  "candidate": {
+    "registry_entry_id": "ko-163c3bd4cf87c72c24210251",
+    "package": "@koishijs/plugin-echo",
+    "version": "2.2.5",
+    "artifact_sha256": "79da39692ba8fce04ea597ff85696a0fe193cd89a95a91a0d459ea40ab592265",
+    "profile_lock_sha256": "33e0897b794134c39215e7824a47edec3eb4acc79fcb9f4df00a03c1455f616b",
+    "host_provider_lock_sha256": "5e3df82b0c353a8ded6c32708a8a591d9854182a38c6af9924c3e2671862bbcb"
+  },
+  "containment": {
+    "docker_image": "ligamina-p405-koishi-profile:20261029",
+    "worker_network": "none",
+    "worker_root_filesystem": "read_only",
+    "capability_drop": "ALL",
+    "no_new_privileges": true,
+    "worker_user": "10001:10001",
+    "install_scripts": "disabled"
+  },
+  "scenario": {
+    "id": "positive-group-echo-canary",
+    "sends_requested": 1,
+    "marker": "[Ligamina P4-05 TEST] 0423cffe-d9ab-46f8-a3fa-61e2ed9d3263"
+  },
+  "result": "failed_or_incomplete",
+  "cleanup": {
+    "daemon_stopped": false,
+    "labeled_worker_containers_remaining": 0,
+    "koishi_volume_removed": true
+  },
+  "scope": {
+    "account_fingerprint": "98b2a09fcf2417e2",
+    "configured_group_count": 5,
+    "joined_group_count": 11,
+    "matching_group_count": 5,
+    "selected_group_ordinal": 1,
+    "selected_group_fingerprint": "a45573c3a7d79814"
+  },
+  "profile_assets": {
+    "profile_package_lock_sha256": "cd7dce2e2e3e1bdced95faf6c423139f00d250cdd81b6730525d6222edb53d9e",
+    "original_offline_cache_sha256": "d1a77d19ab0f934cb10a38c17bc2bd3eb308753ea2f87da48e2f49dd6e1c6a77",
+    "supplemental_offline_cache_sha256": "1613fbdb5256c2d528139a24a4e16d5a9192805819b762ecc58d687be6159123"
+  },
+  "platform": {
+    "gateway": "SnowLuma OneBot HTTP",
+    "runtime_version": "1.14.19"
+  },
+  "error_code": "Command failed: docker run --rm --network none --read-only --tmpfs /tmp:rw,nosuid,nodev,noexec,size=64m --cap-drop=ALL --security-opt=no-new-privileges --pids-limit=64 --memory=512m --cpus=1 --user=0:0 --volume ligamina-p405-koishi-ce4882b4-322e-4fcc-aa66-1c703b76a66e:/var/lib/ligamina/koishi --workdir /opt/ligamina/p405-koishi-profile --entrypoint /usr/local/bin/node ligamina-p405-koishi-profile:20261029 -e const { createRequire } = require('node:module')\nconst fs = require('node:fs')\nconst requireFromProfile = createRequire(process.cwd() + '/package.json')\nconst { Context } = requireFromProfile('@koishijs/core')\nconst driverModule = requireFromProfile('@minatojs/driver-sqlite')\nconst SQLiteDriver = driverModule.default ?? driverModule\n;(async () => {\n  const directory = '/var/lib/ligamina/koishi'\n  const database = directory + '/koishi.sqlite'\n  const app = new Context()\n  app.plugin(SQLiteDriver, { path: database })\n  await app.start()\n  try {\n    await app.database.createUser('onebot.v11', 'p405-synthetic-actor', { authority: 3 })\n    const user = await app.database.getUser('onebot.v11', 'p405-synthetic-actor', ['authority'])\n    if (user?.authority !== 3) throw new Error('authority_seed_not_observed')\n  } finally { await app.stop() }\n  fs.chmodSync(directory, 0o777)\n  fs.chmodSync(database, 0o666)\n  console.log(JSON.stringify({ authority_seeded: true, authority: 3 }))\n})().catch((error) => { console.error(error.name); process.exitCode = 1 })\nnode:internal/modules/cjs/loader:1568\n  throw err;\n  ^\n\nError: Cannot find module '@minatojs/driver-sqlite'\nRequire stack:\n- /opt/ligamina/p405-koishi-profile/package.json\n    at Module._resolveFilename (node:internal/modules/cjs/loader:1564:15)\n    at wrapResolveFilename (node:internal/modules/cjs/loader:1118:27)\n    at defaultResolveImplForCJSLoading (node:internal/modules/cjs/loader:1142:10)\n    at resolveForCJSWithHooks (node:internal/modules/cjs/loader:1169:12)\n    at Module._load (node:internal/modules/cjs/loader:1341:5)\n    at wrapModuleLoad (node:internal/modules/cjs/loader:261:19)\n    at Module.require (node:internal/modules/cjs/loader:1674:12)\n    at require (node:internal/modules/helpers:157:16)\n    at [eval]:5:22\n    at runScriptInThisContext (node:internal/vm:219:10) {\n  code: 'MODULE_NOT_FOUND',\n  requireStack: [ '/opt/ligamina/p405-koishi-profile/package.json' ]\n}\n\nNode.js v24.20.0\n"
+}

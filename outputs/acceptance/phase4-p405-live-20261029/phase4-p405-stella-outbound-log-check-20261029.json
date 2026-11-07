@@ -1,0 +1,84 @@
+{
+  "schema_version": 1,
+  "kind": "phase4_p405_stella_outbound_log_check",
+  "created_at_utc": "2026-10-29T10:27:19Z",
+  "status": "no_outbound_send_observed",
+  "runtime": {
+    "status_endpoint_http": 200,
+    "application_version": "6.3.0",
+    "runtime_desired": "running",
+    "onebot_connected": true,
+    "onebot_healthy": true,
+    "current_process_id": 2768,
+    "current_process_created_at_utc": "2026-10-29T07:55:21.151Z"
+  },
+  "logger_review": {
+    "source_commit": "838819c",
+    "source_commit_in_current_head": true,
+    "source": "E:/stella/stella_project/core/transport/outbound.py",
+    "summary_prefix": "[OutboundDelivery]",
+    "records_payload_free": true,
+    "recorded_fields": "status, adapter, scene, segment kinds, part counts, receipt count, categorized error and elapsed time",
+    "message_body_recorded": false,
+    "log_scope": "StellaData/logs active and rotated .jsonl/.log files",
+    "matching_outbound_summary_count": 0
+  },
+  "trace_review": {
+    "source": "E:/stella/stella_project/StellaData/turn_trace.db",
+    "read_only": true,
+    "time_index_used": "idx_message_traces_started",
+    "window_start_utc": "2026-10-29T07:55:21.151Z",
+    "last_db_write_utc": "2026-10-29T10:26:49.843352Z",
+    "trace_counts": {
+      "qq_passive_passive_only_closed": 1352,
+      "qq_passive_plugin_handled_closed": 4,
+      "qq_passive_running": 1,
+      "proactive_timer_closed": 151,
+      "lifecycle_started_closed": 3
+    },
+    "latest_trace": {
+      "started_at_utc": "2026-10-29T10:26:49.819Z",
+      "root_kind": "qq_passive",
+      "outcome": "passive_only",
+      "status": "closed",
+      "complete": true,
+      "events": [
+        {
+          "node": "ingress.receive",
+          "status": "succeeded"
+        },
+        {
+          "node": "ingress.passive.filter",
+          "status": "succeeded"
+        },
+        {
+          "node": "ingress.passive.persist",
+          "status": "skipped",
+          "reason_code": "capture_closed"
+        },
+        {
+          "node": "ingress.plugin",
+          "status": "succeeded"
+        }
+      ]
+    },
+    "generation_send_event_counts": {
+      "chat.runtime": 0,
+      "send.prepare": 0,
+      "send.segment": 0,
+      "send.aggregate": 0
+    }
+  },
+  "correlation": {
+    "specific_user_message_attributed": false,
+    "message_contents_read": false,
+    "account_or_group_ids_read_or_reported": false,
+    "recipient_observation": "not_performed"
+  },
+  "decision": {
+    "p4_field_gate": "blocked",
+    "feat_030": "in-progress",
+    "acceptance_claim": "none",
+    "next_step": "A non-Stella member must send a fresh unique @Stella text in an enabled test group. Then inspect the Stella generation/send trace and the payload-free outbound summary, and independently confirm receiver observation. Do not call SnowLuma directly or replay old unknown operations."
+  }
+}

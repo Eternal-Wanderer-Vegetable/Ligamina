@@ -721,9 +721,42 @@ $env:PYTHONNOUSERSITE = '1'
 $env:PIP_NO_INDEX = '1'
 $env:PIP_DISABLE_PIP_VERSION_CHECK = '1'
 $env:PIP_NO_INPUT = '1'
+$probeStartedAt = [DateTime]::UtcNow
 $driverOutput = & $python (Join-Path $inputRoot 'windows_driver.py') $inputRoot $work
-if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
-Write-Output $driverOutput
+$driverExitCode = $LASTEXITCODE
+$ciEvents = @()
+$ciQueryError = $null
+try {
+  $ciEvents = @(Get-WinEvent -FilterHashtable @{
+    LogName = 'Microsoft-Windows-CodeIntegrity/Operational'
+    Id = @(3004, 3033, 3034, 3036, 3064, 3065, 3076, 3077, 3089, 3099)
+    StartTime = $probeStartedAt.ToLocalTime()
+  } -MaxEvents 200 -ErrorAction Stop | ForEach-Object {
+    [pscustomobject]@{
+      id = $_.Id
+      record_id = $_.RecordId
+      time_created_utc = $_.TimeCreated.ToUniversalTime().ToString('o')
+      message = $_.Message
+      xml = $_.ToXml()
+    }
+  })
+} catch {
+  $ciQueryError = $_.Exception.Message
+}
+if ($driverExitCode -ne 0) { exit $driverExitCode }
+try {
+  $protocol = (($driverOutput -join "`n") | ConvertFrom-Json -ErrorAction Stop)
+  $protocol | Add-Member -Force -NotePropertyName codeintegrity_collection -NotePropertyValue ([pscustomobject]@{
+    kind = 'phase4_p404_nonebot_codeintegrity_window'
+    window_start_utc = $probeStartedAt.ToString('o')
+    event_count = $ciEvents.Count
+    query_error = $ciQueryError
+    events = @($ciEvents)
+  })
+  Write-Output ($protocol | ConvertTo-Json -Depth 32 -Compress)
+} catch {
+  Write-Output ($driverOutput -join "`n")
+}
 exit 0
 ''',
         encoding="utf-8",

@@ -1,0 +1,379 @@
+{
+  "behavior_fixture": {
+    "adapter": {
+      "federated_dispatch": "Core event queue -> Rust Host -> Koishi OneBot Session dispatch",
+      "id": "koishi.onebot.v11",
+      "native_dispatch": "Koishi Context/Session -> Bot.dispatch"
+    },
+    "case_id": "ko-koishijs-plugin-echo-positive",
+    "determinism": {
+      "clock": "2026-10-26T00:00:00Z",
+      "random_seed": 0,
+      "scheduler_drain": "drain Koishi middleware and pending sends after each Session dispatch",
+      "settle_timeout_ms": 1500
+    },
+    "fixture_binding": {
+      "artifact_sha256": "79da39692ba8fce04ea597ff85696a0fe193cd89a95a91a0d459ea40ab592265",
+      "case_id": "ko-koishijs-plugin-echo-positive",
+      "dependency_lock_sha256": "33e0897b794134c39215e7824a47edec3eb4acc79fcb9f4df00a03c1455f616b",
+      "ecosystem": "koishi",
+      "fixture_sha256": "4feab36d52fa284384924ae58cb59a7462c0dc5820d034e62fbac52629a13537",
+      "package": "@koishijs/plugin-echo",
+      "platform": "windows-x86_64",
+      "profile_id": "koishi-core-4.18.11-node-24.20.0-x86_64-portable-lock",
+      "registry_entry_id": "ko-163c3bd4cf87c72c24210251",
+      "version": "2.2.5"
+    },
+    "issues": [],
+    "oracle_assertions": [
+      {
+        "operator": "equals",
+        "path": "plugin_observation.response_or_operation_count",
+        "value": 1
+      },
+      {
+        "operator": "equals",
+        "path": "plugin_observation.operations.0.params.message.0.text",
+        "value": "alpha"
+      },
+      {
+        "operator": "equals",
+        "path": "plugin_observation.operations.0.target",
+        "value": {
+          "id": "501",
+          "kind": "group"
+        }
+      },
+      {
+        "operator": "equals",
+        "path": "plugin_observation.operations.0.account_id",
+        "value": "9001"
+      },
+      {
+        "operator": "equals",
+        "path": "plugin_observation.operations.0.source_event_id",
+        "value": "ko-echo-positive"
+      },
+      {
+        "operator": "equals",
+        "path": "plugin_observation.receipts.0.status",
+        "value": "succeeded"
+      }
+    ],
+    "oracle_source_member": "package/lib/index.js"
+  },
+  "catalog": {
+    "artifact_lock_sha256": "8dcec5da7cd81b9ed7d0f4e8aead8e76ef15cd7e17dfcdc4fa6f7b8944b83d4a",
+    "artifact_sha256": "79da39692ba8fce04ea597ff85696a0fe193cd89a95a91a0d459ea40ab592265",
+    "dependency_archives": {
+      "archive_bytes": 3697742,
+      "cache_hits": 169,
+      "catalog_locked_package_count": 172,
+      "combined_package_lock_sha256": "83c6d12d84e2d3930ffb68cd993c864fcbfbd9f34e0851eeb4a0366367cc4f81",
+      "downloaded_archives": 0,
+      "downloaded_bytes": 0,
+      "host_provider_lock_sha256": "5e3df82b0c353a8ded6c32708a8a591d9854182a38c6af9924c3e2671862bbcb",
+      "host_provider_package_count": 3,
+      "locked_package_count": 175,
+      "package_lock_sha256": "c582e2fbcb758f8ab4a0d0d51733a643668a088be29c61d53f9b6df24f0702d1",
+      "unique_archive_count": 169
+    },
+    "dependency_lock_sha256": "33e0897b794134c39215e7824a47edec3eb4acc79fcb9f4df00a03c1455f616b",
+    "package": "@koishijs/plugin-echo",
+    "profile_document_sha256": "68a7391620a06e7141d949519333a1f4fc5ccee7abd84dc036c46d09fdae8d38",
+    "profile_id": "koishi-core-4.18.11-node-24.20.0-x86_64-portable-lock",
+    "registry_entry_id": "ko-163c3bd4cf87c72c24210251",
+    "snapshot": "catalogs/p2-41649744e057d61031d5",
+    "version": "2.2.5"
+  },
+  "completed_at_utc": "2026-10-28T13:36:35.284683+00:00",
+  "execution": {
+    "cleanup_confirmed": true,
+    "elapsed_seconds": 48.156,
+    "guest_result": {
+      "binding": {
+        "artifact_sha256": "79da39692ba8fce04ea597ff85696a0fe193cd89a95a91a0d459ea40ab592265",
+        "case_id": "ko-koishijs-plugin-echo-positive",
+        "dependency_lock_sha256": "33e0897b794134c39215e7824a47edec3eb4acc79fcb9f4df00a03c1455f616b",
+        "ecosystem": "koishi",
+        "fixture_sha256": "4feab36d52fa284384924ae58cb59a7462c0dc5820d034e62fbac52629a13537",
+        "package": "@koishijs/plugin-echo",
+        "platform": "windows-x86_64",
+        "profile_id": "koishi-core-4.18.11-node-24.20.0-x86_64-portable-lock",
+        "registry_entry_id": "ko-163c3bd4cf87c72c24210251",
+        "version": "2.2.5"
+      },
+      "child_stderr_sha256": null,
+      "child_stderr_tail": "[I] sqlite auto creating table user\n[I] sqlite auto creating table binding\n[I] sqlite auto creating table channel\n",
+      "environment": {
+        "artifact_hash": "79da39692ba8fce04ea597ff85696a0fe193cd89a95a91a0d459ea40ab592265",
+        "config_sha256": "61a7b7238635d93b6f2d4c8759a10aaf6f91977c549585a781f882eb0332c653",
+        "ecosystem": "koishi",
+        "framework_version": "4.18.11",
+        "lockfile_sha256": "33e0897b794134c39215e7824a47edec3eb4acc79fcb9f4df00a03c1455f616b",
+        "profile_sha256": "f7c0fd9fb2c5d50a9bb902b2c05459b13b061d18a42f60a8106b8aba71558b66",
+        "runtime_version": "24.20.0",
+        "stimulus_sha256": "4a20effb3655562dca55b1df5f0b6cd22a975858494bd07dbd335faaf9a8b995"
+      },
+      "kind": "phase4_p404_koishi_native_behavior_guest_result",
+      "native_report": {
+        "binding": {
+          "artifact_sha256": "79da39692ba8fce04ea597ff85696a0fe193cd89a95a91a0d459ea40ab592265",
+          "case_id": "ko-koishijs-plugin-echo-positive",
+          "dependency_lock_sha256": "33e0897b794134c39215e7824a47edec3eb4acc79fcb9f4df00a03c1455f616b",
+          "ecosystem": "koishi",
+          "fixture_sha256": "4feab36d52fa284384924ae58cb59a7462c0dc5820d034e62fbac52629a13537",
+          "package": "@koishijs/plugin-echo",
+          "platform": "windows-x86_64",
+          "profile_id": "koishi-core-4.18.11-node-24.20.0-x86_64-portable-lock",
+          "registry_entry_id": "ko-163c3bd4cf87c72c24210251",
+          "version": "2.2.5"
+        },
+        "capability_probe_observation": {
+          "events": [
+            {
+              "account_id": "9001",
+              "actor_id": "23",
+              "conversation": {
+                "id": "501",
+                "kind": "group"
+              },
+              "event_id": "ko-echo-positive",
+              "timestamp": "2026-10-26T00:00:00Z"
+            }
+          ],
+          "status": "recorded",
+          "storage": {
+            "file_sha256": "481113d95726e4746088e23bf6ed8134092239c4d66095c573476cd9e5ebba7b",
+            "probe_source_sha256": "3c749f71d9a1dda0ea19e6b2d12ac45e54d6a5d6808ea6dbe3d11ecaa19e3515",
+            "record_count": 1,
+            "relative_path": "native-koishi-data/phase4-probes/observations.ndjson"
+          }
+        },
+        "cleanup": {
+          "active_capability_count": 0,
+          "live_processes": []
+        },
+        "environment": {
+          "artifact_hash": "79da39692ba8fce04ea597ff85696a0fe193cd89a95a91a0d459ea40ab592265",
+          "config_sha256": "61a7b7238635d93b6f2d4c8759a10aaf6f91977c549585a781f882eb0332c653",
+          "ecosystem": "koishi",
+          "framework_version": "4.18.11",
+          "lockfile_sha256": "33e0897b794134c39215e7824a47edec3eb4acc79fcb9f4df00a03c1455f616b",
+          "profile_sha256": "f7c0fd9fb2c5d50a9bb902b2c05459b13b061d18a42f60a8106b8aba71558b66",
+          "runtime_version": "24.20.0",
+          "stimulus_sha256": "4a20effb3655562dca55b1df5f0b6cd22a975858494bd07dbd335faaf9a8b995"
+        },
+        "events": [
+          {
+            "account_id": "9001",
+            "actor_id": "23",
+            "conversation": {
+              "id": "501",
+              "kind": "group"
+            },
+            "event_id": "ko-echo-positive",
+            "extensions": {
+              "onebot.v11": {
+                "message_id": "11147404"
+              }
+            },
+            "message": [
+              {
+                "text": "echo alpha",
+                "type": "text"
+              }
+            ],
+            "timestamp": "2026-10-26T00:00:00Z"
+          }
+        ],
+        "native_trace": {
+          "bridge_adapter_imported": false
+        },
+        "operation_receipts": [
+          {
+            "account_id": "9001",
+            "operation_id": "operation-1",
+            "source_event_id": "ko-echo-positive",
+            "status": "succeeded",
+            "target": {
+              "id": "501",
+              "kind": "group"
+            }
+          }
+        ],
+        "operations": [
+          {
+            "account_id": "9001",
+            "operation": "send_message",
+            "operation_id": "operation-1",
+            "params": {
+              "message": [
+                {
+                  "text": "alpha",
+                  "type": "text"
+                }
+              ]
+            },
+            "source_event_id": "ko-echo-positive",
+            "target": {
+              "id": "501",
+              "kind": "group"
+            }
+          }
+        ],
+        "plugin_observation": {
+          "events": [
+            {
+              "account_id": "9001",
+              "actor_id": "23",
+              "conversation": {
+                "id": "501",
+                "kind": "group"
+              },
+              "event_id": "ko-echo-positive"
+            }
+          ],
+          "operations": [
+            {
+              "account_id": "9001",
+              "operation": "send_message",
+              "operation_id": "operation-1",
+              "params": {
+                "message": [
+                  {
+                    "text": "alpha",
+                    "type": "text"
+                  }
+                ]
+              },
+              "source_event_id": "ko-echo-positive",
+              "target": {
+                "id": "501",
+                "kind": "group"
+              }
+            }
+          ],
+          "receipts": [
+            {
+              "account_id": "9001",
+              "operation_id": "operation-1",
+              "source_event_id": "ko-echo-positive",
+              "status": "succeeded",
+              "target": {
+                "id": "501",
+                "kind": "group"
+              }
+            }
+          ],
+          "response_or_operation_count": 1
+        },
+        "status": "completed",
+        "stock_native": {
+          "api": "Context/Session/Bot",
+          "bridge_adapter_imported": false,
+          "framework": "Koishi"
+        }
+      },
+      "plugin_entry_url": "file:///C:/Ligamina/Workspace/project/node_modules/@koishijs/plugin-echo/lib/index.js",
+      "runtime_version": "24.20.0",
+      "schema_version": 1,
+      "status": "completed"
+    },
+    "peak_memory_bytes": 6097809408,
+    "stderr_sha256": "6a36963d254758914277c5fa1b8e85eab55e4f70b2315a1191a1538852991694",
+    "stderr_tail": "npm warn deprecated @koa/router@10.1.1: **IMPORTANT 10x+ PERFORMANCE UPGRADE**: Please upgrade to v12.0.1+ as we have fixed an issue with debuglog causing 10x slower router benchmark performance, see https://github.com/koajs/router/pull/173\n",
+    "stdout_sha256": "4d86805f2ca39e0b543614fa8eebdf32592b1d0402896eafe9d6d759fbc5ee98",
+    "stdout_tail": "\nadded 175 packages in 5s\nLIGAMINA_P404_KOISHI={\"schema_version\":1,\"kind\":\"phase4_p404_koishi_native_behavior_guest_result\",\"status\":\"completed\",\"runtime_version\":\"24.20.0\",\"plugin_entry_url\":\"file:///C:/Ligamina/Workspace/project/node_modules/@koishijs/plugin-echo/lib/index.js\",\"binding\":{\"registry_entry_id\":\"ko-163c3bd4cf87c72c24210251\",\"ecosystem\":\"koishi\",\"package\":\"@koishijs/plugin-echo\",\"version\":\"2.2.5\",\"artifact_sha256\":\"79da39692ba8fce04ea597ff85696a0fe193cd89a95a91a0d459ea40ab592265\",\"platform\":\"windows-x86_64\",\"profile_id\":\"koishi-core-4.18.11-node-24.20.0-x86_64-portable-lock\",\"dependency_lock_sha256\":\"33e0897b794134c39215e7824a47edec3eb4acc79fcb9f4df00a03c1455f616b\",\"case_id\":\"ko-koishijs-plugin-echo-positive\",\"fixture_sha256\":\"4feab36d52fa284384924ae58cb59a7462c0dc5820d034e62fbac52629a13537\"},\"environment\":{\"ecosystem\":\"koishi\",\"framework_version\":\"4.18.11\",\"runtime_version\":\"24.20.0\",\"lockfile_sha256\":\"33e0897b794134c39215e7824a47edec3eb4acc79fcb9f4df00a03c1455f616b\",\"profile_sha256\":\"f7c0fd9fb2c5d50a9bb902b2c05459b13b061d18a42f60a8106b8aba71558b66\",\"artifact_hash\":\"79da39692ba8fce04ea597ff85696a0fe193cd89a95a91a0d459ea40ab592265\",\"config_sha256\":\"61a7b7238635d93b6f2d4c8759a10aaf6f91977c549585a781f882eb0332c653\",\"stimulus_sha256\":\"4a20effb3655562dca55b1df5f0b6cd22a975858494bd07dbd335faaf9a8b995\"},\"native_report\":{\"status\":\"completed\",\"environment\":{\"ecosystem\":\"koishi\",\"framework_version\":\"4.18.11\",\"runtime_version\":\"24.20.0\",\"lockfile_sha256\":\"33e0897b794134c39215e7824a47edec3eb4acc79fcb9f4df00a03c1455f616b\",\"profile_sha256\":\"f7c0fd9fb2c5d50a9bb902b2c05459b13b061d18a42f60a8106b8aba71558b66\",\"artifact_hash\":\"79da39692ba8fce04ea597ff85696a0fe193cd89a95a91a0d459ea40ab592265\",\"config_sha256\":\"61a7b7238635d93b6f2d4c8759a10aaf6f91977c549585a781f882eb0332c653\",\"stimulus_sha256\":\"4a20effb3655562dca55b1df5f0b6cd22a975858494bd07dbd335faaf9a8b995\"},\"events\":[{\"event_id\":\"ko-echo-positive\",\"timestamp\":\"2026-10-26T00:00:00Z\",\"account_id\":\"9001\",\"actor_id\":\"23\",\"conversation\":{\"kind\":\"group\",\"id\":\"501\"},\"message\":[{\"type\":\"text\",\"text\":\"echo alpha\"}],\"extensions\":{\"onebot.v11\":{\"message_id\":\"11147404\"}}}],\"operations\":[{\"operation_id\":\"operation-1\",\"account_id\":\"9001\",\"operation\":\"send_message\",\"target\":{\"kind\":\"group\",\"id\":\"501\"},\"params\":{\"message\":[{\"type\":\"text\",\"text\":\"alpha\"}]},\"source_event_id\":\"ko-echo-positive\"}],\"operation_receipts\":[{\"operation_id\":\"operation-1\",\"status\":\"succeeded\",\"target\":{\"kind\":\"group\",\"id\":\"501\"},\"account_id\":\"9001\",\"source_event_id\":\"ko-echo-positive\"}],\"cleanup\":{\"active_capability_count\":0,\"live_processes\":[]},\"stock_native\":{\"framework\":\"Koishi\",\"api\":\"Context/Session/Bot\",\"bridge_adapter_imported\":false},\"native_trace\":{\"bridge_adapter_imported\":false},\"binding\":{\"registry_entry_id\":\"ko-163c3bd4cf87c72c24210251\",\"ecosystem\":\"koishi\",\"package\":\"@koishijs/plugin-echo\",\"version\":\"2.2.5\",\"artifact_sha256\":\"79da39692ba8fce04ea597ff85696a0fe193cd89a95a91a0d459ea40ab592265\",\"platform\":\"windows-x86_64\",\"profile_id\":\"koishi-core-4.18.11-node-24.20.0-x86_64-portable-lock\",\"dependency_lock_sha256\":\"33e0897b794134c39215e7824a47edec3eb4acc79fcb9f4df00a03c1455f616b\",\"case_id\":\"ko-koishijs-plugin-echo-positive\",\"fixture_sha256\":\"4feab36d52fa284384924ae58cb59a7462c0dc5820d034e62fbac52629a13537\"},\"capability_probe_observation\":{\"status\":\"recorded\",\"storage\":{\"relative_path\":\"native-koishi-data/phase4-probes/observations.ndjson\",\"file_sha256\":\"481113d95726e4746088e23bf6ed8134092239c4d66095c573476cd9e5ebba7b\",\"record_count\":1,\"probe_source_sha256\":\"3c749f71d9a1dda0ea19e6b2d12ac45e54d6a5d6808ea6dbe3d11ecaa19e3515\"},\"events\":[{\"event_id\":\"ko-echo-positive\",\"account_id\":\"9001\",\"actor_id\":\"23\",\"conversation\":{\"kind\":\"group\",\"id\":\"501\"},\"timestamp\":\"2026-10-26T00:00:00Z\"}]},\"plugin_observation\":{\"events\":[{\"event_id\":\"ko-echo-positive\",\"account_id\":\"9001\",\"actor_id\":\"23\",\"conversation\":{\"kind\":\"group\",\"id\":\"501\"}}],\"operations\":[{\"operation_id\":\"operation-1\",\"account_id\":\"9001\",\"operation\":\"send_message\",\"target\":{\"kind\":\"group\",\"id\":\"501\"},\"params\":{\"message\":[{\"type\":\"text\",\"text\":\"alpha\"}]},\"source_event_id\":\"ko-echo-positive\"}],\"receipts\":[{\"operation_id\":\"operation-1\",\"status\":\"succeeded\",\"target\":{\"kind\":\"group\",\"id\":\"501\"},\"account_id\":\"9001\",\"source_event_id\":\"ko-echo-positive\"}],\"response_or_operation_count\":1}},\"child_stderr_sha256\":null,\"child_stderr_tail\":\"[I] sqlite auto creating table user\\n[I] sqlite auto creating table binding\\n[I] sqlite auto creating table channel\\n\"}\n\r\nLIGAMINA_CODEINTEGRITY={\"schema_version\":1,\"kind\":\"phase4_p404_koishi_codeintegrity_window\",\"collected_at_utc\":\"2026-10-28T13:36:33.5084076Z\",\"window_start_utc\":\"2026-10-28T11:36:33.3242174Z\",\"event_count\":2,\"query_error\":null,\"events\":[{\"time_created_utc\":\"2026-10-28T13:36:04.6682624Z\",\"id\":3099,\"record_id\":1041,\"activity_id\":null,\"provider\":\"Microsoft-Windows-CodeIntegrity\",\"message\":\"Refreshed and activated Code Integrity policy {1678656c-05ef-481f-bc5b-ebd8c991502d} VerifiedAndReputableDesktopFlightSupplemental. id 27766.241221-1700. Status 0x0\",\"xml\":\"\\u003cEvent xmlns=\\u0027http://schemas.microsoft.com/win/2004/08/events/event\\u0027\\u003e\\u003cSystem\\u003e\\u003cProvider Name=\\u0027Microsoft-Windows-CodeIntegrity\\u0027 Guid=\\u0027{4ee76bd8-3cf4-44a0-a0ac-3937643e37a3}\\u0027/\\u003e\\u003cEventID\\u003e3099\\u003c/EventID\\u003e\\u003cVersion\\u003e2\\u003c/Version\\u003e\\u003cLevel\\u003e4\\u003c/Level\\u003e\\u003cTask\\u003e21\\u003c/Task\\u003e\\u003cOpcode\\u003e131\\u003c/Opcode\\u003e\\u003cKeywords\\u003e0x8000000000000000\\u003c/Keywords\\u003e\\u003cTimeCreated SystemTime=\\u00272026-10-28T13:36:04.6682624Z\\u0027/\\u003e\\u003cEventRecordID\\u003e1041\\u003c/EventRecordID\\u003e\\u003cCorrelation/\\u003e\\u003cExecution ProcessID=\\u00274\\u0027 ThreadID=\\u0027164\\u0027/\\u003e\\u003cChannel\\u003eMicrosoft-Windows-CodeIntegrity/Operational\\u003c/Channel\\u003e\\u003cComputer\\u003e72d94808-28c5-47c0-8a16-679d2eb65060\\u003c/Computer\\u003e\\u003cSecurity UserID=\\u0027S-1-5-18\\u0027/\\u003e\\u003c/System\\u003e\\u003cEventData\\u003e\\u003cData Name=\\u0027PolicyNameLength\\u0027\\u003e45\\u003c/Data\\u003e\\u003cData Name=\\u0027PolicyNameBuffer\\u0027\\u003eVerifiedAndReputableDesktopFlightSupplemental\\u003c/Data\\u003e\\u003cData Name=\\u0027PolicyIdLength\\u0027\\u003e17\\u003c/Data\\u003e\\u003cData Name=\\u0027PolicyIdBuffer\\u0027\\u003e27766.241221-1700\\u003c/Data\\u003e\\u003cData Name=\\u0027PolicyGUID\\u0027\\u003e{1678656c-05ef-481f-bc5b-ebd8c991502d}\\u003c/Data\\u003e\\u003cData Name=\\u0027Status\\u0027\\u003e0x0\\u003c/Data\\u003e\\u003cData Name=\\u0027Options\\u0027\\u003e0xd1882304\\u003c/Data\\u003e\\u003cData Name=\\u0027PolicyHashSize\\u0027\\u003e32\\u003c/Data\\u003e\\u003cData Name=\\u0027PolicyHash\\u0027\\u003e140CE61A30A209A23B5D43906C9BF0E8AFCD7C2CFA952F5CD04E8058EBBFAFE2\\u003c/Data\\u003e\\u003cData Name=\\u0027OptionsV2\\u0027\\u003e0x0\\u003c/Data\\u003e\\u003c/EventData\\u003e\\u003c/Event\\u003e\"},{\"time_created_utc\":\"2026-10-28T13:36:04.6682534Z\",\"id\":3099,\"record_id\":1039,\"activity_id\":null,\"provider\":\"Microsoft-Windows-CodeIntegrity\",\"message\":\"Refreshed and activated Code Integrity policy {0283ac0f-fff1-49ae-ada1-8a933130cad6} VerifiedAndReputableDesktop. id 27555.1000.240208. Status 0x0\",\"xml\":\"\\u003cEvent xmlns=\\u0027http://schemas.microsoft.com/win/2004/08/events/event\\u0027\\u003e\\u003cSystem\\u003e\\u003cProvider Name=\\u0027Microsoft-Windows-CodeIntegrity\\u0027 Guid=\\u0027{4ee76bd8-3cf4-44a0-a0ac-3937643e37a3}\\u0027/\\u003e\\u003cEventID\\u003e3099\\u003c/EventID\\u003e\\u003cVersion\\u003e2\\u003c/Version\\u003e\\u003cLevel\\u003e4\\u003c/Level\\u003e\\u003cTask\\u003e21\\u003c/Task\\u003e\\u003cOpcode\\u003e131\\u003c/Opcode\\u003e\\u003cKeywords\\u003e0x8000000000000000\\u003c/Keywords\\u003e\\u003cTimeCreated SystemTime=\\u00272026-10-28T13:36:04.6682534Z\\u0027/\\u003e\\u003cEventRecordID\\u003e1039\\u003c/EventRecordID\\u003e\\u003cCorrelation/\\u003e\\u003cExecution ProcessID=\\u00274\\u0027 ThreadID=\\u0027164\\u0027/\\u003e\\u003cChannel\\u003eMicrosoft-Windows-CodeIntegrity/Operational\\u003c/Channel\\u003e\\u003cComputer\\u003e72d94808-28c5-47c0-8a16-679d2eb65060\\u003c/Computer\\u003e\\u003cSecurity UserID=\\u0027S-1-5-18\\u0027/\\u003e\\u003c/System\\u003e\\u003cEventData\\u003e\\u003cData Name=\\u0027PolicyNameLength\\u0027\\u003e27\\u003c/Data\\u003e\\u003cData Name=\\u0027PolicyNameBuffer\\u0027\\u003eVerifiedAndReputableDesktop\\u003c/Data\\u003e\\u003cData Name=\\u0027PolicyIdLength\\u0027\\u003e17\\u003c/Data\\u003e\\u003cData Name=\\u0027PolicyIdBuffer\\u0027\\u003e27555.1000.240208\\u003c/Data\\u003e\\u003cData Name=\\u0027PolicyGUID\\u0027\\u003e{0283ac0f-fff1-49ae-ada1-8a933130cad6}\\u003c/Data\\u003e\\u003cData Name=\\u0027Status\\u0027\\u003e0x0\\u003c/Data\\u003e\\u003cData Name=\\u0027Options\\u0027\\u003e0xb18c2714\\u003c/Data\\u003e\\u003cData Name=\\u0027PolicyHashSize\\u0027\\u003e32\\u003c/Data\\u003e\\u003cData Name=\\u0027PolicyHash\\u0027\\u003e2668895A5B233A80432D00D67251D7B7F52686A3FB13780F4B242C5A1F937A01\\u003c/Data\\u003e\\u003cData Name=\\u0027OptionsV2\\u0027\\u003e0x0\\u003c/Data\\u003e\\u003c/EventData\\u003e\\u003c/Event\\u003e\"}]}\r\n",
+    "worker_exit_code": 0,
+    "worker_id": "wsb-d4edc007d6354152",
+    "worker_reason_code": null,
+    "worker_status": "passed"
+  },
+  "host_provider_profile": {
+    "combined_package_lock_path": "outputs/acceptance/phase4-p404-koishi-combined-package-lock-20261028.json",
+    "combined_package_lock_sha256": "83c6d12d84e2d3930ffb68cd993c864fcbfbd9f34e0851eeb4a0366367cc4f81",
+    "host_package_lock_path": "hosts/koishi/package-lock.json",
+    "host_package_lock_sha256": "5e3df82b0c353a8ded6c32708a8a591d9854182a38c6af9924c3e2671862bbcb",
+    "provider_archive_review": {
+      "archive_sha512": {
+        "@minatojs/driver-sqlite": "9f934095bdd1cc9fa11042c3750bc398fa409a2e0470d06aebca50847e6f71f6999c49264af3d5ed9c4ee93e38596b138b51d93e9771117757230680c634f85c",
+        "@minatojs/sql-utils": "143d4779212a4278579bf9c6f8b5d96fc1bc59e95307bb4647ecc569364dd139a3312ca82692aa3b17a266f7b8eb862068077723164c71f144dbc9cf5c15b1ff",
+        "@minatojs/sql.js": "8da10594cd3793e99a59ce091efe438043eaeabe5b720e4e997519ea49566d8522eed7d1c921b12e3c21ef4bf8fa9f00f6ac5dc8bf725f70f6610897c25d472b"
+      },
+      "install_scripts": [],
+      "native_members": [],
+      "package_count": 3
+    },
+    "provider_package_versions": {
+      "@minatojs/driver-sqlite": "4.7.0",
+      "@minatojs/sql-utils": "5.6.0",
+      "@minatojs/sql.js": "3.1.0"
+    }
+  },
+  "kind": "phase4_p404_koishi_windows_native_behavior",
+  "limitations": [
+    "One Native Host execution only; repeat as three fresh Sandboxes before any Windows behavior gate claim.",
+    "The report covers only the selected fixture; other cases for this catalog entry remain separate.",
+    "Federated Core-to-Host behavior and comparison were not run.",
+    "CiTool policy inventory remains unavailable; activation is corroborated by the current 3099 event and the separately recorded matching 3077 enforcement event.",
+    "The catalog entry remains a pilot identity; this does not authorize broader catalog execution."
+  ],
+  "policy": {
+    "baseline_report": "outputs/acceptance/phase4-p404-policy-preflight-20261028.json",
+    "citool_full_inventory": "unknown; CiTool returns 0x80073BC3",
+    "codeintegrity_collection": {
+      "collected_at_utc": "2026-10-28T13:36:33.5084076Z",
+      "event_count": 2,
+      "events": [
+        {
+          "activity_id": null,
+          "id": 3099,
+          "message": "Refreshed and activated Code Integrity policy {1678656c-05ef-481f-bc5b-ebd8c991502d} VerifiedAndReputableDesktopFlightSupplemental. id 27766.241221-1700. Status 0x0",
+          "provider": "Microsoft-Windows-CodeIntegrity",
+          "record_id": 1041,
+          "time_created_utc": "2026-10-28T13:36:04.6682624Z",
+          "xml": "<Event xmlns='http://schemas.microsoft.com/win/2004/08/events/event'><System><Provider Name='Microsoft-Windows-CodeIntegrity' Guid='{4ee76bd8-3cf4-44a0-a0ac-3937643e37a3}'/><EventID>3099</EventID><Version>2</Version><Level>4</Level><Task>21</Task><Opcode>131</Opcode><Keywords>0x8000000000000000</Keywords><TimeCreated SystemTime='2026-10-28T13:36:04.6682624Z'/><EventRecordID>1041</EventRecordID><Correlation/><Execution ProcessID='4' ThreadID='164'/><Channel>Microsoft-Windows-CodeIntegrity/Operational</Channel><Computer>72d94808-28c5-47c0-8a16-679d2eb65060</Computer><Security UserID='S-1-5-18'/></System><EventData><Data Name='PolicyNameLength'>45</Data><Data Name='PolicyNameBuffer'>VerifiedAndReputableDesktopFlightSupplemental</Data><Data Name='PolicyIdLength'>17</Data><Data Name='PolicyIdBuffer'>27766.241221-1700</Data><Data Name='PolicyGUID'>{1678656c-05ef-481f-bc5b-ebd8c991502d}</Data><Data Name='Status'>0x0</Data><Data Name='Options'>0xd1882304</Data><Data Name='PolicyHashSize'>32</Data><Data Name='PolicyHash'>140CE61A30A209A23B5D43906C9BF0E8AFCD7C2CFA952F5CD04E8058EBBFAFE2</Data><Data Name='OptionsV2'>0x0</Data></EventData></Event>"
+        },
+        {
+          "activity_id": null,
+          "id": 3099,
+          "message": "Refreshed and activated Code Integrity policy {0283ac0f-fff1-49ae-ada1-8a933130cad6} VerifiedAndReputableDesktop. id 27555.1000.240208. Status 0x0",
+          "provider": "Microsoft-Windows-CodeIntegrity",
+          "record_id": 1039,
+          "time_created_utc": "2026-10-28T13:36:04.6682534Z",
+          "xml": "<Event xmlns='http://schemas.microsoft.com/win/2004/08/events/event'><System><Provider Name='Microsoft-Windows-CodeIntegrity' Guid='{4ee76bd8-3cf4-44a0-a0ac-3937643e37a3}'/><EventID>3099</EventID><Version>2</Version><Level>4</Level><Task>21</Task><Opcode>131</Opcode><Keywords>0x8000000000000000</Keywords><TimeCreated SystemTime='2026-10-28T13:36:04.6682534Z'/><EventRecordID>1039</EventRecordID><Correlation/><Execution ProcessID='4' ThreadID='164'/><Channel>Microsoft-Windows-CodeIntegrity/Operational</Channel><Computer>72d94808-28c5-47c0-8a16-679d2eb65060</Computer><Security UserID='S-1-5-18'/></System><EventData><Data Name='PolicyNameLength'>27</Data><Data Name='PolicyNameBuffer'>VerifiedAndReputableDesktop</Data><Data Name='PolicyIdLength'>17</Data><Data Name='PolicyIdBuffer'>27555.1000.240208</Data><Data Name='PolicyGUID'>{0283ac0f-fff1-49ae-ada1-8a933130cad6}</Data><Data Name='Status'>0x0</Data><Data Name='Options'>0xb18c2714</Data><Data Name='PolicyHashSize'>32</Data><Data Name='PolicyHash'>2668895A5B233A80432D00D67251D7B7F52686A3FB13780F4B242C5A1F937A01</Data><Data Name='OptionsV2'>0x0</Data></EventData></Event>"
+        }
+      ],
+      "kind": "phase4_p404_koishi_codeintegrity_window",
+      "query_error": null,
+      "schema_version": 1,
+      "window_start_utc": "2026-10-28T11:36:33.3242174Z"
+    },
+    "expected_base_policy_guid": "{0283ac0f-fff1-49ae-ada1-8a933130cad6}",
+    "expected_base_policy_hash": "2668895A5B233A80432D00D67251D7B7F52686A3FB13780F4B242C5A1F937A01",
+    "expected_base_policy_options": "0xb18c2714",
+    "observed_current_base_policy_activation": true
+  },
+  "reason_code": null,
+  "runtime": {
+    "network": "disabled by Windows Sandbox policy",
+    "node_authenticode_expected": "Valid / OpenJS Foundation (guest runner verified the signature)",
+    "node_sha256": "5c976096e04e5c2c1f091938926234cc9fbebfe9787ddd149351b3b0ecc707b5",
+    "npm_lifecycle_scripts": "disabled",
+    "npm_version": "11.19.0"
+  },
+  "schema_version": 1,
+  "scope": "single native Koishi Host dispatch behavior case in Windows Sandbox; no Federated parity or full catalog claim",
+  "source_sha256": {
+    "deploy/windows/phase4-p404-koishi-behavior/Collect-CodeIntegrityOutput.ps1": "913e1b3ef7a3795266f15928d2570484ad3239ee4fcb56c339c8b9ed53be125f",
+    "deploy/windows/phase4-p404-koishi-behavior/Execute-KoishiBehavior.mjs": "995deac06152372807c670e26a32ebdb39753fff11adc6816faea9a1e9258349",
+    "deploy/windows/phase4-p404-koishi-behavior/Run-KoishiBehavior.ps1": "923acf0ab0d6bd49b0fce1848b96fcbdb28c122b6b03f3a883f56ac509643c4e",
+    "lab/baselines/koishi/artifact_fingerprint.mjs": "4f2ab09b4c98006e6ce133ef5615541e8a7edaf4cd50101f1d677141baf8f918",
+    "lab/baselines/koishi/phase4_probe_plugin.mjs": "3c749f71d9a1dda0ea19e6b2d12ac45e54d6a5d6808ea6dbe3d11ecaa19e3515",
+    "lab/baselines/koishi/runner.mjs": "c077ca19bcc851eb2dda5040b827c9fa4c3104570db3baba8af75f1a736c1302",
+    "scripts/phase4-p404-koishi-behavior.py": "b9435d2774898de21044a7a71404bf59e861f0d3bc061d44af9b67193ce601a7"
+  },
+  "started_at_utc": "2026-10-28T13:35:45.622592+00:00",
+  "status": "passed_native_scoped"
+}

@@ -1,0 +1,89 @@
+{
+  "schema_version": 1,
+  "kind": "phase4_p404_local_progress_verification",
+  "verified_at_utc": "2026-10-28T00:15:34.6896081Z",
+  "repository": "E:/stella/Ligamina",
+  "branch": "codex/p404-guest-admission",
+  "head": "810b814430f045ac64631408ec56e2298f9683c5",
+  "origin_main": "810b814430f045ac64631408ec56e2298f9683c5",
+  "tracked_changes": [
+    "deploy/windows/phase4-p404-guest-admission/Collect-GuestAdmission.ps1",
+    "deploy/windows/phase4-p404-guest-admission/README.md",
+    "deploy/windows/phase4-p404-guest-admission/phase4-p404-guest-admission.wsb",
+    "docs/plans/2026-10-26-phase-4-behavior-readiness.md",
+    "feature_list.json",
+    "progress.md",
+    "session-handoff.md"
+  ],
+  "checks": {
+    "readme_render": {
+      "command": "node scripts/render-readme.mjs",
+      "exit_code": 0,
+      "result": "README evidence blocks rendered from phase-one, phase-two, and phase-three reports."
+    },
+    "docs": {
+      "command": "pwsh -NoProfile -File init.ps1 -Mode docs",
+      "exit_code": 0,
+      "status": "passed",
+      "documents": 20,
+      "local_links": 473,
+      "indexed_historical_markdown": 12,
+      "features": 31,
+      "failures": []
+    },
+    "harness": {
+      "command": "node .agents/skills/harness-creator/scripts/validate-harness.mjs --target .",
+      "exit_code": 0,
+      "score": "100/100"
+    },
+    "diff_check": {
+      "command": "git diff --check",
+      "exit_code": 0
+    },
+    "static": {
+      "collector_powershell_parse_errors": 0,
+      "cleanup_helper_powershell_parse_errors": 0,
+      "wsb_xml": "valid",
+      "guest_review_and_launch_sidecars": "match"
+    }
+  },
+  "execution_scope": {
+    "unit_tests": "not_run",
+    "native_probe": "not_started",
+    "catalog_plugins": "not_run",
+    "host_policy_changes": "none"
+  },
+  "current_gate": {
+    "feat_028": "blocked",
+    "feat_029": "in-progress",
+    "windows_guest_device_guard": "kernel and user-mode enforcement status 2",
+    "citool_policy_inventory": "unverified after initial collector capture error; updated collector awaits fresh guest",
+    "catalog_plugin_claims_allowed": false,
+    "admission": "not_evaluated"
+  },
+  "user_action": {
+    "required": true,
+    "command": "Run outputs/acceptance/phase4-p404-stop-stale-sandbox-workers.ps1 in Administrator PowerShell from repository root",
+    "reason": "Codex shell is medium integrity and the agent RunAs elevation request was rejected by execution policy",
+    "current_processes": [
+      {
+        "name": "vmwp.exe",
+        "pid": 48444,
+        "parent_pid": 5032,
+        "created": "2026-10-27T14:06:59.518186+08:00"
+      }
+    ],
+    "registered_hyper_v_vm_count": 0
+  },
+  "evidence": [
+    {
+      "sha256": "e8cab7c5d837d1d2441dd5c9c50244ceaf483f6f307c35fd10e799020e592ee3",
+      "path": "outputs/acceptance/phase4-p404-guest-admission-review-20261028.json"
+    },
+    {
+      "sha256": "141f9a2c5937732bf108982eb6f7b33ca736fec211d3baf7520a40a0219c8401",
+      "path": "outputs/acceptance/phase4-p404-launch-attempt-20261028-v2.json"
+    }
+  ],
+  "boundary": "Planning/readiness evidence only; no native probe or catalog behavior acceptance."
+}

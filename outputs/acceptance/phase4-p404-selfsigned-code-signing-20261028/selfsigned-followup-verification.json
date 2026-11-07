@@ -1,0 +1,74 @@
+{
+  "schema_version": 1,
+  "kind": "phase4_p404_selfsigned_followup_local_verification",
+  "verified_at_utc": "2026-10-28T12:05:29Z",
+  "commit": "810b814430f045ac64631408ec56e2298f9683c5",
+  "status": "passed_local_documentation_and_probe_integrity_only",
+  "checks": [
+    {
+      "command": "pwsh -NoProfile -File init.ps1 -Mode docs",
+      "exit_code": 0,
+      "result": "passed",
+      "documents": 20,
+      "local_links": 494,
+      "indexed_historical_markdown": 15,
+      "features": 31,
+      "failures": []
+    },
+    {
+      "command": "node --test scripts/evidence-hash.test.mjs",
+      "exit_code": 0,
+      "result": "passed",
+      "passed": 4,
+      "failed": 0
+    },
+    {
+      "command": "node .agents/skills/harness-creator/scripts/validate-harness.mjs --target . --json",
+      "exit_code": 0,
+      "result": "passed",
+      "overall": 100
+    },
+    {
+      "command": "node scripts/render-readme.mjs --check",
+      "exit_code": 0,
+      "result": "passed"
+    },
+    {
+      "command": "PowerShell Parser on Run-SelfSignedPydProbe.ps1 and Run-SignedPydLoadProbe.ps1",
+      "exit_code": 0,
+      "result": "passed",
+      "files": 2
+    },
+    {
+      "command": "Python ast.parse on deploy/windows/phase4-p404-selfsigned-signature-probe/load_probe.py",
+      "exit_code": 0,
+      "result": "passed"
+    },
+    {
+      "command": "Verify SHA-256 sidecars for host-inputs.json, selfsigned-pyd-probe.json, selfsigned-signature-review.json, guest-postrun.json, guest-postrun2.json",
+      "exit_code": 0,
+      "result": "passed",
+      "matched": 5,
+      "total": 5
+    },
+    {
+      "command": "Search CurrentUser and LocalMachine Root/TrustedPublisher for test certificate thumbprint 3521DF91D8C1FCC95B5A02E299039D6A87C79831",
+      "exit_code": 0,
+      "result": "absent"
+    },
+    {
+      "command": "wsb list --raw",
+      "exit_code": 0,
+      "result": "passed",
+      "active_sandbox_count": 0
+    },
+    {
+      "command": "git diff --check",
+      "exit_code": 0,
+      "result": "passed"
+    }
+  ],
+  "interpretation": "These checks validate documentation, report hashes, and probe source syntax only. They do not change or pass Windows Enforcement admission or plugin behavior; P4-WINDOWS-BEHAVIOR remains blocked and catalog admission remains not_evaluated.",
+  "review_json_sha256": "7b3be69a418a8adb3ec289f6a028371faff51e379df3f8e82c6ee2cba0da26ae",
+  "review_sha256_excluded_from_this_document": true
+}

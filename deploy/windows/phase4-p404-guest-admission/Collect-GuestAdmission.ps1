@@ -26,26 +26,55 @@ function ConvertTo-PlainObject($Value) {
 function Get-CommandCapture([string] $FilePath, [string[]] $Arguments) {
     $command = Get-Command $FilePath -ErrorAction SilentlyContinue
     if ($null -eq $command) {
-        return [ordered]@{ available = $false; exit_code = $null; stdout = ''; stderr = 'command_not_found' }
+        return [ordered]@{ available = $false; command_path = $null; exit_code = $null; stdout = ''; stderr = 'command_not_found' }
     }
 
-    $stderrPath = Join-Path $env:TEMP ([guid]::NewGuid().ToString() + '.stderr.txt')
+    $process = $null
     try {
-        $stdout = @(& $command.Source @Arguments 2> $stderrPath | Out-String)
-        $exitCode = $LASTEXITCODE
-        $stderr = if (Test-Path -LiteralPath $stderrPath) { Get-Content -Raw -LiteralPath $stderrPath } else { '' }
+        $startInfo = New-Object System.Diagnostics.ProcessStartInfo
+        $startInfo.FileName = $command.Source
+        $startInfo.Arguments = [string]::Join(' ', $Arguments)
+        $startInfo.UseShellExecute = $false
+        $startInfo.CreateNoWindow = $true
+        $startInfo.RedirectStandardOutput = $true
+        $startInfo.RedirectStandardError = $true
+
+        $process = New-Object System.Diagnostics.Process
+        $process.StartInfo = $startInfo
+        if (-not $process.Start()) {
+            throw 'process_start_returned_false'
+        }
+
+        $stdoutTask = $process.StandardOutput.ReadToEndAsync()
+        $stderrTask = $process.StandardError.ReadToEndAsync()
+        $process.WaitForExit()
+        $stdout = $stdoutTask.Result
+        $stderr = $stderrTask.Result
         return [ordered]@{
             available = $true
-            exit_code = $exitCode
-            stdout = ($stdout -join '').TrimEnd()
+            command_path = $command.Source
+            exit_code = $process.ExitCode
+            stdout = ([string]$stdout).TrimEnd()
             stderr = ([string]$stderr).TrimEnd()
         }
     }
     catch {
-        return [ordered]@{ available = $true; exit_code = $null; stdout = ''; stderr = $_.Exception.Message }
-    }
-    finally {
-        Remove-Item -LiteralPath $stderrPath -Force -ErrorAction SilentlyContinue
+        $exitCode = $null
+        if ($process) {
+            try {
+                if ($process.HasExited) { $exitCode = $process.ExitCode }
+            }
+            catch {
+                $exitCode = $null
+            }
+        }
+        return [ordered]@{
+            available = $true
+            command_path = $command.Source
+            exit_code = $exitCode
+            stdout = ''
+            stderr = $_.Exception.ToString()
+        }
     }
 }
 
@@ -62,6 +91,16 @@ catch {
 }
 
 $ciTool = Get-CommandCapture -FilePath 'CiTool.exe' -Arguments @('-lp', '-json')
+$ciToolPolicies = $null
+$ciToolJsonError = $null
+if ($ciTool.exit_code -eq 0 -and -not [string]::IsNullOrWhiteSpace($ciTool.stdout)) {
+    try {
+        $ciToolPolicies = ConvertFrom-Json -InputObject $ciTool.stdout -ErrorAction Stop
+    }
+    catch {
+        $ciToolJsonError = $_.Exception.Message
+    }
+}
 $events = [System.Collections.Generic.List[object]]::new()
 $eventErrors = [System.Collections.Generic.List[object]]::new()
 foreach ($eventId in $eventIds) {
@@ -114,12 +153,14 @@ $report = [ordered]@{
             usermode_code_integrity_policy_enforcement_status = $deviceGuard.UsermodeCodeIntegrityPolicyEnforcementStatus
             security_services_configured = @($deviceGuard.SecurityServicesConfigured)
             security_services_running = @($deviceGuard.SecurityServicesRunning)
-            code_integrity_policies_enforced = @($deviceGuard.CodeIntegrityPoliciesEnforced)
-            code_integrity_policies_audit = @($deviceGuard.CodeIntegrityPoliciesAudit)
+            code_integrity_policies_enforced = $deviceGuard.CodeIntegrityPoliciesEnforced
+            code_integrity_policies_audit = $deviceGuard.CodeIntegrityPoliciesAudit
         }
     } else { $null }
     win32_device_guard_error = $deviceGuardError
     citool_list_policies = $ciTool
+    citool_policy_inventory = $ciToolPolicies
+    citool_json_error = $ciToolJsonError
     code_integrity_event_ids = $eventIds
     code_integrity_events_collected = $events.Count
     code_integrity_event_errors = @($eventErrors)

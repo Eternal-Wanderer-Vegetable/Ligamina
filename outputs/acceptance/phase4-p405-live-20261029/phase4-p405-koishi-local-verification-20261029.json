@@ -1,0 +1,46 @@
+{
+  "schema_version": 1,
+  "kind": "phase4_p405_koishi_local_verification",
+  "created_at_utc": "2026-10-29T00:38:27.5868921Z",
+  "result": "passed_scoped_local_only",
+  "runtime": {
+    "npm": "12.0.2",
+    "docker_image": "ligamina-p405-koishi-profile:20261029",
+    "docker_image_id": "sha256:5d35fea26296986651cf398ae7df48d22afb582e9d2de6ed6ec1bb32c5f1dbaf",
+    "node": "v24.22.1",
+    "host_package_lock_sha256": "5e3df82b0c353a8ded6c32708a8a591d9854182a38c6af9924c3e2671862bbcb"
+  },
+  "candidate": {
+    "package": "@koishijs/plugin-echo",
+    "artifact_sha256": "79da39692ba8fce04ea597ff85696a0fe193cd89a95a91a0d459ea40ab592265",
+    "version": "2.2.5",
+    "profile_lock_sha256": "33e0897b794134c39215e7824a47edec3eb4acc79fcb9f4df00a03c1455f616b"
+  },
+  "automated_suite": {
+    "failed": 0,
+    "tests": 8,
+    "test_source_sha256": "8ad845b6ba3a31ef6e57a118022066759899c6bce90b358fb6c2b216b888063e",
+    "passed": 8,
+    "command": "cd hosts/koishi && npm test",
+    "skipped": 0,
+    "build": "passed"
+  },
+  "direct_host_probe": {
+    "script": "outputs/acceptance/phase4-p405-live-20261029/direct-host-probe.mjs",
+    "script_sha256": "eeece3190f308523dd338e2caf141735c9d30d23eff9ecffd9db3f4e3c678ff6",
+    "external_platform_write": false,
+    "target_kind": "group",
+    "event_dispatched": true,
+    "container_run_exit_code": 0,
+    "command": "docker run --rm --network none --read-only --tmpfs /tmp --user 10001:10001 --cap-drop ALL --security-opt no-new-privileges --pids-limit 64 --memory 512m --cpus 1 ... node /tmp/direct-host-probe.mjs",
+    "virtual_platform_receipt": true,
+    "operation_count": 1,
+    "operation": "send_message"
+  },
+  "boundaries": {
+    "P4_FIELD": "blocked",
+    "customer_gateway_http": false,
+    "platform_delivery": false,
+    "real_platform_ingress": false
+  }
+}

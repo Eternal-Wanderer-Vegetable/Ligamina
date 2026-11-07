@@ -57,7 +57,7 @@ target\debug\ligamina-cli.exe report outputs/acceptance/t13-representative-windo
 
 ## 记录验证
 
-记录命令、退出码、环境、commit/dirty 和证据路径。区分本机测试、托管 CI、干净安装与真实平台验收。S2-09 已对 NoneBot Linux 与 Koishi Linux/Windows 的分层 cohort 接通隔离安装和 native-load pilot；行为 fixture 尚未派发，Windows NoneBot 受 App Control 限制而保持 unknown。重建 acceptance 时需传入完整的 NoneBot/Koishi/Linux/Windows 三份平台报告，命令见[兼容性指南](compatibility.md#s2-09-分层-pilot已完成)。
+记录命令、退出码、环境、commit/dirty 和证据路径。区分本机测试、托管 CI、干净安装与真实平台验收。S2-09 已对 NoneBot Linux 与 Koishi Linux/Windows 的分层 cohort 接通隔离安装和 native-load pilot；行为 fixture 尚未派发，Windows NoneBot 受 App Control 限制而保持 unknown。P4-04 新证据将 Koishi 单个 Windows Native Host case 三次通过限定为 `passed_native_scoped`；签名 CPython 3.12.10 的 NoneBot profile 则在冻结的 `pydantic-core` 扩展上收到匹配的 Enforcement Event 3077，不能记为插件失败或通过。另一次 Sandbox-only 自签名 `.pyd` 实验中，guest-local Authenticode/SignTool 验证成功但 `LoadLibrary` 仍报 Win32 4551；该轮只捕获当前策略 Event 3099，没有目标文件匹配的 3077/3089，因此 hash/activity 归因未闭合，详见 [self-signed review](../../outputs/acceptance/phase4-p404-selfsigned-code-signing-20261028/selfsigned-signature-review.json)。完整 CiTool policy inventory 仍 unknown，综合结论见 [P4-04 review](../../outputs/acceptance/phase4-p404-policy-preflight-20261028-v3.json)。重建 acceptance 时需传入完整的 NoneBot/Koishi/Linux/Windows 三份平台报告，命令见[兼容性指南](compatibility.md#s2-09-分层-pilot已完成)。
 
 S2-04 双平台运行时探针可复跑：`uv run --locked --project hosts/nonebot --python 3.12.14 python deploy/lab/linux/probes/acceptance.py` 与 `uv run --locked --project hosts/nonebot --python 3.12.14 python deploy/lab/windows/probes/acceptance.py`。它们只运行 benign isolation probes，不下载或执行 catalog 插件；结果写入 `outputs/acceptance/phase2-workers-*-20261012.json`。
 

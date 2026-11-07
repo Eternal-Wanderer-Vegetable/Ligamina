@@ -1,0 +1,48 @@
+{
+  "schema_version": 1,
+  "kind": "phase4_p405_stella_webui_control_attempt",
+  "created_at_local": "2026-10-30T09:10:21.792+08:00",
+  "result": "blocked_local_ui_automation_initialization",
+  "scope": "existing authenticated Stella WebUI at loopback 127.0.0.1:8080",
+  "preflight": {
+    "webui_root_http_status": 200,
+    "webui_title": "Stella 控制台",
+    "controller_reachable": true,
+    "controller_pid": 32376,
+    "core_phase": "ready",
+    "core_pid": 30740,
+    "desired_revision": "6OGyqc2hTaURqz9G91rn3sHETvgtXpBz",
+    "applied_revision": "nmzdFZbbvPABKGwGkt69kA69v85K-V1-",
+    "desired_bridge_setting_count": 9,
+    "applied_bridge_setting_count": 0,
+    "external_conflict": false,
+    "extension_import_logged": true,
+    "bridge_enabled_logged": false,
+    "gateway_lease_logged": false
+  },
+  "automation_attempts": [
+    {
+      "surface": "mcp__cua_repl.js",
+      "step": "getState",
+      "result": "failed_before_window_state_or_ui_action",
+      "error": "failed to write kernel assets: system path not found (OS error 3)"
+    },
+    {
+      "surface": "mcp__node_repl__js with @oai/sky",
+      "step": "initialize computer-use runtime",
+      "result": "failed_before_window_enumeration_or_ui_action",
+      "error": "failed to write kernel assets: system path not found (OS error 3)"
+    }
+  ],
+  "actions_performed": [
+    "Read-only HTTP GET of the Stella WebUI root returned HTTP 200 and title Stella 控制台.",
+    "Read-only managed status confirmed controller reachable and Core ready on the previously applied revision.",
+    "Read the existing sanitized local-readiness report."
+  ],
+  "ui_controls_clicked": 0,
+  "configuration_changed": false,
+  "credential_values_read_or_written": false,
+  "message_sent": false,
+  "old_direct_snowluma_operations_replayed": false,
+  "next_action": "Authenticated operator applies the pending desired revision in the existing Stella WebUI; then verify desired/applied revision equality, bridge enabled groups=1, and active Gateway lease before asking for a fresh user-triggered marker message."
+}

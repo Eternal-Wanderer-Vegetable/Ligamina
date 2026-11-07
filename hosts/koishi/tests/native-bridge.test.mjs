@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict'
-import { mkdtemp, rm } from 'node:fs/promises'
+import { mkdtemp, rm, writeFile } from 'node:fs/promises'
 import { tmpdir } from 'node:os'
 import { join, resolve } from 'node:path'
 import { pathToFileURL } from 'node:url'
@@ -114,6 +114,51 @@ test('native Koishi Session dispatch preserves quote/direct identity, authority,
     await lifecycle.start()
     const persisted = await lifecycle.app.database.getUser('onebot.v11', '23', ['authority'])
     assert.equal(persisted.authority, 3)
+  } finally {
+    await lifecycle.stop()
+    await rm(dataDirectory, { recursive: true, force: true })
+  }
+})
+
+test('HostLifecycle resolves a CommonJS Koishi plugin object through its apply export', async () => {
+  const dataDirectory = await mkdtemp(join(tmpdir(), 'ligamina-koishi-cjs-'))
+  const modulePath = join(dataDirectory, 'commonjs-plugin.cjs')
+  const calls = []
+  const pluginSource = `module.exports = {
+  name: 'ligamina.test.commonjs-apply',
+  apply(ctx) {
+    ctx.command('cjs.echo <message:text>').action(async ({ session }, message) => {
+      await session.send('cjs:' + message)
+    })
+  }
+}\n`
+  await writeFile(modulePath, pluginSource, 'utf8')
+  const pluginUrl = pathToFileURL(modulePath).href
+  const lifecycle = new HostLifecycle({
+    hostId: 'koishi-test',
+    platformCall: async (operation) => {
+      calls.push(operation)
+      return { status: 'succeeded', platform_message_id: `sent-${calls.length}` }
+    },
+    dataDirectory,
+    plugins: [pluginUrl],
+    nicknames: ['Bot'],
+  })
+  try {
+    await lifecycle.start()
+    await lifecycle.app.database.createUser('onebot.v11', '23', { authority: 3 })
+    await lifecycle.adapter.dispatch(envelope({
+      eventId: 'commonjs-apply',
+      traceId: 'trace-commonjs-apply',
+      conversation: { kind: 'group', id: '91' },
+      messageId: '901',
+      message: [{ type: 'text', text: 'cjs.echo alpha' }],
+    }))
+    const send = calls.find((operation) => operation.operation === 'send_message')
+    assert.ok(send)
+    assert.deepEqual(send.params.message, [{ type: 'text', text: 'cjs:alpha' }])
+    assert.deepEqual(send.target, { kind: 'group', id: '91' })
+    assert.equal(send.trace_id, 'trace-commonjs-apply')
   } finally {
     await lifecycle.stop()
     await rm(dataDirectory, { recursive: true, force: true })
