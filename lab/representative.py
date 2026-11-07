@@ -719,10 +719,64 @@ def api_request(base_url: str, method: str, path: str, token: str, body: Any = N
     return json.loads(raw) if raw else None
 
 
+def _tool_name_part(value: str) -> str:
+    """Mirror the Core's MCP tool-name sanitizing (crates/ligamina-cli/src/mcp.rs)."""
+    return "".join(char if char.isascii() and (char.isalnum() or char in "_-.") else "_" for char in value)
+
+
+def _run_tool_steps(url: str, token: str, host_id: str, steps: list[list[dict[str, Any]]]) -> dict[str, Any]:
+    from lab.mcp_http import McpError, McpHttpClient
+
+    client = McpHttpClient(url, token)
+    initialize = client.initialize()
+    tool_names = sorted(tool["name"] for tool in client.list_tools() if tool.get("name", "").startswith("cmd."))
+    recorded: list[list[dict[str, Any]]] = []
+    for step in steps:
+        outcomes: list[dict[str, Any] | None] = [None] * len(step)
+
+        def call(index: int, spec: dict[str, Any]) -> None:
+            name = f"cmd.{_tool_name_part(host_id)}.{_tool_name_part(str(spec['command_id']))}"
+            record: dict[str, Any] = {"command_id": spec["command_id"], "tool": name, "arguments": spec.get("arguments", {})}
+            try:
+                response = client.call_tool(name, spec.get("arguments", {}))
+                structured = response.get("structuredContent") or {}
+                record.update({
+                    "is_error": response.get("isError") is True,
+                    "replies": [message.get("text", "") for message in structured.get("messages", [])],
+                    "segments": [message.get("segments", []) for message in structured.get("messages", [])],
+                    "refused_operations": structured.get("refused_operations", []),
+                    "dispatch": structured.get("dispatch"),
+                    "error_text": None if structured else "".join(
+                        block.get("text", "") for block in response.get("content", []) if isinstance(block, dict)
+                    )[:500],
+                })
+            except McpError as error:
+                record.update({"is_error": True, "protocol_error": str(error)[:500], "replies": [], "refused_operations": []})
+            outcomes[index] = record
+
+        threads = [threading.Thread(target=call, args=(index, spec), daemon=True) for index, spec in enumerate(step)]
+        for thread in threads:
+            thread.start()
+        for thread in threads:
+            thread.join(timeout=90)
+        recorded.append([outcome or {"command_id": None, "is_error": True, "protocol_error": "call did not finish"} for outcome in outcomes])
+    return {
+        "protocol_version": initialize.get("protocolVersion"),
+        "server": initialize.get("serverInfo", {}).get("name"),
+        "listed_command_tools": tool_names,
+        "steps": recorded,
+    }
+
+
 def run_federated(
     sample: dict[str, Any], work: Path, host_environment: dict[str, str], events: list[dict[str, Any]],
     *, profile_work: Path | None = None,
+    tool_calls: list[list[dict[str, Any]]] | None = None,
 ) -> dict[str, Any]:
+    """Run events through Core/Host/Gateway, or with ``tool_calls`` call the Host's
+    native commands as MCP tools (ADR 0002). Each step is a list of calls run
+    concurrently; steps run in order. The virtual Gateway still runs and must stay idle.
+    """
     configured_executable = host_environment.get("LIGAMINA_CORE_EXECUTABLE")
     executable = (
         Path(configured_executable)
@@ -795,6 +849,8 @@ def run_federated(
                    "max_tracked_conversations": 64, "max_concurrent_conversations": 8,
                    "processing_timeout_ms": 30000},
     }
+    if tool_calls is not None:
+        config["command_tools"] = {"enabled": True, "allow": [f"cmd.{_tool_name_part(host_id)}.*"]}
     config_path = work / "daemon.json"
     config_path.write_text(json.dumps(config, ensure_ascii=False, indent=2), encoding="utf-8")
     core_environment = isolated_environment(work / "core-environment", work / "shared-cache")
@@ -889,6 +945,8 @@ def run_federated(
         ]
         for gateway_thread in gateway_threads:
             gateway_thread.start()
+        if tool_calls is not None:
+            result["tool_calls"] = _run_tool_steps(f"{base_url}/mcp", client_token, host_id, tool_calls)
         statuses = []
         for event in events:
             accepted = api_request(base_url, "POST", "/v1/events", client_token, event, expected=(202,))
