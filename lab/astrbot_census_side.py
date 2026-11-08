@@ -52,7 +52,7 @@ def install() -> dict:
     return {"status": "installed", "seconds": round(time.monotonic() - started, 1)}
 
 
-async def load(plugin_dir: Path) -> dict:
+async def load(plugin_dir: Path, settle: list) -> dict:
     sys.path.insert(0, str(INPUT / "project" / "hosts" / "astrbot"))
     from ligamina_astrbot.lifecycle import HostLifecycle
 
@@ -64,17 +64,20 @@ async def load(plugin_dir: Path) -> dict:
 
     lifecycle = HostLifecycle(host_id="census", platform_call=platform_call, data_dir=WORK / "astrbot")
     started = time.monotonic()
-    await asyncio.wait_for(lifecycle.start([str(plugin_dir)]), timeout=240)
     try:
-        from astrbot.core.star.star import star_registry
+        await asyncio.wait_for(lifecycle.start([str(plugin_dir)]), timeout=240)
+        from astrbot.core.star.star import star_map, star_registry
         from ligamina_astrbot.commands import describe_commands
 
         manager = lifecycle.core.plugin_manager
         failed = {name: {"error": str(info.get("error", ""))[:600], "traceback_tail": str(info.get("traceback", ""))[-1200:]}
                   for name, info in (manager.failed_plugin_dict or {}).items()}
+        # star_map (module path -> metadata) is what AstrBot dispatches handlers through and what
+        # commands.py reads; star_registry can miss plugins that are loaded and dispatchable.
         loaded = [
-            {"name": star.name, "version": star.version, "activated": bool(star.activated), "root_dir": star.root_dir_name}
-            for star in star_registry if not star.reserved
+            {"name": star.name, "version": star.version, "activated": bool(star.activated), "root_dir": star.root_dir_name,
+             "in_star_registry": any(item is star for item in star_registry)}
+            for star in {id(meta): meta for meta in star_map.values()}.values() if not star.reserved
         ]
         commands = describe_commands(lifecycle.wake_prefix())
         return {
@@ -85,7 +88,37 @@ async def load(plugin_dir: Path) -> dict:
             "startup_sends": len(sends),
         }
     finally:
-        await lifecycle.stop()
+        # The verdict is emitted by the caller; teardown is skipped (see census()).
+        if lifecycle.core is not None:
+            settle.append(lifecycle)
+
+
+def verdict(plugin_dir: Path, install_result: dict, load_result: dict) -> dict:
+    ours = [star for star in load_result["loaded_plugins"] if star["root_dir"] == plugin_dir.name]
+    if load_result["failed_plugins"]:
+        status, reason = "failed", "plugin_load_failed"
+    elif ours and all(star["activated"] for star in ours):
+        status, reason = "passed", None
+    elif ours:
+        status, reason = "failed", "plugin_not_activated"
+    else:
+        status, reason = "failed", "plugin_not_registered"
+    return {"status": status, "reason_code": reason, "install": install_result, "load": load_result}
+
+
+async def census(plugin_dir: Path, install_result: dict) -> None:
+    settle: list = []
+    try:
+        result = verdict(plugin_dir, install_result, await load(plugin_dir, settle))
+    except asyncio.TimeoutError:
+        result = {"status": "unknown", "reason_code": "astrbot_startup_timeout", "install": install_result}
+    except Exception as error:  # the Host itself failed, not necessarily the plugin
+        result = {"status": "unknown", "reason_code": "host_startup_failed", "install": install_result,
+                  "diagnostic": f"{type(error).__name__}: {str(error)[:500]}"}
+    emit(result)
+    # No AstrBot teardown: core.stop() was observed to block the loop indefinitely (and to ignore
+    # cancellation) in network-disabled Workers. The Worker is discarded, so main() hard-exits.
+    del settle
 
 
 def main() -> None:
@@ -99,25 +132,13 @@ def main() -> None:
     if install_result["status"] == "failed":
         emit({"status": "failed", "reason_code": "dependency_install_failed", "install": install_result})
         return
+    loop = asyncio.new_event_loop()
     try:
-        load_result = asyncio.run(load(plugin_dir))
-    except asyncio.TimeoutError:
-        emit({"status": "unknown", "reason_code": "astrbot_startup_timeout", "install": install_result})
-        return
-    except Exception as error:  # the Host itself failed, not necessarily the plugin
-        emit({"status": "unknown", "reason_code": "host_startup_failed", "install": install_result,
-              "diagnostic": f"{type(error).__name__}: {str(error)[:500]}"})
-        return
-    ours = [star for star in load_result["loaded_plugins"] if star["root_dir"] == plugin_dir.name]
-    if load_result["failed_plugins"]:
-        status, reason = "failed", "plugin_load_failed"
-    elif ours and all(star["activated"] for star in ours):
-        status, reason = "passed", None
-    elif ours:
-        status, reason = "failed", "plugin_not_activated"
-    else:
-        status, reason = "failed", "plugin_not_registered"
-    emit({"status": status, "reason_code": reason, "install": install_result, "load": load_result})
+        loop.run_until_complete(census(plugin_dir, install_result))
+    finally:
+        # Skip asyncio.run's default-executor join (up to 300 s on 3.12) and non-daemon thread joins.
+        sys.stderr.flush()
+        os._exit(0)
 
 
 if __name__ == "__main__":
