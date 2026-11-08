@@ -32,7 +32,7 @@
 | AB-02 / feat-038 | AB-01 | 事件路径对齐：@ 与引用、图片、管理员映射与权限过滤、`send_by_session` 主动发送（经账本）、平台适配器类型兼容策略（是否以 `aiocqhttp` 名义注册） | 每项有原生语义测试；不支持的 API 显式 `unsupported_api`；2026-11-08 完成（`tests/event_parity.py`；不以 `aiocqhttp` 名义注册，见第 4 节） |
 | AB-03 / feat-039 | AB-01 | 冻结 AstrBot 插件目录：市场快照 + 自行计算的下载包 SHA-256、按插件冻结依赖锁、不可复现条目的明确终态 | 与第二阶段目录合同同等的可复核快照与锁；不执行插件；2026-11-08 完成（`ab-15937e90d26b7caf9d12`：3,271 条，3,265 冻结，3 条超过 64 MB 下载上限，3 条缺 `main.py`） |
 | AB-04 / feat-040 | AB-03 | Linux Docker Worker 中的 AstrBot 安装/加载普查与 pilot（预装依赖、禁网、禁止运行时 pip） | 账本闭合、清理确认；失败与 unknown 按既有规则留账；2026-11-08 pilot 完成（见 3.1） |
-| AB-05 / feat-041 | AB-04 | 选定 AstrBot 插件的工具级与 Native/Federated 行为验收 | 独立 Oracle、三次 fresh 运行、清理确认；结果单列，不扩大其他框架结论 |
+| AB-05 / feat-041 | AB-04 | 选定 AstrBot 插件的工具级与 Native/Federated 行为验收 | 独立 Oracle、三次 fresh 运行、清理确认；结果单列，不扩大其他框架结论；2026-11-08 工具级完成（见 3.2） |
 
 ### 3.1 AB-04 pilot 结果（2026-11-08）
 
@@ -47,6 +47,21 @@ pilot 过程中修正的三个 harness 问题（v2、v3 报告作废，未入库
 1. Worker 端在 AstrBot 停止之后才输出结论，而 `core.stop()` 在禁网 Worker 中无限期阻塞事件循环（且不响应取消），使每个插件都撞上 420 s 超时。现在先输出结论再直接退出，Worker 随即销毁。
 2. 加载判定改读 `star_map`（处理器分发与 `commands.py` 使用的映射）。`astrbot_plugin_provider_hub` 已加载、可分发，却不在 `star_registry` 中；报告逐行记录 `in_star_registry`。
 3. 插件目录名按 AstrBot 安装器规则取 `metadata.yaml` 的 `name`（须为合法标识符，否则回退到归档根目录名，并记录来源）。插件会写死 `data.plugins.<name>` 导入路径，此前以归档根目录名（带提交哈希）命名导致误判失败。
+
+补记：v4 中有两行回退到归档根目录名。`astrbot_plugin_media302-save` 的 name 含连字符，回退正确；`astrbot_plugin_teamup` 的 metadata.yaml 以 UTF-8 BOM 开头，当时的解析漏读了 name（AB-05 中发现并修正，该行仍为 passed，结论不变）。
+
+### 3.2 AB-05 工具级行为验收（2026-11-08）
+
+[campaign report](../../outputs/acceptance/ab05-astrbot-tool-linux-20261108-v1.json)，SHA-256 `fde3e4e900d699f6e5bcaff16bbaa98db4956e02079212bb162f80b1a23567c8`；gate `astrbot_tool_linux=passed_scoped`。
+
+- 对象：AB-04 中加载成功、且有离线可判定命令的三个插件——`astrbot_plugin_teamup`（plain）、`astrbot_plugin_gallery`（platform_specific）、`astrbot_plugin_pet`（platform_specific，离线安装 9 个 wheel）。其余插件依赖 LLM、外网或真实平台，不适合离线判定。
+- 用例：[astrbot-tool-cases.json](../../contracts/lab/automation/tools/v1/astrbot-tool-cases.json)，8 个（正例、负例、权限/隔离），含并发步骤与“无回复”断言。Oracle 由冻结归档的源码静态推导（不运行插件），每条期望回复引用文件摘要、行号以及字符串常量或原文；编排器派发前逐条复核 28 处引用，文本或源码漂移即拒绝。AstrBot 原生权限拒绝的回复引用 AstrBot 4.29.1 源码，并以正则匹配每次调用不同的 `tool-actor-<uuid>`。Worker 只收到 stimulus。
+- 执行：`lab/astrbot_tool_campaign.py`，每个用例 3 次，每次一个全新的已准入禁网 Worker（镜像 [astrbot-tool-runtime.Dockerfile](../../deploy/lab/linux/astrbot/astrbot-tool-runtime.Dockerfile)：AB-04 镜像只替换 Core 二进制，`ligamina-astrbot-tool-runtime@sha256:07b6a1ae5a1a3c659294da7abd966f93de54aacd1055fb13efb25762e91b5ba0`）。Worker 内运行真实 Core 守护进程与 AstrBot Host，经 MCP 调用插件命令；虚拟 Gateway 持有租约且必须空闲。
+- 结果：24/24 通过，24 个不同 Worker，清理全部确认；54 次工具调用，Gateway 操作 0；Core 均以 0 退出，Host 进程均已回收。单个 Worker 最长 8 s、峰值内存 255 MB。
+- 首次证明的 authority 路径：匿名工具调用者被插件自身的管理员检查（teamup 的创建/重置）和 AstrBot 原生 `PermissionType.ADMIN` 过滤（gallery、pet）拒绝，且被拒绝的创建没有留下状态。补上了 TOOL-04 中未被触发的 authority 拒绝路径（那次是 Koishi 在参数校验阶段就拒绝了）。
+- 过程中发现并修复的 Core 缺陷：MCP 工具名只允许 ASCII，非 ASCII 字符一律替换为 `_`，中文命令名因此全部塌缩为同样的下划线并被当作歧义丢弃（teamup 的 13 个命令一个都不会暴露）。现在清洗改变原值时追加 `-` 与原名 SHA-256 的前 8 位十六进制，ASCII 名称不变，TOOL-04 证据不受影响。
+- 范围：工具级。市场插件的 Native（真实平台对照）与 Federated（经 Core 事件与 Gateway）行为未覆盖：前者需要真实 QQ/aiocqhttp 环境，后者在 AB-02 中以自写插件验证了事件路径语义，未对市场插件逐个复验。
+
 
 ## 4. 已知限制
 

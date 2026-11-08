@@ -32,7 +32,7 @@ It is also a compatibility lab: official plugin catalogs are frozen with our own
 | --- | --- |
 | Core, Koishi and NoneBot Hosts, HTTP and MCP | Working; Phase 1 acceptance passed (4 exact plugin versions behavior-verified) |
 | MCP command tools (Koishi, NoneBot, AstrBot) | Working; frozen catalog plugins passed 18/18 tool-level runs in network-disabled Linux Workers |
-| AstrBot Host | Working on the unmodified framework; event-path parity tested; market catalog frozen (3,265 plugins); install/load pilot 21/24 loaded in network-disabled Linux Workers; behavior acceptance next ([plan](docs/plans/2026-11-07-phase-5-astrbot-host.md)) |
+| AstrBot Host | Working on the unmodified framework; event-path parity tested; market catalog frozen (3,265 plugins); install/load pilot 21/24 loaded in network-disabled Linux Workers; tool-level behavior of 3 market plugins passed 24/24 runs ([plan](docs/plans/2026-11-07-phase-5-astrbot-host.md)) |
 | Catalog-wide compatibility | Not claimed. Census and recovery ledgers are closed, but behavior and automation gates remain blocked (details in [简体中文](README.zh-CN.md)) |
 | Real-platform delivery | Blocked: the tool path works up to the bot, but the first test bot's own delivery check drops tool replies (reported to that bot) |
 | Windows Sandbox Enforcement | Blocked on a signing identity accepted by the current App Control policy |

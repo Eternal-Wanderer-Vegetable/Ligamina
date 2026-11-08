@@ -19,7 +19,7 @@ Ligamina 让 **Koishi**、**NoneBot** 和 **AstrBot** 的聊天机器人插件�
 | --- | --- |
 | Core、Koishi 与 NoneBot Host、HTTP 与 MCP | 可用；第一阶段验收通过（4 个精确插件版本通过行为验证） |
 | MCP 命令工具（Koishi、NoneBot、AstrBot） | 可用；冻结目录插件在禁网 Linux Worker 中工具级运行 18/18 通过 |
-| AstrBot Host | 基于未修改的 AstrBot 4.29.1 可用；事件路径对齐已测试；市场目录已冻结（3,265 个插件）；禁网 Linux Worker 安装/加载 pilot 24 个中 21 个加载成功；下一步行为验收（[计划](docs/plans/2026-11-07-phase-5-astrbot-host.md)） |
+| AstrBot Host | 基于未修改的 AstrBot 4.29.1 可用；事件路径对齐已测试；市场目录已冻结（3,265 个插件）；禁网 Linux Worker 安装/加载 pilot 24 个中 21 个加载成功；3 个市场插件的工具级行为 24/24 次通过（[计划](docs/plans/2026-11-07-phase-5-astrbot-host.md)） |
 | 目录级兼容性 | 不作声明。普查与恢复账本已闭合，但行为与自动化 gate 仍阻塞（见下方阶段结果） |
 | 真实平台投递 | 阻塞：工具链路已到达 bot，但首个测试 bot 自身的投递校验丢弃了工具回复（已向该 bot 报告） |
 | Windows Sandbox Enforcement | 阻塞：需要当前 App Control 策略认可的签名身份 |
