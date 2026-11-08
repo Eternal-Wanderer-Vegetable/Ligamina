@@ -335,8 +335,11 @@ async fn cleanup_runs_once_per_launch_after_crash_and_after_shutdown() {
     })
     .await
     .expect("cleanup after the crash");
+    // The state stays Active at the crashed epoch until the cleanup process has exited,
+    // so wait for the restarted launch, not just any Active status.
+    let crashed_epoch = first.epoch();
     wait_for_status(&supervisor, "cleanup", |status| {
-        status.state == HostState::Active
+        status.state == HostState::Active && status.epoch > crashed_epoch
     })
     .await;
 
