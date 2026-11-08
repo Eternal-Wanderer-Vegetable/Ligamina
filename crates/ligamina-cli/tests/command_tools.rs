@@ -209,11 +209,11 @@ async fn koishi_commands_are_listed_and_callable_as_mcp_tools_without_a_gateway(
         json!({ "arguments": "x", "value": "y" }),
     )
     .await
-    .expect("invalid arguments are reported in the tool result");
+    .unwrap();
     assert_eq!(
-        mixed.is_error,
-        Some(true),
-        "raw and structured input together are rejected"
+        first_text(&mixed),
+        "x",
+        "raw text wins over structured fields when both are given"
     );
 
     let result = call(

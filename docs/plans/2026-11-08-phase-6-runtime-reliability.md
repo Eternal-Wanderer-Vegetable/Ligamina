@@ -101,7 +101,25 @@ P6-01 与 P6-02 合为下一个里程碑：P6-02 不需要真实账号，先行�
 
 第一轮的回复已经送达群里，说明能力直回投递门的修复有效。其他群员把 `@机器人名` 当文字输入（不是 QQ 的 @ 提及），按设计不触发。运行后 Core 的 Gateway 操作 0、容器残留 0；Stella 的工作区与两份配置已恢复（哈希与备份一致），并按原方式（LM Studio、MCP 关闭）重启。
 
-未完成：feat-030 要求的隔离、重复/重启、超时/unknown 各三次未执行；Stella PR #132 未合并。
+未完成（已由 3.1c 补齐重启与超时）：feat-030 要求的隔离、重复/重启、超时/unknown 各三次；Stella PR #132 已合并。
+
+### 3.1c P6-01 场景轮：负例、重启、超时（2026-11-08）
+
+在 P6-03 之后整体执行，路径与 3.1b 相同，但三个 Host 都以 untrusted 等级运行在 Core 生成的隔离容器中；Stella 以 main + PR #133 的补丁临时运行。用户发送全部消息并确认回复。报告 [p6-p601-qq-scenarios-20261108.json](../../outputs/acceptance/p6-p601-qq-scenarios-20261108.json)（SHA-256 `413acca7b595e6ce75ef9d3d0b7b68933ac7ddbd10fb9407359b9a338c8e967e`，不含 QQ 号与群号），由 `lab/field/qq_round.py`（日志解析与重启监视）与 `lab/field/qq_round_timeout.py`（暂停容器）驱动。
+
+| 生态 | 正例 | 负例/越权 | Core 重启后首调 | Host 超时 |
+| --- | --- | --- | --- | --- |
+| NoneBot Roll | 4 | 3（0d6 插件报错） | 3 | 3 |
+| Koishi Echo | 3 | 3（`-u` 跨会话发送被插件拒绝） | 5 | 3 |
+| AstrBot Teamup | 3 | 3（非管理员创建组队被拒） | 5 | 3 |
+
+- 重启：每条回复送达后重启现场 Core（新 epoch、MCP 会话终止、新容器）。重启窗口内到达的 4 条消息各得一次兜底回复，无重复，不计为失败。
+- 超时：暂停全部 Host 容器后 9/9 在 Core 的 30 s 命令期限结束，Stella 各发一次兜底；恢复后 120 s 内无迟到回复，容器存活。
+- 本轮发现并修复：本仓库 `d1fadb1`（非空 `arguments` 优先于结构化字段）、`9b62520`（Windows 上 Host 与清理进程不再弹控制台窗口，关闭窗口曾杀死 Host）；Stella PR #133 的 `0ad3d59`、`5efd679`（Core 重启后工具目录失效）。
+- 不计入的 Stella 行为：同一用户前一轮未结束时的新消息被丢弃 1 次；路由把两条 `-u` 消息判为闲聊（语义分 0.65 < 0.70）；其他群员复制的纯文本不含 QQ 提及，按设计不触发。
+- 运行后 Gateway 操作 0、容器残留 0；Stella 工作区与配置已恢复并按原方式重启。
+
+未完成：重复事件投递（同一 OneBot 事件两次）无法由用户发送产生，未执行；MCP 路径不经 Core Gateway 账本，feat-030 要求的去重/账本状态证据需另以受控注入补齐。feat-030 因此为 in-progress，不是 done。
 
 ### 3.2 P6-03 结果（2026-11-08）
 
@@ -119,26 +137,16 @@ P6-01 与 P6-02 合为下一个里程碑：P6-02 不需要真实账号，先行�
 - 现场验收 `lab/field/isolation_acceptance.py`（WSL Docker，三次独立运行全部通过，[run1](../../outputs/acceptance/p6-p603-isolation-20261108-run1.json) SHA-256 `95baa81d6817f683ecc58a1ae2382842bf568ea59b712c561be9a23f88793822`）：五类不安全配置均被拒绝且错误写明规则；预先放置的遗留容器在启动时被清理；三个 Host 容器的 `docker inspect` 显示网络 none、只读根、CapDrop ALL、no-new-privileges、PIDs/内存/CPU 限制、绑定挂载只读、AutoRemove；结束某个 Host 的 docker 客户端后旧容器被删除、Host 以新 epoch 在新容器中重启；停止后无残留。
 - 用 Core 生成的隔离配置复跑 Stella MCP 层级 1：三轮 27/27，Gateway 操作 0，容器残留 0（`outputs/acceptance/p6-stella-mcp-field-20261108-p603/`）。
 
-### 3.3 P6-04 能力描述（待实施）
+### 3.3 P6-04 结果（2026-11-08）
 
-每个插件版本一条，替代单一的“支持 / 不支持”：
+[兼容性矩阵摘要](../../outputs/compat/compatibility-matrix-v1.md)与同名 JSON（8,961 个目录条目，537 个证据源）由 `lab/compat_matrix.py` 从已提交的证据生成，格式由 [schema](../../contracts/lab/compat/v1/compatibility-matrix.schema.json) 约束，口径写在矩阵摘要开头，入口见[兼容性实验](../guides/compatibility.md#当前支持范围)。
 
-```json
-{
-  "plugin": "example-plugin",
-  "framework": "astrbot",
-  "artifact_sha256": "<冻结归档哈希>",
-  "capabilities": {
-    "mcp_tool": "verified",
-    "federated_event": "untested",
-    "proactive_send": "requires_gateway",
-    "native_platform_api": "unsupported"
-  },
-  "evidence": ["outputs/acceptance/<report>.json#<case-id>"]
-}
-```
-
-取值：`verified`、`failed`、`skipped`、`unknown`、`untested`，以及说明性的 `requires_gateway`、`unsupported`。`verified` 必须引用证据；静态推断（如插件引用 `aiocqhttp` 原生客户端）只能得到 `unsupported` 或 `untested`，不能得到 `verified`。MCP 工具列表可据此隐藏或标注在虚拟会话中无法正常工作的命令。
+- 能力维度：`load`（按平台）、`mcp_tool`、`federated_event`、`platform_delivery`；取值 `verified` / `failed` / `skipped` / `unknown` / `untested`。最初设想的 `native_platform_api` 没有系统性证据，未加入，避免靠静态推断给出结论。
+- 证据链：每条 `verified` / `failed` 都引用证据文件、其 SHA-256 与文件内记录；矩阵记录全部证据源的哈希，任何证据变化而矩阵未重建时 `check` 失败。`scope` 写明覆盖范围（如 AstrBot gallery 的工具级结论没有正例、P6-01 未覆盖重复投递）。
+- 口径：`load` 以 S2-11 全量重跑为底，P3-10 恢复矩阵覆盖其后结果，P4-03 恢复只作注释（feat-028 保留 P3 结论）；AstrBot 取 AB-04。核对：Koishi/NoneBot 每个平台各 4,747 / 943 条 `load` 结论，剩余 unknown 39（Linux）+ 14（Windows）与 P3-10 的 53 一致；AstrBot load 21 / 1 / 2 与 AB-04 一致。
+- 发现：NoneBot 在 Windows 上没有一个 `load` 为 verified（failed 253、skipped 676、unknown 14），矩阵把这一点直接摆出来。
+- PR 回归：Linux 自检（`scripts/phase3-linux-self-test.sh`）新增 `lab.tests.test_compat_matrix`（8 项：确定性、条目唯一、每平台计数、已知结论、P4-03 只作注释、证据哈希、篡改与非法取值被拒、提交的矩阵是最新的）与 `python -m lab.compat_matrix check`。
+- 矩阵是证据索引，不是新的支持名单；对外支持声明仍以兼容性实验指南中的支持范围为准。
 
 ## 4. 成功指标
 

@@ -1,0 +1,1234 @@
+{
+  "schema_version": 1,
+  "kind": "p6_p601_qq_scenarios",
+  "date": "2026-11-08",
+  "authorization": "User authorized all groups configured in Stella and restarting Stella; the user sent every test message in one configured group and confirmed the replies. QQ user and group identifiers are omitted.",
+  "path": "QQ @-mention -> Stella keyword/semantic capability route -> Comes restricted agent (LM Studio google/gemma-4-e4b) -> Stella MCP client -> field Core 127.0.0.1:63900 -> untrusted Hosts in Core-generated isolated containers (ADR 0003) -> frozen plugin -> direct_reply tool_output -> Stella delivery plan -> OneBot v11",
+  "stella_code": "Stella main + PR #133 (follow-ups) applied as an uncommitted patch to the running checkout for the test; restored afterwards",
+  "core_fixes_found_in_this_round": [
+    "d1fadb1: non-empty `arguments` wins over structured fields (model sent the native command line plus a wrong field)",
+    "9b62520: Host and cleanup processes start with CREATE_NO_WINDOW (closing a visible console window had killed the Hosts)"
+  ],
+  "stella_fixes_found_in_this_round": [
+    "0ad3d59: call_tool re-lists once before reporting a missing tool",
+    "5efd679: Comes lets an MCP provider recover a stale tool list before execution (restart left the catalog empty)"
+  ],
+  "scenarios": {
+    "positive": "round A: dice, echo, nickname x3 each, normal Core",
+    "negative": "round A/B: 0d6 (plugin error), echo -u (cross-session send refused by the plugin), 组队创建 (admin-only, refused) - target 3 each",
+    "restart": "round B: the field Core was restarted after every delivered reply (new epoch, terminated MCP session, new containers); the next call must work",
+    "timeout": "round C: all Host containers paused; every call ends at the Core's 30 s command deadline, Stella sends one fallback, and no late reply appears after unpausing"
+  },
+  "tally": {
+    "negative/astrbot/passed": 1,
+    "negative/koishi/passed": 1,
+    "negative/nonebot/passed": 1,
+    "negative_after_restart/astrbot/passed": 2,
+    "negative_after_restart/koishi/fallback_core_unavailable": 1,
+    "negative_after_restart/koishi/passed": 2,
+    "negative_after_restart/koishi/router_chat_miss": 2,
+    "negative_after_restart/nonebot/passed": 2,
+    "positive/astrbot/passed": 3,
+    "positive/koishi/fallback_core_unavailable": 1,
+    "positive/koishi/passed": 3,
+    "positive/koishi/router_chat_miss": 1,
+    "positive/nonebot/passed": 4,
+    "restart/astrbot/fallback_core_unavailable": 1,
+    "restart/astrbot/passed": 3,
+    "restart/koishi/passed": 3,
+    "restart/nonebot/dropped_while_previous_turn_pending": 1,
+    "restart/nonebot/fallback_core_unavailable": 2,
+    "restart/nonebot/passed": 1,
+    "timeout/astrbot/fallback_as_expected": 3,
+    "timeout/koishi/fallback_as_expected": 3,
+    "timeout/nonebot/fallback_as_expected": 3
+  },
+  "coverage_passed_by_ecosystem": {
+    "nonebot": {
+      "positive": 4,
+      "negative": 3,
+      "restart": 3,
+      "timeout": 3
+    },
+    "koishi": {
+      "positive": 3,
+      "negative": 3,
+      "restart": 5,
+      "timeout": 3
+    },
+    "astrbot": {
+      "positive": 3,
+      "negative": 3,
+      "restart": 5,
+      "timeout": 3
+    }
+  },
+  "coverage_note": "restart counts every passed call that was the first after a Core restart (negative cases sent after a restart included)",
+  "restart_journal": [
+    {
+      "after_turn": "20:16:13",
+      "message": "复读这句话：p6-restart-1",
+      "restart": 1,
+      "restart_seconds": 27.4,
+      "at": "20:16:51"
+    },
+    {
+      "after_turn": "20:17:17",
+      "message": "帮我掷两个六面骰子",
+      "restart": 2,
+      "restart_seconds": 12.5,
+      "at": "20:17:36"
+    },
+    {
+      "after_turn": "20:23:53",
+      "message": "复读这句话：p6-restart-2",
+      "restart": 3,
+      "restart_seconds": 27.3,
+      "at": "20:24:26"
+    },
+    {
+      "after_turn": "20:24:09",
+      "message": "帮我掷两个六面骰子",
+      "restart": 4,
+      "restart_seconds": 11.9,
+      "at": "20:25:10"
+    },
+    {
+      "after_turn": "20:25:15",
+      "message": "帮我掷两个六面骰子",
+      "restart": 5,
+      "restart_seconds": 28.4,
+      "at": "20:25:48"
+    },
+    {
+      "after_turn": "20:26:37",
+      "message": "p6-restart-3",
+      "restart": 6,
+      "restart_seconds": 18.8,
+      "at": "20:27:10"
+    },
+    {
+      "after_turn": "20:27:07",
+      "message": "复读这句话：p6-restart-3",
+      "restart": 7,
+      "restart_seconds": 104.8,
+      "at": "20:28:59"
+    },
+    {
+      "after_turn": "20:28:41",
+      "message": "把我的组队昵称设置成 重启A",
+      "restart": 8,
+      "restart_seconds": 12.6,
+      "at": "20:29:44"
+    },
+    {
+      "after_turn": "20:29:52",
+      "message": "把我的组队昵称设置成 重启A",
+      "restart": 9,
+      "restart_seconds": 117.1,
+      "at": "20:31:54"
+    },
+    {
+      "after_turn": "20:32:26",
+      "message": "把我的组队昵称设置成 重启B",
+      "restart": 10,
+      "restart_seconds": 119.9,
+      "at": "20:34:31"
+    },
+    {
+      "after_turn": "20:35:15",
+      "message": "把我的组队昵称设置成 重启C",
+      "restart": 11,
+      "restart_seconds": 118.0,
+      "at": "20:37:19"
+    },
+    {
+      "after_turn": "20:37:39",
+      "message": "帮我掷 0d6 骰子",
+      "restart": 12,
+      "restart_seconds": 118.1,
+      "at": "20:39:48"
+    },
+    {
+      "after_turn": "20:40:04",
+      "message": "帮我掷 0d6 骰子",
+      "restart": 13,
+      "restart_seconds": 86.1,
+      "at": "20:41:37"
+    },
+    {
+      "after_turn": "20:41:18",
+      "message": "复读这句话：-u 10001 越权消息",
+      "restart": 14,
+      "restart_seconds": 14.1,
+      "at": "20:42:23"
+    }
+  ],
+  "timeout_round": {
+    "paused_at": "20:52:10",
+    "unpaused_at": "21:00:34",
+    "texts_sent_after_unpause": [],
+    "containers_survived": true,
+    "tool_error_seen_by_model": "command did not finish within 30s"
+  },
+  "observations": [
+    "Messages sent while the Core was restarting (13-120 s windows) got exactly one fallback each, no duplicate; counted as core_unavailable samples, not restart failures",
+    "Stella dropped a second message from the same user while the first was still waiting (one turn at a time): Stella behavior, not counted",
+    "Stella's router sent two `复读这句话：-u ...` messages to chat (semantic score 0.65 < 0.70): Stella routing, not counted",
+    "Other members copied test texts as plain text without a QQ mention; Stella ignores those by design",
+    "Duplicate event redelivery (the same OneBot event twice) cannot be produced by user sends and was not exercised"
+  ],
+  "core_after_run": {
+    "gateway_operations": 0,
+    "containers_left": 0
+  },
+  "restoration": "Stella checkout tracked files and both StellaData config files restored (hashes match backups); Stella restarted in its prior mode (LM Studio, MCP disabled)",
+  "turns": [
+    {
+      "time": "19:41:25",
+      "message": "帮我掷两个六面骰子",
+      "route": "chat+memory+tool+no-generation ['dice.roll'] via rule",
+      "comes": {
+        "capability": "dice.roll",
+        "status": "success",
+        "ms": 3609,
+        "mode": "agent",
+        "tool_calls": 1
+      },
+      "sent_text": "你掷出了2个6面骰子, 点数为【7】",
+      "delivery": {
+        "status": "accepted",
+        "accepted_parts": 1,
+        "failed_parts": 0,
+        "unknown_parts": 0,
+        "receipt_count": 1
+      },
+      "delivery_plan_rejected": false,
+      "ecosystem": "nonebot",
+      "scenario": "positive",
+      "outcome": "passed"
+    },
+    {
+      "time": "19:41:43",
+      "message": "帮我掷两个六面骰子",
+      "route": "chat+memory+tool+no-generation ['dice.roll'] via rule",
+      "comes": {
+        "capability": "dice.roll",
+        "status": "success",
+        "ms": 3687,
+        "mode": "agent",
+        "tool_calls": 1
+      },
+      "sent_text": "你掷出了2个6面骰子, 点数为【8】",
+      "delivery": {
+        "status": "accepted",
+        "accepted_parts": 1,
+        "failed_parts": 0,
+        "unknown_parts": 0,
+        "receipt_count": 1
+      },
+      "delivery_plan_rejected": false,
+      "ecosystem": "nonebot",
+      "scenario": "positive",
+      "outcome": "passed"
+    },
+    {
+      "time": "19:41:59",
+      "message": "帮我掷两个六面骰子",
+      "route": "chat+memory+tool+no-generation ['dice.roll'] via rule",
+      "comes": {
+        "capability": "dice.roll",
+        "status": "success",
+        "ms": 3391,
+        "mode": "agent",
+        "tool_calls": 1
+      },
+      "sent_text": "你掷出了2个6面骰子, 点数为【7】",
+      "delivery": {
+        "status": "accepted",
+        "accepted_parts": 1,
+        "failed_parts": 0,
+        "unknown_parts": 0,
+        "receipt_count": 1
+      },
+      "delivery_plan_rejected": false,
+      "ecosystem": "nonebot",
+      "scenario": "positive",
+      "outcome": "passed"
+    },
+    {
+      "time": "19:42:15",
+      "message": "复读这句话：p6-final-1",
+      "route": "chat+memory+tool+no-generation ['text.echo'] via rule",
+      "comes": {
+        "capability": "text.echo",
+        "status": "success",
+        "ms": 3765,
+        "mode": "agent",
+        "tool_calls": 1
+      },
+      "sent_text": "p6-final-1",
+      "delivery": {
+        "status": "accepted",
+        "accepted_parts": 1,
+        "failed_parts": 0,
+        "unknown_parts": 0,
+        "receipt_count": 1
+      },
+      "delivery_plan_rejected": false,
+      "ecosystem": "koishi",
+      "scenario": "positive",
+      "outcome": "passed"
+    },
+    {
+      "time": "19:42:25",
+      "message": "复读这句话：p6-final-2",
+      "route": "chat+memory+tool+no-generation ['text.echo'] via rule",
+      "comes": {
+        "capability": "text.echo",
+        "status": "success",
+        "ms": 4140,
+        "mode": "agent",
+        "tool_calls": 1
+      },
+      "sent_text": "p6-final-2",
+      "delivery": {
+        "status": "accepted",
+        "accepted_parts": 1,
+        "failed_parts": 0,
+        "unknown_parts": 0,
+        "receipt_count": 1
+      },
+      "delivery_plan_rejected": false,
+      "ecosystem": "koishi",
+      "scenario": "positive",
+      "outcome": "passed"
+    },
+    {
+      "time": "19:42:43",
+      "message": "复读这句话：p6-final-3",
+      "route": "chat+memory+tool+no-generation ['text.echo'] via rule",
+      "comes": {
+        "capability": "text.echo",
+        "status": "success",
+        "ms": 4031,
+        "mode": "agent",
+        "tool_calls": 1
+      },
+      "sent_text": "p6-final-3",
+      "delivery": {
+        "status": "accepted",
+        "accepted_parts": 1,
+        "failed_parts": 0,
+        "unknown_parts": 0,
+        "receipt_count": 1
+      },
+      "delivery_plan_rejected": false,
+      "ecosystem": "koishi",
+      "scenario": "positive",
+      "outcome": "passed"
+    },
+    {
+      "time": "19:43:02",
+      "message": "把我的组队昵称设置成 队员A",
+      "route": "chat+memory+tool+no-generation ['teamup.nickname'] via rule",
+      "comes": {
+        "capability": "teamup.nickname",
+        "status": "success",
+        "ms": 4891,
+        "mode": "agent",
+        "tool_calls": 1
+      },
+      "sent_text": "已设置昵称：队员A",
+      "delivery": {
+        "status": "accepted",
+        "accepted_parts": 1,
+        "failed_parts": 0,
+        "unknown_parts": 0,
+        "receipt_count": 1
+      },
+      "delivery_plan_rejected": false,
+      "ecosystem": "astrbot",
+      "scenario": "positive",
+      "outcome": "passed"
+    },
+    {
+      "time": "19:43:11",
+      "message": "把我的组队昵称设置成 队员B",
+      "route": "chat+memory+tool+no-generation ['teamup.nickname'] via rule",
+      "comes": {
+        "capability": "teamup.nickname",
+        "status": "success",
+        "ms": 4859,
+        "mode": "agent",
+        "tool_calls": 1
+      },
+      "sent_text": "已设置昵称：队员B",
+      "delivery": {
+        "status": "accepted",
+        "accepted_parts": 1,
+        "failed_parts": 0,
+        "unknown_parts": 0,
+        "receipt_count": 1
+      },
+      "delivery_plan_rejected": false,
+      "ecosystem": "astrbot",
+      "scenario": "positive",
+      "outcome": "passed"
+    },
+    {
+      "time": "19:43:27",
+      "message": "把我的组队昵称设置成 队员C",
+      "route": "chat+memory+tool+no-generation ['teamup.nickname'] via rule",
+      "comes": {
+        "capability": "teamup.nickname",
+        "status": "success",
+        "ms": 4922,
+        "mode": "agent",
+        "tool_calls": 1
+      },
+      "sent_text": "已设置昵称：队员C",
+      "delivery": {
+        "status": "accepted",
+        "accepted_parts": 1,
+        "failed_parts": 0,
+        "unknown_parts": 0,
+        "receipt_count": 1
+      },
+      "delivery_plan_rejected": false,
+      "ecosystem": "astrbot",
+      "scenario": "positive",
+      "outcome": "passed"
+    },
+    {
+      "time": "19:43:38",
+      "message": "帮我掷 0d6 骰子",
+      "route": "chat+memory+tool+no-generation ['dice.roll'] via rule",
+      "comes": {
+        "capability": "dice.roll",
+        "status": "success",
+        "ms": 4219,
+        "mode": "agent",
+        "tool_calls": 1
+      },
+      "sent_text": "错误！你掷出了不存在的骰子, 只有上帝知道结果是多少🤔",
+      "delivery": {
+        "status": "accepted",
+        "accepted_parts": 1,
+        "failed_parts": 0,
+        "unknown_parts": 0,
+        "receipt_count": 1
+      },
+      "delivery_plan_rejected": false,
+      "ecosystem": "nonebot",
+      "scenario": "negative",
+      "outcome": "passed"
+    },
+    {
+      "time": "19:43:58",
+      "message": "复读这句话：-u 10001 越权消息",
+      "route": "chat+memory+tool+no-generation ['text.echo'] via rule",
+      "comes": {
+        "capability": "text.echo",
+        "status": "success",
+        "ms": 4328,
+        "mode": "agent",
+        "tool_calls": 1
+      },
+      "sent_text": "选项 user 输入无效，请指定正确的用户。",
+      "delivery": {
+        "status": "accepted",
+        "accepted_parts": 1,
+        "failed_parts": 0,
+        "unknown_parts": 0,
+        "receipt_count": 1
+      },
+      "delivery_plan_rejected": false,
+      "ecosystem": "koishi",
+      "scenario": "negative",
+      "outcome": "passed"
+    },
+    {
+      "time": "19:44:17",
+      "message": "创建一个每队2人的组队，名字叫周末，跨群",
+      "route": "chat+memory+tool+no-generation ['teamup.create'] via semantic",
+      "comes": {
+        "capability": "teamup.create",
+        "status": "success",
+        "ms": 4593,
+        "mode": "agent",
+        "tool_calls": 1
+      },
+      "sent_text": "仅管理员可创建组队报名。",
+      "delivery": {
+        "status": "accepted",
+        "accepted_parts": 1,
+        "failed_parts": 0,
+        "unknown_parts": 0,
+        "receipt_count": 1
+      },
+      "delivery_plan_rejected": false,
+      "ecosystem": "astrbot",
+      "scenario": "negative",
+      "outcome": "passed"
+    },
+    {
+      "time": "19:50:24",
+      "message": "帮我掷两个六面骰子",
+      "route": "chat+memory+tool+no-generation ['dice.roll'] via rule",
+      "comes": {
+        "capability": "dice.roll",
+        "status": "success",
+        "ms": 4765,
+        "mode": "agent",
+        "tool_calls": 1
+      },
+      "sent_text": "你掷出了2个6面骰子, 点数为【2】",
+      "delivery": {
+        "status": "accepted",
+        "accepted_parts": 1,
+        "failed_parts": 0,
+        "unknown_parts": 0,
+        "receipt_count": 1
+      },
+      "delivery_plan_rejected": false,
+      "ecosystem": "nonebot",
+      "scenario": "positive",
+      "outcome": "passed"
+    },
+    {
+      "time": "19:50:47",
+      "message": "复读这句话：p6-restart-1",
+      "route": "chat+memory+tool+no-generation ['text.echo'] via rule",
+      "comes": {
+        "capability": "text.echo",
+        "status": "failed",
+        "ms": 50000,
+        "mode": "agent",
+        "tool_calls": 1
+      },
+      "sent_text": "这个功能暂时不可用，请稍后再试。",
+      "delivery": {
+        "status": "accepted",
+        "accepted_parts": 1,
+        "failed_parts": 0,
+        "unknown_parts": 0,
+        "receipt_count": 1
+      },
+      "delivery_plan_rejected": false,
+      "ecosystem": "koishi",
+      "scenario": "positive",
+      "outcome": "fallback_core_unavailable"
+    },
+    {
+      "time": "20:06:32",
+      "message": "复读这句话：p6-restart-1",
+      "route": "chat+memory+tool+no-generation ['text.echo'] via semantic",
+      "comes": null,
+      "sent_text": "这个功能暂时不可用，请稍后再试。",
+      "delivery": {
+        "status": "accepted",
+        "accepted_parts": 1,
+        "failed_parts": 0,
+        "unknown_parts": 0,
+        "receipt_count": 1
+      },
+      "delivery_plan_rejected": false,
+      "ecosystem": "koishi",
+      "scenario": "positive",
+      "outcome": "router_chat_miss"
+    },
+    {
+      "time": "20:16:13",
+      "message": "复读这句话：p6-restart-1",
+      "route": "chat+memory+tool+no-generation ['text.echo'] via rule",
+      "comes": {
+        "capability": "text.echo",
+        "status": "success",
+        "ms": 8672,
+        "mode": "agent",
+        "tool_calls": 1
+      },
+      "sent_text": "p6-restart-1",
+      "delivery": {
+        "status": "accepted",
+        "accepted_parts": 1,
+        "failed_parts": 0,
+        "unknown_parts": 0,
+        "receipt_count": 1
+      },
+      "delivery_plan_rejected": false,
+      "ecosystem": "koishi",
+      "scenario": "restart",
+      "outcome": "passed"
+    },
+    {
+      "time": "20:16:33",
+      "message": "帮我掷两个六面骰子",
+      "route": "chat+memory+tool+no-generation ['dice.roll'] via rule",
+      "comes": null,
+      "sent_text": null,
+      "delivery": null,
+      "delivery_plan_rejected": false,
+      "ecosystem": "nonebot",
+      "scenario": "restart",
+      "outcome": "fallback_core_unavailable",
+      "correction": "result lines re-attributed by hand; see note in the report builder"
+    },
+    {
+      "time": "20:17:17",
+      "message": "帮我掷两个六面骰子",
+      "route": null,
+      "comes": {
+        "capability": "dice.roll",
+        "status": "failed",
+        "ms": 49422,
+        "mode": "agent",
+        "tool_calls": 1
+      },
+      "sent_text": "这个功能暂时不可用，请稍后再试。",
+      "delivery": {
+        "status": "accepted",
+        "accepted_parts": 1,
+        "failed_parts": 0,
+        "unknown_parts": 0,
+        "receipt_count": 1
+      },
+      "delivery_plan_rejected": false,
+      "ecosystem": "nonebot",
+      "scenario": "restart",
+      "outcome": "dropped_while_previous_turn_pending",
+      "correction": "result lines re-attributed by hand; see note in the report builder"
+    },
+    {
+      "time": "20:23:53",
+      "message": "复读这句话：p6-restart-2",
+      "route": "chat+memory+tool+no-generation ['text.echo'] via semantic",
+      "comes": {
+        "capability": "text.echo",
+        "status": "success",
+        "ms": 3937,
+        "mode": "agent",
+        "tool_calls": 1
+      },
+      "sent_text": "p6-restart-2",
+      "delivery": {
+        "status": "accepted",
+        "accepted_parts": 1,
+        "failed_parts": 0,
+        "unknown_parts": 0,
+        "receipt_count": 1
+      },
+      "delivery_plan_rejected": false,
+      "ecosystem": "koishi",
+      "scenario": "restart",
+      "outcome": "passed"
+    },
+    {
+      "time": "20:24:09",
+      "message": "帮我掷两个六面骰子",
+      "route": "chat+memory+tool+no-generation ['dice.roll'] via rule",
+      "comes": {
+        "capability": "dice.roll",
+        "status": "failed",
+        "ms": 48562,
+        "mode": "agent",
+        "tool_calls": 1
+      },
+      "sent_text": "这个功能暂时不可用，请稍后再试。",
+      "delivery": {
+        "status": "accepted",
+        "accepted_parts": 1,
+        "failed_parts": 0,
+        "unknown_parts": 0,
+        "receipt_count": 1
+      },
+      "delivery_plan_rejected": false,
+      "ecosystem": "nonebot",
+      "scenario": "restart",
+      "outcome": "fallback_core_unavailable"
+    },
+    {
+      "time": "20:25:15",
+      "message": "帮我掷两个六面骰子",
+      "route": "chat+memory+tool+no-generation ['dice.roll'] via semantic",
+      "comes": {
+        "capability": "dice.roll",
+        "status": "success",
+        "ms": 3140,
+        "mode": "agent",
+        "tool_calls": 1
+      },
+      "sent_text": "你掷出了2个6面骰子, 点数为【3】",
+      "delivery": {
+        "status": "accepted",
+        "accepted_parts": 1,
+        "failed_parts": 0,
+        "unknown_parts": 0,
+        "receipt_count": 1
+      },
+      "delivery_plan_rejected": false,
+      "ecosystem": "nonebot",
+      "scenario": "restart",
+      "outcome": "passed"
+    },
+    {
+      "time": "20:26:37",
+      "message": "p6-restart-3",
+      "route": "chat+memory ['dice.roll', 'text.echo', 'video.dynamics', 'knowledge.search'] via semantic",
+      "comes": null,
+      "sent_text": "啥玩意儿啊？p6-restart-3是哪个新游戏bug还是什么？😂",
+      "delivery": {
+        "status": "accepted",
+        "accepted_parts": 1,
+        "failed_parts": 0,
+        "unknown_parts": 0,
+        "receipt_count": 1
+      },
+      "delivery_plan_rejected": false,
+      "ecosystem": null,
+      "scenario": "restart",
+      "outcome": "not_a_test_message"
+    },
+    {
+      "time": "20:27:07",
+      "message": "复读这句话：p6-restart-3",
+      "route": "chat+memory+tool+no-generation ['text.echo'] via semantic",
+      "comes": {
+        "capability": "text.echo",
+        "status": "success",
+        "ms": 6141,
+        "mode": "agent",
+        "tool_calls": 1
+      },
+      "sent_text": "p6-restart-3",
+      "delivery": {
+        "status": "accepted",
+        "accepted_parts": 1,
+        "failed_parts": 0,
+        "unknown_parts": 0,
+        "receipt_count": 1
+      },
+      "delivery_plan_rejected": false,
+      "ecosystem": "koishi",
+      "scenario": "restart",
+      "outcome": "passed"
+    },
+    {
+      "time": "20:28:41",
+      "message": "把我的组队昵称设置成 重启A",
+      "route": "chat+memory+tool+no-generation ['teamup.nickname'] via rule",
+      "comes": {
+        "capability": "teamup.nickname",
+        "status": "failed",
+        "ms": 49563,
+        "mode": "agent",
+        "tool_calls": 1
+      },
+      "sent_text": "这个功能暂时不可用，请稍后再试。",
+      "delivery": {
+        "status": "accepted",
+        "accepted_parts": 1,
+        "failed_parts": 0,
+        "unknown_parts": 0,
+        "receipt_count": 1
+      },
+      "delivery_plan_rejected": false,
+      "ecosystem": "astrbot",
+      "scenario": "restart",
+      "outcome": "fallback_core_unavailable"
+    },
+    {
+      "time": "20:29:52",
+      "message": "把我的组队昵称设置成 重启A",
+      "route": "chat+memory+tool+no-generation ['teamup.nickname'] via semantic",
+      "comes": {
+        "capability": "teamup.nickname",
+        "status": "success",
+        "ms": 4078,
+        "mode": "agent",
+        "tool_calls": 1
+      },
+      "sent_text": "已设置昵称：重启A",
+      "delivery": {
+        "status": "accepted",
+        "accepted_parts": 1,
+        "failed_parts": 0,
+        "unknown_parts": 0,
+        "receipt_count": 1
+      },
+      "delivery_plan_rejected": false,
+      "ecosystem": "astrbot",
+      "scenario": "restart",
+      "outcome": "passed"
+    },
+    {
+      "time": "20:32:26",
+      "message": "把我的组队昵称设置成 重启B",
+      "route": "chat+memory+tool+no-generation ['teamup.nickname'] via rule",
+      "comes": {
+        "capability": "teamup.nickname",
+        "status": "success",
+        "ms": 3812,
+        "mode": "agent",
+        "tool_calls": 1
+      },
+      "sent_text": "已设置昵称：重启B",
+      "delivery": {
+        "status": "accepted",
+        "accepted_parts": 1,
+        "failed_parts": 0,
+        "unknown_parts": 0,
+        "receipt_count": 1
+      },
+      "delivery_plan_rejected": false,
+      "ecosystem": "astrbot",
+      "scenario": "restart",
+      "outcome": "passed"
+    },
+    {
+      "time": "20:35:15",
+      "message": "把我的组队昵称设置成 重启C",
+      "route": "chat+memory+tool+no-generation ['teamup.nickname'] via rule",
+      "comes": {
+        "capability": "teamup.nickname",
+        "status": "success",
+        "ms": 4531,
+        "mode": "agent",
+        "tool_calls": 1
+      },
+      "sent_text": "已设置昵称：重启C",
+      "delivery": {
+        "status": "accepted",
+        "accepted_parts": 1,
+        "failed_parts": 0,
+        "unknown_parts": 0,
+        "receipt_count": 1
+      },
+      "delivery_plan_rejected": false,
+      "ecosystem": "astrbot",
+      "scenario": "restart",
+      "outcome": "passed"
+    },
+    {
+      "time": "20:37:39",
+      "message": "帮我掷 0d6 骰子",
+      "route": "chat+memory+tool+no-generation ['dice.roll'] via rule",
+      "comes": {
+        "capability": "dice.roll",
+        "status": "success",
+        "ms": 8844,
+        "mode": "agent",
+        "tool_calls": 1
+      },
+      "sent_text": "错误！你掷出了不存在的骰子, 只有上帝知道结果是多少🤔",
+      "delivery": {
+        "status": "accepted",
+        "accepted_parts": 1,
+        "failed_parts": 0,
+        "unknown_parts": 0,
+        "receipt_count": 1
+      },
+      "delivery_plan_rejected": false,
+      "ecosystem": "nonebot",
+      "scenario": "negative_after_restart",
+      "outcome": "passed"
+    },
+    {
+      "time": "20:40:04",
+      "message": "帮我掷 0d6 骰子",
+      "route": "chat+memory+tool+no-generation ['dice.roll'] via rule",
+      "comes": {
+        "capability": "dice.roll",
+        "status": "success",
+        "ms": 5156,
+        "mode": "agent",
+        "tool_calls": 1
+      },
+      "sent_text": "错误！你掷出了不存在的骰子, 只有上帝知道结果是多少🤔",
+      "delivery": {
+        "status": "accepted",
+        "accepted_parts": 1,
+        "failed_parts": 0,
+        "unknown_parts": 0,
+        "receipt_count": 1
+      },
+      "delivery_plan_rejected": false,
+      "ecosystem": "nonebot",
+      "scenario": "negative_after_restart",
+      "outcome": "passed"
+    },
+    {
+      "time": "20:41:18",
+      "message": "复读这句话：-u 10001 越权消息",
+      "route": "chat+memory+tool+no-generation ['text.echo'] via rule",
+      "comes": {
+        "capability": "text.echo",
+        "status": "failed",
+        "ms": 50032,
+        "mode": "agent",
+        "tool_calls": 1
+      },
+      "sent_text": "这个功能暂时不可用，请稍后再试。",
+      "delivery": {
+        "status": "accepted",
+        "accepted_parts": 1,
+        "failed_parts": 0,
+        "unknown_parts": 0,
+        "receipt_count": 1
+      },
+      "delivery_plan_rejected": false,
+      "ecosystem": "koishi",
+      "scenario": "negative_after_restart",
+      "outcome": "fallback_core_unavailable"
+    },
+    {
+      "time": "20:43:01",
+      "message": "复读这句话：-u 10001 越权消息",
+      "route": "chat+memory ['text.echo', 'video.dynamics', 'knowledge.search'] via semantic",
+      "comes": null,
+      "sent_text": "哈？什么意思呀？",
+      "delivery": {
+        "status": "accepted",
+        "accepted_parts": 1,
+        "failed_parts": 0,
+        "unknown_parts": 0,
+        "receipt_count": 1
+      },
+      "delivery_plan_rejected": false,
+      "ecosystem": "koishi",
+      "scenario": "negative_after_restart",
+      "outcome": "router_chat_miss"
+    },
+    {
+      "time": "20:44:29",
+      "message": "复读这句话：-u 10001 越权消息",
+      "route": "chat+memory ['text.echo', 'video.dynamics', 'knowledge.search'] via semantic",
+      "comes": null,
+      "sent_text": "啊？你让我复读啥呀？",
+      "delivery": {
+        "status": "accepted",
+        "accepted_parts": 1,
+        "failed_parts": 0,
+        "unknown_parts": 0,
+        "receipt_count": 1
+      },
+      "delivery_plan_rejected": false,
+      "ecosystem": "koishi",
+      "scenario": "negative_after_restart",
+      "outcome": "router_chat_miss"
+    },
+    {
+      "time": "20:45:30",
+      "message": "创建一个每队2人的组队，名字叫周末，跨群",
+      "route": "chat+memory+tool+no-generation ['teamup.create'] via semantic",
+      "comes": {
+        "capability": "teamup.create",
+        "status": "success",
+        "ms": 5422,
+        "mode": "agent",
+        "tool_calls": 1
+      },
+      "sent_text": "仅管理员可创建组队报名。",
+      "delivery": {
+        "status": "accepted",
+        "accepted_parts": 1,
+        "failed_parts": 0,
+        "unknown_parts": 0,
+        "receipt_count": 1
+      },
+      "delivery_plan_rejected": false,
+      "ecosystem": "astrbot",
+      "scenario": "negative_after_restart",
+      "outcome": "passed"
+    },
+    {
+      "time": "20:46:54",
+      "message": "创建一个每队2人的组队，名字叫周末，跨群",
+      "route": "chat+memory+tool+no-generation ['teamup.create'] via semantic",
+      "comes": {
+        "capability": "teamup.create",
+        "status": "success",
+        "ms": 5797,
+        "mode": "agent",
+        "tool_calls": 1
+      },
+      "sent_text": "仅管理员可创建组队报名。",
+      "delivery": {
+        "status": "accepted",
+        "accepted_parts": 1,
+        "failed_parts": 0,
+        "unknown_parts": 0,
+        "receipt_count": 1
+      },
+      "delivery_plan_rejected": false,
+      "ecosystem": "astrbot",
+      "scenario": "negative_after_restart",
+      "outcome": "passed"
+    },
+    {
+      "time": "20:47:15",
+      "message": "复读这句话：-u 10001 越权消息",
+      "route": "chat+memory+tool+no-generation ['text.echo'] via rule",
+      "comes": {
+        "capability": "text.echo",
+        "status": "success",
+        "ms": 5437,
+        "mode": "agent",
+        "tool_calls": 1
+      },
+      "sent_text": "选项 user 输入无效，请指定正确的用户。",
+      "delivery": {
+        "status": "accepted",
+        "accepted_parts": 1,
+        "failed_parts": 0,
+        "unknown_parts": 0,
+        "receipt_count": 1
+      },
+      "delivery_plan_rejected": false,
+      "ecosystem": "koishi",
+      "scenario": "negative_after_restart",
+      "outcome": "passed"
+    },
+    {
+      "time": "20:52:00",
+      "message": "复读这句话：-u 10001 越权消息",
+      "route": "chat+memory+tool+no-generation ['text.echo'] via rule",
+      "comes": {
+        "capability": "text.echo",
+        "status": "success",
+        "ms": 7703,
+        "mode": "agent",
+        "tool_calls": 1
+      },
+      "sent_text": "选项 user 输入无效，请指定正确的用户。",
+      "delivery": {
+        "status": "accepted",
+        "accepted_parts": 1,
+        "failed_parts": 0,
+        "unknown_parts": 0,
+        "receipt_count": 1
+      },
+      "delivery_plan_rejected": false,
+      "ecosystem": "koishi",
+      "scenario": "negative_after_restart",
+      "outcome": "passed"
+    },
+    {
+      "time": "20:52:40",
+      "message": "帮我掷两个六面骰子",
+      "route": "chat+memory+tool+no-generation ['dice.roll'] via rule",
+      "comes": {
+        "capability": "dice.roll",
+        "status": "failed",
+        "ms": 33687,
+        "mode": "agent",
+        "tool_calls": 1
+      },
+      "sent_text": "这个功能暂时不可用，请稍后再试。",
+      "delivery": {
+        "status": "accepted",
+        "accepted_parts": 1,
+        "failed_parts": 0,
+        "unknown_parts": 0,
+        "receipt_count": 1
+      },
+      "delivery_plan_rejected": false,
+      "ecosystem": "nonebot",
+      "scenario": "timeout",
+      "outcome": "fallback_as_expected"
+    },
+    {
+      "time": "20:53:21",
+      "message": "帮我掷两个六面骰子",
+      "route": "chat+memory+tool+no-generation ['dice.roll'] via rule",
+      "comes": {
+        "capability": "teamup.create",
+        "status": "failed",
+        "ms": 35437,
+        "mode": "agent",
+        "tool_calls": 1
+      },
+      "sent_text": "这个功能暂时不可用，请稍后再试。",
+      "delivery": {
+        "status": "accepted",
+        "accepted_parts": 1,
+        "failed_parts": 0,
+        "unknown_parts": 0,
+        "receipt_count": 1
+      },
+      "delivery_plan_rejected": false,
+      "ecosystem": "nonebot",
+      "scenario": "timeout",
+      "outcome": "fallback_as_expected"
+    },
+    {
+      "time": "20:54:43",
+      "message": "帮我掷两个六面骰子",
+      "route": "chat+memory+tool+no-generation ['dice.roll'] via rule",
+      "comes": {
+        "capability": "dice.roll",
+        "status": "failed",
+        "ms": 33797,
+        "mode": "agent",
+        "tool_calls": 1
+      },
+      "sent_text": "这个功能暂时不可用，请稍后再试。",
+      "delivery": {
+        "status": "accepted",
+        "accepted_parts": 1,
+        "failed_parts": 0,
+        "unknown_parts": 0,
+        "receipt_count": 1
+      },
+      "delivery_plan_rejected": false,
+      "ecosystem": "nonebot",
+      "scenario": "timeout",
+      "outcome": "fallback_as_expected"
+    },
+    {
+      "time": "20:55:37",
+      "message": "复读这句话：p6-timeout-1",
+      "route": "chat+memory+tool+no-generation ['text.echo'] via rule",
+      "comes": {
+        "capability": "text.echo",
+        "status": "failed",
+        "ms": 35297,
+        "mode": "agent",
+        "tool_calls": 1
+      },
+      "sent_text": "这个功能暂时不可用，请稍后再试。",
+      "delivery": {
+        "status": "accepted",
+        "accepted_parts": 1,
+        "failed_parts": 0,
+        "unknown_parts": 0,
+        "receipt_count": 1
+      },
+      "delivery_plan_rejected": false,
+      "ecosystem": "koishi",
+      "scenario": "timeout",
+      "outcome": "fallback_as_expected"
+    },
+    {
+      "time": "20:56:15",
+      "message": "复读这句话：p6-timeout-2",
+      "route": "chat+memory+tool+no-generation ['text.echo'] via rule",
+      "comes": {
+        "capability": "text.echo",
+        "status": "failed",
+        "ms": 34312,
+        "mode": "agent",
+        "tool_calls": 1
+      },
+      "sent_text": "这个功能暂时不可用，请稍后再试。",
+      "delivery": {
+        "status": "accepted",
+        "accepted_parts": 1,
+        "failed_parts": 0,
+        "unknown_parts": 0,
+        "receipt_count": 1
+      },
+      "delivery_plan_rejected": false,
+      "ecosystem": "koishi",
+      "scenario": "timeout",
+      "outcome": "fallback_as_expected"
+    },
+    {
+      "time": "20:56:57",
+      "message": "复读这句话：p6-timeout-3",
+      "route": "chat+memory+tool+no-generation ['text.echo'] via rule",
+      "comes": {
+        "capability": "text.echo",
+        "status": "failed",
+        "ms": 33890,
+        "mode": "agent",
+        "tool_calls": 1
+      },
+      "sent_text": "这个功能暂时不可用，请稍后再试。",
+      "delivery": {
+        "status": "accepted",
+        "accepted_parts": 1,
+        "failed_parts": 0,
+        "unknown_parts": 0,
+        "receipt_count": 1
+      },
+      "delivery_plan_rejected": false,
+      "ecosystem": "koishi",
+      "scenario": "timeout",
+      "outcome": "fallback_as_expected"
+    },
+    {
+      "time": "20:57:51",
+      "message": "把我的组队昵称设置成 超时A",
+      "route": "chat+memory+tool+no-generation ['teamup.nickname'] via rule",
+      "comes": {
+        "capability": "teamup.nickname",
+        "status": "failed",
+        "ms": 35235,
+        "mode": "agent",
+        "tool_calls": 1
+      },
+      "sent_text": "这个功能暂时不可用，请稍后再试。",
+      "delivery": {
+        "status": "accepted",
+        "accepted_parts": 1,
+        "failed_parts": 0,
+        "unknown_parts": 0,
+        "receipt_count": 1
+      },
+      "delivery_plan_rejected": false,
+      "ecosystem": "astrbot",
+      "scenario": "timeout",
+      "outcome": "fallback_as_expected"
+    },
+    {
+      "time": "20:58:30",
+      "message": "把我的组队昵称设置成 超时B",
+      "route": "chat+memory+tool+no-generation ['teamup.nickname'] via rule",
+      "comes": {
+        "capability": "teamup.nickname",
+        "status": "failed",
+        "ms": 35281,
+        "mode": "agent",
+        "tool_calls": 1
+      },
+      "sent_text": "这个功能暂时不可用，请稍后再试。",
+      "delivery": {
+        "status": "accepted",
+        "accepted_parts": 1,
+        "failed_parts": 0,
+        "unknown_parts": 0,
+        "receipt_count": 1
+      },
+      "delivery_plan_rejected": false,
+      "ecosystem": "astrbot",
+      "scenario": "timeout",
+      "outcome": "fallback_as_expected"
+    },
+    {
+      "time": "20:59:57",
+      "message": "把我的组队昵称设置成 超时C",
+      "route": "chat+memory+tool+no-generation ['teamup.nickname'] via rule",
+      "comes": {
+        "capability": "teamup.nickname",
+        "status": "failed",
+        "ms": 35422,
+        "mode": "agent",
+        "tool_calls": 1
+      },
+      "sent_text": "这个功能暂时不可用，请稍后再试。",
+      "delivery": {
+        "status": "accepted",
+        "accepted_parts": 1,
+        "failed_parts": 0,
+        "unknown_parts": 0,
+        "receipt_count": 1
+      },
+      "delivery_plan_rejected": false,
+      "ecosystem": "astrbot",
+      "scenario": "timeout",
+      "outcome": "fallback_as_expected"
+    }
+  ]
+}

@@ -15,6 +15,7 @@
 - [outputs/acceptance/phase2-s211-failures-20261014.md](../../outputs/acceptance/phase2-s211-failures-20261014.md)
 - [outputs/acceptance/phase4-p404-signed-runtime-20261028/README.md](../../outputs/acceptance/phase4-p404-signed-runtime-20261028/README.md)
 - [outputs/acceptance/windows-sandbox/README.md](../../outputs/acceptance/windows-sandbox/README.md)
+- [outputs/compat/compatibility-matrix-v1.md](../../outputs/compat/compatibility-matrix-v1.md)（自动生成的当前兼容性矩阵摘要，P6-04）
 
 ## 设计记录
 
