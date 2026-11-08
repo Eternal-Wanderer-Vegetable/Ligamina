@@ -1,0 +1,80 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://Ligamina.local/contracts/lab/compat/v1/compatibility-matrix.schema.json",
+  "title": "Per-plugin, per-capability compatibility matrix",
+  "type": "object",
+  "required": ["schema_version", "kind", "capabilities", "values", "sources", "summary", "entries"],
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": { "const": 1 },
+    "kind": { "const": "compatibility_matrix" },
+    "capabilities": {
+      "type": "array",
+      "items": { "enum": ["load", "mcp_tool", "federated_event", "platform_delivery"] }
+    },
+    "values": {
+      "type": "array",
+      "items": { "enum": ["verified", "failed", "skipped", "unknown", "untested"] }
+    },
+    "notes": { "type": "array", "items": { "type": "string" } },
+    "sources": {
+      "type": "object",
+      "additionalProperties": { "type": "string", "pattern": "^[0-9a-f]{64}$" }
+    },
+    "summary": { "type": "object" },
+    "entries": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/entry" }
+    }
+  },
+  "$defs": {
+    "evidence": {
+      "type": "object",
+      "required": ["path", "sha256", "ref"],
+      "additionalProperties": false,
+      "properties": {
+        "path": { "type": "string", "minLength": 1 },
+        "sha256": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+        "ref": { "type": "string", "minLength": 1 }
+      }
+    },
+    "claim": {
+      "type": "object",
+      "required": ["value", "reason", "evidence"],
+      "properties": {
+        "value": { "enum": ["verified", "failed", "skipped", "unknown"] },
+        "reason": { "type": ["string", "null"] },
+        "evidence": { "type": "array", "items": { "$ref": "#/$defs/evidence" } },
+        "scope": { "type": "string" },
+        "cleanup": { "type": "string" },
+        "cases": { "type": "array", "items": { "type": "object" } },
+        "annotations": { "type": "array", "items": { "type": "object" } },
+        "history": { "type": "array", "items": { "type": "object" } }
+      },
+      "additionalProperties": false
+    },
+    "platforms": {
+      "type": "object",
+      "propertyNames": { "enum": ["linux", "windows", "qq"] },
+      "additionalProperties": { "$ref": "#/$defs/claim" }
+    },
+    "entry": {
+      "type": "object",
+      "required": ["registry_entry_id", "ecosystem", "package", "version", "artifact_sha256", "catalog_status", "capabilities"],
+      "additionalProperties": false,
+      "properties": {
+        "registry_entry_id": { "type": "string", "pattern": "^(ko|nb|ab)-[0-9a-f]{24}$" },
+        "ecosystem": { "enum": ["koishi", "nonebot", "astrbot"] },
+        "package": { "type": "string" },
+        "version": { "type": ["string", "null"] },
+        "artifact_sha256": { "type": "array", "items": { "type": "string", "pattern": "^[0-9a-f]{64}$" } },
+        "catalog_status": { "type": ["string", "null"] },
+        "capabilities": {
+          "type": "object",
+          "propertyNames": { "enum": ["load", "mcp_tool", "federated_event", "platform_delivery"] },
+          "additionalProperties": { "$ref": "#/$defs/platforms" }
+        }
+      }
+    }
+  }
+}
