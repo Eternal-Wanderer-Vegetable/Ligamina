@@ -203,14 +203,16 @@ async fn koishi_commands_are_listed_and_callable_as_mcp_tools_without_a_gateway(
     .await
     .unwrap();
     assert_eq!(first_text(&result), "STRUCTURED -U TEXT");
-    assert!(
-        call(
-            &client,
-            "cmd.koishi-tools.ligamina.echo",
-            json!({ "arguments": "x", "value": "y" }),
-        )
-        .await
-        .is_err(),
+    let mixed = call(
+        &client,
+        "cmd.koishi-tools.ligamina.echo",
+        json!({ "arguments": "x", "value": "y" }),
+    )
+    .await
+    .expect("invalid arguments are reported in the tool result");
+    assert_eq!(
+        mixed.is_error,
+        Some(true),
         "raw and structured input together are rejected"
     );
 
@@ -239,15 +241,36 @@ async fn koishi_commands_are_listed_and_callable_as_mcp_tools_without_a_gateway(
     assert_eq!(first_text(&left.unwrap()), "left");
     assert_eq!(first_text(&right.unwrap()), "right");
 
-    assert!(
-        call(
-            &client,
-            "cmd.koishi-tools.ligamina.echo",
-            json!({ "text": "x" })
-        )
-        .await
-        .is_err(),
+    // Arguments outside the input schema are a tool execution error (isError), not a
+    // protocol error, so the session stays usable and the model sees why.
+    let rejected = call(
+        &client,
+        "cmd.koishi-tools.ligamina.echo",
+        json!({ "text": "x" }),
+    )
+    .await
+    .expect("invalid arguments are reported in the tool result");
+    assert_eq!(
+        rejected.is_error,
+        Some(true),
         "unexpected argument fields are rejected"
+    );
+    assert!(
+        first_text(&rejected).contains("unexpected argument field: text"),
+        "{}",
+        first_text(&rejected)
+    );
+    let after = call(
+        &client,
+        "cmd.koishi-tools.ligamina.echo",
+        json!({ "arguments": "still here" }),
+    )
+    .await
+    .unwrap();
+    assert_eq!(
+        first_text(&after),
+        "still here",
+        "the session survives a rejected call"
     );
     assert!(
         call(&client, "cmd.koishi-tools.missing", json!({}))
