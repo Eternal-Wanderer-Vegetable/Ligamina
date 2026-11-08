@@ -1,7 +1,7 @@
 use std::{collections::BTreeMap, ffi::OsString, path::PathBuf, time::Duration};
 
 use ligamina_core::{
-    deployment::local::LocalCommand,
+    deployment::local::{CleanupCommand, LocalCommand},
     supervisor::{
         HostConfig, HostState, HostStatus, HostSupervisor, RestartPolicy, SupervisorError,
     },
@@ -268,6 +268,92 @@ async fn host_originated_core_requests_carry_the_active_host_epoch() {
 }
 
 #[cfg(any(unix, windows))]
+/// The cleanup command appends its `{spawn}` argument to `log`, one line per run.
+fn with_recording_cleanup(mut config: HostConfig, log: &std::path::Path) -> HostConfig {
+    let root = PathBuf::from(env!("CARGO_MANIFEST_DIR"))
+        .join("../..")
+        .canonicalize()
+        .unwrap();
+    let args: Vec<OsString> = [
+        "run",
+        "--locked",
+        "--project",
+        root.join("hosts/nonebot").to_str().unwrap(),
+        "--python",
+        "3.12.14",
+        "python",
+        "-c",
+        "import sys; open(sys.argv[1], 'a').write(sys.argv[2] + chr(10))",
+        log.to_str().unwrap(),
+        "{spawn}",
+    ]
+    .into_iter()
+    .map(OsString::from)
+    .collect();
+    config.command.cleanup = Some(CleanupCommand {
+        program: OsString::from("uv"),
+        args,
+        timeout: Duration::from_secs(60),
+    });
+    config.command.environment.insert(
+        OsString::from("UV_PROJECT_ENVIRONMENT"),
+        std::env::temp_dir()
+            .join(format!("ligamina-supervisor-{}", config.id))
+            .into_os_string(),
+    );
+    config
+}
+
+fn cleanup_runs(log: &std::path::Path) -> Vec<String> {
+    std::fs::read_to_string(log)
+        .unwrap_or_default()
+        .lines()
+        .map(str::to_owned)
+        .collect()
+}
+
+#[tokio::test(flavor = "multi_thread", worker_threads = 4)]
+async fn cleanup_runs_once_per_launch_after_crash_and_after_shutdown() {
+    let dir = std::env::temp_dir().join(format!("ligamina-cleanup-{}", std::process::id()));
+    std::fs::create_dir_all(&dir).unwrap();
+    let log = dir.join("cleanup.log");
+    let _ = std::fs::remove_file(&log);
+    let mut config = with_recording_cleanup(worker_config("cleanup"), &log);
+    config.restart.max_restarts = 1;
+    let supervisor = HostSupervisor::new();
+    supervisor.apply_desired_set(vec![config]).await.unwrap();
+
+    // Crash: the monitor runs the cleanup for the first launch, then the Host restarts.
+    let first = supervisor.handle("cleanup").await.unwrap();
+    let _ = first
+        .request("host.crash", Value::Null, Duration::from_secs(2))
+        .await;
+    timeout(Duration::from_secs(60), async {
+        while cleanup_runs(&log).is_empty() {
+            sleep(Duration::from_millis(50)).await;
+        }
+    })
+    .await
+    .expect("cleanup after the crash");
+    wait_for_status(&supervisor, "cleanup", |status| {
+        status.state == HostState::Active
+    })
+    .await;
+
+    // Shutdown: the second launch is cleaned up before shutdown returns.
+    supervisor.shutdown().await;
+    let runs = cleanup_runs(&log);
+    assert_eq!(runs.len(), 2, "one cleanup per launch: {runs:?}");
+    assert_ne!(runs[0], runs[1], "each launch gets its own spawn id");
+    for run in &runs {
+        let (epoch, token) = run.split_once('-').expect("spawn id is <epoch>-<token>");
+        assert!(epoch.parse::<u64>().is_ok(), "{run}");
+        assert_eq!(token.len(), 12, "{run}");
+        assert!(!run.contains('{'), "placeholder was substituted: {run}");
+    }
+    let _ = std::fs::remove_dir_all(&dir);
+}
+
 #[tokio::test(flavor = "multi_thread", worker_threads = 4)]
 async fn shutdown_cleans_up_host_grandchildren() {
     let supervisor = HostSupervisor::new();

@@ -31,6 +31,20 @@ pub type CoreRequestHandler = Arc<
 
 use std::future::Future;
 
+/// Replaced in `args` and in the cleanup command by an ID unique to each launch, so a
+/// container started for one generation can be named and removed by that name.
+pub const SPAWN_PLACEHOLDER: &str = "{spawn}";
+
+/// A command run once after the launched process has exited or been stopped, for
+/// resources the process tree does not own (for example a container left running
+/// after its `docker` client was killed). Failures are reported, never retried.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct CleanupCommand {
+    pub program: OsString,
+    pub args: Vec<OsString>,
+    pub timeout: Duration,
+}
+
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct LocalCommand {
     pub program: OsString,
@@ -40,6 +54,7 @@ pub struct LocalCommand {
     pub clear_environment: bool,
     pub startup_timeout: Duration,
     pub shutdown_timeout: Duration,
+    pub cleanup: Option<CleanupCommand>,
 }
 
 impl LocalCommand {
@@ -52,7 +67,49 @@ impl LocalCommand {
             clear_environment: false,
             startup_timeout: Duration::from_secs(15),
             shutdown_timeout: Duration::from_secs(10),
+            cleanup: None,
         }
+    }
+}
+
+/// Substitutes [`SPAWN_PLACEHOLDER`] with `spawn_id` in every argument that contains it.
+pub fn substitute_spawn(args: &[OsString], spawn_id: &str) -> Vec<OsString> {
+    args.iter()
+        .map(|arg| match arg.to_str() {
+            Some(text) if text.contains(SPAWN_PLACEHOLDER) => {
+                OsString::from(text.replace(SPAWN_PLACEHOLDER, spawn_id))
+            }
+            _ => arg.clone(),
+        })
+        .collect()
+}
+
+fn new_spawn_id(epoch: u64) -> String {
+    let random = uuid::Uuid::new_v4().simple().to_string();
+    format!("{epoch}-{}", &random[..12])
+}
+
+/// Runs a cleanup command to completion. Returns a description of the failure, if any.
+pub async fn run_cleanup(cleanup: &CleanupCommand) -> Result<(), String> {
+    let mut command = Command::new(&cleanup.program);
+    command
+        .args(&cleanup.args)
+        .stdin(std::process::Stdio::null())
+        .stdout(std::process::Stdio::null())
+        .stderr(std::process::Stdio::piped())
+        .kill_on_drop(true);
+    let child = command
+        .spawn()
+        .map_err(|error| format!("cleanup could not start: {error}"))?;
+    match tokio::time::timeout(cleanup.timeout, child.wait_with_output()).await {
+        Err(_) => Err(format!("cleanup timed out after {:?}", cleanup.timeout)),
+        Ok(Err(error)) => Err(format!("cleanup failed: {error}")),
+        Ok(Ok(output)) if output.status.success() => Ok(()),
+        Ok(Ok(output)) => Err(format!(
+            "cleanup exited with {}: {}",
+            output.status,
+            String::from_utf8_lossy(&output.stderr).trim()
+        )),
     }
 }
 
@@ -92,6 +149,8 @@ pub(crate) struct SpawnedProcess {
     pub process_tree: ProcessTree,
     pub exited: watch::Receiver<Option<ExitInfo>>,
     pub cancellation: CancellationToken,
+    /// The launch's cleanup command with [`SPAWN_PLACEHOLDER`] already resolved.
+    pub cleanup: Option<CleanupCommand>,
 }
 
 pub(crate) async fn spawn(
@@ -100,9 +159,10 @@ pub(crate) async fn spawn(
     epoch: u64,
     handler: CoreRequestHandler,
 ) -> io::Result<SpawnedProcess> {
+    let spawn_id = new_spawn_id(epoch);
     let mut command = Command::new(&command_spec.program);
     command
-        .args(&command_spec.args)
+        .args(substitute_spawn(&command_spec.args, &spawn_id))
         .stdin(std::process::Stdio::piped())
         .stdout(std::process::Stdio::piped())
         .stderr(std::process::Stdio::piped())
@@ -189,12 +249,18 @@ pub(crate) async fn spawn(
         let _ = stderr_task.await;
     });
 
+    let cleanup = command_spec.cleanup.as_ref().map(|cleanup| CleanupCommand {
+        program: cleanup.program.clone(),
+        args: substitute_spawn(&cleanup.args, &spawn_id),
+        timeout: cleanup.timeout,
+    });
     Ok(SpawnedProcess {
         pid,
         session,
         process_tree,
         exited,
         cancellation,
+        cleanup,
     })
 }
 

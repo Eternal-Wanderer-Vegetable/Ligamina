@@ -127,6 +127,26 @@ struct RunningProcess {
     process_tree: local::ProcessTree,
     exited: watch::Receiver<Option<ExitInfo>>,
     cancellation: CancellationToken,
+    cleanup: Option<Arc<CleanupOnce>>,
+}
+
+/// Runs a launch's cleanup command at most once, whichever exit path reaches it first.
+struct CleanupOnce {
+    host_id: String,
+    command: local::CleanupCommand,
+    done: tokio::sync::OnceCell<()>,
+}
+
+impl CleanupOnce {
+    async fn run(&self) {
+        self.done
+            .get_or_init(|| async {
+                if let Err(error) = local::run_cleanup(&self.command).await {
+                    eprintln!("Host {} cleanup after exit failed: {error}", self.host_id);
+                }
+            })
+            .await;
+    }
 }
 
 struct SupervisorInner {
@@ -434,7 +454,7 @@ async fn start_generation(
             });
         }
     };
-    let running = running_process(spawned);
+    let running = running_process(spawned, &config.id);
     {
         let mut record = slot.record.lock().await;
         if !record.desired || record.epoch != epoch {
@@ -499,13 +519,20 @@ async fn start_generation(
     }
 }
 
-fn running_process(process: SpawnedProcess) -> RunningProcess {
+fn running_process(process: SpawnedProcess, host_id: &str) -> RunningProcess {
     RunningProcess {
         pid: process.pid,
         session: process.session,
         process_tree: process.process_tree,
         exited: process.exited,
         cancellation: process.cancellation,
+        cleanup: process.cleanup.map(|command| {
+            Arc::new(CleanupOnce {
+                host_id: host_id.to_owned(),
+                command,
+                done: tokio::sync::OnceCell::new(),
+            })
+        }),
     }
 }
 
@@ -541,6 +568,9 @@ fn monitor_process(
         };
         running.cancellation.cancel();
         running.process_tree.terminate(true);
+        if let Some(cleanup) = &running.cleanup {
+            cleanup.run().await;
+        }
         process_exited(inner, slot, config, epoch, info).await;
     });
 }
@@ -656,6 +686,11 @@ async fn stop_running(process: &RunningProcess, command: &LocalCommand) {
     }
     // The main process may have exited while descendants remained in its group/job.
     process.process_tree.terminate(true);
+    // Resources outside the process tree (a container whose client was killed) are
+    // removed before stop returns, so shutdown does not race the monitor task.
+    if let Some(cleanup) = &process.cleanup {
+        cleanup.run().await;
+    }
 }
 
 async fn wait_for_exit(
