@@ -36,7 +36,7 @@ representative 校验发布物哈希、创建单插件 profile、生成依赖锁
 
 ## 当前支持范围
 
-以 [T18](../../outputs/acceptance/t18-final-audit-20261012.json) supported_plugins 和 T13 fixtures 为准：四个精确版本，Windows 与本机 WSL Linux 有证据。L0–L3 失败、未运行与条件缺失不进入支持名单。
+以 [T18](../../outputs/acceptance/t18-final-audit-20261012.json) supported_plugins 和 T13 fixtures 为准：四个精确版本，Windows 与本机 WSL Linux 有证据。L0–L3 失败、未运行与条件缺失不进入支持名单。按能力维度汇总全部证据的[兼容性矩阵](../../outputs/compat/compatibility-matrix-v1.md)由 `python -m lab.compat_matrix build` 生成，是证据索引而非支持名单（口径见其开头，P6-04）。
 
 S2-05 在禁网 Linux Docker Worker 对四个精确版本完成 stock/native 与 federated 双路径复核，四项通过；Windows Sandbox 被本机 App Control 阻止于插件启动前，后续 Windows cohort 仍未验收。
 

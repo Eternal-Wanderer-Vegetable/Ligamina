@@ -2,6 +2,7 @@
 
 ## Current Objective
 
+- **2026-11-08 最新：P6-03、P6-04 完成。** 重建矩阵：`UV_PROJECT_ENVIRONMENT=<新目录> uv run --locked --project lab --python 3.12.14 python -m lab.compat_matrix build`（新增或替换证据后运行，再提交两份输出）；校验：`... -m lab.compat_matrix check`。下一步：整体执行剩余 QQ 场景（隔离、重复/重启、超时/unknown，每生态各三次），完成后把结果写入新报告并重建矩阵。
 - **2026-11-08 最新：P6-03 完成（ADR 0003），下一项 P6-04 / feat-044。** 复现现场验收：先 `cargo build -p ligamina-cli`，再 `python lab/field/isolation_acceptance.py --work .work/<新目录> --output outputs/acceptance/<新报告>.json`（需 WSL Docker 与 TOOL-04/AB-05 镜像和 bundle）。之后按用户要求整体执行剩余 QQ 场景（隔离、重复/重启、超时/unknown 各三次）。
 - **2026-11-08 最新：P6-01 真实 QQ 正例已通过（三种生态，经 Stella MCP 路径），见计划 3.1b。** 运行环境已恢复：Stella 按原方式运行（`.work/field-20261107/run-stella.ps1 -Mode start -LlmBaseUrl http://127.0.0.1:1234 -LlmModel google/gemma-4-e4b`，MCP 关闭），现场 Core 已停止。复现完整联调：生成新 Core 配置 `python lab/field/three_host_config.py --work .work/<新目录> --port 63900`，按 `.work/field-20261108/qq1/` 的做法扩展 Stella 两份 MCP 配置（先备份），把 Stella PR #132 的补丁应用到 Stella 检出并以 `run-stella.ps1 -Mcp` 启动，结束后恢复。下一步：Stella PR #132 合并后补跑隔离、重复/重启、超时/unknown 各三次；或转 P6-03 / P6-04。
 - **2026-11-08 Stella MCP 实验已完成（P6-01 的 MCP 路径）。** 复现：`powershell -NoProfile -File lab/field/run_stella_mcp_experiment.ps1 -Run <新 id>`（层级 1）或加 `-Level comes`（层级 2，需 LM Studio 在 127.0.0.1:1234 加载 `google/gemma-4-e4b`）。现场 Core 用 63910 端口，避开 Stella 配置中的 63900；正在运行的 Stella（8080）未改动。待 Stella 侧修复两处问题后再做 QQ 投递：能力直回投递门（其 docs/reports/2026-11-07-…）与参数全可选工具的直调捷径（见计划 3.1a）。

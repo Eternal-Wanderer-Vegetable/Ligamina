@@ -2,7 +2,7 @@
   "schema_version": 1,
   "updated_at": "2026-11-08",
   "active_feature": null,
-  "next_feature": "feat-044",
+  "next_feature": null,
   "features": [
     {
       "id": "feat-001",
@@ -2323,10 +2323,17 @@
         "feat-041",
         "feat-035"
       ],
-      "status": "not-started",
+      "status": "done",
       "done_when": "区分 verified/failed/skipped/unknown/untested；每条对外兼容声明可追溯到具体证据文件与哈希；PR 上运行轻量回归。",
-      "evidence": "",
-      "evidence_paths": []
+      "evidence": "2026-11-08：lab/compat_matrix.py 从已提交证据生成 outputs/compat/compatibility-matrix-v1.{json,md}：8,961 个目录条目，537 个证据源，能力 load（按平台）/mcp_tool/federated_event/platform_delivery，取值 verified/failed/skipped/unknown/untested；每条 verified/failed 引用证据文件、SHA-256 与文件内记录，schema contracts/lab/compat/v1/compatibility-matrix.schema.json。核对：Koishi/NoneBot 每平台 4,747/943 条 load，剩余 unknown 53 与 P3-10 一致；AstrBot load 21/1/2 与 AB-04 一致；工具级 5 个插件、行为 20 个条目、真实平台 3 个插件。PR 上 Linux 自检运行 lab.tests.test_compat_matrix（8 项）与 python -m lab.compat_matrix check。矩阵 JSON SHA-256 a34c064790753b2e735ef82e69d3ed283847cc2c873e66052858eec7ef8a0ebb。native_platform_api 维度因无系统性证据未加入。",
+      "evidence_paths": [
+        "lab/compat_matrix.py",
+        "lab/tests/test_compat_matrix.py",
+        "contracts/lab/compat/v1/compatibility-matrix.schema.json",
+        "outputs/compat/compatibility-matrix-v1.json",
+        "outputs/compat/compatibility-matrix-v1.md",
+        "scripts/phase3-linux-self-test.sh"
+      ]
     }
   ]
 }
