@@ -50,7 +50,7 @@ async def main() -> None:
             for descriptor in commands:
                 assert contracts.validate_command_descriptor(descriptor) == [], descriptor
             by_id = {descriptor["command_id"]: descriptor for descriptor in commands}
-            assert set(by_id) == {"ligamina_echo", "ligamina_add", "ligamina_twice"}, sorted(by_id)
+            assert set(by_id) == {"ligamina_echo", "ligamina_add", "ligamina_twice", "ligamina_admin", "ligamina_proactive"}, sorted(by_id)
             assert by_id["ligamina_echo"]["aliases"] == ["/lecho"], by_id["ligamina_echo"]
             assert by_id["ligamina_add"]["arguments"] == [
                 {"name": "left", "required": True, "type": "integer"},

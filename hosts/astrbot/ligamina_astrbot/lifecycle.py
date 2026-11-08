@@ -70,6 +70,11 @@ class HostLifecycle:
         from . import bridge  # noqa: F401  registers the platform adapter
         from astrbot.core.core_lifecycle import AstrBotCoreLifecycle
 
+        # AstrBot's default admin list is ["astrbot"], which would make any platform user
+        # with that ID an admin. Admins are always explicit here (none by default).
+        astrbot_config["admins_id"] = [
+            item.strip() for item in os.environ.get("LIGAMINA_ASTRBOT_ADMINS", "").split(",") if item.strip()
+        ]
         for key, value in HEADLESS_CONFIG.items():
             if isinstance(value, dict) and isinstance(astrbot_config.get(key), dict):
                 astrbot_config[key].update(value)

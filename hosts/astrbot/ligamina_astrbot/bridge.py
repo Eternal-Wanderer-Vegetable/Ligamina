@@ -58,17 +58,7 @@ class BridgeEvent(AstrMessageEvent):
                 "target": {"kind": conversation["kind"], "id": conversation["id"]},
                 "params": {"message": segments},
             }
-            errors = validate_operation(operation)
-            if errors:
-                raise BridgeApiError("invalid_request", "; ".join(errors))
-            call = RUNTIME["platform_call"]
-            if call is None:
-                raise BridgeApiError("host_not_ready", "platform.execute is unavailable")
-            result = await call(operation)
-            if not isinstance(result, dict) or result.get("status") != "succeeded":
-                status = result.get("status") if isinstance(result, dict) else None
-                code = "operation_unknown" if status == "unknown" else "platform_operation_failed"
-                raise BridgeApiError(code, f"platform operation ended with status {status!r}")
+            await _execute(operation)
         await super().send(message)
 
     def cleanup_temporary_local_files(self) -> None:
@@ -87,6 +77,8 @@ class BridgePlatform(Platform):
         super().__init__(platform_config, event_queue)
         self.settings = platform_settings
         self._stop = asyncio.Event()
+        # session_id -> (account_id, conversation) for proactive sends, bounded.
+        self._sessions: dict[str, tuple[str, dict[str, str]]] = {}
         RUNTIME["instance"] = self
 
     def meta(self) -> PlatformMetadata:
@@ -103,9 +95,28 @@ class BridgePlatform(Platform):
         self._stop.set()
 
     async def send_by_session(self, session: Any, message_chain: MessageChain) -> None:
-        # Proactive sends outside an event need an explicit account and a ledger path;
-        # they are not part of this profile yet.
-        raise BridgeApiError("unsupported_api", "proactive send_by_session is not supported by the Ligamina bridge")
+        """Proactive send to a conversation this Host has seen.
+
+        The operation carries a fresh trace, so it goes through the Core's normal
+        grant, ledger and Gateway path (or is refused for tool accounts); it is never
+        delivered as part of another event's tool result.
+        """
+        known = self._sessions.get(str(getattr(session, "session_id", "")))
+        if known is None:
+            raise BridgeApiError("unsupported_api", "proactive send to a conversation this Host has not seen")
+        account_id, conversation = known
+        segments = outgoing_segments(message_chain)
+        if not segments:
+            return
+        await _execute({
+            "operation_id": str(uuid.uuid4()),
+            "trace_id": f"proactive-{uuid.uuid4()}",
+            "account_id": account_id,
+            "operation": "send_message",
+            "target": dict(conversation),
+            "params": {"message": segments},
+        })
+        await super().send_by_session(session, message_chain)
 
     async def dispatch(self, envelope: dict[str, Any], *, timeout: float = 30.0) -> None:
         errors = validate_event(envelope)
@@ -114,6 +125,11 @@ class BridgePlatform(Platform):
         if envelope["target_host"] != RUNTIME["host_id"]:
             raise BridgeApiError("wrong_host", "event target_host does not match this Host")
         message = to_astrbot_message(envelope)
+        await _enrich_replies(message, envelope)
+        conversation = envelope["conversation"]
+        self._sessions[message.session_id] = (envelope["account_id"], {"kind": conversation["kind"], "id": conversation["id"]})
+        while len(self._sessions) > 10_000:
+            self._sessions.pop(next(iter(self._sessions)))
         done: asyncio.Future = asyncio.get_running_loop().create_future()
         event = BridgeEvent(
             message_str=message.message_str,
@@ -128,6 +144,52 @@ class BridgePlatform(Platform):
             await asyncio.wait_for(done, timeout=timeout)
         except asyncio.TimeoutError as error:
             raise BridgeApiError("timeout", f"AstrBot pipeline did not finish in {timeout:g} seconds") from error
+
+
+async def _execute(operation: dict[str, Any]) -> dict[str, Any]:
+    errors = validate_operation(operation)
+    if errors:
+        raise BridgeApiError("invalid_request", "; ".join(errors))
+    call = RUNTIME["platform_call"]
+    if call is None:
+        raise BridgeApiError("host_not_ready", "platform.execute is unavailable")
+    result = await call(operation)
+    if not isinstance(result, dict) or result.get("status") != "succeeded":
+        status = result.get("status") if isinstance(result, dict) else None
+        code = "operation_unknown" if status == "unknown" else "platform_operation_failed"
+        raise BridgeApiError(code, f"platform operation ended with status {status!r}")
+    return result
+
+
+async def _enrich_replies(message: AstrBotMessage, envelope: dict[str, Any]) -> None:
+    """Fill quoted-message details the way native adapters do (via get_message).
+
+    AstrBot wakes on a reply to the bot's own message, which needs the quoted
+    sender. If the platform cannot return the message (for example in tool
+    sessions), the reply keeps only its ID and wakes nothing by itself.
+    """
+    conversation = envelope["conversation"]
+    for component in message.message:
+        if not isinstance(component, Reply):
+            continue
+        try:
+            result = await _execute({
+                "operation_id": str(uuid.uuid4()),
+                "trace_id": envelope["trace_id"],
+                "account_id": envelope["account_id"],
+                "operation": "get_message",
+                "target": {"kind": conversation["kind"], "id": conversation["id"]},
+                "params": {"message_id": str(component.id)},
+            })
+        except Exception:
+            continue
+        data = result.get("data") if isinstance(result.get("data"), dict) else {}
+        if data.get("target") not in (None, {"kind": conversation["kind"], "id": conversation["id"]}):
+            continue
+        component.sender_id = str(data.get("actor_id") or "")
+        component.sender_nickname = str(data.get("nickname") or "")
+        quoted = data.get("message") if isinstance(data.get("message"), list) else []
+        component.message_str = "".join(seg.get("text", "") for seg in quoted if isinstance(seg, dict) and seg.get("type") == "text")
 
 
 def to_astrbot_message(envelope: dict[str, Any]) -> AstrBotMessage:

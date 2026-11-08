@@ -25,6 +25,18 @@ class LigaminaSmoke(Star):
         await event.send(_chain(f"first:{text}"))
         yield event.plain_result(f"second:{text}")
 
+    @filter.permission_type(filter.PermissionType.ADMIN)
+    @filter.command("ligamina_admin")
+    async def admin_only(self, event: AstrMessageEvent):
+        """Reply only to configured admins"""
+        yield event.plain_result("admin-ok")
+
+    @filter.command("ligamina_proactive")
+    async def proactive(self, event: AstrMessageEvent):
+        """Send a proactive message to the same session"""
+        await self.context.send_message(event.unified_msg_origin, _chain("proactive-ok"))
+        yield event.plain_result("queued")
+
 
 def _chain(text: str):
     from astrbot.core.message.components import Plain

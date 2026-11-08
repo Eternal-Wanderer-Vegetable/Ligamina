@@ -31,6 +31,7 @@ uv run --locked --project hosts/nonebot --python 3.12.14 python hosts/nonebot/te
 uv run --locked --project hosts/nonebot --python 3.12.14 python hosts/nonebot/tests/native_bridge.py
 uv run --locked --project hosts/nonebot --python 3.12.14 python hosts/nonebot/tests/command_tools.py
 uv run --locked --project hosts/astrbot --python 3.12.14 python hosts/astrbot/tests/bridge_smoke.py
+uv run --locked --project hosts/astrbot --python 3.12.14 python hosts/astrbot/tests/event_parity.py
 uv run --locked --project hosts/nonebot --python 3.12.14 python hosts/nonebot/tests/worker_smoke.py
 
 (
