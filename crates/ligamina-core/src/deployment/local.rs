@@ -98,6 +98,8 @@ pub async fn run_cleanup(cleanup: &CleanupCommand) -> Result<(), String> {
         .stdout(std::process::Stdio::null())
         .stderr(std::process::Stdio::piped())
         .kill_on_drop(true);
+    #[cfg(windows)]
+    command.creation_flags(windows_sys::Win32::System::Threading::CREATE_NO_WINDOW);
     let child = command
         .spawn()
         .map_err(|error| format!("cleanup could not start: {error}"))?;
@@ -168,7 +170,13 @@ pub(crate) async fn spawn(
         .stderr(std::process::Stdio::piped())
         .kill_on_drop(true);
     #[cfg(windows)]
-    command.creation_flags(windows_sys::Win32::System::Threading::CREATE_SUSPENDED);
+    // CREATE_NO_WINDOW: when the Core itself has no console, a console Host (for example
+    // `wsl.exe` running docker) would otherwise get its own visible console window, and
+    // closing that window kills the Host with STATUS_CONTROL_C_EXIT.
+    command.creation_flags(
+        windows_sys::Win32::System::Threading::CREATE_SUSPENDED
+            | windows_sys::Win32::System::Threading::CREATE_NO_WINDOW,
+    );
     if let Some(current_dir) = &command_spec.current_dir {
         command.current_dir(current_dir);
     }

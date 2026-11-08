@@ -58,6 +58,7 @@ trap finish EXIT
     lab.tests.test_automation_dispatcher \
     lab.tests.test_native_runner \
     lab.tests.test_compare \
+    lab.tests.test_compat_matrix \
     lab.tests.test_baselines.StockBaselineSourceTests.test_both_native_host_profiles_are_present \
     lab.tests.test_baselines.StockBaselineSourceTests.test_linux_profile_cleanup_removes_host_owned_staging_without_docker \
     lab.tests.test_baselines.StockBaselineSourceTests.test_native_baseline_sources_do_not_import_ligamina_bridge \
@@ -65,4 +66,6 @@ trap finish EXIT
     lab.tests.test_baselines.StockBaselineSourceTests.test_registry_proxy_is_scoped_to_host_resolver_environment \
     lab.tests.test_baselines.StockBaselineSourceTests.test_s205_worker_closure_includes_recipe_helpers -v
   uv run --locked --project lab --python 3.12.14 python -m lab.automation validate-behavior
+  # P6-04: the committed compatibility matrix must match the committed evidence.
+  uv run --locked --project lab --python 3.12.14 python -m lab.compat_matrix check
 } 2>&1 | tee "$log"

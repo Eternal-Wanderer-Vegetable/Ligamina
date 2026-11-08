@@ -248,10 +248,12 @@ pub async fn sweep_leftovers(
     owner: &str,
     spec: &ContainerSpec,
 ) -> Result<usize, String> {
+    let mut list = tokio::process::Command::new(&spec.docker[0]);
+    #[cfg(windows)]
+    list.creation_flags(windows_sys::Win32::System::Threading::CREATE_NO_WINDOW);
     let output = tokio::time::timeout(
         CLEANUP_TIMEOUT,
-        tokio::process::Command::new(&spec.docker[0])
-            .args(&spec.docker[1..])
+        list.args(&spec.docker[1..])
             .args([
                 "ps",
                 "-aq",
