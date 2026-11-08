@@ -15,6 +15,7 @@
 | 第五阶段 AstrBot Host（AB-01–05 完成） | [第五阶段计划](plans/2026-11-07-phase-5-astrbot-host.md)、[AstrBot Host](../hosts/astrbot/README.md) |
 | 让 bot 或 Coding Agent 使用插件 | [Bot 与 Agent 接入](guides/bot-integration.md)：MCP 命令工具，或事件 + OneBot v11 Gateway |
 | 插件统一为 MCP 工具（TOOL-01–05 完成） | [插件工具面计划](plans/2026-11-07-plugin-tool-surface.md)、[ADR 0002](adr/0002-plugins-as-tools.md) |
+| Host 受信任等级与容器隔离 | [ADR 0003](adr/0003-host-trust-and-isolation.md)、[架构与接口边界](guides/architecture.md#host-受信任等级与隔离) |
 | 维护入口、指南与状态 | [文档维护](guides/documentation.md) |
 | 查阅旧设计、验收和裁决 | [证据索引](evidence/README.md) |
 

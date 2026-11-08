@@ -1,0 +1,101 @@
+{
+  "schema_version": 1,
+  "kind": "p6_p603_isolation_acceptance",
+  "date": "2026-11-08",
+  "owner": "8811a2b69cdc",
+  "checks": {
+    "rejections": {
+      "passed": true,
+      "cases": [
+        {
+          "case": "untrusted_without_isolation",
+          "exit_code": 1,
+          "stderr_names_rule": true,
+          "stderr": "Error: Host field-nonebot-roll rejected: trust = untrusted requires an `isolation` block"
+        },
+        {
+          "case": "image_not_pinned",
+          "exit_code": 1,
+          "stderr_names_rule": true,
+          "stderr": "Error: Host field-nonebot-roll: isolation.image must be pinned by digest (name@sha256:<64 hex>) (rejected)"
+        },
+        {
+          "case": "writable_mount",
+          "exit_code": 1,
+          "stderr_names_rule": true,
+          "stderr": "Error: Host field-nonebot-roll: bind mounts of an untrusted Host must be read-only (rejected)"
+        },
+        {
+          "case": "network_not_none",
+          "exit_code": 1,
+          "stderr_names_rule": true,
+          "stderr": "Error: Host field-nonebot-roll: isolation.network must be `none` (rejected)"
+        },
+        {
+          "case": "unknown_isolation_field",
+          "exit_code": 1,
+          "stderr_names_rule": true,
+          "stderr": "    unknown field `read_only_root`, expected one of `runtime`, `docker`, `image`, `entrypoint`, `command`, `workdir`, `user`, `environment`, `mounts`, `tmpfs`, `memory_mb`, `cpus`, `pids_limit`, `network` at line 119 column 24"
+        }
+      ]
+    },
+    "leftover_swept": {
+      "passed": true,
+      "leftover_id": "8d8d4ba75fa6"
+    },
+    "hardening": {
+      "passed": true,
+      "containers": [
+        {
+          "container": "ligamina-field-astrbot-teamup-2-4e16a6f5f91c",
+          "network_none": true,
+          "read_only_root": true,
+          "cap_drop_all": true,
+          "no_new_privileges": true,
+          "pids_limited": true,
+          "memory_limited": true,
+          "cpus_limited": true,
+          "bind_mounts_read_only": true,
+          "auto_remove": true
+        },
+        {
+          "container": "ligamina-field-nonebot-roll-2-c4364c3c5205",
+          "network_none": true,
+          "read_only_root": true,
+          "cap_drop_all": true,
+          "no_new_privileges": true,
+          "pids_limited": true,
+          "memory_limited": true,
+          "cpus_limited": true,
+          "bind_mounts_read_only": true,
+          "auto_remove": true
+        },
+        {
+          "container": "ligamina-field-koishi-echo-2-5d021e127f5c",
+          "network_none": true,
+          "read_only_root": true,
+          "cap_drop_all": true,
+          "no_new_privileges": true,
+          "pids_limited": true,
+          "memory_limited": true,
+          "cpus_limited": true,
+          "bind_mounts_read_only": true,
+          "auto_remove": true
+        }
+      ]
+    },
+    "client_killed": {
+      "passed": true,
+      "old_container": "ligamina-field-nonebot-roll-2-c4364c3c5205",
+      "new_container": "ligamina-field-nonebot-roll-3-12137a85c1b2",
+      "epoch_before": 2,
+      "epoch_after": 3,
+      "restart_count": 1
+    },
+    "shutdown_clean": {
+      "passed": true,
+      "containers_left": []
+    }
+  },
+  "passed": true
+}

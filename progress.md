@@ -2,6 +2,7 @@
 
 ## Current State
 
+- **2026-11-08 P6-03 / feat-043 完成：Host 受信任等级与 Core 强制的容器隔离（ADR 0003）。** untrusted Host 只能由 Core 生成的加固容器运行，不安全配置使守护进程拒绝启动并写明规则，容器在 Host 退出/重启/停止后由 Core 删除，启动时清理遗留容器。`cargo test --workspace` 通过；现场验收三次独立运行全部通过（拒绝、遗留清理、docker inspect 加固、客户端被结束后的删除与重启、停止后无残留）；以新隔离复跑 Stella MCP 层级 1 三轮 27/27。下一项 P6-04 / feat-044。详见第六阶段计划 3.2。
 - **2026-11-08 P6-01 首次真实 QQ 投递闭环（正例，三种生态）：** 经 Stella 的 MCP 路径，用户在授权群内发送消息，第五轮 Koishi Echo、NoneBot Roll、AstrBot Teamup 全部按预期送达并经用户确认。前四轮暴露的问题均已修复：本仓库 Core 把命令工具的参数错误改为 `isError` 结果（`24ca6cf`）、忽略结构化字段旁的空 `arguments`（`1aa777c`）；Stella PR #132 修复会话被错误拆除并取消 lifespan 任务、空闲会话终止后不重连、确定性路由丢可选参数，并新增 `direct_reply = "tool_output"`。Stella 已恢复原样运行。隔离、重复/重启、超时/unknown 场景未执行，P4-FIELD 仍 blocked。详见第六阶段计划 3.1b。
 - **2026-11-08 Stella 侧修复：PR #132（Stella 仓库，分支 `codex/fix-capability-tool-delivery`，基于其 main，不影响其进行中的 PR #130）。** 能力直回新增可信投递来源 `capability-direct` 并在投递计划被拒时写 WARNING；参数全为可选的工具不再无参直调。Stella 新增回归测试 4 项（修复前失败、修复后通过），全量测试 4323 通过，余下 5 项失败在其 main 上同样存在。以该分支复跑本仓库 Comes 层级实验 9/9（修复前 6/9）。PR 未合并，QQ 投递未验证。
 - **2026-11-08 P6-01 MCP 路径：以 Stella 为 MCP 实验平台，三框架插件经 Stella 的 MCP 客户端与 Comes 执行器调用。** 不经聊天平台；正在运行的 Stella 未改动。层级 1（Stella `McpServerClient`，冻结 TOOL-04/AB-05 用例，3 轮全新 Core 与禁网容器）27/27 通过，容器残留 0、Gateway 操作 0。层级 2（Stella Comes 执行器 + 本地 LM Studio gemma-4-e4b 填参）掷骰 3/3、复读 3/3、组队昵称 0/3：Stella 的直调捷径把“无必填参数”当成“不带参数”，丢失了可选参数，属 Stella 侧问题。另记 rmcp 对 MCP 会话 DELETE 返回 202 导致 Python SDK 告警（无影响）。QQ 投递因 Stella 能力直回投递门未修复而未尝试，P4-FIELD 仍 blocked。详见第六阶段计划 3.1a 与 `outputs/acceptance/p6-stella-mcp-field-20261108-summary.json`。
