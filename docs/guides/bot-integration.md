@@ -20,6 +20,11 @@
 
 每次调用都在独立的临时私聊会话中运行，使用保留账号和普通权限；不会向任何真实平台发送消息。定时器等在命令处理结束后才发出的消息不计入结果。
 
+客户端须知：
+
+- MCP 会话空闲 5 分钟后由服务端关闭（rmcp 默认 keep-alive）。之后带旧会话 ID 的请求得到 HTTP 404，客户端应按 MCP 规范重新 `initialize` 并重试；该请求未被处理，重试不会重复执行命令。Python MCP SDK 把 404 报告为 `McpError(code=32600, "Session terminated")`。
+- 参数不合工具 `inputSchema`（未知字段、`arguments` 非字符串、原样文本与结构化字段同时给出）时，结果为 `isError: true`，文本以 `invalid arguments:` 开头，会话不受影响；只有未知或未开放的工具名才返回 JSON-RPC 错误。
+
 ## 路径二：事件 + Gateway（以 OneBot v11 为例）
 
 bot 自己持有 QQ 等平台连接（NapCat、Lagrange、LLOneBot 等 OneBot v11 实现）。Ligamina 只负责把消息交给插件、把插件要发的消息交还给 bot：
