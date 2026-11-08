@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import unittest
 
-from lab.astrbot_census import _requirement_name, locked_names, select_pilot
+from lab.astrbot_census import _requirement_name, locked_names, metadata_dir_name, select_pilot
 
 
 def _entry(entry_id: str, *notes: str, status: str = "frozen") -> dict:
@@ -33,6 +33,14 @@ class AstrBotCensusSelectionTests(unittest.TestCase):
         self.assertEqual(_requirement_name("Some_Package.Name~=1"), "some-package-name")
         self.assertIn("astrbot", locked_names())
         self.assertIn("aiohttp", locked_names())
+
+    def test_plugin_directory_follows_astrbot_metadata_name_rule(self) -> None:
+        self.assertEqual(metadata_dir_name("name: astrbot_plugin_gallery\nversion: 2.1.0\n"), "astrbot_plugin_gallery")
+        self.assertEqual(metadata_dir_name('desc: x\nname: "plugin_x"  # comment\n'), "plugin_x")
+        self.assertIsNone(metadata_dir_name("  name: nested_key_only\n"))
+        self.assertIsNone(metadata_dir_name("name: has-dash\n"))
+        self.assertIsNone(metadata_dir_name("name: class\n"))
+        self.assertIsNone(metadata_dir_name("version: 1\n"))
 
 
 if __name__ == "__main__":

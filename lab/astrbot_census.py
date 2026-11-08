@@ -17,6 +17,7 @@ import argparse
 import hashlib
 import io
 import json
+import keyword
 import os
 import re
 import shutil
@@ -90,12 +91,35 @@ def constraints_text() -> str:
     return "\n".join(lines) + "\n"
 
 
-def extract_plugin(archive_path: Path, plugin_root: str, target: Path) -> str:
-    """Extract only the plugin tree; paths were validated during the freeze and again here."""
+def metadata_dir_name(metadata_text: str) -> str | None:
+    """AstrBot 4.29.1 installs a plugin into a directory named after metadata.yaml's `name`
+    (stripped; must be a non-keyword Python identifier). Plugins rely on it, e.g.
+    `from data.plugins.<name>.utils import ...`. Only the top-level scalar key is read."""
+    for line in metadata_text.splitlines():
+        match = re.match(r"name:\s*(.*?)\s*$", line)
+        if not match:
+            continue
+        value = re.sub(r"\s+#.*$", "", match.group(1)).strip()
+        if len(value) >= 2 and value[0] == value[-1] and value[0] in "'\"":
+            value = value[1:-1].strip()
+        return value if value.isidentifier() and not keyword.iskeyword(value) else None
+    return None
+
+
+def extract_plugin(archive_path: Path, plugin_root: str, target: Path) -> tuple[str, str]:
+    """Extract only the plugin tree; paths were validated during the freeze and again here.
+
+    Returns (directory name, source): the metadata name AstrBot's installer would use, or a
+    sanitized archive-root name when the metadata has no usable name."""
     prefix = "" if plugin_root == "." else plugin_root + "/"
-    name = re.sub(r"[^A-Za-z0-9_]", "_", PurePosixPath(plugin_root).name if plugin_root != "." else "plugin") or "plugin"
-    destination = target / name
     with zipfile.ZipFile(io.BytesIO(archive_path.read_bytes())) as archive:
+        metadata_text = next((archive.read(prefix + filename).decode("utf-8", "replace")
+                              for filename in ("metadata.yaml", "metadata.yml") if prefix + filename in archive.namelist()), "")
+        name, source = metadata_dir_name(metadata_text), "metadata_name"
+        if name is None:
+            name = re.sub(r"[^A-Za-z0-9_]", "_", PurePosixPath(plugin_root).name if plugin_root != "." else "plugin") or "plugin"
+            source = "archive_root"
+        destination = target / name
         for info in archive.infolist():
             if info.is_dir() or not info.filename.startswith(prefix):
                 continue
@@ -105,7 +129,7 @@ def extract_plugin(archive_path: Path, plugin_root: str, target: Path) -> str:
             out = destination.joinpath(*relative.parts)
             out.parent.mkdir(parents=True, exist_ok=True)
             out.write_bytes(archive.read(info))
-    return name
+    return name, source
 
 
 def download_wheels(bundle: Path) -> dict[str, Any]:
@@ -136,7 +160,7 @@ def prepare_bundle(bundle: Path, entry: dict[str, Any], cache_root: Path) -> dic
     artifact = cache_root / entry["artifact"]["cache_path"]
     if _sha256(artifact) != entry["artifact"]["computed_digests"]["sha256"]:
         raise ValueError(f"cached archive differs from the frozen digest: {entry['registry_entry_id']}")
-    plugin_name = extract_plugin(artifact, entry["inspection"]["plugin_root"], bundle / "plugin")
+    plugin_name, name_source = extract_plugin(artifact, entry["inspection"]["plugin_root"], bundle / "plugin")
     locked = locked_names()
     requirements, satisfied = [], []
     for line in entry["inspection"].get("requirements") or []:
@@ -154,7 +178,7 @@ def prepare_bundle(bundle: Path, entry: dict[str, Any], cache_root: Path) -> dic
         shutil.copytree(ROOT / "contracts" / version, bundle / "project" / "contracts" / version)
     (bundle / "side").mkdir()
     shutil.copy2(ROOT / "lab/astrbot_census_side.py", bundle / "side" / "astrbot_census_side.py")
-    return {"plugin_dir": plugin_name, "requirement_count": len(requirements), "satisfied_by_runtime": satisfied}
+    return {"plugin_dir": plugin_name, "plugin_dir_source": name_source, "requirement_count": len(requirements), "satisfied_by_runtime": satisfied}
 
 
 def _checkpoint(output: Path, report: dict[str, Any]) -> None:
