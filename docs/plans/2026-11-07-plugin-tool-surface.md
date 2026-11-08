@@ -63,7 +63,7 @@
 
 ### 3.3 MCP 工具形态
 
-- **每个命令一个工具**，名为 `cmd.<host_id>.<command_id>`，非法字符统一替换为 `_`。前缀 `cmd.` 与 capability ID 若冲突则跳过并记录日志。选择一命令一工具，是因为 Agent 可以直接从工具列表发现插件能力；描述里带上框架说明和用法。
+- **每个命令一个工具**，名为 `cmd.<host_id>.<command_id>`，非法字符统一替换为 `_`；若替换改变了原值，追加 `-` 与原值 SHA-256 的前 8 位十六进制（2026-11-08 AB-05 发现：中文命令名原本全部塌缩为同样的下划线，被当作歧义丢弃；例 `组队菜单` → `____-fda2f352`，ASCII 名称不变）。前缀 `cmd.` 与 capability ID 若冲突则跳过并记录日志。选择一命令一工具，是因为 Agent 可以直接从工具列表发现插件能力；描述里带上框架说明和用法。
 - **输入**：`{ "arguments": string }`，即命令名之后的原样文本，由框架自己解析。这是 Koishi、NoneBot、AstrBot 都能遵守的最小公约数。结构化参数（`arguments` / `options` → JSON Schema）在 TOOL-03 中引入，并保留原样文本入口。
 - **输出**：结构化 `{ messages: [{ segments, text }], dispatch: "completed" }`，同时把所有文本拼接后放进 MCP text content，方便 LLM 直接阅读。
 - **默认关闭**：守护进程需要显式开启（配置 `command_tools.enabled`，可选 `allow` 精确列表）。未开启时 MCP 行为与之前完全相同。
