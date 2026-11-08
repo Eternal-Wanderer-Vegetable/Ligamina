@@ -1,0 +1,327 @@
+{
+  "run_id": "comes4-fixed",
+  "status": "completed",
+  "executor": "Stella capability.comes.executor.execute + McpServerClient",
+  "model": {
+    "base_url": "http://127.0.0.1:1234",
+    "model": "google/gemma-4-e4b"
+  },
+  "capabilities_loaded": 3,
+  "tool_schemas": {
+    "cmd.field-astrbot-teamup.____-f0d4f036": {
+      "additionalProperties": false,
+      "properties": {
+        "arguments": {
+          "description": "Text after the command name, parsed natively by the plugin framework; pass an empty string when the command takes no arguments. Use either this field or the structured fields, not both.",
+          "maxLength": 4096,
+          "type": "string"
+        },
+        "nickname": {
+          "description": "Positional argument",
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "cmd.field-koishi-echo.echo": {
+      "additionalProperties": false,
+      "properties": {
+        "arguments": {
+          "description": "Text after the command name, parsed natively by the plugin framework; pass an empty string when the command takes no arguments. Use either this field or the structured fields, not both.",
+          "maxLength": 4096,
+          "type": "string"
+        },
+        "message": {
+          "description": "Positional argument (required)",
+          "type": "string"
+        },
+        "options": {
+          "additionalProperties": false,
+          "description": "Command options by name.",
+          "properties": {
+            "channel": {
+              "description": "发送到频道",
+              "type": "string"
+            },
+            "escape": {
+              "description": "发送转义消息",
+              "type": "boolean"
+            },
+            "guild": {
+              "description": "指定群组编号",
+              "type": "string"
+            },
+            "unescape": {
+              "description": "发送反转义消息",
+              "type": "boolean"
+            },
+            "user": {
+              "description": "发送到用户",
+              "type": "string"
+            }
+          },
+          "type": "object"
+        }
+      },
+      "required": [
+        "message"
+      ],
+      "type": "object"
+    },
+    "cmd.field-nonebot-roll.rd": {
+      "additionalProperties": false,
+      "properties": {
+        "arguments": {
+          "description": "Text after the command name, parsed natively by the plugin framework; pass an empty string when the command takes no arguments. Use either this field or the structured fields, not both.",
+          "maxLength": 4096,
+          "type": "string"
+        }
+      },
+      "required": [
+        "arguments"
+      ],
+      "type": "object"
+    }
+  },
+  "platform_sends_by_fake_bot": 0,
+  "results": [
+    {
+      "case_id": "comes-roll-2d6",
+      "attempt": 1,
+      "objective": "帮我掷两个六面骰子",
+      "status": "success",
+      "tool_outputs": [
+        {
+          "tool": "mcp_plugins_cmd_field-nonebot-roll_rd",
+          "text": "你掷出了2个6面骰子, 点数为【4】"
+        }
+      ],
+      "summary": "两个六面骰子的点数是4。",
+      "metadata": {
+        "capability": "dice.roll",
+        "tools": [
+          "mcp_plugins_cmd_field-nonebot-roll_rd"
+        ],
+        "direct_call": false,
+        "steps": 1,
+        "missing": [],
+        "elapsed": 4.187
+      },
+      "model_calls": 2,
+      "ms": 4203,
+      "result": "passed"
+    },
+    {
+      "case_id": "comes-roll-2d6",
+      "attempt": 2,
+      "objective": "帮我掷两个六面骰子",
+      "status": "success",
+      "tool_outputs": [
+        {
+          "tool": "mcp_plugins_cmd_field-nonebot-roll_rd",
+          "text": "你掷出了2个6面骰子, 点数为【10】"
+        }
+      ],
+      "summary": "点数是10。",
+      "metadata": {
+        "capability": "dice.roll",
+        "tools": [
+          "mcp_plugins_cmd_field-nonebot-roll_rd"
+        ],
+        "direct_call": false,
+        "steps": 1,
+        "missing": [],
+        "elapsed": 3.969
+      },
+      "model_calls": 2,
+      "ms": 3969,
+      "result": "passed"
+    },
+    {
+      "case_id": "comes-roll-2d6",
+      "attempt": 3,
+      "objective": "帮我掷两个六面骰子",
+      "status": "success",
+      "tool_outputs": [
+        {
+          "tool": "mcp_plugins_cmd_field-nonebot-roll_rd",
+          "text": "你掷出了2个6面骰子, 点数为【4】"
+        }
+      ],
+      "summary": "点数是4。",
+      "metadata": {
+        "capability": "dice.roll",
+        "tools": [
+          "mcp_plugins_cmd_field-nonebot-roll_rd"
+        ],
+        "direct_call": false,
+        "steps": 1,
+        "missing": [],
+        "elapsed": 3.297
+      },
+      "model_calls": 2,
+      "ms": 3297,
+      "result": "passed"
+    },
+    {
+      "case_id": "comes-echo",
+      "attempt": 1,
+      "objective": "请让复读插件原样复述这句话：field-check-42",
+      "status": "success",
+      "tool_outputs": [
+        {
+          "tool": "mcp_plugins_cmd_field-koishi-echo_echo",
+          "text": "field-check-42"
+        }
+      ],
+      "summary": "复读插件原样复述了“field-check-42”。",
+      "metadata": {
+        "capability": "text.echo",
+        "tools": [
+          "mcp_plugins_cmd_field-koishi-echo_echo"
+        ],
+        "direct_call": false,
+        "steps": 1,
+        "missing": [],
+        "elapsed": 4.812
+      },
+      "model_calls": 2,
+      "ms": 4812,
+      "result": "passed"
+    },
+    {
+      "case_id": "comes-echo",
+      "attempt": 2,
+      "objective": "请让复读插件原样复述这句话：field-check-42",
+      "status": "success",
+      "tool_outputs": [
+        {
+          "tool": "mcp_plugins_cmd_field-koishi-echo_echo",
+          "text": "field-check-42"
+        }
+      ],
+      "summary": "复读插件原样复述了“field-check-42”。",
+      "metadata": {
+        "capability": "text.echo",
+        "tools": [
+          "mcp_plugins_cmd_field-koishi-echo_echo"
+        ],
+        "direct_call": false,
+        "steps": 1,
+        "missing": [],
+        "elapsed": 4.469
+      },
+      "model_calls": 2,
+      "ms": 4469,
+      "result": "passed"
+    },
+    {
+      "case_id": "comes-echo",
+      "attempt": 3,
+      "objective": "请让复读插件原样复述这句话：field-check-42",
+      "status": "success",
+      "tool_outputs": [
+        {
+          "tool": "mcp_plugins_cmd_field-koishi-echo_echo",
+          "text": "field-check-42"
+        }
+      ],
+      "summary": "复读插件原样复述了“field-check-42”。",
+      "metadata": {
+        "capability": "text.echo",
+        "tools": [
+          "mcp_plugins_cmd_field-koishi-echo_echo"
+        ],
+        "direct_call": false,
+        "steps": 1,
+        "missing": [],
+        "elapsed": 4.687
+      },
+      "model_calls": 2,
+      "ms": 4687,
+      "result": "passed"
+    },
+    {
+      "case_id": "comes-teamup-nickname",
+      "attempt": 1,
+      "objective": "把我的组队昵称设置成 测试员",
+      "status": "success",
+      "tool_outputs": [
+        {
+          "tool": "mcp_plugins_cmd_field-astrbot-teamup_____-f0d4f036",
+          "text": "已设置昵称：测试员"
+        }
+      ],
+      "summary": "组队昵称已设置为测试员。",
+      "metadata": {
+        "capability": "teamup.nickname",
+        "tools": [
+          "mcp_plugins_cmd_field-astrbot-teamup_____-f0d4f036"
+        ],
+        "direct_call": false,
+        "steps": 1,
+        "missing": [],
+        "elapsed": 4.547
+      },
+      "model_calls": 2,
+      "ms": 4547,
+      "result": "passed"
+    },
+    {
+      "case_id": "comes-teamup-nickname",
+      "attempt": 2,
+      "objective": "把我的组队昵称设置成 测试员",
+      "status": "success",
+      "tool_outputs": [
+        {
+          "tool": "mcp_plugins_cmd_field-astrbot-teamup_____-f0d4f036",
+          "text": "已设置昵称：测试员"
+        }
+      ],
+      "summary": "组队昵称已设置为测试员。",
+      "metadata": {
+        "capability": "teamup.nickname",
+        "tools": [
+          "mcp_plugins_cmd_field-astrbot-teamup_____-f0d4f036"
+        ],
+        "direct_call": false,
+        "steps": 1,
+        "missing": [],
+        "elapsed": 4.703
+      },
+      "model_calls": 2,
+      "ms": 4703,
+      "result": "passed"
+    },
+    {
+      "case_id": "comes-teamup-nickname",
+      "attempt": 3,
+      "objective": "把我的组队昵称设置成 测试员",
+      "status": "success",
+      "tool_outputs": [
+        {
+          "tool": "mcp_plugins_cmd_field-astrbot-teamup_____-f0d4f036",
+          "text": "已设置昵称：测试员"
+        }
+      ],
+      "summary": "组队昵称已设置为 测试员。",
+      "metadata": {
+        "capability": "teamup.nickname",
+        "tools": [
+          "mcp_plugins_cmd_field-astrbot-teamup_____-f0d4f036"
+        ],
+        "direct_call": false,
+        "steps": 1,
+        "missing": [],
+        "elapsed": 4.313
+      },
+      "model_calls": 2,
+      "ms": 4313,
+      "result": "passed"
+    }
+  ],
+  "passed": 9,
+  "total": 9,
+  "model_calls_total": 18,
+  "duration_ms": 49063
+}

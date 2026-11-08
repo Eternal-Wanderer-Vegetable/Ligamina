@@ -81,7 +81,9 @@ P6-01 与 P6-02 合为下一个里程碑：P6-02 不需要真实账号，先行�
 - **第三方：MCP 会话 DELETE 返回 202。** Core 使用的 rmcp Streamable HTTP 服务对 `DELETE /mcp` 返回 202，Stella 环境中的 Python MCP SDK 只把 200/204 视为成功并记一条 warning；无功能影响。
 - **QQ 投递未尝试。** 2026-11-07 记录的 Stella 能力直回投递门问题仍未修复，经 Stella 发往 QQ 的工具回复仍会被丢弃；P6-01 的平台投递部分保持 blocked。
 
-复现：`powershell -NoProfile -File lab/field/run_stella_mcp_experiment.ps1 -Run <新 id> [-Level comes]`（拒绝覆盖已有报告；令牌只写在被忽略的 `.work/` 下）。
+**Stella 侧修复（2026-11-08）：** 上述两个 Stella 问题已在 Stella PR #132（分支 `codex/fix-capability-tool-delivery`，基于其 main）修复：能力直回新增可信投递来源 `capability-direct`，投递计划被拒时写 WARNING；参数全为可选的工具不再无参直调。用该分支代码复跑层级 2（`-StellaCheckout <worktree>`）：掷骰、复读、组队昵称各 3/3。PR 尚未合并，QQ 投递仍未验证。
+
+复现：`powershell -NoProfile -File lab/field/run_stella_mcp_experiment.ps1 -Run <新 id> [-Level comes] [-StellaCheckout <Stella 检出目录>]`（拒绝覆盖已有报告；令牌只写在被忽略的 `.work/` 下）。
 
 ### 3.2 P6-03 设计要点（待实施）
 

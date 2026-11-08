@@ -67,7 +67,8 @@
       "side": "stella",
       "title": "direct-call shortcut drops the user's input for tools whose parameters are all optional",
       "detail": "capability.comes.executor.can_direct_call treats 'no required parameters' as 'call with no arguments'. astrbot_plugin_teamup's 组队昵称 declares nickname: str = \"\", so Core's schema (faithfully) has no required field; Stella skips the model and calls it with {}, the plugin answers with its usage text, and Comes still reports status success. 3/3 attempts.",
-      "suggested_fix": "only direct-call when the schema has no properties at all, or when known slots cover the optional ones"
+      "suggested_fix": "only direct-call when the schema has no properties at all, or when known slots cover the optional ones",
+      "status": "fixed in Stella PR #132 (not merged yet)"
     },
     {
       "side": "third-party",
@@ -76,8 +77,9 @@
     },
     {
       "side": "stella",
-      "title": "capability direct-reply delivery gate (2026-11-07) still unfixed",
-      "detail": "Stella's docs/reports/2026-11-07-capability-tool-reply-delivery-rejected.md is still uncommitted with no fix; QQ delivery of tool replies would still be dropped, so no QQ run was attempted."
+      "title": "capability direct-reply delivery gate",
+      "detail": "Stella's docs/reports/2026-11-07-capability-tool-reply-delivery-rejected.md is still uncommitted with no fix; QQ delivery of tool replies would still be dropped, so no QQ run was attempted.",
+      "status": "fixed in Stella PR #132 (not merged yet); QQ delivery still not verified"
     }
   ],
   "gate": {
@@ -91,6 +93,8 @@
     "outputs/acceptance/p6-stella-mcp-field-20261108-comes/comes2.teardown.json": "e534418d17b012b5d8b03d62d3d48d43146a551efd2f2067abc112a1fdd05c1d",
     "outputs/acceptance/p6-stella-mcp-field-20261108-comes/comes3.json": "7f461bc73afb147356645d223e0a99441a2d7cfbb741a32de83f4e0bd0f907de",
     "outputs/acceptance/p6-stella-mcp-field-20261108-comes/comes3.teardown.json": "44bc4c2b338b087f500646c7fe83efc18e7f08cfa698503ee2d1fa4d02866840",
+    "outputs/acceptance/p6-stella-mcp-field-20261108-comes/comes4-fixed.json": "6e9836666f9e282aa0304295fa4dd857273c266bea2c79967588a21e5f7e59e1",
+    "outputs/acceptance/p6-stella-mcp-field-20261108-comes/comes4-fixed.teardown.json": "761eb76397044fddfafdd4e55931f992342104e08fc928954ce18172c47fb2c9",
     "outputs/acceptance/p6-stella-mcp-field-20261108/run1.json": "b1b9adad4d3c139d39351bcf3c2a0d5a55f554cfeca79805b200533a46f1e9bc",
     "outputs/acceptance/p6-stella-mcp-field-20261108/run1.teardown.json": "9efe708e979d9bc82e542f278c8a47d98a67bec5ef3c12303f96cdd5ebf9f82c",
     "outputs/acceptance/p6-stella-mcp-field-20261108/run2.json": "22e2a184f0e42b3959a222c352f0c0d2b39768b28aecfb7e6e1ea23fa11ca613",
@@ -98,5 +102,17 @@
     "outputs/acceptance/p6-stella-mcp-field-20261108/run3.json": "6920ae2e4217f4428543ec06ca4960aaeac9e3fe6bade6f51f802cf295ae637e",
     "outputs/acceptance/p6-stella-mcp-field-20261108/run3.teardown.json": "9e7865233642d64866ca123423ee50b23ffe66cf8536a63e0ef0fadd10529456"
   },
-  "reproduce": "powershell -NoProfile -File lab/field/run_stella_mcp_experiment.ps1 -Run <new-id> [-Level comes]"
+  "reproduce": "powershell -NoProfile -File lab/field/run_stella_mcp_experiment.ps1 -Run <new-id> [-Level comes]",
+  "level2_comes_after_stella_fix": {
+    "stella_checkout": "branch codex/fix-capability-tool-delivery (Stella PR #132), worktree off origin/main e4a16ef",
+    "run": "comes4-fixed",
+    "passed": 9,
+    "total": 9,
+    "by_case": {
+      "comes-roll-2d6": "3/3",
+      "comes-echo": "3/3",
+      "comes-teamup-nickname": "3/3"
+    },
+    "platform_sends_by_fake_bot": 0
+  }
 }

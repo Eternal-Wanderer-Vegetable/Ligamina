@@ -13,7 +13,9 @@ param(
     [Parameter(Mandatory)] [string] $Run,
     [string] $Batch = "field-20261108",
     [int] $Port = 63910,
-    [ValidateSet("client", "comes")] [string] $Level = "client"
+    [ValidateSet("client", "comes")] [string] $Level = "client",
+    # Stella checkout whose code is under test (default: the one start_stella.bat runs).
+    [string] $StellaCheckout = ""
 )
 $ErrorActionPreference = "Stop"
 $root = Split-Path -Parent (Split-Path -Parent $PSScriptRoot)
@@ -29,6 +31,7 @@ $line = $bat | Where-Object { $_ -match '"([^"]+python\.exe)"\s+bot\.py' } | Sel
 if (-not $line -or $line -notmatch '"([^"]+python\.exe)"') { throw "Stella interpreter not found in start_stella.bat" }
 $stellaPython = $Matches[1]
 $stellaRoot = ($bat | Where-Object { $_ -match '^cd /d (.+)$' } | Select-Object -First 1) -replace '^cd /d ', ''
+if ($StellaCheckout) { $stellaRoot = (Resolve-Path $StellaCheckout).Path }
 
 $generated = python (Join-Path $root "lab\field\three_host_config.py") --work $work --port $Port | ConvertFrom-Json
 $secrets = Get-Content (Join-Path $work "secrets.json") -Raw | ConvertFrom-Json
