@@ -85,7 +85,10 @@ def start_core(config: Path) -> subprocess.Popen:
     stdout_path = work / f"core.stdout.{stamp}.log"
     stdout = open(stdout_path, "w", encoding="utf-8")
     stderr = open(work / f"core.stderr.{stamp}.log", "w", encoding="utf-8")
-    flags = getattr(subprocess, "CREATE_NEW_PROCESS_GROUP", 0) | getattr(subprocess, "DETACHED_PROCESS", 0)
+    # CREATE_NO_WINDOW, not DETACHED_PROCESS: a detached Core has no console, so each
+    # wsl.exe Host client would get its own visible window, and closing one kills the
+    # Host. With a hidden console the children inherit it and no window appears.
+    flags = getattr(subprocess, "CREATE_NEW_PROCESS_GROUP", 0) | getattr(subprocess, "CREATE_NO_WINDOW", 0)
     process = subprocess.Popen([str(CLI), "daemon", "--config", str(config)], stdout=stdout, stderr=stderr,
                                stdin=subprocess.DEVNULL, creationflags=flags)
     deadline = time.monotonic() + 300
