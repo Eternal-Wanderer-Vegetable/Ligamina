@@ -38,7 +38,9 @@ class CompatibilityMatrixTests(unittest.TestCase):
         self.assertEqual(echo["federated_event"]["linux"]["value"], "verified")
         delivery = echo["platform_delivery"]["qq"]
         self.assertEqual(delivery["value"], "verified")
-        self.assertIn("positive cases only", delivery["scope"])
+        self.assertIn("Core restart and Host timeout", delivery["scope"])
+        self.assertIn("duplicate event redelivery not run", delivery["scope"])
+        self.assertEqual(len(delivery["evidence"]), 2)
         self.assertTrue(delivery["history"], "earlier P4-05 canaries are kept as history")
 
         help_plugin = self.by_id["nb-0b37b4bb782b82c00e95a87f"]["capabilities"]

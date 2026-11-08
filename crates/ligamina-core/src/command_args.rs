@@ -21,7 +21,7 @@ pub fn input_schema(descriptor: &CommandDescriptor) -> Value {
     let raw = json!({
         "type": "string",
         "maxLength": RAW_MAX_BYTES,
-        "description": "Text after the command name, parsed natively by the plugin framework; pass an empty string when the command takes no arguments. When you fill the structured fields, leave this field out (an empty string is ignored).",
+        "description": "Text after the command name, parsed natively by the plugin framework; pass an empty string when the command takes no arguments. If this field has text, it is used as-is and the structured fields are ignored; leave it out (or empty) when filling the structured fields.",
     });
     let mut properties = Map::new();
     properties.insert(RAW_FIELD.to_owned(), raw);
@@ -96,18 +96,14 @@ pub fn compose(
         }
     }
     let structured_keys = input.keys().filter(|key| key.as_str() != RAW_FIELD).count();
-    // Models told to "pass an empty string when the command takes no arguments" often
-    // send `arguments: ""` next to structured fields. An empty raw value carries no
-    // input, so it does not conflict with them.
+    // Models often send both forms. An empty raw value carries no input, so the
+    // structured fields are used. Raw text with content is the native command line —
+    // the closest thing to what the user wrote — so it wins and the structured fields
+    // are ignored (seen live: `arguments: "2 周末 跨群"` next to a wrong `name`).
     let raw = input.get(RAW_FIELD).filter(|raw| {
         !(structured_keys > 0 && raw.as_str().is_some_and(|text| text.trim().is_empty()))
     });
     if let Some(raw) = raw {
-        if structured_keys > 0 {
-            return Err(format!(
-                "use either `{RAW_FIELD}` or the structured fields, not both"
-            ));
-        }
         return raw
             .as_str()
             .map(str::to_owned)
@@ -403,7 +399,6 @@ mod tests {
     #[test]
     fn rejects_ambiguous_or_invalid_structured_input() {
         let cases = [
-            json!({ RAW_FIELD: "x", "name": "y" }),
             json!({ "times": 3 }),
             json!({ "name": "a", "rest": "b" }),
             json!({ "name": "a\"b" }),
@@ -428,8 +423,12 @@ mod tests {
             compose(&greet(), &input(json!({ RAW_FIELD: "  ", "name": "Ada" }))).unwrap(),
             "Ada"
         );
-        // Raw text with content next to structured fields is still ambiguous.
-        assert!(compose(&greet(), &input(json!({ RAW_FIELD: "x", "name": "Ada" }))).is_err());
+        // Raw text with content wins: it is the native command line (seen live:
+        // `arguments: "2 周末 跨群"` next to a wrong structured `name`).
+        assert_eq!(
+            compose(&greet(), &input(json!({ RAW_FIELD: "x", "name": "Ada" }))).unwrap(),
+            "x"
+        );
         // An empty raw value alone still means "no arguments".
         assert_eq!(
             compose(&greet(), &input(json!({ RAW_FIELD: "" }))).unwrap(),

@@ -2,6 +2,7 @@
 
 ## Current State
 
+- **2026-11-08 P6-01 场景轮完成（负例/越权、Core 重启、Host 超时，每生态各 ≥3，经 stella MCP 路径、Host 在隔离容器中）：** 用户发送全部消息并确认回复；按生态（正例/负例/重启/超时）NoneBot 4/3/3/3、Koishi 3/3/5/3、AstrBot 3/3/5/3；超时 9/9 一次兜底且无迟到回复；重启窗口内消息各得一次兜底、无重复。本轮修复 d1fadb1、9b62520（本仓库）与 Stella PR #133 的 0ad3d59、5efd679。兼容性矩阵 platform_delivery 改为引用该报告。剩余：重复事件投递与 Gateway 账本去重证据未覆盖，feat-030 改为 in-progress。见计划 3.1c，报告 outputs/acceptance/p6-p601-qq-scenarios-20261108.json。
 - **2026-11-08 P6-04 / feat-044 完成：能力维度兼容性矩阵。** `lab/compat_matrix.py` 从已提交证据生成 `outputs/compat/compatibility-matrix-v1.{json,md}`（8,961 条目、537 个证据源，load/mcp_tool/federated_event/platform_delivery），每条结论可追溯到证据文件与哈希；PR 的 Linux 自检运行矩阵单测与 `check`。核对计数与 P3-10、AB-04 一致；矩阵显示 NoneBot 在 Windows 上没有 verified 的 load。下一步按用户要求整体执行剩余 QQ 场景。详见第六阶段计划 3.3。
 - **2026-11-08 P6-03 / feat-043 完成：Host 受信任等级与 Core 强制的容器隔离（ADR 0003）。** untrusted Host 只能由 Core 生成的加固容器运行，不安全配置使守护进程拒绝启动并写明规则，容器在 Host 退出/重启/停止后由 Core 删除，启动时清理遗留容器。`cargo test --workspace` 通过；现场验收三次独立运行全部通过（拒绝、遗留清理、docker inspect 加固、客户端被结束后的删除与重启、停止后无残留）；以新隔离复跑 Stella MCP 层级 1 三轮 27/27。下一项 P6-04 / feat-044。详见第六阶段计划 3.2。
 - **2026-11-08 P6-01 首次真实 QQ 投递闭环（正例，三种生态）：** 经 Stella 的 MCP 路径，用户在授权群内发送消息，第五轮 Koishi Echo、NoneBot Roll、AstrBot Teamup 全部按预期送达并经用户确认。前四轮暴露的问题均已修复：本仓库 Core 把命令工具的参数错误改为 `isError` 结果（`24ca6cf`）、忽略结构化字段旁的空 `arguments`（`1aa777c`）；Stella PR #132 修复会话被错误拆除并取消 lifespan 任务、空闲会话终止后不重连、确定性路由丢可选参数，并新增 `direct_reply = "tool_output"`。Stella 已恢复原样运行。隔离、重复/重启、超时/unknown 场景未执行，P4-FIELD 仍 blocked。详见第六阶段计划 3.1b。
