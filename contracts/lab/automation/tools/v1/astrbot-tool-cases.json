@@ -1,0 +1,746 @@
+{
+  "schema_version": 1,
+  "kind": "astrbot_tool_cases",
+  "description": "AB-05: frozen AstrBot market plugins called as MCP command tools. Every expected reply is derived from the frozen archive's source, or from AstrBot 4.29.1's locked source for native framework replies, without running plugin code. The orchestrator re-checks each plugin citation against the frozen archive before dispatch; the Worker never sees this file.",
+  "snapshot_id": "ab-15937e90d26b7caf9d12",
+  "host_id": "astrbot-ab05",
+  "session_model": "Each tool call runs in a fresh private virtual conversation whose sender is tool-actor-<32 hex>, with no group and no admin rights (ligamina_core::commands::tool_identity; LIGAMINA_ASTRBOT_ADMINS unset).",
+  "global_oracle": {
+    "gateway_operation_count": 0,
+    "refused_operations": 0
+  },
+  "entries": [
+    {
+      "registry_entry_id": "ab-01803ad6c618f2321ed12e48",
+      "plugin": "astrbot_plugin_teamup",
+      "stratum": "plain",
+      "artifact_sha256": "f5603cb4d41293d802270b90fbaf201b84ad6852a214ee1778ec91de3611557a",
+      "plugin_root": "astrbot_plugin_teamup-01ffdd412b7c164f60693a271192907de2a1f969",
+      "cases": [
+        {
+          "case_id": "ab05-teamup-positive",
+          "class": "positive",
+          "purpose": "Raw and typed arguments reach the native handlers; a private nickname write succeeds.",
+          "stimulus": {
+            "tool_calls": [
+              [
+                {
+                  "command_id": "组队菜单",
+                  "arguments": {
+                    "arguments": ""
+                  }
+                }
+              ],
+              [
+                {
+                  "command_id": "组队昵称",
+                  "arguments": {
+                    "nickname": "测试员"
+                  }
+                }
+              ]
+            ]
+          },
+          "oracle": {
+            "calls": [
+              [
+                {
+                  "replies": [
+                    {
+                      "text": "组队报名菜单（主菜单）：\n【信息与查询】\n- /组队大厅 [本群|跨群]\n- /组队列表 [组队名] [本群|跨群]\n- /组队空缺 [组队名] [本群|跨群]\n- /组队我的 [组队名] [本群|跨群]\n- /组队昵称 <昵称>\n\n【报名与组队】\n- /组队建队 <队伍名> [组队名] [本群|跨群]\n- /组队加入 [队伍名] [组队名] [本群|跨群]\n- /组队退出 [组队名] [本群|跨群]\n- /组队随机 [组队名] [本群|跨群]\n\n【管理员】\n- /组队创建 <每队人数> <组队名> [本群|跨群]\n- /组队切换 <组队名> [本群|跨群]\n- /组队随机 全部 [组队名] [本群|跨群]\n- /组队重置 [组队名] [本群|跨群]",
+                      "sources": [
+                        {
+                          "file": "main.py",
+                          "file_sha256": "d1047c256012f7bc83c5f1c7064af6f86dcb9df053fdc34d9b7c32be76b3707f",
+                          "lines": [
+                            201,
+                            219
+                          ],
+                          "check": "string_constant"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ],
+              [
+                {
+                  "replies": [
+                    {
+                      "text": "已设置昵称：测试员",
+                      "sources": [
+                        {
+                          "file": "main.py",
+                          "file_sha256": "d1047c256012f7bc83c5f1c7064af6f86dcb9df053fdc34d9b7c32be76b3707f",
+                          "lines": [
+                            233,
+                            233
+                          ],
+                          "check": "contains",
+                          "text": "f\"已设置昵称：{nickname}\""
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            ]
+          }
+        },
+        {
+          "case_id": "ab05-teamup-negative",
+          "class": "negative",
+          "purpose": "An over-long nickname is rejected; a group-scoped command in a private session asks for 跨群.",
+          "stimulus": {
+            "tool_calls": [
+              [
+                {
+                  "command_id": "组队昵称",
+                  "arguments": {
+                    "nickname": "一二三四五六七八九十一二三四五六七八九十一"
+                  }
+                }
+              ],
+              [
+                {
+                  "command_id": "组队大厅",
+                  "arguments": {
+                    "arguments": ""
+                  }
+                }
+              ]
+            ]
+          },
+          "oracle": {
+            "calls": [
+              [
+                {
+                  "replies": [
+                    {
+                      "text": "昵称过长，请控制在 20 字以内。",
+                      "sources": [
+                        {
+                          "file": "main.py",
+                          "file_sha256": "d1047c256012f7bc83c5f1c7064af6f86dcb9df053fdc34d9b7c32be76b3707f",
+                          "lines": [
+                            228,
+                            229
+                          ],
+                          "check": "string_constant"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ],
+              [
+                {
+                  "replies": [
+                    {
+                      "text": "跨群请写“跨群”，群内请在群聊使用。",
+                      "sources": [
+                        {
+                          "file": "main.py",
+                          "file_sha256": "d1047c256012f7bc83c5f1c7064af6f86dcb9df053fdc34d9b7c32be76b3707f",
+                          "lines": [
+                            271,
+                            273
+                          ],
+                          "check": "string_constant"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            ]
+          }
+        },
+        {
+          "case_id": "ab05-teamup-authority",
+          "class": "isolation",
+          "purpose": "The plugin's own admin checks deny an anonymous tool caller; the denied create leaves no state (the cross-group hall stays empty); the last step runs two calls concurrently.",
+          "stimulus": {
+            "tool_calls": [
+              [
+                {
+                  "command_id": "组队创建",
+                  "arguments": {
+                    "team_size": "2",
+                    "name": "周末",
+                    "scope": "跨群"
+                  }
+                }
+              ],
+              [
+                {
+                  "command_id": "组队重置",
+                  "arguments": {
+                    "session_name": "周末",
+                    "scope": "跨群"
+                  }
+                }
+              ],
+              [
+                {
+                  "command_id": "组队大厅",
+                  "arguments": {
+                    "scope": "跨群"
+                  }
+                },
+                {
+                  "command_id": "组队菜单",
+                  "arguments": {
+                    "arguments": ""
+                  }
+                }
+              ]
+            ]
+          },
+          "oracle": {
+            "calls": [
+              [
+                {
+                  "replies": [
+                    {
+                      "text": "仅管理员可创建组队报名。",
+                      "sources": [
+                        {
+                          "file": "main.py",
+                          "file_sha256": "d1047c256012f7bc83c5f1c7064af6f86dcb9df053fdc34d9b7c32be76b3707f",
+                          "lines": [
+                            237,
+                            238
+                          ],
+                          "check": "string_constant"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ],
+              [
+                {
+                  "replies": [
+                    {
+                      "text": "仅管理员可重置。",
+                      "sources": [
+                        {
+                          "file": "main.py",
+                          "file_sha256": "d1047c256012f7bc83c5f1c7064af6f86dcb9df053fdc34d9b7c32be76b3707f",
+                          "lines": [
+                            466,
+                            467
+                          ],
+                          "check": "string_constant"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ],
+              [
+                {
+                  "replies": [
+                    {
+                      "text": "当前没有组队信息。",
+                      "sources": [
+                        {
+                          "file": "main.py",
+                          "file_sha256": "d1047c256012f7bc83c5f1c7064af6f86dcb9df053fdc34d9b7c32be76b3707f",
+                          "lines": [
+                            276,
+                            277
+                          ],
+                          "check": "string_constant"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "replies": [
+                    {
+                      "text": "组队报名菜单（主菜单）：\n【信息与查询】\n- /组队大厅 [本群|跨群]\n- /组队列表 [组队名] [本群|跨群]\n- /组队空缺 [组队名] [本群|跨群]\n- /组队我的 [组队名] [本群|跨群]\n- /组队昵称 <昵称>\n\n【报名与组队】\n- /组队建队 <队伍名> [组队名] [本群|跨群]\n- /组队加入 [队伍名] [组队名] [本群|跨群]\n- /组队退出 [组队名] [本群|跨群]\n- /组队随机 [组队名] [本群|跨群]\n\n【管理员】\n- /组队创建 <每队人数> <组队名> [本群|跨群]\n- /组队切换 <组队名> [本群|跨群]\n- /组队随机 全部 [组队名] [本群|跨群]\n- /组队重置 [组队名] [本群|跨群]",
+                      "sources": [
+                        {
+                          "file": "main.py",
+                          "file_sha256": "d1047c256012f7bc83c5f1c7064af6f86dcb9df053fdc34d9b7c32be76b3707f",
+                          "lines": [
+                            201,
+                            219
+                          ],
+                          "check": "string_constant"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "registry_entry_id": "ab-00d908510026dba4d2cc6acd",
+      "plugin": "astrbot_plugin_gallery",
+      "stratum": "platform_specific",
+      "artifact_sha256": "706f1c8607cc69aedde2fe9755a37b5359b3638fa66fc37e19fabf565a5954f7",
+      "plugin_root": "astrbot_plugin_gallery-bc053e67a25e14ab88f774831697be0df5a07f37",
+      "cases": [
+        {
+          "case_id": "ab05-gallery-negative",
+          "class": "negative",
+          "purpose": "Free text is parsed by the plugin itself; unknown galleries (concurrently) and a missing image are reported.",
+          "stimulus": {
+            "tool_calls": [
+              [
+                {
+                  "command_id": "看图",
+                  "arguments": {
+                    "arguments": "风景"
+                  }
+                },
+                {
+                  "command_id": "图库详情",
+                  "arguments": {
+                    "arguments": "风景 山水"
+                  }
+                }
+              ],
+              [
+                {
+                  "command_id": "解析",
+                  "arguments": {
+                    "arguments": ""
+                  }
+                }
+              ]
+            ]
+          },
+          "oracle": {
+            "calls": [
+              [
+                {
+                  "replies": [
+                    {
+                      "text": "未找到图库【风景】",
+                      "sources": [
+                        {
+                          "file": "handle/operate.py",
+                          "file_sha256": "281b72db8d958515e73f5a64d475e62ffc417a5a93a33109a80190d9f0836c98",
+                          "lines": [
+                            171,
+                            174
+                          ],
+                          "check": "contains",
+                          "text": "f\"未找到图库【{name}】\""
+                        },
+                        {
+                          "file": "utils.py",
+                          "file_sha256": "c790d02bcbe016f81517103f9bf3419d5092886bf8309e2a4c0439e453281b27",
+                          "lines": [
+                            116,
+                            157
+                          ],
+                          "check": "contains",
+                          "text": "names = at_ids or texts or [sender_id]"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "replies": [
+                    {
+                      "text": "未找到图库【风景】",
+                      "sources": [
+                        {
+                          "file": "handle/operate.py",
+                          "file_sha256": "281b72db8d958515e73f5a64d475e62ffc417a5a93a33109a80190d9f0836c98",
+                          "lines": [
+                            215,
+                            219
+                          ],
+                          "check": "contains",
+                          "text": "f\"未找到图库【{name}】\""
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ],
+              [
+                {
+                  "replies": [
+                    {
+                      "text": "未指定要解析的图片",
+                      "sources": [
+                        {
+                          "file": "main.py",
+                          "file_sha256": "600d26c012a4ed32e704b239adc80df7ec14f726b7cbfb36b7136daca1e9f614",
+                          "lines": [
+                            145,
+                            148
+                          ],
+                          "check": "string_constant"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            ]
+          }
+        },
+        {
+          "case_id": "ab05-gallery-authority",
+          "class": "isolation",
+          "purpose": "AstrBot's native ADMIN permission filter denies an anonymous tool caller before the handler runs.",
+          "stimulus": {
+            "tool_calls": [
+              [
+                {
+                  "command_id": "图库列表",
+                  "arguments": {
+                    "arguments": ""
+                  }
+                },
+                {
+                  "command_id": "设置容量",
+                  "arguments": {
+                    "arguments": "风景 10"
+                  }
+                }
+              ]
+            ]
+          },
+          "oracle": {
+            "calls": [
+              [
+                {
+                  "replies": [
+                    {
+                      "pattern": "您\\(ID: tool-actor-[0-9a-f]{32}\\)的权限不足以使用此指令。通过 /sid 获取 ID 并请管理员添加。",
+                      "sources": [
+                        {
+                          "file": "main.py",
+                          "file_sha256": "600d26c012a4ed32e704b239adc80df7ec14f726b7cbfb36b7136daca1e9f614",
+                          "lines": [
+                            114,
+                            115
+                          ],
+                          "check": "contains",
+                          "text": "filter.PermissionType.ADMIN"
+                        },
+                        {
+                          "framework": "astrbot",
+                          "version": "4.29.1",
+                          "file": "astrbot/core/pipeline/waking_check/stage.py",
+                          "file_sha256": "0a6fc273004f13747816397fd875b27a7e6e34ce9a12230396f17d03865811f6",
+                          "lines": [
+                            197,
+                            205
+                          ],
+                          "text": "f\"您(ID: {event.get_sender_id()})的权限不足以使用此指令。通过 /sid 获取 ID 并请管理员添加。\""
+                        },
+                        {
+                          "framework": "astrbot",
+                          "version": "4.29.1",
+                          "file": "astrbot/core/config/default.py",
+                          "file_sha256": "1c455582275770bb981b317982b83ffe492b1dc1d46b15dfa56788cf03e60af9",
+                          "lines": [
+                            127,
+                            127
+                          ],
+                          "text": "\"no_permission_reply\": True"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "replies": [
+                    {
+                      "pattern": "您\\(ID: tool-actor-[0-9a-f]{32}\\)的权限不足以使用此指令。通过 /sid 获取 ID 并请管理员添加。",
+                      "sources": [
+                        {
+                          "file": "main.py",
+                          "file_sha256": "600d26c012a4ed32e704b239adc80df7ec14f726b7cbfb36b7136daca1e9f614",
+                          "lines": [
+                            81,
+                            82
+                          ],
+                          "check": "contains",
+                          "text": "filter.PermissionType.ADMIN"
+                        },
+                        {
+                          "framework": "astrbot",
+                          "version": "4.29.1",
+                          "file": "astrbot/core/pipeline/waking_check/stage.py",
+                          "file_sha256": "0a6fc273004f13747816397fd875b27a7e6e34ce9a12230396f17d03865811f6",
+                          "lines": [
+                            197,
+                            205
+                          ],
+                          "text": "f\"您(ID: {event.get_sender_id()})的权限不足以使用此指令。通过 /sid 获取 ID 并请管理员添加。\""
+                        },
+                        {
+                          "framework": "astrbot",
+                          "version": "4.29.1",
+                          "file": "astrbot/core/config/default.py",
+                          "file_sha256": "1c455582275770bb981b317982b83ffe492b1dc1d46b15dfa56788cf03e60af9",
+                          "lines": [
+                            127,
+                            127
+                          ],
+                          "text": "\"no_permission_reply\": True"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "registry_entry_id": "ab-026af14d509a0e3b248ae734",
+      "plugin": "astrbot_plugin_pet",
+      "stratum": "platform_specific",
+      "artifact_sha256": "a14d27a8a05a9a0bb664940e4eea247c9b3d29a81781bda4eb0968a14fa2af22",
+      "plugin_root": "astrbot_plugin_pet-89506e5cec172f6f47cbd8b89052b42e803d025b",
+      "cases": [
+        {
+          "case_id": "ab05-pet-positive",
+          "class": "positive",
+          "purpose": "Static and computed multi-line replies, concurrently; the plugin's dependencies were installed offline.",
+          "stimulus": {
+            "tool_calls": [
+              [
+                {
+                  "command_id": "宠物菜单",
+                  "arguments": {
+                    "arguments": ""
+                  }
+                },
+                {
+                  "command_id": "宠物商店",
+                  "arguments": {
+                    "arguments": ""
+                  }
+                }
+              ]
+            ]
+          },
+          "oracle": {
+            "calls": [
+              [
+                {
+                  "replies": [
+                    {
+                      "text": "--- 🐾 宠物插件帮助菜单 v1.5 🐾 ---\n【核心功能】\n/领养宠物 [名字] - 领养一只新宠物。\n/我的宠物 - 查看宠物详细状态图(含状态/持有物)。\n/宠物改名 [新名] - 给你的宠物换个名字。\n/宠物进化 - 当宠物达到等级时进化。\n\n【技能与装备】\n/宠物技能 - 查看当前技能和可学技能。\n/学习技能 [栏位] [技能名] - 学习新技能。\n/装备 [物品名] - 让宠物携带一个持有物。\n\n【日常互动】\n/宠物签到 - 每天领取金钱奖励。\n/散步 - 带宠物散步，触发奇遇或战斗。\n/使用 [物品名] - 使用食物或药品。 (原/投喂)\n\n【商店与物品】\n/宠物商店 - 查看可购买的商品。\n/购买 [物品] [数量] - 从商店购买物品。\n/宠物背包 - 查看你拥有的物品。\n\n【社交与竞技】\n/对决 @某人 - 与群友的宠物进行1v1对决。\n/宠物排行 - 查看本群最强的宠物们。\n\n【其他命令】\n/修复宠物技能 - (管理员) 修复本群所有宠物的重复技能。\n/丢弃宠物 - (危险) 与你的宠物告别，慎用！\n",
+                      "sources": [
+                        {
+                          "file": "main.py",
+                          "file_sha256": "f629471d307a753d2e41020caa23a4812ffaa00b12e976edef2ad50edbb8240c",
+                          "lines": [
+                            1492,
+                            1521
+                          ],
+                          "check": "string_constant"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "replies": [
+                    {
+                      "text": "欢迎光临宠物商店！\n--------------------\n【普通口粮】 $10\n效果: 能快速填饱肚子的基础食物。\n【美味罐头】 $30\n效果: 营养均衡，宠物非常爱吃。\n【心情饼干】 $25\n效果: 能让宠物心情愉悦的神奇零食。\n【解毒药】 $40\n效果: 治愈「中毒」状态。\n【苏醒药】 $40\n效果: 治愈「睡眠」状态。\n【麻痹药】 $40\n效果: 治愈「麻痹」状态。\n【力量头带】 $200\n效果: 【持有】战斗时，攻击力小幅提升。\n【坚硬外壳】 $200\n效果: 【持有】战斗时，防御力小幅提升。\n【技能光盘-剧毒】 $500\n效果: 一次性光盘，让宠物学会「剧毒」。\n--------------------\n使用 `/购买 [物品名] [数量]` 来购买。",
+                      "sources": [
+                        {
+                          "file": "main.py",
+                          "file_sha256": "f629471d307a753d2e41020caa23a4812ffaa00b12e976edef2ad50edbb8240c",
+                          "lines": [
+                            113,
+                            129
+                          ],
+                          "check": "contains",
+                          "text": "SHOP_ITEMS = {"
+                        },
+                        {
+                          "file": "main.py",
+                          "file_sha256": "f629471d307a753d2e41020caa23a4812ffaa00b12e976edef2ad50edbb8240c",
+                          "lines": [
+                            1161,
+                            1161
+                          ],
+                          "check": "contains",
+                          "text": "reply = \"欢迎光临宠物商店！\\n--------------------\\n\""
+                        },
+                        {
+                          "file": "main.py",
+                          "file_sha256": "f629471d307a753d2e41020caa23a4812ffaa00b12e976edef2ad50edbb8240c",
+                          "lines": [
+                            1162,
+                            1163
+                          ],
+                          "check": "contains",
+                          "text": "reply += f\"【{name}】 ${item['price']}\\n效果: {item['description']}\\n\""
+                        },
+                        {
+                          "file": "main.py",
+                          "file_sha256": "f629471d307a753d2e41020caa23a4812ffaa00b12e976edef2ad50edbb8240c",
+                          "lines": [
+                            1164,
+                            1164
+                          ],
+                          "check": "contains",
+                          "text": "reply += \"--------------------\\n使用 `/购买 [物品名] [数量]` 来购买。\""
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            ]
+          }
+        },
+        {
+          "case_id": "ab05-pet-negative",
+          "class": "negative",
+          "purpose": "Group-only commands in a private session: one refuses explicitly, one returns without replying.",
+          "stimulus": {
+            "tool_calls": [
+              [
+                {
+                  "command_id": "领养宠物",
+                  "arguments": {
+                    "pet_name": "小白"
+                  }
+                }
+              ],
+              [
+                {
+                  "command_id": "我的宠物",
+                  "arguments": {
+                    "arguments": ""
+                  }
+                }
+              ]
+            ]
+          },
+          "oracle": {
+            "calls": [
+              [
+                {
+                  "replies": [
+                    {
+                      "text": "该功能仅限群聊使用。",
+                      "sources": [
+                        {
+                          "file": "main.py",
+                          "file_sha256": "f629471d307a753d2e41020caa23a4812ffaa00b12e976edef2ad50edbb8240c",
+                          "lines": [
+                            643,
+                            646
+                          ],
+                          "check": "string_constant"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ],
+              [
+                {
+                  "replies": [],
+                  "silent_sources": [
+                    {
+                      "file": "main.py",
+                      "file_sha256": "f629471d307a753d2e41020caa23a4812ffaa00b12e976edef2ad50edbb8240c",
+                      "lines": [
+                        684,
+                        685
+                      ],
+                      "check": "contains",
+                      "text": "if not group_id: return"
+                    }
+                  ]
+                }
+              ]
+            ]
+          }
+        },
+        {
+          "case_id": "ab05-pet-authority",
+          "class": "isolation",
+          "purpose": "AstrBot's native ADMIN filter denies the admin-only repair command before the handler's group check.",
+          "stimulus": {
+            "tool_calls": [
+              [
+                {
+                  "command_id": "修复宠物技能",
+                  "arguments": {
+                    "arguments": ""
+                  }
+                }
+              ]
+            ]
+          },
+          "oracle": {
+            "calls": [
+              [
+                {
+                  "replies": [
+                    {
+                      "pattern": "您\\(ID: tool-actor-[0-9a-f]{32}\\)的权限不足以使用此指令。通过 /sid 获取 ID 并请管理员添加。",
+                      "sources": [
+                        {
+                          "file": "main.py",
+                          "file_sha256": "f629471d307a753d2e41020caa23a4812ffaa00b12e976edef2ad50edbb8240c",
+                          "lines": [
+                            1099,
+                            1100
+                          ],
+                          "check": "contains",
+                          "text": "filter.PermissionType.ADMIN"
+                        },
+                        {
+                          "framework": "astrbot",
+                          "version": "4.29.1",
+                          "file": "astrbot/core/pipeline/waking_check/stage.py",
+                          "file_sha256": "0a6fc273004f13747816397fd875b27a7e6e34ce9a12230396f17d03865811f6",
+                          "lines": [
+                            197,
+                            205
+                          ],
+                          "text": "f\"您(ID: {event.get_sender_id()})的权限不足以使用此指令。通过 /sid 获取 ID 并请管理员添加。\""
+                        },
+                        {
+                          "framework": "astrbot",
+                          "version": "4.29.1",
+                          "file": "astrbot/core/config/default.py",
+                          "file_sha256": "1c455582275770bb981b317982b83ffe492b1dc1d46b15dfa56788cf03e60af9",
+                          "lines": [
+                            127,
+                            127
+                          ],
+                          "text": "\"no_permission_reply\": True"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}

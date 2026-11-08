@@ -18,6 +18,7 @@
 | HTTP/MCP | [daemon](../../crates/ligamina-cli/src/daemon.rs) / [HTTP](../../crates/ligamina-cli/src/http.rs) / [MCP](../../crates/ligamina-cli/src/mcp.rs) |
 | NoneBot | [Host README](../../hosts/nonebot/README.md)：OneBot v11 转换、Bot.handle_event 与框架生命周期 |
 | Koishi | [Host README](../../hosts/koishi/README.md)：原生 Session/dispatch、插件服务依赖与 SQLite |
+| AstrBot | [Host README](../../hosts/astrbot/README.md)：未修改的 AstrBot 4.29.1 无头生命周期、`ligamina_bridge` 平台适配器、命令发现（内置 star 不暴露） |
 | Reference Client | [说明](../../clients/reference/README.md)：typed HTTP、独立 MCP SDK、虚拟平台与平台中立的 [OneBot v11 Gateway](../../clients/reference/src/onebot-gateway.ts)（接入见 [Bot 与 Agent 接入](bot-integration.md)） |
 | 实验室 | [run.py](../../lab/run.py)、[representative.py](../../lab/representative.py)、[独立原生基线](../../lab/baselines/paired_worker.py)、[比较器](../../lab/compare.py) |
 

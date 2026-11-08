@@ -21,7 +21,7 @@ use tokio::sync::broadcast;
 const TOOL_DEADLINE: Duration = Duration::from_secs(30);
 const PING_TOOL: &str = "_ligamina_ping";
 /// Prefix of tools backed by native plugin commands (ADR 0002).
-pub const COMMAND_TOOL_PREFIX: &str = "cmd.";
+pub const COMMAND_TOOL_PREFIX: &str = ligamina_core::commands::COMMAND_TOOL_PREFIX;
 const MAX_TOOL_NAME: usize = 128;
 
 /// Which native plugin commands are exposed as MCP tools.
@@ -71,26 +71,13 @@ impl CommandTools {
     }
 }
 
-/// `cmd.<host>.<command>` with characters outside MCP's tool-name set replaced by `_`.
+/// `cmd.<host>.<command>`; see [`ligamina_core::commands::tool_name_part`].
 pub fn command_tool_name(host_id: &str, command_id: &str) -> String {
-    format!(
-        "{COMMAND_TOOL_PREFIX}{}.{}",
-        sanitize(host_id),
-        sanitize(command_id)
-    )
+    ligamina_core::commands::command_tool_name(host_id, command_id)
 }
 
 fn sanitize(value: &str) -> String {
-    value
-        .chars()
-        .map(|c| {
-            if c.is_ascii_alphanumeric() || matches!(c, '_' | '-' | '.') {
-                c
-            } else {
-                '_'
-            }
-        })
-        .collect()
+    ligamina_core::commands::tool_name_part(value)
 }
 
 fn command_tool(name: &str, info: &CommandInfo) -> Tool {
