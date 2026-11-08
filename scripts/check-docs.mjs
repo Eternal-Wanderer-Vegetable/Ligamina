@@ -19,18 +19,18 @@ const stripFences = (text) => text.replace(/^(```|~~~)[\s\S]*?^\1[^\n]*$/gm, '')
 const slug = (text) => text.toLowerCase().replace(/<[^>]*>/g, '').replace(/[^\p{L}\p{N}_\-\s]/gu, '').trim().replace(/\s/g, '-');
 
 try {
-  const mandatory = ['AGENTS.md', 'README.md', 'feature_list.json', 'progress.md', 'session-handoff.md',
+  const mandatory = ['AGENTS.md', 'README.md', 'README.zh-CN.md', 'feature_list.json', 'progress.md', 'session-handoff.md',
     'init.ps1', 'init.sh', 'skills-lock.json', '.agents/skills/harness-creator/SKILL.md', 'docs/README.md',
     'docs/evidence/README.md', 'docs/plans/2026-10-12-phase-2-full-catalog.md'];
   for (const file of mandatory) assert(await exists(path.join(root, file)), `Missing ${file}`);
-  const docs = ['AGENTS.md', 'README.md', 'progress.md', 'session-handoff.md',
-    ...await walk('docs'), 'hosts/nonebot/README.md', 'hosts/koishi/README.md',
+  const docs = ['AGENTS.md', 'README.md', 'README.zh-CN.md', 'progress.md', 'session-handoff.md',
+    ...await walk('docs'), 'hosts/nonebot/README.md', 'hosts/koishi/README.md', 'hosts/astrbot/README.md',
     'clients/reference/README.md', 'deploy/windows/README.md', 'deploy/linux/README.md'].filter((file) => file.endsWith('.md'));
   let links = 0;
   for (const file of docs) {
     const text = await read(file);
     const lines = text.trimEnd().split(/\r?\n/).length;
-    const budget = file === 'AGENTS.md' ? 100 : file === 'README.md' || file.startsWith('docs/guides/') ? 150 : null;
+    const budget = file === 'AGENTS.md' ? 100 : file === 'README.md' || file === 'README.zh-CN.md' || file.startsWith('docs/guides/') ? 150 : null;
     if (budget) assert(lines <= budget, `${file}: ${lines} lines exceeds budget ${budget}`);
     assert(!/YYYY-MM-DD|\[feat-XXX|\[Completed item|\[Current work item/.test(text), `${file}: scaffolding placeholder remains`);
     for (const match of stripFences(text).matchAll(/!?\[[^\]\n]+\]\(([^\n)]+)\)/g)) {
