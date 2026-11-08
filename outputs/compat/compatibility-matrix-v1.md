@@ -7,7 +7,7 @@
 | `load` | 隔离 Worker 中安装并原生加载，清理已确认（约 L0–L2） | S2-11 全量重跑，P3-10 恢复矩阵覆盖；AstrBot 取 AB-04 |
 | `mcp_tool` | 命令作为 MCP 工具的工具级验收 | TOOL-04、AB-05 |
 | `federated_event` | Native/Federated 双路径行为（约 L3–L4） | P4-01 v10、P4-02 v2r3 |
-| `platform_delivery` | 回复送达真实聊天平台 | P6-01（仅正例）；P4-05 canary 作为历史 |
+| `platform_delivery` | 回复送达真实聊天平台 | P6-01 正例与场景轮（负例/越权、Core 重启、Host 超时，各 ≥3；未覆盖重复投递）；P4-05 canary 作为历史 |
 
 取值只有 `verified`、`failed`、`skipped`、`unknown`、`untested`；`scope` 写明覆盖范围。P4-03 的恢复只作注释，不改变 P3 结论。Windows `load` 来自 S2/P3 的 Windows Sandbox profile，不覆盖 App Control Enforcement 准入（P4-04）。本矩阵是证据索引，不是新的支持名单。
 

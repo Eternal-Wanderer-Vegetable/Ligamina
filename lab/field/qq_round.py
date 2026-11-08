@@ -26,7 +26,7 @@ ROOT = Path(__file__).resolve().parents[2]
 CLI = ROOT / "target" / "debug" / ("ligamina" + "-cli.exe")
 ANSI = re.compile(r"\x1b\[[0-9;]*m")
 TIME = re.compile(r"^\d\d-\d\d (\d\d:\d\d:\d\d) ")
-MENTION = re.compile(r"\[message\.group\.normal\]: Message (-?\d+) from \d+@\[群:\d+\] '(.*)'$")
+MENTION = re.compile(r"\[message\.group\.normal\]: Message (-?\d+) from (\d+)@\[群:\d+\] '(.*)'$")
 ROUTE = re.compile(r"\[Router\] Route\((.*?)\)")
 COMES = re.compile(r"\[Comes\] (\S+) → (\w+) \((\d+)ms, (\S+), (\d+) 次工具调用\)")
 SEND = re.compile(r"\[即将发送给 QQ 的台词\]: (.*)$")
@@ -43,15 +43,16 @@ def lines(log: Path):
             yield match.group(1), line
 
 
-def collect(log: Path, since: str, bot_id: str) -> list[dict]:
+def collect(log: Path, since: str, bot_id: str, sender: str | None = None) -> list[dict]:
+    """`sender` (a QQ ID) only filters; it is never written to the records."""
     turns: list[dict] = []
     current: dict | None = None
     for clock, line in lines(log):
         if clock < since:
             continue
         mention = MENTION.search(line)
-        if mention and f"[at:qq={bot_id}]" in mention.group(2):
-            text = re.sub(r"\[at:qq=\d+\]", "", mention.group(2)).strip()
+        if mention and f"[at:qq={bot_id}]" in mention.group(3) and sender in (None, mention.group(2)):
+            text = re.sub(r"\[at:qq=\d+\]", "", mention.group(3)).strip()
             current = {"time": clock, "message": text, "route": None, "comes": None,
                        "sent_text": None, "delivery": None, "delivery_plan_rejected": False}
             turns.append(current)
@@ -79,6 +80,22 @@ def outbound_after(log: Path, since: str) -> list[str]:
     return [line for clock, line in lines(log) if clock >= since and "[OutboundDelivery]" in line]
 
 
+def wait_hosts_active(config: Path, deadline: float) -> None:
+    """The daemon is ready before its Hosts are; wait until every Host is active."""
+    data = json.loads(config.read_text(encoding="utf-8"))
+    request = urllib.request.Request(f"http://{data['listen']}/v1/status",
+                                     headers={"authorization": f"Bearer {data['admin_token']}"})
+    while time.monotonic() < deadline:
+        try:
+            hosts = json.loads(NO_PROXY.open(request, timeout=10).read())["hosts"]
+            if hosts and all(host["state"] == "active" for host in hosts):
+                return
+        except Exception:  # noqa: BLE001 - not listening yet
+            pass
+        time.sleep(1)
+    raise RuntimeError("Hosts did not all become active")
+
+
 def start_core(config: Path) -> subprocess.Popen:
     work = config.parent
     stamp = time.strftime("%H%M%S")
@@ -96,6 +113,7 @@ def start_core(config: Path) -> subprocess.Popen:
         text = stdout_path.read_text(encoding="utf-8", errors="replace")
         if '"ready":true' in text.replace(" ", ""):
             (work / "core.pid").write_text(str(process.pid), encoding="ascii")
+            wait_hosts_active(config, deadline)
             return process
         if process.poll() is not None:
             break
@@ -115,19 +133,21 @@ def stop_core(config: Path) -> None:
     if pid_file.exists():
         pid = pid_file.read_text(encoding="ascii").strip()
         for _ in range(90):
-            alive = subprocess.run(["tasklist", "/FI", f"PID eq {pid}"], capture_output=True, text=True).stdout
-            if pid not in alive:
+            alive = subprocess.run(["tasklist", "/FI", f"PID eq {pid}", "/FO", "CSV", "/NH"],
+                                   capture_output=True).stdout.decode("ascii", errors="ignore")
+            if f'"{pid}"' not in alive:
                 return
             time.sleep(1)
         subprocess.run(["taskkill", "/T", "/F", "/PID", pid], capture_output=True)
 
 
-def restart_watch(log: Path, config: Path, restarts: int, bot_id: str, journal: Path) -> None:
+def restart_watch(log: Path, config: Path, restarts: int, bot_id: str, journal: Path,
+                  sender: str | None = None) -> None:
     since = time.strftime("%H:%M:%S")
     seen = 0
     events = []
     while seen < restarts:
-        turns = collect(log, since, bot_id)
+        turns = collect(log, since, bot_id, sender)
         done = [t for t in turns if t["delivery"] is not None]
         while len(done) > seen and seen < restarts:
             turn = done[seen]
@@ -151,12 +171,14 @@ def main() -> None:
     c.add_argument("--since", required=True)
     c.add_argument("--bot-id", required=True)
     c.add_argument("--output", type=Path, required=True)
+    c.add_argument("--sender", default=None)
     w = sub.add_parser("restart-watch")
     w.add_argument("--stella-log", type=Path, required=True)
     w.add_argument("--core-config", type=Path, required=True)
     w.add_argument("--restarts", type=int, required=True)
     w.add_argument("--bot-id", required=True)
     w.add_argument("--journal", type=Path, required=True)
+    w.add_argument("--sender", default=None)
     s = sub.add_parser("start-core")
     s.add_argument("--core-config", type=Path, required=True)
     t = sub.add_parser("stop-core")
@@ -166,11 +188,11 @@ def main() -> None:
     o.add_argument("--since", required=True)
     args = parser.parse_args()
     if args.action == "collect":
-        turns = collect(args.stella_log, args.since, args.bot_id)
+        turns = collect(args.stella_log, args.since, args.bot_id, args.sender)
         args.output.write_text(json.dumps(turns, ensure_ascii=False, indent=2) + "\n", encoding="utf-8", newline="\n")
         print(json.dumps({"turns": len(turns)}))
     elif args.action == "restart-watch":
-        restart_watch(args.stella_log, args.core_config, args.restarts, args.bot_id, args.journal)
+        restart_watch(args.stella_log, args.core_config, args.restarts, args.bot_id, args.journal, args.sender)
     elif args.action == "start-core":
         process = start_core(args.core_config)
         print(json.dumps({"pid": process.pid}))

@@ -16,8 +16,9 @@ Capabilities (values: verified / failed / skipped / unknown / untested):
   are annotations only (feat-028 keeps the P3 verdict). AstrBot from the AB-04 pilot.
 - ``mcp_tool``: commands called as MCP tools (TOOL-04, AB-05).
 - ``federated_event``: Native/Federated paired behavior (P4-01 v10, P4-02 v2r3).
-- ``platform_delivery``: replies delivered to a real chat platform (P6-01, positive
-  cases only; earlier P4-05 canaries stayed unknown and are listed as history).
+- ``platform_delivery``: replies delivered to a real chat platform (P6-01 positive round
+  plus the scenario round: negative/authority, Core restart, Host timeout; duplicate
+  redelivery not covered; earlier P4-05 canaries stayed unknown and are listed as history).
 """
 
 from __future__ import annotations
@@ -53,6 +54,7 @@ AB05 = f"{ACCEPTANCE}/ab05-astrbot-tool-linux-20261108-v2.json"
 P401 = f"{ACCEPTANCE}/phase4-p401-behavior-runs-20261026-v10.json"
 P402 = f"{ACCEPTANCE}/phase4-p402-behavior-runs-20261026-v2r3.json"
 P601 = f"{ACCEPTANCE}/p6-p601-qq-mcp-field-20261108.json"
+P601_SCENARIOS = f"{ACCEPTANCE}/p6-p601-qq-scenarios-20261108.json"
 P405_CANARY_GLOB = "phase4-p405-live-20261029/phase4-p405-koishi-live-canary-20261029*.json"
 # P6-01 names plugins by package@version / artifact hash; resolved against the catalogs.
 P601_PLUGINS = {
@@ -221,8 +223,9 @@ def build(root: Path = ROOT) -> dict:
         caps[rid]["federated_event"] = {"linux": claim(
             value, [src.ref(rel, f"positions[{i}]") for rel, i, _ in positions], reason, cases=cases)}
 
-    # platform_delivery: P6-01 round 5 (positive) with P4-05 canaries as history
+    # platform_delivery: P6-01 round 5 (positive) and the scenario round, P4-05 canaries as history
     field = src.json(P601)
+    scenarios = src.json(P601_SCENARIOS)
     final = next(r for r in field["rounds"] if r.get("outcome") == "passed")
     by_key = {(e["package"], e["version"]): rid for rid, e in entries.items()}
     teamup_sha = field["plugins"]["astrbot"].split("sha256", 1)[1].strip()
@@ -231,9 +234,14 @@ def build(root: Path = ROOT) -> dict:
             rid = by_key[(package, version)]
         else:
             rid = next(r for r, e in entries.items() if e["ecosystem"] == "astrbot" and teamup_sha in e["artifact_sha256"])
+        covered = scenarios["coverage_passed_by_ecosystem"][ecosystem]
+        if min(covered.get(k, 0) for k in ("positive", "negative", "restart", "timeout")) < 3:
+            raise SystemExit(f"P6-01 scenario coverage below 3 for {ecosystem}: {covered}")
         caps[rid]["platform_delivery"] = {"qq": claim(
-            "verified", [src.ref(P601, f"rounds[{field['rounds'].index(final)}]")],
-            scope="positive cases only, MCP path through one bot, user-observed; isolation/duplicate/restart/timeout not run")}
+            "verified", [src.ref(P601, f"rounds[{field['rounds'].index(final)}]"),
+                         src.ref(P601_SCENARIOS, f"coverage_passed_by_ecosystem.{ecosystem}")],
+            scope="positive, negative/authority, Core restart and Host timeout cases (>=3 each), MCP path through "
+                  "one bot in isolated containers, user-observed; duplicate event redelivery not run")}
     for rel in src.glob(P405_CANARY_GLOB):
         report = src.json(rel)
         rid = (report.get("candidate") or {}).get("registry_entry_id")
@@ -299,7 +307,7 @@ def render_markdown(matrix: dict) -> str:
            "| `load` | 隔离 Worker 中安装并原生加载，清理已确认（约 L0–L2） | S2-11 全量重跑，P3-10 恢复矩阵覆盖；AstrBot 取 AB-04 |",
            "| `mcp_tool` | 命令作为 MCP 工具的工具级验收 | TOOL-04、AB-05 |",
            "| `federated_event` | Native/Federated 双路径行为（约 L3–L4） | P4-01 v10、P4-02 v2r3 |",
-           "| `platform_delivery` | 回复送达真实聊天平台 | P6-01（仅正例）；P4-05 canary 作为历史 |", "",
+           "| `platform_delivery` | 回复送达真实聊天平台 | P6-01 正例与场景轮（负例/越权、Core 重启、Host 超时，各 ≥3；未覆盖重复投递）；P4-05 canary 作为历史 |", "",
            "取值只有 `verified`、`failed`、`skipped`、`unknown`、`untested`；`scope` 写明覆盖范围。"
            "P4-03 的恢复只作注释，不改变 P3 结论。Windows `load` 来自 S2/P3 的 Windows Sandbox profile，"
            "不覆盖 App Control Enforcement 准入（P4-04）。本矩阵是证据索引，不是新的支持名单。", "",

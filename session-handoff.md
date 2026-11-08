@@ -2,6 +2,7 @@
 
 ## Current Objective
 
+- **2026-11-08 最新：P6-01 场景轮完成，见计划 3.1c；feat-030 为 in-progress。** 剩余缺口是重复事件投递与 Gateway 账本去重证据（需受控注入，用户发送无法产生）；Stella PR #133 待合并。复现：按 3.1b 起现场 Core 与 Stella，然后 `python lab/field/qq_round.py restart-watch --stella-log <log> --core-config <daemon.json> --restarts 9 --bot-id <qq> --sender <qq> --journal <json>`（重启轮）、`python lab/field/qq_round_timeout.py --stella-log <log> --owner <owner> --sender <qq> --bot-id <qq> --turns 9 --journal <json>`（超时轮）；QQ 号只作过滤参数，不写入报告。两次发送之间留一分钟，避开重启窗口。
 - **2026-11-08 最新：P6-03、P6-04 完成。** 重建矩阵：`UV_PROJECT_ENVIRONMENT=<新目录> uv run --locked --project lab --python 3.12.14 python -m lab.compat_matrix build`（新增或替换证据后运行，再提交两份输出）；校验：`... -m lab.compat_matrix check`。下一步：整体执行剩余 QQ 场景（隔离、重复/重启、超时/unknown，每生态各三次），完成后把结果写入新报告并重建矩阵。
 - **2026-11-08 最新：P6-03 完成（ADR 0003），下一项 P6-04 / feat-044。** 复现现场验收：先 `cargo build -p ligamina-cli`，再 `python lab/field/isolation_acceptance.py --work .work/<新目录> --output outputs/acceptance/<新报告>.json`（需 WSL Docker 与 TOOL-04/AB-05 镜像和 bundle）。之后按用户要求整体执行剩余 QQ 场景（隔离、重复/重启、超时/unknown 各三次）。
 - **2026-11-08 最新：P6-01 真实 QQ 正例已通过（三种生态，经 Stella MCP 路径），见计划 3.1b。** 运行环境已恢复：Stella 按原方式运行（`.work/field-20261107/run-stella.ps1 -Mode start -LlmBaseUrl http://127.0.0.1:1234 -LlmModel google/gemma-4-e4b`，MCP 关闭），现场 Core 已停止。复现完整联调：生成新 Core 配置 `python lab/field/three_host_config.py --work .work/<新目录> --port 63900`，按 `.work/field-20261108/qq1/` 的做法扩展 Stella 两份 MCP 配置（先备份），把 Stella PR #132 的补丁应用到 Stella 检出并以 `run-stella.ps1 -Mcp` 启动，结束后恢复。下一步：Stella PR #132 合并后补跑隔离、重复/重启、超时/unknown 各三次；或转 P6-03 / P6-04。
