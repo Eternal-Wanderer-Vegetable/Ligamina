@@ -1,8 +1,8 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-11-07",
+  "updated_at": "2026-11-08",
   "active_feature": null,
-  "next_feature": "feat-038",
+  "next_feature": "feat-041",
   "features": [
     {
       "id": "feat-001",
@@ -2206,10 +2206,14 @@
       "dependencies": [
         "feat-037"
       ],
-      "status": "not-started",
+      "status": "done",
       "done_when": "每项有原生语义测试；不支持的 API 显式 unsupported_api。",
-      "evidence": "",
-      "evidence_paths": []
+      "evidence": "2026-11-08：hosts/astrbot/tests/event_parity.py 通过（无前缀 @ 唤醒；普通群消息与 @ 他人不唤醒；成员调用管理员命令得到原生权限回复、管理员可用；可解析与不可解析引用的回复唤醒；send_by_session 经 Core 授权/账本发往已见会话）。管理员显式配置（默认无），避免 AstrBot 默认管理员 ID astrbot 被平台用户冒用；桥接平台不以 aiocqhttp 名义注册。",
+      "evidence_paths": [
+        "hosts/astrbot/tests/event_parity.py",
+        "hosts/astrbot/README.md",
+        "docs/plans/2026-11-07-phase-5-astrbot-host.md"
+      ]
     },
     {
       "id": "feat-039",
@@ -2219,10 +2223,15 @@
       "dependencies": [
         "feat-037"
       ],
-      "status": "not-started",
+      "status": "done",
       "done_when": "与第二阶段目录合同同等的可复核快照与锁；不执行插件。",
-      "evidence": "",
-      "evidence_paths": []
+      "evidence": "2026-11-08：快照 ab-15937e90d26b7caf9d12 共 3,271 条：3,265 冻结（自算 SHA-256/SHA-512，归档只在内存中静态检查、不执行插件代码），3 条超过 64 MB 下载上限，3 条缺 main.py；verify 对全部 3,268 个已缓存归档复核通过。lab/tests/test_astrbot_catalog.py 通过。",
+      "evidence_paths": [
+        "catalogs/ab-15937e90d26b7caf9d12/catalog.json",
+        "catalogs/ab-15937e90d26b7caf9d12/artifacts.lock.json",
+        "lab/astrbot_catalog.py",
+        "lab/tests/test_astrbot_catalog.py"
+      ]
     },
     {
       "id": "feat-040",
@@ -2232,10 +2241,16 @@
       "dependencies": [
         "feat-039"
       ],
-      "status": "not-started",
+      "status": "done",
       "done_when": "账本闭合、清理确认；失败与 unknown 按既有规则留账。",
-      "evidence": "",
-      "evidence_paths": []
+      "evidence": "2026-11-08：v4 pilot 24/24 结清：21 passed、1 failed（插件自身 initialize 抛错）、2 skipped（依赖不可按只用 wheel 规则解析），unknown 0，清理全部确认，启动期发送 0。修正了 Worker 端在 AstrBot 停止后才输出结论（core.stop 在禁网 Worker 中阻塞）、改用 star_map 判定加载、按 metadata.yaml name 命名插件目录三处 harness 问题；v2/v3 报告作废未入库。",
+      "evidence_paths": [
+        "outputs/acceptance/ab04-astrbot-linux-pilot-20261108-v4.json",
+        "outputs/acceptance/tool04-linux-admission-20261108.json",
+        "lab/astrbot_census.py",
+        "lab/astrbot_census_side.py",
+        "docs/plans/2026-11-07-phase-5-astrbot-host.md"
+      ]
     },
     {
       "id": "feat-041",
