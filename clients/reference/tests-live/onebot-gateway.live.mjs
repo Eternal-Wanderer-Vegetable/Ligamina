@@ -41,15 +41,19 @@ function fakeOneBot() {
   return new Promise((resolve) => server.listen(0, "127.0.0.1", () => resolve({ server, actions, url: `http://127.0.0.1:${server.address().port}` })));
 }
 
-async function startDaemon(work) {
-  const clientToken = token();
-  const registrationToken = token() + token();
+async function startDaemon(work, options = {}) {
+  const clientToken = options.clientToken ?? token();
+  const registrationToken = options.registrationToken ?? token() + token();
   const config = {
-    listen: "127.0.0.1:0",
+    listen: `127.0.0.1:${options.port ?? 0}`,
     database_path: path.join(work, "core.sqlite3"),
     admin_token: token(),
     mcp_client_id: "bot",
-    clients: [{ id: "bot", token: clientToken }],
+    clients: [{
+      id: "bot",
+      token: clientToken,
+      ...(options.readGrant ? { operation_grants: [{ id: "bot-read", account_id: ACCOUNT, operations: ["send_message"] }] } : {}),
+    }],
     gateways: [{ id: "qq-main", client_id: "bot", account_id: ACCOUNT, registration_token: registrationToken }],
     hosts: [{
       id: "koishi",
@@ -129,8 +133,209 @@ test("a OneBot group message reaches a Koishi plugin and its reply goes out thro
     await running;
   } finally {
     stop.abort();
-    daemon.child.kill();
+    await stopDaemon(daemon);
     onebot.server.close();
-    await rm(work, { recursive: true, force: true });
+    await rm(work, { recursive: true, force: true, maxRetries: 5, retryDelay: 200 });
+  }
+});
+
+async function freePort() {
+  const { createServer: createNetServer } = await import("node:net");
+  return new Promise((resolve) => {
+    const server = createNetServer().listen(0, "127.0.0.1", () => {
+      const { port } = server.address();
+      server.close(() => resolve(port));
+    });
+  });
+}
+
+async function waitFor(predicate, timeoutMs, what) {
+  const deadline = Date.now() + timeoutMs;
+  while (!(await predicate())) {
+    if (Date.now() > deadline) throw new Error(`timed out waiting for ${what}`);
+    await new Promise((resolve) => setTimeout(resolve, 100));
+  }
+}
+
+function stopDaemon(daemon) {
+  return new Promise((resolve) => {
+    if (daemon.child.exitCode !== null) return resolve();
+    daemon.child.once("exit", () => resolve());
+    daemon.child.kill();
+  });
+}
+
+// P6-02: Core is killed while the Gateway is in the middle of a platform send. The send
+// is not repeated, the restarted Core keeps that operation unknown, the Gateway hands
+// its late outcome to onUnreported, re-leases and serves the next message.
+test("a Core crash during a send leaves it unknown, never re-sent, and the Gateway recovers", { skip: !existsSync(executable) || !existsSync(path.join(koishi, "dist/worker.js")) }, async () => {
+  const work = await mkdtemp(path.join(tmpdir(), "ligamina-onebot-restart-"));
+  const sends = [];
+  let releaseFirst;
+  const firstHeld = new Promise((resolve) => { releaseFirst = resolve; });
+  let next = 8000;
+  const server = createServer((request, response) => {
+    let body = "";
+    request.on("data", (chunk) => { body += chunk; });
+    request.on("end", async () => {
+      const action = request.url.slice(1);
+      const parsed = JSON.parse(body || "{}");
+      if (action.startsWith("send_")) {
+        sends.push(parsed.message.map((segment) => segment.data.text).join(""));
+        if (sends.length === 1) await firstHeld;
+      }
+      response.setHeader("content-type", "application/json");
+      response.end(JSON.stringify({ status: "ok", retcode: 0, data: { message_id: next++ } }));
+    });
+  });
+  await new Promise((resolve) => server.listen(0, "127.0.0.1", resolve));
+  const onebotUrl = `http://127.0.0.1:${server.address().port}`;
+  const port = await freePort();
+  const credentials = { port, clientToken: token(), registrationToken: token() + token(), readGrant: true };
+  let daemon = await startDaemon(work, credentials);
+  const stop = new AbortController();
+  const errors = [];
+  const unreported = [];
+  let running;
+  try {
+    const client = new LigaminaClient({ baseUrl: daemon.baseUrl, token: credentials.clientToken });
+    const gateway = new OneBotGateway({
+      core: client,
+      gatewayId: "qq-main",
+      registrationToken: credentials.registrationToken,
+      onebot: { baseUrl: onebotUrl },
+      actionTimeoutMs: 60_000,
+      onError: (error) => errors.push(error),
+      onUnreported: (record) => unreported.push(record),
+    });
+    running = gateway.run(stop.signal, 50);
+    const message = (id, text) => toEventEnvelope({
+      post_type: "message", message_type: "group", self_id: Number(ACCOUNT), group_id: 42, user_id: 7,
+      message_id: id, time: Math.floor(Date.now() / 1000),
+      message: [{ type: "text", data: { text: `ligamina.echo -u ${text}` } }],
+    }, "koishi");
+
+    await client.submitEvent(message(601, "first"));
+    await waitFor(() => sends.length === 1, 30_000, "the first send to reach OneBot");
+
+    // Crash Core while the send is in flight, then start a new Core on the same ledger.
+    await stopDaemon(daemon);
+    daemon = await startDaemon(work, credentials);
+    releaseFirst();
+
+    await waitFor(() => unreported.length === 1, 30_000, "the late outcome to be dropped");
+    assert.equal(unreported[0].status, "succeeded", "OneBot did accept the held send");
+    const query = new URLSearchParams({ account_id: ACCOUNT, operation: "send_message" });
+    const record = await fetch(`${daemon.baseUrl}/v1/operations/${encodeURIComponent(unreported[0].operation_id)}?${query}`, {
+      headers: { authorization: `Bearer ${credentials.clientToken}` },
+    }).then((response) => response.json());
+    assert.equal(record.status, "unknown", `ledger keeps the crashed send unknown: ${JSON.stringify(record)}`);
+    assert.equal(record.result?.error, "core_epoch_changed");
+
+    await client.submitEvent(message(602, "second"));
+    await waitFor(() => sends.length === 2, 30_000, "the second send after restart");
+    // Give a stray replay time to show up, then check there was none.
+    await new Promise((resolve) => setTimeout(resolve, 1_000));
+    assert.deepEqual(sends, ["FIRST", "SECOND"]);
+    assert.equal(gateway.hasPendingReport, false);
+    // The Gateway was inside the held send for the whole outage, so the only symptom is
+    // the rejected report (stale lease from the previous Core epoch).
+    assert.match(unreported[0].reason, /Core rejected the report/);
+    assert.deepEqual(errors, [], "no loop error: the rejected report is an outcome, not a failure");
+  } finally {
+    stop.abort();
+    releaseFirst();
+    await running?.catch(() => {});
+    await stopDaemon(daemon);
+    server.closeAllConnections?.();
+    server.close();
+    await rm(work, { recursive: true, force: true, maxRetries: 5, retryDelay: 200 });
+  }
+});
+
+// P6-02: the Gateway process dies in the middle of a send. A replacement Gateway takes
+// the lease over; Core marks the abandoned operation unknown (never re-offers it), and
+// the replacement serves new messages. The abandoned send is attempted exactly once.
+test("a Gateway crash during a send leaves it unknown and a replacement Gateway takes over", { skip: !existsSync(executable) || !existsSync(path.join(koishi, "dist/worker.js")) }, async () => {
+  const work = await mkdtemp(path.join(tmpdir(), "ligamina-onebot-takeover-"));
+  const sends = [];
+  let releaseFirst;
+  const firstHeld = new Promise((resolve) => { releaseFirst = resolve; });
+  let next = 9000;
+  const server = createServer((request, response) => {
+    let body = "";
+    request.on("data", (chunk) => { body += chunk; });
+    request.on("end", async () => {
+      const parsed = JSON.parse(body || "{}");
+      if (request.url.startsWith("/send_")) {
+        sends.push(parsed.message.map((segment) => segment.data.text).join(""));
+        if (sends.length === 1) await firstHeld;
+      }
+      response.setHeader("content-type", "application/json");
+      response.end(JSON.stringify({ status: "ok", retcode: 0, data: { message_id: next++ } }));
+    });
+  });
+  await new Promise((resolve) => server.listen(0, "127.0.0.1", resolve));
+  const onebotUrl = `http://127.0.0.1:${server.address().port}`;
+  const daemon = await startDaemon(work, { readGrant: true });
+  const stopA = new AbortController();
+  const stopB = new AbortController();
+  const unreportedA = [];
+  let runningA;
+  let runningB;
+  try {
+    const client = new LigaminaClient({ baseUrl: daemon.baseUrl, token: daemon.clientToken });
+    const gatewayOptions = {
+      core: client,
+      gatewayId: "qq-main",
+      registrationToken: daemon.registrationToken,
+      onebot: { baseUrl: onebotUrl },
+      actionTimeoutMs: 60_000,
+      onError: () => {},
+    };
+    const gatewayA = new OneBotGateway({ ...gatewayOptions, onUnreported: (record) => unreportedA.push(record) });
+    runningA = gatewayA.run(stopA.signal, 50);
+    const message = (id, text) => toEventEnvelope({
+      post_type: "message", message_type: "group", self_id: Number(ACCOUNT), group_id: 42, user_id: 7,
+      message_id: id, time: Math.floor(Date.now() / 1000),
+      message: [{ type: "text", data: { text: `ligamina.echo -u ${text}` } }],
+    }, "koishi");
+
+    await client.submitEvent(message(701, "first"));
+    await waitFor(() => sends.length === 1, 30_000, "the first send to reach OneBot");
+
+    // Gateway A is now wedged inside the send, as if its process had died. Start B.
+    const unreportedB = [];
+    const gatewayB = new OneBotGateway({ ...gatewayOptions, onUnreported: (record) => unreportedB.push(record) });
+    runningB = gatewayB.run(stopB.signal, 50);
+
+    await client.submitEvent(message(702, "second"));
+    await waitFor(() => sends.length === 2, 30_000, "the replacement Gateway to send");
+
+    // A finally comes back: its late report is refused because B replaced its lease.
+    stopA.abort();
+    releaseFirst();
+    await runningA;
+    assert.equal(unreportedA.length, 1);
+    const query = new URLSearchParams({ account_id: ACCOUNT, operation: "send_message" });
+    const record = await fetch(`${daemon.baseUrl}/v1/operations/${encodeURIComponent(unreportedA[0].operation_id)}?${query}`, {
+      headers: { authorization: `Bearer ${daemon.clientToken}` },
+    }).then((response) => response.json());
+    assert.equal(record.status, "unknown", `abandoned send stays unknown: ${JSON.stringify(record)}`);
+    assert.equal(record.result?.error, "lease_replaced");
+
+    await new Promise((resolve) => setTimeout(resolve, 1_000));
+    assert.deepEqual(sends, ["FIRST", "SECOND"], "no replay of the abandoned send");
+    assert.deepEqual(unreportedB, []);
+  } finally {
+    stopA.abort();
+    stopB.abort();
+    releaseFirst();
+    await runningA?.catch(() => {});
+    await runningB?.catch(() => {});
+    await stopDaemon(daemon);
+    server.closeAllConnections?.();
+    server.close();
+    await rm(work, { recursive: true, force: true, maxRetries: 5, retryDelay: 200 });
   }
 });

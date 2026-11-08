@@ -232,6 +232,13 @@ async fn wait_for_late_responses(session: &HostSession, expected: usize) {
 async fn python_and_node_workers_support_concurrent_bidirectional_requests() {
     for kind in ["python", "node"] {
         let worker = start_worker(kind).await;
+        // A cold `uv run` on a CI runner can take longer than the per-call deadline below;
+        // wait for the worker to answer once so the burst measures requests, not startup.
+        worker
+            .session
+            .request("host.echo", json!({"value": -1}), Duration::from_secs(120))
+            .await
+            .unwrap_or_else(|error| panic!("{kind} worker did not answer: {error:?}"));
         let calls = (0..16).map(|value| {
             let session = worker.session.clone();
             async move {

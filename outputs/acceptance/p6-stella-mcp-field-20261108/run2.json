@@ -1,0 +1,308 @@
+{
+  "run_id": "run2",
+  "status": "completed",
+  "client": "Stella capability.providers.mcp.client.McpServerClient",
+  "catalog": [
+    "_ligamina_ping",
+    "cmd.field-astrbot-teamup.____-90da9d72",
+    "cmd.field-astrbot-teamup.____-bc58971e",
+    "cmd.field-astrbot-teamup.____-f0d4f036",
+    "cmd.field-astrbot-teamup.____-fa319e0f",
+    "cmd.field-astrbot-teamup.____-fda2f352",
+    "cmd.field-koishi-echo.echo",
+    "cmd.field-nonebot-roll.rd"
+  ],
+  "wait_for_tools_ms": 9843,
+  "cases": [
+    {
+      "case_id": "tool-ko-koishijs-plugin-echo-positive",
+      "class": "positive",
+      "plugin": "@koishijs/plugin-echo",
+      "artifact": "@koishijs/plugin-echo@2.2.5",
+      "host": "field-koishi-echo",
+      "result": "passed",
+      "steps": [
+        [
+          {
+            "tool": "cmd.field-koishi-echo.echo",
+            "arguments": {
+              "message": "alpha"
+            },
+            "text": "alpha",
+            "allowed_by_stella": true,
+            "ms": 16,
+            "problems": []
+          }
+        ]
+      ]
+    },
+    {
+      "case_id": "tool-ko-koishijs-plugin-echo-negative",
+      "class": "negative",
+      "plugin": "@koishijs/plugin-echo",
+      "artifact": "@koishijs/plugin-echo@2.2.5",
+      "host": "field-koishi-echo",
+      "result": "passed",
+      "steps": [
+        [
+          {
+            "tool": "cmd.field-koishi-echo.echo",
+            "arguments": {},
+            "text": "请输入要发送的文本。",
+            "allowed_by_stella": true,
+            "ms": 16,
+            "problems": []
+          }
+        ]
+      ]
+    },
+    {
+      "case_id": "tool-ko-koishijs-plugin-echo-isolation",
+      "class": "isolation",
+      "plugin": "@koishijs/plugin-echo",
+      "artifact": "@koishijs/plugin-echo@2.2.5",
+      "host": "field-koishi-echo",
+      "result": "passed",
+      "steps": [
+        [
+          {
+            "tool": "cmd.field-koishi-echo.echo",
+            "arguments": {
+              "message": "group-message"
+            },
+            "text": "group-message",
+            "allowed_by_stella": true,
+            "ms": 15,
+            "problems": []
+          },
+          {
+            "tool": "cmd.field-koishi-echo.echo",
+            "arguments": {
+              "message": "private-message"
+            },
+            "text": "private-message",
+            "allowed_by_stella": true,
+            "ms": 15,
+            "problems": []
+          },
+          {
+            "tool": "cmd.field-koishi-echo.echo",
+            "arguments": {
+              "arguments": "-u onebot.v11:77 leaked-message"
+            },
+            "text": "选项 user 输入无效，请指定正确的用户。",
+            "allowed_by_stella": true,
+            "ms": 15,
+            "problems": []
+          }
+        ]
+      ]
+    },
+    {
+      "case_id": "tool-nb-nonebot-plugin-roll-positive",
+      "class": "positive",
+      "plugin": "nonebot_plugin_roll",
+      "artifact": "nonebot_plugin_roll@0.2.3",
+      "host": "field-nonebot-roll",
+      "result": "passed",
+      "steps": [
+        [
+          {
+            "tool": "cmd.field-nonebot-roll.rd",
+            "arguments": {
+              "arguments": "1d6"
+            },
+            "text": "你掷出了1个6面骰子, 点数为【2】",
+            "allowed_by_stella": true,
+            "ms": 16,
+            "problems": []
+          }
+        ]
+      ]
+    },
+    {
+      "case_id": "tool-nb-nonebot-plugin-roll-negative",
+      "class": "negative",
+      "plugin": "nonebot_plugin_roll",
+      "artifact": "nonebot_plugin_roll@0.2.3",
+      "host": "field-nonebot-roll",
+      "result": "passed",
+      "steps": [
+        [
+          {
+            "tool": "cmd.field-nonebot-roll.rd",
+            "arguments": {
+              "arguments": "0d6"
+            },
+            "text": "错误！你掷出了不存在的骰子, 只有上帝知道结果是多少🤔",
+            "allowed_by_stella": true,
+            "ms": 15,
+            "problems": []
+          }
+        ]
+      ]
+    },
+    {
+      "case_id": "tool-nb-nonebot-plugin-roll-isolation",
+      "class": "isolation",
+      "plugin": "nonebot_plugin_roll",
+      "artifact": "nonebot_plugin_roll@0.2.3",
+      "host": "field-nonebot-roll",
+      "result": "passed",
+      "steps": [
+        [
+          {
+            "tool": "cmd.field-nonebot-roll.rd",
+            "arguments": {},
+            "text": "你还没掷骰子呢：rd [x]d[y]",
+            "allowed_by_stella": true,
+            "ms": 0,
+            "problems": []
+          }
+        ],
+        [
+          {
+            "tool": "cmd.field-nonebot-roll.rd",
+            "arguments": {
+              "arguments": "1d6"
+            },
+            "text": "你掷出了1个6面骰子, 点数为【6】",
+            "allowed_by_stella": true,
+            "ms": 16,
+            "problems": []
+          }
+        ]
+      ]
+    },
+    {
+      "case_id": "ab05-teamup-positive",
+      "class": "positive",
+      "plugin": "astrbot_plugin_teamup",
+      "artifact": "astrbot_plugin_teamup#f5603cb4d41293d802270b90fbaf201b84ad6852a214ee1778ec91de3611557a",
+      "host": "field-astrbot-teamup",
+      "result": "passed",
+      "steps": [
+        [
+          {
+            "tool": "cmd.field-astrbot-teamup.____-fda2f352",
+            "arguments": {
+              "arguments": ""
+            },
+            "text": "组队报名菜单（主菜单）：\n【信息与查询】\n- /组队大厅 [本群|跨群]\n- /组队列表 [组队名] [本群|跨群]\n- /组队空缺 [组队名] [本群|跨群]\n- /组队我的 [组队名] [本群|跨群]\n- /组队昵称 <昵称>\n\n【报名与组队】\n- /组队建队 <队伍名> [组队名] [本群|跨群]\n- /组队加入 [队伍名] [组队名] [本群|跨群]\n- /组队退出 [组队名] [本群|跨群]\n- /组队随机 [组队名] [本群|跨群]\n\n【管理员】\n- /组队创建 <每队人数> <组队名> [本群|跨群]\n- /组队切换 <组队名> [本群|跨群]\n- /组队随机 全部 [组队名] [本群|跨群]\n- /组队重置 [组队名] [本群|跨群]",
+            "allowed_by_stella": true,
+            "ms": 16,
+            "problems": []
+          }
+        ],
+        [
+          {
+            "tool": "cmd.field-astrbot-teamup.____-f0d4f036",
+            "arguments": {
+              "nickname": "测试员"
+            },
+            "text": "已设置昵称：测试员",
+            "allowed_by_stella": true,
+            "ms": 0,
+            "problems": []
+          }
+        ]
+      ]
+    },
+    {
+      "case_id": "ab05-teamup-negative",
+      "class": "negative",
+      "plugin": "astrbot_plugin_teamup",
+      "artifact": "astrbot_plugin_teamup#f5603cb4d41293d802270b90fbaf201b84ad6852a214ee1778ec91de3611557a",
+      "host": "field-astrbot-teamup",
+      "result": "passed",
+      "steps": [
+        [
+          {
+            "tool": "cmd.field-astrbot-teamup.____-f0d4f036",
+            "arguments": {
+              "nickname": "一二三四五六七八九十一二三四五六七八九十一"
+            },
+            "text": "昵称过长，请控制在 20 字以内。",
+            "allowed_by_stella": true,
+            "ms": 15,
+            "problems": []
+          }
+        ],
+        [
+          {
+            "tool": "cmd.field-astrbot-teamup.____-fa319e0f",
+            "arguments": {
+              "arguments": ""
+            },
+            "text": "跨群请写“跨群”，群内请在群聊使用。",
+            "allowed_by_stella": true,
+            "ms": 16,
+            "problems": []
+          }
+        ]
+      ]
+    },
+    {
+      "case_id": "ab05-teamup-authority",
+      "class": "isolation",
+      "plugin": "astrbot_plugin_teamup",
+      "artifact": "astrbot_plugin_teamup#f5603cb4d41293d802270b90fbaf201b84ad6852a214ee1778ec91de3611557a",
+      "host": "field-astrbot-teamup",
+      "result": "passed",
+      "steps": [
+        [
+          {
+            "tool": "cmd.field-astrbot-teamup.____-bc58971e",
+            "arguments": {
+              "team_size": "2",
+              "name": "周末",
+              "scope": "跨群"
+            },
+            "text": "仅管理员可创建组队报名。",
+            "allowed_by_stella": true,
+            "ms": 0,
+            "problems": []
+          }
+        ],
+        [
+          {
+            "tool": "cmd.field-astrbot-teamup.____-90da9d72",
+            "arguments": {
+              "session_name": "周末",
+              "scope": "跨群"
+            },
+            "text": "仅管理员可重置。",
+            "allowed_by_stella": true,
+            "ms": 16,
+            "problems": []
+          }
+        ],
+        [
+          {
+            "tool": "cmd.field-astrbot-teamup.____-fa319e0f",
+            "arguments": {
+              "scope": "跨群"
+            },
+            "text": "当前没有组队信息。",
+            "allowed_by_stella": true,
+            "ms": 15,
+            "problems": []
+          },
+          {
+            "tool": "cmd.field-astrbot-teamup.____-fda2f352",
+            "arguments": {
+              "arguments": ""
+            },
+            "text": "组队报名菜单（主菜单）：\n【信息与查询】\n- /组队大厅 [本群|跨群]\n- /组队列表 [组队名] [本群|跨群]\n- /组队空缺 [组队名] [本群|跨群]\n- /组队我的 [组队名] [本群|跨群]\n- /组队昵称 <昵称>\n\n【报名与组队】\n- /组队建队 <队伍名> [组队名] [本群|跨群]\n- /组队加入 [队伍名] [组队名] [本群|跨群]\n- /组队退出 [组队名] [本群|跨群]\n- /组队随机 [组队名] [本群|跨群]\n\n【管理员】\n- /组队创建 <每队人数> <组队名> [本群|跨群]\n- /组队切换 <组队名> [本群|跨群]\n- /组队随机 全部 [组队名] [本群|跨群]\n- /组队重置 [组队名] [本群|跨群]",
+            "allowed_by_stella": true,
+            "ms": 15,
+            "problems": []
+          }
+        ]
+      ]
+    }
+  ],
+  "passed": 9,
+  "total": 9,
+  "duration_ms": 10015
+}

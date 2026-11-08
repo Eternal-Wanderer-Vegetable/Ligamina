@@ -34,4 +34,32 @@
 - S2-05 stock baseline 在不导入 Ligamina Bridge 的独立进程中调用原生 Bot/Session API；配对 Worker 固定 artifact、lock、config、stimulus 指纹后分别验证 Native 与 Federated 输出。
 - 第一阶段验证虚拟 Gateway 收发；真实 QQ/平台网关不在已经通过的验收范围。
 
+## Host 受信任等级与隔离
+
+决策见 [ADR 0003](../adr/0003-host-trust-and-isolation.md)。守护进程配置中每个 Host 有 `trust`：
+
+- `trusted`（未声明 `isolation` 时的缺省值）：以 `program` / `args` 作为本地进程运行，启动时在 stderr 打印一条“未经 OS 隔离”的提示。
+- `untrusted`（声明了 `isolation` 时的缺省值）：只能由 Core 生成的容器运行，不得同时给出 `program`、`args`、`current_dir`、`environment`。目录插件一律按此运行。
+
+`isolation` 只写镜像、挂载与资源，加固项由 Core 固定添加（`--network none --read-only --cap-drop ALL --security-opt no-new-privileges`、`--pids-limit`、`--memory`、`--cpus`、`--rm -i`、唯一容器名与归属标签）：
+
+```json
+{
+  "id": "field-nonebot-roll", "trust": "untrusted",
+  "isolation": {
+    "docker": ["C:\\Windows\\System32\\wsl.exe", "-e", "docker"],
+    "image": "<name>@sha256:<64 hex>",
+    "entrypoint": "/usr/local/bin/python", "command": ["/input/field/nonebot_host.py"],
+    "mounts": [{ "source": "/home/me/bundle", "target": "/input/project" }],
+    "tmpfs": [{ "target": "/work", "size_mb": 768, "exec": true }],
+    "environment": { "LIGAMINA_FIELD_PLUGIN": "nonebot_plugin_roll" },
+    "memory_mb": 1024, "cpus": 1, "pids_limit": 128
+  }
+}
+```
+
+- 拒绝规则（守护进程以非零状态退出，错误写明 Host 与规则）：镜像未按摘要固定、网络不是 `none`、资源上限缺失或非正、untrusted Host 的可写绑定挂载、挂载目标为 `/`、`/proc`、`/sys`、`/dev` 或非绝对路径、`isolation` 中的未知字段。
+- 收尾：每次启动的容器名为 `ligamina-<host>-<epoch>-<随机>`；Host 进程退出、重启或停止后 Core 执行一次 `docker rm -f <容器名>`；守护进程启动时按 `io.ligamina.owner`（由数据库路径派生）与 Host 标签清理上一轮遗留的容器。
+- 不覆盖：Windows 原生隔离（按 P4-04 单独验收）、网络白名单、自定义 seccomp/AppArmor。实验室 Worker 的准入与清理确认不受影响。
+
 旧版本和工具链决策见 [ADR 0001](../adr/0001-baseline.md)，其中 readiness 按记录日期解释；当前裁决使用 progress 指向的最新报告。

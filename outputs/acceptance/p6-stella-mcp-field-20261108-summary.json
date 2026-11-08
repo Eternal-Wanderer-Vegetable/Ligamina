@@ -1,0 +1,118 @@
+{
+  "schema_version": 1,
+  "kind": "p6_stella_mcp_field_experiment",
+  "date": "2026-11-08",
+  "authorization": "User designated the locally configured Stella as the MCP experiment platform (2026-11-08). No chat platform was used: Stella's code and interpreter only, against a separate field Core on 127.0.0.1:63910; the running Stella bot (port 8080) was not restarted or reconfigured.",
+  "path": "Stella capability.providers.mcp.client.McpServerClient (Streamable HTTP) -> field Core command tools -> one Host per framework in WSL Docker (--network none --read-only --cap-drop=ALL) -> frozen plugin -> reply text back to Stella",
+  "plugins": {
+    "koishi": "@koishijs/plugin-echo@2.2.5 (TOOL-04 bundle)",
+    "nonebot": "nonebot_plugin_roll@0.2.3 (TOOL-04 bundle)",
+    "astrbot": "astrbot_plugin_teamup sha256 f5603cb4d41293d802270b90fbaf201b84ad6852a214ee1778ec91de3611557a (AB-05 bundle)"
+  },
+  "level1_client": {
+    "description": "frozen TOOL-04/AB-05 cases (positive, negative, isolation/authority) called through Stella's MCP client; 3 runs, each a fresh Core, ledger and Host containers",
+    "runs": [
+      {
+        "run": "run1",
+        "passed": 9,
+        "total": 9,
+        "containers_left": 0,
+        "gateway_operations": 0,
+        "core_exited": true
+      },
+      {
+        "run": "run2",
+        "passed": 9,
+        "total": 9,
+        "containers_left": 0,
+        "gateway_operations": 0,
+        "core_exited": true
+      },
+      {
+        "run": "run3",
+        "passed": 9,
+        "total": 9,
+        "containers_left": 0,
+        "gateway_operations": 0,
+        "core_exited": true
+      }
+    ],
+    "result": "27/27 passed",
+    "deviation": "field NoneBot Host is not seeded, so a successful 1d6 roll is matched by pattern (1-6) instead of the seeded 【1】"
+  },
+  "level2_comes": {
+    "description": "natural-language objectives through Stella's Comes executor; local model fills tool arguments",
+    "model": {
+      "base_url": "http://127.0.0.1:1234",
+      "model": "google/gemma-4-e4b"
+    },
+    "run": "comes3",
+    "passed": 6,
+    "total": 9,
+    "by_case": {
+      "comes-roll-2d6": "3/3",
+      "comes-echo": "3/3",
+      "comes-teamup-nickname": "0/3"
+    },
+    "platform_sends_by_fake_bot": 0,
+    "containers_left": 0,
+    "gateway_operations": 0,
+    "earlier_attempts": {
+      "comes1": "0/9: driver bug, model base URL had a /v1 suffix that Stella's client appends itself",
+      "comes2": "same run, with diagnostics added"
+    }
+  },
+  "findings": [
+    {
+      "side": "stella",
+      "title": "direct-call shortcut drops the user's input for tools whose parameters are all optional",
+      "detail": "capability.comes.executor.can_direct_call treats 'no required parameters' as 'call with no arguments'. astrbot_plugin_teamup's 组队昵称 declares nickname: str = \"\", so Core's schema (faithfully) has no required field; Stella skips the model and calls it with {}, the plugin answers with its usage text, and Comes still reports status success. 3/3 attempts.",
+      "suggested_fix": "only direct-call when the schema has no properties at all, or when known slots cover the optional ones",
+      "status": "fixed in Stella PR #132 (not merged yet)"
+    },
+    {
+      "side": "third-party",
+      "title": "MCP session DELETE answered with 202",
+      "detail": "Core's rmcp Streamable HTTP service answers DELETE /mcp with 202; the Python MCP SDK in Stella's env only treats 200/204 as success and logs 'Session termination failed: 202'. Harmless."
+    },
+    {
+      "side": "stella",
+      "title": "capability direct-reply delivery gate",
+      "detail": "Stella's docs/reports/2026-11-07-capability-tool-reply-delivery-rejected.md is still uncommitted with no fix; QQ delivery of tool replies would still be dropped, so no QQ run was attempted.",
+      "status": "fixed in Stella PR #132 (not merged yet); QQ delivery still not verified"
+    }
+  ],
+  "gate": {
+    "p6_mcp_path_stella": "passed_scoped",
+    "p4_field_qq_delivery": "blocked (not attempted: Stella delivery gate)"
+  },
+  "reports": {
+    "outputs/acceptance/p6-stella-mcp-field-20261108-comes/comes1.json": "32d64929858fffd4001e93d0c46c52e3a3647ee990836bb4d8f36a3b7b2d53b8",
+    "outputs/acceptance/p6-stella-mcp-field-20261108-comes/comes1.teardown.json": "85f9444db89300f3d70dc725a9f43e4b8d9e2fe77ead044fc253ff8326e5d45a",
+    "outputs/acceptance/p6-stella-mcp-field-20261108-comes/comes2.json": "eae6d9ec06fa7b80c33b930aaa99611c8681fd56cbdd0ee0649145262bd07e01",
+    "outputs/acceptance/p6-stella-mcp-field-20261108-comes/comes2.teardown.json": "e534418d17b012b5d8b03d62d3d48d43146a551efd2f2067abc112a1fdd05c1d",
+    "outputs/acceptance/p6-stella-mcp-field-20261108-comes/comes3.json": "7f461bc73afb147356645d223e0a99441a2d7cfbb741a32de83f4e0bd0f907de",
+    "outputs/acceptance/p6-stella-mcp-field-20261108-comes/comes3.teardown.json": "44bc4c2b338b087f500646c7fe83efc18e7f08cfa698503ee2d1fa4d02866840",
+    "outputs/acceptance/p6-stella-mcp-field-20261108-comes/comes4-fixed.json": "6e9836666f9e282aa0304295fa4dd857273c266bea2c79967588a21e5f7e59e1",
+    "outputs/acceptance/p6-stella-mcp-field-20261108-comes/comes4-fixed.teardown.json": "761eb76397044fddfafdd4e55931f992342104e08fc928954ce18172c47fb2c9",
+    "outputs/acceptance/p6-stella-mcp-field-20261108/run1.json": "b1b9adad4d3c139d39351bcf3c2a0d5a55f554cfeca79805b200533a46f1e9bc",
+    "outputs/acceptance/p6-stella-mcp-field-20261108/run1.teardown.json": "9efe708e979d9bc82e542f278c8a47d98a67bec5ef3c12303f96cdd5ebf9f82c",
+    "outputs/acceptance/p6-stella-mcp-field-20261108/run2.json": "22e2a184f0e42b3959a222c352f0c0d2b39768b28aecfb7e6e1ea23fa11ca613",
+    "outputs/acceptance/p6-stella-mcp-field-20261108/run2.teardown.json": "939a2ec2fdd932f5f31ea837244f993cee824caed01a9337612b7288ce47a3f0",
+    "outputs/acceptance/p6-stella-mcp-field-20261108/run3.json": "6920ae2e4217f4428543ec06ca4960aaeac9e3fe6bade6f51f802cf295ae637e",
+    "outputs/acceptance/p6-stella-mcp-field-20261108/run3.teardown.json": "9e7865233642d64866ca123423ee50b23ffe66cf8536a63e0ef0fadd10529456"
+  },
+  "reproduce": "powershell -NoProfile -File lab/field/run_stella_mcp_experiment.ps1 -Run <new-id> [-Level comes]",
+  "level2_comes_after_stella_fix": {
+    "stella_checkout": "branch codex/fix-capability-tool-delivery (Stella PR #132), worktree off origin/main e4a16ef",
+    "run": "comes4-fixed",
+    "passed": 9,
+    "total": 9,
+    "by_case": {
+      "comes-roll-2d6": "3/3",
+      "comes-echo": "3/3",
+      "comes-teamup-nickname": "3/3"
+    },
+    "platform_sends_by_fake_bot": 0
+  }
+}

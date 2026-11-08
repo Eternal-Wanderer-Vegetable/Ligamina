@@ -324,8 +324,14 @@ async fn call_command_tool(
         ));
     };
     let arguments = request.arguments.clone().unwrap_or_default();
-    let text = ligamina_core::command_args::compose(&info.descriptor, &arguments)
-        .map_err(|error| McpError::invalid_params(error, None))?;
+    // Arguments that do not fit the tool's input schema are a tool execution error, not a
+    // protocol error: the result carries `isError` and a readable reason, so a model can
+    // correct its call. A JSON-RPC error here made some clients treat a healthy session as
+    // broken and tear it down.
+    let text = match ligamina_core::command_args::compose(&info.descriptor, &arguments) {
+        Ok(text) => text,
+        Err(error) => return Ok(invalid_arguments_result(&error)),
+    };
     match command_tools
         .runtime
         .invoke_command(&info.host_id, &info.descriptor.command_id, &text)
@@ -346,9 +352,14 @@ async fn call_command_tool(
             result.content = vec![ContentBlock::text(reply)];
             Ok(result.into())
         }
-        Err(error @ CommandError::InvalidArguments(_)) => {
-            Err(McpError::invalid_params(error.to_string(), None))
-        }
+        Err(CommandError::InvalidArguments(reason)) => Ok(invalid_arguments_result(&reason)),
         Err(error) => Ok(CallToolResult::error(vec![ContentBlock::text(error.to_string())]).into()),
     }
+}
+
+fn invalid_arguments_result(reason: &str) -> CallToolResponse {
+    CallToolResult::error(vec![ContentBlock::text(format!(
+        "invalid arguments: {reason}"
+    ))])
+    .into()
 }
