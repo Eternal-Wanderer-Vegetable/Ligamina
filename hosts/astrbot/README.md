@@ -27,6 +27,6 @@ uv run --locked --python 3.12.14 python -m ligamina_astrbot.worker   # started b
 ## Known limits
 
 - Plugins that restrict handlers with `filter.platform_adapter_type(...)` to a real platform (for example `aiocqhttp`) do not match the bridge platform, and code that reaches for a platform's raw client (such as `AiocqhttpMessageEvent.bot`) is unavailable.
-- Proactive `send_by_session` is refused (`unsupported_api`) until a ledger-backed path is designed.
+- Proactive `send_by_session` works only for conversations this Host has already seen through an event; it becomes a normal Core operation with a fresh trace (grant, ledger and Gateway apply, and tool accounts are refused). Sessions the Host has never seen are refused with `unsupported_api`.
 - Only text, mention, reply and image message components are mapped; others fail with `unsupported_api`.
 - AstrBot installs missing plugin requirements lazily with `pip` at import time. Catalog plugins must therefore run in admitted OS-isolated Workers with frozen, pre-installed dependencies, never on a developer machine.
