@@ -66,6 +66,23 @@ P6-01 与 P6-02 合为下一个里程碑：P6-02 不需要真实账号，先行�
 - 被丢弃结果的只读核对：目前只交给 `onUnreported` 回调，Core 没有“补录观察”的接口；`unknown` 的后续核对仍按 P4 的只读恢复规则人工进行。
 - Gateway 进程真正被杀（而非卡在请求中）的场景与上面的接管场景在 Core 侧等价（都是租约替换或过期），未单独测。
 
+### 3.1a P6-01 的 MCP 路径：以 Stella 为实验平台（2026-11-08）
+
+用户指定本机已配置的 Stella 作为 MCP 实验平台。实验只使用 Stella 的代码与解释器，连接一个独立的现场 Core（`127.0.0.1:63910`，Stella 的配置不指向该端口）；正在运行的 Stella 未重启、未改配置，未经任何聊天平台收发。三个框架各一个已验收的冻结插件，各自运行在 WSL Docker 的禁网只读容器中（`lab/field/three_host_config.py`；Koishi 新增启动器 `lab/field/koishi_host.py`）。汇总见 [summary](../../outputs/acceptance/p6-stella-mcp-field-20261108-summary.json)。
+
+| 层级 | 做法 | 结果 |
+| --- | --- | --- |
+| 1. Stella MCP 客户端 | `lab/field/stella_mcp_experiment.py`：用 Stella 的 `McpServerClient` 按 TOOL-04 / AB-05 冻结用例（正例、负例、隔离/权限）调用；3 轮，每轮全新 Core、账本与容器 | 27/27 通过；每轮 Core 正常退出、容器残留 0、Gateway 操作 0。差异：现场 NoneBot Host 未设随机种子，成功掷骰按 1–6 的模式匹配而非种子值【1】 |
+| 2. Stella Comes 执行器 + 本地模型 | `lab/field/stella_comes_experiment.py`：自然语言目标经 Stella 的 `capability.comes.executor.execute`，由本地 LM Studio `google/gemma-4-e4b` 选择工具并填参；模型端点在进程内固定为回环地址，事件为 Stella 测试用的记录型假 bot | 掷骰 3/3、复读 3/3（模型填 `2d6`、`field-check-42`）；组队昵称 0/3（见下）；假 bot 发送 0 |
+
+实验发现：
+
+- **Stella：参数全为可选的工具被“直调”丢失用户输入。** `can_direct_call` 把“没有必填参数”当作“不带参数调用”。`astrbot_plugin_teamup` 的 `组队昵称` 声明 `nickname: str = ""`，Core 的 schema 如实没有必填字段，于是 Stella 跳过模型、以 `{}` 调用，插件返回用法说明，Comes 仍记为 success。建议只在 schema 没有任何属性时直调。属于 Stella 侧问题，本仓库不修改其代码。
+- **第三方：MCP 会话 DELETE 返回 202。** Core 使用的 rmcp Streamable HTTP 服务对 `DELETE /mcp` 返回 202，Stella 环境中的 Python MCP SDK 只把 200/204 视为成功并记一条 warning；无功能影响。
+- **QQ 投递未尝试。** 2026-11-07 记录的 Stella 能力直回投递门问题仍未修复，经 Stella 发往 QQ 的工具回复仍会被丢弃；P6-01 的平台投递部分保持 blocked。
+
+复现：`powershell -NoProfile -File lab/field/run_stella_mcp_experiment.ps1 -Run <新 id> [-Level comes]`（拒绝覆盖已有报告；令牌只写在被忽略的 `.work/` 下）。
+
 ### 3.2 P6-03 设计要点（待实施）
 
 - Host 配置新增受信任等级：`trusted`（自写或审阅过的插件，允许 `LocalCommand`）、`untrusted`（目录插件，默认）。`untrusted` 只能通过隔离启动器运行，Core 启动时校验并拒绝不满足的配置，拒绝原因写入日志与状态接口。

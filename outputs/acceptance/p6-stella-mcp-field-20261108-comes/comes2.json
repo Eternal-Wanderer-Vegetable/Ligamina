@@ -1,0 +1,267 @@
+{
+  "run_id": "comes2",
+  "status": "completed",
+  "executor": "Stella capability.comes.executor.execute + McpServerClient",
+  "model": {
+    "base_url": "http://127.0.0.1:1234/v1",
+    "model": "google/gemma-4-e4b"
+  },
+  "capabilities_loaded": 3,
+  "tool_schemas": {
+    "cmd.field-astrbot-teamup.____-f0d4f036": {
+      "additionalProperties": false,
+      "properties": {
+        "arguments": {
+          "description": "Text after the command name, parsed natively by the plugin framework; pass an empty string when the command takes no arguments. Use either this field or the structured fields, not both.",
+          "maxLength": 4096,
+          "type": "string"
+        },
+        "nickname": {
+          "description": "Positional argument",
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "cmd.field-koishi-echo.echo": {
+      "additionalProperties": false,
+      "properties": {
+        "arguments": {
+          "description": "Text after the command name, parsed natively by the plugin framework; pass an empty string when the command takes no arguments. Use either this field or the structured fields, not both.",
+          "maxLength": 4096,
+          "type": "string"
+        },
+        "message": {
+          "description": "Positional argument (required)",
+          "type": "string"
+        },
+        "options": {
+          "additionalProperties": false,
+          "description": "Command options by name.",
+          "properties": {
+            "channel": {
+              "description": "发送到频道",
+              "type": "string"
+            },
+            "escape": {
+              "description": "发送转义消息",
+              "type": "boolean"
+            },
+            "guild": {
+              "description": "指定群组编号",
+              "type": "string"
+            },
+            "unescape": {
+              "description": "发送反转义消息",
+              "type": "boolean"
+            },
+            "user": {
+              "description": "发送到用户",
+              "type": "string"
+            }
+          },
+          "type": "object"
+        }
+      },
+      "required": [
+        "message"
+      ],
+      "type": "object"
+    },
+    "cmd.field-nonebot-roll.rd": {
+      "additionalProperties": false,
+      "properties": {
+        "arguments": {
+          "description": "Text after the command name, parsed natively by the plugin framework; pass an empty string when the command takes no arguments. Use either this field or the structured fields, not both.",
+          "maxLength": 4096,
+          "type": "string"
+        }
+      },
+      "required": [
+        "arguments"
+      ],
+      "type": "object"
+    }
+  },
+  "platform_sends_by_fake_bot": 0,
+  "results": [
+    {
+      "case_id": "comes-roll-2d6",
+      "attempt": 1,
+      "objective": "帮我掷两个六面骰子",
+      "status": "failed",
+      "tool_outputs": [],
+      "summary": "",
+      "metadata": {
+        "capability": "dice.roll",
+        "reason": "执行异常: chat-completions 请求失败: 返回体没有 choices",
+        "elapsed": 0.046
+      },
+      "model_calls": 0,
+      "ms": 46,
+      "result": "failed"
+    },
+    {
+      "case_id": "comes-roll-2d6",
+      "attempt": 2,
+      "objective": "帮我掷两个六面骰子",
+      "status": "failed",
+      "tool_outputs": [],
+      "summary": "",
+      "metadata": {
+        "capability": "dice.roll",
+        "reason": "执行异常: chat-completions 请求失败: 返回体没有 choices",
+        "elapsed": 0.032
+      },
+      "model_calls": 0,
+      "ms": 32,
+      "result": "failed"
+    },
+    {
+      "case_id": "comes-roll-2d6",
+      "attempt": 3,
+      "objective": "帮我掷两个六面骰子",
+      "status": "failed",
+      "tool_outputs": [],
+      "summary": "",
+      "metadata": {
+        "capability": "dice.roll",
+        "reason": "执行异常: chat-completions 请求失败: 返回体没有 choices",
+        "elapsed": 0.031
+      },
+      "model_calls": 0,
+      "ms": 31,
+      "result": "failed"
+    },
+    {
+      "case_id": "comes-echo",
+      "attempt": 1,
+      "objective": "请让复读插件原样复述这句话：field-check-42",
+      "status": "failed",
+      "tool_outputs": [],
+      "summary": "",
+      "metadata": {
+        "capability": "text.echo",
+        "reason": "执行异常: chat-completions 请求失败: 返回体没有 choices",
+        "elapsed": 0.031
+      },
+      "model_calls": 0,
+      "ms": 31,
+      "result": "failed"
+    },
+    {
+      "case_id": "comes-echo",
+      "attempt": 2,
+      "objective": "请让复读插件原样复述这句话：field-check-42",
+      "status": "failed",
+      "tool_outputs": [],
+      "summary": "",
+      "metadata": {
+        "capability": "text.echo",
+        "reason": "执行异常: chat-completions 请求失败: 返回体没有 choices",
+        "elapsed": 0.031
+      },
+      "model_calls": 0,
+      "ms": 31,
+      "result": "failed"
+    },
+    {
+      "case_id": "comes-echo",
+      "attempt": 3,
+      "objective": "请让复读插件原样复述这句话：field-check-42",
+      "status": "failed",
+      "tool_outputs": [],
+      "summary": "",
+      "metadata": {
+        "capability": "text.echo",
+        "reason": "执行异常: chat-completions 请求失败: 返回体没有 choices",
+        "elapsed": 0.032
+      },
+      "model_calls": 0,
+      "ms": 32,
+      "result": "failed"
+    },
+    {
+      "case_id": "comes-teamup-nickname",
+      "attempt": 1,
+      "objective": "把我的组队昵称设置成 测试员",
+      "status": "success",
+      "tool_outputs": [
+        {
+          "tool": "mcp_plugins_cmd_field-astrbot-teamup_____-f0d4f036",
+          "text": "用法：/组队昵称 <昵称>"
+        }
+      ],
+      "summary": "用法：/组队昵称 <昵称>",
+      "metadata": {
+        "capability": "teamup.nickname",
+        "tools": [
+          "mcp_plugins_cmd_field-astrbot-teamup_____-f0d4f036"
+        ],
+        "direct_call": true,
+        "steps": 1,
+        "missing": [],
+        "elapsed": 0.015
+      },
+      "model_calls": 0,
+      "ms": 15,
+      "result": "failed"
+    },
+    {
+      "case_id": "comes-teamup-nickname",
+      "attempt": 2,
+      "objective": "把我的组队昵称设置成 测试员",
+      "status": "success",
+      "tool_outputs": [
+        {
+          "tool": "mcp_plugins_cmd_field-astrbot-teamup_____-f0d4f036",
+          "text": "用法：/组队昵称 <昵称>"
+        }
+      ],
+      "summary": "用法：/组队昵称 <昵称>",
+      "metadata": {
+        "capability": "teamup.nickname",
+        "tools": [
+          "mcp_plugins_cmd_field-astrbot-teamup_____-f0d4f036"
+        ],
+        "direct_call": true,
+        "steps": 1,
+        "missing": [],
+        "elapsed": 0.016
+      },
+      "model_calls": 0,
+      "ms": 16,
+      "result": "failed"
+    },
+    {
+      "case_id": "comes-teamup-nickname",
+      "attempt": 3,
+      "objective": "把我的组队昵称设置成 测试员",
+      "status": "success",
+      "tool_outputs": [
+        {
+          "tool": "mcp_plugins_cmd_field-astrbot-teamup_____-f0d4f036",
+          "text": "用法：/组队昵称 <昵称>"
+        }
+      ],
+      "summary": "用法：/组队昵称 <昵称>",
+      "metadata": {
+        "capability": "teamup.nickname",
+        "tools": [
+          "mcp_plugins_cmd_field-astrbot-teamup_____-f0d4f036"
+        ],
+        "direct_call": true,
+        "steps": 1,
+        "missing": [],
+        "elapsed": 0.016
+      },
+      "model_calls": 0,
+      "ms": 16,
+      "result": "failed"
+    }
+  ],
+  "passed": 0,
+  "total": 9,
+  "model_calls_total": 0,
+  "duration_ms": 9704
+}
