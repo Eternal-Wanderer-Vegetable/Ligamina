@@ -41,6 +41,7 @@ class AstrBotCensusSelectionTests(unittest.TestCase):
         self.assertIsNone(metadata_dir_name("name: has-dash\n"))
         self.assertIsNone(metadata_dir_name("name: class\n"))
         self.assertIsNone(metadata_dir_name("version: 1\n"))
+        self.assertEqual(metadata_dir_name("\ufeffname: astrbot_plugin_teamup\n"), "astrbot_plugin_teamup")
 
 
 if __name__ == "__main__":

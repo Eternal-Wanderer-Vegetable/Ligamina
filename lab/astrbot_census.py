@@ -94,8 +94,9 @@ def constraints_text() -> str:
 def metadata_dir_name(metadata_text: str) -> str | None:
     """AstrBot 4.29.1 installs a plugin into a directory named after metadata.yaml's `name`
     (stripped; must be a non-keyword Python identifier). Plugins rely on it, e.g.
-    `from data.plugins.<name>.utils import ...`. Only the top-level scalar key is read."""
-    for line in metadata_text.splitlines():
+    `from data.plugins.<name>.utils import ...`. Only the top-level scalar key is read;
+    a leading UTF-8 BOM is ignored, as YAML loaders do."""
+    for line in metadata_text.removeprefix("\ufeff").splitlines():
         match = re.match(r"name:\s*(.*?)\s*$", line)
         if not match:
             continue
