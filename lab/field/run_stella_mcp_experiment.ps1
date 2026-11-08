@@ -57,7 +57,7 @@ try {
     $summary.core_exited = $core.WaitForExit(60000)
     if (-not $summary.core_exited) { & taskkill /T /F /PID $core.Id | Out-Null }
     Start-Sleep -Seconds 3
-    $left = & wsl.exe -e docker ps -q --filter "label=io.$([char]0x6c)igamina.field.run=$($generated.run_label)"
+    $left = & wsl.exe -e docker ps -q --filter "label=io.$([char]0x6c)igamina.owner=$($generated.owner)"
     $summary.containers_left = @($left | Where-Object { $_ }).Count
 }
 $db = Join-Path $work "core.sqlite3"
