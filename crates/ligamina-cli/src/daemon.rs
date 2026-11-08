@@ -11,7 +11,7 @@ use std::{
 
 use anyhow::{Context, bail};
 use ligamina_core::{
-    deployment::local::LocalCommand,
+    deployment::{container, local::LocalCommand},
     policy::{Grant, OperationTarget, Principal},
     router::RouterLimits,
     runtime::{CoreRuntime, CoreRuntimeConfig, ManagedGateway, ManagedHost},
@@ -73,6 +73,13 @@ pub struct HostConfigFile {
     pub id: String,
     #[serde(default = "default_true")]
     pub enabled: bool,
+    /// `trusted` Hosts may run as local processes; `untrusted` Hosts must declare
+    /// `isolation` (ADR 0003). Defaults to `untrusted` when `isolation` is present.
+    #[serde(default)]
+    pub trust: Option<HostTrust>,
+    #[serde(default)]
+    pub isolation: Option<IsolationConfig>,
+    #[serde(default)]
     pub program: String,
     #[serde(default)]
     pub args: Vec<String>,
@@ -89,6 +96,108 @@ pub struct HostConfigFile {
     pub shutdown_timeout_ms: u64,
     #[serde(default)]
     pub operation_grants: Vec<HostOperationGrant>,
+}
+
+#[derive(Clone, Copy, Debug, Deserialize, PartialEq, Eq)]
+#[serde(rename_all = "lowercase")]
+pub enum HostTrust {
+    Trusted,
+    Untrusted,
+}
+
+/// Container the Core starts for a Host. Hardening flags are not configurable; unknown
+/// fields are rejected so a misspelled safety setting cannot be silently ignored.
+#[derive(Debug, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct IsolationConfig {
+    #[serde(default = "default_isolation_runtime")]
+    pub runtime: String,
+    #[serde(default = "default_docker_command")]
+    pub docker: Vec<String>,
+    pub image: String,
+    #[serde(default)]
+    pub entrypoint: Option<String>,
+    #[serde(default)]
+    pub command: Vec<String>,
+    #[serde(default)]
+    pub workdir: Option<String>,
+    #[serde(default)]
+    pub user: Option<String>,
+    #[serde(default)]
+    pub environment: BTreeMap<String, String>,
+    #[serde(default)]
+    pub mounts: Vec<MountConfig>,
+    #[serde(default)]
+    pub tmpfs: Vec<TmpfsConfig>,
+    pub memory_mb: u64,
+    pub cpus: f64,
+    pub pids_limit: u64,
+    #[serde(default = "default_network")]
+    pub network: String,
+}
+
+#[derive(Debug, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct MountConfig {
+    pub source: String,
+    pub target: String,
+    #[serde(default = "default_true")]
+    pub read_only: bool,
+}
+
+#[derive(Debug, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct TmpfsConfig {
+    pub target: String,
+    pub size_mb: u64,
+    #[serde(default)]
+    pub exec: bool,
+}
+
+impl HostConfigFile {
+    pub fn effective_trust(&self) -> HostTrust {
+        self.trust.unwrap_or(if self.isolation.is_some() {
+            HostTrust::Untrusted
+        } else {
+            HostTrust::Trusted
+        })
+    }
+}
+
+impl IsolationConfig {
+    fn spec(&self) -> container::ContainerSpec {
+        container::ContainerSpec {
+            docker: self.docker.clone(),
+            image: self.image.clone(),
+            entrypoint: self.entrypoint.clone(),
+            command: self.command.clone(),
+            workdir: self.workdir.clone(),
+            user: self.user.clone(),
+            environment: self.environment.clone(),
+            mounts: self
+                .mounts
+                .iter()
+                .map(|mount| container::BindMount {
+                    source: mount.source.clone(),
+                    target: mount.target.clone(),
+                    read_only: mount.read_only,
+                })
+                .collect(),
+            tmpfs: self
+                .tmpfs
+                .iter()
+                .map(|tmpfs| container::Tmpfs {
+                    target: tmpfs.target.clone(),
+                    size_mb: tmpfs.size_mb,
+                    exec: tmpfs.exec,
+                })
+                .collect(),
+            memory_mb: self.memory_mb,
+            cpus: self.cpus,
+            pids_limit: self.pids_limit,
+            network: self.network.clone(),
+        }
+    }
 }
 
 #[derive(Debug, Deserialize)]
@@ -201,20 +310,55 @@ pub async fn run(config_path: PathBuf) -> anyhow::Result<()> {
         })
         .collect::<Vec<_>>();
 
+    let owner = container::owner_for(&config.database_path.to_string_lossy());
     let mut managed_hosts = Vec::new();
     for host in config.hosts {
-        let command = LocalCommand {
-            program: OsString::from(host.program),
-            args: host.args.into_iter().map(OsString::from).collect(),
-            current_dir: host.current_dir,
-            environment: host
-                .environment
-                .into_iter()
-                .map(|(key, value)| (OsString::from(key), OsString::from(value)))
-                .collect(),
-            clear_environment: false,
-            startup_timeout: Duration::from_millis(host.startup_timeout_ms),
-            shutdown_timeout: Duration::from_millis(host.shutdown_timeout_ms),
+        let command = match &host.isolation {
+            Some(isolation) => {
+                let spec = isolation.spec();
+                // Containers left by an earlier run of this daemon (Core killed) go first.
+                match container::sweep_leftovers(&host.id, &owner, &spec).await {
+                    Ok(0) => {}
+                    Ok(removed) => eprintln!(
+                        "Host {}: removed {removed} leftover container(s) from an earlier run",
+                        host.id
+                    ),
+                    Err(error) => {
+                        eprintln!("Host {}: leftover container check failed: {error}", host.id)
+                    }
+                }
+                let (program, args) = container::container_args(&host.id, &owner, &spec);
+                LocalCommand {
+                    program,
+                    args,
+                    current_dir: None,
+                    environment: BTreeMap::new(),
+                    clear_environment: false,
+                    startup_timeout: Duration::from_millis(host.startup_timeout_ms),
+                    shutdown_timeout: Duration::from_millis(host.shutdown_timeout_ms),
+                    cleanup: Some(container::cleanup_command(&host.id, &spec)),
+                }
+            }
+            None => {
+                eprintln!(
+                    "Host {} runs as a local process without OS isolation (trust = trusted)",
+                    host.id
+                );
+                LocalCommand {
+                    program: OsString::from(&host.program),
+                    args: host.args.iter().map(OsString::from).collect(),
+                    current_dir: host.current_dir.clone(),
+                    environment: host
+                        .environment
+                        .iter()
+                        .map(|(key, value)| (OsString::from(key), OsString::from(value)))
+                        .collect(),
+                    clear_environment: false,
+                    startup_timeout: Duration::from_millis(host.startup_timeout_ms),
+                    shutdown_timeout: Duration::from_millis(host.shutdown_timeout_ms),
+                    cleanup: None,
+                }
+            }
         };
         let mut host_config = HostConfig::new(host.id.clone(), command);
         host_config.enabled = host.enabled;
@@ -377,12 +521,13 @@ fn validate_config(config: &DaemonConfig) -> anyhow::Result<()> {
     }
     for host in &config.hosts {
         if host.id.trim().is_empty()
-            || host.program.is_empty()
+            || (host.isolation.is_none() && host.program.is_empty())
             || host.startup_timeout_ms == 0
             || host.shutdown_timeout_ms == 0
         {
             bail!("Host IDs, programs, and startup/shutdown deadlines must be valid");
         }
+        validate_host_isolation(host)?;
         for grant in &host.operation_grants {
             let registered = config.gateways.iter().any(|gateway| {
                 gateway.account_id == grant.account_id && gateway.client_id == grant.client_id
@@ -395,8 +540,50 @@ fn validate_config(config: &DaemonConfig) -> anyhow::Result<()> {
     Ok(())
 }
 
+/// ADR 0003: untrusted Hosts only run in a Core-generated container; any isolation
+/// block must pass the container rules. Violations stop the daemon from starting.
+fn validate_host_isolation(host: &HostConfigFile) -> anyhow::Result<()> {
+    let trust = host.effective_trust();
+    match (&host.isolation, trust) {
+        (None, HostTrust::Untrusted) => bail!(
+            "Host {} rejected: trust = untrusted requires an `isolation` block",
+            host.id
+        ),
+        (None, HostTrust::Trusted) => Ok(()),
+        (Some(isolation), trust) => {
+            if !host.program.is_empty()
+                || !host.args.is_empty()
+                || host.current_dir.is_some()
+                || !host.environment.is_empty()
+            {
+                bail!(
+                    "Host {} rejected: an isolated Host is launched by the Core; use isolation.entrypoint, isolation.command and isolation.environment instead of program/args/current_dir/environment",
+                    host.id
+                );
+            }
+            if isolation.runtime != "docker" {
+                bail!(
+                    "Host {} rejected: isolation.runtime must be `docker`",
+                    host.id
+                );
+            }
+            container::validate(&host.id, &isolation.spec(), trust == HostTrust::Trusted)
+                .map_err(|rejection| anyhow::anyhow!("{rejection} (rejected)"))
+        }
+    }
+}
+
 fn default_true() -> bool {
     true
+}
+fn default_isolation_runtime() -> String {
+    "docker".to_owned()
+}
+fn default_docker_command() -> Vec<String> {
+    vec!["docker".to_owned()]
+}
+fn default_network() -> String {
+    "none".to_owned()
 }
 fn default_max_restarts() -> u32 {
     3
@@ -509,5 +696,111 @@ mod tests {
                 "{reserved} must be rejected"
             );
         }
+    }
+
+    fn with_host(host: serde_json::Value) -> serde_json::Value {
+        let mut value = config("10001", serde_json::Value::Null);
+        value["hosts"] = serde_json::json!([host]);
+        value
+    }
+
+    fn isolation() -> serde_json::Value {
+        serde_json::json!({
+            "docker": ["wsl.exe", "-e", "docker"],
+            "image": format!("example/runtime@sha256:{}", "a".repeat(64)),
+            "entrypoint": "/usr/local/bin/python",
+            "command": ["/input/field/host.py"],
+            "mounts": [{ "source": "/home/u/bundle", "target": "/input/project" }],
+            "tmpfs": [{ "target": "/work", "size_mb": 512, "exec": true }],
+            "memory_mb": 1024, "cpus": 1, "pids_limit": 128
+        })
+    }
+
+    fn rejection(host: serde_json::Value) -> String {
+        let parsed: DaemonConfig = serde_json::from_value(with_host(host)).unwrap();
+        validate_config(&parsed).unwrap_err().to_string()
+    }
+
+    #[test]
+    fn isolated_hosts_default_to_untrusted_and_valid_ones_are_accepted() {
+        let parsed: DaemonConfig = serde_json::from_value(with_host(
+            serde_json::json!({ "id": "roll", "isolation": isolation() }),
+        ))
+        .unwrap();
+        assert_eq!(
+            parsed.hosts[0].effective_trust(),
+            super::HostTrust::Untrusted
+        );
+        validate_config(&parsed).unwrap();
+
+        let plain: DaemonConfig = serde_json::from_value(with_host(
+            serde_json::json!({ "id": "koishi", "program": "node" }),
+        ))
+        .unwrap();
+        assert_eq!(plain.hosts[0].effective_trust(), super::HostTrust::Trusted);
+    }
+
+    #[test]
+    fn untrusted_hosts_cannot_bypass_isolation() {
+        let error = rejection(
+            serde_json::json!({ "id": "roll", "trust": "untrusted", "program": "python" }),
+        );
+        assert!(error.contains("requires an `isolation` block"), "{error}");
+
+        let error = rejection(serde_json::json!({
+            "id": "roll", "program": "python", "isolation": isolation()
+        }));
+        assert!(error.contains("launched by the Core"), "{error}");
+
+        let mut writable = isolation();
+        writable["mounts"][0]["read_only"] = serde_json::json!(false);
+        let error = rejection(serde_json::json!({ "id": "roll", "isolation": writable }));
+        assert!(
+            error.contains("must be read-only") && error.contains("rejected"),
+            "{error}"
+        );
+
+        let mut unpinned = isolation();
+        unpinned["image"] = serde_json::json!("example/runtime:latest");
+        let error = rejection(serde_json::json!({ "id": "roll", "isolation": unpinned }));
+        assert!(error.contains("pinned by digest"), "{error}");
+
+        let mut networked = isolation();
+        networked["network"] = serde_json::json!("bridge");
+        let error = rejection(serde_json::json!({ "id": "roll", "isolation": networked }));
+        assert!(error.contains("network must be `none`"), "{error}");
+    }
+
+    #[test]
+    fn isolation_fields_are_strict_and_limits_required() {
+        let mut misspelled = isolation();
+        misspelled["read_only_root"] = serde_json::json!(false);
+        assert!(
+            serde_json::from_value::<DaemonConfig>(with_host(
+                serde_json::json!({ "id": "roll", "isolation": misspelled })
+            ))
+            .is_err(),
+            "unknown isolation fields are rejected"
+        );
+        let mut unlimited = isolation();
+        unlimited.as_object_mut().unwrap().remove("memory_mb");
+        assert!(
+            serde_json::from_value::<DaemonConfig>(with_host(
+                serde_json::json!({ "id": "roll", "isolation": unlimited })
+            ))
+            .is_err(),
+            "memory_mb is required"
+        );
+    }
+
+    #[test]
+    fn trusted_isolated_hosts_may_mount_writable_directories() {
+        let mut writable = isolation();
+        writable["mounts"][0]["read_only"] = serde_json::json!(false);
+        let parsed: DaemonConfig = serde_json::from_value(with_host(serde_json::json!({
+            "id": "dev", "trust": "trusted", "isolation": writable
+        })))
+        .unwrap();
+        validate_config(&parsed).unwrap();
     }
 }

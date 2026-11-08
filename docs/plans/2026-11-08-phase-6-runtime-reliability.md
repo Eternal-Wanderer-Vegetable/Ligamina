@@ -103,12 +103,21 @@ P6-01 与 P6-02 合为下一个里程碑：P6-02 不需要真实账号，先行�
 
 未完成：feat-030 要求的隔离、重复/重启、超时/unknown 各三次未执行；Stella PR #132 未合并。
 
-### 3.2 P6-03 设计要点（待实施）
+### 3.2 P6-03 结果（2026-11-08）
 
-- Host 配置新增受信任等级：`trusted`（自写或审阅过的插件，允许 `LocalCommand`）、`untrusted`（目录插件，默认）。`untrusted` 只能通过隔离启动器运行，Core 启动时校验并拒绝不满足的配置，拒绝原因写入日志与状态接口。
-- Linux 路径复用实验室 Worker 的做法：固定镜像摘要、只读根、`network=none` 或显式白名单、内存与 PID 上限、只挂载必要的可写目录、预装且锁定的依赖（禁止运行时 pip/npm）、停止时销毁容器并确认无残留。
-- Windows：沿用 P4-04 的门槛，不以自签名或 Audit 证据替代 Enforcement。
-- 完成前先写 ADR，明确受信任等级与默认值。
+决策见 [ADR 0003](../adr/0003-host-trust-and-isolation.md)，用法见[架构与接口边界](../guides/architecture.md#host-受信任等级与隔离)。
+
+- **受信任等级**：Host 配置新增 `trust`（`trusted` / `untrusted`）。声明 `isolation` 时缺省为 `untrusted`，否则为 `trusted`（保持既有配置可用，启动时打印“未经 OS 隔离”）。`untrusted` 必须声明 `isolation`，且不得给出 `program`、`args`、`current_dir`、`environment`。
+- **Core 生成并强制加固**（`crates/ligamina-core/src/deployment/container.rs`）：固定加上 `--rm -i --network none --read-only --cap-drop ALL --security-opt no-new-privileges`、`--pids-limit`、`--memory`、`--cpus`、唯一容器名与 `io.ligamina.host` / `io.ligamina.owner` 标签。
+- **拒绝规则**：镜像未按摘要固定、网络不是 `none`、资源上限缺失或非正、untrusted 的可写绑定挂载、受保护或非绝对的挂载目标、`isolation` 中的未知字段；守护进程以非零状态退出并写明 Host 与规则。
+- **收尾**：`LocalCommand` 新增一次性的 `cleanup` 与按次启动替换的 `{spawn}` 占位；supervisor 在 Host 退出、重启或停止后执行一次 `docker rm -f <容器名>`；守护进程启动时按 owner 与 Host 标签清理上一轮遗留的容器。
+- **现场配置**：`lab/field/three_host_config.py` 改为 `isolation` 声明，不再手写 `docker run`。
+
+验证：
+
+- 单元与集成测试：容器参数生成、拒绝规则与 owner 派生 5 项；守护进程配置校验 6 项（缺省等级、绕过隔离、未知字段、可写挂载）；supervisor 中清理在崩溃与停止两条路径上每次启动恰好执行一次、`{spawn}` 每次不同。`cargo test --workspace` 全部通过。
+- 现场验收 `lab/field/isolation_acceptance.py`（WSL Docker，三次独立运行全部通过，[run1](../../outputs/acceptance/p6-p603-isolation-20261108-run1.json) SHA-256 `95baa81d6817f683ecc58a1ae2382842bf568ea59b712c561be9a23f88793822`）：五类不安全配置均被拒绝且错误写明规则；预先放置的遗留容器在启动时被清理；三个 Host 容器的 `docker inspect` 显示网络 none、只读根、CapDrop ALL、no-new-privileges、PIDs/内存/CPU 限制、绑定挂载只读、AutoRemove；结束某个 Host 的 docker 客户端后旧容器被删除、Host 以新 epoch 在新容器中重启；停止后无残留。
+- 用 Core 生成的隔离配置复跑 Stella MCP 层级 1：三轮 27/27，Gateway 操作 0，容器残留 0（`outputs/acceptance/p6-stella-mcp-field-20261108-p603/`）。
 
 ### 3.3 P6-04 能力描述（待实施）
 

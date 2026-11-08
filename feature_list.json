@@ -2,7 +2,7 @@
   "schema_version": 1,
   "updated_at": "2026-11-08",
   "active_feature": null,
-  "next_feature": "feat-043",
+  "next_feature": "feat-044",
   "features": [
     {
       "id": "feat-001",
@@ -2301,10 +2301,18 @@
       "dependencies": [
         "feat-042"
       ],
-      "status": "not-started",
+      "status": "done",
       "done_when": "非受信插件不能经 LocalCommand 直接在宿主执行；违规配置被拒绝并留记录；Windows Enforcement 单独验收，不降低门槛。",
-      "evidence": "",
-      "evidence_paths": []
+      "evidence": "2026-11-08：ADR 0003 采纳。Host 新增 trust（trusted/untrusted），untrusted 必须声明 isolation 且不得给出 program/args/current_dir/environment；Core 生成 docker run 并固定加固（network none、只读根、CapDrop ALL、no-new-privileges、PIDs/内存/CPU 上限、唯一容器名与 owner 标签），拒绝未按摘要固定的镜像、非 none 网络、缺失资源上限、untrusted 可写挂载、受保护挂载目标与未知字段（守护进程非零退出并写明规则）；supervisor 在 Host 退出/重启/停止后执行一次 docker rm -f，守护进程启动时清理上一轮遗留容器。cargo test --workspace 通过（新增容器 5 项、配置校验 6 项、supervisor 清理 1 项）。现场验收 lab/field/isolation_acceptance.py 三次独立运行全部通过：拒绝、遗留清理、docker inspect 加固、结束 docker 客户端后删除旧容器并以新 epoch 重启、停止后无残留；以 Core 生成的隔离复跑 Stella MCP 层级 1 三轮 27/27。报告 outputs/acceptance/p6-p603-isolation-20261108-run1.json SHA-256 95baa81d6817f683ecc58a1ae2382842bf568ea59b712c561be9a23f88793822。范围：Linux 容器（WSL Docker）；Windows 原生隔离按 P4-04 单独验收，网络白名单与自定义 seccomp 不在本阶段。",
+      "evidence_paths": [
+        "docs/adr/0003-host-trust-and-isolation.md",
+        "crates/ligamina-core/src/deployment/container.rs",
+        "crates/ligamina-cli/src/daemon.rs",
+        "lab/field/isolation_acceptance.py",
+        "outputs/acceptance/p6-p603-isolation-20261108-run1.json",
+        "outputs/acceptance/p6-p603-isolation-20261108-run2.json",
+        "outputs/acceptance/p6-p603-isolation-20261108-run3.json"
+      ]
     },
     {
       "id": "feat-044",
