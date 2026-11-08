@@ -720,8 +720,11 @@ def api_request(base_url: str, method: str, path: str, token: str, body: Any = N
 
 
 def _tool_name_part(value: str) -> str:
-    """Mirror the Core's MCP tool-name sanitizing (crates/ligamina-cli/src/mcp.rs)."""
-    return "".join(char if char.isascii() and (char.isalnum() or char in "_-.") else "_" for char in value)
+    """Mirror the Core's MCP tool-name part (ligamina_core::commands::tool_name_part)."""
+    sanitized = "".join(char if char.isascii() and (char.isalnum() or char in "_-.") else "_" for char in value)
+    if sanitized == value:
+        return sanitized
+    return f"{sanitized}-{hashlib.sha256(value.encode('utf-8')).hexdigest()[:8]}"
 
 
 def _run_tool_steps(url: str, token: str, host_id: str, steps: list[list[dict[str, Any]]]) -> dict[str, Any]:

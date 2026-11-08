@@ -560,3 +560,155 @@ async fn nonebot_commands_are_callable_as_mcp_tools_with_onebot_identities() {
     runtime.shutdown().await;
     let _ = std::fs::remove_dir_all(&work);
 }
+
+#[tokio::test(flavor = "multi_thread", worker_threads = 2)]
+async fn astrbot_commands_are_callable_as_mcp_tools_through_the_real_framework() {
+    let repository_root = PathBuf::from(env!("CARGO_MANIFEST_DIR"))
+        .join("../..")
+        .canonicalize()
+        .unwrap();
+    let work =
+        std::env::temp_dir().join(format!("ligamina-astrbot-tools-{}", uuid::Uuid::new_v4()));
+    std::fs::create_dir_all(&work).unwrap();
+
+    let mut command = LocalCommand::new("uv");
+    command.args = [
+        "run",
+        "--locked",
+        "--project",
+        "hosts/astrbot",
+        "--python",
+        "3.12.14",
+        "python",
+        "-m",
+        "ligamina_astrbot.worker",
+    ]
+    .into_iter()
+    .map(Into::into)
+    .collect();
+    command.current_dir = Some(repository_root.clone());
+    command.environment.insert(
+        "PYTHONPATH".into(),
+        repository_root.join("hosts/astrbot").into_os_string(),
+    );
+    command.environment.insert(
+        "LIGAMINA_ASTRBOT_PLUGINS".into(),
+        repository_root
+            .join("hosts/astrbot/tests/fixtures/ligamina_smoke")
+            .into_os_string(),
+    );
+    command.environment.insert(
+        "LIGAMINA_ASTRBOT_DATA_DIR".into(),
+        work.join("astrbot-data").into_os_string(),
+    );
+    command.startup_timeout = Duration::from_secs(300);
+    let runtime = CoreRuntime::start(CoreRuntimeConfig {
+        database_path: work.join("core.sqlite3"),
+        hosts: vec![ManagedHost {
+            config: HostConfig::new("astrbot-tools", command),
+            operation_grants: Vec::new(),
+        }],
+        gateways: Vec::new(),
+        client_grants: Vec::new(),
+        router_limits: RouterLimits {
+            max_pending_per_conversation: 8,
+            max_outstanding_events: 64,
+            max_tracked_conversations: 64,
+            max_concurrent_conversations: 4,
+            processing_timeout: Duration::from_secs(30),
+        },
+    })
+    .await
+    .expect("Core runtime starts with the AstrBot Host (requires uv and the locked environment)");
+
+    let deadline = tokio::time::Instant::now() + Duration::from_secs(60);
+    while runtime
+        .commands()
+        .get("astrbot-tools", "ligamina_add")
+        .await
+        .is_none()
+    {
+        assert!(
+            tokio::time::Instant::now() < deadline,
+            "AstrBot commands were not discovered"
+        );
+        tokio::time::sleep(Duration::from_millis(100)).await;
+    }
+
+    let (server_transport, client_transport) = tokio::io::duplex(64 * 1024);
+    let server = LigaminaMcp::new(runtime.broker().clone())
+        .with_command_tools(CommandTools::new(runtime.clone(), None));
+    let server_task = tokio::spawn(async move { server.serve(server_transport).await });
+    let client = TestClient.serve(client_transport).await.unwrap();
+
+    let tools = client.peer().list_tools(None).await.unwrap().tools;
+    let names = tools
+        .iter()
+        .map(|tool| tool.name.to_string())
+        .collect::<Vec<_>>();
+    assert!(
+        names.contains(&"cmd.astrbot-tools.ligamina_echo".to_owned()),
+        "{names:?}"
+    );
+    // AstrBot's built-in admin commands (plugin install, config) are never exposed.
+    assert!(
+        names
+            .iter()
+            .all(|name| !name.contains(".plugin") && !name.contains(".help")),
+        "{names:?}"
+    );
+    let add = tools
+        .iter()
+        .find(|tool| tool.name == "cmd.astrbot-tools.ligamina_add")
+        .unwrap();
+    assert_eq!(add.input_schema["properties"]["left"]["type"], "integer");
+    assert_eq!(add.input_schema["required"], json!(["left", "right"]));
+
+    let result = call(
+        &client,
+        "cmd.astrbot-tools.ligamina_add",
+        json!({ "left": 2, "right": 40 }),
+    )
+    .await
+    .unwrap();
+    assert_eq!(result.is_error, Some(false));
+    assert_eq!(first_text(&result), "sum:42");
+
+    let result = call(
+        &client,
+        "cmd.astrbot-tools.ligamina_echo",
+        json!({ "text": "hello astrbot" }),
+    )
+    .await
+    .unwrap();
+    assert_eq!(first_text(&result), "HELLO ASTRBOT");
+
+    let result = call(
+        &client,
+        "cmd.astrbot-tools.ligamina_twice",
+        json!({ "arguments": "y" }),
+    )
+    .await
+    .unwrap();
+    assert_eq!(first_text(&result), "first:y\nsecond:y");
+
+    let (left, right) = tokio::join!(
+        call(
+            &client,
+            "cmd.astrbot-tools.ligamina_echo",
+            json!({ "text": "left" })
+        ),
+        call(
+            &client,
+            "cmd.astrbot-tools.ligamina_echo",
+            json!({ "text": "right" })
+        ),
+    );
+    assert_eq!(first_text(&left.unwrap()), "LEFT");
+    assert_eq!(first_text(&right.unwrap()), "RIGHT");
+    client.cancel().await.unwrap();
+    let _ = server_task.await;
+
+    runtime.shutdown().await;
+    let _ = std::fs::remove_dir_all(&work);
+}

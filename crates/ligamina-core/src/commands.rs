@@ -30,6 +30,47 @@ pub fn is_tool_account(account_id: &str) -> bool {
     account_id == TOOL_ACCOUNT_ID || account_id == TOOL_ONEBOT_ACCOUNT_ID
 }
 
+/// Prefix of MCP tools backed by native plugin commands.
+pub const COMMAND_TOOL_PREFIX: &str = "cmd.";
+
+/// MCP tool name `cmd.<host>.<command>`, each part made safe by [`tool_name_part`].
+pub fn command_tool_name(host_id: &str, command_id: &str) -> String {
+    format!(
+        "{COMMAND_TOOL_PREFIX}{}.{}",
+        tool_name_part(host_id),
+        tool_name_part(command_id)
+    )
+}
+
+/// MCP tool names allow only ASCII letters, digits, `_`, `-` and `.`. Other characters
+/// become `_`; when that changed the value, `-` and the first 8 hex digits of the
+/// SHA-256 of the original are appended. Without the suffix, non-ASCII command IDs
+/// (most Chinese commands) would collapse to the same underscores and be dropped as
+/// ambiguous. ASCII IDs keep their plain names.
+pub fn tool_name_part(value: &str) -> String {
+    use sha2::{Digest, Sha256};
+
+    let sanitized: String = value
+        .chars()
+        .map(|c| {
+            if c.is_ascii_alphanumeric() || matches!(c, '_' | '-' | '.') {
+                c
+            } else {
+                '_'
+            }
+        })
+        .collect();
+    if sanitized == value {
+        return sanitized;
+    }
+    let digest = Sha256::digest(value.as_bytes());
+    let suffix: String = digest[..4]
+        .iter()
+        .map(|byte| format!("{byte:02x}"))
+        .collect();
+    format!("{sanitized}-{suffix}")
+}
+
 /// Identity of one tool call's virtual private conversation, shaped for the Host framework.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct ToolIdentity {
@@ -42,7 +83,8 @@ pub struct ToolIdentity {
 /// Builds a fresh identity for a framework, or `None` when tool sessions are unsupported.
 pub fn tool_identity(framework: &str, call: uuid::Uuid) -> Option<ToolIdentity> {
     match framework {
-        "koishi" => {
+        // Koishi and AstrBot accept arbitrary string IDs on any platform name.
+        "koishi" | "astrbot" => {
             let id = call.simple().to_string();
             Some(ToolIdentity {
                 platform: TOOL_PLATFORM,
@@ -525,7 +567,11 @@ mod tests {
             assert!(value <= i64::MAX as u64);
         }
         assert_ne!(nonebot.actor_id, nonebot.message_id);
-        assert!(tool_identity("astrbot", call).is_none());
+        assert_eq!(
+            tool_identity("astrbot", call).unwrap().platform,
+            TOOL_PLATFORM
+        );
+        assert!(tool_identity("unknown-framework", call).is_none());
         assert!(!is_tool_account("10001"));
     }
 
@@ -564,5 +610,23 @@ mod tests {
         );
         catalog.deactivate_host("koishi", 2).await;
         assert!(catalog.list().await.is_empty());
+    }
+
+    #[test]
+    fn tool_names_keep_ascii_ids_and_disambiguate_non_ascii_ones() {
+        assert_eq!(command_tool_name("koishi", "echo"), "cmd.koishi.echo");
+        assert_eq!(command_tool_name("nonebot", "roll"), "cmd.nonebot.roll");
+        // Chinese command IDs would all become `____`; the hash suffix keeps them apart.
+        assert_eq!(
+            command_tool_name("astrbot", "组队菜单"),
+            "cmd.astrbot.____-fda2f352"
+        );
+        assert_eq!(
+            command_tool_name("astrbot", "组队大厅"),
+            "cmd.astrbot.____-fa319e0f"
+        );
+        assert_eq!(tool_name_part("炒股.菜单"), "__.__-ff5e4afa");
+        assert_eq!(tool_name_part("my host"), "my_host-88dd8853");
+        assert_eq!(tool_name_part("组队菜单"), tool_name_part("组队菜单"));
     }
 }

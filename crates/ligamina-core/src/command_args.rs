@@ -163,7 +163,11 @@ pub fn compose(
                 }
                 let text = scalar(argument.name, argument.kind, value)?;
                 let rest = argument.kind == "text" && Some(index) == provided;
-                parts.push(quote(&text, rest, argument.name)?);
+                parts.push(if descriptor.framework == "astrbot" {
+                    astrbot_token(&text, rest, argument.name)?
+                } else {
+                    quote(&text, rest, argument.name)?
+                });
             }
         }
     }
@@ -171,7 +175,7 @@ pub fn compose(
 }
 
 fn supports_structured(descriptor: &CommandDescriptor) -> bool {
-    descriptor.framework == "koishi"
+    matches!(descriptor.framework.as_str(), "koishi" | "astrbot")
         && (!descriptor.arguments.is_empty() || !descriptor.options.is_empty())
         && arguments(descriptor)
             .iter()
@@ -274,6 +278,20 @@ fn scalar(name: &str, kind: &str, value: &Value) -> Result<String, String> {
         (_, Value::Bool(flag)) => Ok(flag.to_string()),
         _ => Err(format!("{name} must be a string, number or boolean")),
     }
+}
+
+/// AstrBot splits command arguments on whitespace and has no quoting, so only the
+/// final rest-of-line (`GreedyStr`) argument may contain spaces.
+fn astrbot_token(text: &str, rest_of_line: bool, name: &str) -> Result<String, String> {
+    if rest_of_line && !text.trim().is_empty() {
+        return Ok(text.to_owned());
+    }
+    if text.is_empty() || text.chars().any(char::is_whitespace) {
+        return Err(format!(
+            "{name} must be a single non-empty word for AstrBot; use the raw `{RAW_FIELD}` field otherwise"
+        ));
+    }
+    Ok(text.to_owned())
 }
 
 /// Quotes a token for Koishi's argv parser, which has no escape for `"` inside quotes.
@@ -391,6 +409,41 @@ mod tests {
         for case in cases {
             assert!(compose(&greet(), &input(case.clone())).is_err(), "{case}");
         }
+    }
+
+    #[test]
+    fn astrbot_arguments_are_whitespace_tokens_with_a_greedy_tail() {
+        let add: CommandDescriptor = serde_json::from_value(json!({
+            "command_id": "ligamina_add", "invocation": "/ligamina_add", "framework": "astrbot",
+            "arguments": [
+                { "name": "left", "required": true, "type": "integer" },
+                { "name": "right", "required": true, "type": "integer" }
+            ]
+        }))
+        .unwrap();
+        assert_eq!(input_schema(&add)["required"], json!(["left", "right"]));
+        assert_eq!(
+            compose(&add, &input(json!({ "left": 2, "right": 40 }))).unwrap(),
+            "2 40"
+        );
+        assert!(compose(&add, &input(json!({ "left": 2 }))).is_err());
+        let echo: CommandDescriptor = serde_json::from_value(json!({
+            "command_id": "echo", "invocation": "/echo", "framework": "astrbot",
+            "arguments": [
+                { "name": "who", "required": true, "type": "string" },
+                { "name": "text", "required": true, "type": "text" }
+            ]
+        }))
+        .unwrap();
+        assert_eq!(
+            compose(
+                &echo,
+                &input(json!({ "who": "ada", "text": "hello there" }))
+            )
+            .unwrap(),
+            "ada hello there"
+        );
+        assert!(compose(&echo, &input(json!({ "who": "ada lovelace", "text": "x" }))).is_err());
     }
 
     #[test]
