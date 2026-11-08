@@ -8,12 +8,29 @@
  *
  * Delivery rule: a send whose outcome is uncertain (network error, timeout, async
  * acceptance) is reported as `unknown` and never retried, matching the Core ledger.
+ *
+ * Fault handling (P6-02). Each claimed operation goes through three stages, and an
+ * exception in any of them is contained to that operation:
+ *
+ * 1. prepare  - validation and segment conversion. Nothing was sent: `failed`.
+ * 2. platform - the OneBot call. Transport doubt is `unknown` (see `#call`); an
+ *    exception while interpreting the reply is `unknown` for sends and `failed` for
+ *    read-only actions.
+ * 3. report   - writing the outcome to Core. A transient failure keeps the outcome and
+ *    re-reports it under the same lease (Core accepts an identical result twice); the
+ *    platform action is never repeated. When the lease has expired or Core rejects the
+ *    report, the outcome is handed to `onUnreported` and dropped: Core has recorded (or
+ *    will record) the operation as `unknown`, which must not be replayed.
+ *
+ * `run()` survives Core restarts and OneBot outages: errors back off, and a lease that
+ * Core refuses is discarded so the next poll acquires a fresh one.
  */
 
-import type { EventEnvelope, GatewayLease, LigaminaClient } from "./client.js";
+import { ApiError, type EventEnvelope, type GatewayLease, type LigaminaClient } from "./client.js";
 
 const PROTOCOL_VERSION = "ligamina/0.1";
 const ONEBOT_PLATFORM = "onebot.v11";
+const MAX_BACKOFF_MS = 5_000;
 
 export interface OneBotEndpoint {
   /** Base URL of the OneBot v11 HTTP API, e.g. `http://127.0.0.1:3000`. */
@@ -32,6 +49,21 @@ export interface OneBotGatewayOptions {
   actionTimeoutMs?: number;
   fetch?: typeof fetch;
   now?: () => number;
+  /** Receives errors that `run()` recovers from (Core or OneBot unavailable, ...). */
+  onError?: (error: unknown) => void;
+  /**
+   * Receives an outcome that could not be written to Core and was dropped. The Core
+   * ledger keeps that operation `unknown`; operators reconcile it from this record.
+   */
+  onUnreported?: (record: UnreportedOutcome) => void;
+}
+
+export interface UnreportedOutcome {
+  operation_id: string;
+  key: ClaimedOperation["key"];
+  status: Outcome["status"];
+  platform_message_id: string | null;
+  reason: string;
 }
 
 interface ClaimedOperation {
@@ -54,51 +86,157 @@ interface Outcome {
 
 type Segment = Record<string, unknown>;
 
+/** A prepared OneBot action plus how to read its reply. */
+interface PlatformAction {
+  action: string;
+  body: Record<string, unknown>;
+  /** True when the action may change platform state (a send). */
+  sideEffect: boolean;
+  interpret: (data: unknown) => Outcome;
+}
+
+interface PendingReport {
+  operation: ClaimedOperation;
+  lease: GatewayLease;
+  outcome: Outcome;
+  result: Record<string, unknown>;
+}
+
+type ResolvedOptions = Required<Omit<OneBotGatewayOptions, "fetch" | "now" | "onError" | "onUnreported">> & {
+  fetch: typeof fetch;
+  now: () => number;
+  onError: (error: unknown) => void;
+  onUnreported: (record: UnreportedOutcome) => void;
+};
+
 export class OneBotGateway {
-  readonly #options: Required<Omit<OneBotGatewayOptions, "fetch" | "now">> & {
-    fetch: typeof fetch;
-    now: () => number;
-  };
+  readonly #options: ResolvedOptions;
   #lease?: GatewayLease;
+  #pending?: PendingReport;
 
   constructor(options: OneBotGatewayOptions) {
     this.#options = {
       leaseTtlMs: 60_000,
       actionTimeoutMs: 15_000,
+      ...options,
       fetch: options.fetch ?? fetch,
       now: options.now ?? Date.now,
-      ...options,
-    } as never;
+      onError: options.onError ?? ((error) => console.error("[OneBotGateway]", error)),
+      onUnreported: options.onUnreported
+        ?? ((record) => console.error("[OneBotGateway] outcome not reported to Core", record)),
+    };
   }
 
-  /** Claims and performs at most one action. Returns false when nothing was pending. */
+  /** True while an outcome is waiting to be written to Core. */
+  get hasPendingReport(): boolean {
+    return this.#pending !== undefined;
+  }
+
+  /**
+   * Claims and performs at most one action. Returns false when nothing was pending.
+   *
+   * An outcome left unreported by an earlier poll is flushed first, and no new action is
+   * claimed until it has been written or dropped. Core errors (lease, claim, report)
+   * propagate; an operation's own preparation or platform errors never do.
+   */
   async pollOnce(): Promise<boolean> {
+    if (this.#pending) {
+      await this.#flushReport();
+      return true;
+    }
     const lease = await this.#currentLease();
-    const operation = (await this.#options.core.claimGatewayAction<ClaimedOperation>(
-      this.#options.gatewayId,
-      lease,
-    )) as ClaimedOperation | null;
+    let operation: ClaimedOperation | null;
+    try {
+      operation = (await this.#options.core.claimGatewayAction<ClaimedOperation>(
+        this.#options.gatewayId,
+        lease,
+      )) as ClaimedOperation | null;
+    } catch (error) {
+      this.#forgetLeaseOnDenial(error);
+      throw error;
+    }
     if (!operation) return false;
     const outcome = await this.#perform(operation.operation_payload);
-    await this.#options.core.reportGatewayResult(this.#options.gatewayId, operation.key.operation_id, lease, {
-      key: operation.key,
-      fingerprint: operation.fingerprint,
-      status: outcome.status,
-      platform_message_id: outcome.platform_message_id ?? null,
-      data: outcome.data ?? null,
-      error: outcome.error ?? null,
-      observed_at_ms: this.#options.now(),
-      evidence_ref: outcome.platform_message_id ? `onebot.v11://message/${outcome.platform_message_id}` : null,
-    });
+    this.#pending = {
+      operation,
+      lease,
+      outcome,
+      result: {
+        key: operation.key,
+        fingerprint: operation.fingerprint,
+        status: outcome.status,
+        platform_message_id: outcome.platform_message_id ?? null,
+        data: outcome.data ?? null,
+        error: outcome.error ?? null,
+        observed_at_ms: this.#options.now(),
+        evidence_ref: outcome.platform_message_id ? `onebot.v11://message/${outcome.platform_message_id}` : null,
+      },
+    };
+    await this.#flushReport();
     return true;
   }
 
-  /** Polls until the signal aborts, idling between empty claims. */
+  /**
+   * Polls until the signal aborts, idling between empty claims. Errors go to `onError`
+   * and are retried with capped exponential backoff; only an abort ends the loop.
+   */
   async run(signal: AbortSignal, idleMs = 200): Promise<void> {
+    let backoff = idleMs;
     while (!signal.aborted) {
-      const handled = await this.pollOnce();
-      if (!handled) await new Promise((resolve) => setTimeout(resolve, idleMs));
+      try {
+        const handled = await this.pollOnce();
+        backoff = idleMs;
+        if (!handled) await sleep(idleMs, signal);
+      } catch (error) {
+        if (signal.aborted) break;
+        this.#options.onError(error);
+        await sleep(backoff, signal);
+        backoff = Math.min(Math.max(backoff, 1) * 2, MAX_BACKOFF_MS);
+      }
     }
+  }
+
+  /** Writes the pending outcome to Core; a transient failure keeps it for the next poll. */
+  async #flushReport(): Promise<void> {
+    const pending = this.#pending!;
+    if (pending.lease.expires_at_ms <= this.#options.now()) {
+      // Core reaps the lease and marks the operation unknown; this report cannot land.
+      this.#drop(pending, "lease expired before the outcome was reported");
+      return;
+    }
+    try {
+      await this.#options.core.reportGatewayResult(
+        this.#options.gatewayId,
+        pending.operation.key.operation_id,
+        pending.lease,
+        pending.result,
+      );
+      this.#pending = undefined;
+    } catch (error) {
+      if (error instanceof ApiError && error.status >= 400 && error.status < 500) {
+        // Stale lease, conflicting result or malformed report: Core will not accept it.
+        this.#forgetLeaseOnDenial(error);
+        this.#drop(pending, `Core rejected the report: ${error.code}: ${error.message}`);
+        return;
+      }
+      throw error;
+    }
+  }
+
+  #drop(pending: PendingReport, reason: string): void {
+    this.#pending = undefined;
+    this.#options.onUnreported({
+      operation_id: pending.operation.key.operation_id,
+      key: pending.operation.key,
+      status: pending.outcome.status,
+      platform_message_id: pending.outcome.platform_message_id ?? null,
+      reason,
+    });
+  }
+
+  /** A lease Core refuses (expired, replaced, Core restarted) is useless; re-acquire next time. */
+  #forgetLeaseOnDenial(error: unknown): void {
+    if (error instanceof ApiError && (error.status === 401 || error.status === 403)) this.#lease = undefined;
   }
 
   async #currentLease(): Promise<GatewayLease> {
@@ -114,47 +252,21 @@ export class OneBotGateway {
     return this.#lease!;
   }
 
+  /** Runs one operation through the prepare and platform stages. Never throws. */
   async #perform(payload: ClaimedOperation["operation_payload"]): Promise<Outcome> {
-    switch (payload.operation) {
-      case "send_message": {
-        const message = toOneBotMessage(payload.params.message);
-        const action = payload.target.kind === "group" ? "send_group_msg" : "send_private_msg";
-        const target = payload.target.kind === "group"
-          ? { group_id: oneBotId(payload.target.id) }
-          : { user_id: oneBotId(payload.target.id) };
-        const response = await this.#call(action, { ...target, message });
-        if (response.status !== "succeeded") return response;
-        const id = (response.data as { message_id?: unknown } | undefined)?.message_id;
-        if (id === undefined || id === null) {
-          return { status: "unknown", error: "OneBot accepted the send but returned no message_id" };
-        }
-        return { status: "succeeded", platform_message_id: String(id) };
-      }
-      case "get_message": {
-        const response = await this.#call("get_msg", { message_id: oneBotId(String(payload.params.message_id)) });
-        if (response.status !== "succeeded") return response;
-        const data = response.data as Record<string, any>;
-        return {
-          status: "succeeded",
-          data: {
-            target: payload.target,
-            message_id: String(data.message_id),
-            real_id: String(data.real_id ?? data.message_id),
-            actor_id: String(data.sender?.user_id ?? ""),
-            nickname: data.sender?.nickname,
-            timestamp: new Date(Number(data.time) * 1000).toISOString(),
-            message: fromOneBotMessage(data.message),
-          },
-        };
-      }
-      case "get_self_info": {
-        const response = await this.#call("get_login_info", {});
-        if (response.status !== "succeeded") return response;
-        const data = response.data as { user_id?: unknown; nickname?: unknown };
-        return { status: "succeeded", data: { user_id: String(data.user_id), nickname: String(data.nickname ?? "") } };
-      }
-      default:
-        return { status: "failed", error: `unsupported operation ${payload.operation}` };
+    let prepared: PlatformAction;
+    try {
+      prepared = prepareAction(payload);
+    } catch (error) {
+      return { status: "failed", error: `not sent: ${errorText(error)}` };
+    }
+    const response = await this.#call(prepared.action, prepared.body);
+    if (response.status !== "succeeded") return response;
+    try {
+      return prepared.interpret(response.data);
+    } catch (error) {
+      const error_ = `OneBot ${prepared.action} reply could not be interpreted: ${errorText(error)}`;
+      return { status: prepared.sideEffect ? "unknown" : "failed", error: error_ };
     }
   }
 
@@ -179,6 +291,9 @@ export class OneBotGateway {
     } catch {
       return { status: "unknown", error: `OneBot ${action} returned HTTP ${response.status} without JSON` };
     }
+    if (!payload || typeof payload !== "object") {
+      return { status: "unknown", error: `OneBot ${action} returned HTTP ${response.status} with a non-object body` };
+    }
     if (payload.retcode === 0 && payload.status === "ok") return { status: "succeeded", data: payload.data };
     // retcode 1 is OneBot's "accepted asynchronously": delivery is not confirmed.
     if (payload.retcode === 1) return { status: "unknown", error: `OneBot ${action} was accepted asynchronously` };
@@ -186,6 +301,76 @@ export class OneBotGateway {
       status: "failed",
       error: `OneBot ${action} failed with retcode ${String(payload.retcode)}: ${payload.wording ?? payload.message ?? ""}`.trim(),
     };
+  }
+}
+
+/** Validates an operation and builds its OneBot action. Throws when it cannot be sent. */
+function prepareAction(payload: ClaimedOperation["operation_payload"]): PlatformAction {
+  if (!payload || typeof payload !== "object") throw new TypeError("operation payload is missing");
+  const target = payload.target;
+  const params = payload.params ?? {};
+  switch (payload.operation) {
+    case "send_message": {
+      if (!target || (target.kind !== "group" && target.kind !== "private") || !target.id) {
+        throw new TypeError("send_message requires a group or private target");
+      }
+      const message = toOneBotMessage(params.message);
+      if (message.length === 0) throw new TypeError("send_message params.message is empty");
+      return {
+        action: target.kind === "group" ? "send_group_msg" : "send_private_msg",
+        body: {
+          ...(target.kind === "group" ? { group_id: oneBotId(target.id) } : { user_id: oneBotId(target.id) }),
+          message,
+        },
+        sideEffect: true,
+        interpret: (data) => {
+          const id = (data as { message_id?: unknown } | null | undefined)?.message_id;
+          if (id === undefined || id === null) {
+            return { status: "unknown", error: "OneBot accepted the send but returned no message_id" };
+          }
+          return { status: "succeeded", platform_message_id: String(id) };
+        },
+      };
+    }
+    case "get_message": {
+      if (params.message_id === undefined || params.message_id === null) {
+        throw new TypeError("get_message requires params.message_id");
+      }
+      return {
+        action: "get_msg",
+        body: { message_id: oneBotId(String(params.message_id)) },
+        sideEffect: false,
+        interpret: (raw) => {
+          if (!raw || typeof raw !== "object") throw new TypeError("get_msg returned no message");
+          const data = raw as Record<string, any>;
+          return {
+            status: "succeeded",
+            data: {
+              target,
+              message_id: String(data.message_id),
+              real_id: String(data.real_id ?? data.message_id),
+              actor_id: String(data.sender?.user_id ?? ""),
+              nickname: data.sender?.nickname,
+              timestamp: new Date(Number(data.time) * 1000).toISOString(),
+              message: fromOneBotMessage(data.message),
+            },
+          };
+        },
+      };
+    }
+    case "get_self_info":
+      return {
+        action: "get_login_info",
+        body: {},
+        sideEffect: false,
+        interpret: (raw) => {
+          if (!raw || typeof raw !== "object") throw new TypeError("get_login_info returned no data");
+          const data = raw as { user_id?: unknown; nickname?: unknown };
+          return { status: "succeeded", data: { user_id: String(data.user_id), nickname: String(data.nickname ?? "") } };
+        },
+      };
+    default:
+      throw new TypeError(`unsupported operation ${String(payload.operation)}`);
   }
 }
 
@@ -221,6 +406,7 @@ export function toEventEnvelope(event: Record<string, any>, targetHost: string):
 export function toOneBotMessage(message: unknown): Segment[] {
   if (!Array.isArray(message)) throw new TypeError("send_message params.message must be a segment array");
   return message.map((segment: Record<string, unknown>) => {
+    if (!segment || typeof segment !== "object") throw new TypeError("message segment must be an object");
     switch (segment.type) {
       case "text": return { type: "text", data: { text: String(segment.text ?? "") } };
       case "mention": return { type: "at", data: { qq: String(segment.user_id) } };
@@ -248,4 +434,21 @@ export function fromOneBotMessage(message: unknown): Segment[] {
 /** OneBot implementations expect numeric IDs; keep strings that exceed the safe range. */
 function oneBotId(id: string): number | string {
   return /^\d+$/.test(id) && Number.isSafeInteger(Number(id)) ? Number(id) : id;
+}
+
+function errorText(error: unknown): string {
+  return error instanceof Error ? error.message : String(error);
+}
+
+function sleep(ms: number, signal: AbortSignal): Promise<void> {
+  if (signal.aborted) return Promise.resolve();
+  return new Promise((resolve) => {
+    const done = () => {
+      clearTimeout(timer);
+      signal.removeEventListener("abort", done);
+      resolve();
+    };
+    const timer = setTimeout(done, ms);
+    signal.addEventListener("abort", done, { once: true });
+  });
 }
