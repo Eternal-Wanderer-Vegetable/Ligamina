@@ -64,7 +64,10 @@ pub fn tool_name_part(value: &str) -> String {
         return sanitized;
     }
     let digest = Sha256::digest(value.as_bytes());
-    let suffix: String = digest[..4].iter().map(|byte| format!("{byte:02x}")).collect();
+    let suffix: String = digest[..4]
+        .iter()
+        .map(|byte| format!("{byte:02x}"))
+        .collect();
     format!("{sanitized}-{suffix}")
 }
 
@@ -614,8 +617,14 @@ mod tests {
         assert_eq!(command_tool_name("koishi", "echo"), "cmd.koishi.echo");
         assert_eq!(command_tool_name("nonebot", "roll"), "cmd.nonebot.roll");
         // Chinese command IDs would all become `____`; the hash suffix keeps them apart.
-        assert_eq!(command_tool_name("astrbot", "组队菜单"), "cmd.astrbot.____-fda2f352");
-        assert_eq!(command_tool_name("astrbot", "组队大厅"), "cmd.astrbot.____-fa319e0f");
+        assert_eq!(
+            command_tool_name("astrbot", "组队菜单"),
+            "cmd.astrbot.____-fda2f352"
+        );
+        assert_eq!(
+            command_tool_name("astrbot", "组队大厅"),
+            "cmd.astrbot.____-fa319e0f"
+        );
         assert_eq!(tool_name_part("炒股.菜单"), "__.__-ff5e4afa");
         assert_eq!(tool_name_part("my host"), "my_host-88dd8853");
         assert_eq!(tool_name_part("组队菜单"), tool_name_part("组队菜单"));
