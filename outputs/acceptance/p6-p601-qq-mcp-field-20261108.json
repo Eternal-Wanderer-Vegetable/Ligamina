@@ -1,0 +1,104 @@
+{
+  "schema_version": 1,
+  "kind": "p6_p601_qq_mcp_field_run",
+  "date": "2026-11-08",
+  "authorization": "User authorized all groups configured in Stella and restarting Stella (2026-11-08); test messages were sent by the user in one configured group. No credentials were read; QQ user and group identifiers are omitted from this report.",
+  "path": "QQ group @-mention -> Stella (keyword capability route, Comes restricted agent, LM Studio google/gemma-4-e4b) -> Stella MCP client (Streamable HTTP) -> field Core 127.0.0.1:63900 command tools -> one network-disabled read-only WSL Docker Host per framework -> frozen plugin -> reply -> Stella delivery plan -> OneBot v11 send",
+  "plugins": {
+    "koishi": "@koishijs/plugin-echo@2.2.5",
+    "nonebot": "nonebot_plugin_roll@0.2.3",
+    "astrbot": "astrbot_plugin_teamup sha256 f5603cb4d41293d802270b90fbaf201b84ad6852a214ee1778ec91de3611557a"
+  },
+  "stella_code": "main-based fix branch codex/fix-capability-tool-delivery (Stella PR #132) applied as an uncommitted patch to the running checkout for the test only; restored afterwards",
+  "rounds": [
+    {
+      "round": 1,
+      "time": "15:41",
+      "messages": 1,
+      "outcome": "failed",
+      "observed": "fallback reply '这个功能暂时不可用' delivered (receipt 1): capability delivery gate fix confirmed",
+      "cause": "tool call answered with JSON-RPC error; Stella's MCP client tore the session down from the calling task, cancelling NoneBot's lifespan task (shutdown hooks ran)",
+      "fixes": [
+        "Core 24ca6cf: invalid command-tool arguments are isError results",
+        "Stella 69b79a0: protocol errors keep the session; session owned by one task"
+      ]
+    },
+    {
+      "round": 2,
+      "time": "16:07",
+      "messages": 1,
+      "outcome": "failed",
+      "observed": "fallback reply delivered",
+      "cause": "model sent rd(arguments='2d6') correctly; the Core had closed the idle MCP session (rmcp keep-alive 5 min) and Stella treated 'Session terminated' as a protocol error",
+      "fixes": [
+        "Stella 3de22b1: renew a terminated session and retry once (verified after 320 s idle)"
+      ]
+    },
+    {
+      "round": 3,
+      "time": "16:31-16:35",
+      "messages": 9,
+      "results": {
+        "dice x3": "3 tool calls ok; replies were the model's paraphrase, one wrong ('点数分别为2' for a total of 2)",
+        "echo x3": "3 ok, paraphrased wrapper",
+        "teamup x3": "3 failed: deterministic keyword route direct-called with {} -> usage text"
+      },
+      "other_members": "one member typed '@<bot name>' as plain text instead of a QQ mention; ignored by design (is_tome=False)",
+      "fixes": [
+        "Stella 8740f03: deterministic routes do not direct-call with unfilled optional args"
+      ]
+    },
+    {
+      "round": 4,
+      "time": "16:50",
+      "messages": 1,
+      "outcome": "failed",
+      "observed": "fallback reply accepted by OneBot; user did not see it in the group",
+      "cause": "model sent arguments='' together with nickname; Core rejected raw+structured; model did not retry",
+      "fixes": [
+        "Core 1aa777c: an empty `arguments` is ignored next to structured fields",
+        "Stella 8700d13: direct_reply = 'tool_output' sends the plugin's own text (user decision)"
+      ]
+    },
+    {
+      "round": 5,
+      "time": "17:11-17:13",
+      "messages": 5,
+      "outcome": "passed",
+      "results": [
+        {
+          "message": "把我的组队昵称设置成 测试员A",
+          "delivered": "已设置昵称：测试员A"
+        },
+        {
+          "message": "把我的组队昵称设置成 测试员B",
+          "delivered": "已设置昵称：测试员B"
+        },
+        {
+          "message": "把我的组队昵称设置成 测试员C",
+          "delivered": "已设置昵称：测试员C"
+        },
+        {
+          "message": "帮我掷两个六面骰子",
+          "delivered": "你掷出了2个6面骰子, 点数为【9】"
+        },
+        {
+          "message": "复读这句话：p6-echo-4",
+          "delivered": "p6-echo-4"
+        }
+      ],
+      "each": "route keyword -> Comes agent, 1 tool call -> OneBot accepted, receipt_count 1",
+      "receiver_observation": "user confirmed all replies appeared as expected"
+    }
+  ],
+  "core_after_run": {
+    "gateway_operations": 0,
+    "containers_left": 0,
+    "core_exited": true
+  },
+  "restoration": "Stella checkout tracked files and both StellaData config files restored (hashes match backups); Stella restarted in its prior mode (LM Studio overrides, MCP disabled)",
+  "gate": {
+    "p6_mcp_path_qq_positive": "passed_scoped (all three ecosystems, real QQ delivery, user-observed)",
+    "p4_field": "blocked: isolation, duplicate/restart and timeout/unknown scenarios x3 per ecosystem not run; Stella fixes not merged (PR #132)"
+  }
+}

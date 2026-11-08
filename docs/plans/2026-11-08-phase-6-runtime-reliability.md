@@ -85,6 +85,24 @@ P6-01 与 P6-02 合为下一个里程碑：P6-02 不需要真实账号，先行�
 
 复现：`powershell -NoProfile -File lab/field/run_stella_mcp_experiment.ps1 -Run <新 id> [-Level comes] [-StellaCheckout <Stella 检出目录>]`（拒绝覆盖已有报告；令牌只写在被忽略的 `.work/` 下）。
 
+### 3.1b P6-01 真实 QQ 投递：经 Stella 的 MCP 路径（2026-11-08）
+
+用户授权 Stella 已配置的全部群聊并允许重启 Stella。测试消息由用户在其中一个群里发送；Stella 以修复分支（Stella PR #132）的补丁临时运行，模型为 LM Studio `google/gemma-4-e4b`，未启动 Strata。报告 [p6-p601-qq-mcp-field-20261108.json](../../outputs/acceptance/p6-p601-qq-mcp-field-20261108.json)（不含 QQ 号与群号）。
+
+五轮结果：前四轮各暴露一个问题，均已修复；第五轮三种生态全部按预期送达，用户确认在群里看到：
+
+| 轮次 | 现象 | 原因 | 修复 |
+| --- | --- | --- | --- |
+| 1 | 回“这个功能暂时不可用” | 参数被 Core 以 JSON-RPC error 拒绝；Stella 从调用任务拆会话，取消了 NoneBot lifespan 任务（停机钩子被执行） | 本仓库 `24ca6cf`：参数错误改为 `isError` 结果；Stella `69b79a0`：协议错误保留会话、会话由专属任务持有 |
+| 2 | 同上 | 模型参数正确；Core 的 MCP 会话空闲 5 分钟被关闭，Stella 把 “Session terminated” 当普通协议错误 | Stella `3de22b1`：重建会话并重试一次（空闲 320 s 后实测成功） |
+| 3 | 掷骰回复是模型转述，一次说错；组队昵称回用法说明 | 直回用模型摘要；确定性关键词路由按“无必填”直调 | Stella `8740f03`：确定性路由有空着的可选参数时交给模型 |
+| 4 | 组队昵称无可见回复 | 模型同时传了 `arguments: ""` 与 `nickname`，Core 判为冲突，模型未重试 | 本仓库 `1aa777c`：结构化字段旁的空 `arguments` 忽略；Stella `8700d13`：`direct_reply = "tool_output"` 直接发插件原文（用户决定） |
+| 5 | 组队昵称 A/B/C、掷骰、复读全部正确 | — | — |
+
+第一轮的回复已经送达群里，说明能力直回投递门的修复有效。其他群员把 `@机器人名` 当文字输入（不是 QQ 的 @ 提及），按设计不触发。运行后 Core 的 Gateway 操作 0、容器残留 0；Stella 的工作区与两份配置已恢复（哈希与备份一致），并按原方式（LM Studio、MCP 关闭）重启。
+
+未完成：feat-030 要求的隔离、重复/重启、超时/unknown 各三次未执行；Stella PR #132 未合并。
+
 ### 3.2 P6-03 设计要点（待实施）
 
 - Host 配置新增受信任等级：`trusted`（自写或审阅过的插件，允许 `LocalCommand`）、`untrusted`（目录插件，默认）。`untrusted` 只能通过隔离启动器运行，Core 启动时校验并拒绝不满足的配置，拒绝原因写入日志与状态接口。
