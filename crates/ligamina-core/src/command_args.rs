@@ -21,7 +21,7 @@ pub fn input_schema(descriptor: &CommandDescriptor) -> Value {
     let raw = json!({
         "type": "string",
         "maxLength": RAW_MAX_BYTES,
-        "description": "Text after the command name, parsed natively by the plugin framework; pass an empty string when the command takes no arguments. Use either this field or the structured fields, not both.",
+        "description": "Text after the command name, parsed natively by the plugin framework; pass an empty string when the command takes no arguments. When you fill the structured fields, leave this field out (an empty string is ignored).",
     });
     let mut properties = Map::new();
     properties.insert(RAW_FIELD.to_owned(), raw);
@@ -96,7 +96,13 @@ pub fn compose(
         }
     }
     let structured_keys = input.keys().filter(|key| key.as_str() != RAW_FIELD).count();
-    if let Some(raw) = input.get(RAW_FIELD) {
+    // Models told to "pass an empty string when the command takes no arguments" often
+    // send `arguments: ""` next to structured fields. An empty raw value carries no
+    // input, so it does not conflict with them.
+    let raw = input.get(RAW_FIELD).filter(|raw| {
+        !(structured_keys > 0 && raw.as_str().is_some_and(|text| text.trim().is_empty()))
+    });
+    if let Some(raw) = raw {
         if structured_keys > 0 {
             return Err(format!(
                 "use either `{RAW_FIELD}` or the structured fields, not both"
@@ -409,6 +415,26 @@ mod tests {
         for case in cases {
             assert!(compose(&greet(), &input(case.clone())).is_err(), "{case}");
         }
+    }
+
+    #[test]
+    fn an_empty_raw_value_does_not_conflict_with_structured_fields() {
+        // Seen live: a model sent `arguments: ""` together with the typed field.
+        assert_eq!(
+            compose(&greet(), &input(json!({ RAW_FIELD: "", "name": "Ada" }))).unwrap(),
+            "Ada"
+        );
+        assert_eq!(
+            compose(&greet(), &input(json!({ RAW_FIELD: "  ", "name": "Ada" }))).unwrap(),
+            "Ada"
+        );
+        // Raw text with content next to structured fields is still ambiguous.
+        assert!(compose(&greet(), &input(json!({ RAW_FIELD: "x", "name": "Ada" }))).is_err());
+        // An empty raw value alone still means "no arguments".
+        assert_eq!(
+            compose(&greet(), &input(json!({ RAW_FIELD: "" }))).unwrap(),
+            ""
+        );
     }
 
     #[test]
