@@ -52,7 +52,7 @@ pilot 过程中修正的三个 harness 问题（v2、v3 报告作废，未入库
 
 ### 3.2 AB-05 工具级行为验收（2026-11-08）
 
-[campaign report](../../outputs/acceptance/ab05-astrbot-tool-linux-20261108-v1.json)，SHA-256 `fde3e4e900d699f6e5bcaff16bbaa98db4956e02079212bb162f80b1a23567c8`；gate `astrbot_tool_linux=passed_scoped`。
+[campaign report](../../outputs/acceptance/ab05-astrbot-tool-linux-20261108-v2.json)，SHA-256 `33e2e6871ac41efdd3923c28c9c6b49ada6f8c09dbe3708ea73d15f84405bafb`；gate `astrbot_tool_linux=passed_scoped`。v1 结果相同但作废未保留：其记录的用例文件摘要来自 CRLF 工作副本，与仓库中的 LF 文件不符；v2 以与提交一致的字节重跑。
 
 - 对象：AB-04 中加载成功、且有离线可判定命令的三个插件——`astrbot_plugin_teamup`（plain）、`astrbot_plugin_gallery`（platform_specific）、`astrbot_plugin_pet`（platform_specific，离线安装 9 个 wheel）。其余插件依赖 LLM、外网或真实平台，不适合离线判定。
 - 用例：[astrbot-tool-cases.json](../../contracts/lab/automation/tools/v1/astrbot-tool-cases.json)，8 个（正例、负例、权限/隔离），含并发步骤与“无回复”断言。Oracle 由冻结归档的源码静态推导（不运行插件），每条期望回复引用文件摘要、行号以及字符串常量或原文；编排器派发前逐条复核 28 处引用，文本或源码漂移即拒绝。AstrBot 原生权限拒绝的回复引用 AstrBot 4.29.1 源码，并以正则匹配每次调用不同的 `tool-actor-<uuid>`。Worker 只收到 stimulus。

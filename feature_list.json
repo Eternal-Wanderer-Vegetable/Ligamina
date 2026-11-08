@@ -2264,7 +2264,7 @@
       "done_when": "独立 Oracle、三次 fresh 运行、清理确认；结果单列。",
       "evidence": "2026-11-08：工具级验收 gate astrbot_tool_linux=passed_scoped。冻结的 astrbot_plugin_teamup、astrbot_plugin_gallery、astrbot_plugin_pet 共 8 个用例（正例、负例、权限/隔离）×3 次，24 个全新禁网 Worker 全部通过、清理全部确认，54 次工具调用，Gateway 操作 0，Core 均正常退出且 Host 已回收。每条期望回复都引用冻结归档中的源码（文件摘要、行号、字符串常量或原文），28 处引用在派发前逐条复核；原生权限拒绝引用 AstrBot 4.29.1 源码。首次证明了 authority 拒绝路径（插件自身管理员检查与 AstrBot 原生 ADMIN 过滤）。过程中修复 Core 缺陷：非 ASCII 命令名清洗后全部塌缩为下划线并被当作歧义丢弃，现追加原名 SHA-256 前 8 位。范围：工具级；市场插件的 Native/Federated 事件路径行为未覆盖（见计划 3.2）。",
       "evidence_paths": [
-        "outputs/acceptance/ab05-astrbot-tool-linux-20261108-v1.json",
+        "outputs/acceptance/ab05-astrbot-tool-linux-20261108-v2.json",
         "contracts/lab/automation/tools/v1/astrbot-tool-cases.json",
         "lab/astrbot_tool_campaign.py",
         "lab/astrbot_tool_side.py",
