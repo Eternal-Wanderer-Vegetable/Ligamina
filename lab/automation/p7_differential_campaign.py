@@ -31,6 +31,7 @@ from jsonschema import Draft202012Validator
 from lab.automation import phase4_campaign
 from lab.automation.behavior_v2 import ARTIFACT_CACHE, CATALOG_ROOT, _canonical
 from lab.automation.phase4_docker_side import _docker_side
+from lab.automation.p7_contracts import CONTRACT_IDS, _pilot_entry_contracts
 from lab.capability_inventory import SCANNER_VERSION
 from lab.pilot_nonebot import _prepare_wheelhouse
 from lab.pilot_workers import _load_npm_lock, _prepare_npm_project
@@ -1019,6 +1020,7 @@ def run_campaign(
             entry_result["conclusions_consistent_across_three_fresh_reruns"] = None
             entry_result["skip_domain"] = _discovery_skip_domain(discovery_summary)
             entry_result["skip_reason"] = discovery_summary.get("diagnostic_summary") or discovery_summary.get("reason_code") or "native_discovery_failed"
+            entry_result["contracts"] = _pilot_entry_contracts(entry_result)
             report["entries"].append(entry_result)
             report["counts"]["entries"] += 1
             if entry_result["status"] == "incomplete" and stop_reason is None:
@@ -1051,6 +1053,7 @@ def run_campaign(
             )
             entry_result["conclusions_consistent_across_three_fresh_reruns"] = None
             entry_result["status"] = "completed"
+            entry_result["contracts"] = _pilot_entry_contracts(entry_result)
             report["entries"].append(entry_result)
             report["counts"]["entries"] += 1
             print(f"[{index}/{len(candidates)}] {candidate['ecosystem']} {entry_id}: no runtime commands; behavior comparison not applicable", flush=True)
@@ -1152,6 +1155,7 @@ def run_campaign(
             else False
         )
         entry_result["status"] = "completed" if len(entry_result["rounds"]) == ROUNDS and all_clean else "incomplete"
+        entry_result["contracts"] = _pilot_entry_contracts(entry_result)
         report["entries"].append(entry_result)
         report["counts"]["entries"] += 1
         print(f"[{index}/{len(candidates)}] {candidate['ecosystem']} {entry_id}: commands={entry_result['commands']['discovered']} scenarios={len(scenario_meta)} rounds={len(entry_result['rounds'])} status={entry_result['status']}", flush=True)
@@ -1164,6 +1168,13 @@ def run_campaign(
     )
     assessed_entries = [entry for entry in report["entries"] if entry.get("scenario_generation", {}).get("scenario_count", 0) > 0]
     all_consistent = complete_entries and all(entry.get("conclusions_consistent_across_three_fresh_reruns") is True for entry in assessed_entries)
+    contract_totals = {
+        contract_id: {status: 0 for status in ("passed", "failed", "unknown")}
+        for contract_id in CONTRACT_IDS
+    }
+    for entry in report["entries"]:
+        for contract_id, check in (entry.get("contracts") or {}).items():
+            contract_totals[contract_id][check["status"]] += 1
     report["summary"] = {
         "selected_entries": len(candidates),
         "completed_entries": sum(entry.get("status") == "completed" for entry in report["entries"]),
@@ -1180,6 +1191,13 @@ def run_campaign(
         "commands_unknown": sum(entry.get("commands", {}).get("unknown", 0) for entry in report["entries"]),
         "conclusions_consistent_across_three_fresh_reruns": all_consistent,
         "mismatch_count": sum(len(round_row.get("mismatches", [])) for entry in report["entries"] for round_row in entry["rounds"]),
+        "contract_checks": {
+            "entries_with_all_c1_c8_conclusions": sum(
+                set((entry.get("contracts") or {}).keys()) == set(CONTRACT_IDS)
+                for entry in report["entries"]
+            ),
+            "by_contract": contract_totals,
+        },
     }
     report["stop_reason"] = stop_reason
     report["status"] = "completed" if complete_entries and report["counts"]["cleanup_unconfirmed"] == 0 else "incomplete"

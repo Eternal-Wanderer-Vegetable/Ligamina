@@ -75,4 +75,9 @@
 - [AB-04 AstrBot Linux install/load pilot](../../outputs/acceptance/ab04-astrbot-linux-pilot-20261108-v4.json)（SHA-256 `9605165c1f49e5bc83a55404b218a05261d5f79af3b2f43826ec83e32dff2344`）：未修改的 AstrBot 4.29.1 在 24 个全新禁网 Worker 中逐个加载分层选取的市场插件，21 passed、1 failed、2 skipped、unknown 0，清理全部确认；准入见 [admission](../../outputs/acceptance/tool04-linux-admission-20261108.json)。加载不等于行为兼容，详见 [AstrBot Host 计划](../plans/2026-11-07-phase-5-astrbot-host.md) 3.1。
 - [AB-05 AstrBot tool-surface campaign](../../outputs/acceptance/ab05-astrbot-tool-linux-20261108-v2.json)（SHA-256 `33e2e6871ac41efdd3923c28c9c6b49ada6f8c09dbe3708ea73d15f84405bafb`）：冻结的 teamup、gallery、pet 三个市场插件经 MCP 命令工具 8 个用例 ×3 次，24 个全新禁网 Worker 全部通过、清理全部确认，Gateway 操作 0；Oracle 引用冻结源码并在派发前复核。gate `astrbot_tool_linux=passed_scoped`，仅限工具级，详见 [AstrBot Host 计划](../plans/2026-11-07-phase-5-astrbot-host.md) 3.2。
 
+## 第七阶段自动化验证
+
+- [P7-04 30+30 differential pilot](../../outputs/acceptance/p7-p704-differential-pilot-20261110-retry3.json)（SHA-256 `2c6f4c65402cb986aec39fb1df3f9a01589a16e2c39d9926baded357dc51be5e`）：60 条目全部有终态；21/133 nontrivial，123/133 unknown，未达到全量 P7-09 准入门。
+- [P7-05 C1–C8 contract adjudication](../../outputs/acceptance/p7-p705-contract-pilot-20261110.json)（SHA-256 `e7fd56592fda040994dcb7e77ac823ddb3aa29a405b6db8655f8730882a71769`）：60×8 结论，16 个自有正反观察夹具通过；P7-04 证据支持 12 个 C1 pass，其余 468 格显式 unknown。
+
 其他 JSON、锁和 traces 保留在 outputs/acceptance 下，由相应报告和历史文档引用；S2-11 复跑使用独立文件名和 SQLite 队列，不能覆盖旧 S2-10 acceptance。

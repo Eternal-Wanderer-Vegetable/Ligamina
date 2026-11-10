@@ -1,8 +1,8 @@
 {
   "schema_version": 1,
   "updated_at": "2026-11-10",
-  "active_feature": "feat-050",
-  "next_feature": "feat-051",
+  "active_feature": "feat-051",
+  "next_feature": "feat-052",
   "features": [
     {
       "id": "feat-001",
@@ -2477,10 +2477,15 @@
       "dependencies": [
         "feat-049"
       ],
-      "status": "in-progress",
+      "status": "done",
       "done_when": "每项检查在合成插件上有正例与反例；pilot 条目全部给出 C1–C8 结论。",
-      "evidence": "",
-      "evidence_paths": [],
+      "evidence": "C1–C8 判定器接入 P7 differential executor；自有正反观察夹具 16/16 检出预期，pilot 60 项均有 8 项结论（480 格：C1 12 passed、48 unknown；C2–C8 共 420 unknown）。未执行专门 C2–C8 stimulus，按证据规则保留 unknown。现有 Core host_session/supervisor 与 MCP command_tools 回归 17/17 通过。",
+      "evidence_paths": [
+        "outputs/acceptance/p7-p705-contract-pilot-20261110.json",
+        "contracts/lab/contract/v1/fixtures.json",
+        "lab/automation/p7_contracts.py",
+        "lab/tests/test_p7_contracts.py"
+      ],
       "plan_path": "docs/plans/2026-11-09-phase-7-automated-verification.md"
     },
     {
@@ -2492,7 +2497,7 @@
         "feat-049",
         "feat-050"
       ],
-      "status": "not-started",
+      "status": "in-progress",
       "done_when": "每个变异体至少被一层检出或存活原因写明；分层检出率进入报告；PR 上运行小变异体回归。",
       "evidence": "",
       "evidence_paths": [],
