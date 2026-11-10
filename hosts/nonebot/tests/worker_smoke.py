@@ -64,7 +64,7 @@ def request(process: subprocess.Popen[bytes], method: str, params: dict, *, expe
 def main() -> None:
     environment = os.environ.copy()
     environment["PYTHONPATH"] = str(HOST_DIR)
-    environment["LIGAMINA_NONEBOT_PLUGINS"] = "ligamina_nonebot.bridge_smoke_plugin"
+    environment["LIGAMINA_NONEBOT_PLUGINS"] = "ligamina_nonebot.bridge_smoke_plugin,ligamina_nonebot.inventory_smoke_plugin"
     environment["LIGAMINA_NONEBOT_NICKNAMES"] = "Bot"
     process = subprocess.Popen(
         [sys.executable, "-m", "ligamina_nonebot.worker"],
@@ -82,6 +82,13 @@ def main() -> None:
         })
         assert initialized["ready"] is True
         assert initialized["protocol_version"] == "0.1"
+        inventory = initialized["inventory"]
+        assert inventory["schema_version"] == 1 and inventory["ecosystem"] == "nonebot"
+        assert {item["name"] for item in inventory["capabilities"]["commands"]["items"]} >= {"inventory.echo"}
+        assert {item["kind"] for item in inventory["capabilities"]["handlers"]["items"]} >= {
+            "message", "keyword", "regex", "startswith", "endswith", "fullmatch", "notice",
+        }
+        assert "inventory" in request(process, "runtime.capabilities", {})
         assert initialized["capabilities"] == [{
             "capability_id": "ligamina.nonebot.math.add",
             "input_schema": {

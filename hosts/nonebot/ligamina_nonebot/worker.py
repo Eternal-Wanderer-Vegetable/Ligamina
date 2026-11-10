@@ -13,6 +13,7 @@ from .commands import describe_commands
 from .contracts import event_error_code, validate_command_descriptor
 from .capabilities import CapabilityError, capability_descriptors, invoke_capability
 from .lifecycle import HostLifecycle, configured_plugins
+from .inventory import describe_runtime_inventory
 
 PROTOCOL_VERSION = "0.1"
 MAX_FRAME_BYTES = 1024 * 1024
@@ -128,6 +129,7 @@ class Worker:
                 "protocol_version": PROTOCOL_VERSION,
                 "capabilities": capability_descriptors(),
                 "commands": self._commands(),
+                "inventory": self._inventory(),
             }
         if method == "event.dispatch":
             self._require_ready()
@@ -156,7 +158,7 @@ class Worker:
             }
         if method == "runtime.capabilities":
             self._require_ready()
-            return {"capabilities": capability_descriptors(), "commands": self._commands()}
+            return {"capabilities": capability_descriptors(), "commands": self._commands(), "inventory": self._inventory()}
         if method in {"runtime.stop", "host.shutdown"}:
             self._draining = True
             current = asyncio.current_task()
@@ -182,6 +184,10 @@ class Worker:
             else:
                 valid.append(descriptor)
         return valid
+
+    def _inventory(self) -> dict[str, Any]:
+        driver = self._lifecycle.driver if self._lifecycle is not None else None
+        return describe_runtime_inventory(driver)
 
     def _require_ready(self, *, allow_draining: bool = False) -> None:
         if not self._ready or self._stopping or (self._draining and not allow_draining):

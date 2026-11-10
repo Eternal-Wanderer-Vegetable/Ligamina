@@ -1,6 +1,7 @@
 """Boot the real AstrBot lifecycle headless and dispatch events through the bridge."""
 
 import asyncio
+import json
 import os
 import sys
 import tempfile
@@ -44,7 +45,17 @@ async def main() -> None:
         await lifecycle.start([str(HERE / "fixtures" / "ligamina_smoke")])
         try:
             from ligamina_astrbot.commands import describe_commands
+            from ligamina_astrbot.inventory import describe_runtime_inventory
+            from jsonschema import Draft202012Validator
 
+            schema_path = HERE.parents[3] / "contracts" / "lab" / "inventory" / "v1" / "capability-inventory.schema.json"
+            schema = json.loads(schema_path.read_text(encoding="utf-8"))
+            inventory = describe_runtime_inventory(lifecycle)
+            assert list(Draft202012Validator(schema).iter_errors(inventory)) == [], inventory
+            assert inventory["source"]["kind"] == "runtime"
+            assert {item["name"] for item in inventory["capabilities"]["commands"]["items"]} >= {
+                "ligamina_echo", "ligamina_add", "ligamina_twice", "ligamina_admin", "ligamina_proactive",
+            }
             commands = describe_commands()
             print(commands, file=sys.stderr)
             for descriptor in commands:

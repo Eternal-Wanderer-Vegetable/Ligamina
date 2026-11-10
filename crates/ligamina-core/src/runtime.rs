@@ -130,6 +130,7 @@ pub struct CoreRuntime {
     broker: CapabilityBroker,
     router: EventRouter,
     commands: CommandCatalog,
+    runtime_inventories: Arc<RwLock<HashMap<String, (u64, Value)>>>,
     tool_sessions: ToolSessions,
     active_generations: Arc<Mutex<HashMap<String, u64>>>,
     lifecycle_stop: CancellationToken,
@@ -372,6 +373,7 @@ impl CoreRuntime {
             broker,
             router,
             commands: CommandCatalog::new(),
+            runtime_inventories: Arc::new(RwLock::new(HashMap::new())),
             tool_sessions,
             active_generations: Arc::new(Mutex::new(HashMap::new())),
             lifecycle_stop: CancellationToken::new(),
@@ -397,6 +399,27 @@ impl CoreRuntime {
 
     pub fn commands(&self) -> &CommandCatalog {
         &self.commands
+    }
+
+    /// Returns the latest optional runtime inventory from each active Host.
+    /// Inventories remain separate from MCP command descriptors and are scoped
+    /// to the Host generation that reported them.
+    pub async fn runtime_inventories(&self) -> Vec<Value> {
+        let mut inventories = self
+            .runtime_inventories
+            .read()
+            .await
+            .iter()
+            .map(|(host_id, (epoch, inventory))| {
+                json!({ "host_id": host_id, "host_epoch": epoch, "inventory": inventory })
+            })
+            .collect::<Vec<_>>();
+        inventories.sort_by(|left, right| {
+            left.get("host_id")
+                .and_then(Value::as_str)
+                .cmp(&right.get("host_id").and_then(Value::as_str))
+        });
+        inventories
     }
 
     /// Tool-session operations refused after their command had already returned.
@@ -567,6 +590,7 @@ impl CoreRuntime {
             self.broker.deactivate_host(&host_id, epoch).await;
             self.commands.deactivate_host(&host_id, epoch).await;
         }
+        self.runtime_inventories.write().await.clear();
     }
 
     async fn sync_host_generations(&self) -> Result<(), CoreRuntimeError> {
@@ -587,6 +611,7 @@ impl CoreRuntime {
                 generations.remove(&host_id);
                 self.broker.deactivate_host(&host_id, epoch).await;
                 self.commands.deactivate_host(&host_id, epoch).await;
+                self.runtime_inventories.write().await.remove(&host_id);
             }
         }
 
@@ -606,6 +631,7 @@ impl CoreRuntime {
             if let Some(old_epoch) = current {
                 self.broker.deactivate_host(&status.id, old_epoch).await;
                 self.commands.deactivate_host(&status.id, old_epoch).await;
+                self.runtime_inventories.write().await.remove(&status.id);
             }
             self.broker.activate_host(&status.id, status.epoch).await?;
             let handle = self.supervisor.handle(&status.id).await?;
@@ -641,6 +667,17 @@ impl CoreRuntime {
             {
                 eprintln!("Host {} command omitted: {rejected}", status.id);
             }
+            if let Some(inventory) = result
+                .get("inventory")
+                .filter(|value| is_runtime_inventory(value))
+            {
+                self.runtime_inventories
+                    .write()
+                    .await
+                    .insert(status.id.clone(), (status.epoch, inventory.clone()));
+            } else {
+                self.runtime_inventories.write().await.remove(&status.id);
+            }
             self.active_generations
                 .lock()
                 .await
@@ -663,6 +700,71 @@ impl CoreRuntime {
                 }
             }
         });
+    }
+}
+
+fn is_runtime_inventory(value: &Value) -> bool {
+    value.get("schema_version").and_then(Value::as_u64) == Some(1)
+        && value
+            .get("source")
+            .and_then(|source| source.get("kind"))
+            .and_then(Value::as_str)
+            == Some("runtime")
+        && value
+            .get("source")
+            .and_then(|source| source.get("confidence"))
+            .and_then(Value::as_str)
+            == Some("observed")
+        && value
+            .get("plugin")
+            .and_then(|plugin| plugin.get("package"))
+            .and_then(Value::as_str)
+            .is_some_and(|package| !package.trim().is_empty())
+        && [
+            "commands",
+            "handlers",
+            "services",
+            "schedulers",
+            "configuration",
+        ]
+        .iter()
+        .all(|key| {
+            value
+                .get("capabilities")
+                .and_then(|capabilities| capabilities.get(key))
+                .and_then(Value::as_object)
+                .is_some()
+        })
+}
+
+#[cfg(test)]
+mod inventory_tests {
+    use super::is_runtime_inventory;
+    use serde_json::json;
+
+    #[test]
+    fn accepts_only_observed_runtime_inventory_shapes() {
+        let inventory = json!({
+            "schema_version": 1,
+            "plugin": { "package": "fixture" },
+            "source": { "kind": "runtime", "confidence": "observed" },
+            "capabilities": {
+                "commands": {}, "handlers": {}, "services": {},
+                "schedulers": {}, "configuration": {}
+            }
+        });
+        assert!(is_runtime_inventory(&inventory));
+
+        let mut static_record = inventory.clone();
+        static_record["source"]["kind"] = json!("static");
+        assert!(!is_runtime_inventory(&static_record));
+
+        let mut incomplete = inventory;
+        incomplete["capabilities"]
+            .as_object_mut()
+            .unwrap()
+            .remove("handlers");
+        assert!(!is_runtime_inventory(&incomplete));
     }
 }
 

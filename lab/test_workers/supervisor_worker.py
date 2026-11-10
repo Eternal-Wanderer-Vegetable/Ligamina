@@ -48,6 +48,30 @@ def main() -> None:
         if method == "host.initialize":
             ready = os.environ.get("LIGAMINA_TEST_INIT_FAIL") != "1"
             result = {"ready": ready, "protocol_version": "0.1"}
+        elif method == "runtime.capabilities":
+            result = {
+                "capabilities": [],
+                "commands": [],
+                "inventory": {
+                    "schema_version": 1,
+                    "ecosystem": "nonebot",
+                    "plugin": {"package": os.environ.get("LIGAMINA_TEST_INVENTORY_PACKAGE", "core-runtime-inventory-fixture")},
+                    "source": {
+                        "kind": "runtime",
+                        "collector": "supervisor-test/1",
+                        "confidence": "observed",
+                        "evidence": [{"reference": "test fixture"}],
+                    },
+                    "capabilities": {
+                        "commands": {"status": "observed", "items": []},
+                        "handlers": {"status": "observed", "items": []},
+                        "services": {"status": "unavailable", "items": [], "reason": "fixture"},
+                        "schedulers": {"status": "unavailable", "items": [], "reason": "fixture"},
+                        "configuration": {"status": "unavailable", "items": [], "reason": "fixture"},
+                    },
+                    "limitations": [],
+                },
+            }
         elif method == "host.call-core":
             result = call_core("core.test", params)
         elif method == "host.echo":

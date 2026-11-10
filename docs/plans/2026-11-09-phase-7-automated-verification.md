@@ -74,6 +74,17 @@
 - 非命令处理器只进清单，不自动成为 MCP 工具；是否把 Alconna 命令暴露为工具单独评估，不扩大 ADR 0002 的范围。
 - 质量测量：按生态分层抽 60 个已加载条目（每生态 20），人工从源码标注命令与处理器，计算发现率、误识别率与漏识别原因。
 
+**P7-01 检查点（2026-11-10）：** 合同与正/负 fixture 已加；NoneBot、Koishi、AstrBot 的 `runtime.capabilities` 都返回 runtime inventory，Core 以 Host ID/epoch 独立保存并在停机/代际变化时清理。静态 scanner 从锁定发布物只读源码，并将运行时与静态来源分开。60 个样本和单人源码标注见[样本](../../outputs/acceptance/p7-p701-static-samples-20261110.json)、[标注](../../outputs/acceptance/p7-p701-manual-annotations-20261110.json)与[质量报告](../../outputs/acceptance/p7-p701-inventory-quality-20261110.json)。
+
+| 范围 | 命令 TP/FP/FN/TN | Presence recall | Presence FPR |
+| --- | ---: | ---: | ---: |
+| Koishi (n=20) | 13/0/0/7 | 13/13 (100%) | 0/7 (0%) |
+| NoneBot (n=20) | 16/0/0/4 | 16/16 (100%) | 0/4 (0%) |
+| AstrBot (n=20) | 16/0/0/4 | 16/16 (100%) | 0/4 (0%) |
+| 合计 | 45/0/0/15 | 45/45 (100%) | 0/15 (0%) |
+
+处理器 presence（包含各 Host 的非命令事件处理器及 AstrBot `llm_tool`）：Koishi TP/FP/FN/TN=`9/0/0/11`，NoneBot=`8/0/0/12`，AstrBot=`14/0/0/6`，合计=`31/0/0/29`。本指标只判断样本中是否至少有一个相应注册，不统计注册数、不比较名称精度；动态名称在静态清单中标为 `name_confidence=unknown`。样本是按 registry ID 与缓存可用性确定的非随机子集，标签由 Codex 单次源码审阅，没有独立第二审阅者；因此该检查点达到计划的样本 presence 90% 门槛，但不能外推为万级目录的精确率。没有样本级 command/handler presence 漏项；未命名动态注册与包内源码/构建副本去重留给后续 discovery 精度测量。
+
 ### 3.2 场景合同与输入生成（P7-02）
 
 新增 `contracts/lab/scenario/v1/`，把 behavior v2 与工具用例统一成可生成的场景：`actors`、`conversations`、`steps`（事件或工具调用）、`controls`（种子、时区、网络）、`relation`（`differential`、性质 ID 或变形关系 ID）。场景由生成器产出，不手改；同一 `(清单哈希, 生成器版本, 种子)` 必须生成相同场景（单测保证）。
@@ -182,7 +193,7 @@ P7-03、P7-08 与 P7-04 可并行。P7-04 与 P7-06 是两个决策点，见第 
 - **Oracle 边界**：差分只证明与原生一致。依赖网络的插件在禁网下只会走错误路径，结论 scope 必须写“仅错误路径”。依赖 LLM provider 的 AstrBot 插件同理。
 - **原生基线自身的偏差**：stock runner 与真实部署存在配置差异；原生侧异常要单独标记，不能混入兼容结论。
 - **规模成本**：每条目 3 次 Worker 运行，全量时长只能在 P7-04 后估算；预算超出时先按生态分批。
-- **任务顺序**：P6-01 / feat-030 已于 2026-11-10 完成；受控重复投递和 SQLite 账本去重见[第六阶段计划](2026-11-08-phase-6-runtime-reliability.md) 3.1d。当前 active feature 为 P7-01 / feat-046。受控本地重复投递不代表真实 QQ 重复投递观察。
+- **任务顺序**：P6-01 / feat-030 于 2026-11-10 完成；受控重复投递和 SQLite 账本去重见[第六阶段计划](2026-11-08-phase-6-runtime-reliability.md) 3.1d。P7-01 / feat-046 于 2026-11-10 完成，当前 active feature 为 P7-02 / feat-047。P7-01 的样本指标为源码声明 presence，不是插件运行时 discovery 或全目录估计。受控本地重复投递不代表真实 QQ 重复投递观察。
 
 ## 8. 验证命令（规划阶段）
 

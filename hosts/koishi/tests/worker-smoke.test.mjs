@@ -84,6 +84,14 @@ test('Koishi stdio worker initializes, dispatches natively, calls the gateway, a
     })
     assert.equal(initialized.ready, true)
     assert.equal(initialized.protocol_version, '0.1')
+    const inventory = initialized.inventory
+    assert.equal(inventory.schema_version, 1)
+    assert.equal(inventory.ecosystem, 'koishi')
+    assert.equal(inventory.source.kind, 'runtime')
+    assert.ok(inventory.capabilities.commands.items.some((item) => item.name === 'ligamina.secure'))
+    assert.ok(inventory.capabilities.handlers.items.some((item) => item.kind === 'message_listener' && item.name === 'message'))
+    assert.ok(inventory.capabilities.services.items.some((item) => item.name === '$commander'))
+    assert.equal(inventory.capabilities.schedulers.status, 'unavailable')
     assert.deepEqual(initialized.capabilities, [{
       capability_id: 'ligamina.koishi.math.add',
       input_schema: {
@@ -102,6 +110,9 @@ test('Koishi stdio worker initializes, dispatches natively, calls the gateway, a
       capability_id: 'ligamina.koishi.math.add',
       arguments: { left: 19, right: 23 },
     }), 42)
+    const refreshed = await rpc('runtime.capabilities', {})
+    assert.equal(refreshed.inventory.ecosystem, 'koishi')
+    assert.match(refreshed.inventory.plugin.package, /bridge-smoke-plugin/)
     assert.equal((await rpcError('capability.invoke', {
       capability_id: 'ligamina.koishi.math.add',
       arguments: { left: '19', right: 23 },

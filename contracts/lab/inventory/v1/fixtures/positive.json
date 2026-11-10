@@ -1,0 +1,24 @@
+{
+  "schema_version": 1,
+  "ecosystem": "nonebot",
+  "plugin": {
+    "registry_entry_id": "fixture-nonebot-positive",
+    "package": "inventory_fixture",
+    "version": "1.0.0",
+    "artifact_sha256": "0000000000000000000000000000000000000000000000000000000000000000"
+  },
+  "source": {
+    "kind": "runtime",
+    "collector": "nonebot-inventory/1",
+    "confidence": "observed",
+    "evidence": [{ "reference": "nonebot.matcher.matchers[1]" }]
+  },
+  "capabilities": {
+    "commands": { "status": "observed", "items": [{ "kind": "command", "name": "echo", "evidence": [{ "reference": "CommandRule.cmds" }] }] },
+    "handlers": { "status": "observed", "items": [{ "kind": "keyword", "name": "hello", "evidence": [{ "reference": "KeywordsRule.keywords" }] }] },
+    "services": { "status": "unavailable", "items": [], "reason": "NoneBot has no shared service registry for this collector." },
+    "schedulers": { "status": "unavailable", "items": [], "reason": "Scheduler registrations are owned by optional plugins." },
+    "configuration": { "status": "unavailable", "items": [], "reason": "Plugin configuration schemas are not exposed by the matcher registry." }
+  },
+  "limitations": ["Inventory reports framework-visible registrations only."]
+}
