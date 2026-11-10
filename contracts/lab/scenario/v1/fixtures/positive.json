@@ -1,0 +1,48 @@
+{
+  "schema_version": 1,
+  "scenario_id": "scn-0123456789abcdef01234567",
+  "source_inventory_sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+  "command_descriptor_sha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+  "generator": {
+    "name": "ligamina-scenario-generator",
+    "version": "1",
+    "seed": 7
+  },
+  "relation": {
+    "kind": "differential",
+    "id": "native-vs-federated"
+  },
+  "actors": [
+    { "actor_id": "actor-1", "account_id": "test-account" }
+  ],
+  "conversations": [
+    { "conversation_id": "private-1", "kind": "private", "actor_id": "actor-1", "account_id": "test-account" }
+  ],
+  "steps": [
+    {
+      "step_id": "step-1",
+      "kind": "tool_call",
+      "host_id": "nonebot",
+      "actor_id": "actor-1",
+      "conversation_id": "private-1",
+      "command_id": "echo",
+      "invocation": "/echo",
+      "arguments": "hello",
+      "inputs": { "raw_text": "hello" }
+    }
+  ],
+  "controls": {
+    "random_seed": 7,
+    "timezone": "UTC",
+    "fixed_time_utc": "2026-10-26T00:00:00Z",
+    "network": "offline"
+  },
+  "normalization": {
+    "volatile_fields": ["event_id", "trace_id", "timestamp", "message_id", "duration_ms"]
+  },
+  "case": {
+    "kind": "raw_text",
+    "index": 0,
+    "pairwise": { "complete": true, "covered_pairs": 0, "total_pairs": 0 }
+  }
+}

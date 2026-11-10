@@ -1,8 +1,8 @@
 {
   "schema_version": 1,
   "updated_at": "2026-11-10",
-  "active_feature": "feat-047",
-  "next_feature": "feat-048",
+  "active_feature": "feat-048",
+  "next_feature": "feat-049",
   "features": [
     {
       "id": "feat-001",
@@ -2392,11 +2392,15 @@
       "dependencies": [
         "feat-045"
       ],
-      "status": "in-progress",
+      "status": "done",
       "done_when": "同一种子生成相同场景；类型域、pairwise、缩减有单测；不执行插件。",
-      "evidence": "2026-11-10 pre-change baseline: behavior-v2 contract and comparison suites passed 21/21; use isolated uv environment under .work because the shared lab/.venv was not removable.",
+      "evidence": "2026-11-10：场景/批次合同 v1、正负 fixtures、确定性类型生成与 Hypothesis shrink、pairwise、别名事件、NoneBot 原始文本、volatile 比较完成；未执行插件/Worker。P7-01/P7-02 相关 Lab 测试 14/14、py_compile、diff check 通过。使用独立 uv 环境，保留共享 lab/.venv。基线和实现报告分别记录于 evidence paths。",
       "evidence_paths": [
-        "outputs/acceptance/p7-p702-baseline-20261110.json"
+        "outputs/acceptance/p7-p702-baseline-20261110.json",
+        "outputs/acceptance/p7-p702-generation-20261110.json",
+        "contracts/lab/scenario/v1/scenario.schema.json",
+        "lab/scenario_generator.py",
+        "lab/tests/test_scenario_generator.py"
       ],
       "plan_path": "docs/plans/2026-11-09-phase-7-automated-verification.md"
     },
@@ -2408,7 +2412,7 @@
       "dependencies": [
         "feat-045"
       ],
-      "status": "not-started",
+      "status": "in-progress",
       "done_when": "teamup/gallery/pet 在原生基线与 Federated 下按 AB-05 Oracle 一致；原生侧不导入 Bridge。",
       "evidence": "",
       "evidence_paths": [],
