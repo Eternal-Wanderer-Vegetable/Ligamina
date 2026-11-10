@@ -165,6 +165,10 @@
 
 Koishi 2,002 条 Linux skipped 主要因缺 Host 服务。为高频服务提供离线 provider profile：内存数据库（`@koishijs/plugin-database-memory`）、本地存储、禁网下的 `http`（只能走错误路径，scope 写明）。NoneBot 的 `localstore`、`apscheduler` 等常见依赖同理。配置取 schema 默认值；必填且无默认的凭证类配置记 `skipped/missing_credentials`。每个 profile 单独锁定、单独记账，不覆盖 core-only 的历史结论。
 
+**P7-08 完成 checkpoint（2026-11-10）：** [profile admission](../../outputs/acceptance/p7-p708-profile-admission-20261110-final.json)，SHA-256 `af1bd8b03656cf3567aa60dc66964c252626cdcf37bd671a28c2368a8091660b`；当前 P3 Linux Worker benign probe 10/10 通过、cleanup 全确认，admission SHA-256 `4b63399b6a11f0f3856b22c8b386b901973115dc3ce72cb75f015a09f4de704a`。固定 runtime image 再探针通过（Linux x86_64、Python 3.12.14、Node 24.20.0、禁网、无 Oracle contracts）。Koishi 独立组合 lock SHA-256 `3ffc3b0f30c20d4921b5a8f1ca270c678adde9550feaca389114704733a8d959`，含原先因缺 `database` / `cron` skipped 的 `koishi-plugin-auto-checkin-all@1.0.3` 与 database-memory、cron、localstorage、http providers；实际 runtime services 全部可见，命令“立即打卡”已发现。该插件的 ready hook 要求至少发现一个群，因此仅此 load-only profile 提供 synthetic `p7-offline-account` / `p7-offline-group`；0 个事件派发、禁网、不请求 HTTP、不调用签到处理器。NoneBot `nonebot_plugin_picstatus@2.3.1` 使用原 hash-locked profile 另加 `nonebot-plugin-localstore==0.7.4` 与 `nonebot-plugin-apscheduler==0.5.0`，三个 provider 模块均加载。两次 profile Worker 均 `completed`，cleanup 2/2 confirmed；没有运行差分场景或行为 Oracle。原 P3 skipped 记录保持原样，新结论只表示此扩展 profile 下 load 和服务可见。
+
+诊断修复：Koishi provider resolver 现递归解开 CJS `default.default` 并识别命名 callable export；Node regression 3/3。超时 Worker 保留限长 stderr 诊断摘要，相关 Lab tests 6/6。完整本地和 CI 验证见 PR 与当前 `progress.md`。
+
 ## 4. 任务
 
 依赖只写工程依赖；全部第三方执行都要求已准入的 Linux Worker。
@@ -179,7 +183,7 @@ Koishi 2,002 条 Linux skipped 主要因缺 Host 服务。为高频服务提供�
 | P7-06 / feat-051 | P7-04、P7-05 | 框架变异体、合成插件、检出率报告 | 每个变异体至少被一层检出，或存活原因已写明；分层检出率进入报告；PR 上运行一组小变异体回归 |
 | P7-07 / feat-052 | P7-04 | 有状态序列生成、依赖推断、以原生为前提的变形关系 | 合成组队/计数器插件的序列缺陷被检出；pilot 中适用关系的条目给出结论，不适用的记录原因 |
 | P7-08 / feat-053 | P7-01 | Koishi/NoneBot 常用服务与配置 profile | 每个 profile 有锁与准入；在曾因缺服务 skipped 的条目抽样上，新 profile 的 load 结论单独记账 |
-| P7-09 / feat-054 | P7-03、P7-05、P7-06 | 全量 Linux campaign：先补 AstrBot 全量加载普查，再对所有加载通过条目跑清单、契约、差分；状态序列按 P7-07 结果决定范围 | 分母守恒（每个已加载条目都有终态或明确 skipped/unknown 原因）；清理全部确认；增量键可复跑；unknown 不改写为通过 |
+| P7-09 / feat-054 | P7-03、P7-05、P7-06、P7-08，且通过 P7-04 pilot gate | 全量 Linux campaign：先补 AstrBot 全量加载普查，再对所有加载通过条目跑清单、契约、差分；状态序列按 P7-07 结果决定范围 | 分母守恒（每个已加载条目都有终态或明确 skipped/unknown 原因）；清理全部确认；增量键可复跑；unknown 不改写为通过 |
 | P7-10 / feat-055 | P7-09 | 矩阵 v2（新增 `discovery`、`contract`、`differential`、`stateful` 及覆盖度）、报告、指南与 CI | v1 矩阵与 schema 保持不变；v2 每条结论引用证据与哈希；`check` 在证据变化时失败；兼容性指南与 README 不新增支持名单 |
 
 P7-03、P7-08 与 P7-04 可并行。P7-04 与 P7-06 是两个决策点，见第 5 节。
@@ -191,7 +195,7 @@ P7-03、P7-08 与 P7-04 可并行。P7-04 与 P7-06 是两个决策点，见第 
 | 检查点 | 时机 | 继续的条件 | 不满足时 |
 | --- | --- | --- | --- |
 | 能力能否自动发现 | P7-01 结束 | 命令发现率达标，漏识别原因可归类 | 先补发现规则，或缩小 P7-04 范围到可发现的类别 |
-| 生成的输入能否触达有效路径 | P7-04 结束 | nontrivial 命令占比至少 30%、unknown 不超过 50%、三轮结论一致且清理全确认。30% 要求至少每三条执行命令触达一条用法提示外路径；unknown 上限避免全量预算主要耗在不可判定输入。 | 当前 15.8% nontrivial、92.5% unknown；先完成 P7-05–08 并复核 profile/生成器，不准入 P7-09。 |
+| 生成的输入能否触达有效路径 | P7-04 结束并在 P7-05–08 完成后复核 | nontrivial 命令占比至少 30%、unknown 不超过 50%、三轮结论一致且清理全确认。30% 要求至少每三条执行命令触达一条用法提示外路径；unknown 上限避免全量预算主要耗在不可判定输入。 | P7-08 已恢复一个缺服务 Koishi sample 的 load，并扩展 NoneBot profile；P7-04 pilot 仍为 15.8% nontrivial、92.5% unknown。两项定量门槛均失败，因此 P7-09 / feat-054 为 blocked、未准入；不要开始全量 campaign 或把 unknown 改写为通过。retry3 明细另显示 13 个 Koishi 条目三轮 Federated Host 均因 `host stdout reached EOF` 失败启动、未暴露命令工具，具体根因未知；先诊断单个精确条目，修复或确认插件前置条件后重跑 pilot。 |
 | 测试能否识别缺陷 | P7-06 结束 | 变异体全部检出或存活原因可接受 | 补检查项后重测，不进入全量 |
 
 ## 6. 不采纳或暂缓
@@ -211,7 +215,7 @@ P7-03、P7-08 与 P7-04 可并行。P7-04 与 P7-06 是两个决策点，见第 
 - **Oracle 边界**：差分只证明与原生一致。依赖网络的插件在禁网下只会走错误路径，结论 scope 必须写“仅错误路径”。依赖 LLM provider 的 AstrBot 插件同理。
 - **原生基线自身的偏差**：stock runner 与真实部署存在配置差异；原生侧异常要单独标记，不能混入兼容结论。
 - **规模成本**：每条目 3 次 Worker 运行，全量时长只能在 P7-04 后估算；预算超出时先按生态分批。
-- **任务顺序**：P6-01 / feat-030 于 2026-11-10 完成；受控重复投递和 SQLite 账本去重见[第六阶段计划](2026-11-08-phase-6-runtime-reliability.md) 3.1d。P7-01 至 P7-07（feat-046–052）均于 2026-11-10 完成，当前 active feature 为 P7-08 / feat-053。P7-01 的样本指标为源码声明 presence，不是运行时 discovery 或全目录估计；P7-03 只覆盖三个已验收 AstrBot 插件与 AB-05 用例。P7-04 30+30 pilot 的 unknown/nontrivial gate 未达全量门槛；P7-09 当前不准入，先完成 P7-08 后复核。受控本地重复投递不代表真实 QQ 重复事件观察。
+- **任务顺序**：P6-01 / feat-030 于 2026-11-10 完成；受控重复投递和 SQLite 账本去重见[第六阶段计划](2026-11-08-phase-6-runtime-reliability.md) 3.1d。P7-01 至 P7-08（feat-046–053）均于 2026-11-10 完成。P7-01 的样本指标为源码声明 presence，不是运行时 discovery 或全目录估计；P7-03 只覆盖三个已验收 AstrBot 插件与 AB-05 用例。P7-04 30+30 pilot 的 nontrivial/unknown gate 在 P7-08 profile 复核后仍未达门槛；当前唯一阻塞项为 P7-09 / feat-054，tracker 的 `active_feature` 按约定为 null；P7-10 依赖 P7-09，二者均不得宣称完成。受控本地重复投递不代表真实 QQ 重复事件观察。
 
 ## 8. 验证命令（规划阶段）
 

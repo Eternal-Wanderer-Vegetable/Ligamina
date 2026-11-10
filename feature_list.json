@@ -1,8 +1,8 @@
 {
   "schema_version": 1,
   "updated_at": "2026-11-10",
-  "active_feature": "feat-053",
-  "next_feature": "feat-054",
+  "active_feature": null,
+  "next_feature": "feat-055",
   "features": [
     {
       "id": "feat-001",
@@ -2534,10 +2534,23 @@
       "dependencies": [
         "feat-046"
       ],
-      "status": "in-progress",
+      "status": "done",
       "done_when": "每个 profile 有锁与准入；曾因缺服务 skipped 的抽样条目在新 profile 下单独记账，不覆盖历史结论。",
-      "evidence": "",
-      "evidence_paths": [],
+      "evidence": "2026-11-10：Koishi 与 NoneBot 离线 service profile 均在当前 admitted Linux Worker 与精确 P7 runtime image 中 load-only 通过，Worker cleanup 2/2 confirmed。Koishi 原先因缺 database/cron 被 skip 的 koishi-plugin-auto-checkin-all@1.0.3，在独立 profile 下观察到 database、cron、localstorage、http；使用 p7-offline-account/group 满足其 ready-hook 群发现前置条件，零事件、禁网、不触发签到调用，原 core-only skip 记录未覆盖。NoneBot nonebot_plugin_picstatus@2.3.1 在独立 profile 下加载 localstore 与 scheduler。报告 outputs/acceptance/p7-p708-profile-admission-20261110-final.json SHA-256 af1bd8b03656cf3567aa60dc66964c252626cdcf37bd671a28c2368a8091660b；当前 benign admission SHA-256 4b63399b6a11f0f3856b22c8b386b901973115dc3ce72cb75f015a09f4de704a。profile 只证明 load 与服务可见，不声明插件行为或兼容支持。",
+      "evidence_paths": [
+        "lab/automation/p7_service_profiles.py",
+        "lab/automation/phase4_worker_side.py",
+        "lab/baselines/koishi/plugin_export.mjs",
+        "lab/baselines/koishi/runner.mjs",
+        "samples/profiles/p7-koishi-offline-services-v1.json",
+        "samples/profiles/p7-nonebot-offline-services-v1.json",
+        "outputs/acceptance/phase7-linux-probes-p708-20261110.json",
+        "outputs/acceptance/phase7-linux-admission-p708-20261110.json",
+        "outputs/acceptance/p7-p708-profile-admission-20261110-final.json",
+        "hosts/koishi/tests/plugin-export.test.mjs",
+        "lab/tests/test_p7_service_profiles.py",
+        "lab/tests/test_native_runner.py"
+      ],
       "plan_path": "docs/plans/2026-11-09-phase-7-automated-verification.md"
     },
     {
@@ -2548,12 +2561,17 @@
       "dependencies": [
         "feat-048",
         "feat-050",
-        "feat-051"
+        "feat-051",
+        "feat-053"
       ],
-      "status": "not-started",
+      "status": "blocked",
       "done_when": "分母守恒；清理全部确认；增量键可复跑；unknown 不改写为通过。",
-      "evidence": "",
-      "evidence_paths": [],
+      "evidence": "P7-09 remains not admitted after the completed P7-08 profile review: P7-04 retry3 is still 21/133 nontrivial (15.8%) and 123/133 unknown (92.5%), failing the required >=30% and <=50% pilot thresholds. Three-round consistency and all 330 cleanups passed, but the two quantitative gates did not. Retry3 detail also shows 13 Koishi entries with three repeated Federated Host startup failures each (no command tools; safe diagnostic: host stdout reached EOF); the root cause is unknown and should be isolated on one exact entry before another pilot. No full AstrBot inventory or all-catalog campaign was started; unknowns remain unknown.",
+      "evidence_paths": [
+        "outputs/acceptance/p7-p704-differential-pilot-20261110-retry3.json",
+        "outputs/acceptance/p7-p708-profile-admission-20261110-final.json",
+        "docs/plans/2026-11-09-phase-7-automated-verification.md"
+      ],
       "plan_path": "docs/plans/2026-11-09-phase-7-automated-verification.md"
     },
     {
