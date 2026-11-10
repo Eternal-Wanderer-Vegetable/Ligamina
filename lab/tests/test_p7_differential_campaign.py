@@ -11,6 +11,7 @@ from lab.automation.p7_differential_campaign import (
     _command_summary,
     _discovery_skip_domain,
     _discovery_terminal_state,
+    _event_from_scenario,
     _nontrivial_commands,
     _round_scenario_results,
     _write_final,
@@ -34,6 +35,63 @@ def _observation(message: str, event_id: str = "evt-1") -> dict[str, object]:
 
 
 class DifferentialCampaignTests(unittest.TestCase):
+    def test_koishi_scenario_maps_stable_message_id_to_platform_extension(self) -> None:
+        scenario = {
+            "scenario_id": "scn-example",
+            "steps": [{
+                "kind": "event",
+                "event": {
+                    "event_id": "event-example",
+                    "platform": "onebot.v11",
+                    "extensions": {"onebot.v11": {"message_id": "message-example"}},
+                },
+            }],
+        }
+
+        event = _event_from_scenario(scenario, ecosystem="koishi")
+
+        self.assertEqual(event["platform"], "koishi")
+        self.assertEqual(event["extensions"]["koishi"]["message_id"], "message-example")
+        self.assertEqual(event["extensions"]["onebot.v11"]["message_id"], "message-example")
+
+    def test_koishi_scenario_generates_message_id_when_native_extension_is_absent(self) -> None:
+        scenario = {
+            "scenario_id": "scn-example",
+            "steps": [{
+                "kind": "event",
+                "event": {"event_id": "event-example", "extensions": {}},
+            }],
+        }
+
+        event = _event_from_scenario(scenario, ecosystem="koishi")
+
+        self.assertRegex(event["extensions"]["koishi"]["message_id"], r"^[0-9]+$")
+
+    def test_generated_group_conversation_is_preserved_in_pilot_event(self) -> None:
+        scenario = {
+            "scenario_id": "scn-example",
+            "actors": [{"actor_id": "actor-1", "account_id": "account-1"}],
+            "conversations": [{
+                "conversation_id": "group-1",
+                "kind": "group",
+                "actor_id": "actor-1",
+                "account_id": "account-1",
+            }],
+            "controls": {"fixed_time_utc": "2026-11-10T00:00:00Z"},
+            "steps": [{
+                "kind": "tool_call",
+                "host_id": "koishi",
+                "actor_id": "actor-1",
+                "conversation_id": "group-1",
+                "invocation": "hello",
+                "arguments": "world",
+            }],
+        }
+
+        event = _event_from_scenario(scenario, ecosystem="koishi")
+
+        self.assertEqual(event["conversation"], {"kind": "group", "id": "group-1"})
+
     def test_clean_discovery_failure_is_a_skipped_terminal_state(self) -> None:
         result = _discovery_terminal_state({
             "status": "failed",
@@ -137,6 +195,8 @@ class DifferentialCampaignTests(unittest.TestCase):
             phase4_campaign._copy_python_sources(project)
 
             self.assertTrue((project / "lab/baselines/koishi/artifact_fingerprint.mjs").is_file())
+            self.assertTrue((project / "contracts/lab/v1/catalog.schema.json").is_file())
+            self.assertTrue((project / "contracts/lab/v1/run.schema.json").is_file())
 
     def test_raw_diagnostic_is_replaced_with_scrubbed_summary_and_hash(self) -> None:
         result = _scrub_result_diagnostics({"diagnostic": "RuntimeError: password=private-value"})

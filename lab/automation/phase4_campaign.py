@@ -87,6 +87,11 @@ def _copy_python_sources(project: Path) -> None:
         "contracts/v0.1/platform-operation.schema.json",
         "contracts/v0.1/capability-descriptor.schema.json",
         "contracts/v0.2/command-descriptor.schema.json",
+        "contracts/lab/v1/catalog.schema.json",
+        "contracts/lab/v1/result.schema.json",
+        "contracts/lab/v1/summary.schema.json",
+        "contracts/lab/v1/run.schema.json",
+        "contracts/lab/v1/recipe.schema.json",
     )
     for relative in files:
         _copy_file(ROOT / relative, project / relative)

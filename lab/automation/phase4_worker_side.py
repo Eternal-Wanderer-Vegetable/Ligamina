@@ -269,6 +269,25 @@ def _prepare_profile(request: dict[str, Any]) -> dict[str, Any]:
         shutil.copytree(bundled_host_dist, bundled_host_root / "dist")
         (bundled_host_root / "node_modules").symlink_to(host_root / "node_modules", target_is_directory=True)
 
+        contract_source = Path("/input/project/contracts")
+        required_contracts = (
+            "v0.1/event-envelope.schema.json",
+            "v0.1/platform-operation.schema.json",
+            "v0.1/capability-descriptor.schema.json",
+            "v0.2/command-descriptor.schema.json",
+            "lab/v1/catalog.schema.json",
+            "lab/v1/result.schema.json",
+            "lab/v1/summary.schema.json",
+            "lab/v1/run.schema.json",
+        )
+        missing_contracts = [name for name in required_contracts if not (contract_source / name).is_file()]
+        if missing_contracts:
+            raise RuntimeError("bundled Koishi Host contract schemas are incomplete")
+        contract_root = Path("/work/contracts")
+        if contract_root.exists() or contract_root.is_symlink():
+            raise RuntimeError("Worker contract staging path already exists")
+        contract_root.symlink_to(contract_source, target_is_directory=True)
+
     resolver = _run(
         [
             "/usr/local/bin/node",

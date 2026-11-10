@@ -425,7 +425,10 @@ def _event_from_scenario(scenario: dict[str, Any], *, ecosystem: str) -> dict[st
             "trace_id": f"trace-{event_id}",
             "platform": "onebot.v11" if ecosystem == "nonebot" else "koishi",
             "account_id": scenario["actors"][0]["account_id"],
-            "conversation": {"kind": "private", "id": scenario["conversations"][0]["conversation_id"]},
+            "conversation": {
+                "kind": scenario["conversations"][0]["kind"],
+                "id": scenario["conversations"][0]["conversation_id"],
+            },
             "actor_id": scenario["actors"][0]["actor_id"],
             "timestamp": scenario["controls"]["fixed_time_utc"],
             "target_host": step["host_id"],
@@ -447,6 +450,15 @@ def _event_from_scenario(scenario: dict[str, Any], *, ecosystem: str) -> dict[st
         event["platform"] = "onebot.v11"
         event["conversation"] = {"kind": "private", "id": actor_id}
     else:
+        extensions = event.get("extensions") if isinstance(event.get("extensions"), dict) else {}
+        onebot = extensions.get("onebot.v11") if isinstance(extensions.get("onebot.v11"), dict) else {}
+        message_id = onebot.get("message_id")
+        if not isinstance(message_id, str) or not message_id:
+            message_id = str(int(hashlib.sha256(str(event["event_id"]).encode("utf-8")).hexdigest()[:8], 16) + 1)
+        koishi = extensions.get("koishi") if isinstance(extensions.get("koishi"), dict) else {}
+        koishi["message_id"] = message_id
+        extensions["koishi"] = koishi
+        event["extensions"] = extensions
         event["platform"] = "koishi"
     return event
 
@@ -476,6 +488,7 @@ def build_scenario_batch(candidate: dict[str, Any], runtime_commands: list[dict[
             descriptor=descriptor,
             host_id=candidate["ecosystem"],
             seed=seed,
+            conversation_kind="group",
             max_scenarios=16,
         )
         for scenario in batch.scenarios:
@@ -501,6 +514,7 @@ def build_scenario_batch(candidate: dict[str, Any], runtime_commands: list[dict[
         "inventory_sha256": inventory_sha,
         "generator_version": GENERATOR_VERSION,
         "seed": seed,
+        "conversation_kind": "group",
         "commands_valid": len(command_descriptors),
         "commands_invalid": invalid_descriptors,
         "scenarios": scenarios,

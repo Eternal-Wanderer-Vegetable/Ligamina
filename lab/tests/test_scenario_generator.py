@@ -127,6 +127,33 @@ class ScenarioGeneratorTests(unittest.TestCase):
         self.assertEqual(alias["controls"]["network"], "offline")
         self.assertEqual(alias["controls"]["fixed_time_utc"], "2026-10-26T00:00:00Z")
 
+    def test_group_profile_context_is_bound_to_generated_scenarios(self):
+        batch = generate_scenarios(
+            inventory_sha256=INVENTORY_SHA,
+            descriptor=_descriptor(),
+            host_id="koishi",
+            seed=17,
+            conversation_kind="group",
+        )
+
+        self.assertEqual(batch.to_dict()["generator"]["version"], "2")
+        for scenario in batch.scenarios:
+            self.assertEqual(scenario["conversations"][0]["kind"], "group")
+            self.assertTrue(scenario["conversations"][0]["conversation_id"].startswith("group-"))
+            step = scenario["steps"][0]
+            if step["kind"] == "event":
+                self.assertEqual(step["event"]["conversation"]["kind"], "group")
+
+    def test_invalid_conversation_kind_is_rejected(self):
+        with self.assertRaises(ScenarioGenerationError):
+            generate_scenarios(
+                inventory_sha256=INVENTORY_SHA,
+                descriptor=_descriptor(),
+                host_id="koishi",
+                seed=17,
+                conversation_kind="channel",
+            )
+
     def test_nonebot_untyped_command_uses_raw_text_and_fixed_controls(self):
         descriptor = {
             "framework": "nonebot",

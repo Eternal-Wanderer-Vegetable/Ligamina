@@ -15,7 +15,7 @@ from typing import Any, Callable, Iterable, Sequence
 from hypothesis import find, settings, strategies as st
 
 GENERATOR_NAME = "ligamina-scenario-generator"
-GENERATOR_VERSION = "1"
+GENERATOR_VERSION = "2"
 DEFAULT_FIXED_TIME = "2026-10-26T00:00:00Z"
 DEFAULT_VOLATILE_FIELDS = (
     "event_id",
@@ -226,6 +226,7 @@ def generate_scenarios(
     seed: int,
     max_scenarios: int = MAX_GENERATED_SCENARIOS,
     fixed_time_utc: str = DEFAULT_FIXED_TIME,
+    conversation_kind: str = "private",
 ) -> ScenarioBatch:
     """Generate deterministic, schema-shaped command cases; never loads or invokes a plugin."""
     if not SHA256_RE.fullmatch(inventory_sha256):
@@ -242,6 +243,8 @@ def generate_scenarios(
         raise ScenarioGenerationError("descriptor requires non-empty command_id and invocation")
     if not isinstance(host_id, str) or not host_id.strip():
         raise ScenarioGenerationError("host_id must be non-empty")
+    if conversation_kind not in {"private", "group"}:
+        raise ScenarioGenerationError("conversation_kind must be private or group")
     descriptor_hash = object_sha256(descriptor)
     rng = random.Random(int(hashlib.sha256(f"{inventory_sha256}:{descriptor_hash}:{seed}".encode()).hexdigest(), 16))
     factors = _descriptor_factors(descriptor, rng)
@@ -281,7 +284,7 @@ def generate_scenarios(
 
     actor_digest = hashlib.sha256(f"{inventory_sha256}:{host_id}:{seed}".encode()).hexdigest()[:16]
     actor_id = f"actor-{actor_digest}"
-    conversation_id = f"private-{actor_digest}"
+    conversation_id = f"{conversation_kind}-{actor_digest}"
     account_id = "ligamina-test-account"
     scenarios = []
     for index, (kind, inputs, alias) in enumerate(cases):
@@ -293,6 +296,7 @@ def generate_scenarios(
             "seed": seed,
             "index": index,
             "kind": kind,
+            "conversation_kind": conversation_kind,
             "inputs": inputs,
             "alias": alias,
         }
@@ -307,6 +311,7 @@ def generate_scenarios(
                 invocation=alias,
                 raw_arguments=raw_arguments,
                 fixed_time_utc=fixed_time_utc,
+                conversation_kind=conversation_kind,
             )
         else:
             step = {
@@ -330,7 +335,7 @@ def generate_scenarios(
             "actors": [{"actor_id": actor_id, "account_id": account_id}],
             "conversations": [{
                 "conversation_id": conversation_id,
-                "kind": "private",
+                "kind": conversation_kind,
                 "actor_id": actor_id,
                 "account_id": account_id,
             }],
@@ -527,6 +532,7 @@ def _option_token(option: dict[str, Any]) -> str:
 def _event_step(
     *, scenario_id: str, host_id: str, actor_id: str, conversation_id: str,
     account_id: str, invocation: str, raw_arguments: str, fixed_time_utc: str,
+    conversation_kind: str,
 ) -> dict[str, Any]:
     message = " ".join(item for item in (invocation, raw_arguments) if item)
     return {
@@ -541,7 +547,7 @@ def _event_step(
             "trace_id": f"trace-{scenario_id[4:]}",
             "platform": "onebot.v11",
             "account_id": account_id,
-            "conversation": {"kind": "private", "id": conversation_id},
+            "conversation": {"kind": conversation_kind, "id": conversation_id},
             "actor_id": actor_id,
             "timestamp": fixed_time_utc,
             "target_host": host_id,
@@ -567,6 +573,7 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--descriptor", type=Path, required=True)
     parser.add_argument("--host-id", required=True)
     parser.add_argument("--seed", type=int, required=True)
+    parser.add_argument("--conversation-kind", choices=("private", "group"), default="private")
     parser.add_argument("--output", type=Path, required=True)
     args = parser.parse_args(argv)
     if args.output.exists():
@@ -576,6 +583,7 @@ def main(argv: list[str] | None = None) -> int:
         descriptor=load_command_descriptor(args.descriptor),
         host_id=args.host_id,
         seed=args.seed,
+        conversation_kind=args.conversation_kind,
     )
     args.output.parent.mkdir(parents=True, exist_ok=True)
     args.output.write_text(json.dumps(batch.to_dict(), ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
