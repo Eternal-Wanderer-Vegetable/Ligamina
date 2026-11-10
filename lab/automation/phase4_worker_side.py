@@ -25,6 +25,7 @@ _SENSITIVE_VALUE = re.compile(
     r"(?i)(?:token|secret|password|authorization|api[_-]?key|cookie|credential)\s*[:=]\s*[^\s,;]+"
 )
 _LONG_VALUE = re.compile(r"(?<![A-Za-z0-9])[A-Fa-f0-9]{32,}(?![A-Za-z0-9])")
+_PYTHON_TRACEBACK_FRAME = re.compile(r"^\s*File [\"'](.+?)[\"'], line (\d+), in ([^\s]+)\s*$", re.MULTILINE)
 
 
 def _safe_diagnostic_summary(raw: str) -> str:
@@ -33,6 +34,13 @@ def _safe_diagnostic_summary(raw: str) -> str:
     if not lines:
         return "diagnostic output was empty"
     summary = lines[-1]
+    traceback_frames = _PYTHON_TRACEBACK_FRAME.findall(raw)
+    if traceback_frames:
+        frames = [
+            f"{re.split(r'[/\\\\]', filename)[-1][:120]}:{line}:{function[:96]}"
+            for filename, line, function in traceback_frames[-3:]
+        ]
+        summary = f"{summary} [trace: {' <- '.join(frames)}]"
     if summary.startswith("Node.js v"):
         errors = [
             line

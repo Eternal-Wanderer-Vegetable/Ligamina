@@ -293,8 +293,8 @@ async def _run(request: dict[str, Any]) -> dict[str, Any]:
     adapter._call_api = native_api
     events = case["stimulus"]["events"]
     bots: dict[str, Any] = {}
-    try:
-        async with driver._lifespan:
+    async with driver._lifespan:
+        try:
             for event in events:
                 account_id = str(event["account_id"])
                 bot = bots.get(account_id)
@@ -329,10 +329,10 @@ async def _run(request: dict[str, Any]) -> dict[str, Any]:
                     raise RuntimeError("stock OneBot adapter rejected the stimulus event")
                 current_event_id = str(event["event_id"])
                 await bot.handle_event(native_event)
-    finally:
-        for bot in bots.values():
-            if bot.self_id in adapter.bots:
-                adapter.bot_disconnect(bot)
+        finally:
+            for bot in bots.values():
+                if bot.self_id in adapter.bots:
+                    adapter.bot_disconnect(bot)
 
     bridge_modules = sorted(
         name for name in sys.modules
