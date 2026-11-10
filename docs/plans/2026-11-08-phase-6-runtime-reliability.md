@@ -121,6 +121,24 @@ P6-01 与 P6-02 合为下一个里程碑：P6-02 不需要真实账号，先行�
 
 未完成：重复事件投递（同一 OneBot 事件两次）无法由用户发送产生，未执行；MCP 路径不经 Core Gateway 账本，feat-030 要求的去重/账本状态证据需另以受控注入补齐。feat-030 因此为 in-progress，不是 done。
 
+### 3.1d P6-01 受控重复事件与账本去重（2026-11-10）
+
+以真实 Core、SQLite 账本、OneBot Gateway 和三个自有 Host 插件做受控集成；入站重复通过 `toEventEnvelope()` 转换后调用 `LigaminaClient.submitEvent()` 注入，出站由本地假 OneBot HTTP 端点记录。没有向真实 QQ 注入重复事件；本报告也不增加真实 QQ 投递次数。
+
+`clients/reference/tests-live/onebot-gateway.live.mjs` 针对 Koishi、NoneBot、AstrBot 各执行三轮独立测试，每轮使用新的 Core/SQLite 工作目录并在同一账本上重启 Core：
+
+| 生态 | Host 插件 | 独立轮次 | 每轮事件提交 | 每轮重复回送 | 每轮 OneBot 发送 |
+| --- | --- | ---: | ---: | ---: | ---: |
+| Koishi | 自有 `tool-smoke-plugin` | 3 | 首次接受 1 次 | 发送进行中、完成后、Core 重启后各 1 次；均为 duplicate | 1 |
+| NoneBot | 自有 `ligamina_nonebot.tool_smoke_plugin` | 3 | 首次接受 1 次 | 发送进行中、完成后、Core 重启后各 1 次；均为 duplicate | 1 |
+| AstrBot | 自有 `ligamina_smoke` fixture | 3 | 首次接受 1 次 | 发送进行中、完成后、Core 重启后各 1 次；均为 duplicate | 1 |
+
+每轮还验证同一 OneBot message ID 携带不同内容会被拒绝，重启后账本仍返回原 `completed` 结果，工作目录与本地服务均清理。每生态三轮共 12 次提交（3 次首次接受、9 次重复），每轮只产生一条本地平台发送。
+
+验证：`cargo build -p ligamina-cli --locked` 与 Koishi `npm run build` 通过；`cd clients/reference && npm run test:live` 连续三轮，每轮 4/4 子测试通过、0 失败、0 跳过；重复事件子测试在三轮内覆盖全部三个 Host。运行时为 Rust 1.97.1、Node v24.22.1；仓库指南列出的 Node 基线为 v24.20.0，当前环境版本差异保留记录。首次跨 Host 尝试因测试输入未包含 NoneBot 原生 `/` 前缀超时；修正自有 fixture 的命令文本后，以下三轮均通过，产品运行时代码未因此修改。
+
+报告 [p6-p601-gateway-dedup-20261110.json](../../outputs/acceptance/p6-p601-gateway-dedup-20261110.json)，SHA-256 `60672e40a9709933374245eed7debd2ef0445d47b5781a7856e9d44bf35b971f`。这是本地受控去重证据；真实 QQ 平台正例、隔离、重启与超时的观察仍以 3.1b/3.1c 报告为准。
+
 ### 3.2 P6-03 结果（2026-11-08）
 
 决策见 [ADR 0003](../adr/0003-host-trust-and-isolation.md)，用法见[架构与接口边界](../guides/architecture.md#host-受信任等级与隔离)。
@@ -139,7 +157,7 @@ P6-01 与 P6-02 合为下一个里程碑：P6-02 不需要真实账号，先行�
 
 ### 3.3 P6-04 结果（2026-11-08）
 
-[兼容性矩阵摘要](../../outputs/compat/compatibility-matrix-v1.md)与同名 JSON（8,961 个目录条目，537 个证据源）由 `lab/compat_matrix.py` 从已提交的证据生成，格式由 [schema](../../contracts/lab/compat/v1/compatibility-matrix.schema.json) 约束，口径写在矩阵摘要开头，入口见[兼容性实验](../guides/compatibility.md#当前支持范围)。
+[兼容性矩阵摘要](../../outputs/compat/compatibility-matrix-v1.md)与同名 JSON（8,961 个目录条目，现有 539 个证据源）由 `lab/compat_matrix.py` 从已提交的证据生成，格式由 [schema](../../contracts/lab/compat/v1/compatibility-matrix.schema.json) 约束，口径写在矩阵摘要开头，入口见[兼容性实验](../guides/compatibility.md#当前支持范围)。2026-11-10 将 P6-01 受控重复投递报告纳入证据哈希；`platform_delivery` 的 scope 明确区分本地假 OneBot 去重与真实 QQ 重复事件。
 
 - 能力维度：`load`（按平台）、`mcp_tool`、`federated_event`、`platform_delivery`；取值 `verified` / `failed` / `skipped` / `unknown` / `untested`。最初设想的 `native_platform_api` 没有系统性证据，未加入，避免靠静态推断给出结论。
 - 证据链：每条 `verified` / `failed` 都引用证据文件、其 SHA-256 与文件内记录；矩阵记录全部证据源的哈希，任何证据变化而矩阵未重建时 `check` 失败。`scope` 写明覆盖范围（如 AstrBot gallery 的工具级结论没有正例、P6-01 未覆盖重复投递）。

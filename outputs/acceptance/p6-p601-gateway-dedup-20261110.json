@@ -1,0 +1,73 @@
+{
+  "schema_version": 1,
+  "kind": "p6_p601_gateway_event_dedup",
+  "date": "2026-11-10",
+  "scope": "Controlled local integration evidence for Core event-ledger deduplication across the three Hosts. The fake OneBot HTTP endpoint is local; this report is not a real QQ delivery observation.",
+  "command": "cd clients/reference && npm run test:live",
+  "source_commit": "5ac1685",
+  "test_source": {
+    "path": "clients/reference/tests-live/onebot-gateway.live.mjs",
+    "sha256": "f55b43374f9c99bfdd4c81863514e0b04edb7d3d8f7d9d0fede636de8cedcfd8"
+  },
+  "environment": {
+    "os": "Windows",
+    "node": "v24.22.1 (repository guide baseline: v24.20.0)",
+    "rustc": "1.97.1",
+    "core": "Real ligamina-cli daemon and SQLite event ledger",
+    "onebot": "Local fake OneBot v11 HTTP endpoint; no external platform traffic"
+  },
+  "injection": "Each raw OneBot message is converted with toEventEnvelope and submitted through LigaminaClient.submitEvent to exercise the controlled duplicate-arrival boundary.",
+  "ecosystems": [
+    {
+      "id": "koishi",
+      "plugin": "self-authored hosts/koishi tool-smoke-plugin",
+      "independent_runs": 3,
+      "per_run": {
+        "submissions": 4,
+        "accepted": 1,
+        "duplicates": 3,
+        "duplicate_phases": ["platform send in flight", "event completed", "Core restarted with the same SQLite ledger"],
+        "payload_conflict_rejected": true,
+        "event_status_after_restart": "completed",
+        "platform_sends": 1,
+        "cleanup": "confirmed"
+      }
+    },
+    {
+      "id": "nonebot",
+      "plugin": "self-authored hosts/nonebot ligamina_nonebot.tool_smoke_plugin",
+      "independent_runs": 3,
+      "per_run": {
+        "submissions": 4,
+        "accepted": 1,
+        "duplicates": 3,
+        "duplicate_phases": ["platform send in flight", "event completed", "Core restarted with the same SQLite ledger"],
+        "payload_conflict_rejected": true,
+        "event_status_after_restart": "completed",
+        "platform_sends": 1,
+        "cleanup": "confirmed"
+      }
+    },
+    {
+      "id": "astrbot",
+      "plugin": "self-authored hosts/astrbot/tests/fixtures/ligamina_smoke",
+      "independent_runs": 3,
+      "per_run": {
+        "submissions": 4,
+        "accepted": 1,
+        "duplicates": 3,
+        "duplicate_phases": ["platform send in flight", "event completed", "Core restarted with the same SQLite ledger"],
+        "payload_conflict_rejected": true,
+        "event_status_after_restart": "completed",
+        "platform_sends": 1,
+        "cleanup": "confirmed"
+      }
+    }
+  ],
+  "suite_runs": [
+    {"run": 1, "tests": 4, "passed": 4, "failed": 0, "skipped": 0, "redelivery_test_ms": 20296.3917, "total_ms": 24595.6865},
+    {"run": 2, "tests": 4, "passed": 4, "failed": 0, "skipped": 0, "redelivery_test_ms": 17762.4088, "total_ms": 22039.7881},
+    {"run": 3, "tests": 4, "passed": 4, "failed": 0, "skipped": 0, "redelivery_test_ms": 17342.5663, "total_ms": 21636.965}
+  ],
+  "harness_note": "The first cross-Host attempt omitted NoneBot's native slash prefix and timed out. The fixture invocation was corrected to /ligamina.echo; the three recorded suite runs then passed. No product runtime code changed for this correction."
+}

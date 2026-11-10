@@ -22,9 +22,61 @@ import { OneBotGateway, toEventEnvelope } from "../dist/onebot-gateway.js";
 
 const root = fileURLToPath(new URL("../../../", import.meta.url));
 const koishi = path.join(root, "hosts", "koishi");
+const nonebot = path.join(root, "hosts", "nonebot");
+const astrbot = path.join(root, "hosts", "astrbot");
 const executable = path.join(root, "target", "debug", process.platform === "win32" ? "ligamina-cli.exe" : "ligamina-cli");
 const ACCOUNT = "10001";
 const token = () => randomBytes(24).toString("hex");
+
+function hostConfig(work, ecosystem) {
+  const common = {
+    id: ecosystem,
+    max_restarts: 0,
+    startup_timeout_ms: 60000,
+    operation_grants: [{ id: `${ecosystem}-send`, client_id: "bot", account_id: ACCOUNT, operations: ["send_message"] }],
+  };
+  if (ecosystem === "nonebot") {
+    return {
+      ...common,
+      program: "uv",
+      args: ["run", "--locked", "--project", nonebot, "--python", "3.12.14", "python", "-m", "ligamina_nonebot.worker"],
+      current_dir: root,
+      environment: {
+        PYTHONPATH: nonebot,
+        LIGAMINA_NONEBOT_PLUGINS: "ligamina_nonebot.tool_smoke_plugin",
+      },
+    };
+  }
+  if (ecosystem === "astrbot") {
+    return {
+      ...common,
+      program: "uv",
+      args: ["run", "--locked", "--project", astrbot, "--python", "3.12.14", "python", "-m", "ligamina_astrbot.worker"],
+      current_dir: root,
+      environment: {
+        PYTHONPATH: astrbot,
+        LIGAMINA_ASTRBOT_PLUGINS: path.join(astrbot, "tests", "fixtures", "ligamina_smoke"),
+        LIGAMINA_ASTRBOT_DATA_DIR: path.join(work, "astrbot-data"),
+      },
+    };
+  }
+  return {
+    ...common,
+    program: process.execPath,
+    args: ["dist/worker.js"],
+    current_dir: koishi,
+    environment: {
+      LIGAMINA_KOISHI_PLUGINS: pathToFileURL(path.join(koishi, "dist/tool-smoke-plugin.js")).href,
+      LIGAMINA_KOISHI_DATA_DIR: path.join(work, "koishi-data"),
+    },
+  };
+}
+
+function eventText(ecosystem, text) {
+  if (ecosystem === "nonebot") return `/ligamina.echo ${text}`;
+  if (ecosystem === "astrbot") return `/ligamina_echo ${text}`;
+  return `ligamina.echo -u ${text}`;
+}
 
 function fakeOneBot() {
   const actions = [];
@@ -42,6 +94,7 @@ function fakeOneBot() {
 }
 
 async function startDaemon(work, options = {}) {
+  const ecosystem = options.ecosystem ?? "koishi";
   const clientToken = options.clientToken ?? token();
   const registrationToken = options.registrationToken ?? token() + token();
   const config = {
@@ -55,19 +108,7 @@ async function startDaemon(work, options = {}) {
       ...(options.readGrant ? { operation_grants: [{ id: "bot-read", account_id: ACCOUNT, operations: ["send_message"] }] } : {}),
     }],
     gateways: [{ id: "qq-main", client_id: "bot", account_id: ACCOUNT, registration_token: registrationToken }],
-    hosts: [{
-      id: "koishi",
-      program: process.execPath,
-      args: ["dist/worker.js"],
-      current_dir: koishi,
-      environment: {
-        LIGAMINA_KOISHI_PLUGINS: pathToFileURL(path.join(koishi, "dist/tool-smoke-plugin.js")).href,
-        LIGAMINA_KOISHI_DATA_DIR: path.join(work, "koishi-data"),
-      },
-      max_restarts: 0,
-      startup_timeout_ms: 30000,
-      operation_grants: [{ id: "koishi-send", client_id: "bot", account_id: ACCOUNT, operations: ["send_message"] }],
-    }],
+    hosts: [hostConfig(work, ecosystem)],
   };
   const configPath = path.join(work, "daemon.json");
   await writeFile(configPath, JSON.stringify(config));
@@ -250,6 +291,108 @@ test("a Core crash during a send leaves it unknown, never re-sent, and the Gatew
     server.closeAllConnections?.();
     server.close();
     await rm(work, { recursive: true, force: true, maxRetries: 5, retryDelay: 200 });
+  }
+});
+
+// P6-01 (feat-030): three copies of the same OneBot event are redelivered to each
+// framework Host: while the reply is in flight, after completion, and after a Core
+// restart on the same ledger. Core accepts it once and the plugin reply reaches the
+// local OneBot endpoint exactly once. A different payload reusing the event ID is refused.
+test("OneBot event redelivery is deduplicated across all three Hosts", { skip: !existsSync(executable) || !existsSync(path.join(koishi, "dist/worker.js")) }, async () => {
+  for (const ecosystem of ["koishi", "nonebot", "astrbot"]) {
+    const work = await mkdtemp(path.join(tmpdir(), `ligamina-onebot-duplicate-${ecosystem}-`));
+    const sends = [];
+    let releaseFirst;
+    const firstHeld = new Promise((resolve) => { releaseFirst = resolve; });
+    let next = 9500;
+    const server = createServer((request, response) => {
+      let body = "";
+      request.on("data", (chunk) => { body += chunk; });
+      request.on("end", async () => {
+        const parsed = JSON.parse(body || "{}");
+        if (request.url.startsWith("/send_")) {
+          sends.push(parsed.message.map((segment) => segment.data.text).join(""));
+          if (sends.length === 1) await firstHeld;
+        }
+        response.setHeader("content-type", "application/json");
+        response.end(JSON.stringify({ status: "ok", retcode: 0, data: { message_id: next++ } }));
+      });
+    });
+    await new Promise((resolve) => server.listen(0, "127.0.0.1", resolve));
+    const onebotUrl = `http://127.0.0.1:${server.address().port}`;
+    const port = await freePort();
+    const credentials = { port, clientToken: token(), registrationToken: token() + token(), readGrant: true, ecosystem };
+    let daemon = await startDaemon(work, credentials);
+    const stop = new AbortController();
+    let running;
+    const startGateway = (client, signal) => new OneBotGateway({
+      core: client,
+      gatewayId: "qq-main",
+      registrationToken: credentials.registrationToken,
+      onebot: { baseUrl: onebotUrl },
+      actionTimeoutMs: 60_000,
+      onError: () => {},
+    }).run(signal, 50);
+    const onebotEvent = (text) => ({
+      post_type: "message", message_type: "group", self_id: Number(ACCOUNT), group_id: 42, user_id: 7,
+      message_id: 801, time: 1_700_000_000,
+      message: [{ type: "text", data: { text: eventText(ecosystem, text) } }],
+    });
+    const eventStatus = async (eventId) => {
+      const query = new URLSearchParams({ platform: "onebot.v11", account_id: ACCOUNT, conversation_kind: "group", conversation_id: "42" });
+      return fetch(`${daemon.baseUrl}/v1/events/${encodeURIComponent(eventId)}?${query}`, {
+        headers: { authorization: `Bearer ${credentials.clientToken}` },
+      }).then((response) => response.json());
+    };
+    try {
+      let client = new LigaminaClient({ baseUrl: daemon.baseUrl, token: credentials.clientToken });
+      running = startGateway(client, stop.signal);
+      const envelope = toEventEnvelope(onebotEvent("once"), ecosystem);
+      // The same OneBot event converts to the same envelope, so redelivery is detectable.
+      assert.deepEqual(toEventEnvelope(onebotEvent("once"), ecosystem), envelope);
+
+      const dispositions = [];
+      dispositions.push((await client.submitEvent(envelope)).disposition);
+      await waitFor(() => sends.length === 1, 60_000, `${ecosystem} reply to reach OneBot`);
+      // Copy 2 arrives while the reply is still in flight.
+      dispositions.push((await client.submitEvent(envelope)).disposition);
+      releaseFirst();
+      await waitFor(async () => (await eventStatus(envelope.event_id)).status === "completed", 60_000, `${ecosystem} event to complete`);
+      // Copy 3 arrives after completion.
+      dispositions.push((await client.submitEvent(envelope)).disposition);
+
+      // Copy 4 arrives after Core restarts on the same ledger.
+      stop.abort();
+      await running.catch(() => {});
+      await stopDaemon(daemon);
+      daemon = await startDaemon(work, credentials);
+      client = new LigaminaClient({ baseUrl: daemon.baseUrl, token: credentials.clientToken });
+      const restartStop = new AbortController();
+      running = startGateway(client, restartStop.signal);
+      try {
+        const fourth = await client.submitEvent(envelope);
+        dispositions.push(fourth.disposition);
+        assert.equal(fourth.event.status, "completed", `${ecosystem} restarted Core retains the original outcome`);
+
+        // A different payload under the same OneBot message ID is a conflict, not a new event.
+        await assert.rejects(client.submitEvent(toEventEnvelope(onebotEvent("tampered"), ecosystem)));
+        await new Promise((resolve) => setTimeout(resolve, 1_500));
+      } finally {
+        restartStop.abort();
+        await running.catch(() => {});
+      }
+      assert.deepEqual(dispositions, ["accepted", "duplicate", "duplicate", "duplicate"], `${ecosystem} dispositions`);
+      assert.deepEqual(sends, ["ONCE"], `${ecosystem} must send exactly once for four deliveries`);
+      assert.equal((await eventStatus(envelope.event_id)).status, "completed");
+    } finally {
+      stop.abort();
+      releaseFirst();
+      await running?.catch(() => {});
+      await stopDaemon(daemon);
+      server.closeAllConnections?.();
+      server.close();
+      await rm(work, { recursive: true, force: true, maxRetries: 5, retryDelay: 200 });
+    }
   }
 });
 
