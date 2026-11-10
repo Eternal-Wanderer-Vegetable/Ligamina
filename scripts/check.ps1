@@ -27,7 +27,7 @@ try {
     Invoke-Checked node @('scripts/check-docs.mjs')
     Invoke-Checked uv @('python', 'install', '3.12.14')
     Invoke-Checked uv @('run', '--locked', '--project', 'hosts/nonebot', '--python', '3.12.14', 'pytest', '-q', 'hosts/nonebot/tests')
-    Invoke-Checked uv @('run', '--locked', '--project', 'hosts/nonebot', '--python', '3.12.14', 'python', '-m', 'unittest', 'discover', '-s', 'lab/tests', '-v')
+    Invoke-Checked uv @('run', '--locked', '--project', 'lab', '--python', '3.12.14', 'python', '-m', 'unittest', 'discover', '-s', 'lab/tests', '-v')
     Invoke-Checked uv @('run', '--locked', '--project', 'hosts/nonebot', '--python', '3.12.14', 'python', 'hosts/nonebot/tests/native_smoke.py')
     Invoke-Checked uv @('run', '--locked', '--project', 'hosts/nonebot', '--python', '3.12.14', 'python', 'hosts/nonebot/tests/native_bridge.py')
     Invoke-Checked uv @('run', '--locked', '--project', 'hosts/nonebot', '--python', '3.12.14', 'python', 'hosts/nonebot/tests/command_tools.py')

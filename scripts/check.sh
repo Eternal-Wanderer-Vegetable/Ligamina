@@ -26,7 +26,7 @@ node scripts/check-docs.mjs
 uv python install 3.12.14
 
 uv run --locked --project hosts/nonebot --python 3.12.14 pytest -q hosts/nonebot/tests
-uv run --locked --project hosts/nonebot --python 3.12.14 python -m unittest discover -s lab/tests -v
+uv run --locked --project lab --python 3.12.14 python -m unittest discover -s lab/tests -v
 uv run --locked --project hosts/nonebot --python 3.12.14 python hosts/nonebot/tests/native_smoke.py
 uv run --locked --project hosts/nonebot --python 3.12.14 python hosts/nonebot/tests/native_bridge.py
 uv run --locked --project hosts/nonebot --python 3.12.14 python hosts/nonebot/tests/command_tools.py

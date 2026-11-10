@@ -1,15 +1,40 @@
 from __future__ import annotations
 
 import hashlib
+import tempfile
 import unittest
+from pathlib import Path
 
 from lab.automation import p7_differential_campaign as p7
 from lab.automation.phase4_worker_side import _koishi_database_provider_module, _safe_diagnostic_summary
 from lab.automation.p7_service_profiles import (
     PROFILE_PATHS,
-    _candidate_from_frozen,
+    _validate_nonebot_provider_lock,
     validate_profile_documents,
 )
+
+
+def candidate_for_profile(profile: dict[str, object], ecosystem: str) -> dict[str, object]:
+    sample = profile["sample"]
+    assert isinstance(sample, dict)
+    providers = profile["providers"]
+    assert isinstance(providers, list)
+    provider_names = [row["module"] if ecosystem == "nonebot" else row["package"] for row in providers]
+    return {
+        "registry_entry_id": sample["registry_entry_id"],
+        "ecosystem": ecosystem,
+        "package": sample["package"],
+        "version": "2.3.1" if ecosystem == "nonebot" else "1.0.3",
+        "artifact_sha256": "a" * 64,
+        "profile_lock_sha256": "b" * 64,
+        "profile_id": profile["profile_id"],
+        "catalog_entry": {"entry_point": "nonebot_plugin_picstatus"},
+        "profile_document_path": PROFILE_PATHS[ecosystem],
+        "service_profile_sha256": hashlib.sha256(PROFILE_PATHS[ecosystem].read_bytes()).hexdigest(),
+        "service_profile": profile,
+        "preload_plugins": provider_names,
+        "required_services": sorted({service for row in providers for service in row["services"]}),
+    }
 
 
 class P7OfflineServiceProfileTests(unittest.TestCase):
@@ -30,17 +55,25 @@ class P7OfflineServiceProfileTests(unittest.TestCase):
 
     def test_nonebot_profile_lock_contains_hash_locked_provider_wheels(self) -> None:
         profiles = validate_profile_documents()
+        profile = profiles["nonebot"]
+        lock_text = "\n\n".join(
+            f"{provider['distribution']}=={provider['version']} \\\n    --hash=sha256:{provider['artifact_sha256']}"
+            for provider in profile["providers"]
+        ) + "\n"
+        with tempfile.TemporaryDirectory() as temporary:
+            lock_path = Path(temporary) / "requirements.txt"
+            lock_path.write_text(lock_text, encoding="utf-8")
+            _validate_nonebot_provider_lock(lock_path, profile["providers"])
 
-        candidate = _candidate_from_frozen(profiles["nonebot"], ecosystem="nonebot")
-
-        self.assertEqual(candidate["registry_entry_id"], "nb-031f347fab50945ebffe96d4")
-        self.assertEqual(candidate["preload_plugins"], ["nonebot_plugin_localstore", "nonebot_plugin_apscheduler"])
-        self.assertEqual(candidate["service_profile_sha256"], hashlib.sha256(PROFILE_PATHS["nonebot"].read_bytes()).hexdigest())
-        self.assertEqual(len(candidate["profile_lock_sha256"]), 64)
+        self.assertEqual(profile["sample"]["registry_entry_id"], "nb-031f347fab50945ebffe96d4")
+        self.assertEqual(
+            [provider["module"] for provider in profile["providers"]],
+            ["nonebot_plugin_localstore", "nonebot_plugin_apscheduler"],
+        )
 
     def test_service_context_fingerprint_includes_variant_profile(self) -> None:
         profiles = validate_profile_documents()
-        candidate = _candidate_from_frozen(profiles["nonebot"], ecosystem="nonebot")
+        candidate = candidate_for_profile(profiles["nonebot"], "nonebot")
 
         request = p7._build_request(
             candidate,
