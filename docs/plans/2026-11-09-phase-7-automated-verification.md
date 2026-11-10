@@ -108,6 +108,10 @@
 
 **P7-04 discovery 与大请求修正 checkpoint（2026-11-10，30+30 pilot 仍未完成）：** 首轮诊断试跑发现 Koishi Native runner 在 `app.stop()` 后读取命令表，导致退出清理清空命令；31 条目诊断报告见 [partial diagnostic](../../outputs/acceptance/p7-p704-differential-pilot-20261110-koishi-discovery-diagnostic.partial.json)，SHA-256 `9cd6ec2c213deed144285140f2d51d549b66fb4b63aeede7186a74cd1addba1d`。现改为在插件仍注册时采集；锁定样本 `koishi-plugin-bt` 在禁网 Worker 中发现 14 条命令并确认清理，证据 [discovery fix](../../outputs/acceptance/p7-p704-koishi-discovery-fix-20261110.json)，SHA-256 `d2bc0d18323ae2624ddc832b3e15da248c7a0ee4fc2dab5c201a524f725365bb`。随后两次正式尝试都准备好 60 个精确 bundle，但在 2/60 条目处停止；单条 Federated 请求实测 143,920 字节，旧实现把它放在一个 argv 值中，超过 Linux 的 131,072-byte 单参数上限并导致 Worker 未启动。Docker Worker 现支持 16 MiB 有界 stdin，请求通过 `docker run --interactive` 传递，保留旧 `--request-json` Worker CLI。143,950-byte 输入在准入禁网 Worker 中完整到达并清理；同一 177 场景请求的端到端预检 Worker exit 0、cleanup confirmed。报告 [large-stdin preflight](../../outputs/acceptance/p7-p704-large-stdin-preflight-20261110.json)，SHA-256 `f316fd8b0f341871d92534c3218ef6c2c79fc7534c5c2da7aa915676900ae2ef`。Lab 全套 289 项在补充 Windows stdin 拒绝保护前通过；当前 `test_workers.py` 10/10、worker-side stdin parser 2/2 通过。两次停止报告见 [attempt1](../../outputs/acceptance/p7-p704-differential-pilot-20261110-attempt1-incomplete.json)（SHA `4c82670d71ef12c67778ff8349630438464300431e350189fcba7b5becb6717e`）与 [attempt2](../../outputs/acceptance/p7-p704-differential-pilot-20261110-attempt2-incomplete.json)；它们不是 30+30 完成证据。大请求通过后，样本 Federated Host 仍在插件启动时退出，比较仍为 unknown；待下一轮 pilot 收集全体数据后决定是否需 P7-08 profile 扩面。不可推断为兼容通过。
 
+**P7-04 正式 pilot 完成 checkpoint（2026-11-10）：** 第三次正式执行以新 bundle 根跑完锁定 Koishi/NoneBot 各 30 项；报告 [retry3](../../outputs/acceptance/p7-p704-differential-pilot-20261110-retry3.json)，SHA-256 `2c6f4c65402cb986aec39fb1df3f9a01589a16e2c39d9926baded357dc51be5e`。60/60 条目有终态：59 completed，1 skipped；330 次 Worker 执行全部确认清理；29 项没有 runtime 命令清单，30 项有行为场景，133 条命令均发现和执行。命令级结论为 21 nontrivial (15.8%)、5 equivalent、5 non-equivalent、0 nondeterministic、123 unknown (92.5%)。30 个行为条目的三轮 fresh 结论一致。5 个非等价命令在每条场景记录了 Native/Federated 哈希和归因；现有证据只支持 `unknown/unresolved`（两侧流程都完成，无法区分插件与 Core/Host），不宣称支持或直接归责。`nonebot_plugin_pixivbot` 因数据库迁移前置条件被跳过；复核将 `skip_domain` 更正为 `profile`，见 [retry3 adjudication](../../outputs/acceptance/p7-p704-differential-pilot-20261110-retry3-adjudication.json)，SHA-256 `71fcab8c5b74e592b828e124e49d728f5d0e9309285532d1868267346271ca8e`。retry2 在 50/60 停止，原始报告保留作历史 attempt，不覆盖。
+
+**P7-04 → P7-09 准入裁决：** 以 `nontrivial >= 30%`、`unknown <= 50%`、行为条目三轮结论一致、Worker 清理全部确认作为全量前最低 pilot 门槛。30% 要求至少每三条已执行命令有一条触达用法提示外的行为路径；unknown 上限避免全量预算主要花在不可判定场景。当前 nontrivial 为 21/133 = 15.8%，unknown 为 123/133 = 92.5%，因此暂不准入 P7-09。先完成 P7-05 至 P7-08，改进契约覆盖、检测器有效性、有状态输入和服务/config profile，再用新证据重审；不要把未知改写为通过。
+
 - 控制：两路使用相同的随机种子（Python 通过 Worker 预加载设置 `random` 与 `PYTHONHASHSEED`，Node 通过预加载替换 `Math.random`）、相同 `TZ`、禁网。假时钟暂不做，按 P7-04 的数据决定。
 - **自差分**：Native 在两个全新 Worker 中各跑一次。两次之间不同的字段标为 volatile，从比较中去除；去除后什么都不剩的场景记 `unknown`（原因 `nondeterministic`），不计通过。
 - 比较项：回复条数与顺序、目标会话与账号、消息段类型、归一化文本（掩码时间戳、UUID、耗时等 volatile token）、平台操作类型、Host 是否存活。
@@ -181,7 +185,7 @@ P7-03、P7-08 与 P7-04 可并行。P7-04 与 P7-06 是两个决策点，见第 
 | 检查点 | 时机 | 继续的条件 | 不满足时 |
 | --- | --- | --- | --- |
 | 能力能否自动发现 | P7-01 结束 | 命令发现率达标，漏识别原因可归类 | 先补发现规则，或缩小 P7-04 范围到可发现的类别 |
-| 生成的输入能否触达有效路径 | P7-04 结束 | 已执行命令中 nontrivial 比例与 nondeterministic 比例可接受（阈值在 P7-04 报告中按数据定，写明理由） | 调整生成器或确定性控制，重跑 pilot，不进入全量 |
+| 生成的输入能否触达有效路径 | P7-04 结束 | nontrivial 命令占比至少 30%、unknown 不超过 50%、三轮结论一致且清理全确认。30% 要求至少每三条执行命令触达一条用法提示外路径；unknown 上限避免全量预算主要耗在不可判定输入。 | 当前 15.8% nontrivial、92.5% unknown；先完成 P7-05–08 并复核 profile/生成器，不准入 P7-09。 |
 | 测试能否识别缺陷 | P7-06 结束 | 变异体全部检出或存活原因可接受 | 补检查项后重测，不进入全量 |
 
 ## 6. 不采纳或暂缓
@@ -201,7 +205,7 @@ P7-03、P7-08 与 P7-04 可并行。P7-04 与 P7-06 是两个决策点，见第 
 - **Oracle 边界**：差分只证明与原生一致。依赖网络的插件在禁网下只会走错误路径，结论 scope 必须写“仅错误路径”。依赖 LLM provider 的 AstrBot 插件同理。
 - **原生基线自身的偏差**：stock runner 与真实部署存在配置差异；原生侧异常要单独标记，不能混入兼容结论。
 - **规模成本**：每条目 3 次 Worker 运行，全量时长只能在 P7-04 后估算；预算超出时先按生态分批。
-- **任务顺序**：P6-01 / feat-030 于 2026-11-10 完成；受控重复投递和 SQLite 账本去重见[第六阶段计划](2026-11-08-phase-6-runtime-reliability.md) 3.1d。P7-01 / feat-046、P7-02 / feat-047、P7-03 / feat-048 均于 2026-11-10 完成，当前 active feature 为 P7-04 / feat-049。P7-01 的样本指标为源码声明 presence，不是插件运行时 discovery 或全目录估计；P7-02 的生成器本身未执行插件，真实 Koishi/NoneBot Worker 控制和差分仍待 P7-04。P7-03 仅覆盖三个已验收 AstrBot 插件与 AB-05 用例。受控本地重复投递不代表真实 QQ 重复投递观察。
+- **任务顺序**：P6-01 / feat-030 于 2026-11-10 完成；受控重复投递和 SQLite 账本去重见[第六阶段计划](2026-11-08-phase-6-runtime-reliability.md) 3.1d。P7-01 / feat-046、P7-02 / feat-047、P7-03 / feat-048、P7-04 / feat-049 均于 2026-11-10 完成，当前 active feature 为 P7-05 / feat-050。P7-01 的样本指标为源码声明 presence，不是运行时 discovery 或全目录估计；P7-03 只覆盖三个已验收 AstrBot 插件与 AB-05 用例。P7-04 30+30 pilot 的 unknown/nontrivial gate 未达全量门槛；P7-09 当前不准入，先完成 P7-05 至 P7-08 后复核。受控本地重复投递不代表真实 QQ 重复投递观察。
 
 ## 8. 验证命令（规划阶段）
 
