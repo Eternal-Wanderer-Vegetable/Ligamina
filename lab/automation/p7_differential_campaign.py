@@ -592,6 +592,16 @@ def _discovery_terminal_state(discovery: dict[str, Any]) -> tuple[str, str] | No
     return "skipped", "native_discovery_failed"
 
 
+def _discovery_skip_domain(discovery: dict[str, Any]) -> str:
+    """Classify known service/database setup prerequisites separately from Host failures."""
+    profile_status = discovery.get("profile_setup", {}).get("status") or discovery.get("profile_setup_status")
+    if profile_status != "passed":
+        return "profile"
+    diagnostic = str(discovery.get("diagnostic_summary") or "").casefold()
+    profile_markers = ("migration", "orm upgrade", "database schema", "required host service")
+    return "profile" if any(marker in diagnostic for marker in profile_markers) else "native_host"
+
+
 def _project_observation(result: dict[str, Any], event_ids: list[str]) -> dict[str, Any] | None:
     if result.get("status") != "completed":
         return None
@@ -1007,10 +1017,7 @@ def run_campaign(
                 raise AssertionError("discovery failure has no terminal state")
             entry_result["status"], entry_result["conclusion_state"] = terminal_state
             entry_result["conclusions_consistent_across_three_fresh_reruns"] = None
-            entry_result["skip_domain"] = (
-                "profile" if discovery.get("profile_setup", {}).get("status") != "passed"
-                else "native_host"
-            )
+            entry_result["skip_domain"] = _discovery_skip_domain(discovery_summary)
             entry_result["skip_reason"] = discovery_summary.get("diagnostic_summary") or discovery_summary.get("reason_code") or "native_discovery_failed"
             report["entries"].append(entry_result)
             report["counts"]["entries"] += 1

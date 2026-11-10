@@ -9,6 +9,7 @@ from pathlib import Path
 from lab.automation import phase4_campaign
 from lab.automation.p7_differential_campaign import (
     _command_summary,
+    _discovery_skip_domain,
     _discovery_terminal_state,
     _nontrivial_commands,
     _round_scenario_results,
@@ -59,6 +60,22 @@ class DifferentialCampaignTests(unittest.TestCase):
         })
 
         self.assertIsNone(result)
+
+    def test_database_migration_prerequisite_is_attributed_to_profile(self) -> None:
+        result = _discovery_skip_domain({
+            "profile_setup_status": "passed",
+            "diagnostic_summary": "Please run nb orm upgrade: database migration is required",
+        })
+
+        self.assertEqual(result, "profile")
+
+    def test_other_native_load_errors_remain_host_scoped(self) -> None:
+        result = _discovery_skip_domain({
+            "profile_setup_status": "passed",
+            "diagnostic_summary": "plugin initialization failed before command discovery",
+        })
+
+        self.assertEqual(result, "native_host")
 
     def test_no_gateway_operation_is_unknown_instead_of_nondeterministic(self) -> None:
         scenarios = [{"scenario_id": "scn-one", "event_id": "evt-1", "command_id": "echo", "kind": "raw_text"}]
