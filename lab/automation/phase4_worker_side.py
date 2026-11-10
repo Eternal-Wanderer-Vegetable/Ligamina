@@ -392,11 +392,14 @@ def run_side(request: dict[str, Any]) -> dict[str, Any]:
     )
     seed = context["execution"].get("random_seed")
     if isinstance(seed, int) and not isinstance(seed, bool) and seed >= 0:
+        fixed_time = context["execution"].get("fixed_time_utc")
         context["host_environment"].update({
             "TZ": "UTC",
             "PYTHONHASHSEED": str(seed % 2**32),
             "LIGAMINA_BEHAVIOR_RANDOM_SEED": str(seed),
         })
+        if isinstance(fixed_time, str):
+            context["host_environment"]["LIGAMINA_BEHAVIOR_FIXED_TIME_UTC"] = fixed_time
         if ecosystem == "koishi":
             context["host_environment"]["LIGAMINA_NODE_RANDOM_PRELOAD"] = "/input/project/lab/baselines/seed_node_random.cjs"
     Path("/work/side").mkdir(parents=True, exist_ok=True)

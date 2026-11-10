@@ -819,10 +819,12 @@ def run_federated(
         "PYTHONPATH": host_environment.get("PYTHONPATH", str(ROOT / "hosts/nonebot")),
         "LIGAMINA_BEHAVIOR_RANDOM_SEED": host_environment.get("LIGAMINA_BEHAVIOR_RANDOM_SEED", ""),
     }
+    if host_environment.get("LIGAMINA_BEHAVIOR_FIXED_TIME_UTC"):
+        host_env["LIGAMINA_BEHAVIOR_FIXED_TIME_UTC"] = host_environment["LIGAMINA_BEHAVIOR_FIXED_TIME_UTC"]
     for key in ("GUESS_NAME", "GUESS_LIMIT", "GUESS_NAME_LIST"):
         if key in host_environment:
             host_env[key] = host_environment[key]
-    for key in ("TZ", "PYTHONHASHSEED", "LIGAMINA_BEHAVIOR_RANDOM_SEED"):
+    for key in ("TZ", "PYTHONHASHSEED", "LIGAMINA_BEHAVIOR_RANDOM_SEED", "LIGAMINA_BEHAVIOR_FIXED_TIME_UTC"):
         if key in host_environment:
             host_env[key] = host_environment[key]
     if sample["ecosystem"] == "koishi" and host_environment.get("LIGAMINA_NODE_RANDOM_PRELOAD"):

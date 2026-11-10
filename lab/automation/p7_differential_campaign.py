@@ -36,6 +36,7 @@ from lab.capability_inventory import SCANNER_VERSION
 from lab.pilot_nonebot import _prepare_wheelhouse
 from lab.pilot_workers import _load_npm_lock, _prepare_npm_project
 from lab.scenario_generator import (
+    DEFAULT_FIXED_TIME,
     GENERATOR_VERSION,
     compare_repeated_observations,
     generate_scenarios,
@@ -397,6 +398,7 @@ def _build_context(
         "execution": {
             "mode": mode,
             "random_seed": seed,
+            "fixed_time_utc": DEFAULT_FIXED_TIME,
             "capture_source_event_id": True,
             "discover_commands": discover_commands,
             "required_services": list(candidate.get("required_services", [])),
@@ -937,6 +939,8 @@ def run_campaign(
             "scenario_limit_per_command": 16,
             "random_seed": FIXED_SEED,
             "timezone": "UTC",
+            "node_clock_fixed_time_utc": DEFAULT_FIXED_TIME,
+            "node_determinism_preload_sha256": _sha256_file(ROOT / "lab/baselines/seed_node_random.cjs"),
             "network": "disabled",
             "limit_per_ecosystem": limit_per_ecosystem,
         },

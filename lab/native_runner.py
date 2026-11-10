@@ -53,6 +53,9 @@ def _harness_environment(mode: str, case: dict[str, Any] | None = None) -> dict[
             "PYTHONHASHSEED": str(seed % 2**32),
             "LIGAMINA_BEHAVIOR_RANDOM_SEED": str(seed),
         })
+        fixed_time = execution.get("fixed_time_utc")
+        if isinstance(fixed_time, str):
+            environment["LIGAMINA_BEHAVIOR_FIXED_TIME_UTC"] = fixed_time
         sample = context.get("sample", {})
         if isinstance(sample, dict) and sample.get("ecosystem") == "koishi":
             environment["NODE_OPTIONS"] = "--require=/input/project/lab/baselines/seed_node_random.cjs"
