@@ -9,6 +9,7 @@ from pathlib import Path
 from lab.automation import phase4_campaign
 from lab.automation.p7_differential_campaign import (
     _command_summary,
+    _discovery_terminal_state,
     _nontrivial_commands,
     _round_scenario_results,
     _write_final,
@@ -32,6 +33,33 @@ def _observation(message: str, event_id: str = "evt-1") -> dict[str, object]:
 
 
 class DifferentialCampaignTests(unittest.TestCase):
+    def test_clean_discovery_failure_is_a_skipped_terminal_state(self) -> None:
+        result = _discovery_terminal_state({
+            "status": "failed",
+            "profile_setup": {"status": "passed"},
+            "outer_worker": {"cleanup_confirmed": True},
+        })
+
+        self.assertEqual(result, ("skipped", "native_discovery_failed"))
+
+    def test_discovery_failure_without_confirmed_cleanup_stops_campaign(self) -> None:
+        result = _discovery_terminal_state({
+            "status": "failed",
+            "profile_setup": {"status": "passed"},
+            "outer_worker": {"cleanup_confirmed": False},
+        })
+
+        self.assertEqual(result, ("incomplete", "worker_cleanup_unconfirmed"))
+
+    def test_completed_discovery_is_not_a_failure_state(self) -> None:
+        result = _discovery_terminal_state({
+            "status": "completed",
+            "profile_setup": {"status": "passed"},
+            "outer_worker": {"cleanup_confirmed": True},
+        })
+
+        self.assertIsNone(result)
+
     def test_no_gateway_operation_is_unknown_instead_of_nondeterministic(self) -> None:
         scenarios = [{"scenario_id": "scn-one", "event_id": "evt-1", "command_id": "echo", "kind": "raw_text"}]
         empty = {"status": "completed", "operations": []}

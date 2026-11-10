@@ -579,6 +579,19 @@ def _worker_summary(result: dict[str, Any]) -> dict[str, Any]:
     }
 
 
+def _discovery_terminal_state(discovery: dict[str, Any]) -> tuple[str, str] | None:
+    """Return an entry state for a failed discovery, stopping only on lost cleanup."""
+    cleanup_confirmed = discovery.get("outer_worker", {}).get("cleanup_confirmed") is True
+    if not cleanup_confirmed:
+        return "incomplete", "worker_cleanup_unconfirmed"
+    if (
+        discovery.get("status") == "completed"
+        and discovery.get("profile_setup", {}).get("status") == "passed"
+    ):
+        return None
+    return "skipped", "native_discovery_failed"
+
+
 def _project_observation(result: dict[str, Any], event_ids: list[str]) -> dict[str, Any] | None:
     if result.get("status") != "completed":
         return None
@@ -986,18 +999,29 @@ def run_campaign(
                 "equivalent": 0,
                 "non_equivalent": 0,
                 "nondeterministic": 0,
-                "unknown": len(descriptors),
+                "unknown": 0,
                 "items": [],
             }
-            entry_result["conclusions_consistent_across_three_fresh_reruns"] = False
-            entry_result["status"] = "incomplete"
-            if stop_reason is None:
-                stop_reason = f"native_discovery_incomplete:{entry_id}"
+            terminal_state = _discovery_terminal_state(discovery)
+            if terminal_state is None:
+                raise AssertionError("discovery failure has no terminal state")
+            entry_result["status"], entry_result["conclusion_state"] = terminal_state
+            entry_result["conclusions_consistent_across_three_fresh_reruns"] = None
+            entry_result["skip_domain"] = (
+                "profile" if discovery.get("profile_setup", {}).get("status") != "passed"
+                else "native_host"
+            )
+            entry_result["skip_reason"] = discovery_summary.get("diagnostic_summary") or discovery_summary.get("reason_code") or "native_discovery_failed"
             report["entries"].append(entry_result)
             report["counts"]["entries"] += 1
-            print(f"[{index}/{len(candidates)}] {candidate['ecosystem']} {entry_id}: discovery=incomplete; stopping", flush=True)
+            if entry_result["status"] == "incomplete" and stop_reason is None:
+                stop_reason = f"worker_cleanup_unconfirmed:{entry_id}:native_discovery"
+            action = "skipped; continuing" if entry_result["status"] == "skipped" else "incomplete; stopping"
+            print(f"[{index}/{len(candidates)}] {candidate['ecosystem']} {entry_id}: discovery={entry_result['status']} ({action})", flush=True)
             _write_progress(progress_path, report)
-            break
+            if entry_result["status"] == "incomplete":
+                break
+            continue
 
         if not descriptors:
             entry_result["commands"] = {
@@ -1128,12 +1152,15 @@ def run_campaign(
         if stop_reason:
             break
 
-    complete_entries = len(report["entries"]) == len(candidates) and all(entry.get("status") == "completed" for entry in report["entries"])
+    complete_entries = len(report["entries"]) == len(candidates) and all(
+        entry.get("status") in {"completed", "skipped"} for entry in report["entries"]
+    )
     assessed_entries = [entry for entry in report["entries"] if entry.get("scenario_generation", {}).get("scenario_count", 0) > 0]
     all_consistent = complete_entries and all(entry.get("conclusions_consistent_across_three_fresh_reruns") is True for entry in assessed_entries)
     report["summary"] = {
         "selected_entries": len(candidates),
         "completed_entries": sum(entry.get("status") == "completed" for entry in report["entries"]),
+        "skipped_discovery_entries": sum(entry.get("conclusion_state") == "native_discovery_failed" for entry in report["entries"]),
         "entries_without_runtime_commands": sum(entry.get("conclusion_state") == "no_runtime_commands_discovered" for entry in report["entries"]),
         "entries_without_valid_runtime_descriptors": sum(entry.get("conclusion_state") == "no_valid_runtime_command_descriptors" for entry in report["entries"]),
         "entries_with_behavior_scenarios": len(assessed_entries),
