@@ -352,11 +352,13 @@ def run_side(request: dict[str, Any]) -> dict[str, Any]:
 
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--request-json", required=True)
+    request = parser.add_mutually_exclusive_group(required=True)
+    request.add_argument("--request-json")
+    request.add_argument("--request-stdin", action="store_true")
     options = parser.parse_args()
     try:
-        request = json.loads(options.request_json)
-        result = run_side(request)
+        value = json.load(sys.stdin) if options.request_stdin else json.loads(options.request_json)
+        result = run_side(value)
         print(json.dumps(result, ensure_ascii=False))
         return 0
     except Exception as error:  # Worker boundary converts setup faults into explicit attempt output.

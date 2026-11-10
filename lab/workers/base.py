@@ -8,6 +8,7 @@ from pathlib import Path
 from typing import Literal
 
 WorkerStatus = Literal["passed", "failed", "unknown"]
+MAX_WORKER_STDIN_BYTES = 16 * 1024 * 1024
 
 
 @dataclass(frozen=True)
@@ -42,6 +43,7 @@ class WorkerSpec:
     generation: int | None = None
     job_id: str | None = None
     entrypoint: str | None = None
+    stdin_data: bytes | None = None
 
     def __post_init__(self) -> None:
         if not self.run_id or not self.entry_id:
@@ -50,6 +52,11 @@ class WorkerSpec:
             raise ValueError("command must be a non-empty string argument list")
         if self.entrypoint is not None and (not self.entrypoint.startswith("/") or "\x00" in self.entrypoint):
             raise ValueError("entrypoint must be an absolute container path")
+        if self.stdin_data is not None:
+            if not isinstance(self.stdin_data, bytes):
+                raise ValueError("stdin_data must be bytes")
+            if len(self.stdin_data) > MAX_WORKER_STDIN_BYTES:
+                raise ValueError(f"stdin_data exceeds the {MAX_WORKER_STDIN_BYTES}-byte Worker limit")
         if not self.input_dir.is_dir():
             raise ValueError("input_dir must be an existing directory")
         if (self.attempt_id is None) != (self.generation is None):

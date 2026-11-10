@@ -71,6 +71,8 @@ class WindowsSandboxWorker:
         self.collect_script_path = collect_script_path or deploy_root / "collect-output.ps1"
 
     def run(self, spec: WorkerSpec) -> WorkerResult:
+        if spec.stdin_data is not None:
+            raise ValueError("Windows Sandbox Worker does not support stdin_data")
         artifact_dir = ensure_external_directory(spec.input_dir, forbidden_root=self.repository_root)
         with _SANDBOX_RUN_LOCK:
             return self._run_serialized(spec, artifact_dir)

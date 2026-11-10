@@ -61,6 +61,23 @@ class WorkerPolicyTests(unittest.TestCase):
         self.assertEqual(direct_command[entrypoint_index + 1], "/usr/bin/env")
         self.assertEqual(direct_command[-3:], ["/usr/local/bin/python", "-c", "print('direct')"])
 
+    def test_docker_worker_stdin_is_bounded_and_never_becomes_an_argv_value(self) -> None:
+        with tempfile.TemporaryDirectory(prefix="ligamina-worker-input-") as directory:
+            input_dir = Path(directory)
+            payload = b"{" + b"x" * 140_000 + b"}"
+            spec = WorkerSpec(
+                "run-stdin", "entry-stdin", ("python", "-c", "import sys; sys.stdin.buffer.read()"),
+                input_dir, stdin_data=payload,
+            )
+            command = self.docker_worker().command(spec, worker_id="ligamina-stdin")
+            self.assertIn("--interactive", command)
+            self.assertNotIn(payload.decode("ascii"), command)
+            self.assertEqual(command[-3:], ["python", "-c", "import sys; sys.stdin.buffer.read()"])
+            with self.assertRaisesRegex(ValueError, "exceeds the 16777216-byte Worker limit"):
+                WorkerSpec("run-large", "entry-large", ("true",), input_dir, stdin_data=b"x" * (16 * 1024 * 1024 + 1))
+            with self.assertRaisesRegex(ValueError, "stdin_data must be bytes"):
+                WorkerSpec("run-text", "entry-text", ("true",), input_dir, stdin_data="{}")  # type: ignore[arg-type]
+
     def test_docker_backend_rejects_unpinned_image_and_repository_input(self) -> None:
         with self.assertRaises(ValueError):
             DockerWorker(image_digest="registry.example/ligamina/worker:latest", repository_root=REPOSITORY_ROOT)
@@ -93,6 +110,13 @@ class WorkerPolicyTests(unittest.TestCase):
         self.assertIn("/setintegritylevel Low /T", source)
         self.assertIn("QueryInformationJobObject", source)
         self.assertIn("PeakJobMemoryUsed", source)
+
+    def test_windows_worker_rejects_unsupported_stdin_payload(self) -> None:
+        with tempfile.TemporaryDirectory(prefix="ligamina-worker-input-") as directory:
+            worker = WindowsSandboxWorker(repository_root=REPOSITORY_ROOT, wsb_executable="wsb.exe")
+            spec = WorkerSpec("run-stdin", "entry-stdin", ("python", "-c", "pass"), Path(directory), stdin_data=b"{}")
+            with self.assertRaisesRegex(ValueError, "does not support stdin_data"):
+                worker.run(spec)
 
     def test_windows_worker_result_preserves_job_peak_memory(self) -> None:
         result = WindowsSandboxWorker._make_result(

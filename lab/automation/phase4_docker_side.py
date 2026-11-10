@@ -58,12 +58,12 @@ def _docker_side(request: dict[str, Any], options: argparse.Namespace) -> dict[s
         command=(
             "/usr/local/bin/python",
             "/input/project/lab/automation/phase4_worker_side.py",
-            "--request-json",
-            encoded,
+            "--request-stdin",
         ),
         input_dir=options.bundle,
         limits=WorkerLimits(timeout_seconds=240, memory_mb=4096, cpu_cores=2.0, process_limit=256, output_limit_bytes=4 * 1024 * 1024),
         entrypoint="/usr/bin/env",
+        stdin_data=encoded.encode("utf-8"),
     )
     outcome = worker.run(spec)
     result: dict[str, Any]

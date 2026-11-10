@@ -2444,7 +2444,7 @@
       ],
       "status": "in-progress",
       "done_when": "每条目报告发现/执行/nontrivial 命令数、等价/不等价/nondeterministic 数与资源；不等价项逐条归因；三次全新复跑结论一致。",
-      "evidence": "Partial checkpoint only: the 1+1 admitted Linux Worker smoke remains non-acceptance evidence. A pre-stop Koishi command-capture regression was fixed and validated on locked koishi-plugin-bt: 14 Native commands discovered, Worker cleanup confirmed. The first official 30+30 attempt prepared all 60 exact bundles but stopped at 2/60 after three concurrent Worker launches returned worker_backend_unavailable with cleanup unconfirmed; the first entry's Federated Host also exited, so its behavior observations remain unknown. See attempt1 report. Not a completed pilot; retry with one concurrent Worker.",
+      "evidence": "Partial checkpoint only: the 1+1 admitted Linux Worker smoke remains non-acceptance evidence. A pre-stop Koishi command-capture regression was fixed and validated on locked koishi-plugin-bt: 14 Native commands discovered, cleanup confirmed. Two official 30+30 attempts prepared all 60 bundles but stopped at 2/60: a 143,920-byte request was passed as one argv value beyond Linux's 131,072-byte per-argument limit, causing Popen E2BIG and preventing Worker startup. Requests now travel through bounded (16 MiB) Docker stdin; a 143,950-byte real Worker payload and end-to-end 177-scenario request reached the worker and cleanup was confirmed. The Federated Host still exits for this plugin, so its behavior remains unknown. See both attempt reports and stdin preflight. The 30+30 pilot is not complete.",
       "evidence_paths": [
         "outputs/acceptance/p7-p704-pilot-selection-20261110.json",
         "outputs/acceptance/p7-p704-pilot-selection-20261110.json.sha256",
@@ -2455,7 +2455,11 @@
         "outputs/acceptance/p7-p704-koishi-discovery-fix-20261110.json",
         "outputs/acceptance/p7-p704-koishi-discovery-fix-20261110.json.sha256",
         "outputs/acceptance/p7-p704-differential-pilot-20261110-attempt1-incomplete.json",
-        "outputs/acceptance/p7-p704-differential-pilot-20261110-attempt1-incomplete.json.sha256"
+        "outputs/acceptance/p7-p704-differential-pilot-20261110-attempt1-incomplete.json.sha256",
+        "outputs/acceptance/p7-p704-differential-pilot-20261110-attempt2-incomplete.json",
+        "outputs/acceptance/p7-p704-differential-pilot-20261110-attempt2-incomplete.json.sha256",
+        "outputs/acceptance/p7-p704-large-stdin-preflight-20261110.json",
+        "outputs/acceptance/p7-p704-large-stdin-preflight-20261110.json.sha256"
       ],
       "plan_path": "docs/plans/2026-11-09-phase-7-automated-verification.md"
     },
