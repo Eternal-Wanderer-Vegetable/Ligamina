@@ -114,6 +114,8 @@
 
 **P7-06 完成 checkpoint（2026-11-10）：** `lab/automation/p7_mutations.py` 对自有合成事件观察和 fixture 状态运行 10 个确定性变体：错发会话、错发账号、丢回复、重复回复、丢非文本段、截断文本、回复乱序、吞处理器异常、actor 状态串用、共享数据目录。10/10 被检出，分层为 fixture 1、contract 3、differential 5、stateful 1，存活 0。报告 [mutation regression](../../outputs/acceptance/p7-p706-mutation-regression-20261110.json)，SHA-256 `1efaf4d23b2014bd5fb563195e511b02659c5d5d2b4c2d2f7d44eaf47239e147`。PR workflow 的 `phase3-linux-self-test` 加入 `test_p7_contracts` 与 `test_p7_mutations` 小型回归；Lab 定向 6/6，workflow 静态检查 5/5。**范围限制：** 变体作用于自有合成观察/fixture，不是对编译后 Core/Host 的 mutation score；没有注入生产构建故障点，也没有改动第三方归档。此结果证明当前 oracle 对这些合成偏差敏感，不能外推为运行时代码 mutation coverage。
 
+**P7-07 完成 checkpoint（2026-11-10）：** `lab/automation/p7_stateful.py` 固定 2 actor × 私聊/群聊上下文，pairwise 推断依赖边，只沿有依赖的边扩展到最多 6 步，并用 Hypothesis state machine 与 shrinker 验证生成/缩减。自有 per-conversation counter 与 group roster 合成插件生成 24 条确定性序列，最大 3 步；检出 `increment→read`、`clear→increment/read`、`join/leave→members` 依赖，native 不满足的关系会记 `skipped`，不要求 Federated 模拟本身错误的原生关系。报告 [stateful pilot adjudication](../../outputs/acceptance/p7-p707-stateful-pilot-20261110.json)，SHA-256 `401fce172d697e66b244b16e805302e877eca880f082d146f10032ec12662cf8`：60 条目×2 关系，session isolation 59 unknown（P7-04 未运行多 actor/stateful sequence）、1 skipped（profile probe 前未加载）；可选 restart persistence 60 skipped 并附延后原因。定向 stateful tests 8/8。新增 PR self-test 状态机回归；不能把未执行的 pilot 序列宣称通过。
+
 **P7-04 → P7-09 准入裁决：** 以 `nontrivial >= 30%`、`unknown <= 50%`、行为条目三轮结论一致、Worker 清理全部确认作为全量前最低 pilot 门槛。30% 要求至少每三条已执行命令有一条触达用法提示外的行为路径；unknown 上限避免全量预算主要花在不可判定场景。当前 nontrivial 为 21/133 = 15.8%，unknown 为 123/133 = 92.5%，因此暂不准入 P7-09。先完成 P7-05 至 P7-08，改进契约覆盖、检测器有效性、有状态输入和服务/config profile，再用新证据重审；不要把未知改写为通过。
 
 - 控制：两路使用相同的随机种子（Python 通过 Worker 预加载设置 `random` 与 `PYTHONHASHSEED`，Node 通过预加载替换 `Math.random`）、相同 `TZ`、禁网。假时钟暂不做，按 P7-04 的数据决定。
@@ -209,7 +211,7 @@ P7-03、P7-08 与 P7-04 可并行。P7-04 与 P7-06 是两个决策点，见第 
 - **Oracle 边界**：差分只证明与原生一致。依赖网络的插件在禁网下只会走错误路径，结论 scope 必须写“仅错误路径”。依赖 LLM provider 的 AstrBot 插件同理。
 - **原生基线自身的偏差**：stock runner 与真实部署存在配置差异；原生侧异常要单独标记，不能混入兼容结论。
 - **规模成本**：每条目 3 次 Worker 运行，全量时长只能在 P7-04 后估算；预算超出时先按生态分批。
-- **任务顺序**：P6-01 / feat-030 于 2026-11-10 完成；受控重复投递和 SQLite 账本去重见[第六阶段计划](2026-11-08-phase-6-runtime-reliability.md) 3.1d。P7-01 至 P7-06（feat-046–051）均于 2026-11-10 完成，当前 active feature 为 P7-07 / feat-052。P7-01 的样本指标为源码声明 presence，不是运行时 discovery 或全目录估计；P7-03 只覆盖三个已验收 AstrBot 插件与 AB-05 用例。P7-04 30+30 pilot 的 unknown/nontrivial gate 未达全量门槛；P7-09 当前不准入，先完成 P7-07 至 P7-08 后复核。受控本地重复投递不代表真实 QQ 重复事件观察。
+- **任务顺序**：P6-01 / feat-030 于 2026-11-10 完成；受控重复投递和 SQLite 账本去重见[第六阶段计划](2026-11-08-phase-6-runtime-reliability.md) 3.1d。P7-01 至 P7-07（feat-046–052）均于 2026-11-10 完成，当前 active feature 为 P7-08 / feat-053。P7-01 的样本指标为源码声明 presence，不是运行时 discovery 或全目录估计；P7-03 只覆盖三个已验收 AstrBot 插件与 AB-05 用例。P7-04 30+30 pilot 的 unknown/nontrivial gate 未达全量门槛；P7-09 当前不准入，先完成 P7-08 后复核。受控本地重复投递不代表真实 QQ 重复事件观察。
 
 ## 8. 验证命令（规划阶段）
 

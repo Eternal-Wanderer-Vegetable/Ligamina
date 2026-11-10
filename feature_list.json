@@ -1,8 +1,8 @@
 {
   "schema_version": 1,
   "updated_at": "2026-11-10",
-  "active_feature": "feat-052",
-  "next_feature": "feat-053",
+  "active_feature": "feat-053",
+  "next_feature": "feat-054",
   "features": [
     {
       "id": "feat-001",
@@ -2516,10 +2516,14 @@
       "dependencies": [
         "feat-049"
       ],
-      "status": "in-progress",
+      "status": "done",
       "done_when": "合成组队/计数器插件的序列缺陷被检出；pilot 中适用关系给出结论，不适用的记录原因。",
-      "evidence": "",
-      "evidence_paths": [],
+      "evidence": "自有 per-conversation counter 与 group roster 合成插件通过 Native-first 关系和依赖推断，共生成 24 条确定性有界序列，最大 3/6 步；Hypothesis 状态机及 shrink 测试通过。pilot 60 条目都记录 session isolation 与可选 restart 关系：59 个 session isolation unknown（P7-04 未运行多 actor/stateful 序列）、1 个在 probe 前 clean-skipped；restart relation 60 项按 optional scope skipped 并给出原因。",
+      "evidence_paths": [
+        "outputs/acceptance/p7-p707-stateful-pilot-20261110.json",
+        "lab/automation/p7_stateful.py",
+        "lab/tests/test_p7_stateful.py"
+      ],
       "plan_path": "docs/plans/2026-11-09-phase-7-automated-verification.md"
     },
     {
@@ -2530,7 +2534,7 @@
       "dependencies": [
         "feat-046"
       ],
-      "status": "not-started",
+      "status": "in-progress",
       "done_when": "每个 profile 有锁与准入；曾因缺服务 skipped 的抽样条目在新 profile 下单独记账，不覆盖历史结论。",
       "evidence": "",
       "evidence_paths": [],

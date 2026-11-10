@@ -80,5 +80,6 @@
 - [P7-04 30+30 differential pilot](../../outputs/acceptance/p7-p704-differential-pilot-20261110-retry3.json)（SHA-256 `2c6f4c65402cb986aec39fb1df3f9a01589a16e2c39d9926baded357dc51be5e`）：60 条目全部有终态；21/133 nontrivial，123/133 unknown，未达到全量 P7-09 准入门。
 - [P7-05 C1–C8 contract adjudication](../../outputs/acceptance/p7-p705-contract-pilot-20261110.json)（SHA-256 `e7fd56592fda040994dcb7e77ac823ddb3aa29a405b6db8655f8730882a71769`）：60×8 结论，16 个自有正反观察夹具通过；P7-04 证据支持 12 个 C1 pass，其余 468 格显式 unknown。
 - [P7-06 synthetic mutation regression](../../outputs/acceptance/p7-p706-mutation-regression-20261110.json)（SHA-256 `1efaf4d23b2014bd5fb563195e511b02659c5d5d2b4c2d2f7d44eaf47239e147`）：10/10 自有合成变异被检出；fixture 1、contract 3、differential 5、stateful 1。只衡量合成观察 oracle 敏感度，不代表生产 Core/Host 变异覆盖。
+- [P7-07 stateful pilot adjudication](../../outputs/acceptance/p7-p707-stateful-pilot-20261110.json)（SHA-256 `401fce172d697e66b244b16e805302e877eca880f082d146f10032ec12662cf8`）：自有 counter/group roster 共 24 条依赖序列；pilot 60×2 关系均有终态，未执行的 session isolation 保留 unknown，可选 restart 关系按范围 skipped。
 
 其他 JSON、锁和 traces 保留在 outputs/acceptance 下，由相应报告和历史文档引用；S2-11 复跑使用独立文件名和 SQLite 队列，不能覆盖旧 S2-10 acceptance。
