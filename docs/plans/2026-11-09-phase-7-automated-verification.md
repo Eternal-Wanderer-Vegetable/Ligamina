@@ -100,6 +100,8 @@
 
 **P7-02 检查点（2026-11-10）：** 场景与批次合同 v1、正/负 fixture 和 `lab/scenario_generator.py` 已完成；Hypothesis 锁定在 `lab/uv.lock`。同一清单哈希、描述符、Host、版本与种子稳定生成；类型域、上限 16 的 pairwise、缺必填/多余参数/别名、NoneBot 原始文本、UTC/离线控制、确定性缩减及 volatile 归一化均有单测。预算不足时合同明确返回 `pairwise.complete=false`，不冒充覆盖完成。验证报告 [p7-p702-generation-20261110.json](../../outputs/acceptance/p7-p702-generation-20261110.json)：P7-01 与 P7-02 相关 Lab 测试 14/14、py_compile、diff check 通过；没有执行插件或 Worker。此项只交付输入生成与观测归一化函数，实际 Worker 的随机/时钟/网络控制和 Native×2/Federated 回放仍属于 P7-04。
 
+**P7-03 检查点（2026-11-10）：** stock AstrBot 4.29.1 原生基线已完成，使用自有 `p7_native_test` 平台适配器走 AstrBot 插件管理器、命令过滤器与原生 pipeline；Worker side 不导入 Ligamina Host/Bridge。运行库由 `deploy/lab/linux/astrbot/requirements.lock.txt` 以 `--require-hashes --no-deps` 准备，清单 SHA `c594e3bc43b60e956b3b911aed81d8ad613e9a5c95d4000510c0cf30c366939e`，归档 SHA `ec4e078d982a3ac90539efed022cf74a769cc5bbae2cf480309823aa049d6984`；没有在准备步骤运行目录插件。新 Linux Docker admission 的 benign probes 10/10，准入 `admitted`。冻结 AB-05 teamup/gallery/pet 共 8 个 case × 3 个全新禁网 Worker：24/24 原生尝试通过 source-bound Oracle，24/24 清理确认，24/24 与 Federated 观测按同一 AB-05 Oracle 等价；18/24 回复逐字相同，其余 6 次是 Oracle 明确允许的随机 actor ID pattern。最终报告 [p7-p703-astrbot-native-oracle-20261110.json](../../outputs/acceptance/p7-p703-astrbot-native-oracle-20261110.json)，SHA-256 `39ea221926369b217876a6ed19db243bc6430adefc9397243c9823fda65dbfe9`。早期严格字面比较器与原生观测投影各有一次被保留的诊断报告；修正后完整 Oracle-aware campaign 全通过。下一项 P7-04 / feat-049。
+
 ### 3.3 确定性控制与等价关系（P7-02、P7-04）
 
 - 控制：两路使用相同的随机种子（Python 通过 Worker 预加载设置 `random` 与 `PYTHONHASHSEED`，Node 通过预加载替换 `Math.random`）、相同 `TZ`、禁网。假时钟暂不做，按 P7-04 的数据决定。
@@ -195,7 +197,7 @@ P7-03、P7-08 与 P7-04 可并行。P7-04 与 P7-06 是两个决策点，见第 
 - **Oracle 边界**：差分只证明与原生一致。依赖网络的插件在禁网下只会走错误路径，结论 scope 必须写“仅错误路径”。依赖 LLM provider 的 AstrBot 插件同理。
 - **原生基线自身的偏差**：stock runner 与真实部署存在配置差异；原生侧异常要单独标记，不能混入兼容结论。
 - **规模成本**：每条目 3 次 Worker 运行，全量时长只能在 P7-04 后估算；预算超出时先按生态分批。
-- **任务顺序**：P6-01 / feat-030 于 2026-11-10 完成；受控重复投递和 SQLite 账本去重见[第六阶段计划](2026-11-08-phase-6-runtime-reliability.md) 3.1d。P7-01 / feat-046、P7-02 / feat-047 于 2026-11-10 完成，当前 active feature 为 P7-03 / feat-048。P7-01 的样本指标为源码声明 presence，不是插件运行时 discovery 或全目录估计；P7-02 没有执行插件，真实 Worker 控制和差分仍待 P7-04。受控本地重复投递不代表真实 QQ 重复投递观察。
+- **任务顺序**：P6-01 / feat-030 于 2026-11-10 完成；受控重复投递和 SQLite 账本去重见[第六阶段计划](2026-11-08-phase-6-runtime-reliability.md) 3.1d。P7-01 / feat-046、P7-02 / feat-047、P7-03 / feat-048 均于 2026-11-10 完成，当前 active feature 为 P7-04 / feat-049。P7-01 的样本指标为源码声明 presence，不是插件运行时 discovery 或全目录估计；P7-02 的生成器本身未执行插件，真实 Koishi/NoneBot Worker 控制和差分仍待 P7-04。P7-03 仅覆盖三个已验收 AstrBot 插件与 AB-05 用例。受控本地重复投递不代表真实 QQ 重复投递观察。
 
 ## 8. 验证命令（规划阶段）
 

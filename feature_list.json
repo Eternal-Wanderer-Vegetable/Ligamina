@@ -1,8 +1,8 @@
 {
   "schema_version": 1,
   "updated_at": "2026-11-10",
-  "active_feature": "feat-048",
-  "next_feature": "feat-049",
+  "active_feature": "feat-049",
+  "next_feature": "feat-050",
   "features": [
     {
       "id": "feat-001",
@@ -2412,10 +2412,25 @@
       "dependencies": [
         "feat-045"
       ],
-      "status": "in-progress",
+      "status": "done",
       "done_when": "teamup/gallery/pet 在原生基线与 Federated 下按 AB-05 Oracle 一致；原生侧不导入 Bridge。",
-      "evidence": "",
-      "evidence_paths": [],
+      "evidence": "2026-11-10：stock AstrBot 4.29.1 经自有 p7_native_test 平台适配器运行，原生侧不导入 Host/Bridge。冻结 AB-05 的 teamup/gallery/pet 共 8 个 case 各运行 3 个全新、禁网 Linux Docker Worker；24/24 原生尝试通过同一 AB-05 Oracle，24/24 Worker 清理确认，且 24/24 与 Federated Oracle 等价。18/24 回复逐字相同；其余 6 次仅含 Oracle pattern 允许的随机 actor ID，报告单独记录字面比较与 Oracle 等价。AstrBot 运行库按 requirements.lock 哈希安装并归档，插件只在 admitted Worker 中执行。严格字面比较器曾产生 6 个误报，诊断报告保留；最终 oracle-aware campaign 关闭范围 gate。",
+      "evidence_paths": [
+        "lab/astrbot_native_runtime.py",
+        "lab/astrbot_native_tool_campaign.py",
+        "lab/astrbot_native_tool_side.py",
+        "lab/tests/test_astrbot_native_tool_campaign.py",
+        "outputs/acceptance/p7-p703-astrbot-native-oracle-20261110.json",
+        "outputs/acceptance/p7-p703-astrbot-native-20261110.json",
+        "outputs/acceptance/p7-p703-astrbot-native-smoke-r1-20261110.json",
+        "outputs/acceptance/p7-p703-astrbot-native-smoke-r2-20261110.json",
+        "outputs/acceptance/phase7-linux-admission-20261110.json",
+        "outputs/acceptance/phase7-linux-worker-probes-20261110.json",
+        "outputs/acceptance/phase7-linux-admission-p703-20261110.json",
+        "outputs/acceptance/phase7-linux-worker-probes-p703-20261110.json",
+        "outputs/acceptance/phase7-linux-admission-p703-r2-20261110.json",
+        "outputs/acceptance/phase7-linux-worker-probes-p703-r2-20261110.json"
+      ],
       "plan_path": "docs/plans/2026-11-09-phase-7-automated-verification.md"
     },
     {
@@ -2427,7 +2442,7 @@
         "feat-046",
         "feat-047"
       ],
-      "status": "not-started",
+      "status": "in-progress",
       "done_when": "每条目报告发现/执行/nontrivial 命令数、等价/不等价/nondeterministic 数与资源；不等价项逐条归因；三次全新复跑结论一致。",
       "evidence": "",
       "evidence_paths": [],
