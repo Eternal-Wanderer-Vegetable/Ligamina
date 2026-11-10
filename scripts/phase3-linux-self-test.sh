@@ -59,6 +59,8 @@ trap finish EXIT
     lab.tests.test_native_runner \
     lab.tests.test_compare \
     lab.tests.test_compat_matrix \
+    lab.tests.test_p7_contracts \
+    lab.tests.test_p7_mutations \
     lab.tests.test_baselines.StockBaselineSourceTests.test_both_native_host_profiles_are_present \
     lab.tests.test_baselines.StockBaselineSourceTests.test_linux_profile_cleanup_removes_host_owned_staging_without_docker \
     lab.tests.test_baselines.StockBaselineSourceTests.test_native_baseline_sources_do_not_import_ligamina_bridge \

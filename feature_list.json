@@ -1,8 +1,8 @@
 {
   "schema_version": 1,
   "updated_at": "2026-11-10",
-  "active_feature": "feat-051",
-  "next_feature": "feat-052",
+  "active_feature": "feat-052",
+  "next_feature": "feat-053",
   "features": [
     {
       "id": "feat-001",
@@ -2497,10 +2497,15 @@
         "feat-049",
         "feat-050"
       ],
-      "status": "in-progress",
+      "status": "done",
       "done_when": "每个变异体至少被一层检出或存活原因写明；分层检出率进入报告；PR 上运行小变异体回归。",
-      "evidence": "",
-      "evidence_paths": [],
+      "evidence": "10 个自有 synthetic mutants 全部被 oracle 检出：fixture 1、contract 3、differential 5、stateful 1；PR Linux self-test 增加 contract/mutation 回归并由 workflow 静态检查锁定。检测率仅度量合成观察层的 oracle 敏感度，不是生产 Core/Host mutation score；没有改动产品二进制注入变异。",
+      "evidence_paths": [
+        "outputs/acceptance/p7-p706-mutation-regression-20261110.json",
+        "lab/automation/p7_mutations.py",
+        "lab/tests/test_p7_mutations.py",
+        "scripts/phase3-linux-self-test.sh"
+      ],
       "plan_path": "docs/plans/2026-11-09-phase-7-automated-verification.md"
     },
     {
@@ -2511,7 +2516,7 @@
       "dependencies": [
         "feat-049"
       ],
-      "status": "not-started",
+      "status": "in-progress",
       "done_when": "合成组队/计数器插件的序列缺陷被检出；pilot 中适用关系给出结论，不适用的记录原因。",
       "evidence": "",
       "evidence_paths": [],

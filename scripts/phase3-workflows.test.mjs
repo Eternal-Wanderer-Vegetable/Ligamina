@@ -108,5 +108,7 @@ test('Linux self-test records failure state and never dispatches third-party plu
   assert.match(selfTestScript, /trap finish EXIT/);
   assert.match(selfTestScript, /"windows_tests_run": False/);
   assert.match(selfTestScript, /"plugin_execution": False/);
+  assert.match(selfTestScript, /lab\.tests\.test_p7_mutations/);
+  assert.match(selfTestScript, /lab\.tests\.test_p7_contracts/);
   assert.doesNotMatch(selfTestScript, /execute-recovery-pilot|run_s205/);
 });

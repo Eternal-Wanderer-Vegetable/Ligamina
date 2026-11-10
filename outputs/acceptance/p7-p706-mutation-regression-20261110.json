@@ -1,0 +1,122 @@
+{
+  "schema_version": 1,
+  "kind": "p7_p706_synthetic_mutation_regression",
+  "mutation_version": "p7-synthetic-observations-v1",
+  "status": "passed",
+  "scope": {
+    "mutants": "self-owned synthetic event observations and fixture state",
+    "third_party_artifacts_modified": false,
+    "production_core_host_modified_for_injection": false,
+    "limitation": "This measures oracle sensitivity on synthetic observations; it is not a mutation score for compiled Core/Host runtime code."
+  },
+  "counts": {
+    "mutants": 10,
+    "detected": 10,
+    "survived": 0,
+    "mutation_score": 1.0,
+    "detected_by_layer": {
+      "fixture": 1,
+      "contract": 3,
+      "differential": 5,
+      "stateful": 1
+    }
+  },
+  "layers": [
+    "fixture",
+    "contract",
+    "differential",
+    "stateful"
+  ],
+  "mutants": [
+    {
+      "mutant_id": "wrong_session",
+      "detected": true,
+      "detected_by": [
+        "contract"
+      ],
+      "survival_reason": null,
+      "synthetic_observation_sha256": "d4d49538aeba0fbc4e06d5c63c0ea79c085854721a236772ecc2d07c416ab446"
+    },
+    {
+      "mutant_id": "wrong_account",
+      "detected": true,
+      "detected_by": [
+        "contract"
+      ],
+      "survival_reason": null,
+      "synthetic_observation_sha256": "8e29eebd1200bc57070b7b9f091721571c90e3fb9153724b97455bfe0f61f3bd"
+    },
+    {
+      "mutant_id": "drop_reply",
+      "detected": true,
+      "detected_by": [
+        "differential"
+      ],
+      "survival_reason": null,
+      "synthetic_observation_sha256": "a1704e1ab199a45778609719a155f666679a611a52519c892076956d49a81aad"
+    },
+    {
+      "mutant_id": "duplicate_reply",
+      "detected": true,
+      "detected_by": [
+        "differential"
+      ],
+      "survival_reason": null,
+      "synthetic_observation_sha256": "fd8ee51fb95636ed1533bd6cd425406388181f4ddbfb044ce001a9c41c84fcde"
+    },
+    {
+      "mutant_id": "discard_non_text_segment",
+      "detected": true,
+      "detected_by": [
+        "differential"
+      ],
+      "survival_reason": null,
+      "synthetic_observation_sha256": "03d6b014b5833e183677f4da590d29111c52339c0471fa1feb20292bdf4ae93d"
+    },
+    {
+      "mutant_id": "truncate_text",
+      "detected": true,
+      "detected_by": [
+        "differential"
+      ],
+      "survival_reason": null,
+      "synthetic_observation_sha256": "b587b6555a8cfcbab8722b7dda6efdb4813be8c736f068e0fe4f4b04e264b898"
+    },
+    {
+      "mutant_id": "reorder_replies",
+      "detected": true,
+      "detected_by": [
+        "differential"
+      ],
+      "survival_reason": null,
+      "synthetic_observation_sha256": "ad79ac518b776288a1510bf8a4a835ead34568814c1d2f19d23715a337ee5556"
+    },
+    {
+      "mutant_id": "swallow_handler_exception",
+      "detected": true,
+      "detected_by": [
+        "contract"
+      ],
+      "survival_reason": null,
+      "synthetic_observation_sha256": "bc6cf3c6220bac9031f059be7c2a09264980e9c75950757be1b9235ab1f0140e"
+    },
+    {
+      "mutant_id": "cross_actor_state",
+      "detected": true,
+      "detected_by": [
+        "stateful"
+      ],
+      "survival_reason": null,
+      "synthetic_observation_sha256": "d9bfd37d76c762c41c96b0d62c579182fe8f468f25c45e081a785679dc8a296d"
+    },
+    {
+      "mutant_id": "share_data_directory",
+      "detected": true,
+      "detected_by": [
+        "fixture"
+      ],
+      "survival_reason": null,
+      "synthetic_observation_sha256": "e6493f14f0f49ba41b376a488a9e153d02c87f186b7790867e4cc2863364337d"
+    }
+  ]
+}

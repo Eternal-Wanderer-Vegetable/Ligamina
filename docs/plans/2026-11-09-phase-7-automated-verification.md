@@ -112,6 +112,8 @@
 
 **P7-05 完成 checkpoint（2026-11-10）：** `lab/automation/p7_contracts.py` 实现 C1–C8 oracle、missing-evidence unknown 规则和 pilot adjudication，并接入 `p7_differential_campaign.py` 每条 entry 输出。16 个自有 positive/negative contract fixtures（每项各一）全部按预期分类。用独立命令 `uv run --locked --project lab --python 3.12.14 python -m lab.automation.p7_contracts --pilot outputs/acceptance/p7-p704-differential-pilot-20261110-retry3.json --output outputs/acceptance/p7-p705-contract-pilot-20261110.json` 生成绑定源报告哈希的 60×8 审计；480 格中 C1 为 12 passed、48 unknown，C2–C8 共 420 unknown，因为 P7-04 没有运行对应事件、异常、超时或 MCP 调用 stimulus。未知保留原样，不按原生差分结论推定通过。报告 SHA-256 `e7fd56592fda040994dcb7e77ac823ddb3aa29a405b6db8655f8730882a71769`。定向 Lab 16/16；Core `host_session`/`supervisor` 13/13；CLI `command_tools` 4/4（覆盖命令工具和晚到结果拒绝）。后两组提供既有实现证据，但不会替换 pilot 中缺失的 C2–C8 逐项观察。下一项为 P7-06 / feat-051。
 
+**P7-06 完成 checkpoint（2026-11-10）：** `lab/automation/p7_mutations.py` 对自有合成事件观察和 fixture 状态运行 10 个确定性变体：错发会话、错发账号、丢回复、重复回复、丢非文本段、截断文本、回复乱序、吞处理器异常、actor 状态串用、共享数据目录。10/10 被检出，分层为 fixture 1、contract 3、differential 5、stateful 1，存活 0。报告 [mutation regression](../../outputs/acceptance/p7-p706-mutation-regression-20261110.json)，SHA-256 `1efaf4d23b2014bd5fb563195e511b02659c5d5d2b4c2d2f7d44eaf47239e147`。PR workflow 的 `phase3-linux-self-test` 加入 `test_p7_contracts` 与 `test_p7_mutations` 小型回归；Lab 定向 6/6，workflow 静态检查 5/5。**范围限制：** 变体作用于自有合成观察/fixture，不是对编译后 Core/Host 的 mutation score；没有注入生产构建故障点，也没有改动第三方归档。此结果证明当前 oracle 对这些合成偏差敏感，不能外推为运行时代码 mutation coverage。
+
 **P7-04 → P7-09 准入裁决：** 以 `nontrivial >= 30%`、`unknown <= 50%`、行为条目三轮结论一致、Worker 清理全部确认作为全量前最低 pilot 门槛。30% 要求至少每三条已执行命令有一条触达用法提示外的行为路径；unknown 上限避免全量预算主要花在不可判定场景。当前 nontrivial 为 21/133 = 15.8%，unknown 为 123/133 = 92.5%，因此暂不准入 P7-09。先完成 P7-05 至 P7-08，改进契约覆盖、检测器有效性、有状态输入和服务/config profile，再用新证据重审；不要把未知改写为通过。
 
 - 控制：两路使用相同的随机种子（Python 通过 Worker 预加载设置 `random` 与 `PYTHONHASHSEED`，Node 通过预加载替换 `Math.random`）、相同 `TZ`、禁网。假时钟暂不做，按 P7-04 的数据决定。
@@ -207,7 +209,7 @@ P7-03、P7-08 与 P7-04 可并行。P7-04 与 P7-06 是两个决策点，见第 
 - **Oracle 边界**：差分只证明与原生一致。依赖网络的插件在禁网下只会走错误路径，结论 scope 必须写“仅错误路径”。依赖 LLM provider 的 AstrBot 插件同理。
 - **原生基线自身的偏差**：stock runner 与真实部署存在配置差异；原生侧异常要单独标记，不能混入兼容结论。
 - **规模成本**：每条目 3 次 Worker 运行，全量时长只能在 P7-04 后估算；预算超出时先按生态分批。
-- **任务顺序**：P6-01 / feat-030 于 2026-11-10 完成；受控重复投递和 SQLite 账本去重见[第六阶段计划](2026-11-08-phase-6-runtime-reliability.md) 3.1d。P7-01 至 P7-05（feat-046–050）均于 2026-11-10 完成，当前 active feature 为 P7-06 / feat-051。P7-01 的样本指标为源码声明 presence，不是运行时 discovery 或全目录估计；P7-03 只覆盖三个已验收 AstrBot 插件与 AB-05 用例。P7-04 30+30 pilot 的 unknown/nontrivial gate 未达全量门槛；P7-09 当前不准入，先完成 P7-06 至 P7-08 后复核。受控本地重复投递不代表真实 QQ 重复事件观察。
+- **任务顺序**：P6-01 / feat-030 于 2026-11-10 完成；受控重复投递和 SQLite 账本去重见[第六阶段计划](2026-11-08-phase-6-runtime-reliability.md) 3.1d。P7-01 至 P7-06（feat-046–051）均于 2026-11-10 完成，当前 active feature 为 P7-07 / feat-052。P7-01 的样本指标为源码声明 presence，不是运行时 discovery 或全目录估计；P7-03 只覆盖三个已验收 AstrBot 插件与 AB-05 用例。P7-04 30+30 pilot 的 unknown/nontrivial gate 未达全量门槛；P7-09 当前不准入，先完成 P7-07 至 P7-08 后复核。受控本地重复投递不代表真实 QQ 重复事件观察。
 
 ## 8. 验证命令（规划阶段）
 
