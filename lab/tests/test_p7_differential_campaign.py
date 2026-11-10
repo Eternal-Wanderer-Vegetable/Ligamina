@@ -1,0 +1,109 @@
+from __future__ import annotations
+
+import hashlib
+import json
+import tempfile
+import unittest
+from pathlib import Path
+
+from lab.automation import phase4_campaign
+from lab.automation.p7_differential_campaign import (
+    _command_summary,
+    _nontrivial_commands,
+    _round_scenario_results,
+    _write_final,
+)
+from lab.automation.phase4_worker_side import _scrub_result_diagnostics
+
+
+def _observation(message: str, event_id: str = "evt-1") -> dict[str, object]:
+    return {
+        "status": "completed",
+        "operations": [
+            {
+                "source_event_id": event_id,
+                "account_id": "100000",
+                "operation": "send_message",
+                "target": {"kind": "private", "id": "200000"},
+                "params": {"message": [{"type": "text", "text": message}]},
+            }
+        ],
+    }
+
+
+class DifferentialCampaignTests(unittest.TestCase):
+    def test_no_gateway_operation_is_unknown_instead_of_nondeterministic(self) -> None:
+        scenarios = [{"scenario_id": "scn-one", "event_id": "evt-1", "command_id": "echo", "kind": "raw_text"}]
+        empty = {"status": "completed", "operations": []}
+
+        rows, _, _, _ = _round_scenario_results(scenarios, empty, empty, empty)
+
+        self.assertEqual(rows[0]["status"], "unknown")
+        self.assertEqual(rows[0]["native_self_status"], "unknown")
+        self.assertEqual(rows[0]["reason_code"], "no_native_gateway_operation_observed")
+
+    def test_native_variation_is_nondeterministic_but_federated_difference_is_non_equivalent(self) -> None:
+        scenarios = [{"scenario_id": "scn-one", "event_id": "evt-1", "command_id": "echo", "kind": "raw_text"}]
+
+        varied, _, _, _ = _round_scenario_results(
+            scenarios, _observation("first"), _observation("second"), _observation("first")
+        )
+        mismatch, _, _, _ = _round_scenario_results(
+            scenarios, _observation("same"), _observation("same"), _observation("different")
+        )
+
+        self.assertEqual(varied[0]["status"], "nondeterministic")
+        self.assertEqual(mismatch[0]["status"], "non_equivalent")
+
+    def test_nontrivial_requires_stable_observed_normal_and_edge_outputs(self) -> None:
+        scenarios = [
+            {"event_id": "normal", "command_id": "echo", "kind": "raw_text", "arguments_nonempty": True},
+            {"event_id": "edge", "command_id": "echo", "kind": "raw_text", "arguments_nonempty": False},
+        ]
+        no_output = {"events": {"normal": [], "edge": []}}
+        output_one = {"events": {"normal": [{"message": "ok"}], "edge": [{"message": "usage"}]}}
+        output_two = json.loads(json.dumps(output_one))
+
+        self.assertEqual(_nontrivial_commands(scenarios, [(no_output, no_output)]), {"echo": "not_assessed"})
+        self.assertEqual(_nontrivial_commands(scenarios, [(output_one, output_two)]), {"echo": "nontrivial"})
+
+    def test_command_consistency_requires_three_fresh_reruns(self) -> None:
+        descriptor = {"command_id": "echo"}
+        scenario = {"scenario_id": "scn-one", "command_id": "echo", "event_id": "evt-1", "kind": "raw_text", "arguments_nonempty": True}
+        one_round = [[{"scenario_id": "scn-one", "command_id": "echo", "status": "equivalent"}]]
+
+        summary = _command_summary([descriptor], [scenario], [], one_round, [])
+
+        self.assertFalse(summary["items"][0]["consistent_across_three_fresh_reruns"])
+
+    def test_final_report_sidecar_hash_matches_written_bytes(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / "report.json"
+            digest = _write_final(path, {"status": "completed"})
+            raw = path.read_bytes()
+
+            self.assertEqual(digest, hashlib.sha256(raw).hexdigest())
+            self.assertEqual(path.with_suffix(".json.sha256").read_text(encoding="ascii").split()[0], digest)
+            self.assertNotIn("report_sha256", json.loads(raw))
+
+    def test_p7_source_bundle_includes_koishi_runner_fingerprint_module(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            project = Path(directory) / "project"
+            phase4_campaign._copy_python_sources(project)
+
+            self.assertTrue((project / "lab/baselines/koishi/artifact_fingerprint.mjs").is_file())
+
+    def test_raw_diagnostic_is_replaced_with_scrubbed_summary_and_hash(self) -> None:
+        result = _scrub_result_diagnostics({"diagnostic": "RuntimeError: password=private-value"})
+
+        self.assertNotIn("diagnostic", result)
+        self.assertNotIn("private-value", json.dumps(result))
+        self.assertEqual(
+            result["diagnostic_evidence"]["sha256"],
+            hashlib.sha256(b"RuntimeError: password=private-value").hexdigest(),
+        )
+        self.assertEqual(result["diagnostic_summary"], "RuntimeError: <redacted-field>")
+
+
+if __name__ == "__main__":
+    unittest.main()

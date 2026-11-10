@@ -79,6 +79,51 @@ def _fingerprints(context: dict[str, Any], stimulus: dict[str, Any]) -> dict[str
     }
 
 
+def _native_command_descriptors(driver: Any) -> list[dict[str, Any]]:
+    """Describe stock NoneBot command matchers without importing the Ligamina Host."""
+    from nonebot.matcher import matchers
+    from nonebot.rule import CommandRule, ShellCommandRule
+
+    config = getattr(driver, "config", None)
+    starts = sorted(getattr(config, "command_start", None) or {"/"})
+    prefix = "" if "" in starts else starts[0]
+    separators = sorted(getattr(config, "command_sep", None) or {"."})
+    separator = separators[0]
+    descriptors: list[dict[str, Any]] = []
+    seen: set[str] = set()
+    for priority in sorted(matchers.keys()):
+        for matcher in matchers[priority]:
+            rule = None
+            for dependent in getattr(getattr(matcher, "rule", None), "checkers", ()):
+                call = getattr(dependent, "call", None)
+                if isinstance(call, (CommandRule, ShellCommandRule)):
+                    rule = call
+                    break
+            if rule is None:
+                continue
+            ordered = sorted((command for command in rule.cmds if command), key=lambda item: (-len(item), separator.join(item)))
+            names = [separator.join(command) for command in ordered]
+            names = [name for name in names if name and not any(char.isspace() for char in name)]
+            if not names:
+                continue
+            command_id = names[0]
+            if command_id in seen or len(descriptors) >= 512:
+                continue
+            seen.add(command_id)
+            descriptor: dict[str, Any] = {
+                "command_id": command_id[:96],
+                "invocation": (prefix + command_id)[:256],
+                "framework": "nonebot",
+                "usage": (f"{prefix}{command_id} [shell-style arguments]" if isinstance(rule, ShellCommandRule)
+                          else f"{prefix}{command_id} <text>")[:1024],
+            }
+            aliases = [prefix + name for name in names[1:]]
+            if aliases:
+                descriptor["aliases"] = [alias[:256] for alias in aliases[:64]]
+            descriptors.append(descriptor)
+    return sorted(descriptors, key=lambda item: item["command_id"])
+
+
 def _probe_observation(work: Path, events: list[dict[str, Any]]) -> dict[str, Any]:
     data_root = (work / "nonebot-data").resolve()
     path = (data_root / "phase4-probes" / "observations.ndjson").resolve()
@@ -122,6 +167,12 @@ async def _run(request: dict[str, Any]) -> dict[str, Any]:
     sample = context["sample"]
     behavior_fixture = context.get("behavior_fixture")
     work = Path(context.get("execution", {}).get("workspace", context["work_dir"])).resolve()
+    seed = context.get("execution", {}).get("random_seed")
+    if isinstance(seed, int) and not isinstance(seed, bool):
+        import random
+
+        random.seed(seed)
+        os.environ["LIGAMINA_BEHAVIOR_RANDOM_SEED"] = str(seed)
     site.addsitedir(str(Path(context["site_packages"]).resolve()))
     os.environ["HOME"] = str(work / "native-home")
     os.environ["TEMP"] = str(work / "native-temp")
@@ -178,11 +229,13 @@ async def _run(request: dict[str, Any]) -> dict[str, Any]:
     for plugin_name in plugin_names:
         if nonebot.load_plugin(plugin_name) is None:
             raise RuntimeError(f"NoneBot could not load plugin {plugin_name!r}")
+    runtime_commands = _native_command_descriptors(driver)
 
     operations: list[dict[str, Any]] = []
     receipts: list[dict[str, Any]] = []
     api_inputs: list[dict[str, Any]] = []
     current_event_id: str | None = None
+    capture_source_event_id = bool(behavior_fixture or context.get("execution", {}).get("capture_source_event_id"))
 
     async def native_api(bot: Any, api: str, **params: Any) -> Any:
         if api == "get_msg":
@@ -220,7 +273,7 @@ async def _run(request: dict[str, Any]) -> dict[str, Any]:
             "target": target,
             "params": {"message": _message_segments(params.get("message", []))},
         }
-        if behavior_fixture:
+        if capture_source_event_id:
             operation["source_event_id"] = current_event_id
         operations.append(operation)
         receipt = {
@@ -228,7 +281,7 @@ async def _run(request: dict[str, Any]) -> dict[str, Any]:
             "status": "succeeded",
             "target": target,
         }
-        if behavior_fixture:
+        if capture_source_event_id:
             receipt["account_id"] = str(bot.self_id)
             receipt["source_event_id"] = current_event_id
         receipts.append(receipt)
@@ -307,6 +360,7 @@ async def _run(request: dict[str, Any]) -> dict[str, Any]:
             "adapter": "OneBot v11",
             "bridge_modules": bridge_modules,
             "api_inputs": api_inputs,
+            "runtime_commands": runtime_commands,
         },
     }
     if behavior_fixture:

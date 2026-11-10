@@ -31,6 +31,8 @@ def _docker_side(request: dict[str, Any], options: argparse.Namespace) -> dict[s
         "lockfile": (
             "/input/project/sample/requirements.txt"
             if context.get("sample", {}).get("ecosystem") == "nonebot"
+            else "/input/project/sample/original-package-lock.json"
+            if (options.bundle / "project/sample/original-package-lock.json").is_file()
             else "/input/project/sample/package-lock.json"
         ),
         "profile": "/input/project/samples/profiles/"

@@ -37,13 +37,25 @@ _PROCESS_ENVIRONMENT = {
 }
 
 
-def _harness_environment(mode: str) -> dict[str, str]:
+def _harness_environment(mode: str, case: dict[str, Any] | None = None) -> dict[str, str]:
     environment = {
         key: value
         for key, value in os.environ.items()
         if key.upper() in _PROCESS_ENVIRONMENT
     }
     environment["LIGAMINA_RUN_MODE"] = mode
+    context = (case or {}).get("context", {})
+    execution = context.get("execution", {}) if isinstance(context, dict) else {}
+    seed = execution.get("random_seed") if isinstance(execution, dict) else None
+    if isinstance(seed, int) and not isinstance(seed, bool) and seed >= 0:
+        environment.update({
+            "TZ": "UTC",
+            "PYTHONHASHSEED": str(seed % 2**32),
+            "LIGAMINA_BEHAVIOR_RANDOM_SEED": str(seed),
+        })
+        sample = context.get("sample", {})
+        if isinstance(sample, dict) and sample.get("ecosystem") == "koishi":
+            environment["NODE_OPTIONS"] = "--require=/input/project/lab/baselines/seed_node_random.cjs"
     return environment
 
 
@@ -71,7 +83,7 @@ def execute_harness(
             encoding="utf-8",
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,
-            env=_harness_environment(mode),
+            env=_harness_environment(mode, case),
             cwd=cwd,
             timeout=timeout_seconds,
             check=False,

@@ -98,6 +98,30 @@ def _sha256_file(path: Path) -> str:
     return digest.hexdigest()
 
 
+def _tree_sha256(root: Path) -> str:
+    rows = []
+    for path in sorted(root.rglob("*")):
+        if path.is_symlink():
+            raise ValueError(f"runtime artifact tree contains a symlink: {path}")
+        if path.is_file():
+            rows.append({"path": path.relative_to(root).as_posix(), "sha256": _sha256_file(path)})
+    encoded = json.dumps(rows, ensure_ascii=False, sort_keys=True, separators=(",", ":")).encode("utf-8")
+    return hashlib.sha256(encoded).hexdigest()
+
+
+def _scrub_result_diagnostics(result: dict[str, Any]) -> dict[str, Any]:
+    """Replace raw harness diagnostics with bounded scrubbed summaries and hashes."""
+    for key in ("diagnostic", "diagnostics", "stderr"):
+        raw = result.pop(key, None)
+        if isinstance(raw, str) and raw:
+            result[f"{key}_evidence"] = {
+                "sha256": hashlib.sha256(raw.encode("utf-8", errors="replace")).hexdigest(),
+                "size_bytes": len(raw.encode("utf-8", errors="replace")),
+            }
+            result["diagnostic_summary" if key == "diagnostic" else f"{key}_summary"] = _safe_diagnostic_summary(raw)
+    return result
+
+
 def _prepare_profile(request: dict[str, Any]) -> dict[str, Any]:
     context = request["context"]
     ecosystem = context["sample"]["ecosystem"]
@@ -147,34 +171,43 @@ def _prepare_profile(request: dict[str, Any]) -> dict[str, Any]:
 
     if ecosystem != "koishi":
         raise ValueError(f"unsupported Phase 4 ecosystem: {ecosystem!r}")
-    archive = Path("/input/project/sample/npm-cache.tar.gz")
-    if _sha256_file(archive) != context["npm_cache_sha256"]:
-        raise RuntimeError("offline npm cache archive differs from its prepared asset report")
-    with tarfile.open(archive, mode="r:gz") as stream:
-        stream.extractall("/work", filter="data")
-    shutil.copy2("/input/project/sample/package.json", profile / "package.json")
-    shutil.copy2("/input/project/sample/package-lock.json", profile / "package-lock.json")
+    runtime_artifacts = context.get("runtime_artifacts", {})
+    local_tarballs = runtime_artifacts.get("koishi_install") == "localized_tarballs"
+    if local_tarballs:
+        expected_local_lock = runtime_artifacts.get("localized_package_lock_sha256")
+        localized_lock = Path("/input/project/sample/package-lock.json")
+        if not isinstance(expected_local_lock, str) or _sha256_file(localized_lock) != expected_local_lock:
+            raise RuntimeError("localized Koishi lock differs from its prepared input manifest")
+        shutil.copy2("/input/project/sample/package.json", profile / "package.json")
+        shutil.copy2(localized_lock, profile / "package-lock.json")
+        shutil.copytree("/input/project/sample/tarballs", profile / "tarballs")
+        cache = None
+    else:
+        archive = Path("/input/project/sample/npm-cache.tar.gz")
+        if _sha256_file(archive) != context["npm_cache_sha256"]:
+            raise RuntimeError("offline npm cache archive differs from its prepared asset report")
+        with tarfile.open(archive, mode="r:gz") as stream:
+            stream.extractall("/work", filter="data")
+        shutil.copy2("/input/project/sample/package.json", profile / "package.json")
+        shutil.copy2("/input/project/sample/package-lock.json", profile / "package-lock.json")
+        cache = Path("/work/npm-cache")
+        if not cache.is_dir():
+            raise RuntimeError("offline npm cache archive has no npm-cache directory")
     shutil.copy2("/input/project/sample/artifact.bin", profile / "artifact.bin")
-    cache = Path("/work/npm-cache")
-    if not cache.is_dir():
-        raise RuntimeError("offline npm cache archive has no npm-cache directory")
-    install = _run(
-        [
-            "/usr/local/bin/node",
-            "/usr/local/lib/node_modules/npm/bin/npm-cli.js",
-            "ci",
-            "--offline",
-            "--ignore-scripts",
-            "--no-audit",
-            "--fund=false",
-            "--strict-peer-deps",
-            "--engine-strict",
-            "--cache",
-            str(cache),
-        ],
-        cwd=profile,
-        timeout=600,
-    )
+    npm_command = [
+        "/usr/local/bin/node",
+        "/usr/local/lib/node_modules/npm/bin/npm-cli.js",
+        "ci",
+        "--offline",
+        "--ignore-scripts",
+        "--no-audit",
+        "--fund=false",
+        "--strict-peer-deps",
+        "--engine-strict",
+    ]
+    if cache is not None:
+        npm_command.extend(["--cache", str(cache)])
+    install = _run(npm_command, cwd=profile, timeout=600)
     if install.returncode:
         raise RuntimeError(f"locked offline npm profile install failed: {install.stderr[-2000:]}")
     package_name = context["sample"]["package"]
@@ -210,6 +243,19 @@ def _prepare_profile(request: dict[str, Any]) -> dict[str, Any]:
     driver_target.parent.mkdir(parents=True, exist_ok=True)
     driver_target.symlink_to(sqlite_driver, target_is_directory=True)
 
+    expected_host_dist = runtime_artifacts.get("koishi_host_dist_sha256")
+    if expected_host_dist is not None:
+        bundled_host_dist = Path("/input/project/sample/koishi-host-dist").resolve(strict=True)
+        if _tree_sha256(bundled_host_dist) != expected_host_dist:
+            raise RuntimeError("current Koishi Host build differs from its bound runtime artifact hash")
+        bundled_host_root = profile / "ligamina-koishi-host"
+        if not bundled_host_root.is_symlink():
+            raise RuntimeError("expected the profile Koishi Host link before applying the current build")
+        bundled_host_root.unlink()
+        bundled_host_root.mkdir(parents=True)
+        shutil.copytree(bundled_host_dist, bundled_host_root / "dist")
+        (bundled_host_root / "node_modules").symlink_to(host_root / "node_modules", target_is_directory=True)
+
     resolver = _run(
         [
             "/usr/local/bin/node",
@@ -232,11 +278,17 @@ def _prepare_profile(request: dict[str, Any]) -> dict[str, Any]:
     harness = profile / ".ligamina/koishi/runner.mjs"
     harness.parent.mkdir(parents=True, exist_ok=True)
     shutil.copy2("/input/project/lab/baselines/koishi/runner.mjs", harness)
+    shutil.copy2(
+        "/input/project/lab/baselines/koishi/artifact_fingerprint.mjs",
+        harness.parent / "artifact_fingerprint.mjs",
+    )
     return {
         "status": "passed",
-        "kind": "locked_npm_offline_install",
+        "kind": "locked_npm_offline_install_local_tarballs" if local_tarballs else "locked_npm_offline_install",
         "lock_sha256": context["expected_environment"]["lockfile_sha256"],
-        "npm_cache_sha256": context["npm_cache_sha256"],
+        "npm_cache_sha256": context.get("npm_cache_sha256"),
+        "localized_package_lock_sha256": runtime_artifacts.get("localized_package_lock_sha256"),
+        "koishi_host_dist_sha256": expected_host_dist,
         "framework_version": "4.18.11",
         "host_lock_sha256": context["host_lock_sha256"],
     }
@@ -252,17 +304,34 @@ def run_side(request: dict[str, Any]) -> dict[str, Any]:
         raise ValueError("side request does not select a registered execution mode")
     ecosystem = context.get("sample", {}).get("ecosystem")
     setup_evidence = _prepare_profile(request)
+    runtime_artifacts = context.get("runtime_artifacts", {})
+    core_path = "/usr/local/bin/ligamina-cli"
+    expected_core_hash = runtime_artifacts.get("core_cli_sha256")
+    if expected_core_hash is not None:
+        bundled_core = Path("/input/project/sample/ligamina-cli").resolve(strict=True)
+        if _sha256_file(bundled_core) != expected_core_hash:
+            raise RuntimeError("current Linux Core binary differs from its bound runtime artifact hash")
+        core_path = str(bundled_core)
     context["repo_root"] = "/input/project"
     context["work_dir"] = "/work/profile"
     context["node_executable"] = "/usr/local/bin/node"
     context["execution"]["workspace"] = "/work/side"
     context["host_environment"].update(
         {
-            "LIGAMINA_CORE_EXECUTABLE": "/usr/local/bin/ligamina-cli",
+            "LIGAMINA_CORE_EXECUTABLE": core_path,
             "LIGAMINA_NODE_EXECUTABLE": "/usr/local/bin/node",
             "PATH": "/usr/local/bin:/usr/bin:/bin",
         }
     )
+    seed = context["execution"].get("random_seed")
+    if isinstance(seed, int) and not isinstance(seed, bool) and seed >= 0:
+        context["host_environment"].update({
+            "TZ": "UTC",
+            "PYTHONHASHSEED": str(seed % 2**32),
+            "LIGAMINA_BEHAVIOR_RANDOM_SEED": str(seed),
+        })
+        if ecosystem == "koishi":
+            context["host_environment"]["LIGAMINA_NODE_RANDOM_PRELOAD"] = "/input/project/lab/baselines/seed_node_random.cjs"
     Path("/work/side").mkdir(parents=True, exist_ok=True)
     if ecosystem == "nonebot":
         # Tool mode reuses the Federated harness: same Core/Host, MCP tool calls instead of events.
@@ -276,14 +345,7 @@ def run_side(request: dict[str, Any]) -> dict[str, Any]:
         if mode in {"federated", "tool"}:
             command = [sys.executable, "/input/project/lab/baselines/federated.py"]
     result = execute_harness(command, request, mode, 180, cwd=Path("/work/side"))
-    for key in ("diagnostics", "stderr"):
-        raw = result.pop(key, None)
-        if isinstance(raw, str) and raw:
-            result[f"{key}_evidence"] = {
-                "sha256": hashlib.sha256(raw.encode("utf-8", errors="replace")).hexdigest(),
-                "size_bytes": len(raw.encode("utf-8", errors="replace")),
-            }
-            result[f"{key}_summary"] = _safe_diagnostic_summary(raw)
+    result = _scrub_result_diagnostics(result)
     result["profile_setup"] = setup_evidence
     return result
 

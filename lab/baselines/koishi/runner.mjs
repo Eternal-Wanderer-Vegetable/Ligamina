@@ -79,6 +79,49 @@ function messageSegments(content) {
   return text ? [{ type: 'text', text }] : []
 }
 
+// Independent stock-framework inventory used by the P7 Native baseline. This
+// intentionally reads Koishi's registered command objects instead of importing
+// Ligamina Host inventory code.
+function nativeCommandDescriptors(app) {
+  const commands = app?.$commander?._commandList ?? []
+  const descriptors = []
+  for (const command of commands) {
+    if (descriptors.length >= 512) break
+    const name = typeof command?.name === 'string' ? command.name : ''
+    if (!name || /\s/.test(name)) continue
+    const descriptor = { command_id: name, invocation: name, framework: 'koishi' }
+    const declaration = typeof command.declaration === 'string' ? command.declaration.trim() : ''
+    const optionSyntax = Object.values(command._options ?? {})
+      .map((option) => typeof option?.syntax === 'string' ? `[${option.syntax}]` : '')
+      .filter(Boolean)
+    const usage = [name, declaration, ...optionSyntax].filter(Boolean).join(' ')
+    if (usage) descriptor.usage = usage.slice(0, 1024)
+    const aliases = Object.keys(command._aliases ?? {}).filter((alias) => alias !== name && alias.trim())
+    if (aliases.length) descriptor.aliases = aliases.slice(0, 64).map((alias) => alias.slice(0, 256))
+    const args = (Array.isArray(command._arguments) ? command._arguments : [])
+      .filter((argument) => typeof argument?.name === 'string' && argument.name)
+      .slice(0, 64)
+      .map((argument) => ({
+        name: argument.name.slice(0, 128),
+        required: argument.required === true,
+        ...(argument.variadic === true ? { variadic: true } : {}),
+        ...(typeof argument.type === 'string' ? { type: argument.type.slice(0, 64) } : {}),
+      }))
+    if (args.length) descriptor.arguments = args
+    const options = Object.values(command._options ?? {})
+      .filter((option) => typeof option?.name === 'string' && option.name)
+      .slice(0, 64)
+      .map((option) => ({
+        name: option.name.slice(0, 128),
+        ...(typeof option.syntax === 'string' ? { syntax: option.syntax.slice(0, 256) } : {}),
+        ...(typeof option.type === 'string' ? { type: option.type.slice(0, 64) } : {}),
+      }))
+    if (options.length) descriptor.options = options
+    descriptors.push(descriptor)
+  }
+  return descriptors.sort((left, right) => left.command_id.localeCompare(right.command_id))
+}
+
 class NativeAdapter extends Adapter {}
 
 class NativeBot extends Bot {
@@ -130,6 +173,7 @@ async function main() {
   const app = new Context({ nickname: ['Bot'] })
   const removeBotDisposeListeners = []
   const bots = new Map()
+  const captureSourceEventId = Boolean(behaviorFixture || context.execution?.capture_source_event_id)
 
   const nativeDataDirectory = resolve(work, 'native-koishi-data')
   await mkdir(nativeDataDirectory, { recursive: true })
@@ -155,7 +199,7 @@ async function main() {
   }
   const events = request.stimulus.events
   for (const accountId of [...new Set(events.map((event) => String(event.account_id)))]) {
-    const bot = new NativeBot(app, operations, receipts, accountId, Boolean(behaviorFixture))
+    const bot = new NativeBot(app, operations, receipts, accountId, captureSourceEventId)
     bots.set(accountId, bot)
     adapter.fork(app, bot)
   }
@@ -241,6 +285,7 @@ async function main() {
     cleanup: { active_capability_count: 0, live_processes: [] },
     stock_native: { framework: 'Koishi', api: 'Context/Session/Bot', bridge_adapter_imported: false },
   }
+  report.stock_native.runtime_commands = nativeCommandDescriptors(app)
   if (behaviorFixture) {
     report.native_trace = { bridge_adapter_imported: false }
     report.binding = context.binding

@@ -203,6 +203,7 @@ def run(request: dict[str, Any]) -> dict[str, Any]:
     # Tool mode (TOOL-04): call the plugin's native commands as MCP tools instead of
     # sending platform events. Tool sessions run as a fresh, unprivileged actor.
     tool_calls = request["stimulus"].get("tool_calls")
+    discover_commands = context.get("execution", {}).get("discover_commands") is True
     fixture_events = [] if tool_calls is not None else request["stimulus"]["events"]
     if behavior_fixture:
         if behavior_fixture.get("adapter", {}).get("id") != f"{sample['ecosystem']}.onebot.v11":
@@ -293,7 +294,15 @@ def run(request: dict[str, Any]) -> dict[str, Any]:
         config = sample.get("fixture", {}).get("plugin_config")
         if config:
             environment["LIGAMINA_KOISHI_PLUGIN_CONFIG"] = json.dumps({module_url: config}, ensure_ascii=False)
-    trace = run_federated(sample, work, environment, events, profile_work=profile_work, tool_calls=tool_calls)
+    trace = run_federated(
+        sample,
+        work,
+        environment,
+        events,
+        profile_work=profile_work,
+        tool_calls=tool_calls,
+        discover_commands=discover_commands,
+    )
     if trace.get("cleanup", {}).get("host_alive_after_shutdown") is not False:
         raise RuntimeError("federated Host process cleanup was not confirmed")
 
@@ -317,9 +326,10 @@ def run(request: dict[str, Any]) -> dict[str, Any]:
             "target": target,
             "params": {"message": message},
         })
-        if behavior_fixture:
-            trace_id = operation.get("trace_id")
-            messages[-1]["source_event_id"] = event_by_trace.get(trace_id)
+        trace_id = operation.get("trace_id")
+        source_event_id = event_by_trace.get(trace_id)
+        if source_event_id is not None:
+            messages[-1]["source_event_id"] = source_event_id
         receipt_doc = record.get("receipt", {})
         receipt = receipt_doc.get("result", receipt_doc)
         if receipt.get("status") != "succeeded":
@@ -355,6 +365,8 @@ def run(request: dict[str, Any]) -> dict[str, Any]:
             "gateway_operation_count": len(messages),
         }
         return result
+    if discover_commands:
+        result["command_inventory"] = trace.get("command_inventory", {})
     if behavior_fixture:
         result["binding"] = context.get("binding")
         result["capability_probe_observation"] = _phase4_probe_observation(sample["ecosystem"], work, fixture_events)

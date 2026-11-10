@@ -5,6 +5,7 @@ from __future__ import annotations
 import asyncio
 import json
 import os
+import random
 import sys
 import uuid
 from typing import Any
@@ -255,6 +256,15 @@ class WorkerError(RuntimeError):
 
 
 def main() -> None:
+    raw_seed = os.environ.get("LIGAMINA_BEHAVIOR_RANDOM_SEED")
+    if raw_seed is not None:
+        try:
+            seed = int(raw_seed)
+        except ValueError as error:
+            raise RuntimeError("LIGAMINA_BEHAVIOR_RANDOM_SEED must be an integer") from error
+        if seed < 0:
+            raise RuntimeError("LIGAMINA_BEHAVIOR_RANDOM_SEED must be non-negative")
+        random.seed(seed)
     asyncio.run(Worker().run())
 
 
