@@ -48,7 +48,7 @@ async def main() -> None:
             from ligamina_astrbot.inventory import describe_runtime_inventory
             from jsonschema import Draft202012Validator
 
-            schema_path = HERE.parents[3] / "contracts" / "lab" / "inventory" / "v1" / "capability-inventory.schema.json"
+            schema_path = HERE.parents[2] / "contracts" / "lab" / "inventory" / "v1" / "capability-inventory.schema.json"
             schema = json.loads(schema_path.read_text(encoding="utf-8"))
             inventory = describe_runtime_inventory(lifecycle)
             assert list(Draft202012Validator(schema).iter_errors(inventory)) == [], inventory
