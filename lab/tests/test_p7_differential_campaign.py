@@ -92,6 +92,60 @@ class DifferentialCampaignTests(unittest.TestCase):
 
         self.assertEqual(event["conversation"], {"kind": "group", "id": "group-1"})
 
+    def test_nonebot_group_scenario_keeps_group_and_uses_numeric_group_id(self) -> None:
+        scenario = {
+            "scenario_id": "scn-nonebot-group",
+            "actors": [{"actor_id": "actor-1", "account_id": "account-1"}],
+            "conversations": [{
+                "conversation_id": "group-1",
+                "kind": "group",
+                "actor_id": "actor-1",
+                "account_id": "account-1",
+            }],
+            "controls": {"fixed_time_utc": "2026-11-10T00:00:00Z"},
+            "steps": [{
+                "kind": "tool_call",
+                "host_id": "nonebot",
+                "actor_id": "actor-1",
+                "conversation_id": "group-1",
+                "invocation": "/开启全群广播",
+                "arguments": "",
+            }],
+        }
+
+        event = _event_from_scenario(scenario, ecosystem="nonebot")
+
+        self.assertEqual(event["conversation"]["kind"], "group")
+        self.assertRegex(event["conversation"]["id"], r"^[1-9][0-9]*$")
+        self.assertLessEqual(int(event["conversation"]["id"]), 1_000_000_000)
+        repeated = _event_from_scenario(scenario, ecosystem="nonebot")
+        self.assertEqual(event["conversation"]["id"], repeated["conversation"]["id"])
+
+    def test_nonebot_private_scenario_conversation_matches_actor_id(self) -> None:
+        scenario = {
+            "scenario_id": "scn-nonebot-private",
+            "actors": [{"actor_id": "actor-1", "account_id": "account-1"}],
+            "conversations": [{
+                "conversation_id": "private-1",
+                "kind": "private",
+                "actor_id": "actor-1",
+                "account_id": "account-1",
+            }],
+            "controls": {"fixed_time_utc": "2026-11-10T00:00:00Z"},
+            "steps": [{
+                "kind": "tool_call",
+                "host_id": "nonebot",
+                "actor_id": "actor-1",
+                "conversation_id": "private-1",
+                "invocation": "/echo",
+                "arguments": "hello",
+            }],
+        }
+
+        event = _event_from_scenario(scenario, ecosystem="nonebot")
+
+        self.assertEqual(event["conversation"], {"kind": "private", "id": event["actor_id"]})
+
     def test_clean_discovery_failure_is_a_skipped_terminal_state(self) -> None:
         result = _discovery_terminal_state({
             "status": "failed",

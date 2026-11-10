@@ -440,6 +440,12 @@ def _event_from_scenario(scenario: dict[str, Any], *, ecosystem: str) -> dict[st
     if ecosystem == "nonebot":
         actor_seed = hashlib.sha256(str(event["actor_id"]).encode("utf-8")).hexdigest()[:8]
         actor_id = str(int(actor_seed, 16) % 1_000_000_000 + 1)
+        source_conversation = event.get("conversation") if isinstance(event.get("conversation"), dict) else {}
+        if source_conversation.get("kind") == "group":
+            group_seed = hashlib.sha256(str(source_conversation.get("id", "")).encode("utf-8")).hexdigest()[:8]
+            conversation = {"kind": "group", "id": str(int(group_seed, 16) % 1_000_000_000 + 1)}
+        else:
+            conversation = {"kind": "private", "id": actor_id}
         account_id = "100000"
         message_id = str(int(hashlib.sha256(str(event["event_id"]).encode("utf-8")).hexdigest()[:8], 16) + 1)
         event["actor_id"] = actor_id
@@ -450,7 +456,7 @@ def _event_from_scenario(scenario: dict[str, Any], *, ecosystem: str) -> dict[st
         extensions["onebot.v11"] = onebot
         event["extensions"] = extensions
         event["platform"] = "onebot.v11"
-        event["conversation"] = {"kind": "private", "id": actor_id}
+        event["conversation"] = conversation
     else:
         extensions = event.get("extensions") if isinstance(event.get("extensions"), dict) else {}
         onebot = extensions.get("onebot.v11") if isinstance(extensions.get("onebot.v11"), dict) else {}
