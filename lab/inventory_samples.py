@@ -19,7 +19,15 @@ CATALOGS = {
 }
 
 
-def build_report(*, matrix_path: Path, cache_root: Path, per_ecosystem: int = 20) -> dict[str, Any]:
+def build_report(
+    *,
+    matrix_path: Path,
+    cache_root: Path,
+    per_ecosystem: int = 20,
+    selection_seed: str | None = None,
+) -> dict[str, Any]:
+    if selection_seed is not None and (not selection_seed.strip() or len(selection_seed) > 128):
+        raise ValueError("selection_seed must be a non-empty string of at most 128 characters")
     matrix_bytes = matrix_path.read_bytes()
     matrix = json.loads(matrix_bytes)
     locks = {
@@ -39,6 +47,8 @@ def build_report(*, matrix_path: Path, cache_root: Path, per_ecosystem: int = 20
             ),
             key=lambda row: row["registry_entry_id"],
         )
+        if selection_seed is not None:
+            rows.sort(key=lambda row: _selection_rank(selection_seed, row["registry_entry_id"]))
         selected = 0
         for row in rows:
             entry = lock_entries.get(row["registry_entry_id"])
@@ -87,13 +97,24 @@ def build_report(*, matrix_path: Path, cache_root: Path, per_ecosystem: int = 20
         "selection": {
             "source_matrix": matrix_path.relative_to(ROOT).as_posix(),
             "source_matrix_sha256": hashlib.sha256(matrix_bytes).hexdigest(),
-            "rule": "Within each ecosystem, sort Linux load-verified frozen rows by registry_entry_id and select the first cached artifacts until the per-ecosystem target is met.",
+            "rule": (
+                "Within each ecosystem, sort Linux load-verified frozen rows by registry_entry_id and select the first cached artifacts until the per-ecosystem target is met."
+                if selection_seed is None else
+                "Within each ecosystem, rank Linux load-verified frozen rows by SHA-256(selection_seed + ':' + registry_entry_id), then select the first cached artifacts until the per-ecosystem target is met."
+            ),
+            **({"selection_seed": selection_seed} if selection_seed is not None else {}),
             "per_ecosystem_target": per_ecosystem,
             "counts": counts,
         },
         "execution": "static_only_no_plugin_import_or_execution",
         "samples": samples,
     }
+
+
+def _selection_rank(selection_seed: str, registry_entry_id: str) -> tuple[str, str]:
+    """Give an order-independent, reproducible rank to one frozen catalog identity."""
+    rank = hashlib.sha256(f"{selection_seed}:{registry_entry_id}".encode("utf-8")).hexdigest()
+    return rank, registry_entry_id
 
 
 def _artifact_for(ecosystem: str, entry: dict, row: dict) -> dict | None:
@@ -125,13 +146,19 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--matrix", type=Path, default=MATRIX)
     parser.add_argument("--cache-root", type=Path, required=True)
     parser.add_argument("--per-ecosystem", type=int, default=20)
+    parser.add_argument("--selection-seed", help="optional namespace for deterministic hash-ranked sampling")
     parser.add_argument("--output", type=Path, required=True)
     args = parser.parse_args(argv)
     if args.per_ecosystem <= 0:
         parser.error("--per-ecosystem must be positive")
     if args.output.exists():
         parser.error(f"refusing to overwrite existing report: {args.output}")
-    report = build_report(matrix_path=args.matrix.resolve(), cache_root=args.cache_root.resolve(), per_ecosystem=args.per_ecosystem)
+    report = build_report(
+        matrix_path=args.matrix.resolve(),
+        cache_root=args.cache_root.resolve(),
+        per_ecosystem=args.per_ecosystem,
+        selection_seed=args.selection_seed,
+    )
     args.output.parent.mkdir(parents=True, exist_ok=True)
     args.output.write_text(json.dumps(report, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
     print(json.dumps({"status": "built", "output": args.output.as_posix(), "samples": report["selection"]["counts"]}, ensure_ascii=False))
