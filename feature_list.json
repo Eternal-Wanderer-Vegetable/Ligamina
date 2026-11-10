@@ -2449,7 +2449,7 @@
       ],
       "status": "done",
       "done_when": "每条目报告发现/执行/nontrivial 命令数、等价/不等价/nondeterministic 数与资源；不等价项逐条记录归因；报告三次全新复跑结论，有不一致时保留不一致并阻塞 P7-09 准入。",
-      "evidence": "The Native×2 + Federated differential executor and locked 30 Koishi + 30 NoneBot pilot deliverable are complete. Fixed-clock retry7 completed 60/60 terminal (59 completed, 1 discovery skip), 330/330 Worker cleanups, 1,473 scenarios, and all 133 discovered commands. Results: 21 nontrivial (15.8%), 35 equivalent, 17 non-equivalent, 0 nondeterministic, 81 unknown (60.9%). 29/30 behavior entries were consistent across three fresh reruns; koishi-plugin-shui@0.0.2 is now consistent after scenario-bound Node wall-clock control, while koishi-plugin-sd-list@0.5.3 remains inconsistent on 查看pt and 查看模型 (Native hashes stable, Federated hashes vary). Retry7 report SHA e2bad72372faa80cf3988406cb16e235bffaa459061c6c75494c781676f478e7. Cleanup gate passes; nontrivial, unknown, and consistency admission gates do not. The delivered feature does not imply pilot admission or compatibility support. Further gate diagnosis must preserve these results and reports.",
+      "evidence": "The Native×2 + Federated differential executor and locked 30 Koishi + 30 NoneBot pilot deliverable are complete. Source review found _event_from_scenario forced every NoneBot conversation to private despite group scenarios; commit 7fb5156 now preserves group kind with a deterministic positive numeric OneBot group ID while retaining the private actor-ID invariant. The targeted 2-entry diagnostic completed 118 scenarios and 20/20 Worker runs with confirmed cleanup; boardgamehelper still has two group-broadcast commands with no observed gateway operation, retained as unknown. Corrected fixed-clock retry8 completed 60/60 terminal entries (59 completed, 1 profile skip), 330/330 Worker cleanups, 1,473 scenarios, and all 133 discovered commands. Results: 21 nontrivial (15.8%), 50 equivalent, 17 non-equivalent, 0 nondeterministic, 66 unknown (49.6%). 29/30 behavior entries were consistent across three fresh reruns; koishi-plugin-sd-list@0.5.3 remains inconsistent on 查看pt and 查看模型. Retry8 report SHA cfeba526cfddc9c251a98132f7e2e1a4a060355f44be0e854d1f26ad23fe090b. The unknown-share threshold now passes, but nontrivial coverage and consistency thresholds still fail, so P7-09 remains blocked. The delivered feature does not imply pilot admission or compatibility support.",
       "evidence_paths": [
         "outputs/acceptance/p7-p704-pilot-selection-20261110.json",
         "outputs/acceptance/p7-p704-pilot-selection-20261110.json.sha256",
@@ -2503,7 +2503,15 @@
         "lab/baselines/seed_node_random.cjs",
         "lab/tests/test_node_determinism.py",
         "outputs/acceptance/p7-p704-differential-pilot-20261111-retry7.json",
-        "outputs/acceptance/p7-p704-differential-pilot-20261111-retry7.json.sha256"
+        "outputs/acceptance/p7-p704-differential-pilot-20261111-retry7.json.sha256",
+        "lab/automation/p7_differential_campaign.py",
+        "lab/tests/test_p7_differential_campaign.py",
+        "outputs/acceptance/p7-p704-nonebot-group-context-selection-20261111.json",
+        "outputs/acceptance/p7-p704-nonebot-group-context-selection-20261111.json.sha256",
+        "outputs/acceptance/p7-p704-nonebot-group-context-diagnostic-20261111.json",
+        "outputs/acceptance/p7-p704-nonebot-group-context-diagnostic-20261111.json.sha256",
+        "outputs/acceptance/p7-p704-differential-pilot-20261111-retry8.json",
+        "outputs/acceptance/p7-p704-differential-pilot-20261111-retry8.json.sha256"
       ],
       "plan_path": "docs/plans/2026-11-09-phase-7-automated-verification.md"
     },
@@ -2517,7 +2525,7 @@
       ],
       "status": "done",
       "done_when": "每项检查在合成插件上有正例与反例；pilot 条目全部给出 C1–C8 结论。",
-      "evidence": "C1–C8 adjudication is integrated with the P7 differential executor and 16 owned positive/negative fixtures classify as expected. Latest retry7 audit covers 60×8 (480 checks): C1 26 passed/34 unknown; C2–C8 420 unknown because the pilot did not emit the corresponding stimuli. Report SHA 7bff9d1bc541b32bd697c23c21d19a87a68b0f05d87949511394dc1bdb89b91f, bound to retry7 source report SHA e2bad72372faa80cf3988406cb16e235bffaa459061c6c75494c781676f478e7. Existing Core host_session/supervisor and MCP command_tools regressions pass 17/17. Unknown remains unknown.",
+      "evidence": "C1–C8 adjudication is integrated with the P7 differential executor and 16 owned positive/negative fixtures classify as expected. Latest retry8 audit covers 60×8 (480 checks): C1 26 passed/34 unknown; C2–C8 have 420 unknown because the pilot emitted no matching stimuli. Report SHA f8edd42b31a75ab1784bbba6c32ec8e24f788b34ec75369de7b7fcb0b9c920c3, bound to retry8 report SHA cfeba526cfddc9c251a98132f7e2e1a4a060355f44be0e854d1f26ad23fe090b. Unknown remains unknown.",
       "evidence_paths": [
         "outputs/acceptance/p7-p705-contract-pilot-20261110.json",
         "outputs/acceptance/p7-p705-contract-pilot-20261111-retry6.json",
@@ -2526,7 +2534,11 @@
         "lab/automation/p7_contracts.py",
         "lab/tests/test_p7_contracts.py",
         "outputs/acceptance/p7-p705-contract-pilot-20261111-retry7.json",
-        "outputs/acceptance/p7-p705-contract-pilot-20261111-retry7.json.sha256"
+        "outputs/acceptance/p7-p705-contract-pilot-20261111-retry7.json.sha256",
+        "outputs/acceptance/p7-p705-contract-pilot-20261111-retry8.json",
+        "outputs/acceptance/p7-p705-contract-pilot-20261111-retry8.json.sha256",
+        "outputs/acceptance/p7-p704-differential-pilot-20261111-retry8.json",
+        "outputs/acceptance/p7-p704-differential-pilot-20261111-retry8.json.sha256"
       ],
       "plan_path": "docs/plans/2026-11-09-phase-7-automated-verification.md"
     },
@@ -2608,7 +2620,7 @@
       ],
       "status": "blocked",
       "done_when": "分母守恒；清理全部确认；增量键可复跑；unknown 不改写为通过。",
-      "evidence": "P7-09 remains blocked and not admitted after fixed-clock full retry7: 21/133 nontrivial (15.8%), 81/133 unknown (60.9%), and one of 30 behavior entries fails three-round consistency on koishi-plugin-sd-list@0.5.3 (查看pt and 查看模型); cleanup passes 330/330. Retry7 report SHA e2bad72372faa80cf3988406cb16e235bffaa459061c6c75494c781676f478e7. The fixed Node clock resolves the koishi-plugin-shui@0.0.2 rerun variation but does not improve coverage/unknown gates. Retry7 C1–C8 audit reports C1 26 passed/34 unknown and C2–C8 420 unknown (SHA 7bff9d1bc541b32bd697c23c21d19a87a68b0f05d87949511394dc1bdb89b91f). The sd-list Native hashes are stable while Federated hashes vary; its source uses HTTP at 127.0.0.1:7860, unavailable in the network-disabled profile, but the root cause/layer is unconfirmed. No loopback stub, full AstrBot inventory, or all-catalog campaign was started. Preserve retry5 incomplete cleanup history and all unknowns. P7-10 remains blocked.",
+      "evidence": "P7-09 remains blocked and not admitted after corrected fixed-clock retry8. The unknown threshold now passes at 66/133 (49.6%), with cleanup 330/330 confirmed; nontrivial coverage remains 21/133 (15.8%) and one of 30 behavior entries remains inconsistent on koishi-plugin-sd-list@0.5.3 (查看pt and 查看模型). Retry8 SHA cfeba526cfddc9c251a98132f7e2e1a4a060355f44be0e854d1f26ad23fe090b. The NoneBot group-context correction reduced unknown commands from 81 to 66 and increased equivalent commands from 35 to 50; all mismatches remain explicit. Retry8 C1–C8 audit: C1 26 passed/34 unknown, C2–C8 420 unknown (SHA f8edd42b31a75ab1784bbba6c32ec8e24f788b34ec75369de7b7fcb0b9c920c3). The sd-list source uses HTTP at 127.0.0.1:7860; the network-disabled dependency-error path still leaves the Federated variation unexplained. No loopback stub or all-catalog campaign was started. Preserve retry5 incomplete cleanup history and all unknowns. P7-10 remains blocked.",
       "evidence_paths": [
         "outputs/acceptance/p7-p704-differential-pilot-20261110-retry4.json",
         "outputs/acceptance/p7-p704-differential-pilot-20261110-retry4.json.sha256",
@@ -2630,7 +2642,15 @@
         "outputs/acceptance/p7-p704-differential-pilot-20261111-retry7.json",
         "outputs/acceptance/p7-p704-differential-pilot-20261111-retry7.json.sha256",
         "outputs/acceptance/p7-p705-contract-pilot-20261111-retry7.json",
-        "outputs/acceptance/p7-p705-contract-pilot-20261111-retry7.json.sha256"
+        "outputs/acceptance/p7-p705-contract-pilot-20261111-retry7.json.sha256",
+        "outputs/acceptance/p7-p704-differential-pilot-20261111-retry8.json",
+        "outputs/acceptance/p7-p704-differential-pilot-20261111-retry8.json.sha256",
+        "outputs/acceptance/p7-p705-contract-pilot-20261111-retry8.json",
+        "outputs/acceptance/p7-p705-contract-pilot-20261111-retry8.json.sha256",
+        "outputs/acceptance/p7-p704-nonebot-group-context-diagnostic-20261111.json",
+        "outputs/acceptance/p7-p704-nonebot-group-context-diagnostic-20261111.json.sha256",
+        "outputs/acceptance/p7-p704-nonebot-group-context-selection-20261111.json",
+        "outputs/acceptance/p7-p704-nonebot-group-context-selection-20261111.json.sha256"
       ],
       "plan_path": "docs/plans/2026-11-09-phase-7-automated-verification.md"
     },
@@ -2644,7 +2664,7 @@
       ],
       "status": "blocked",
       "done_when": "v1 矩阵保持不变；v2 每条结论引用证据与哈希；check 在证据变化时失败；不新增支持名单。",
-      "evidence": "P7-10 remains unstarted and blocked because P7-09's fixed-clock retry7 pilot gate still fails: nontrivial 21/133, unknown 81/133, and only 29/30 behavior entries are three-round consistent (cleanup 330/330). Do not publish matrix v2 until all P7-09 admission criteria pass.",
+      "evidence": "P7-10 remains unstarted and blocked. Corrected retry8 passes the unknown-share threshold (66/133, 49.6%) and cleanup gate (330/330), but fails nontrivial coverage (21/133, 15.8%) and three-round consistency (29/30); do not start P7-09 or publish matrix v2.",
       "evidence_paths": [],
       "plan_path": "docs/plans/2026-11-09-phase-7-automated-verification.md"
     }
