@@ -40,6 +40,8 @@ P6-01 与 P6-02 合为下一个里程碑：P6-02 不需要真实账号，先行�
 | P6-03 / feat-043 | P6-02 | 运行时隔离：Host 受信任等级、资源限制、网络策略、可写目录、依赖准入、停止/销毁；先做 Linux 容器路径 | 非受信插件不能经 `LocalCommand` 直接在宿主执行；违规配置被拒绝并留记录；Windows Enforcement 单独验收，不降低门槛 |
 | P6-04 / feat-044 | AB-05、TOOL-04 | 按能力维度的兼容性描述与矩阵：目录、pilot、工具级、Native/Federated、field 证据绑定到同一插件版本与哈希；PR 上跑轻量回归 | 区分 verified / failed / skipped / unknown / untested；每条对外兼容声明可追溯到具体证据文件与哈希 |
 
+**第六阶段收口（2026-11-10）：** P6-01 / feat-030、P6-02 / feat-042、P6-03 / feat-043、P6-04 / feat-044 均完成。P6-01 的真实平台正例、负例/越权、重启与超时见 3.1b/3.1c；最后缺少的 Gateway 账本重复事件注入与去重见 3.1d。真实 QQ 重复事件未注入；本地假 OneBot 三轮去重证据不替代真实平台观察。P6-02 至 P6-04 分别见 3.1、3.2、3.3；所有 unknown 与 Windows Enforcement 边界维持原结论。
+
 ### 3.1 P6-02 结果（2026-11-08）
 
 改动在 `clients/reference/src/onebot-gateway.ts`。每个领取的操作分三段：
