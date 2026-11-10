@@ -2,6 +2,7 @@
 
 ## Current Objective
 
+- **2026-11-09 最新：第七阶段计划已交付（feat-045 done），下一项 P7-01 / feat-046（能力清单与自动发现）。** 计划 [docs/plans/2026-11-09-phase-7-automated-verification.md](docs/plans/2026-11-09-phase-7-automated-verification.md)。开始 P7-01 前，feat-030 须完成或改为 blocked（当前唯一 in-progress）。P7-01 第一步：定义 `contracts/lab/inventory/v1` 清单 schema，扩展三个 Host 的加载探针上报运行时清单，并按生态各 20 条已加载条目人工标注样本。规划验证：`pwsh -NoProfile -File init.ps1 -Mode docs`、`git diff --check`。
 - **2026-11-08 最新：P6-01 场景轮完成，见计划 3.1c；feat-030 为 in-progress。** 剩余缺口是重复事件投递与 Gateway 账本去重证据（需受控注入，用户发送无法产生）；Stella PR #133 待合并。复现：按 3.1b 起现场 Core 与 Stella，然后 `python lab/field/qq_round.py restart-watch --stella-log <log> --core-config <daemon.json> --restarts 9 --bot-id <qq> --sender <qq> --journal <json>`（重启轮）、`python lab/field/qq_round_timeout.py --stella-log <log> --owner <owner> --sender <qq> --bot-id <qq> --turns 9 --journal <json>`（超时轮）；QQ 号只作过滤参数，不写入报告。两次发送之间留一分钟，避开重启窗口。
 - **2026-11-08 最新：P6-03、P6-04 完成。** 重建矩阵：`UV_PROJECT_ENVIRONMENT=<新目录> uv run --locked --project lab --python 3.12.14 python -m lab.compat_matrix build`（新增或替换证据后运行，再提交两份输出）；校验：`... -m lab.compat_matrix check`。下一步：整体执行剩余 QQ 场景（隔离、重复/重启、超时/unknown，每生态各三次），完成后把结果写入新报告并重建矩阵。
 - **2026-11-08 最新：P6-03 完成（ADR 0003），下一项 P6-04 / feat-044。** 复现现场验收：先 `cargo build -p ligamina-cli`，再 `python lab/field/isolation_acceptance.py --work .work/<新目录> --output outputs/acceptance/<新报告>.json`（需 WSL Docker 与 TOOL-04/AB-05 镜像和 bundle）。之后按用户要求整体执行剩余 QQ 场景（隔离、重复/重启、超时/unknown 各三次）。

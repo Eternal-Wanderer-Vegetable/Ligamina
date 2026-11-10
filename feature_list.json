@@ -1,8 +1,8 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-11-08",
+  "updated_at": "2026-11-09",
   "active_feature": "feat-030",
-  "next_feature": null,
+  "next_feature": "feat-046",
   "features": [
     {
       "id": "feat-001",
@@ -2336,6 +2336,169 @@
         "outputs/compat/compatibility-matrix-v1.md",
         "scripts/phase3-linux-self-test.sh"
       ]
+    },
+    {
+      "id": "feat-045",
+      "task_id": "P7-PLAN",
+      "name": "第七阶段万级插件自动化验证计划",
+      "description": "依据用户 2026-11-09 提供的自动化兼容性验证调研，核对源码与证据后制定 P7-01 至 P7-10；本项仅交付计划和可恢复状态。",
+      "dependencies": [
+        "feat-044"
+      ],
+      "status": "done",
+      "done_when": "调研结论逐条核对；计划列出验证维度、Oracle、任务依赖、完成标准、决策点、不采纳项与风险；文档检查通过。",
+      "evidence": "2026-11-09：核对调研与仓库（目录 5,690+3,265、官方维护 55=Koishi 46+NoneBot 9、AB-04/05 计数、NoneBot 命令发现只识别 CommandRule/ShellCommandRule、工具会话每次随机 actor 不能承载多轮序列、矩阵 federated_event 8,942 untested），交付第七阶段计划。仅规划，未运行插件、Worker 或运行时测试；docs 检查结果见 progress.md 同日条目。",
+      "evidence_paths": [
+        "docs/plans/2026-11-09-phase-7-automated-verification.md",
+        "progress.md",
+        "session-handoff.md",
+        "AGENTS.md"
+      ],
+      "plan_path": "docs/plans/2026-11-09-phase-7-automated-verification.md"
+    },
+    {
+      "id": "feat-046",
+      "task_id": "P7-01",
+      "name": "能力清单与自动发现",
+      "description": "能力清单合同；三 Host 运行时清单（含 NoneBot Alconna/关键词/正则、AstrBot llm_tool）与静态扫描；60 条分层人工标注样本测量发现质量。",
+      "dependencies": [
+        "feat-045"
+      ],
+      "status": "not-started",
+      "done_when": "清单 schema 与正负 fixture；样本发现率、误识别率与漏识别原因成表；命令发现率暂定目标 ≥90%，未达标时写明原因与处理。",
+      "evidence": "",
+      "evidence_paths": [],
+      "plan_path": "docs/plans/2026-11-09-phase-7-automated-verification.md"
+    },
+    {
+      "id": "feat-047",
+      "task_id": "P7-02",
+      "name": "场景合同与输入生成",
+      "description": "场景合同 v1、按参数类型的输入生成器（Hypothesis，编排侧）、确定性控制与 volatile 归一化。",
+      "dependencies": [
+        "feat-045"
+      ],
+      "status": "not-started",
+      "done_when": "同一种子生成相同场景；类型域、pairwise、缩减有单测；不执行插件。",
+      "evidence": "",
+      "evidence_paths": [],
+      "plan_path": "docs/plans/2026-11-09-phase-7-automated-verification.md"
+    },
+    {
+      "id": "feat-048",
+      "task_id": "P7-03",
+      "name": "AstrBot 原生基线",
+      "description": "stock AstrBot + 自有测试平台适配器，不经 Ligamina Bridge，作为 AstrBot 差分的参考实现。",
+      "dependencies": [
+        "feat-045"
+      ],
+      "status": "not-started",
+      "done_when": "teamup/gallery/pet 在原生基线与 Federated 下按 AB-05 Oracle 一致；原生侧不导入 Bridge。",
+      "evidence": "",
+      "evidence_paths": [],
+      "plan_path": "docs/plans/2026-11-09-phase-7-automated-verification.md"
+    },
+    {
+      "id": "feat-049",
+      "task_id": "P7-04",
+      "name": "生成式差分执行器与 pilot",
+      "description": "Native×2（自差分）+ Federated 的生成式差分执行器；Koishi/NoneBot 各 30 个已加载条目 pilot。",
+      "dependencies": [
+        "feat-046",
+        "feat-047"
+      ],
+      "status": "not-started",
+      "done_when": "每条目报告发现/执行/nontrivial 命令数、等价/不等价/nondeterministic 数与资源；不等价项逐条归因；三次全新复跑结论一致。",
+      "evidence": "",
+      "evidence_paths": [],
+      "plan_path": "docs/plans/2026-11-09-phase-7-automated-verification.md"
+    },
+    {
+      "id": "feat-050",
+      "task_id": "P7-05",
+      "name": "通用契约检查",
+      "description": "契约检查 C1–C8 接入执行器。",
+      "dependencies": [
+        "feat-049"
+      ],
+      "status": "not-started",
+      "done_when": "每项检查在合成插件上有正例与反例；pilot 条目全部给出 C1–C8 结论。",
+      "evidence": "",
+      "evidence_paths": [],
+      "plan_path": "docs/plans/2026-11-09-phase-7-automated-verification.md"
+    },
+    {
+      "id": "feat-051",
+      "task_id": "P7-06",
+      "name": "测试有效性评估",
+      "description": "测试构建专用的框架变异体与自有合成插件，测量各层检出率。",
+      "dependencies": [
+        "feat-049",
+        "feat-050"
+      ],
+      "status": "not-started",
+      "done_when": "每个变异体至少被一层检出或存活原因写明；分层检出率进入报告；PR 上运行小变异体回归。",
+      "evidence": "",
+      "evidence_paths": [],
+      "plan_path": "docs/plans/2026-11-09-phase-7-automated-verification.md"
+    },
+    {
+      "id": "feat-052",
+      "task_id": "P7-07",
+      "name": "有状态序列与变形关系",
+      "description": "事件路径上的多 actor/多会话序列生成、依赖推断与以原生为前提的变形关系。",
+      "dependencies": [
+        "feat-049"
+      ],
+      "status": "not-started",
+      "done_when": "合成组队/计数器插件的序列缺陷被检出；pilot 中适用关系给出结论，不适用的记录原因。",
+      "evidence": "",
+      "evidence_paths": [],
+      "plan_path": "docs/plans/2026-11-09-phase-7-automated-verification.md"
+    },
+    {
+      "id": "feat-053",
+      "task_id": "P7-08",
+      "name": "服务与配置 profile 扩面",
+      "description": "Koishi/NoneBot 常用离线服务 provider 与配置默认值 profile，单独锁定与记账。",
+      "dependencies": [
+        "feat-046"
+      ],
+      "status": "not-started",
+      "done_when": "每个 profile 有锁与准入；曾因缺服务 skipped 的抽样条目在新 profile 下单独记账，不覆盖历史结论。",
+      "evidence": "",
+      "evidence_paths": [],
+      "plan_path": "docs/plans/2026-11-09-phase-7-automated-verification.md"
+    },
+    {
+      "id": "feat-054",
+      "task_id": "P7-09",
+      "name": "全量 Linux 自动化 campaign",
+      "description": "先补 AstrBot 全量加载普查，再对全部加载通过条目运行清单、契约与差分，增量键可复跑。",
+      "dependencies": [
+        "feat-048",
+        "feat-050",
+        "feat-051"
+      ],
+      "status": "not-started",
+      "done_when": "分母守恒；清理全部确认；增量键可复跑；unknown 不改写为通过。",
+      "evidence": "",
+      "evidence_paths": [],
+      "plan_path": "docs/plans/2026-11-09-phase-7-automated-verification.md"
+    },
+    {
+      "id": "feat-055",
+      "task_id": "P7-10",
+      "name": "兼容性矩阵 v2 与 CI",
+      "description": "矩阵 v2 新增 discovery/contract/differential/stateful 维度与覆盖度，更新报告、指南与 CI。",
+      "dependencies": [
+        "feat-054"
+      ],
+      "status": "not-started",
+      "done_when": "v1 矩阵保持不变；v2 每条结论引用证据与哈希；check 在证据变化时失败；不新增支持名单。",
+      "evidence": "",
+      "evidence_paths": [],
+      "plan_path": "docs/plans/2026-11-09-phase-7-automated-verification.md"
     }
   ]
 }
