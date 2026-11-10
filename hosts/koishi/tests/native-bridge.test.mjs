@@ -164,3 +164,24 @@ test('HostLifecycle resolves a CommonJS Koishi plugin object through its apply e
     await rm(dataDirectory, { recursive: true, force: true })
   }
 })
+
+test('HostLifecycle can load a pinned database provider instead of the default SQLite driver', async () => {
+  const dataDirectory = await mkdtemp(join(tmpdir(), 'ligamina-koishi-provider-'))
+  const providerPath = join(dataDirectory, 'database-provider.mjs')
+  await writeFile(providerPath, `export default function () { globalThis.__ligaminaDatabaseProviderLoaded = true }\n`, 'utf8')
+  const lifecycle = new HostLifecycle({
+    hostId: 'koishi-provider-test',
+    platformCall: async () => ({ status: 'succeeded' }),
+    dataDirectory,
+    databaseProvider: pathToFileURL(providerPath).href,
+  })
+  try {
+    delete globalThis.__ligaminaDatabaseProviderLoaded
+    await lifecycle.start()
+    assert.equal(globalThis.__ligaminaDatabaseProviderLoaded, true)
+  } finally {
+    await lifecycle.stop()
+    delete globalThis.__ligaminaDatabaseProviderLoaded
+    await rm(dataDirectory, { recursive: true, force: true })
+  }
+})

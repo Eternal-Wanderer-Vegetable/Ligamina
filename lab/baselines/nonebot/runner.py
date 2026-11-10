@@ -226,9 +226,12 @@ async def _run(request: dict[str, Any]) -> dict[str, Any]:
     adapter = driver._adapters[Adapter.get_name()]
 
     plugin_names = [*sample.get("preload_plugins", []), sample["_entry"]]
+    loaded_plugin_names = []
     for plugin_name in plugin_names:
-        if nonebot.load_plugin(plugin_name) is None:
+        loaded_plugin = nonebot.load_plugin(plugin_name)
+        if loaded_plugin is None:
             raise RuntimeError(f"NoneBot could not load plugin {plugin_name!r}")
+        loaded_plugin_names.append(plugin_name)
     runtime_commands = _native_command_descriptors(driver)
 
     operations: list[dict[str, Any]] = []
@@ -361,6 +364,7 @@ async def _run(request: dict[str, Any]) -> dict[str, Any]:
             "bridge_modules": bridge_modules,
             "api_inputs": api_inputs,
             "runtime_commands": runtime_commands,
+            "runtime_plugins": loaded_plugin_names,
         },
     }
     if behavior_fixture:

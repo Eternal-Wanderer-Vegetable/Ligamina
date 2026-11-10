@@ -198,9 +198,10 @@ def prepare_bundle(candidate: dict[str, Any], *, bundle_root: Path, core_binary:
     sample = project / "sample"
     phase4_campaign._copy_python_sources(project)
     sample.mkdir(parents=True)
-    descriptor = ROOT / "samples/profiles" / (
+    descriptor = candidate.get("profile_document_path") or (ROOT / "samples/profiles" / (
         "nonebot-group-v0.1.json" if candidate["ecosystem"] == "nonebot" else "koishi-group-v0.1.json"
-    )
+    ))
+    descriptor = Path(descriptor).resolve(strict=True)
     shutil.copy2(descriptor, project / "samples/profiles" / descriptor.name)
     shutil.copy2(candidate["artifact_path"], sample / "artifact.bin")
     _link_or_copy(core_binary, sample / "ligamina-cli")
@@ -273,6 +274,8 @@ def prepare_bundle(candidate: dict[str, Any], *, bundle_root: Path, core_binary:
         "artifact_sha256": candidate["artifact_sha256"],
         "profile_lock_sha256": candidate["profile_lock_sha256"],
         "runtime_artifacts": runtime_artifacts,
+        "profile_document": f"project/samples/profiles/{descriptor.name}",
+        "service_profile_sha256": candidate.get("service_profile_sha256"),
         "files": [
             {"path": path.relative_to(bundle).as_posix(), "size_bytes": path.stat().st_size, "sha256": _sha256_file(path)}
             for path in sorted(bundle.rglob("*")) if path.is_file()
@@ -328,7 +331,7 @@ def _native_sample(candidate: dict[str, Any]) -> dict[str, Any]:
         "_entry": entry,
         "_artifact_hash": candidate["artifact_sha256"],
         "_artifact_hash_algorithm": "sha256",
-        "preload_plugins": [],
+        "preload_plugins": list(candidate.get("preload_plugins", [])),
         "fixture": {"plugin_config": {}},
     }
 
@@ -357,13 +360,17 @@ def _build_context(
         "environment": {},
     }
     profile = "nonebot-group-v0.1.json" if ecosystem == "nonebot" else "koishi-group-v0.1.json"
+    profile_document = candidate.get("profile_document_path")
+    profile_document_name = Path(profile_document).name if profile_document else profile
     lock_path = "requirements.txt" if ecosystem == "nonebot" else "original-package-lock.json"
+    profile_path = Path(profile_document) if profile_document else ROOT / "samples/profiles" / profile
+    config["preload_plugins"] = list(candidate.get("preload_plugins", []))
     expected = {
         "ecosystem": ecosystem,
         "framework_version": "2.5.0" if ecosystem == "nonebot" else "4.18.11",
         "runtime_version": "3.12.14" if ecosystem == "nonebot" else "24.20.0",
         "lockfile_sha256": candidate["profile_lock_sha256"],
-        "profile_sha256": _sha256_file(ROOT / "samples/profiles" / profile),
+        "profile_sha256": _sha256_file(profile_path),
         "artifact_hash": candidate["artifact_sha256"],
         "config_sha256": _sha256_bytes(_canonical(config)),
         "stimulus_sha256": _sha256_bytes(_canonical(stimulus)),
@@ -383,13 +390,16 @@ def _build_context(
         "fingerprint_paths": {
             "artifact": "/input/project/sample/artifact.bin",
             "lockfile": f"/input/project/sample/{lock_path}",
-            "profile": f"/input/project/samples/profiles/{profile}",
+            "profile": f"/input/project/samples/profiles/{profile_document_name}",
         },
+        "profile_document": f"samples/profiles/{profile_document_name}",
+        "service_profile": copy.deepcopy(candidate.get("service_profile", {})),
         "execution": {
             "mode": mode,
             "random_seed": seed,
             "capture_source_event_id": True,
             "discover_commands": discover_commands,
+            "required_services": list(candidate.get("required_services", [])),
             "workspace": "/work/side",
         },
         "runtime_artifacts": copy.deepcopy(runtime_artifacts),
@@ -547,6 +557,13 @@ def _worker_summary(result: dict[str, Any]) -> dict[str, Any]:
     setup = result.get("profile_setup", {}) if isinstance(result.get("profile_setup"), dict) else {}
     cleanup = result.get("cleanup", {}) if isinstance(result.get("cleanup"), dict) else {}
     inventory = result.get("stock_native", {}).get("runtime_commands")
+    runtime_inventory = result.get("stock_native", {}).get("runtime_inventory", {})
+    service_items = runtime_inventory.get("capabilities", {}).get("services", {}).get("items", [])
+    runtime_services = sorted({
+        item["name"] for item in service_items
+        if isinstance(item, dict) and isinstance(item.get("name"), str)
+    })
+    runtime_plugins = result.get("stock_native", {}).get("runtime_plugins", [])
     command_inventory = result.get("command_inventory", {})
     return {
         "status": result.get("status"),
@@ -573,6 +590,8 @@ def _worker_summary(result: dict[str, Any]) -> dict[str, Any]:
             descriptor.get("command_id") for descriptor in inventory or []
             if isinstance(descriptor, dict) and isinstance(descriptor.get("command_id"), str)
         ),
+        "runtime_services": runtime_services,
+        "runtime_plugins": sorted(item for item in runtime_plugins if isinstance(item, str)) if isinstance(runtime_plugins, list) else [],
         "federated_command_tool_count": len(command_inventory.get("listed_command_tools", [])) if isinstance(command_inventory, dict) else None,
         "federated_command_tools_sha256": object_sha256(command_inventory.get("listed_command_tools", [])) if isinstance(command_inventory, dict) else None,
         "gateway_operation_count": result.get("federated_trace", {}).get("gateway_operation_count"),

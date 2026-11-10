@@ -35,8 +35,11 @@ def _docker_side(request: dict[str, Any], options: argparse.Namespace) -> dict[s
             if (options.bundle / "project/sample/original-package-lock.json").is_file()
             else "/input/project/sample/package-lock.json"
         ),
-        "profile": "/input/project/samples/profiles/"
-        + ("nonebot-group-v0.1.json" if context.get("sample", {}).get("ecosystem") == "nonebot" else "koishi-group-v0.1.json"),
+        "profile": "/input/project/" + str(context.get("profile_document") or (
+            "samples/profiles/nonebot-group-v0.1.json"
+            if context.get("sample", {}).get("ecosystem") == "nonebot"
+            else "samples/profiles/koishi-group-v0.1.json"
+        )),
     }
     context["host_environment"] = {
         "PATH": "/usr/local/bin:/usr/bin:/bin",

@@ -91,6 +91,7 @@ class Worker {
           serviceCall: (invocation) => this.serviceCall(invocation),
           plugins: parseList(process.env.LIGAMINA_KOISHI_PLUGINS),
           pluginConfig: parsePluginConfig(process.env.LIGAMINA_KOISHI_PLUGIN_CONFIG),
+          databaseProvider: process.env.LIGAMINA_KOISHI_DATABASE_PROVIDER,
         })
         await this.lifecycle.start()
         this.ready = true

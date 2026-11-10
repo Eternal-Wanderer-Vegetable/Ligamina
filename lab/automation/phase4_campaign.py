@@ -69,6 +69,7 @@ def _copy_python_sources(project: Path) -> None:
         "lab/baselines/nonebot/fixtures/phase4_probe_observer.py",
         "lab/baselines/koishi/runner.mjs",
         "lab/baselines/koishi/artifact_fingerprint.mjs",
+        "lab/baselines/koishi/plugin_export.mjs",
         "lab/baselines/seed_node_random.cjs",
         "lab/baselines/koishi/phase4_probe_plugin.mjs",
         "lab/automation/phase4_worker_side.py",

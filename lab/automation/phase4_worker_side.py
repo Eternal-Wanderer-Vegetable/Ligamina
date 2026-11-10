@@ -37,7 +37,7 @@ def _safe_diagnostic_summary(raw: str) -> str:
         errors = [
             line
             for line in lines
-            if re.search(r"\b(?:Error|TypeError|SyntaxError|ReferenceError|RangeError)(?:\b|\[)", line)
+            if re.search(r"^\s*(?:Error|TypeError|SyntaxError|ReferenceError|RangeError)(?:\b|\[)", line)
             and not line.startswith("Node.js v")
         ]
         summary = errors[0] if errors else (lines[-2] if len(lines) > 1 else summary)
@@ -63,6 +63,19 @@ def _safe_diagnostic_summary(raw: str) -> str:
         else:
             summary = "<redacted diagnostic>"
     return summary[:320]
+
+
+def _koishi_database_provider_module(service_profile: dict[str, Any], provider_modules: list[str]) -> str | None:
+    """Resolve the selected Koishi database provider from its structured profile record."""
+    provider = service_profile.get("database_provider")
+    if provider is None:
+        return None
+    module_name = provider.get("package") if isinstance(provider, dict) else provider
+    if not isinstance(module_name, str) or not module_name:
+        raise ValueError("Koishi service profile database provider has no package name")
+    if module_name not in provider_modules:
+        raise ValueError("Koishi service profile database provider is absent from its preloaded package set")
+    return module_name
 
 
 def _assert_oracle_absent(value: Any) -> None:
@@ -269,6 +282,31 @@ def _prepare_profile(request: dict[str, Any]) -> dict[str, Any]:
     if resolver.returncode or not resolver.stdout.strip().startswith("file:"):
         raise RuntimeError(f"could not resolve the frozen Koishi package {package_name!r}: {resolver.stderr[-1000:]}")
     context["koishi_entry_url"] = resolver.stdout.strip().splitlines()[-1]
+    provider_modules = context.get("sample", {}).get("preload_plugins", [])
+    if not isinstance(provider_modules, list) or any(not isinstance(item, str) or not item for item in provider_modules):
+        raise ValueError("Koishi service profile has malformed preload plugin names")
+    provider_url_by_module: dict[str, str] = {}
+    for module_name in provider_modules:
+        provider_resolver = _run(
+            [
+                "/usr/local/bin/node",
+                "--input-type=module",
+                "-e",
+                f"console.log(import.meta.resolve({json.dumps(module_name)}))",
+            ],
+            cwd=profile,
+            timeout=15,
+        )
+        if provider_resolver.returncode or not provider_resolver.stdout.strip().startswith("file:"):
+            raise RuntimeError(f"could not resolve a locked Koishi service provider {module_name!r}: {provider_resolver.stderr[-1000:]}")
+        provider_url_by_module[module_name] = provider_resolver.stdout.strip().splitlines()[-1]
+    database_provider = _koishi_database_provider_module(
+        context.get("service_profile", {}), provider_modules
+    )
+    context["database_provider_url"] = provider_url_by_module.get(database_provider)
+    context["provider_urls"] = [
+        url for module_name, url in provider_url_by_module.items() if module_name != database_provider
+    ]
     context["host_environment"].update(
         {
             "LIGAMINA_NODE_EXECUTABLE": "/usr/local/bin/node",
@@ -282,6 +320,10 @@ def _prepare_profile(request: dict[str, Any]) -> dict[str, Any]:
         "/input/project/lab/baselines/koishi/artifact_fingerprint.mjs",
         harness.parent / "artifact_fingerprint.mjs",
     )
+    shutil.copy2(
+        "/input/project/lab/baselines/koishi/plugin_export.mjs",
+        harness.parent / "plugin_export.mjs",
+    )
     return {
         "status": "passed",
         "kind": "locked_npm_offline_install_local_tarballs" if local_tarballs else "locked_npm_offline_install",
@@ -291,6 +333,9 @@ def _prepare_profile(request: dict[str, Any]) -> dict[str, Any]:
         "koishi_host_dist_sha256": expected_host_dist,
         "framework_version": "4.18.11",
         "host_lock_sha256": context["host_lock_sha256"],
+        "provider_modules": provider_modules,
+        "provider_urls": context["provider_urls"],
+        "database_provider_url": context.get("database_provider_url"),
     }
 
 
@@ -303,6 +348,9 @@ def run_side(request: dict[str, Any]) -> dict[str, Any]:
     if mode not in {"native", "federated", "tool"}:
         raise ValueError("side request does not select a registered execution mode")
     ecosystem = context.get("sample", {}).get("ecosystem")
+    harness_timeout = context.get("execution", {}).get("harness_timeout_seconds", 180)
+    if isinstance(harness_timeout, bool) or not isinstance(harness_timeout, int) or not 1 <= harness_timeout <= 180:
+        raise ValueError("harness_timeout_seconds must be an integer from 1 to 180")
     setup_evidence = _prepare_profile(request)
     runtime_artifacts = context.get("runtime_artifacts", {})
     core_path = "/usr/local/bin/ligamina-cli"
@@ -344,7 +392,7 @@ def run_side(request: dict[str, Any]) -> dict[str, Any]:
         ]
         if mode in {"federated", "tool"}:
             command = [sys.executable, "/input/project/lab/baselines/federated.py"]
-    result = execute_harness(command, request, mode, 180, cwd=Path("/work/side"))
+    result = execute_harness(command, request, mode, harness_timeout, cwd=Path("/work/side"))
     result = _scrub_result_diagnostics(result)
     result["profile_setup"] = setup_evidence
     return result
@@ -362,7 +410,13 @@ def main() -> int:
         print(json.dumps(result, ensure_ascii=False))
         return 0
     except Exception as error:  # Worker boundary converts setup faults into explicit attempt output.
-        print(json.dumps({"status": "failed", "reason_code": "worker_side_setup_failed", "diagnostic": str(error)}, ensure_ascii=False))
+        diagnostic = str(error)
+        print(json.dumps({
+            "status": "failed",
+            "reason_code": "worker_side_setup_failed",
+            "diagnostic_summary": _safe_diagnostic_summary(diagnostic),
+            "diagnostic_sha256": hashlib.sha256(diagnostic.encode("utf-8", errors="replace")).hexdigest(),
+        }, ensure_ascii=False))
         return 0
 
 

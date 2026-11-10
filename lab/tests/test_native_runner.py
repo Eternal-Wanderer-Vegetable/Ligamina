@@ -26,7 +26,7 @@ def fixture_command(*inject: str) -> list[str]:
     ]
 
 
-class NativeRunnerTest(unittest.TestCase):
+class NativeRunnerTests(unittest.TestCase):
     def test_harness_gets_only_stimulus_and_logs_stay_out_of_json_stdout(self) -> None:
         case = load_case(ROOT / "samples/fixtures/event-routing/single-group-reply.json")
         script = (
@@ -86,6 +86,18 @@ class NativeRunnerTest(unittest.TestCase):
             "cleanup_expectation_failed",
             {issue["code"] for issue in report["comparison"]["issues"]},
         )
+
+    def test_timeout_preserves_bounded_stderr_for_worker_diagnostics(self) -> None:
+        result = execute_harness(
+            [sys.executable, "-c", "import sys,time; print('P7-stage-marker', file=sys.stderr, flush=True); time.sleep(2)"],
+            {"case_id": "timeout-diagnostics", "stimulus": {"events": []}, "context": {}},
+            "native",
+            0.1,
+        )
+
+        self.assertEqual(result["status"], "failed")
+        self.assertEqual(result["diagnostic"], "harness timed out")
+        self.assertEqual(result["stderr"], "P7-stage-marker\n")
 
 
 if __name__ == "__main__":

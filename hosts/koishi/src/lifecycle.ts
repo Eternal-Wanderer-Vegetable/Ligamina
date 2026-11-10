@@ -16,6 +16,7 @@ export class HostLifecycle {
     dataDirectory?: string
     plugins?: string[]
     pluginConfig?: Record<string, unknown>
+    databaseProvider?: string
     nicknames?: string[]
   }) {}
 
@@ -26,7 +27,13 @@ export class HostLifecycle {
     await mkdir(dataDirectory, { recursive: true })
     const app = new Context({ nickname: this.options.nicknames ?? parseList(process.env.LIGAMINA_KOISHI_NICKNAMES) })
     this.app = app
-    app.plugin(SQLiteDriver as any, { path: resolve(dataDirectory, 'koishi.sqlite') })
+    if (this.options.databaseProvider) {
+      const providerModule = await import(this.options.databaseProvider)
+      const provider = providerModule.default ?? providerModule.apply ?? providerModule
+      app.plugin(provider)
+    } else {
+      app.plugin(SQLiteDriver as any, { path: resolve(dataDirectory, 'koishi.sqlite') })
+    }
     this.adapter = new BridgeAdapter(app, {
       hostId: this.options.hostId,
       platformCall: this.options.platformCall,

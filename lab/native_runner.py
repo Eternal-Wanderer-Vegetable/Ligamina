@@ -90,8 +90,11 @@ def execute_harness(
         )
     except FileNotFoundError as error:
         return {"status": "environment_missing", "diagnostic": str(error)}
-    except subprocess.TimeoutExpired:
-        return {"status": "failed", "diagnostic": "harness timed out"}
+    except subprocess.TimeoutExpired as error:
+        stderr = error.stderr or ""
+        if isinstance(stderr, bytes):
+            stderr = stderr.decode("utf-8", errors="replace")
+        return {"status": "failed", "diagnostic": "harness timed out", "stderr": stderr[-4000:]}
     if process.returncode != 0:
         return {
             "status": "failed",

@@ -255,12 +255,17 @@ def run(request: dict[str, Any]) -> dict[str, Any]:
             sample["fixture"] = {"plugin_config": config}
             module_url = context["koishi_entry_url"]
             probe_url = (root / "lab/baselines/koishi/phase4_probe_plugin.mjs").resolve().as_uri()
+            provider_urls = list(context.get("provider_urls", []))
+            database_provider_url = context.get("database_provider_url")
+            if database_provider_url:
+                environment["LIGAMINA_KOISHI_DATABASE_PROVIDER"] = database_provider_url
+            provider_config = {url: {} for url in provider_urls}
             if tool_calls is not None:
-                environment["LIGAMINA_KOISHI_PLUGINS"] = module_url
-                environment["LIGAMINA_KOISHI_PLUGIN_CONFIG"] = json.dumps({module_url: config}, ensure_ascii=False)
+                environment["LIGAMINA_KOISHI_PLUGINS"] = ",".join((*provider_urls, module_url))
+                environment["LIGAMINA_KOISHI_PLUGIN_CONFIG"] = json.dumps({**provider_config, module_url: config}, ensure_ascii=False)
             else:
-                environment["LIGAMINA_KOISHI_PLUGINS"] = ",".join((module_url, probe_url))
-                environment["LIGAMINA_KOISHI_PLUGIN_CONFIG"] = json.dumps({module_url: config, probe_url: {}}, ensure_ascii=False)
+                environment["LIGAMINA_KOISHI_PLUGINS"] = ",".join((*provider_urls, module_url, probe_url))
+                environment["LIGAMINA_KOISHI_PLUGIN_CONFIG"] = json.dumps({**provider_config, module_url: config, probe_url: {}}, ensure_ascii=False)
             users = []
             seeded = {} if tool_calls is not None else behavior_fixture["setup"].get("user_authority", {})
             for key, authority in seeded.items():
@@ -290,10 +295,15 @@ def run(request: dict[str, Any]) -> dict[str, Any]:
         })
     if sample["ecosystem"] == "koishi" and not behavior_fixture:
         module_url = context["koishi_entry_url"]
-        environment["LIGAMINA_KOISHI_PLUGINS"] = module_url
+        provider_urls = list(context.get("provider_urls", []))
+        database_provider_url = context.get("database_provider_url")
+        if database_provider_url:
+            environment["LIGAMINA_KOISHI_DATABASE_PROVIDER"] = database_provider_url
+        environment["LIGAMINA_KOISHI_PLUGINS"] = ",".join((*provider_urls, module_url))
         config = sample.get("fixture", {}).get("plugin_config")
-        if config:
-            environment["LIGAMINA_KOISHI_PLUGIN_CONFIG"] = json.dumps({module_url: config}, ensure_ascii=False)
+        provider_config = {url: {} for url in provider_urls}
+        if config or provider_config:
+            environment["LIGAMINA_KOISHI_PLUGIN_CONFIG"] = json.dumps({**provider_config, module_url: config or {}}, ensure_ascii=False)
     trace = run_federated(
         sample,
         work,
