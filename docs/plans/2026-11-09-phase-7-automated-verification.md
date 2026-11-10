@@ -106,6 +106,8 @@
 
 ### 3.3 确定性控制与等价关系（P7-02、P7-04）
 
+**P7-04 discovery 修正与首轮正式 pilot（2026-11-10）：** 首轮 30+30 执行前的诊断试跑发现 Koishi Native runner 在 `app.stop()` 后读取命令表，导致退出清理清空命令；保留的 31 条目诊断报告见 [partial discovery diagnostic](../../outputs/acceptance/p7-p704-differential-pilot-20261110-koishi-discovery-diagnostic.partial.json)，SHA-256 `9cd6ec2c213deed144285140f2d51d549b66fb4b63aeede7186a74cd1addba1d`。现改为在插件仍注册时采集；锁定样本 `koishi-plugin-bt` 在禁网 Worker 中正确发现 14 条命令并确认清理，证据 [discovery fix](../../outputs/acceptance/p7-p704-koishi-discovery-fix-20261110.json)，SHA-256 `d2bc0d18323ae2624ddc832b3e15da248c7a0ee4fc2dab5c201a524f725365bb`。第一轮 30+30 campaign 已准备完 60 个精确 bundle，但只进入 2/60 条目：第一条完成三轮 Native×2/Federated 执行，Federated Host 退出导致 135 个场景 unknown；第二条三路 Worker 启动均返回 `worker_backend_unavailable` 且 cleanup 未确认，执行器按失败关闭停止。保留报告 [attempt1](../../outputs/acceptance/p7-p704-differential-pilot-20261110-attempt1-incomplete.json)，SHA-256 `4c82670d71ef12c67778ff8349630438464300431e350189fcba7b5becb6717e`。该报告不是 30+30 完成证据；下一轮使用单 Worker 并发，Host/依赖问题仍按 unknown 归因，不能推断为兼容通过。
+
 - 控制：两路使用相同的随机种子（Python 通过 Worker 预加载设置 `random` 与 `PYTHONHASHSEED`，Node 通过预加载替换 `Math.random`）、相同 `TZ`、禁网。假时钟暂不做，按 P7-04 的数据决定。
 - **自差分**：Native 在两个全新 Worker 中各跑一次。两次之间不同的字段标为 volatile，从比较中去除；去除后什么都不剩的场景记 `unknown`（原因 `nondeterministic`），不计通过。
 - 比较项：回复条数与顺序、目标会话与账号、消息段类型、归一化文本（掩码时间戳、UUID、耗时等 volatile token）、平台操作类型、Host 是否存活。

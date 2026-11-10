@@ -214,6 +214,7 @@ async function main() {
     await app.database.createUser(platform, userId, { authority })
   }
 
+  let runtimeCommands = []
   try {
     for (const event of events) {
       const isPrivate = event.conversation.kind === 'private'
@@ -244,6 +245,9 @@ async function main() {
       await new Promise((resolve) => setImmediate(resolve))
       await Promise.allSettled(bot.pendingSends.splice(0))
     }
+    // Capture while plugins are still registered. app.stop() disposes plugins
+    // and may clear Koishi's command registry before the report is assembled.
+    runtimeCommands = nativeCommandDescriptors(app)
   } finally {
     for (const remove of removeBotDisposeListeners) remove()
     for (const bot of bots.values()) await bot.dispose()
@@ -285,7 +289,7 @@ async function main() {
     cleanup: { active_capability_count: 0, live_processes: [] },
     stock_native: { framework: 'Koishi', api: 'Context/Session/Bot', bridge_adapter_imported: false },
   }
-  report.stock_native.runtime_commands = nativeCommandDescriptors(app)
+  report.stock_native.runtime_commands = runtimeCommands
   if (behaviorFixture) {
     report.native_trace = { bridge_adapter_imported: false }
     report.binding = context.binding

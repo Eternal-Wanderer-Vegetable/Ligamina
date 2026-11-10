@@ -2444,12 +2444,18 @@
       ],
       "status": "in-progress",
       "done_when": "每条目报告发现/执行/nontrivial 命令数、等价/不等价/nondeterministic 数与资源；不等价项逐条归因；三次全新复跑结论一致。",
-      "evidence": "Partial checkpoint only: 1+1 smoke completed in the admitted network-disabled Linux Workers; 11/11 Worker cleanups confirmed and applicable scenario conclusions were consistent across three reruns. This is not the required 30+30 pilot. The only command-bearing smoke entry had 66/66 observations unknown because no Gateway operations were observed; nontrivial behavior was not assessed.",
+      "evidence": "Partial checkpoint only: the 1+1 admitted Linux Worker smoke remains non-acceptance evidence. A pre-stop Koishi command-capture regression was fixed and validated on locked koishi-plugin-bt: 14 Native commands discovered, Worker cleanup confirmed. The first official 30+30 attempt prepared all 60 exact bundles but stopped at 2/60 after three concurrent Worker launches returned worker_backend_unavailable with cleanup unconfirmed; the first entry's Federated Host also exited, so its behavior observations remain unknown. See attempt1 report. Not a completed pilot; retry with one concurrent Worker.",
       "evidence_paths": [
         "outputs/acceptance/p7-p704-pilot-selection-20261110.json",
         "outputs/acceptance/p7-p704-pilot-selection-20261110.json.sha256",
         "outputs/acceptance/p7-p704-smoke-20261110-e.json",
-        "outputs/acceptance/p7-p704-smoke-20261110-e.json.sha256"
+        "outputs/acceptance/p7-p704-smoke-20261110-e.json.sha256",
+        "outputs/acceptance/p7-p704-differential-pilot-20261110-koishi-discovery-diagnostic.partial.json",
+        "outputs/acceptance/p7-p704-differential-pilot-20261110-koishi-discovery-diagnostic.partial.json.sha256",
+        "outputs/acceptance/p7-p704-koishi-discovery-fix-20261110.json",
+        "outputs/acceptance/p7-p704-koishi-discovery-fix-20261110.json.sha256",
+        "outputs/acceptance/p7-p704-differential-pilot-20261110-attempt1-incomplete.json",
+        "outputs/acceptance/p7-p704-differential-pilot-20261110-attempt1-incomplete.json.sha256"
       ],
       "plan_path": "docs/plans/2026-11-09-phase-7-automated-verification.md"
     },
