@@ -758,7 +758,7 @@ def _nontrivial_commands(
         edge = [
             item for item in cases
             if item["kind"] in {"missing_required", "extra_argument"}
-            or (item["kind"] == "raw_text" and not item["arguments_nonempty"])
+            or item.get("arguments_nonempty") is False
         ]
         if not normal or not edge:
             result[command_id] = "not_assessed"

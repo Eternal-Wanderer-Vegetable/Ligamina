@@ -224,6 +224,15 @@ class DifferentialCampaignTests(unittest.TestCase):
         self.assertEqual(_nontrivial_commands(scenarios, [(no_output, no_output)]), {"echo": "not_assessed"})
         self.assertEqual(_nontrivial_commands(scenarios, [(output_one, output_two)]), {"echo": "nontrivial"})
 
+    def test_empty_optional_typed_input_is_a_nontrivial_boundary(self) -> None:
+        scenarios = [
+            {"event_id": "normal", "command_id": "optional", "kind": "pairwise", "arguments_nonempty": True},
+            {"event_id": "empty", "command_id": "optional", "kind": "pairwise", "arguments_nonempty": False},
+        ]
+        native = {"events": {"normal": [{"message": "value"}], "empty": [{"message": "usage"}]}}
+
+        self.assertEqual(_nontrivial_commands(scenarios, [(native, native)]), {"optional": "nontrivial"})
+
     def test_command_consistency_requires_three_fresh_reruns(self) -> None:
         descriptor = {"command_id": "echo"}
         scenario = {"scenario_id": "scn-one", "command_id": "echo", "event_id": "evt-1", "kind": "raw_text", "arguments_nonempty": True}

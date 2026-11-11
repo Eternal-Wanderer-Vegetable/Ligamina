@@ -15,7 +15,7 @@ from typing import Any, Callable, Iterable, Sequence
 from hypothesis import find, settings, strategies as st
 
 GENERATOR_NAME = "ligamina-scenario-generator"
-GENERATOR_VERSION = "2"
+GENERATOR_VERSION = "3"
 DEFAULT_FIXED_TIME = "2026-10-26T00:00:00Z"
 DEFAULT_VOLATILE_FIELDS = (
     "event_id",
@@ -248,10 +248,23 @@ def generate_scenarios(
     descriptor_hash = object_sha256(descriptor)
     rng = random.Random(int(hashlib.sha256(f"{inventory_sha256}:{descriptor_hash}:{seed}".encode()).hexdigest(), 16))
     factors = _descriptor_factors(descriptor, rng)
+    has_raw_text = len(factors) == 1 and factors[0].role == "raw_text"
+    if has_raw_text:
+        raw_factor = factors[0]
+        factors[0] = _Factor(
+            raw_factor.key,
+            raw_factor.parameter,
+            [value for value in raw_factor.values if value != ""],
+            raw_factor.role,
+        )
     has_required = any(parameter.get("required", False) for parameter in descriptor.get("arguments", []))
     aliases = [item for item in descriptor.get("aliases", []) if isinstance(item, str) and item.strip()]
     has_typed_parameters = factors[0].role != "raw_text"
-    reserve = min(max_scenarios - 1, int(has_required) + int(has_typed_parameters) + int(bool(aliases)))
+    empty_input_budget = int(max_scenarios > 1)
+    reserve = min(
+        max_scenarios - 1,
+        int(has_required) + int(has_typed_parameters) + int(bool(aliases)) + empty_input_budget,
+    )
     pairwise = pairwise_cases(factors, max_rows=max(1, max_scenarios - reserve), seed=seed)
     pairwise_summary = {
         "complete": pairwise.complete,
@@ -272,6 +285,10 @@ def generate_scenarios(
         base = dict(cases[0][1]) if cases else {}
         base["_omitted_required"] = [omitted]
         cases.append(("missing_required", base, None))
+    empty_inputs = {"raw_text": ""} if has_raw_text else {}
+    if empty_input_budget and not any(not _render_arguments(descriptor, inputs).strip() for _, inputs, _ in cases):
+        empty_kind = "raw_text" if has_raw_text else "pairwise"
+        cases.append((empty_kind, empty_inputs, None))
     if has_typed_parameters and len(cases) < max_scenarios:
         extra = dict(cases[0][1]) if cases else {}
         extra["_extra_argument"] = "ligamina-extra-argument"

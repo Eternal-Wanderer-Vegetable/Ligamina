@@ -136,7 +136,7 @@ class ScenarioGeneratorTests(unittest.TestCase):
             conversation_kind="group",
         )
 
-        self.assertEqual(batch.to_dict()["generator"]["version"], "2")
+        self.assertEqual(batch.to_dict()["generator"]["version"], "3")
         for scenario in batch.scenarios:
             self.assertEqual(scenario["conversations"][0]["kind"], "group")
             self.assertTrue(scenario["conversations"][0]["conversation_id"].startswith("group-"))
@@ -173,6 +173,48 @@ class ScenarioGeneratorTests(unittest.TestCase):
         self.assertTrue(all(item["case"]["kind"] == "raw_text" for item in batch.scenarios))
         self.assertTrue(all("raw_text" in item["steps"][0]["inputs"] for item in batch.scenarios))
         self.assertIn("", [item["steps"][0]["inputs"]["raw_text"] for item in batch.scenarios])
+
+    def test_raw_text_empty_boundary_is_reserved_before_scenario_cap(self):
+        descriptor = {
+            "framework": "nonebot",
+            "command_id": "echo",
+            "invocation": "/echo",
+            "usage": "/echo " + " ".join(f"value{index}" for index in range(64)),
+            "arguments": [],
+            "options": [],
+            "aliases": [],
+        }
+        batch = generate_scenarios(
+            inventory_sha256=INVENTORY_SHA,
+            descriptor=descriptor,
+            host_id="nonebot",
+            seed=7,
+            max_scenarios=16,
+        )
+
+        self.assertLessEqual(len(batch.scenarios), 16)
+        self.assertTrue(any(item["steps"][0]["arguments"] == "" for item in batch.scenarios))
+        self.assertTrue(any(item["steps"][0]["arguments"].strip() for item in batch.scenarios))
+
+    def test_typed_command_gets_empty_input_when_budget_allows(self):
+        descriptor = {
+            "framework": "nonebot",
+            "command_id": "optional",
+            "invocation": "/optional",
+            "arguments": [{"name": "text", "type": "text", "required": False}],
+            "options": [],
+            "aliases": [],
+        }
+        batch = generate_scenarios(
+            inventory_sha256=INVENTORY_SHA,
+            descriptor=descriptor,
+            host_id="nonebot",
+            seed=19,
+            max_scenarios=4,
+        )
+
+        self.assertTrue(any(item["steps"][0]["arguments"] == "" for item in batch.scenarios))
+        self.assertTrue(any(item["steps"][0]["arguments"].strip() for item in batch.scenarios))
 
     def test_volatile_only_repetitions_are_unknown_and_stable_payload_compares(self):
         only_timestamps = compare_repeated_observations(
