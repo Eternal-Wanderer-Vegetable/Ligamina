@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "updated_at": "2026-11-12",
-  "active_feature": null,
+  "active_feature": "feat-063",
   "next_feature": null,
   "features": [
     {
@@ -2971,6 +2971,25 @@
         "outputs/acceptance/p7-p704-nontrivial-unknown-source-audit-20261112.json.sha256",
         "outputs/acceptance/p7-p704-source-audit-verification-20261112.json",
         "outputs/acceptance/p7-p704-source-audit-verification-20261112.json.sha256",
+        "docs/plans/2026-11-09-phase-7-automated-verification.md"
+      ],
+      "plan_path": "docs/plans/2026-11-09-phase-7-automated-verification.md"
+    },
+    {
+      "id": "feat-063",
+      "task_id": "P7-04J",
+      "name": "复核本地输入敏感候选的有界 Native/Federated 行为",
+      "description": "范围扩展原因：feat-062 的 exact-artifact 源码审计发现两条本地输入敏感分支，但它们尚无行为证据；Koishi subid 的现有 cohort workers 在 15 秒 deadline 失败且 handler 无参会等待 30 秒 prompt，BiliChat .unsub 受 SUPERUSER 保护并写配置。现在只为这两个精确候选构造 prompt-free synthetic input 与每 Worker 隔离 permission/config，再运行 source-bound Native×2/Federated 有界诊断。",
+      "dependencies": [
+        "feat-061",
+        "feat-062"
+      ],
+      "status": "in-progress",
+      "done_when": "精确 artifact/source/command/profile/stimulus hashes 均绑定；subid 使用显式 keyword 避免 prompt 等待；.unsub 使用 synthetic SUPERUSER 与 disposable per-worker config，对 all 与 unmatched keyword 的结果进行 Native×2/Federated 观察；报告确认三侧完成、事件关联、worker/host cleanup，失败仍保留 unknown。只运行两个精确 entry 的隔离诊断，不变更 30+30 分母、完整 cohort 状态或 P7-09 gate。",
+      "evidence": "Started 2026-11-12 after feat-062. Source audit classifies subid and .unsub as source-level local input-sensitive candidates, not behavior passes. The current cohort failed the Koishi subculture entry at the middleware/request deadline; BiliChat .unsub requires a source-bound SUPERUSER context and isolated persistent config. This bounded work seeks new evidence before any same-selection cohort rerun.",
+      "evidence_paths": [
+        "outputs/acceptance/p7-p704-nontrivial-unknown-source-audit-20261112.json",
+        "outputs/acceptance/p7-p704-nontrivial-unknown-source-facts-20261112.json",
         "docs/plans/2026-11-09-phase-7-automated-verification.md"
       ],
       "plan_path": "docs/plans/2026-11-09-phase-7-automated-verification.md"
