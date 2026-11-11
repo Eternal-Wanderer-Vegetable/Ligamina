@@ -5,10 +5,13 @@ from __future__ import annotations
 import copy
 import hashlib
 import json
+from functools import lru_cache
 from pathlib import Path
 from typing import Any
 
 from jsonschema import Draft202012Validator
+
+from lab.automation.p7_context_profile_audit import validate_source_audit_finding
 
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -33,6 +36,17 @@ def _read_json(path: Path) -> dict[str, Any]:
 
 def validate_profile_document(document: dict[str, Any] | None = None) -> dict[str, Any]:
     """Validate the profile schema, source report hash, and exact command/artifact binds."""
+    if document is None:
+        return copy.deepcopy(_cached_profile_document())
+    return _validate_profile_document(document)
+
+
+@lru_cache(maxsize=1)
+def _cached_profile_document() -> dict[str, Any]:
+    return _validate_profile_document(None)
+
+
+def _validate_profile_document(document: dict[str, Any] | None) -> dict[str, Any]:
     value = copy.deepcopy(document) if document is not None else _read_json(PROFILE_DOCUMENT_PATH)
     schema = _read_json(PROFILE_SCHEMA_PATH)
     Draft202012Validator.check_schema(schema)
@@ -51,6 +65,28 @@ def validate_profile_document(document: dict[str, Any] | None = None) -> dict[st
     report = json.loads(report_raw)
     findings = report.get("source_bound_findings", [])
     finding_by_id = {row.get("registry_entry_id"): row for row in findings if isinstance(row, dict)}
+    audit_ref = value["supplemental_source_report"]
+    audit_path = (ROOT / audit_ref["path"]).resolve(strict=True)
+    audit_raw = audit_path.read_bytes()
+    if _sha256(audit_raw) != audit_ref["sha256"]:
+        raise ValueError("P7 context profile supplemental source audit SHA-256 changed")
+    source_audit = json.loads(audit_raw)
+    if source_audit.get("kind") != "p7_p704_source_bound_context_profile_audit":
+        raise ValueError("P7 context profile supplemental source audit has an unexpected kind")
+    selection_ref = source_audit.get("source_selection", {})
+    selection_path = (ROOT / selection_ref.get("path", "")).resolve(strict=True)
+    selection_raw = selection_path.read_bytes()
+    if _sha256(selection_raw) != selection_ref.get("sha256"):
+        raise ValueError("P7 context profile source audit selection SHA-256 changed")
+    source_selection = json.loads(selection_raw)
+    audit_findings = source_audit.get("findings", [])
+    audit_finding_by_id = {
+        row.get("registry_entry_id"): row
+        for row in audit_findings
+        if isinstance(row, dict)
+    }
+    for audit_finding in audit_finding_by_id.values():
+        validate_source_audit_finding(audit_finding, source_selection)
 
     for profile in value["profiles"]:
         entry_id = profile["registry_entry_id"]
@@ -58,17 +94,24 @@ def validate_profile_document(document: dict[str, Any] | None = None) -> dict[st
             raise ValueError(f"duplicate P7 context profile registry entry: {entry_id}")
         profile_ids.add(entry_id)
         finding = finding_by_id.get(entry_id)
+        supplemental_finding = audit_finding_by_id.get(entry_id)
+        if finding is None:
+            finding = supplemental_finding
         if not isinstance(finding, dict):
             raise ValueError(f"P7 context profile has no source-bound finding: {entry_id}")
         identity = (profile["package"], profile["version"], profile["artifact_sha256"])
         finding_identity = (finding.get("package"), finding.get("version"), finding.get("artifact_sha256"))
         if identity != finding_identity:
             raise ValueError(f"P7 context profile identity differs from its source report: {entry_id}")
-        source_commands = {
-            row.get("command_id")
-            for row in finding.get("commands_with_native_no_operation", [])
-            if isinstance(row, dict)
-        }
+        source_commands = (
+            {
+                row.get("command_id")
+                for row in finding.get("commands_with_native_no_operation", [])
+                if isinstance(row, dict)
+            }
+            if entry_id in finding_by_id
+            else set(finding.get("command_ids", []))
+        )
         if set(profile["command_ids"]) != source_commands:
             raise ValueError(f"P7 context profile command set differs from its source report: {entry_id}")
         overrides = [row["command_id"] for row in profile["command_overrides"]]
@@ -76,12 +119,20 @@ def validate_profile_document(document: dict[str, Any] | None = None) -> dict[st
             raise ValueError(f"duplicate P7 context profile command override: {entry_id}")
         if not set(overrides).issubset(source_commands):
             raise ValueError(f"P7 context profile override names an unbound command: {entry_id}")
-        source_file_hashes = {
-            row.get("package_source"): row.get("package_source_sha256")
-            for source in finding.get("wheel", {}).get("source_files", [])
-            for row in [source]
-            if isinstance(row, dict)
-        }
+        source_file_hashes = (
+            {
+                row.get("package_source"): row.get("package_source_sha256")
+                for source in finding.get("wheel", {}).get("source_files", [])
+                for row in [source]
+                if isinstance(row, dict)
+            }
+            if entry_id in finding_by_id
+            else {
+                row.get("path"): row.get("sha256")
+                for row in finding.get("source_files", [])
+                if isinstance(row, dict)
+            }
+        )
         for source in profile["source_evidence"]:
             if source_file_hashes.get(source["path"]) != source["sha256"]:
                 raise ValueError(f"P7 context profile source hash is not bound to its locked wheel: {source['path']}")
@@ -94,8 +145,37 @@ def profile_manifest_sha256() -> str:
     return _sha256(PROFILE_DOCUMENT_PATH.read_bytes())
 
 
+def context_profile_entry_ids() -> set[str]:
+    """Return exact registry identities bound by either ecosystem profile manifest."""
+    from lab.automation.p7_koishi_context_profiles import profile_entry_ids as koishi_profile_entry_ids
+
+    return {
+        *(row["registry_entry_id"] for row in validate_profile_document()["profiles"]),
+        *koishi_profile_entry_ids(),
+    }
+
+
+def context_profile_manifest_sha256() -> str:
+    """Hash the validated NoneBot and Koishi profile-manifest set as one campaign input."""
+    return _sha256(_canonical(context_profile_manifest_hashes()))
+
+
+def context_profile_manifest_hashes() -> dict[str, str]:
+    """Return per-ecosystem hashes for the validated context-profile manifests."""
+    from lab.automation.p7_koishi_context_profiles import profile_manifest_sha256 as koishi_profile_manifest_sha256
+
+    return {
+        "nonebot": profile_manifest_sha256(),
+        "koishi": koishi_profile_manifest_sha256(),
+    }
+
+
 def profile_binding(candidate: dict[str, Any]) -> dict[str, Any] | None:
     """Build an immutable-by-hash context binding for one exact catalog artifact."""
+    if candidate.get("ecosystem") == "koishi":
+        from lab.automation.p7_koishi_context_profiles import profile_binding as koishi_profile_binding
+
+        return koishi_profile_binding(candidate)
     if candidate.get("ecosystem") != "nonebot":
         return None
     document = validate_profile_document()

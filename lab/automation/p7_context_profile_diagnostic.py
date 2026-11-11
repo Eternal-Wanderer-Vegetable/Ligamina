@@ -35,7 +35,16 @@ def build_selection_document(source_selection_path: Path = SOURCE_SELECTION_PATH
     if not isinstance(source, dict) or source.get("kind") != "p7_p701_static_inventory_sample":
         raise ValueError("context diagnostic source must be a P7-01 static inventory selection")
     profile_document = validate_profile_document()
-    profile_by_id = {row["registry_entry_id"]: row for row in profile_document["profiles"]}
+    historical_profile_ids = {
+        "nb-47f239e4b2ed71a255157441",
+        "nb-ed10c5014456c4e265167187",
+        "nb-250c92c282d77dcf502b9dbf",
+    }
+    profile_by_id = {
+        row["registry_entry_id"]: row
+        for row in profile_document["profiles"]
+        if row["registry_entry_id"] in historical_profile_ids
+    }
     source_samples = source.get("samples")
     if not isinstance(source_samples, list):
         raise ValueError("context diagnostic source selection has no sample list")

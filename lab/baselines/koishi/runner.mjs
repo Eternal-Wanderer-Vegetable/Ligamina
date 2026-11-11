@@ -347,6 +347,31 @@ async function main() {
     config_sha256: createHash('sha256').update(canonical(context.config), 'utf8').digest('hex'),
     stimulus_sha256: createHash('sha256').update(canonical(request.stimulus), 'utf8').digest('hex'),
   }
+  const testContextProfile = context.test_context_profile
+  if (testContextProfile !== null && testContextProfile !== undefined) {
+    if (
+      testContextProfile.execution_scope !== 'linux_worker_only_network_disabled'
+      || testContextProfile.authority_scope !== 'synthetic_test_actor_only'
+    ) {
+      throw new Error('P7 Koishi test context profile exceeds its synthetic offline Worker scope')
+    }
+    const { profile_sha256: claimedProfileHash, ...profilePayload } = testContextProfile
+    const observedProfileHash = createHash('sha256').update(canonical(profilePayload), 'utf8').digest('hex')
+    if (claimedProfileHash !== observedProfileHash) {
+      throw new Error('P7 Koishi test context profile hash mismatch')
+    }
+    const expectedPluginConfig = { adminId: [testContextProfile.synthetic_actor_id] }
+    if (
+      !testContextProfile.synthetic_actor_id
+      || canonical(testContextProfile.plugin_config) !== canonical(expectedPluginConfig)
+      || canonical(context.config.plugin_config) !== canonical(expectedPluginConfig)
+      || canonical(sample.fixture?.plugin_config ?? {}) !== canonical(expectedPluginConfig)
+      || request.stimulus.events.some((event) => event.actor_id !== testContextProfile.synthetic_actor_id)
+    ) {
+      throw new Error('P7 Koishi actor/config differs from the source-bound synthetic admin profile')
+    }
+    environment.test_context_profile_sha256 = claimedProfileHash
+  }
   const expected = context.expected_environment
   if (canonical(environment) !== canonical(expected)) {
     throw new Error(`stock native fingerprint mismatch: expected ${canonical(expected)}, observed ${canonical(environment)}`)

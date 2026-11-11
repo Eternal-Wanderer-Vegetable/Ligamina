@@ -4,7 +4,7 @@
   "title": "P7 NoneBot Synthetic Test Context Profiles",
   "type": "object",
   "additionalProperties": false,
-  "required": ["schema_version", "kind", "profile_id", "execution_scope", "authority_scope", "event_envelope_role_claims", "source_report", "synthetic_actor_id", "synthetic_superuser_id", "bot_account_id", "profiles"],
+    "required": ["schema_version", "kind", "profile_id", "execution_scope", "authority_scope", "event_envelope_role_claims", "source_report", "supplemental_source_report", "synthetic_actor_id", "synthetic_superuser_id", "bot_account_id", "profiles"],
   "properties": {
     "schema_version": {"const": 1},
     "kind": {"const": "p7_nonebot_synthetic_context_profiles"},
@@ -18,6 +18,15 @@
       "required": ["path", "sha256"],
       "properties": {
         "path": {"const": "outputs/acceptance/p7-p704-no-operation-source-diagnostic-20261111.json"},
+        "sha256": {"$ref": "#/$defs/hash"}
+      }
+    },
+    "supplemental_source_report": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["path", "sha256"],
+      "properties": {
+        "path": {"const": "outputs/acceptance/p7-p704-context-profile-source-audit-20261111.json"},
         "sha256": {"$ref": "#/$defs/hash"}
       }
     },

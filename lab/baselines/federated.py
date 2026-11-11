@@ -31,7 +31,9 @@ def _artifact_hash(path: Path, algorithm: str) -> str:
     raise ValueError(f"unsupported artifact digest algorithm: {algorithm}")
 
 
-def _test_context_profile_sha256(context: dict[str, Any]) -> str | None:
+def _test_context_profile_sha256(
+    context: dict[str, Any], stimulus: dict[str, Any] | None = None,
+) -> str | None:
     profile = context.get("test_context_profile")
     if profile is None:
         return None
@@ -40,7 +42,6 @@ def _test_context_profile_sha256(context: dict[str, Any]) -> str | None:
     if (
         profile.get("execution_scope") != "linux_worker_only_network_disabled"
         or profile.get("authority_scope") != "synthetic_test_actor_only"
-        or profile.get("event_envelope_role_claims") is not False
     ):
         raise ValueError("P7 test context profile exceeds its synthetic offline Worker scope")
     payload = {key: value for key, value in profile.items() if key != "profile_sha256"}
@@ -48,12 +49,33 @@ def _test_context_profile_sha256(context: dict[str, Any]) -> str | None:
     observed = hashlib.sha256(_canonical(payload)).hexdigest()
     if not isinstance(claimed, str) or claimed != observed:
         raise ValueError("P7 test context profile hash mismatch")
-    expected_superusers = [profile["synthetic_superuser_id"]]
-    expected_host_value = json.dumps(expected_superusers, separators=(",", ":"))
-    if context.get("host_environment", {}).get("SUPERUSERS") != expected_host_value:
-        raise ValueError("P7 Federated Host superuser setting differs from the bound profile")
-    if context.get("config", {}).get("nonebot_config") != {"superusers": expected_superusers}:
-        raise ValueError("P7 Native and Federated superuser settings do not match")
+    if context.get("sample", {}).get("ecosystem") == "nonebot":
+        if profile.get("event_envelope_role_claims") is not False:
+            raise ValueError("P7 NoneBot profile must not claim EventEnvelope roles")
+        expected_superusers = [profile["synthetic_superuser_id"]]
+        expected_host_value = json.dumps(expected_superusers, separators=(",", ":"))
+        if context.get("host_environment", {}).get("SUPERUSERS") != expected_host_value:
+            raise ValueError("P7 Federated Host superuser setting differs from the bound profile")
+        if context.get("config", {}).get("nonebot_config") != {"superusers": expected_superusers}:
+            raise ValueError("P7 Native and Federated superuser settings do not match")
+    elif context.get("sample", {}).get("ecosystem") == "koishi":
+        actor_id = profile.get("synthetic_actor_id")
+        plugin_config = profile.get("plugin_config")
+        expected_config = {"adminId": [actor_id]}
+        if not isinstance(actor_id, str) or plugin_config != expected_config:
+            raise ValueError("P7 Koishi profile must bind one synthetic admin actor")
+        if context.get("config", {}).get("plugin_config") != expected_config:
+            raise ValueError("P7 Native and Federated Koishi config hashes do not match")
+        if context.get("sample", {}).get("fixture", {}).get("plugin_config") != expected_config:
+            raise ValueError("P7 Federated Koishi plugin config differs from its source-bound profile")
+        if stimulus is not None and any(
+            event.get("actor_id") != actor_id
+            for event in stimulus.get("events", [])
+            if isinstance(event, dict)
+        ):
+            raise ValueError("P7 Koishi events must use the profile's synthetic admin actor")
+    else:
+        raise ValueError("P7 context profile is attached to an unsupported ecosystem")
     return claimed
 
 
@@ -88,7 +110,7 @@ def _environment(context: dict[str, Any], request: dict[str, Any]) -> dict[str, 
         "config_sha256": hashlib.sha256(_canonical(context["config"])).hexdigest(),
         "stimulus_sha256": hashlib.sha256(_canonical(request["stimulus"])).hexdigest(),
     }
-    test_context_profile_sha256 = _test_context_profile_sha256(context)
+    test_context_profile_sha256 = _test_context_profile_sha256(context, request["stimulus"])
     if sample["ecosystem"] == "nonebot" or test_context_profile_sha256 is not None:
         fingerprints["test_context_profile_sha256"] = test_context_profile_sha256
     if fingerprints != context["expected_environment"]:

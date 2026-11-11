@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-11-11",
+  "updated_at": "2026-11-12",
   "active_feature": null,
   "next_feature": null,
   "features": [
@@ -2640,7 +2640,7 @@
       ],
       "status": "blocked",
       "done_when": "分母守恒；清理全部确认；增量键可复跑；unknown 不改写为通过。",
-      "evidence": "P7-09 remains blocked. The latest fresh hash-ranked 30+30 recheck with the loopback fixture (selection SHA-256 3076c70a5e692392b993abb8754d84f0b06787a4781a4dfca68c7aad727f86c4; differential report SHA-256 2de44b29612a1936a7f85be7d68e041341a8c2a7476149175738c1262cb3b723) completed 60 terminal entries (56 completed, 4 discovery skips), 348/348 cleanups, and 32/32 consistent behavior entries. It exercised 177 commands: 29 nontrivial (16.4%), 106 equivalent, 21 non-equivalent, 2 nondeterministic, and 48 unknown (27.1%). Unknown, consistency, and cleanup pass; nontrivial >=30% fails. The exact Warframe artifact reached its hash-bound loopback fixture in Native×2 and Federated: 243 requests per side/round, route counts {riven-market:22, translation:11, warframe-data:210}, zero unmatched requests; nevertheless 25/26 commands remain unknown/no_native_gateway_operation_observed. C1–C8 audit SHA-256 7f61669583759d84f2de1441c4e9e06ed787b2bed2d98bf249193b98578f29f0: C1 30 passed/30 unknown; C2–C8 420 unknown for absent stimuli; synthetic fixtures 16/16 pass. No unknown was promoted and no full catalog campaign was started.",
+      "evidence": "P7-09 remains blocked. The latest same-selection hash-ranked 30+30 recheck is outputs/acceptance/p7-p704-differential-pilot-20261111-feat061-source-context-rerun2.json (selection SHA-256 3076c70a5e692392b993abb8754d84f0b06787a4781a4dfca68c7aad727f86c4; report SHA-256 5979f6f5cde9985c29ba309e30359dd7b56984afaef05e79114d9ec5ec64dbe9). It completed 60 terminal entries (56 completed, 4 discovery skips), 348/348 cleanups, and 32/32 consistent behavior entries. It exercised the unchanged 177-command denominator: 44 nontrivial (24.9%), 133 equivalent, 22 non-equivalent, 2 nondeterministic, and 20 unknown (11.3%). Unknown, consistency, and cleanup pass; nontrivial >=30% fails and is 10 commands below the minimum 54. C1–C8 remain as in the bound contract report; no unknown was promoted and no full catalog campaign was started.",
       "evidence_paths": [
         "outputs/acceptance/p7-p704-differential-pilot-20261110-retry4.json",
         "outputs/acceptance/p7-p704-differential-pilot-20261110-retry4.json.sha256",
@@ -2699,7 +2699,10 @@
         "outputs/acceptance/p7-p704-differential-pilot-20261111-loopback-fixture-retry2.json",
         "outputs/acceptance/p7-p705-contract-pilot-20261111-loopback-fixture-retry2.json",
         "outputs/acceptance/p7-p704-loopback-fixture-verification-20261111.json",
-        "outputs/acceptance/p7-p704-loopback-fixture-verification-20261111.json.sha256"
+        "outputs/acceptance/p7-p704-loopback-fixture-verification-20261111.json.sha256",
+        "outputs/acceptance/p7-p704-independent-pilot-selection-20261111.json",
+        "outputs/acceptance/p7-p704-differential-pilot-20261111-feat061-source-context-rerun2.json",
+        "outputs/acceptance/p7-p704-feat061-verification-20261112.json"
       ],
       "plan_path": "docs/plans/2026-11-09-phase-7-automated-verification.md"
     },
@@ -2713,7 +2716,7 @@
       ],
       "status": "blocked",
       "done_when": "v1 矩阵保持不变；v2 每条结论引用证据与哈希；check 在证据变化时失败；不新增支持名单。",
-      "evidence": "P7-10 remains unstarted and blocked. Corrected retry8 passes the unknown-share threshold (66/133, 49.6%) and cleanup gate (330/330), but fails nontrivial coverage (21/133, 15.8%) and three-round consistency (29/30); do not start P7-09 or publish matrix v2. Latest recheck uses the hash-ranked second cohort: unknown-share (71/177), consistency (32/32), and cleanup (348/348) pass, while nontrivial coverage fails at 23/177 (13.0%); P7-09 admission remains blocked. Differential report SHA-256 559f608d61c85feec3771e524fb7ff69394dad99986677b90d85e28403206c25; do not start P7-09 or publish matrix v2. Latest gate evidence is the corrected P7-04 report SHA-256 7dc9ec0ff27569b87f3b0aa6b937ad2634ef2e6a5382e9479bf0e0d4c4b8d5e3 and its C1–C8 audit SHA-256 8f85900cdd5675c3701f718fb65788f76a7bf613d9943fd3b904b04b6a0a3bea. P7-09 still fails nontrivial coverage at 23/177 (13.0%); matrix v2 remains unstarted and blocked. Latest generator-v3 hash-ranked pilot (report SHA-256 4962fc3080afdd6aa8dcd233f7ad28d51ba69fc78609260a377bce222db1557b) confirms nontrivial remains 23/177 (13.0%) while unknown (69/177), consistency (32/32), and cleanup (348/348) pass; P7-09 remains blocked and P7-10 remains unstarted. Current C1-C8 audit SHA-256 734d77670b02a158bc3df429a30492bb100dc2cd48ca0a6944d621c17865e19f. Latest profile-bound gate remains blocked: report SHA-256 0cb90a044ba883fbf048a0be13e9cdc716fedf1ac9bd79c2c38000063d8a06ae has 29/177 nontrivial (16.4%), below P7-09 admission; unknown 48/177 (27.1%), consistency 32/32, cleanup 348/348 pass. Newest loopback-fixture cohort remains below admission at 29/177 nontrivial (16.4%); report SHA-256 2de44b29612a1936a7f85be7d68e041341a8c2a7476149175738c1262cb3b723 and C1–C8 audit SHA-256 7f61669583759d84f2de1441c4e9e06ed787b2bed2d98bf249193b98578f29f0. P7-10 remains unstarted; do not publish matrix v2.",
+      "evidence": "P7-10 remains unstarted and blocked behind P7-09. The latest same-selection hash-ranked 30+30 recheck report SHA-256 5979f6f5cde9985c29ba309e30359dd7b56984afaef05e79114d9ec5ec64dbe9 has 44/177 nontrivial (24.9%), 20/177 unknown (11.3%), 32/32 consistent behavior entries, and 348/348 Worker cleanups. Only the nontrivial gate fails; at least 54 commands are needed, leaving a gap of 10. Do not start the full campaign or publish matrix v2.",
       "evidence_paths": [
         "outputs/acceptance/p7-p704-independent-pilot-selection-20261111.json",
         "outputs/acceptance/p7-p704-differential-pilot-20261111-hashrank.json",
@@ -2900,6 +2903,50 @@
         "outputs/acceptance/phase7-linux-admission-forward-api-20261111.json",
         "outputs/acceptance/phase7-linux-worker-probes-forward-api-20261111.json",
         "outputs/acceptance/p7-p704-forward-node-diagnostic-observer-fix-20261111.json",
+        "docs/plans/2026-11-09-phase-7-automated-verification.md"
+      ],
+      "plan_path": "docs/plans/2026-11-09-phase-7-automated-verification.md"
+    },
+    {
+      "id": "feat-061",
+      "task_id": "P7-04H",
+      "name": "source-bound 合成 actor/context profile 扩展",
+      "description": "范围扩展原因：P7-09 nontrivial 门仍失败；最新 source scan 确认锁定的 Koishi xun 插件以 config.adminId 守卫管理命令，NoneBot antirecall 有三条私聊命令，kawaii_robot 有 SUPERUSER 词库命令。仅增加精确 artifact/命令/source hash 绑定的合成上下文，不触及真实用户身份、第三方归档或 EventEnvelope。",
+      "dependencies": [
+        "feat-049",
+        "feat-053",
+        "feat-058",
+        "feat-059",
+        "feat-060"
+      ],
+      "status": "done",
+      "done_when": "schema 和 fail-closed 校验覆盖 Koishi synthetic admin 与 NoneBot private/SUPERUSER profiles；Native 与 Federated 使用相同 synthetic actor/config/hash；五条目有界诊断清理全确认；同一 30+30 locked selection 以原分母和四门复核，unknown 不提升，未达 nontrivial 门时 P7-09 继续 blocked。",
+      "evidence": "Completed 2026-11-12. TDD added source-bound Koishi config.adminId and exact NoneBot antirecall private/SUPERUSER profiles for kawaii_robot; Native and Federated share actor/config/profile hashes. Five-entry diagnostic: 52/52 commands exercised, 19 nontrivial, 38 equivalent, 5 non-equivalent, 2 nondeterministic, 7 unknown; 591 scenarios and 50/50 Worker cleanup confirmed. Same locked 30+30 selection SHA-256 3076c70a5e692392b993abb8754d84f0b06787a4781a4dfca68c7aad727f86c4: 60 terminal entries (56 completed, 4 discovery skips), 177/177 commands exercised, 44 nontrivial (24.9%), 133 equivalent, 22 non-equivalent, 2 nondeterministic, 20 unknown (11.3%), 32/32 behavior entries consistent, 348/348 Worker cleanup confirmed. P7-09 remains blocked only on the 30% nontrivial threshold (44/177; minimum 54). A first full rerun exposed a NoneBot expected-fingerprint regression (missing explicit null profile hash); the regression test failed red, the guard was corrected, targeted tests passed green, and the failed rerun report remains preserved. TDD/cohort commands and outputs are in the verification record.",
+      "evidence_paths": [
+        "lab/tests/test_p7_context_profiles.py",
+        "lab/tests/test_p7_differential_campaign.py",
+        "lab/automation/data/p7-nonebot-source-bound-context-v1.json",
+        "lab/automation/data/p7-koishi-source-bound-context-v1.json",
+        "outputs/acceptance/p7-p704-context-profile-source-audit-20261111.json",
+        "outputs/acceptance/p7-p704-context-profile-source-audit-20261111.json.sha256",
+        "outputs/acceptance/p7-p704-context-profile-diagnostic-selection-feat061-20261111.json",
+        "outputs/acceptance/p7-p704-context-profile-diagnostic-selection-feat061-20261111.json.sha256",
+        "outputs/acceptance/p7-p704-context-profile-diagnostic-feat061-20261111.json",
+        "outputs/acceptance/p7-p704-context-profile-diagnostic-feat061-20261111.json.sha256",
+        "outputs/acceptance/p7-p704-context-profile-diagnostic-feat061-retry2-20261111.json",
+        "outputs/acceptance/p7-p704-context-profile-diagnostic-feat061-retry2-20261111.json.sha256",
+        "outputs/acceptance/p7-p704-context-profile-diagnostic-selection-feat061-retry3-20261111.json",
+        "outputs/acceptance/p7-p704-context-profile-diagnostic-selection-feat061-retry3-20261111.json.sha256",
+        "outputs/acceptance/p7-p704-context-profile-diagnostic-feat061-retry3-20261111.json",
+        "outputs/acceptance/p7-p704-context-profile-diagnostic-feat061-retry3-20261111.json.sha256",
+        "outputs/acceptance/p7-p704-independent-pilot-selection-20261111.json",
+        "outputs/acceptance/p7-p704-independent-pilot-selection-20261111.json.sha256",
+        "outputs/acceptance/p7-p704-differential-pilot-20261111-feat061-source-context.json",
+        "outputs/acceptance/p7-p704-differential-pilot-20261111-feat061-source-context.json.sha256",
+        "outputs/acceptance/p7-p704-differential-pilot-20261111-feat061-source-context-rerun2.json",
+        "outputs/acceptance/p7-p704-differential-pilot-20261111-feat061-source-context-rerun2.json.sha256",
+        "outputs/acceptance/p7-p704-feat061-verification-20261112.json",
+        "outputs/acceptance/p7-p704-feat061-verification-20261112.json.sha256",
         "docs/plans/2026-11-09-phase-7-automated-verification.md"
       ],
       "plan_path": "docs/plans/2026-11-09-phase-7-automated-verification.md"

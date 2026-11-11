@@ -9,6 +9,10 @@
     "path": "outputs/acceptance/p7-p704-no-operation-source-diagnostic-20261111.json",
     "sha256": "04f20e80996aa2f87a96e3da0aa80bb83220c14e08a4e8311c3efb7c45b4739e"
   },
+  "supplemental_source_report": {
+    "path": "outputs/acceptance/p7-p704-context-profile-source-audit-20261111.json",
+    "sha256": "a0e97de82e862f1cb3778c2a0e61e6d23da2d38f25aa1290afe491203c7a98ab"
+  },
   "synthetic_actor_id": "900000001",
   "synthetic_superuser_id": "900000002",
   "bot_account_id": "100000",
@@ -18,7 +22,14 @@
       "package": "nonebot_plugin_antiinsult",
       "version": "0.7.1",
       "artifact_sha256": "7562ca642a1e08fb1d0507e3178501f4d87cb790a0b1b5c2935d65455850fd95",
-      "command_ids": ["删除屏蔽词", "启用飞妈令", "摘口球", "查看临时黑名单", "添加屏蔽词", "禁用飞妈令"],
+      "command_ids": [
+        "删除屏蔽词",
+        "启用飞妈令",
+        "摘口球",
+        "查看临时黑名单",
+        "添加屏蔽词",
+        "禁用飞妈令"
+      ],
       "default_context": {
         "conversation_kind": "group",
         "mention_bot": false,
@@ -29,7 +40,14 @@
         {
           "path": "nonebot_plugin_antiinsult/__init__.py",
           "sha256": "259310a2e5653cfd672e88924606d88c13a639b64cce440bdfdc3d4209472bdb",
-          "lines": [149, 158, 170, 186, 240, 270]
+          "lines": [
+            149,
+            158,
+            170,
+            186,
+            240,
+            270
+          ]
         }
       ]
     },
@@ -38,18 +56,71 @@
       "package": "nonebot_plugin_antirecall",
       "version": "0.1.4",
       "artifact_sha256": "f85b8d122a60d89cbcc7b5a6c095cd28b2eca5bab6e2286f0f286462bdd9023c",
-      "command_ids": ["disable", "enable", "停用防撤回监听", "停用防撤回私聊", "关闭当前防撤回", "关闭绕过管理层", "删除防撤回监听", "启用防撤回监听", "启用防撤回私聊", "开启当前防撤回", "开启绕过管理层", "查看防撤回监听", "查看防撤回私聊", "查看防撤回群聊", "添加防撤回监听", "清空开启名单"],
+      "command_ids": [
+        "disable",
+        "enable",
+        "停用防撤回监听",
+        "停用防撤回私聊",
+        "关闭当前防撤回",
+        "关闭绕过管理层",
+        "删除防撤回监听",
+        "启用防撤回监听",
+        "启用防撤回私聊",
+        "开启当前防撤回",
+        "开启绕过管理层",
+        "查看防撤回监听",
+        "查看防撤回私聊",
+        "查看防撤回群聊",
+        "添加防撤回监听",
+        "清空开启名单"
+      ],
       "default_context": {
         "conversation_kind": "group",
         "mention_bot": false,
         "authorization": "superuser"
       },
-      "command_overrides": [],
+      "command_overrides": [
+        {
+          "command_id": "停用防撤回私聊",
+          "context": {
+            "conversation_kind": "private"
+          }
+        },
+        {
+          "command_id": "启用防撤回私聊",
+          "context": {
+            "conversation_kind": "private"
+          }
+        },
+        {
+          "command_id": "查看防撤回私聊",
+          "context": {
+            "conversation_kind": "private"
+          }
+        }
+      ],
       "source_evidence": [
         {
           "path": "nonebot_plugin_antirecall/__init__.py",
           "sha256": "a4cedd68e248d8189c2608c3ba0e41c9ce6243eaa6a399af537ea669c71c7e41",
-          "lines": [111, 119, 127, 133, 140, 148, 156, 164, 225, 242, 261, 268, 278, 287, 297, 310]
+          "lines": [
+            111,
+            119,
+            127,
+            133,
+            140,
+            148,
+            156,
+            164,
+            225,
+            242,
+            261,
+            268,
+            278,
+            287,
+            297,
+            310
+          ]
         }
       ]
     },
@@ -58,31 +129,97 @@
       "package": "nonebot_plugin_bilichat",
       "version": "6.5.0",
       "artifact_sha256": "2fd7ac90900b4039fb71765ebf53886f6ade3593eb466fed5e615d2d82e02bb0",
-      "command_ids": [".check", ".checklogin", ".logout", ".otp", ".otp_qrcode", ".qrlogin", ".sub", ".unsub"],
+      "command_ids": [
+        ".check",
+        ".checklogin",
+        ".logout",
+        ".otp",
+        ".otp_qrcode",
+        ".qrlogin",
+        ".sub",
+        ".unsub"
+      ],
       "default_context": {
         "conversation_kind": "group",
         "mention_bot": true,
         "authorization": "none"
       },
       "command_overrides": [
-        {"command_id": ".otp", "context": {"conversation_kind": "private", "mention_bot": false, "authorization": "superuser"}},
-        {"command_id": ".otp_qrcode", "context": {"conversation_kind": "private", "mention_bot": false, "authorization": "superuser"}}
+        {
+          "command_id": ".otp",
+          "context": {
+            "conversation_kind": "private",
+            "mention_bot": false,
+            "authorization": "superuser"
+          }
+        },
+        {
+          "command_id": ".otp_qrcode",
+          "context": {
+            "conversation_kind": "private",
+            "mention_bot": false,
+            "authorization": "superuser"
+          }
+        }
       ],
       "source_evidence": [
         {
           "path": "nonebot_plugin_bilichat/command/base.py",
           "sha256": "b304e16877289115e9dc77367f6312db6d5fbb75ed6205650fd8261e504d8ec9",
-          "lines": [19]
+          "lines": [
+            19
+          ]
         },
         {
           "path": "nonebot_plugin_bilichat/command/otp.py",
           "sha256": "60f2995eb3ecdbfad4f2866d83b9817909fd1271c0ab2560b894da4dcdddf879",
-          "lines": [15, 16, 24, 40]
+          "lines": [
+            15,
+            16,
+            24,
+            40
+          ]
         },
         {
           "path": "nonebot_plugin_bilichat/model/config.py",
           "sha256": "c850e38ec9397474042aa6ddff9b16bc640ab91d424dda0aead5a5e35b58aa7d",
-          "lines": [17, 52, 75, 76, 170, 171, 172, 220, 253]
+          "lines": [
+            17,
+            52,
+            75,
+            76,
+            170,
+            171,
+            172,
+            220,
+            253
+          ]
+        }
+      ]
+    },
+    {
+      "registry_entry_id": "nb-5729c6688b584271718b810f",
+      "package": "nonebot_plugin_kawaii_robot",
+      "version": "4.1.5",
+      "artifact_sha256": "dc92f205b3b10091bac1ae6ea6b77be998b62ac7e20966a552a445086374d81a",
+      "command_ids": [
+        "重载词库"
+      ],
+      "default_context": {
+        "conversation_kind": "group",
+        "mention_bot": false,
+        "authorization": "superuser"
+      },
+      "command_overrides": [],
+      "source_evidence": [
+        {
+          "path": "nonebot_plugin_kawaii_robot/__main__.py",
+          "sha256": "2dfcd0fb49865f3fd50136786cec96e343f4092b3ba92daf7b0a215ec3e6ecad",
+          "lines": [
+            227,
+            228,
+            229
+          ]
         }
       ]
     }

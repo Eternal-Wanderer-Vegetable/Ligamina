@@ -15,10 +15,13 @@ if str(ROOT) not in sys.path:
 
 from lab.workers import DockerWorker, WorkerLimits, WorkerSpec
 from lab.automation.p7_context_profiles import profile_manifest_sha256
+from lab.automation.p7_koishi_context_profiles import profile_manifest_sha256 as koishi_context_profile_manifest_sha256
 from lab.automation.p7_loopback_services import validate_bound_profile
 
 
-def _worker_host_environment(context: dict[str, Any]) -> dict[str, str]:
+def _worker_host_environment(
+    context: dict[str, Any], stimulus: dict[str, Any] | None = None,
+) -> dict[str, str]:
     environment = {
         "PATH": "/usr/local/bin:/usr/bin:/bin",
         "LIGAMINA_CORE_EXECUTABLE": "/usr/local/bin/ligamina-cli",
@@ -45,10 +48,8 @@ def _worker_host_environment(context: dict[str, Any]) -> dict[str, str]:
     if (
         not isinstance(claimed, str)
         or claimed != observed
-        or profile.get("manifest_sha256") != profile_manifest_sha256()
         or profile.get("execution_scope") != "linux_worker_only_network_disabled"
         or profile.get("authority_scope") != "synthetic_test_actor_only"
-        or profile.get("event_envelope_role_claims") is not False
     ):
         raise ValueError("P7 Worker context profile hash or scope is invalid")
     sample = context.get("sample", {})
@@ -59,12 +60,37 @@ def _worker_host_environment(context: dict[str, Any]) -> dict[str, str]:
         or profile.get("artifact_sha256") != sample.get("_artifact_hash")
     ):
         raise ValueError("P7 Worker context profile does not match the installed sample artifact")
-    superusers = [profile["synthetic_superuser_id"]]
-    expected = {"SUPERUSERS": json.dumps(superusers, separators=(",", ":"))}
-    if supplied != expected or context.get("config", {}).get("nonebot_config") != {"superusers": superusers}:
-        raise ValueError("P7 Native and Federated superuser settings do not match")
-    environment.update(expected)
-    return environment
+    if sample.get("ecosystem") == "nonebot":
+        if (
+            profile.get("manifest_sha256") != profile_manifest_sha256()
+            or profile.get("event_envelope_role_claims") is not False
+        ):
+            raise ValueError("P7 NoneBot context profile hash or EventEnvelope scope is invalid")
+        superusers = [profile["synthetic_superuser_id"]]
+        expected = {"SUPERUSERS": json.dumps(superusers, separators=(",", ":"))}
+        if supplied != expected or context.get("config", {}).get("nonebot_config") != {"superusers": superusers}:
+            raise ValueError("P7 Native and Federated superuser settings do not match")
+        environment.update(expected)
+        return environment
+    if sample.get("ecosystem") == "koishi":
+        actor_id = profile.get("synthetic_actor_id")
+        expected_config = {"adminId": [actor_id]}
+        if (
+            profile.get("manifest_sha256") != koishi_context_profile_manifest_sha256()
+            or not isinstance(actor_id, str)
+            or profile.get("plugin_config") != expected_config
+            or supplied
+            or context.get("config", {}).get("plugin_config") != expected_config
+            or sample.get("fixture", {}).get("plugin_config") != expected_config
+            or (stimulus is not None and any(
+                event.get("actor_id") != actor_id
+                for event in stimulus.get("events", [])
+                if isinstance(event, dict)
+            ))
+        ):
+            raise ValueError("P7 Koishi Worker config or event actor differs from its source-bound profile")
+        return environment
+    raise ValueError("P7 context profile is attached to an unsupported ecosystem")
 
 
 def _docker_side(request: dict[str, Any], options: argparse.Namespace) -> dict[str, Any]:
@@ -93,7 +119,7 @@ def _docker_side(request: dict[str, Any], options: argparse.Namespace) -> dict[s
             else "samples/profiles/koishi-group-v0.1.json"
         )),
     }
-    context["host_environment"] = _worker_host_environment(context)
+    context["host_environment"] = _worker_host_environment(context, request.get("stimulus"))
     loopback_service_profile = context.get("loopback_service_profile")
     loopback_host_aliases: tuple[str, ...] = ()
     if loopback_service_profile is not None:

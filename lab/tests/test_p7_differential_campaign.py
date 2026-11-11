@@ -67,6 +67,9 @@ class DifferentialCampaignTests(unittest.TestCase):
         self.assertEqual(native_profile, federated_profile)
         self.assertEqual(native_profile["fixture_host"], "nymph.rbq.life")
         self.assertEqual(native_profile["network_mode"], "none")
+        self.assertIn("test_context_profile_sha256", native["expected_environment"])
+        self.assertIsNone(native["expected_environment"]["test_context_profile_sha256"])
+        self.assertEqual(native["expected_environment"], federated["expected_environment"])
 
     def test_koishi_scenario_maps_stable_message_id_to_platform_extension(self) -> None:
         scenario = {

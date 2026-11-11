@@ -32,7 +32,14 @@ from lab.automation import phase4_campaign
 from lab.automation.behavior_v2 import ARTIFACT_CACHE, CATALOG_ROOT, _canonical
 from lab.automation.phase4_docker_side import _docker_side
 from lab.automation.p7_contracts import CONTRACT_IDS, _pilot_entry_contracts
-from lab.automation.p7_context_profiles import profile_binding, profile_manifest_sha256, validate_profile_document
+from lab.automation.p7_context_profiles import (
+    context_profile_entry_ids,
+    context_profile_manifest_hashes,
+    context_profile_manifest_sha256,
+    profile_binding,
+    profile_manifest_sha256,
+    validate_profile_document,
+)
 from lab.automation.p7_loopback_services import profile_binding as loopback_profile_binding
 from lab.automation.p7_loopback_services import profile_manifest_sha256 as loopback_profile_manifest_sha256
 from lab.capability_inventory import SCANNER_VERSION
@@ -115,6 +122,7 @@ def select_candidates(
     *,
     limit_per_ecosystem: int | None = None,
     allow_profile_subset: bool = False,
+    allow_source_context_subset: bool = False,
 ) -> list[dict[str, Any]]:
     """Validate the 30-per-ecosystem static selection against load and lock evidence."""
     if selection.get("kind") != "p7_p701_static_inventory_sample":
@@ -184,8 +192,27 @@ def select_candidates(
         })
     candidates.sort(key=lambda item: (item["ecosystem"], item["registry_entry_id"]))
     counts = {eco: sum(item["ecosystem"] == eco for item in candidates) for eco in ECOSYSTEMS}
+    if allow_profile_subset and allow_source_context_subset:
+        raise ValueError("P7 profile subset modes are mutually exclusive")
+    if allow_source_context_subset:
+        expected_ids = context_profile_entry_ids()
+        diagnostic_scope = selection.get("diagnostic_scope", {})
+        expected_counts = {"koishi": 1, "nonebot": 4}
+        if (
+            limit_per_ecosystem is not None
+            or diagnostic_scope.get("kind") != "p7_source_bound_context_profiles"
+            or diagnostic_scope.get("profile_manifest_sha256") != context_profile_manifest_sha256()
+            or counts != expected_counts
+            or {item["registry_entry_id"] for item in candidates} != expected_ids
+        ):
+            raise ValueError("source-context diagnostic selection must exactly match the validated profile artifacts")
+        return candidates
     if allow_profile_subset:
-        expected_ids = {row["registry_entry_id"] for row in validate_profile_document()["profiles"]}
+        expected_ids = {
+            "nb-47f239e4b2ed71a255157441",
+            "nb-ed10c5014456c4e265167187",
+            "nb-250c92c282d77dcf502b9dbf",
+        }
         diagnostic_scope = selection.get("diagnostic_scope", {})
         if (
             limit_per_ecosystem is not None
@@ -378,7 +405,7 @@ def _build_context(
     test_context_profile = profile_binding(candidate)
     nonebot_config = (
         {"superusers": [test_context_profile["synthetic_superuser_id"]]}
-        if test_context_profile is not None
+        if test_context_profile is not None and ecosystem == "nonebot"
         else {}
     )
     host_environment = (
@@ -399,6 +426,9 @@ def _build_context(
     }
     if test_context_profile is not None:
         config["test_context_profile_sha256"] = test_context_profile["profile_sha256"]
+        if ecosystem == "koishi":
+            sample["fixture"]["plugin_config"] = copy.deepcopy(test_context_profile["plugin_config"])
+            config["plugin_config"] = copy.deepcopy(test_context_profile["plugin_config"])
     profile = "nonebot-group-v0.1.json" if ecosystem == "nonebot" else "koishi-group-v0.1.json"
     profile_document = candidate.get("profile_document_path")
     profile_document_name = Path(profile_document).name if profile_document else profile
@@ -415,7 +445,7 @@ def _build_context(
         "config_sha256": _sha256_bytes(_canonical(config)),
         "stimulus_sha256": _sha256_bytes(_canonical(stimulus)),
     }
-    if ecosystem == "nonebot":
+    if ecosystem == "nonebot" or test_context_profile is not None:
         expected["test_context_profile_sha256"] = (
             test_context_profile["profile_sha256"] if test_context_profile else None
         )
@@ -534,6 +564,8 @@ def _event_from_scenario(
         extensions["koishi"] = koishi
         event["extensions"] = extensions
         event["platform"] = "koishi"
+        if context_profile is not None:
+            event["actor_id"] = context_profile["actor_id"]
     return event
 
 
@@ -979,6 +1011,7 @@ def run_campaign(
     output_path: Path,
     limit_per_ecosystem: int | None = None,
     allow_profile_subset: bool = False,
+    allow_source_context_subset: bool = False,
     rounds: int = ROUNDS,
     workers: int = 3,
 ) -> dict[str, Any]:
@@ -1020,6 +1053,7 @@ def run_campaign(
         selection,
         limit_per_ecosystem=limit_per_ecosystem,
         allow_profile_subset=allow_profile_subset,
+        allow_source_context_subset=allow_source_context_subset,
     )
     bundle_root.mkdir(parents=True)
     campaign_id = f"p7-p704-{int(time.time())}"
@@ -1044,13 +1078,18 @@ def run_campaign(
             "timezone": "UTC",
             "node_clock_fixed_time_utc": DEFAULT_FIXED_TIME,
             "node_determinism_preload_sha256": _sha256_file(ROOT / "lab/baselines/seed_node_random.cjs"),
-            "test_context_profile_manifest_sha256": profile_manifest_sha256(),
+            "test_context_profile_manifest_sha256": context_profile_manifest_sha256(),
+            "test_context_profile_manifests": {
+                **context_profile_manifest_hashes(),
+            },
             "network": "disabled",
             "limit_per_ecosystem": limit_per_ecosystem,
-            "diagnostic_only": allow_profile_subset or limit_per_ecosystem is not None,
+            "diagnostic_only": allow_profile_subset or allow_source_context_subset or limit_per_ecosystem is not None,
             "selection_scope": (
                 "p7_nonebot_context_profile_subset"
                 if allow_profile_subset
+                else "p7_source_bound_context_profile_subset"
+                if allow_source_context_subset
                 else "bounded_per_ecosystem_subset"
                 if limit_per_ecosystem is not None
                 else "hash_ranked_30_per_ecosystem"
@@ -1416,6 +1455,7 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--output", required=True, type=Path)
     parser.add_argument("--limit-per-ecosystem", type=int)
     parser.add_argument("--allow-profile-subset", action="store_true")
+    parser.add_argument("--allow-source-context-subset", action="store_true")
     parser.add_argument("--rounds", type=int, default=ROUNDS)
     parser.add_argument("--workers", type=int, default=3)
     options = parser.parse_args(argv)
@@ -1429,6 +1469,7 @@ def main(argv: list[str] | None = None) -> int:
             output_path=options.output,
             limit_per_ecosystem=options.limit_per_ecosystem,
             allow_profile_subset=options.allow_profile_subset,
+            allow_source_context_subset=options.allow_source_context_subset,
             rounds=options.rounds,
             workers=options.workers,
         )

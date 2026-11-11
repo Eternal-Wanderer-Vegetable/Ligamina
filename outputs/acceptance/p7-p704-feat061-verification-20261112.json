@@ -1,0 +1,112 @@
+{
+  "schema_version": 1,
+  "kind": "p7_p704_feat061_verification",
+  "date": "2026-11-12",
+  "status": "completed_local_verification_gate_blocked_for_p7_09",
+  "scope": {
+    "feature": "feat-061 / P7-04H",
+    "profiles": [
+      {
+        "ecosystem": "koishi",
+        "package": "koishi-plugin-xun-jiangshanfuzhu",
+        "version": "0.0.2",
+        "artifact_sha256": "f50452569da7fae897dc35addd00d758f20dc6096611bfc26a770d4bd3dd4917",
+        "synthetic_context": "config.adminId"
+      },
+      {
+        "ecosystem": "nonebot",
+        "package": "nonebot_plugin_antirecall",
+        "version": "0.1.4",
+        "synthetic_context": "private session for three exact source-bound command ids"
+      },
+      {
+        "ecosystem": "nonebot",
+        "package": "nonebot_plugin_kawaii_robot",
+        "version": "4.1.5",
+        "synthetic_context": "synthetic SUPERUSER for the exact 重载词库 command"
+      }
+    ],
+    "preserved_boundaries": [
+      "Native and Federated use matching actor/config/profile hashes",
+      "third-party artifacts and archives unchanged",
+      "EventEnvelope schema and Core operation names unchanged",
+      "locked 30+30 cohort denominator and unknown classifications unchanged"
+    ]
+  },
+  "source_audit": {
+    "path": "outputs/acceptance/p7-p704-context-profile-source-audit-20261111.json",
+    "sha256": "a0e97de82e862f1cb3778c2a0e61e6d23da2d38f25aa1290afe491203c7a98ab",
+    "nonebot_profile_manifest_sha256": "06d5717e9e85f3f07f77335396a7c627e92817de5b63a8fdb2bf3164a21879ea",
+    "koishi_profile_manifest_sha256": "6fbb096dcd3103b931c7222bded8085749718129c224ab1035feb5b3094b1268"
+  },
+  "bounded_diagnostic": {
+    "selection_path": "outputs/acceptance/p7-p704-context-profile-diagnostic-selection-feat061-retry3-20261111.json",
+    "selection_sha256": "c1853500ef536d9d76d62e2fc5d8af7a46bc765dc9a0b3f0f9d5b8aedf7b6f3c",
+    "report_path": "outputs/acceptance/p7-p704-context-profile-diagnostic-feat061-retry3-20261111.json",
+    "report_sha256": "75c0d1d1210fc1599f5fbcc653e1a9020ccbdf3c864685f4d482f95e16f51867",
+    "entries_completed": 5,
+    "commands_exercised": 52,
+    "scenarios": 591,
+    "commands_nontrivial": 19,
+    "commands_equivalent": 38,
+    "commands_non_equivalent": 5,
+    "commands_nondeterministic": 2,
+    "commands_unknown": 7,
+    "worker_runs": 50,
+    "cleanup_unconfirmed": 0,
+    "three_rerun_consistency": true
+  },
+  "locked_cohort_recheck": {
+    "selection_path": "outputs/acceptance/p7-p704-independent-pilot-selection-20261111.json",
+    "selection_sha256": "3076c70a5e692392b993abb8754d84f0b06787a4781a4dfca68c7aad727f86c4",
+    "report_path": "outputs/acceptance/p7-p704-differential-pilot-20261111-feat061-source-context-rerun2.json",
+    "report_sha256": "5979f6f5cde9985c29ba309e30359dd7b56984afaef05e79114d9ec5ec64dbe9",
+    "scope": "hash_ranked_30_per_ecosystem",
+    "entries_selected": 60,
+    "entries_completed": 56,
+    "entries_discovery_skipped": 4,
+    "scenarios": 1904,
+    "commands_denominator": 177,
+    "commands_exercised": 177,
+    "commands_nontrivial": 44,
+    "commands_equivalent": 133,
+    "commands_non_equivalent": 22,
+    "commands_nondeterministic": 2,
+    "commands_unknown": 20,
+    "contract_checks": {
+      "C1": "30 passed / 30 unknown",
+      "C2-C8": "420 unknown because the pilot did not emit those contract probe stimuli"
+    },
+    "unknown_share": 0.113,
+    "behavior_entries_consistent": "32/32",
+    "worker_runs": 348,
+    "cleanup_confirmed": 348,
+    "gates": {
+      "nontrivial_at_least_30_percent": "failed; 44/177, minimum is 54",
+      "unknown_at_most_50_percent": "passed; 20/177",
+      "three_fresh_reruns_consistent": "passed; 32/32",
+      "worker_cleanup": "passed; 348/348"
+    },
+    "full_catalog_campaign_admitted": false
+  },
+  "regression_and_repair": {
+    "initial_full_rerun_path": "outputs/acceptance/p7-p704-differential-pilot-20261111-feat061-source-context.json",
+    "initial_full_rerun_sha256": "ec686870e14977a54b688e646a95b5034fd2a0735fa64b3c6b0464b21921b33b",
+    "finding": "The expected Native fingerprint omitted explicit test_context_profile_sha256=null for unprofiled NoneBot entries, producing 22 extra discovery skips.",
+    "regression_test": "test_warframe_loopback_profile_is_identical_for_native_and_federated now asserts the unprofiled NoneBot fingerprint retains the null field",
+    "result": "The regression assertion failed before the guard was corrected; it passed after correction. The corrected same-selection rerun restored the four baseline discovery skips."
+  },
+  "validation": {
+    "targeted_command": "UV_PROJECT_ENVIRONMENT=/tmp/ligamina-p7-diagnostic-venv UV_OFFLINE=1 uv run --locked --project lab --python 3.12.14 python -m unittest lab.tests.test_p7_context_profiles lab.tests.test_p7_differential_campaign -v",
+    "targeted_result": "29 tests passed",
+    "full_command": "UV_PROJECT_ENVIRONMENT=/tmp/ligamina-p7-diagnostic-venv UV_OFFLINE=1 uv run --locked --project lab --python 3.12.14 python -m unittest discover -s lab/tests -v",
+    "full_result": "354 tests passed in 267.535s; compatibility matrix check reported 8961 entries / 539 sources",
+    "full_output_log_sha256": "834f5fb61d87c61458a78c2a8eb1967460469b73cee79b35ab5ed70387c21840",
+    "python_compileall": "passed",
+    "node_check_lab_baselines_koishi_runner_mjs": "passed",
+    "readme_evidence_check": "passed",
+    "harness_validation": "100/100",
+    "git_diff_check": "passed; CRLF normalization warnings only",
+    "documentation_gate": "passed; 29 documents / 737 local links / 16 indexed historical Markdown / 61 features"
+  }
+}
