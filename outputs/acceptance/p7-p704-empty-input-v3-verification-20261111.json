@@ -1,0 +1,155 @@
+{
+  "schema_version": 1,
+  "kind": "p7_p704_empty_input_v3_verification",
+  "feature_id": "feat-056",
+  "status": "completed",
+  "completed_at_utc": "2026-11-11",
+  "generator_version": "3",
+  "selection": {
+    "path": "outputs/acceptance/p7-p704-independent-pilot-selection-20261111.json",
+    "sha256": "3076c70a5e692392b993abb8754d84f0b06787a4781a4dfca68c7aad727f86c4",
+    "entries_per_ecosystem": 30
+  },
+  "pilot": {
+    "path": "outputs/acceptance/p7-p704-differential-pilot-20261111-empty-input-v3.json",
+    "sha256": "4962fc3080afdd6aa8dcd233f7ad28d51ba69fc78609260a377bce222db1557b",
+    "status": "completed",
+    "selected_entries": 60,
+    "completed_entries": 56,
+    "skipped_discovery_entries": 4,
+    "worker_runs": 348,
+    "cleanup_unconfirmed": 0,
+    "scenarios": 1904,
+    "commands_discovered": 177,
+    "commands_exercised": 177,
+    "commands_with_explicit_empty_input": 177,
+    "commands_nontrivial": 23,
+    "commands_equivalent": 87,
+    "commands_non_equivalent": 21,
+    "commands_nondeterministic": 0,
+    "commands_unknown": 69,
+    "consistent_behavior_entries": 32,
+    "behavior_entries": 32,
+    "scenario_round_reason_counts": {
+      "normalized_native_and_federated_observations_differ": 594,
+      "no_native_gateway_operation_observed": 1941,
+      "side_failed_or_operation_could_not_be_bound_to_source_event": 174
+    }
+  },
+  "contract_audit": {
+    "path": "outputs/acceptance/p7-p705-contract-pilot-20261111-empty-input-v3.json",
+    "sha256": "734d77670b02a158bc3df429a30492bb100dc2cd48ca0a6944d621c17865e19f",
+    "status": "completed",
+    "entries": 60,
+    "checks": 480,
+    "by_contract": {
+      "C1": {
+        "passed": 30,
+        "failed": 0,
+        "unknown": 30
+      },
+      "C2": {
+        "passed": 0,
+        "failed": 0,
+        "unknown": 60
+      },
+      "C3": {
+        "passed": 0,
+        "failed": 0,
+        "unknown": 60
+      },
+      "C4": {
+        "passed": 0,
+        "failed": 0,
+        "unknown": 60
+      },
+      "C5": {
+        "passed": 0,
+        "failed": 0,
+        "unknown": 60
+      },
+      "C6": {
+        "passed": 0,
+        "failed": 0,
+        "unknown": 60
+      },
+      "C7": {
+        "passed": 0,
+        "failed": 0,
+        "unknown": 60
+      },
+      "C8": {
+        "passed": 0,
+        "failed": 0,
+        "unknown": 60
+      }
+    },
+    "fixture_validation": {
+      "fixtures": 16,
+      "passed": 16,
+      "failed": 0,
+      "positive": 8,
+      "negative": 8
+    }
+  },
+  "checks": [
+    {
+      "name": "focused_lab_unit_tests",
+      "command": "UV_PROJECT_ENVIRONMENT=/tmp/ligamina-p7-diagnostic-venv UV_OFFLINE=1 uv run --locked --project lab --python 3.12.14 python -m unittest lab.tests.test_scenario_generator lab.tests.test_p7_differential_campaign -v",
+      "exit_code": 0,
+      "tests": 31,
+      "passed": 31,
+      "skipped": 0
+    },
+    {
+      "name": "differential_pilot",
+      "command": "uv run --locked --project lab --python 3.12.14 python -m lab.automation.p7_differential_campaign --selection outputs/acceptance/p7-p704-independent-pilot-selection-20261111.json --admission outputs/acceptance/phase7-linux-admission-20261110.json --runtime-image ligamina-p401-runtime-offline-profile@sha256:2f2aaf3d31b522f31b1dbbc5c5e0109949a86d195e5aa491b2989b7ba9de9c5c --core-binary /mnt/e/stella/Ligamina-artifact-cache/p7-p704-differential-bundles-hashrank-runner-fix-20261111/ko-24d9ed266a017c505a69dd60/project/sample/ligamina-cli --bundle-root /mnt/e/stella/Ligamina-artifact-cache/p7-p704-differential-bundles-empty-input-v3-20261111 --output outputs/acceptance/p7-p704-differential-pilot-20261111-empty-input-v3.json --limit-per-ecosystem 30 --rounds 3 --workers 3",
+      "environment": "WSL Ubuntu-24.04; UV_PROJECT_ENVIRONMENT=/tmp/ligamina-p7-diagnostic-venv; UV_OFFLINE=1",
+      "exit_code": 0
+    },
+    {
+      "name": "contract_audit",
+      "command": "uv run --locked --project lab --python 3.12.14 python -m lab.automation.p7_contracts --pilot outputs/acceptance/p7-p704-differential-pilot-20261111-empty-input-v3.json --output outputs/acceptance/p7-p705-contract-pilot-20261111-empty-input-v3.json",
+      "environment": "WSL Ubuntu-24.04; UV_PROJECT_ENVIRONMENT=/tmp/ligamina-p7-diagnostic-venv; UV_OFFLINE=1",
+      "exit_code": 0
+    },
+    {
+      "name": "documentation_gate",
+      "command": "pwsh -NoProfile -File init.ps1 -Mode docs",
+      "exit_code": 0,
+      "documents": 29,
+      "local_links": 701,
+      "historical_markdown": 16,
+      "features": 56
+    },
+    {
+      "name": "readme_evidence_check",
+      "command": "node scripts/render-readme.mjs --check",
+      "exit_code": 0
+    },
+    {
+      "name": "harness_validation",
+      "command": "node .agents/skills/harness-creator/scripts/validate-harness.mjs --target .",
+      "exit_code": 0,
+      "score": "100/100"
+    },
+    {
+      "name": "diff_whitespace_check",
+      "command": "git diff --check",
+      "exit_code": 0,
+      "notes": "Only Git CRLF-to-LF normalization warnings were printed."
+    }
+  ],
+  "gate_decision": {
+    "nontrivial_threshold": "failed (23/177, 13.0%; required >=30%)",
+    "unknown_threshold": "passed (69/177, 39.0%; maximum 50%)",
+    "three_round_consistency": "passed (32/32 behavior entries)",
+    "worker_cleanup": "passed (348/348 confirmed)",
+    "p7_09": "blocked; do not start full-catalog campaign",
+    "unknown_policy": "unknown and unassessed commands remain unknown"
+  },
+  "limitations": [
+    "Complete Lab suite and init.ps1 -Mode full were not run in this verification.",
+    "Pilot bundles and Core binary are in the external artifact cache; replay requires those exact cached artifacts."
+  ]
+}
