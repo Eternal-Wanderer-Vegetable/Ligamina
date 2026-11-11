@@ -67,6 +67,7 @@ class DockerWorker:
             *self._resource_labels(spec),
             "--init",
             "--network=none",
+            *[argument for alias in spec.loopback_host_aliases for argument in ("--add-host", f"{alias}:127.0.0.1")],
             "--read-only",
             "--cap-drop=ALL",
             "--security-opt=no-new-privileges:true",

@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "updated_at": "2026-11-11",
-  "active_feature": null,
+  "active_feature": "feat-059",
   "next_feature": null,
   "features": [
     {
@@ -2826,6 +2826,29 @@
         "outputs/acceptance/phase7-linux-admission-koishi-fingerprint-fix-20261111.json",
         "outputs/acceptance/phase7-linux-worker-probes-context-profile-20261111.json",
         "outputs/acceptance/phase7-linux-worker-probes-koishi-fingerprint-fix-20261111.json"
+      ],
+      "plan_path": "docs/plans/2026-11-09-phase-7-automated-verification.md"
+    },
+    {
+      "id": "feat-059",
+      "task_id": "P7-04F",
+      "name": "NoneBot 禁网 loopback API fixture",
+      "description": "范围扩展原因：feat-058 后的 profile-bound pilot 中，nonebot_plugin_warframe_mode@1.1.0 仍有 25/26 命令 unknown；精确锁定 wheel 将服务固定为 nymph.rbq.life:3000，禁网 Worker 的 DNS/API 失败使 handler 未产生观察。为这个精确 artifact 提供 Worker 内部、确定性、只读 HTTP fixture，使 Native×2 与 Federated 共用响应；Docker 继续强制 network=none，host alias 只映射到容器自身 127.0.0.1。",
+      "dependencies": [
+        "feat-049",
+        "feat-053",
+        "feat-058"
+      ],
+      "status": "in-progress",
+      "done_when": "服务 profile/schema 绑定 registry id、版本、artifact 和 wheel 内 source hashes；Worker host alias 固定到 127.0.0.1，出网保持禁用；Native×2/Federated 使用同一 profile/hash，报告仅保存 route 计数、不保存请求词；用新哈希 30+30 pilot 复核四门。若 fixture 未触达操作，结果继续 unknown；不直接启动 P7-09 全目录 campaign。",
+      "evidence": "Implementation is complete and test-first regression coverage is green. Baseline Worker/differential tests passed 28/28; new alias and loopback-profile tests were first run red before implementation. After implementation, affected suites passed 47/47, the full Lab suite passed 345 tests with 1 skip, Python compileall and the docs gate passed (29 documents / 717 local links / 59 features). Fresh Linux Worker admission is admitted with 10/10 benign probes and cleanup confirmed. The locked 30+30 differential recheck is still pending; feat-059 remains in progress until its four admission gates are rejudged. No unknown result is promoted to pass and no full catalog campaign has started.",
+      "evidence_paths": [
+        "lab/tests/test_workers.py",
+        "lab/tests/test_p7_loopback_services.py",
+        "outputs/acceptance/phase7-linux-worker-probes-loopback-20261111.json",
+        "outputs/acceptance/phase7-linux-admission-loopback-20261111.json",
+        "outputs/acceptance/p7-p704-differential-pilot-20261111-independent-context-profile.json",
+        "outputs/acceptance/p7-p704-no-operation-source-diagnostic-20261111.json"
       ],
       "plan_path": "docs/plans/2026-11-09-phase-7-automated-verification.md"
     }

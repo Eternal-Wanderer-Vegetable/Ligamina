@@ -33,6 +33,8 @@ from lab.automation.behavior_v2 import ARTIFACT_CACHE, CATALOG_ROOT, _canonical
 from lab.automation.phase4_docker_side import _docker_side
 from lab.automation.p7_contracts import CONTRACT_IDS, _pilot_entry_contracts
 from lab.automation.p7_context_profiles import profile_binding, profile_manifest_sha256, validate_profile_document
+from lab.automation.p7_loopback_services import profile_binding as loopback_profile_binding
+from lab.automation.p7_loopback_services import profile_manifest_sha256 as loopback_profile_manifest_sha256
 from lab.capability_inventory import SCANNER_VERSION
 from lab.pilot_nonebot import _prepare_wheelhouse
 from lab.pilot_workers import _load_npm_lock, _prepare_npm_project
@@ -286,6 +288,9 @@ def prepare_bundle(candidate: dict[str, Any], *, bundle_root: Path, core_binary:
         "host_lock_sha256": _sha256_file(ROOT / "hosts/koishi/package-lock.json") if candidate["ecosystem"] == "koishi" else None,
         "koishi_host_dist_sha256": runtime_artifacts.get("koishi_host_dist_sha256"),
     }
+    loopback_service_profile = loopback_profile_binding(candidate)
+    if loopback_service_profile is not None:
+        context_files["loopback_service_profile_sha256"] = loopback_service_profile["profile_sha256"]
     manifest = {
         "schema_version": 1,
         "registry_entry_id": entry_id,
@@ -295,6 +300,9 @@ def prepare_bundle(candidate: dict[str, Any], *, bundle_root: Path, core_binary:
         "runtime_artifacts": runtime_artifacts,
         "profile_document": f"project/samples/profiles/{descriptor.name}",
         "service_profile_sha256": candidate.get("service_profile_sha256"),
+        "loopback_service_profile_sha256": (
+            loopback_service_profile["profile_sha256"] if loopback_service_profile is not None else None
+        ),
         "files": [
             {"path": path.relative_to(bundle).as_posix(), "size_bytes": path.stat().st_size, "sha256": _sha256_file(path)}
             for path in sorted(bundle.rglob("*")) if path.is_file()
@@ -442,6 +450,9 @@ def _build_context(
         },
         "runtime_artifacts": copy.deepcopy(runtime_artifacts),
     }
+    loopback_service_profile = loopback_profile_binding(candidate)
+    if loopback_service_profile is not None:
+        context["loopback_service_profile"] = loopback_service_profile
     if ecosystem == "koishi":
         context["host_lock_sha256"] = _sha256_file(ROOT / "hosts/koishi/package-lock.json")
     return context
@@ -664,7 +675,7 @@ def _worker_summary(result: dict[str, Any]) -> dict[str, Any]:
     })
     runtime_plugins = result.get("stock_native", {}).get("runtime_plugins", [])
     command_inventory = result.get("command_inventory", {})
-    return {
+    summary = {
         "status": result.get("status"),
         "reason_code": result.get("reason_code") or result.get("worker_failure", {}).get("reason_code"),
         "profile_setup_status": setup.get("status"),
@@ -696,6 +707,10 @@ def _worker_summary(result: dict[str, Any]) -> dict[str, Any]:
         "gateway_operation_count": result.get("federated_trace", {}).get("gateway_operation_count"),
         "diagnostic_summary": result.get("stderr_summary") or result.get("diagnostics_summary") or result.get("diagnostic_summary"),
     }
+    loopback_fixture = result.get("loopback_fixture")
+    if isinstance(loopback_fixture, dict):
+        summary["loopback_fixture"] = copy.deepcopy(loopback_fixture)
+    return summary
 
 
 def _discovery_terminal_state(discovery: dict[str, Any]) -> tuple[str, str] | None:
@@ -1047,6 +1062,14 @@ def run_campaign(
         "entries": [],
         "counts": {"entries": 0, "worker_runs": 0, "cleanup_unconfirmed": 0, "scenarios": 0},
     }
+    loopback_profiled_ids = [
+        candidate["registry_entry_id"]
+        for candidate in candidates
+        if loopback_profile_binding(candidate) is not None
+    ]
+    if loopback_profiled_ids:
+        report["scope"]["loopback_service_profile_manifest_sha256"] = loopback_profile_manifest_sha256()
+        report["scope"]["loopback_profiled_registry_entry_ids"] = loopback_profiled_ids
     _write_progress(progress_path, report)
 
     # The P4 runtime image is re-probed through an admitted Docker Worker before any plugin bundle runs.
@@ -1104,6 +1127,7 @@ def run_campaign(
         stimulus = {"events": events}
         scenario_meta = generation["scenarios"]
         test_context_profile = profile_binding(candidate)
+        loopback_service_profile = loopback_profile_binding(candidate)
         entry_result: dict[str, Any] = {
             "registry_entry_id": entry_id,
             "ecosystem": candidate["ecosystem"],
@@ -1130,6 +1154,19 @@ def run_campaign(
                     ),
                 }
                 if test_context_profile is not None
+                else None
+            ),
+            "loopback_service_profile": (
+                {
+                    "profile_id": loopback_service_profile["profile_id"],
+                    "profile_sha256": loopback_service_profile["profile_sha256"],
+                    "manifest_sha256": loopback_service_profile["manifest_sha256"],
+                    "network_mode": loopback_service_profile["network_mode"],
+                    "fixture_host": loopback_service_profile["fixture_host"],
+                    "fixture_address": loopback_service_profile["fixture_address"],
+                    "fixture_port": loopback_service_profile["fixture_port"],
+                }
+                if loopback_service_profile is not None
                 else None
             ),
             "scenarios": [

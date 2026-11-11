@@ -8,12 +8,14 @@ from pathlib import Path
 
 from lab.automation import phase4_campaign
 from lab.automation.p7_differential_campaign import (
+    _build_context,
     _command_summary,
     _discovery_skip_domain,
     _discovery_terminal_state,
     _event_from_scenario,
     _nontrivial_commands,
     _round_scenario_results,
+    _worker_summary,
     _write_final,
 )
 from lab.automation.phase4_worker_side import _scrub_result_diagnostics
@@ -35,6 +37,37 @@ def _observation(message: str, event_id: str = "evt-1") -> dict[str, object]:
 
 
 class DifferentialCampaignTests(unittest.TestCase):
+    def test_warframe_loopback_profile_is_identical_for_native_and_federated(self) -> None:
+        candidate = {
+            "ecosystem": "nonebot",
+            "registry_entry_id": "nb-3ebafd8e699febd7a7e4e52b",
+            "package": "nonebot_plugin_warframe_mode",
+            "version": "1.1.0",
+            "artifact_sha256": "086911421ce02e46a11c923005ed5028ca3a74ff0cd6f5ee7a69d42386a96827",
+            "profile_lock_sha256": "1" * 64,
+            "catalog_entry": {"entry_point": "nonebot_plugin_warframe_mode"},
+            "preload_plugins": [],
+            "required_services": [],
+            "load_evidence": [],
+            "static_inventory": {},
+            "static_inventory_sha256": "2" * 64,
+            "static_command_count": 0,
+        }
+        native = _build_context(
+            candidate, Path("/tmp/p7-bundle"), {}, {"events": []},
+            mode="native", seed=1, discover_commands=False,
+        )
+        federated = _build_context(
+            candidate, Path("/tmp/p7-bundle"), {}, {"events": []},
+            mode="federated", seed=1, discover_commands=False,
+        )
+
+        native_profile = native["loopback_service_profile"]
+        federated_profile = federated["loopback_service_profile"]
+        self.assertEqual(native_profile, federated_profile)
+        self.assertEqual(native_profile["fixture_host"], "nymph.rbq.life")
+        self.assertEqual(native_profile["network_mode"], "none")
+
     def test_koishi_scenario_maps_stable_message_id_to_platform_extension(self) -> None:
         scenario = {
             "scenario_id": "scn-example",
@@ -242,6 +275,22 @@ class DifferentialCampaignTests(unittest.TestCase):
 
         self.assertFalse(summary["items"][0]["consistent_across_three_fresh_reruns"])
 
+    def test_worker_summary_preserves_only_loopback_route_count_evidence(self) -> None:
+        fixture = {
+            "profile_id": "p7-nonebot-warframe-api-loopback-v1",
+            "profile_sha256": "a" * 64,
+            "network_mode": "none",
+            "bind_address": "127.0.0.1",
+            "request_count": 2,
+            "route_counts": {"warframe-data": 2},
+            "unmatched_request_count": 0,
+        }
+
+        summary = _worker_summary({"status": "completed", "loopback_fixture": fixture})
+
+        self.assertEqual(summary["loopback_fixture"], fixture)
+        self.assertNotIn("request_text", json.dumps(summary))
+
     def test_final_report_sidecar_hash_matches_written_bytes(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
             path = Path(directory) / "report.json"
@@ -252,7 +301,7 @@ class DifferentialCampaignTests(unittest.TestCase):
             self.assertEqual(path.with_suffix(".json.sha256").read_text(encoding="ascii").split()[0], digest)
             self.assertNotIn("report_sha256", json.loads(raw))
 
-    def test_p7_source_bundle_includes_koishi_runner_fingerprint_module(self) -> None:
+    def test_p7_source_bundle_includes_required_runner_and_loopback_sources(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
             project = Path(directory) / "project"
             phase4_campaign._copy_python_sources(project)
@@ -260,6 +309,10 @@ class DifferentialCampaignTests(unittest.TestCase):
             self.assertTrue((project / "lab/baselines/koishi/artifact_fingerprint.mjs").is_file())
             self.assertTrue((project / "contracts/lab/v1/catalog.schema.json").is_file())
             self.assertTrue((project / "contracts/lab/v1/run.schema.json").is_file())
+            self.assertTrue((project / "lab/automation/p7_loopback_services.py").is_file())
+            self.assertTrue((project / "lab/automation/data/p7-nonebot-warframe-api-loopback-v1.json").is_file())
+            self.assertTrue((project / "contracts/lab/automation/p7-loopback-service-profiles/v1.schema.json").is_file())
+            self.assertTrue((project / "outputs/acceptance/p7-p704-no-operation-source-diagnostic-20261111.json").is_file())
 
     def test_raw_diagnostic_is_replaced_with_scrubbed_summary_and_hash(self) -> None:
         result = _scrub_result_diagnostics({"diagnostic": "RuntimeError: password=private-value"})

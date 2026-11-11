@@ -15,6 +15,7 @@ if str(ROOT) not in sys.path:
 
 from lab.workers import DockerWorker, WorkerLimits, WorkerSpec
 from lab.automation.p7_context_profiles import profile_manifest_sha256
+from lab.automation.p7_loopback_services import validate_bound_profile
 
 
 def _worker_host_environment(context: dict[str, Any]) -> dict[str, str]:
@@ -93,6 +94,14 @@ def _docker_side(request: dict[str, Any], options: argparse.Namespace) -> dict[s
         )),
     }
     context["host_environment"] = _worker_host_environment(context)
+    loopback_service_profile = context.get("loopback_service_profile")
+    loopback_host_aliases: tuple[str, ...] = ()
+    if loopback_service_profile is not None:
+        loopback_service_profile = validate_bound_profile(loopback_service_profile, context.get("sample"))
+        if context.get("sample", {}).get("ecosystem") != "nonebot":
+            raise ValueError("P7 loopback service profiles are restricted to their bound NoneBot artifact")
+        loopback_host_aliases = (loopback_service_profile["fixture_host"],)
+        context["loopback_service_profile"] = loopback_service_profile
     request["context"] = context
     encoded = json.dumps(request, ensure_ascii=False, separators=(",", ":"))
     worker = DockerWorker(image_digest=options.image, repository_root=ROOT)
@@ -111,6 +120,7 @@ def _docker_side(request: dict[str, Any], options: argparse.Namespace) -> dict[s
         limits=WorkerLimits(timeout_seconds=240, memory_mb=4096, cpu_cores=2.0, process_limit=256, output_limit_bytes=4 * 1024 * 1024),
         entrypoint="/usr/bin/env",
         stdin_data=encoded.encode("utf-8"),
+        loopback_host_aliases=loopback_host_aliases,
     )
     outcome = worker.run(spec)
     result: dict[str, Any]

@@ -61,6 +61,25 @@ class WorkerPolicyTests(unittest.TestCase):
         self.assertEqual(direct_command[entrypoint_index + 1], "/usr/bin/env")
         self.assertEqual(direct_command[-3:], ["/usr/local/bin/python", "-c", "print('direct')"])
 
+    def test_docker_worker_can_only_map_declared_hosts_to_container_loopback(self) -> None:
+        with tempfile.TemporaryDirectory(prefix="ligamina-worker-input-") as directory:
+            input_dir = Path(directory)
+            spec = WorkerSpec(
+                "run-loopback", "entry-loopback", ("python", "-c", "pass"), input_dir,
+                loopback_host_aliases=("nymph.rbq.life",),
+            )
+            command = self.docker_worker().command(spec, worker_id="ligamina-loopback")
+
+        self.assertIn("--network=none", command)
+        self.assertEqual(command[command.index("--add-host") + 1], "nymph.rbq.life:127.0.0.1")
+        with tempfile.TemporaryDirectory(prefix="ligamina-worker-input-") as directory:
+            for alias in ("127.0.0.1", "localhost", "nymph.rbq.life:3000", "bad..name.example"):
+                with self.subTest(alias=alias), self.assertRaises(ValueError):
+                    WorkerSpec(
+                        "run-loopback-invalid", "entry-loopback-invalid", ("true",), Path(directory),
+                        loopback_host_aliases=(alias,),
+                    )
+
     def test_docker_worker_stdin_is_bounded_and_never_becomes_an_argv_value(self) -> None:
         with tempfile.TemporaryDirectory(prefix="ligamina-worker-input-") as directory:
             input_dir = Path(directory)
@@ -116,6 +135,16 @@ class WorkerPolicyTests(unittest.TestCase):
             worker = WindowsSandboxWorker(repository_root=REPOSITORY_ROOT, wsb_executable="wsb.exe")
             spec = WorkerSpec("run-stdin", "entry-stdin", ("python", "-c", "pass"), Path(directory), stdin_data=b"{}")
             with self.assertRaisesRegex(ValueError, "does not support stdin_data"):
+                worker.run(spec)
+
+    def test_windows_worker_rejects_loopback_host_aliases(self) -> None:
+        with tempfile.TemporaryDirectory(prefix="ligamina-worker-input-") as directory:
+            worker = WindowsSandboxWorker(repository_root=REPOSITORY_ROOT, wsb_executable="wsb.exe")
+            spec = WorkerSpec(
+                "run-loopback", "entry-loopback", ("python", "-c", "pass"), Path(directory),
+                loopback_host_aliases=("nymph.rbq.life",),
+            )
+            with self.assertRaisesRegex(ValueError, "does not support loopback host aliases"):
                 worker.run(spec)
 
     def test_windows_worker_result_preserves_job_peak_memory(self) -> None:

@@ -19,6 +19,7 @@ if str(PROJECT) not in sys.path:
     sys.path.insert(0, str(PROJECT))
 
 from lab.native_runner import execute_harness
+from lab.automation.p7_loopback_services import LoopbackApiFixture, validate_bound_profile
 
 
 _SENSITIVE_VALUE = re.compile(
@@ -422,9 +423,23 @@ def run_side(request: dict[str, Any]) -> dict[str, Any]:
         ]
         if mode in {"federated", "tool"}:
             command = [sys.executable, "/input/project/lab/baselines/federated.py"]
-    result = execute_harness(command, request, mode, harness_timeout, cwd=Path("/work/side"))
+    loopback_fixture = None
+    loopback_profile = context.get("loopback_service_profile")
+    if loopback_profile is not None:
+        if ecosystem != "nonebot" or mode not in {"native", "federated"}:
+            raise ValueError("P7 loopback API fixtures are limited to Native/Federated NoneBot behavior Workers")
+        loopback_profile = validate_bound_profile(loopback_profile, context.get("sample"))
+        loopback_fixture = LoopbackApiFixture(loopback_profile)
+        loopback_fixture.start()
+    try:
+        result = execute_harness(command, request, mode, harness_timeout, cwd=Path("/work/side"))
+    finally:
+        if loopback_fixture is not None:
+            loopback_fixture.close()
     result = _scrub_result_diagnostics(result)
     result["profile_setup"] = setup_evidence
+    if loopback_fixture is not None:
+        result["loopback_fixture"] = loopback_fixture.evidence()
     return result
 
 
