@@ -74,6 +74,73 @@ test("private sends use send_private_msg", async () => {
   assert.equal(calls.onebot[0].body.user_id, 42);
 });
 
+test("forward nodes use standard send_group_msg node segments in original order", async () => {
+  const claimed = operation("group");
+  claimed.key.operation_id = "op-forward";
+  claimed.operation_payload.params.message = [
+    { type: "forward_node", user_id: "9000", nickname: "Alpha", content: "first" },
+    {
+      type: "forward_node",
+      user_id: "9012",
+      nickname: "Beta",
+      content: [{ type: "text", text: "second" }, { type: "mention", user_id: "23" }],
+    },
+  ];
+  const { gateway, calls } = harness({
+    claims: [claimed],
+    onebot: () => Response.json({ status: "ok", retcode: 0, data: { message_id: 778 } }),
+  });
+
+  await gateway.pollOnce();
+
+  assert.deepEqual(calls.onebot, [{
+    action: "send_group_msg",
+    body: {
+      group_id: 42,
+      message: [
+        { type: "node", data: { user_id: "9000", nickname: "Alpha", content: "first" } },
+        {
+          type: "node",
+          data: {
+            user_id: "9012",
+            nickname: "Beta",
+            content: [
+              { type: "text", data: { text: "second" } },
+              { type: "at", data: { qq: "23" } },
+            ],
+          },
+        },
+      ],
+    },
+  }]);
+  assert.equal(calls.core.at(-1).body.result.status, "succeeded");
+  assert.equal(calls.core.at(-1).body.result.platform_message_id, "778");
+});
+
+test("malformed forward nodes and private forward targets fail before OneBot is called", async () => {
+  const cases = [
+    { kind: "private", node: { type: "forward_node", user_id: "9", nickname: "A", content: "x" } },
+    { kind: "group", node: { type: "forward_node", user_id: "not-numeric", nickname: "A", content: "x" } },
+    { kind: "group", node: { type: "forward_node", user_id: "9", nickname: "A", content: [{ type: "video" }] } },
+    { kind: "group", node: { type: "forward_node", user_id: "9", nickname: "A", content: [] } },
+  ];
+
+  for (const [index, item] of cases.entries()) {
+    const claimed = operation(item.kind);
+    claimed.key.operation_id = `op-invalid-forward-${index}`;
+    claimed.operation_payload.params.message = [item.node];
+    const { gateway, calls } = harness({
+      claims: [claimed],
+      onebot: () => assert.fail("invalid forward input must not reach OneBot"),
+    });
+
+    await gateway.pollOnce();
+
+    assert.equal(calls.onebot.length, 0);
+    assert.equal(calls.core.at(-1).body.result.status, "failed");
+  }
+});
+
 test("uncertain outcomes are reported as unknown and never retried", async () => {
   const cases = [
     () => { throw new TypeError("network down"); },

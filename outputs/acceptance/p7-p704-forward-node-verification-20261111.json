@@ -1,0 +1,111 @@
+{
+  "schema_version": 1,
+  "kind": "p7_p704_forward_node_verification",
+  "date": "2026-11-11",
+  "scope": "P7-04G / feat-060 bounded forward-node support and source-bound observation",
+  "status": "completed_with_p7_09_admission_blocked",
+  "selection": {
+    "path": "outputs/acceptance/p7-p704-forward-node-diagnostic-selection-20261111.json",
+    "sha256": "fec7b15419c958ae613f09b67b3ce4e57add550476713379c52cb353e3203491",
+    "source_selection_path": "outputs/acceptance/p7-p704-independent-pilot-selection-20261111.json",
+    "source_selection_sha256": "3076c70a5e692392b993abb8754d84f0b06787a4781a4dfca68c7aad727f86c4",
+    "rule": "one exact Warframe target plus one Koishi control; bounded per-ecosystem subset; diagnostic_only"
+  },
+  "superseded_diagnostic": {
+    "path": "outputs/acceptance/p7-p704-forward-node-diagnostic-20261111.json",
+    "sha256": "6755d98a93463b79d31d5995b8adecb16cc6d91660bd8a7e6d81f718d6a0b163",
+    "reason": "Its source-bound Federated observation flattened forward_node into empty text. It is retained to document the detected observer defect and is not used for the current equivalence conclusion."
+  },
+  "verification": [
+    {
+      "name": "federated_forward_node_observation_red",
+      "command": "wsl.exe -e bash -lc 'cd /mnt/e/stella/Ligamina && PYTHONPATH=/mnt/e/stella/Ligamina UV_PROJECT_ENVIRONMENT=/tmp/ligamina-p7-diagnostic-venv UV_OFFLINE=1 uv run --locked --project lab --python 3.12.14 python -m unittest discover -s lab/tests -p test_federated_baseline.py -v'",
+      "result": "failed_as_expected_before_implementation",
+      "output_summary": "ImportError: _observed_message was not yet present; establishes the red state for typed forward-node projection."
+    },
+    {
+      "name": "federated_forward_node_observation_green",
+      "command": "wsl.exe -e bash -lc 'cd /mnt/e/stella/Ligamina && PYTHONPATH=/mnt/e/stella/Ligamina UV_PROJECT_ENVIRONMENT=/tmp/ligamina-p7-diagnostic-venv UV_OFFLINE=1 uv run --locked --project lab --python 3.12.14 python -m unittest discover -s lab/tests -p test_federated_baseline.py -v'",
+      "result": "passed",
+      "output_summary": "2/2 tests passed: source-bound projection preserves typed forward nodes and nested segments; legacy projection remains unchanged."
+    },
+    {
+      "name": "nonebot_tests_and_bridge_smoke",
+      "command": "wsl.exe -e bash -lc 'cd /mnt/e/stella/Ligamina && UV_PROJECT_ENVIRONMENT=/tmp/ligamina-p7-nonebot-venv UV_OFFLINE=1 uv run --locked --project hosts/nonebot --python 3.12.14 python -m pytest -q hosts/nonebot/tests && UV_PROJECT_ENVIRONMENT=/tmp/ligamina-p7-nonebot-venv UV_OFFLINE=1 uv run --locked --project hosts/nonebot --python 3.12.14 python hosts/nonebot/tests/native_bridge.py'",
+      "result": "passed",
+      "output_summary": "NoneBot tests: 4 passed. Native Bridge smoke passed, including group forward-node API dispatch and malformed-input fail-closed checks."
+    },
+    {
+      "name": "reference_gateway_build_and_tests",
+      "command": "npm test",
+      "working_directory": "clients/reference",
+      "result": "passed",
+      "output_summary": "TypeScript build passed; 25/25 tests passed, including standard send_group_msg node ordering and malformed/private-target rejection."
+    },
+    {
+      "name": "full_lab_suite",
+      "command": "wsl.exe -e bash -lc 'cd /mnt/e/stella/Ligamina && PYTHONPATH=/mnt/e/stella/Ligamina UV_PROJECT_ENVIRONMENT=/tmp/ligamina-p7-diagnostic-venv UV_OFFLINE=1 uv run --locked --project lab --python 3.12.14 python -m unittest discover -s lab/tests -v'",
+      "result": "passed",
+      "output_summary": "351 tests passed in 263.119 seconds. Compatibility matrix check: 8,961 entries and 539 sources."
+    },
+    {
+      "name": "python_compileall",
+      "command": "wsl.exe -e bash -lc 'cd /mnt/e/stella/Ligamina && PYTHONPATH=/mnt/e/stella/Ligamina UV_PROJECT_ENVIRONMENT=/tmp/ligamina-p7-diagnostic-venv UV_OFFLINE=1 uv run --locked --project lab --python 3.12.14 python -m compileall -q hosts/nonebot/ligamina_nonebot/adapter.py hosts/nonebot/ligamina_nonebot/bridge_smoke_plugin.py hosts/nonebot/tests/native_bridge.py lab/automation/p7_differential_campaign.py lab/baselines/federated.py lab/baselines/nonebot/runner.py lab/tests/test_native_runner.py lab/tests/test_federated_baseline.py'",
+      "result": "passed",
+      "output_summary": "All changed Python modules compiled."
+    },
+    {
+      "name": "source_bound_linux_diagnostic",
+      "command": "wsl.exe -e bash -lc 'cd /mnt/e/stella/Ligamina && UV_PROJECT_ENVIRONMENT=/tmp/ligamina-p7-diagnostic-venv UV_OFFLINE=1 uv run --locked --project lab --python 3.12.14 python -m lab.automation.p7_differential_campaign --selection outputs/acceptance/p7-p704-forward-node-diagnostic-selection-20261111.json --admission outputs/acceptance/phase7-linux-admission-forward-api-20261111.json --runtime-image ligamina-p401-runtime-offline-profile@sha256:2f2aaf3d31b522f31b1dbbc5c5e0109949a86d195e5aa491b2989b7ba9de9c5c --core-binary /mnt/e/stella/Ligamina-artifact-cache/p7-p704-loopback-fixture-pilot-20261111/core --bundle-root /mnt/e/stella/Ligamina-artifact-cache/p7-p704-forward-node-diagnostic-observer-fix-20261111/bundles --output outputs/acceptance/p7-p704-forward-node-diagnostic-observer-fix-20261111.json --limit-per-ecosystem 1 --workers 3'",
+      "result": "completed",
+      "report": "outputs/acceptance/p7-p704-forward-node-diagnostic-observer-fix-20261111.json",
+      "report_sha256": "2e919cea1b6b42d2c3c3bdf8ab20e07cc3cb1f209190b0eeab2ca81c27c2dabb",
+      "output_summary": "diagnostic_only=true; bounded_per_ecosystem_subset; 2/2 entries terminal. Koishi control had no runtime commands. Exact Warframe entry: 26 commands, 265 scenarios, three rounds; 795/795 scenario observations and 26/26 command conclusions equivalent; 4/26 nontrivial; zero mismatches; conclusions consistent across rounds. All 11 Worker runs confirmed cleanup, all three Federated Hosts were reaped."
+    },
+    {
+      "name": "documentation_gate",
+      "command": "pwsh -NoProfile -File init.ps1 -Mode docs",
+      "result": "passed",
+      "output_summary": "29 documents; 734 local links; 16 indexed historical Markdown files; 60 features; zero failures."
+    },
+    {
+      "name": "readme_evidence_check",
+      "command": "node scripts/render-readme.mjs --check",
+      "result": "passed",
+      "output_summary": "README evidence blocks match validated phase-one, phase-two, and phase-three reports."
+    },
+    {
+      "name": "harness_validation",
+      "command": "node .agents/skills/harness-creator/scripts/validate-harness.mjs --target .",
+      "result": "passed",
+      "output_summary": "Overall 100/100."
+    },
+    {
+      "name": "diff_check",
+      "command": "git diff --check",
+      "result": "passed",
+      "output_summary": "Exit 0; Git reported only CRLF-to-LF normalization warnings."
+    }
+  ],
+  "p7_09_gate": {
+    "latest_full_cohort_report": "outputs/acceptance/p7-p704-differential-pilot-20261111-loopback-fixture-retry2.json",
+    "latest_full_cohort_report_sha256": "2de44b29612a1936a7f85be7d68e041341a8c2a7476149175738c1262cb3b723",
+    "commands": 177,
+    "nontrivial": 29,
+    "nontrivial_share": 0.164,
+    "nontrivial_gate": "blocked_below_30_percent",
+    "unknown": 48,
+    "unknown_share": 0.271,
+    "unknown_gate": "passed_at_or_below_50_percent",
+    "consistency": "32/32_passed",
+    "cleanup": "348/348_confirmed",
+    "p7_09_admission": "blocked_nontrivial_below_30_percent",
+    "p7_10": "blocked_pending_p7_09",
+    "note": "The bounded diagnostic does not recalculate the 30+30 denominator or alter historical pilot conclusions."
+  },
+  "limitations": [
+    "The generated fixture uses network=none and synthetic loopback responses; it does not establish live OneBot or QQ delivery behavior.",
+    "The result establishes Native/Federated observation equivalence for this exact artifact and bounded generated cases only.",
+    "No unknown was promoted outside the source-bound diagnostic, no full-catalog campaign was started, and matrix v2 remains blocked."
+  ]
+}

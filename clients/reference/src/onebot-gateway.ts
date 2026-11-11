@@ -316,6 +316,9 @@ function prepareAction(payload: ClaimedOperation["operation_payload"]): Platform
       }
       const message = toOneBotMessage(params.message);
       if (message.length === 0) throw new TypeError("send_message params.message is empty");
+      if (target.kind === "private" && message.some((segment) => segment.type === "node")) {
+        throw new TypeError("forward nodes require a group target");
+      }
       return {
         action: target.kind === "group" ? "send_group_msg" : "send_private_msg",
         body: {
@@ -404,15 +407,37 @@ export function toEventEnvelope(event: Record<string, any>, targetHost: string):
 }
 
 export function toOneBotMessage(message: unknown): Segment[] {
+  return toOneBotMessageSegments(message, true);
+}
+
+function toOneBotMessageSegments(message: unknown, allowForwardNodes: boolean): Segment[] {
   if (!Array.isArray(message)) throw new TypeError("send_message params.message must be a segment array");
-  return message.map((segment: Record<string, unknown>) => {
+  return message.map((segment: unknown) => {
     if (!segment || typeof segment !== "object") throw new TypeError("message segment must be an object");
-    switch (segment.type) {
-      case "text": return { type: "text", data: { text: String(segment.text ?? "") } };
-      case "mention": return { type: "at", data: { qq: String(segment.user_id) } };
-      case "reply": return { type: "reply", data: { id: String(segment.message_id) } };
-      case "image_ref": return { type: "image", data: { file: String(segment.resource_ref) } };
-      default: throw new TypeError(`unsupported message segment ${String(segment.type)}`);
+    const value = segment as Record<string, unknown>;
+    switch (value.type) {
+      case "text": return { type: "text", data: { text: String(value.text ?? "") } };
+      case "mention": return { type: "at", data: { qq: String(value.user_id) } };
+      case "reply": return { type: "reply", data: { id: String(value.message_id) } };
+      case "image_ref": return { type: "image", data: { file: String(value.resource_ref) } };
+      case "forward_node": {
+        if (!allowForwardNodes) throw new TypeError("nested forward nodes are unsupported");
+        const userId = value.user_id;
+        if (typeof userId !== "string" || !/^\d+$/.test(userId)) {
+          throw new TypeError("forward_node user_id must be a decimal OneBot ID string");
+        }
+        if (typeof value.nickname !== "string") throw new TypeError("forward_node nickname must be a string");
+        const content = typeof value.content === "string"
+          ? value.content
+          : toOneBotMessageSegments(value.content, false);
+        if (Array.isArray(value.content) && value.content.length === 0) {
+          throw new TypeError("forward_node content must not be an empty segment array");
+        }
+        const extraFields = Object.keys(value).filter((key) => !["type", "user_id", "nickname", "content"].includes(key));
+        if (extraFields.length > 0) throw new TypeError(`forward_node has unsupported fields ${extraFields.join(", ")}`);
+        return { type: "node", data: { user_id: userId, nickname: value.nickname, content } };
+      }
+      default: throw new TypeError(`unsupported message segment ${String(value.type)}`);
     }
   });
 }

@@ -154,6 +154,153 @@ def _probe_observation(work: Path, events: list[dict[str, Any]]) -> dict[str, An
         str(event.get("extensions", {}).get("onebot.v11", {}).get("message_id", "")): event
         for event in events
     }
+
+
+class NativeOneBotApiRecorder:
+    """Record the stock OneBot API calls supported by the isolated Native runner."""
+
+    def __init__(
+        self,
+        *,
+        operations: list[dict[str, Any]],
+        receipts: list[dict[str, Any]],
+        api_inputs: list[dict[str, Any]],
+        source_event_id,
+        capture_source_event_id: bool,
+    ) -> None:
+        self.operations = operations
+        self.receipts = receipts
+        self.api_inputs = api_inputs
+        self.source_event_id = source_event_id
+        self.capture_source_event_id = capture_source_event_id
+
+    async def __call__(self, bot: Any, api: str, **params: Any) -> Any:
+        if api == "get_msg":
+            message_id = str(params.get("message_id", ""))
+            return {
+                "message_id": message_id,
+                "real_id": message_id,
+                "sender": {"user_id": int(bot.self_id)},
+                "time": 0,
+                "message": [],
+            }
+        is_forward = api == "send_group_forward_msg"
+        allowed = {"group_id", "messages", "_timeout"} if is_forward else {"group_id", "user_id", "message", "message_type", "auto_escape", "_timeout"}
+        if api not in {"send_msg", "send_group_msg", "send_private_msg", "send_group_forward_msg"}:
+            raise RuntimeError(f"stock native baseline has no virtual API fixture for {api!r}")
+        unexpected = set(params) - allowed
+        if unexpected:
+            raise RuntimeError(f"stock native API {api!r} has unsupported parameters: {sorted(unexpected)}")
+        raw_message = params.get("messages", []) if is_forward else params.get("message", [])
+        self.api_inputs.append({
+            "api": api,
+            "message_type": type(raw_message).__name__,
+            "message": [
+                {
+                    "type": getattr(segment, "type", None) if not isinstance(segment, dict) else segment.get("type"),
+                    "data": getattr(segment, "data", None) if not isinstance(segment, dict) else segment.get("data"),
+                }
+                for segment in raw_message
+            ] if isinstance(raw_message, (list, tuple)) else str(raw_message),
+        })
+        if is_forward:
+            group_id = params.get("group_id")
+            if group_id is None:
+                raise RuntimeError("send_group_forward_msg requires group_id")
+            target_id = _native_onebot_id(group_id, "group_id")
+            user_id = None
+            message = _native_forward_nodes(raw_message)
+        else:
+            group_id = params.get("group_id")
+            user_id = params.get("user_id")
+            target_id = group_id if group_id is not None else user_id
+            message = _message_segments(params.get("message", []))
+        kind = "group" if group_id is not None else "private" if user_id is not None else None
+        if kind is None or target_id is None:
+            raise RuntimeError(f"native OneBot API {api!r} omitted a target")
+        operation_id = f"operation-{len(self.operations) + 1}"
+        target = {"kind": kind, "id": str(target_id)}
+        operation = {
+            "operation_id": operation_id,
+            "account_id": str(bot.self_id),
+            "operation": "send_message",
+            "target": target,
+            "params": {"message": message},
+        }
+        source_event_id = self.source_event_id()
+        if self.capture_source_event_id:
+            operation["source_event_id"] = source_event_id
+        self.operations.append(operation)
+        receipt = {"operation_id": operation_id, "status": "succeeded", "target": target}
+        if self.capture_source_event_id:
+            receipt["account_id"] = str(bot.self_id)
+            receipt["source_event_id"] = source_event_id
+        self.receipts.append(receipt)
+        return {"message_id": f"virtual-message-{len(self.receipts)}"}
+
+
+def _native_forward_nodes(messages: Any) -> list[dict[str, Any]]:
+    if not isinstance(messages, list) or not messages:
+        raise RuntimeError("send_group_forward_msg requires a non-empty messages list")
+    nodes = []
+    for node in messages:
+        if not isinstance(node, dict) or set(node) != {"type", "data"} or node.get("type") != "node":
+            raise RuntimeError("send_group_forward_msg messages must contain OneBot node objects")
+        data = node["data"]
+        if not isinstance(data, dict):
+            raise RuntimeError("send_group_forward_msg node data must be an object")
+        if set(data) == {"name", "uin", "content"}:
+            nickname, user_id, content = data["name"], data["uin"], data["content"]
+        elif set(data) == {"nickname", "user_id", "content"}:
+            nickname, user_id, content = data["nickname"], data["user_id"], data["content"]
+        else:
+            raise RuntimeError("forward node requires name/uin/content or nickname/user_id/content")
+        if not isinstance(nickname, str):
+            raise RuntimeError("forward node nickname must be a string")
+        nodes.append({
+            "type": "forward_node",
+            "user_id": _native_onebot_id(user_id, "forward node user_id"),
+            "nickname": nickname,
+            "content": _native_forward_content(content),
+        })
+    return nodes
+
+
+def _native_onebot_id(value: Any, label: str) -> str:
+    if isinstance(value, int) and not isinstance(value, bool):
+        numeric = value
+    elif isinstance(value, str) and value.isascii() and value.isdigit():
+        numeric = int(value)
+    else:
+        raise RuntimeError(f"{label} must be a numeric OneBot ID")
+    if numeric < 0 or numeric > (1 << 63) - 1:
+        raise RuntimeError(f"{label} is outside the numeric OneBot ID profile")
+    return str(numeric)
+
+
+def _native_forward_content(value: Any) -> str | list[dict[str, Any]]:
+    if isinstance(value, str):
+        return value
+    if not isinstance(value, list) or not value:
+        raise RuntimeError("forward node content must be a string or non-empty message list")
+    segments = []
+    for item in value:
+        if not isinstance(item, dict) or set(item) != {"type", "data"} or not isinstance(item.get("data"), dict):
+            raise RuntimeError("forward node content segments must have type and data")
+        data = item["data"]
+        if item["type"] == "text" and isinstance(data.get("text"), str):
+            segments.append({"type": "text", "text": data["text"]})
+        elif item["type"] == "at":
+            segments.append({"type": "mention", "user_id": _native_onebot_id(data.get("qq"), "forward node mention ID")})
+        elif item["type"] == "reply":
+            segments.append({"type": "reply", "message_id": _native_onebot_id(data.get("id"), "forward node reply ID")})
+        elif item["type"] == "image" and isinstance(data.get("file"), str) and data["file"]:
+            segments.append({"type": "image_ref", "resource_ref": data["file"]})
+        elif item["type"] in {"text", "image"}:
+            raise RuntimeError(f"forward node {item['type']} segment has invalid data")
+        else:
+            raise RuntimeError(f"unsupported forward node content segment {item['type']!r}")
+    return segments
     observations = []
     for row in rows:
         event = event_by_message_id.get(str(row.get("message_id", "")))
@@ -271,57 +418,13 @@ async def _run(request: dict[str, Any]) -> dict[str, Any]:
     current_event_id: str | None = None
     capture_source_event_id = bool(behavior_fixture or context.get("execution", {}).get("capture_source_event_id"))
 
-    async def native_api(bot: Any, api: str, **params: Any) -> Any:
-        if api == "get_msg":
-            message_id = str(params.get("message_id", ""))
-            return {
-                "message_id": message_id,
-                "real_id": message_id,
-                "sender": {"user_id": int(bot.self_id)},
-                "time": 0,
-                "message": [],
-            }
-        if api not in {"send_msg", "send_group_msg", "send_private_msg"}:
-            raise RuntimeError(f"stock native baseline has no virtual API fixture for {api!r}")
-        raw_message = params.get("message", [])
-        api_inputs.append({
-            "api": api,
-            "message_type": type(raw_message).__name__,
-            "message": [
-                {"type": getattr(segment, "type", None), "data": getattr(segment, "data", None)}
-                for segment in raw_message
-            ] if isinstance(raw_message, (list, tuple)) else str(raw_message),
-        })
-        group_id = params.get("group_id")
-        user_id = params.get("user_id")
-        kind = "group" if group_id is not None else "private" if user_id is not None else None
-        target_id = group_id if group_id is not None else user_id
-        if kind is None or target_id is None:
-            raise RuntimeError(f"native OneBot API {api!r} omitted a target")
-        operation_id = f"operation-{len(operations) + 1}"
-        target = {"kind": kind, "id": str(target_id)}
-        operation = {
-            "operation_id": operation_id,
-            "account_id": str(bot.self_id),
-            "operation": "send_message",
-            "target": target,
-            "params": {"message": _message_segments(params.get("message", []))},
-        }
-        if capture_source_event_id:
-            operation["source_event_id"] = current_event_id
-        operations.append(operation)
-        receipt = {
-            "operation_id": operation_id,
-            "status": "succeeded",
-            "target": target,
-        }
-        if capture_source_event_id:
-            receipt["account_id"] = str(bot.self_id)
-            receipt["source_event_id"] = current_event_id
-        receipts.append(receipt)
-        return {"message_id": f"virtual-message-{len(receipts)}"}
-
-    adapter._call_api = native_api
+    adapter._call_api = NativeOneBotApiRecorder(
+        operations=operations,
+        receipts=receipts,
+        api_inputs=api_inputs,
+        source_event_id=lambda: current_event_id,
+        capture_source_event_id=capture_source_event_id,
+    )
     events = case["stimulus"]["events"]
     bots: dict[str, Any] = {}
     async with driver._lifespan:

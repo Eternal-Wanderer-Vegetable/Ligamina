@@ -77,12 +77,37 @@ async def main() -> None:
             }
             await bridge.dispatch(nickname_event)
 
+            forward_event = {
+                **event,
+                "event_id": "event-forward",
+                "trace_id": "trace-forward",
+                "extensions": {"onebot.v11": {"message_id": "81", "sender": {"user_id": "23", "nickname": "Alice"}}},
+                "message": [{"type": "text", "text": "forward"}],
+            }
+            await bridge.dispatch(forward_event)
+
             bot = next(iter(bridge.bots.values()))
             await bot.call_api("send_group_msg", group_id=42, message="[CQ:at,qq=23]", auto_escape=True)
             await bot.call_api("send_private_msg", user_id=23, message="[CQ:at,qq=23]", auto_escape=False)
+            calls_before_invalid = len(calls)
+            invalid_forward_calls = [
+                ({"group_id": 42, "messages": []}, "invalid_request"),
+                ({"group_id": -1, "messages": [{"type": "node", "data": {"name": "Bot", "uin": "9000", "content": "x"}}]}, "unsupported_api"),
+                ({"group_id": 42, "messages": [{"type": "node", "data": {"name": "Bot", "uin": "not-a-number", "content": "x"}}]}, "unsupported_api"),
+                ({"group_id": 42, "messages": [{"type": "node", "data": {"name": "Bot", "uin": "9000", "content": [{"type": "video", "data": {}}]}}]}, "unsupported_api"),
+                ({"messages": [{"type": "node", "data": {"name": "Bot", "uin": "9000", "content": "x"}}]}, "invalid_request"),
+            ]
+            for arguments, expected_code in invalid_forward_calls:
+                try:
+                    await bot.call_api("send_group_forward_msg", **arguments)
+                except BridgeApiError as error:
+                    assert error.code == expected_code, (expected_code, error.code, str(error))
+                else:
+                    raise AssertionError(f"invalid forward call was accepted: {arguments!r}")
+            assert len(calls) == calls_before_invalid, calls
 
-        assert len(plugin.observed) == 2, plugin.observed
-        first, second = plugin.observed
+        assert len(plugin.observed) == 3, plugin.observed
+        first, second, third = plugin.observed
         assert first == {
             "message": "ping",
             "original_message": "[CQ:reply,id=77][CQ:at,qq=9000]ping",
@@ -91,9 +116,10 @@ async def main() -> None:
             "sender_nickname": "Alice",
         }, first
         assert second["message"] == "ping" and second["to_me"] is True, second
+        assert third["message"] == "forward" and third["to_me"] is False, third
 
         sends = [call for call in calls if call["operation"] == "send_message"]
-        assert len(sends) == 4, sends
+        assert len(sends) == 5, sends
         assert sends[0]["target"] == {"kind": "group", "id": "42"}
         assert sends[0]["trace_id"] == "trace-reply-at"
         assert sends[0]["params"]["message"] == [
@@ -102,10 +128,24 @@ async def main() -> None:
         ], sends[0]
         assert sends[1]["trace_id"] == "trace-nickname"
         assert len([call for call in calls if call["operation"] == "get_message"]) == 1
-        assert sends[2]["target"] == {"kind": "group", "id": "42"}, sends[2]
-        assert sends[2]["params"]["message"] == [{"type": "text", "text": "[CQ:at,qq=23]"}], sends[2]
-        assert sends[3]["target"] == {"kind": "private", "id": "23"}, sends[3]
-        assert sends[3]["params"]["message"] == [{"type": "mention", "user_id": "23"}], sends[3]
+        assert sends[2]["account_id"] == "9000" and sends[2]["target"] == {"kind": "group", "id": "42"}, sends[2]
+        assert sends[2]["trace_id"] == "trace-forward", sends[2]
+        assert sends[2]["params"]["message"] == [
+            {"type": "forward_node", "user_id": "9000", "nickname": "Alpha", "content": "first"},
+            {
+                "type": "forward_node",
+                "user_id": "9012",
+                "nickname": "Beta",
+                "content": [
+                    {"type": "text", "text": "second"},
+                    {"type": "mention", "user_id": "23"},
+                ],
+            },
+        ], sends[2]
+        assert sends[3]["target"] == {"kind": "group", "id": "42"}, sends[3]
+        assert sends[3]["params"]["message"] == [{"type": "text", "text": "[CQ:at,qq=23]"}], sends[3]
+        assert sends[4]["target"] == {"kind": "private", "id": "23"}, sends[4]
+        assert sends[4]["params"]["message"] == [{"type": "mention", "user_id": "23"}], sends[4]
 
         private_event = to_onebot_event({
             **event,

@@ -2873,6 +2873,36 @@
         "outputs/acceptance/p7-p704-loopback-fixture-verification-20261111.json.sha256"
       ],
       "plan_path": "docs/plans/2026-11-09-phase-7-automated-verification.md"
+    },
+    {
+      "id": "feat-060",
+      "task_id": "P7-04G",
+      "name": "NoneBot 转发节点消息映射",
+      "description": "范围扩展原因：精确锁定的 nonebot_plugin_warframe_mode@1.1.0 wheel（artifact SHA-256 086911421ce02e46a11c923005ed5028ca3a74ff0cd6f5ee7a69d42386a96827；__init__.py SHA-256 0e8c9fc201839d1bcfb7e0f28731c9cd158e919b78f56625adc81d44b7937ed7）在群命令处理中调用 Bot.call_api('send_group_forward_msg', ...)；BridgeAdapter 与 stock Native recorder 均需支持此公开 API。定向诊断又确认 source-bound Federated 观察器曾把 typed forward_node 压成空文本；同时修复隔离观察投影。",
+      "dependencies": [
+        "feat-059"
+      ],
+      "status": "done",
+      "done_when": "四个隔离 seam 均有 red-green 回归：真实 Federated NoneBot Bot.call_api 保留 group/account/trace、节点顺序、发送者和内容；独立 Native recorder 接收同形 OneBot 调用并记录为同一 typed send_message observation；Reference Gateway 将 typed forward_node 映射到 OneBot v11 send_group_msg node segments；source-bound Federated observation 保留 typed forward_node 供 Native×2/Federated 比较。畸形 ID、空/错误节点及不支持内容 fail-closed；Native 不导入 Bridge，平台操作仍为 send_message，不修改 EventEnvelope schema、Core operation 名、第三方归档、外网准入或 P7 门槛。精确 artifact 的隔离 loopback diagnostic 已验证输出可达、Native/Federated 三轮一致和 Worker 清理；仅以该新证据更新精确 source-bound 诊断，不把子集结果当作 30+30 pilot gate。",
+      "evidence": "Completed 2026-11-11. Exact locked Warframe wheel source calls send_group_forward_msg in wm/rm/tran. BridgeAdapter converts the bounded custom nodes to the existing send_message operation with typed forward_node values; the independent Native API recorder emits the same observation without importing Bridge; the Reference OneBot Gateway maps nodes to standard send_group_msg segments. The Federated observation harness now preserves typed segments whenever source-event binding is enabled; it previously flattened forward_node to an empty text observation. Red-green tests cover all four seams and reject malformed IDs/nodes/content. Source-bound diagnostic report SHA-256 2e919cea1b6b42d2c3c3bdf8ab20e07cc3cb1f209190b0eeab2ca81c27c2dabb: exact Warframe entry completed 265 generated scenarios over three fresh rounds (795/795 observations equivalent, 26/26 commands equivalent, 4/26 nontrivial, no mismatches, consistent conclusions); all 11 Worker runs had cleanup confirmed and Federated Hosts were reaped. This is a bounded diagnostic subset, not a refreshed 30+30 gate. P7-09 remains blocked because the latest 30+30 cohort had 29/177 nontrivial (16.4%), below 30%; P7-10 remains blocked. No EventEnvelope/Core operation change, external network, third-party archive mutation, or unknown promotion.",
+      "evidence_paths": [
+        "hosts/nonebot/ligamina_nonebot/adapter.py",
+        "hosts/nonebot/tests/native_bridge.py",
+        "lab/baselines/nonebot/runner.py",
+        "lab/baselines/federated.py",
+        "lab/tests/test_native_runner.py",
+        "lab/tests/test_federated_baseline.py",
+        "clients/reference/src/onebot-gateway.ts",
+        "clients/reference/tests/onebot-gateway.test.mjs",
+        "outputs/acceptance/p7-p704-forward-node-verification-20261111.json",
+        "outputs/acceptance/p7-p704-forward-node-diagnostic-20261111.json",
+        "outputs/acceptance/p7-p704-forward-node-diagnostic-selection-20261111.json",
+        "outputs/acceptance/phase7-linux-admission-forward-api-20261111.json",
+        "outputs/acceptance/phase7-linux-worker-probes-forward-api-20261111.json",
+        "outputs/acceptance/p7-p704-forward-node-diagnostic-observer-fix-20261111.json",
+        "docs/plans/2026-11-09-phase-7-automated-verification.md"
+      ],
+      "plan_path": "docs/plans/2026-11-09-phase-7-automated-verification.md"
     }
   ]
 }

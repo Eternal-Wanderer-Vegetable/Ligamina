@@ -3,8 +3,10 @@ from __future__ import annotations
 import sys
 import unittest
 from pathlib import Path
+from types import SimpleNamespace
 from unittest.mock import patch
 
+from lab.baselines.nonebot.runner import NativeOneBotApiRecorder
 from lab.native_runner import execute_harness, load_case, run_pair
 
 
@@ -98,6 +100,103 @@ class NativeRunnerTests(unittest.TestCase):
         self.assertEqual(result["status"], "failed")
         self.assertEqual(result["diagnostic"], "harness timed out")
         self.assertEqual(result["stderr"], "P7-stage-marker\n")
+
+
+class NativeOneBotApiRecorderTests(unittest.IsolatedAsyncioTestCase):
+    async def test_group_forward_api_records_ordered_typed_nodes(self) -> None:
+        operations: list[dict] = []
+        receipts: list[dict] = []
+        recorder = NativeOneBotApiRecorder(
+            operations=operations,
+            receipts=receipts,
+            api_inputs=[],
+            source_event_id=lambda: "event-forward",
+            capture_source_event_id=True,
+        )
+
+        result = await recorder(
+            SimpleNamespace(self_id="9000"),
+            "send_group_forward_msg",
+            group_id=42,
+            messages=[
+                {"type": "node", "data": {"name": "Alpha", "uin": "9000", "content": "first"}},
+                {
+                    "type": "node",
+                    "data": {
+                        "name": "Beta",
+                        "uin": "9012",
+                        "content": [
+                            {"type": "text", "data": {"text": "second"}},
+                            {"type": "at", "data": {"qq": "23"}},
+                        ],
+                    },
+                },
+            ],
+        )
+
+        self.assertEqual(result, {"message_id": "virtual-message-1"})
+        self.assertEqual(operations, [{
+            "operation_id": "operation-1",
+            "account_id": "9000",
+            "operation": "send_message",
+            "target": {"kind": "group", "id": "42"},
+            "params": {"message": [
+                {"type": "forward_node", "user_id": "9000", "nickname": "Alpha", "content": "first"},
+                {
+                    "type": "forward_node",
+                    "user_id": "9012",
+                    "nickname": "Beta",
+                    "content": [
+                        {"type": "text", "text": "second"},
+                        {"type": "mention", "user_id": "23"},
+                    ],
+                },
+            ]},
+            "source_event_id": "event-forward",
+        }])
+        self.assertEqual(receipts, [{
+            "operation_id": "operation-1",
+            "status": "succeeded",
+            "target": {"kind": "group", "id": "42"},
+            "account_id": "9000",
+            "source_event_id": "event-forward",
+        }])
+
+    async def test_invalid_forward_inputs_fail_without_recording_operations(self) -> None:
+        operations: list[dict] = []
+        receipts: list[dict] = []
+        recorder = NativeOneBotApiRecorder(
+            operations=operations,
+            receipts=receipts,
+            api_inputs=[],
+            source_event_id=lambda: "event-forward",
+            capture_source_event_id=True,
+        )
+        bot = SimpleNamespace(self_id="9000")
+        valid_node = {"type": "node", "data": {"name": "Bot", "uin": "9000", "content": "x"}}
+        invalid_calls = [
+            ({"group_id": 42, "messages": []}, "non-empty messages"),
+            ({"group_id": "not-numeric", "messages": [valid_node]}, "numeric OneBot ID"),
+            ({"group_id": 42, "messages": [{"type": "node", "data": {"name": "Bot", "uin": "bad", "content": "x"}}]}, "numeric OneBot ID"),
+            ({"group_id": 42, "messages": [{"type": "node", "data": {"name": "Bot", "uin": "9000", "content": [{"type": "video", "data": {}}]}}]}, "unsupported forward node content"),
+            ({"messages": [valid_node]}, "requires group_id"),
+        ]
+
+        for arguments, expected_message in invalid_calls:
+            with self.subTest(arguments=arguments):
+                operations: list[dict] = []
+                receipts: list[dict] = []
+                recorder = NativeOneBotApiRecorder(
+                    operations=operations,
+                    receipts=receipts,
+                    api_inputs=[],
+                    source_event_id=lambda: "event-forward",
+                    capture_source_event_id=True,
+                )
+                with self.assertRaisesRegex(RuntimeError, expected_message):
+                    await recorder(bot, "send_group_forward_msg", **arguments)
+                self.assertEqual(operations, [])
+                self.assertEqual(receipts, [])
 
 
 if __name__ == "__main__":

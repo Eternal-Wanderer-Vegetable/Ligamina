@@ -1,0 +1,696 @@
+{
+  "schema_version": 1,
+  "kind": "p7_p701_static_inventory_sample",
+  "selection": {
+    "source_matrix": "outputs/compat/compatibility-matrix-v1.json",
+    "source_matrix_sha256": "40bc6559dc6c360857f919dc43f6060732041820cc1bd479f6449ad1bb15d787",
+    "rule": "Within each ecosystem, rank Linux load-verified frozen rows by SHA-256(selection_seed + ':' + registry_entry_id), then select the first cached artifacts until the per-ecosystem target is met.",
+    "selection_seed": "p7-p704-independent-20261111-v1",
+    "per_ecosystem_target": 30,
+    "counts": {
+      "koishi": 30,
+      "nonebot": 30,
+      "astrbot": 21
+    }
+  },
+  "execution": "static selection subset only; no plugin import or execution during selection construction",
+  "samples": [
+    {
+      "ecosystem": "koishi",
+      "sample_index": 8,
+      "entry": {
+        "registry_entry_id": "ko-24d9ed266a017c505a69dd60",
+        "package": "koishi-plugin-chat-analyse",
+        "version": "1.7.9",
+        "artifact_sha256": "6f3386cd4ca47310e1405e9970c6e51d790e18bb49a49d959e6cca0a473cc89f",
+        "load_evidence": [
+          {
+            "path": "outputs/acceptance/phase2-s211-rerun-census-linux-shard113of256-20261014.json",
+            "ref": "plugin_reports[10] result_id=catalog:ko-24d9ed266a017c505a69dd60|linux",
+            "sha256": "91c6d2f97f808922db022b85bca1a0f38d94cabe1412997408a890eec011ca7c"
+          }
+        ]
+      },
+      "static_inventory": {
+        "schema_version": 1,
+        "ecosystem": "koishi",
+        "plugin": {
+          "registry_entry_id": "ko-24d9ed266a017c505a69dd60",
+          "package": "koishi-plugin-chat-analyse",
+          "version": "1.7.9",
+          "artifact_sha256": "6f3386cd4ca47310e1405e9970c6e51d790e18bb49a49d959e6cca0a473cc89f"
+        },
+        "source": {
+          "kind": "static",
+          "collector": "capability-inventory-static/2",
+          "confidence": "heuristic",
+          "evidence": [
+            {
+              "reference": "sha256:6f3386cd4ca47310e1405e9970c6e51d790e18bb49a49d959e6cca0a473cc89f"
+            }
+          ]
+        },
+        "capabilities": {
+          "commands": {
+            "status": "observed",
+            "items": [
+              {
+                "kind": "command",
+                "name": "analyse",
+                "evidence": [
+                  {
+                    "reference": "package/lib/index.js:2826",
+                    "path": "package/lib/index.js",
+                    "line": 2826
+                  }
+                ],
+                "attributes": {
+                  "call": "command",
+                  "name_confidence": "literal"
+                }
+              }
+            ]
+          },
+          "handlers": {
+            "status": "observed",
+            "items": [
+              {
+                "kind": "event_listener",
+                "name": "message",
+                "evidence": [
+                  {
+                    "reference": "package/lib/index.js:70",
+                    "path": "package/lib/index.js",
+                    "line": 70
+                  }
+                ],
+                "attributes": {
+                  "call": "on",
+                  "name_confidence": "literal"
+                }
+              }
+            ]
+          },
+          "services": {
+            "status": "observed",
+            "items": []
+          },
+          "schedulers": {
+            "status": "observed",
+            "items": [
+              {
+                "kind": "interval",
+                "name": "setInterval",
+                "evidence": [
+                  {
+                    "reference": "package/lib/index.js:71",
+                    "path": "package/lib/index.js",
+                    "line": 71
+                  }
+                ],
+                "attributes": {
+                  "call": "setInterval",
+                  "name_confidence": "unknown"
+                }
+              },
+              {
+                "kind": "timeout",
+                "name": "setTimeout",
+                "evidence": [
+                  {
+                    "reference": "package/lib/index.js:313",
+                    "path": "package/lib/index.js",
+                    "line": 313
+                  }
+                ],
+                "attributes": {
+                  "call": "setTimeout",
+                  "name_confidence": "unknown"
+                }
+              },
+              {
+                "kind": "cron",
+                "name": "0 0 * * *",
+                "evidence": [
+                  {
+                    "reference": "package/lib/index.js:1878",
+                    "path": "package/lib/index.js",
+                    "line": 1878
+                  }
+                ],
+                "attributes": {
+                  "call": "cron",
+                  "name_confidence": "literal"
+                }
+              },
+              {
+                "kind": "cron",
+                "name": "0 0 * * *",
+                "evidence": [
+                  {
+                    "reference": "package/lib/index.js:2101",
+                    "path": "package/lib/index.js",
+                    "line": 2101
+                  }
+                ],
+                "attributes": {
+                  "call": "cron",
+                  "name_confidence": "literal"
+                }
+              },
+              {
+                "kind": "cron",
+                "name": "0 0 * * *",
+                "evidence": [
+                  {
+                    "reference": "package/lib/index.js:2155",
+                    "path": "package/lib/index.js",
+                    "line": 2155
+                  }
+                ],
+                "attributes": {
+                  "call": "cron",
+                  "name_confidence": "literal"
+                }
+              },
+              {
+                "kind": "cron",
+                "name": "0 0 * * *",
+                "evidence": [
+                  {
+                    "reference": "package/lib/index.js:2457",
+                    "path": "package/lib/index.js",
+                    "line": 2457
+                  }
+                ],
+                "attributes": {
+                  "call": "cron",
+                  "name_confidence": "literal"
+                }
+              },
+              {
+                "kind": "timeout",
+                "name": "setTimeout",
+                "evidence": [
+                  {
+                    "reference": "package/lib/index.js:2708",
+                    "path": "package/lib/index.js",
+                    "line": 2708
+                  }
+                ],
+                "attributes": {
+                  "call": "setTimeout",
+                  "name_confidence": "unknown"
+                }
+              },
+              {
+                "kind": "timeout",
+                "name": "setTimeout",
+                "evidence": [
+                  {
+                    "reference": "package/lib/wordcloud.d.ts:1",
+                    "path": "package/lib/wordcloud.d.ts",
+                    "line": 1
+                  }
+                ],
+                "attributes": {
+                  "call": "setTimeout",
+                  "name_confidence": "unknown"
+                }
+              }
+            ]
+          },
+          "configuration": {
+            "status": "observed",
+            "items": []
+          }
+        },
+        "limitations": []
+      }
+    },
+    {
+      "ecosystem": "nonebot",
+      "sample_index": 21,
+      "entry": {
+        "registry_entry_id": "nb-3ebafd8e699febd7a7e4e52b",
+        "package": "nonebot_plugin_warframe_mode",
+        "version": "1.1.0",
+        "artifact_sha256": "086911421ce02e46a11c923005ed5028ca3a74ff0cd6f5ee7a69d42386a96827",
+        "load_evidence": [
+          {
+            "path": "outputs/acceptance/phase3-p310-compatibility-matrix-20261026.md",
+            "ref": "row platform=linux registry_id=nb-3ebafd8e699febd7a7e4e52b",
+            "sha256": "7b777a2e4cc23f499c7b0b5ba49001126fdb87d71d08f1b14d46022e9d130b3d"
+          },
+          {
+            "path": "outputs/acceptance/phase3-p305-linux-affected-v3-execution-resume6-20261025.json",
+            "ref": "registry_entry_id=nb-3ebafd8e699febd7a7e4e52b",
+            "sha256": "8b4119e6bc56f2f26f24fc858458aa7c2491f43b0aa42fbc30bc94fe1a19c5f5"
+          }
+        ]
+      },
+      "static_inventory": {
+        "schema_version": 1,
+        "ecosystem": "nonebot",
+        "plugin": {
+          "registry_entry_id": "nb-3ebafd8e699febd7a7e4e52b",
+          "package": "nonebot_plugin_warframe_mode",
+          "version": "1.1.0",
+          "artifact_sha256": "086911421ce02e46a11c923005ed5028ca3a74ff0cd6f5ee7a69d42386a96827"
+        },
+        "source": {
+          "kind": "static",
+          "collector": "capability-inventory-static/2",
+          "confidence": "heuristic",
+          "evidence": [
+            {
+              "reference": "sha256:086911421ce02e46a11c923005ed5028ca3a74ff0cd6f5ee7a69d42386a96827"
+            }
+          ]
+        },
+        "capabilities": {
+          "commands": {
+            "status": "observed",
+            "items": [
+              {
+                "kind": "command",
+                "name": "wf",
+                "evidence": [
+                  {
+                    "reference": "nonebot_plugin_warframe_mode/__init__.py:11",
+                    "path": "nonebot_plugin_warframe_mode/__init__.py",
+                    "line": 11
+                  }
+                ],
+                "attributes": {
+                  "call": "on_command",
+                  "name_confidence": "literal"
+                }
+              },
+              {
+                "kind": "command",
+                "name": "新闻",
+                "evidence": [
+                  {
+                    "reference": "nonebot_plugin_warframe_mode/__init__.py:12",
+                    "path": "nonebot_plugin_warframe_mode/__init__.py",
+                    "line": 12
+                  }
+                ],
+                "attributes": {
+                  "call": "on_command",
+                  "name_confidence": "literal"
+                }
+              },
+              {
+                "kind": "command",
+                "name": "活动",
+                "evidence": [
+                  {
+                    "reference": "nonebot_plugin_warframe_mode/__init__.py:13",
+                    "path": "nonebot_plugin_warframe_mode/__init__.py",
+                    "line": 13
+                  }
+                ],
+                "attributes": {
+                  "call": "on_command",
+                  "name_confidence": "literal"
+                }
+              },
+              {
+                "kind": "command",
+                "name": "警报",
+                "evidence": [
+                  {
+                    "reference": "nonebot_plugin_warframe_mode/__init__.py:14",
+                    "path": "nonebot_plugin_warframe_mode/__init__.py",
+                    "line": 14
+                  }
+                ],
+                "attributes": {
+                  "call": "on_command",
+                  "name_confidence": "literal"
+                }
+              },
+              {
+                "kind": "command",
+                "name": "突击",
+                "evidence": [
+                  {
+                    "reference": "nonebot_plugin_warframe_mode/__init__.py:15",
+                    "path": "nonebot_plugin_warframe_mode/__init__.py",
+                    "line": 15
+                  }
+                ],
+                "attributes": {
+                  "call": "on_command",
+                  "name_confidence": "literal"
+                }
+              },
+              {
+                "kind": "command",
+                "name": "地球赏金",
+                "evidence": [
+                  {
+                    "reference": "nonebot_plugin_warframe_mode/__init__.py:16",
+                    "path": "nonebot_plugin_warframe_mode/__init__.py",
+                    "line": 16
+                  }
+                ],
+                "attributes": {
+                  "call": "on_command",
+                  "name_confidence": "literal"
+                }
+              },
+              {
+                "kind": "command",
+                "name": "金星赏金",
+                "evidence": [
+                  {
+                    "reference": "nonebot_plugin_warframe_mode/__init__.py:17",
+                    "path": "nonebot_plugin_warframe_mode/__init__.py",
+                    "line": 17
+                  }
+                ],
+                "attributes": {
+                  "call": "on_command",
+                  "name_confidence": "literal"
+                }
+              },
+              {
+                "kind": "command",
+                "name": "火二赏金",
+                "evidence": [
+                  {
+                    "reference": "nonebot_plugin_warframe_mode/__init__.py:18",
+                    "path": "nonebot_plugin_warframe_mode/__init__.py",
+                    "line": 18
+                  }
+                ],
+                "attributes": {
+                  "call": "on_command",
+                  "name_confidence": "literal"
+                }
+              },
+              {
+                "kind": "command",
+                "name": "裂缝",
+                "evidence": [
+                  {
+                    "reference": "nonebot_plugin_warframe_mode/__init__.py:19",
+                    "path": "nonebot_plugin_warframe_mode/__init__.py",
+                    "line": 19
+                  }
+                ],
+                "attributes": {
+                  "call": "on_command",
+                  "name_confidence": "literal"
+                }
+              },
+              {
+                "kind": "command",
+                "name": "打折",
+                "evidence": [
+                  {
+                    "reference": "nonebot_plugin_warframe_mode/__init__.py:20",
+                    "path": "nonebot_plugin_warframe_mode/__init__.py",
+                    "line": 20
+                  }
+                ],
+                "attributes": {
+                  "call": "on_command",
+                  "name_confidence": "literal"
+                }
+              },
+              {
+                "kind": "command",
+                "name": "入侵",
+                "evidence": [
+                  {
+                    "reference": "nonebot_plugin_warframe_mode/__init__.py:21",
+                    "path": "nonebot_plugin_warframe_mode/__init__.py",
+                    "line": 21
+                  }
+                ],
+                "attributes": {
+                  "call": "on_command",
+                  "name_confidence": "literal"
+                }
+              },
+              {
+                "kind": "command",
+                "name": "奸商",
+                "evidence": [
+                  {
+                    "reference": "nonebot_plugin_warframe_mode/__init__.py:22",
+                    "path": "nonebot_plugin_warframe_mode/__init__.py",
+                    "line": 22
+                  }
+                ],
+                "attributes": {
+                  "call": "on_command",
+                  "name_confidence": "literal"
+                }
+              },
+              {
+                "kind": "command",
+                "name": "小小黑",
+                "evidence": [
+                  {
+                    "reference": "nonebot_plugin_warframe_mode/__init__.py:23",
+                    "path": "nonebot_plugin_warframe_mode/__init__.py",
+                    "line": 23
+                  }
+                ],
+                "attributes": {
+                  "call": "on_command",
+                  "name_confidence": "literal"
+                }
+              },
+              {
+                "kind": "command",
+                "name": "地球",
+                "evidence": [
+                  {
+                    "reference": "nonebot_plugin_warframe_mode/__init__.py:24",
+                    "path": "nonebot_plugin_warframe_mode/__init__.py",
+                    "line": 24
+                  }
+                ],
+                "attributes": {
+                  "call": "on_command",
+                  "name_confidence": "literal"
+                }
+              },
+              {
+                "kind": "command",
+                "name": "地球平原",
+                "evidence": [
+                  {
+                    "reference": "nonebot_plugin_warframe_mode/__init__.py:25",
+                    "path": "nonebot_plugin_warframe_mode/__init__.py",
+                    "line": 25
+                  }
+                ],
+                "attributes": {
+                  "call": "on_command",
+                  "name_confidence": "literal"
+                }
+              },
+              {
+                "kind": "command",
+                "name": "舰队",
+                "evidence": [
+                  {
+                    "reference": "nonebot_plugin_warframe_mode/__init__.py:26",
+                    "path": "nonebot_plugin_warframe_mode/__init__.py",
+                    "line": 26
+                  }
+                ],
+                "attributes": {
+                  "call": "on_command",
+                  "name_confidence": "literal"
+                }
+              },
+              {
+                "kind": "command",
+                "name": "金星平原",
+                "evidence": [
+                  {
+                    "reference": "nonebot_plugin_warframe_mode/__init__.py:27",
+                    "path": "nonebot_plugin_warframe_mode/__init__.py",
+                    "line": 27
+                  }
+                ],
+                "attributes": {
+                  "call": "on_command",
+                  "name_confidence": "literal"
+                }
+              },
+              {
+                "kind": "command",
+                "name": "电波",
+                "evidence": [
+                  {
+                    "reference": "nonebot_plugin_warframe_mode/__init__.py:28",
+                    "path": "nonebot_plugin_warframe_mode/__init__.py",
+                    "line": 28
+                  }
+                ],
+                "attributes": {
+                  "call": "on_command",
+                  "name_confidence": "literal"
+                }
+              },
+              {
+                "kind": "command",
+                "name": "仲裁",
+                "evidence": [
+                  {
+                    "reference": "nonebot_plugin_warframe_mode/__init__.py:29",
+                    "path": "nonebot_plugin_warframe_mode/__init__.py",
+                    "line": 29
+                  }
+                ],
+                "attributes": {
+                  "call": "on_command",
+                  "name_confidence": "literal"
+                }
+              },
+              {
+                "kind": "command",
+                "name": "火二平原",
+                "evidence": [
+                  {
+                    "reference": "nonebot_plugin_warframe_mode/__init__.py:30",
+                    "path": "nonebot_plugin_warframe_mode/__init__.py",
+                    "line": 30
+                  }
+                ],
+                "attributes": {
+                  "call": "on_command",
+                  "name_confidence": "literal"
+                }
+              },
+              {
+                "kind": "command",
+                "name": "扎里曼",
+                "evidence": [
+                  {
+                    "reference": "nonebot_plugin_warframe_mode/__init__.py:31",
+                    "path": "nonebot_plugin_warframe_mode/__init__.py",
+                    "line": 31
+                  }
+                ],
+                "attributes": {
+                  "call": "on_command",
+                  "name_confidence": "literal"
+                }
+              },
+              {
+                "kind": "command",
+                "name": "特价",
+                "evidence": [
+                  {
+                    "reference": "nonebot_plugin_warframe_mode/__init__.py:32",
+                    "path": "nonebot_plugin_warframe_mode/__init__.py",
+                    "line": 32
+                  }
+                ],
+                "attributes": {
+                  "call": "on_command",
+                  "name_confidence": "literal"
+                }
+              },
+              {
+                "kind": "command",
+                "name": "wm",
+                "evidence": [
+                  {
+                    "reference": "nonebot_plugin_warframe_mode/__init__.py:391",
+                    "path": "nonebot_plugin_warframe_mode/__init__.py",
+                    "line": 391
+                  }
+                ],
+                "attributes": {
+                  "call": "on_command",
+                  "name_confidence": "literal"
+                }
+              },
+              {
+                "kind": "command",
+                "name": "rm",
+                "evidence": [
+                  {
+                    "reference": "nonebot_plugin_warframe_mode/__init__.py:418",
+                    "path": "nonebot_plugin_warframe_mode/__init__.py",
+                    "line": 418
+                  }
+                ],
+                "attributes": {
+                  "call": "on_command",
+                  "name_confidence": "literal"
+                }
+              },
+              {
+                "kind": "command",
+                "name": "tran",
+                "evidence": [
+                  {
+                    "reference": "nonebot_plugin_warframe_mode/__init__.py:445",
+                    "path": "nonebot_plugin_warframe_mode/__init__.py",
+                    "line": 445
+                  }
+                ],
+                "attributes": {
+                  "call": "on_command",
+                  "name_confidence": "literal"
+                }
+              },
+              {
+                "kind": "command",
+                "name": "wiki",
+                "evidence": [
+                  {
+                    "reference": "nonebot_plugin_warframe_mode/__init__.py:472",
+                    "path": "nonebot_plugin_warframe_mode/__init__.py",
+                    "line": 472
+                  }
+                ],
+                "attributes": {
+                  "call": "on_command",
+                  "name_confidence": "literal"
+                }
+              }
+            ]
+          },
+          "handlers": {
+            "status": "observed",
+            "items": []
+          },
+          "services": {
+            "status": "observed",
+            "items": []
+          },
+          "schedulers": {
+            "status": "observed",
+            "items": []
+          },
+          "configuration": {
+            "status": "observed",
+            "items": []
+          }
+        },
+        "limitations": []
+      }
+    }
+  ],
+  "diagnostic_scope": {
+    "kind": "p7_p704_forward_node_diagnostic",
+    "source_selection_path": "outputs/acceptance/p7-p704-independent-pilot-selection-20261111.json",
+    "source_selection_sha256": "3076c70a5e692392b993abb8754d84f0b06787a4781a4dfca68c7aad727f86c4",
+    "target_registry_entry_id": "nb-3ebafd8e699febd7a7e4e52b",
+    "control_registry_entry_id": "ko-24d9ed266a017c505a69dd60",
+    "control_reason": "lowest registry-id Koishi row in source cohort; prior pilot discovered zero runtime commands"
+  }
+}

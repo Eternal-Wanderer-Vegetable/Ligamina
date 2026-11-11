@@ -128,9 +128,39 @@ def _segments(message: Any) -> list[dict[str, Any]]:
             result.append({"type": "reply", "message_id": str(segment.get("message_id", segment.get("data", {}).get("id", "")))})
         elif kind == "image_ref":
             result.append({"type": "image_ref", "resource_ref": str(segment.get("resource_ref", segment.get("data", {}).get("file", "")))})
+        elif kind == "forward_node":
+            user_id = segment.get("user_id")
+            if isinstance(user_id, int) and not isinstance(user_id, bool):
+                numeric_user_id = user_id
+            elif isinstance(user_id, str) and user_id.isascii() and user_id.isdigit():
+                numeric_user_id = int(user_id)
+            else:
+                raise RuntimeError("federated Gateway captured a forward node without a numeric user_id")
+            nickname = segment.get("nickname")
+            content = segment.get("content")
+            if not isinstance(nickname, str) or numeric_user_id < 0 or numeric_user_id > (1 << 63) - 1:
+                raise RuntimeError("federated Gateway captured an invalid forward node identity")
+            if isinstance(content, str):
+                observed_content = content
+            elif isinstance(content, list) and content:
+                observed_content = _segments(content)
+            else:
+                raise RuntimeError("federated Gateway captured invalid forward node content")
+            result.append({
+                "type": "forward_node",
+                "user_id": str(numeric_user_id),
+                "nickname": nickname,
+                "content": observed_content,
+            })
         else:
             raise RuntimeError(f"federated Gateway captured unsupported message segment {kind!r}")
     return result
+
+
+def _observed_message(message: Any, *, preserve_segments: bool) -> list[dict[str, Any]]:
+    if preserve_segments:
+        return _segments(message)
+    return [{"type": "text", "text": _text(message)}]
 
 
 def _phase4_probe_observation(ecosystem: str, work: Path, events: list[dict[str, Any]]) -> dict[str, Any]:
@@ -354,7 +384,8 @@ def run(request: dict[str, Any]) -> dict[str, Any]:
         payload = operation.get("operation_payload", {})
         target = payload.get("target")
         raw_message = payload.get("params", {}).get("message")
-        message = _segments(raw_message) if behavior_fixture else [{"type": "text", "text": _text(raw_message)}]
+        preserve_segments = bool(behavior_fixture) or context.get("execution", {}).get("capture_source_event_id") is True
+        message = _observed_message(raw_message, preserve_segments=preserve_segments)
         if not isinstance(target, dict) or target.get("kind") not in {"group", "private"}:
             raise RuntimeError("federated Gateway captured an invalid message target")
         operation_id = f"operation-{index}"

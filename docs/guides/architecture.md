@@ -30,6 +30,7 @@
 - 已派发且失去回执的动作保持 unknown；重启不能证明真实发送成功。
 - 命令工具调用使用保留账号（Koishi `ligamina-tool`，NoneBot/OneBot `0`）和 Core 生成的 trace；这类操作只在 Core 内完成或拒绝，绝不进入 ledger/Gateway，工具结果也不是平台投递证据。
 - Bridge 平台能力有限，未支持 API 返回 unsupported_api；扩展必须补授权、schema、作用域和差分验证。
+- NoneBot `send_group_forward_msg` 的受限自定义 node 输入映射到现有 `send_message` operation 的 outbound `forward_node` segments；Reference OneBot Gateway 再用标准 `send_group_msg` 发送 node segments。它不扩展 EventEnvelope 的 inbound message schema。
 - NoneBot 2.5.0、Koishi core 4.18.11 是锁定 profile。Koishi 元包/loader、浏览器/控制台等需求使用独立 profile。
 - S2-05 stock baseline 在不导入 Ligamina Bridge 的独立进程中调用原生 Bot/Session API；配对 Worker 固定 artifact、lock、config、stimulus 指纹后分别验证 Native 与 Federated 输出。
 - 第一阶段验证虚拟 Gateway 收发；真实 QQ/平台网关不在已经通过的验收范围。

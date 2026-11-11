@@ -1047,7 +1047,14 @@ def run_campaign(
             "test_context_profile_manifest_sha256": profile_manifest_sha256(),
             "network": "disabled",
             "limit_per_ecosystem": limit_per_ecosystem,
-            "selection_scope": "p7_nonebot_context_profile_subset" if allow_profile_subset else "hash_ranked_30_per_ecosystem",
+            "diagnostic_only": allow_profile_subset or limit_per_ecosystem is not None,
+            "selection_scope": (
+                "p7_nonebot_context_profile_subset"
+                if allow_profile_subset
+                else "bounded_per_ecosystem_subset"
+                if limit_per_ecosystem is not None
+                else "hash_ranked_30_per_ecosystem"
+            ),
         },
         "admission_path": str(admission_path),
         "admission_sha256": _sha256_file(admission_path),
