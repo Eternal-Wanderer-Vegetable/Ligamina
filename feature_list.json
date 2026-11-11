@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "updated_at": "2026-11-11",
-  "active_feature": "feat-057",
+  "active_feature": "feat-058",
   "next_feature": null,
   "features": [
     {
@@ -2756,11 +2756,34 @@
         "feat-053",
         "feat-056"
       ],
-      "status": "in-progress",
+      "status": "done",
       "done_when": "逐场景重算 pilot 中的结果/输入长度统计并绑定输入报告哈希；至少对高频命令簇核对精确锁定发布物与源码行，区分已证实前置条件和未证明假设；明确不会把 unknown 改写为 pass，并在计划和 handoff 记录受约束的下一步。",
-      "evidence": "Source-bound diagnostic is in progress. Scope is limited to read-only analysis of the already completed locked pilot and its exact cached wheels.",
+      "evidence": "Source-bound diagnostic report SHA-256 04f20e80996aa2f87a96e3da0aa80bb83220c14e08a4e8311c3efb7c45b4739e re-aggregates all 5,712 scenario-round observations and binds the exact pilot, selection, locked wheel/artifact and source files. It confirms input-length correlations are non-causal and identifies SUPERUSER/GROUP_OWNER, private-only, and to_me preconditions in three NoneBot source clusters (30 commands, 963 no-operation rounds). Federated observations for these clusters are also empty. This is a diagnostic only: unknown outcomes were not changed, no plugin/Worker/network ran.",
       "evidence_paths": [
+        "lab/automation/p7_source_diagnostic.py",
+        "outputs/acceptance/p7-p704-no-operation-source-diagnostic-20261111.json",
+        "outputs/acceptance/p7-p704-no-operation-source-diagnostic-20261111.json.sha256",
         "outputs/acceptance/p7-p704-differential-pilot-20261111-empty-input-v3.json",
+        "outputs/acceptance/p7-p704-differential-pilot-20261111-empty-input-v3.json.sha256",
+        "docs/plans/2026-11-09-phase-7-automated-verification.md"
+      ],
+      "plan_path": "docs/plans/2026-11-09-phase-7-automated-verification.md"
+    },
+    {
+      "id": "feat-058",
+      "task_id": "P7-04E",
+      "name": "NoneBot pilot 测试 actor/context profile",
+      "description": "范围扩展原因：feat-057 绑定源码确认了当前 P7 场景缺少 SUPERUSER、GROUP_OWNER、私聊和 to_me 条件，造成一组已发现命令没有 Native/Federated 操作。新增隔离 Worker 专用、精确 artifact/command 绑定的合成 actor/context profile，Native 与 Federated 共用同一测试身份/配置；不修改第三方归档、不向真实身份授权、不把角色声明塞入未版本化 EventEnvelope。",
+      "dependencies": [
+        "feat-049",
+        "feat-053",
+        "feat-057"
+      ],
+      "status": "in-progress",
+      "done_when": "有 schema/校验和显式哈希绑定的测试 profile，能为有源码证据的精确命令选择私聊/群聊、to_me 提及和仅限合成 actor 的 SUPERUSER 设置；Native×2 与 Federated 运行使用相同配置且报告包含 profile hash。定向隔离诊断清理全确认，再以新哈希重跑锁定 30+30 pilot 并裁决 nontrivial、unknown、一致性与 cleanup 四门；不得提升未知结论或启动全目录 campaign。",
+      "evidence": "Started after feat-057 source audit. Next implementation is limited to explicit offline Worker profiles for the exact source-bound command clusters.",
+      "evidence_paths": [
+        "outputs/acceptance/p7-p704-no-operation-source-diagnostic-20261111.json",
         "docs/plans/2026-11-09-phase-7-automated-verification.md"
       ],
       "plan_path": "docs/plans/2026-11-09-phase-7-automated-verification.md"
