@@ -250,7 +250,7 @@ P7-03、P7-08 与 P7-04 可并行。P7-04 与 P7-06 是两个决策点，见第 
 - **Oracle 边界**：差分只证明与原生一致。依赖网络的插件在禁网下只会走错误路径，结论 scope 必须写“仅错误路径”。依赖 LLM provider 的 AstrBot 插件同理。
 - **原生基线自身的偏差**：stock runner 与真实部署存在配置差异；原生侧异常要单独标记，不能混入兼容结论。
 - **规模成本**：每条目 3 次 Worker 运行，全量时长只能在 P7-04 后估算；预算超出时先按生态分批。
-- **任务顺序**：P6-01 / feat-030 于 2026-11-10 完成；受控重复投递和 SQLite 账本去重见[第六阶段计划](2026-11-08-phase-6-runtime-reliability.md) 3.1d。P7-01 至 P7-08（feat-046–053）交付完成。P7-01 的样本指标为源码声明 presence，不是运行时 discovery 或全目录估计；P7-03 只覆盖三个已验收 AstrBot 插件与 AB-05 用例。Native disconnect 生命周期缺陷已由 `2a0ffc2` 修复并用 30+30 cohort 复核，但新 cohort 仍以 23/177 nontrivial (13.0%) 未过准入门；unknown 69/177 (39.0%)、32/32 三轮一致性与 348/348 清理通过。P7-09 / feat-054 与 P7-10 / feat-055 均保持 blocked，tracker 的 `active_feature` 与 `next_feature` 为 null。下一步评估 event-aware 输入及严格禁网的 loopback-service diagnostics；不启动全量 campaign 或矩阵 v2，不把 unknown 改写为通过或真实平台投递证据。
+- **任务顺序**：P6-01 / feat-030 于 2026-11-10 完成；受控重复投递和 SQLite 账本去重见[第六阶段计划](2026-11-08-phase-6-runtime-reliability.md) 3.1d。P7-01 至 P7-08（feat-046–053）交付完成；feat-056 空输入边界修正与 feat-057 source-bound 诊断也已完成。P7-01 的样本指标为源码声明 presence，不是运行时 discovery 或全目录估计；P7-03 只覆盖三个已验收 AstrBot 插件与 AB-05 用例。Native disconnect 生命周期缺陷已由 `2a0ffc2` 修复，NoneBot 群会话构造已由 `7fb5156` 修正；最新 generator-v3 cohort 仍以 23/177 nontrivial (13.0%) 未过准入门，unknown 69/177 (39.0%)、32/32 三轮一致性与 348/348 清理通过。feat-058 正在实现精确 artifact/命令绑定的合成 actor/context profile，Native 与 Federated 共用测试身份和配置；不得扩展到真实身份授权或未版本化 EventEnvelope。P7-09 / feat-054 与 P7-10 / feat-055 均保持 blocked，tracker 当前 `active_feature=feat-058`。下一步仅执行获准的 profile 测试边界和隔离诊断；不启动全量 campaign 或矩阵 v2，不把 unknown 改写为通过或真实平台投递证据。
 
 ## 8. 验证命令（规划阶段）
 
