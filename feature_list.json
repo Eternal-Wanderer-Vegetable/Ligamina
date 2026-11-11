@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "updated_at": "2026-11-11",
-  "active_feature": null,
+  "active_feature": "feat-057",
   "next_feature": null,
   "features": [
     {
@@ -2743,6 +2743,25 @@
         "outputs/acceptance/p7-p704-empty-input-v3-verification-20261111.json",
         "outputs/acceptance/p7-p704-empty-input-v3-verification-20261111.json.sha256",
         "lab/tests/test_p7_differential_campaign.py"
+      ],
+      "plan_path": "docs/plans/2026-11-09-phase-7-automated-verification.md"
+    },
+    {
+      "id": "feat-057",
+      "task_id": "P7-04D",
+      "name": "pilot 无操作结果的 source-bound 诊断",
+      "description": "范围扩展原因：P7-09 nontrivial 门失败（13.0%），计划只允许先做 source-bound 输入、服务与观察层诊断。对已完成 hash-bound pilot 的无 Native Gateway operation 聚类做离线只读归因；不运行第三方插件、不修改归档、不把 unknown 重分类。",
+      "dependencies": [
+        "feat-049",
+        "feat-053",
+        "feat-056"
+      ],
+      "status": "in-progress",
+      "done_when": "逐场景重算 pilot 中的结果/输入长度统计并绑定输入报告哈希；至少对高频命令簇核对精确锁定发布物与源码行，区分已证实前置条件和未证明假设；明确不会把 unknown 改写为 pass，并在计划和 handoff 记录受约束的下一步。",
+      "evidence": "Source-bound diagnostic is in progress. Scope is limited to read-only analysis of the already completed locked pilot and its exact cached wheels.",
+      "evidence_paths": [
+        "outputs/acceptance/p7-p704-differential-pilot-20261111-empty-input-v3.json",
+        "docs/plans/2026-11-09-phase-7-automated-verification.md"
       ],
       "plan_path": "docs/plans/2026-11-09-phase-7-automated-verification.md"
     }
