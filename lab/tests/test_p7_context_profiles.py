@@ -145,7 +145,51 @@ class P7ContextProfileTests(unittest.TestCase):
             {sample["entry"]["registry_entry_id"] for sample in document["samples"]},
             {ANTIINSULT["registry_entry_id"], ANTIRECALL["registry_entry_id"], BILICHAT["registry_entry_id"]},
         )
-        candidates = p7.select_candidates(document, allow_profile_subset=True)
+        with tempfile.TemporaryDirectory() as temp_dir:
+            artifact_cache = Path(temp_dir)
+            catalog: dict[str, dict[str, object]] = {}
+            artifacts: dict[str, dict[str, object]] = {}
+            profiles: dict[str, dict[str, object]] = {}
+            cache_hashes: dict[str, str] = {}
+            for sample in document["samples"]:
+                identity = sample["entry"]
+                entry_id = identity["registry_entry_id"]
+                artifact_path = f"{entry_id}.whl"
+                lock_path = f"{entry_id}.lock"
+                (artifact_cache / artifact_path).write_bytes(b"test artifact placeholder")
+                (artifact_cache / lock_path).write_bytes(b"test profile-lock placeholder")
+                cache_hashes[artifact_path] = identity["artifact_sha256"]
+                cache_hashes[lock_path] = hashlib.sha256(b"test profile-lock placeholder").hexdigest()
+                catalog[entry_id] = {
+                    "registry_entry_id": entry_id,
+                    "package": identity["package"],
+                    "version": identity["version"],
+                }
+                artifacts[entry_id] = {
+                    "distribution_name": identity["package"],
+                    "artifacts": [{
+                        "platform": "linux-x86_64",
+                        "artifact": {"cache_path": artifact_path, "filename": f"{identity['package']}.whl"},
+                    }],
+                }
+                profiles[entry_id] = {
+                    "profiles": {
+                        "linux-x86_64": {
+                            "dependency_lock": {
+                                "cache_path": lock_path,
+                                "sha256": cache_hashes[lock_path],
+                                "profile_id": "test-profile",
+                            }
+                        }
+                    }
+                }
+            with (
+                patch.object(p7, "ARTIFACT_CACHE", artifact_cache),
+                patch.object(p7, "_frozen_records", return_value=(catalog, artifacts, profiles)),
+                patch.object(p7, "_sha256_file", side_effect=lambda path: cache_hashes[Path(path).name]),
+            ):
+                candidates = p7.select_candidates(document, allow_profile_subset=True)
+
         self.assertEqual(len(candidates), 3)
         self.assertEqual({candidate["ecosystem"] for candidate in candidates}, {"nonebot"})
 

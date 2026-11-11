@@ -7,15 +7,21 @@
   "verification": [
     {
       "name": "targeted_lab_tests",
-      "command": "wsl -d Ubuntu-24.04 --cd /mnt/e/stella/Ligamina -- env UV_PROJECT_ENVIRONMENT=/tmp/ligamina-p7-context-diagnostic-venv UV_OFFLINE=1 uv run --locked --project lab --python 3.12.14 python -m unittest lab.tests.test_p7_context_profiles lab.tests.test_p7_differential_campaign lab.tests.test_scenario_generator lab.tests.test_p7_service_profiles -v",
+      "command": "wsl -d Ubuntu-24.04 --cd /mnt/e/stella/Ligamina -- env UV_PROJECT_ENVIRONMENT=/tmp/ligamina-p7-ci-fix-venv UV_OFFLINE=1 uv run --locked --project lab --python 3.12.14 python -m unittest lab.tests.test_p7_context_profiles lab.tests.test_p7_differential_campaign lab.tests.test_scenario_generator lab.tests.test_p7_service_profiles -v",
       "result": "passed",
-      "output_summary": "42 tests passed"
+      "output_summary": "42 tests passed in 3.187 seconds after the CI portability fix"
+    },
+    {
+      "name": "ci_cache_independent_regression_test",
+      "command": "wsl -d Ubuntu-24.04 --cd /mnt/e/stella/Ligamina -- env UV_PROJECT_ENVIRONMENT=/tmp/ligamina-p7-ci-fix-venv UV_OFFLINE=1 uv run --locked --project lab --python 3.12.14 python -m unittest lab.tests.test_p7_context_profiles.P7ContextProfileTests.test_diagnostic_selection_is_the_exact_profile_bound_subset -v",
+      "result": "passed",
+      "output_summary": "Ran 1 test in 0.221 seconds; OK. Test now uses a temporary artifact cache and mocked frozen records/hashes."
     },
     {
       "name": "full_lab_suite",
-      "command": "wsl -d Ubuntu-24.04 --cd /mnt/e/stella/Ligamina -- env UV_PROJECT_ENVIRONMENT=/tmp/ligamina-p7-context-diagnostic-venv UV_OFFLINE=1 uv run --locked --project lab --python 3.12.14 python -m unittest discover -s lab/tests -v",
+      "command": "wsl -d Ubuntu-24.04 --cd /mnt/e/stella/Ligamina -- env UV_PROJECT_ENVIRONMENT=/tmp/ligamina-p7-ci-fix-venv UV_OFFLINE=1 uv run --locked --project lab --python 3.12.14 python -m unittest discover -s lab/tests -v",
       "result": "passed",
-      "output_summary": "337 tests passed; 6 skipped; duration 270.819 seconds; compatibility matrix check ok (8961 entries, 539 sources)"
+      "output_summary": "337 tests passed; 6 skipped; duration 242.818 seconds; compatibility matrix check ok (8961 entries, 539 sources)"
     },
     {
       "name": "py_compile",
@@ -77,5 +83,13 @@
     "Unknown outcomes remain unknown.",
     "Synthetic profiles do not grant real-user privileges and do not establish live-platform compatibility.",
     "EventEnvelope schema was not extended; P7-09 full catalog campaign was not started."
-  ]
+  ],
+  "ci_follow_up": {
+    "previous_head": "f6ba4bd",
+    "workflow_run": 174,
+    "failure": "Linux checks failed in test_diagnostic_selection_is_the_exact_profile_bound_subset because the test resolved the external Ligamina artifact-cache directory, absent on a clean GitHub runner.",
+    "fix": "Make the test self-contained with temporary artifact/lock files and patched frozen records/hash lookup; no runtime behavior changed.",
+    "retest": "isolated regression 1/1 and targeted Lab suite 42/42 passed; full Lab suite 337 passed with 6 skipped.",
+    "new_head_ci": "pending after follow-up commit"
+  }
 }
