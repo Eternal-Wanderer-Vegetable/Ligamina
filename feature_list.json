@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "updated_at": "2026-11-12",
-  "active_feature": null,
+  "active_feature": "feat-062",
   "next_feature": null,
   "features": [
     {
@@ -2947,6 +2947,25 @@
         "outputs/acceptance/p7-p704-differential-pilot-20261111-feat061-source-context-rerun2.json.sha256",
         "outputs/acceptance/p7-p704-feat061-verification-20261112.json",
         "outputs/acceptance/p7-p704-feat061-verification-20261112.json.sha256",
+        "docs/plans/2026-11-09-phase-7-automated-verification.md"
+      ],
+      "plan_path": "docs/plans/2026-11-09-phase-7-automated-verification.md"
+    },
+    {
+      "id": "feat-062",
+      "task_id": "P7-04I",
+      "name": "剩余 nontrivial_unknown 命令源码可达性审计",
+      "description": "范围扩展原因：feat-061 将锁定 cohort 的 nontrivial 命令从 29 提升至 44/177，但 P7-09 仍差 10 条达到 54 条门槛。对同一 selection/report 中的 17 条 nontrivial_unknown 命令做只读 exact-artifact 源码审计，判断可验证的 synthetic stimulus/profile 候选及其隔离前提；不改插件、分母、descriptor、unknown 或行为报告。",
+      "dependencies": [
+        "feat-057",
+        "feat-061"
+      ],
+      "status": "in-progress",
+      "done_when": "17 条候选全部绑定到锁定 selection、pilot entry、artifact/member hashes 和精确命令 ID；源码前置条件及 stimulus 可达性有可复核证据；明确可安全实现候选数量与缺口原因；不改变任何 compatibility/unknown 结论；source audit JSON 及 sidecar 通过 validator。",
+      "evidence": "Started 2026-11-12. Current same-selection cohort has 44/177 nontrivial and needs at least 54, leaving 10; 17 commands remain nontrivial_unknown across six exact entries. This task audits source reachability only before considering any further profile or generator changes.",
+      "evidence_paths": [
+        "outputs/acceptance/p7-p704-differential-pilot-20261111-feat061-source-context-rerun2.json",
+        "outputs/acceptance/p7-p704-independent-pilot-selection-20261111.json",
         "docs/plans/2026-11-09-phase-7-automated-verification.md"
       ],
       "plan_path": "docs/plans/2026-11-09-phase-7-automated-verification.md"

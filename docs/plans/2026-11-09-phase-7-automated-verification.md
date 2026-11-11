@@ -231,6 +231,7 @@ Koishi 2,002 条 Linux skipped 主要因缺 Host 服务。为高频服务提供�
 | P7-04F / feat-059 | P7-04、P7-08、P7-04E | 为精确锁定 `nonebot_plugin_warframe_mode@1.1.0` API 调用增加 Worker 内 loopback fixture；host alias 只指向 `127.0.0.1`，Native×2/Federated 共用哈希绑定响应 | 确认 Docker `network=none` 未放宽；fixture/profile/artifact/source 哈希一致，日志不含请求词，清理全确认；新 30+30 pilot 重审准入门，未过门时 P7-09 保持 blocked |
 | P7-04G / feat-060 | P7-04F | 修复 NoneBot `send_group_forward_msg` 到现有 `send_message` 的有界转换；独立 Native recorder 以同一语义采集原生操作；Reference Gateway 发出标准 OneBot v11 群消息 node segments；Federated source-bound 观察保留 typed node | 四个 seam 红绿通过；target/account/trace、节点顺序、sender/content 保真；Native 不导入 Bridge；非法输入 fail-closed；精确 hash-bound 隔离诊断验证 Native/Federated 观察与 cleanup；bounded diagnostic 不改变 30+30 pilot 结论 |
 | P7-04H / feat-061 | P7-04G | 对源码证实的精确 Koishi `adminId`、NoneBot 私聊命令和 SUPERUSER 命令扩展合成上下文 profile；profile 与 artifact/command/source hashes 绑定，Native/Federated 共用 synthetic actor/config | **2026-11-12 完成。** 五条目有界诊断和相同锁定 30+30 selection 复核完成；分母、unknown 与四门定义不变，P7-09 因 nontrivial 未达标继续 blocked |
+| P7-04I / feat-062 | P7-04H、P7-04D | 对最新 cohort 中 17 条 `nontrivial_unknown` 命令做只读 exact-artifact 源码与刺激可达性审计 | 每条绑定 selection/report/entry/artifact/member hash 与 command ID；归纳源码前置条件和现有 generator 能力，分类安全可达候选及所缺 profile/fixture；不改插件、descriptor、分母或 unknown；产出带 sidecar 的审核报告 |
 | P7-05 / feat-050 | P7-04 | 契约检查 C1–C8 接入执行器 | 每项检查在合成插件上有正例与反例；pilot 条目全部给出 C1–C8 结论 |
 | P7-06 / feat-051 | P7-04、P7-05 | 框架变异体、合成插件、检出率报告 | 每个变异体至少被一层检出，或存活原因已写明；分层检出率进入报告；PR 上运行一组小变异体回归 |
 | P7-07 / feat-052 | P7-04 | 有状态序列生成、依赖推断、以原生为前提的变形关系 | 合成组队/计数器插件的序列缺陷被检出；pilot 中适用关系的条目给出结论，不适用的记录原因 |
@@ -251,6 +252,8 @@ P7-03、P7-08 与 P7-04 可并行。P7-04 与 P7-06 是两个决策点，见第 
 同一 hash-ranked selection `outputs/acceptance/p7-p704-independent-pilot-selection-20261111.json`（SHA-256 `3076c70a5e692392b993abb8754d84f0b06787a4781a4dfca68c7aad727f86c4`）的 30+30 完整复核为 `outputs/acceptance/p7-p704-differential-pilot-20261111-feat061-source-context-rerun2.json`（SHA-256 `5979f6f5cde9985c29ba309e30359dd7b56984afaef05e79114d9ec5ec64dbe9`）：60 条目均有终态（56 completed、4 discovery skips），1,904 scenarios，177/177 commands exercised，44 nontrivial（24.9%）、133 equivalent、22 non-equivalent、2 nondeterministic、20 unknown（11.3%），32/32 behavior entries 三轮一致，348/348 Worker cleanup confirmed。unknown、consistency、cleanup 门通过；nontrivial 门需要至少 54/177，本次 44/177，仍差 10 条，因此 P7-09 / feat-054 不准入。未提升 unknown、未改分母、未启动全量 campaign。
 
 首轮应用新 profile 后的全 cohort rerun 将 22 个原本完成的 NoneBot entries 因 expected environment fingerprint 缺少显式 `test_context_profile_sha256: null` 而错误地标记为 discovery skips；该失败报告 `outputs/acceptance/p7-p704-differential-pilot-20261111-feat061-source-context.json` 保留不覆盖。新增回归测试先失败，随后修复 expected fingerprint guard；修复后的同一锁定选择恢复为原有 4 个 discovery skips。复现命令、输出摘要、回归测试与完整 Lab log hash 见 [feat-061 verification record](../../outputs/acceptance/p7-p704-feat061-verification-20261112.json)。第三方发布物、EventEnvelope schema、Core operation 名、禁网边界和全量分母均未改变。
+
+**P7-04I / feat-062 范围记录（2026-11-12）：** feat-061 将 nontrivial 数从 29 提到 44，但 P7-09 的 30% 门槛在 177 条分母下至少需要 54 条；仍有 17 条 `nontrivial_unknown` 分布于 6 个锁定 artifact。当前先检查原始发行包中命令 handler 的前置条件与既有 generator stimulus，确定是否有源证据支持的隔离上下文候选，再决定是否启动后续实现。此任务只做读取和哈希绑定的分析；不据源码声明把 unknown 直接变为 nontrivial，不扩展目录分母，不改第三方包或外网边界。
 
 ## 5. 决策点
 
@@ -279,7 +282,7 @@ P7-03、P7-08 与 P7-04 可并行。P7-04 与 P7-06 是两个决策点，见第 
 - **Oracle 边界**：差分只证明与原生一致。依赖网络的插件在禁网下只会走错误路径，结论 scope 必须写“仅错误路径”。依赖 LLM provider 的 AstrBot 插件同理。
 - **原生基线自身的偏差**：stock runner 与真实部署存在配置差异；原生侧异常要单独标记，不能混入兼容结论。
 - **规模成本**：每条目 3 次 Worker 运行，全量时长只能在 P7-04 后估算；预算超出时先按生态分批。
-- **任务顺序**：P6-01 / feat-030 于 2026-11-10 完成；P7-01 至 P7-08 和 feat-056–061 已完成。最新 feat-061 same-selection 30+30 cohort 为 44/177 nontrivial (24.9%)、20/177 unknown (11.3%)、32/32 三轮一致且 348/348 Worker 清理确认；只有 nontrivial 准入门未通过，尚差 10 个 nontrivial 命令。下一步先对余下 `nontrivial_unknown` 候选做只读源码/刺激可达性审计，形成有证据的范围与准入判断；不得为过门扩大分母、放开外网或提升 unknown 结论。P7-09 / feat-054 与 P7-10 / feat-055 仍 blocked，当前 `active_feature=null`。nontrivial 未达门槛前，不启动全量 campaign 或矩阵 v2；隔离 fixture 结果不解释为真实 API 或平台兼容性。
+- **任务顺序**：P6-01 / feat-030 于 2026-11-10 完成；P7-01 至 P7-08 和 feat-056–061 已完成，P7-04I / feat-062 正在对 17 条 `nontrivial_unknown` 做只读源码/刺激可达性审计。最新同 selection cohort 为 44/177 nontrivial (24.9%)、20/177 unknown (11.3%)、32/32 三轮一致且 348/348 Worker 清理确认；只有 nontrivial 准入门未通过，尚差 10 条。审计证据完成前不得再加 profile、扩大分母、放开外网或提升 unknown 结论。P7-09 / feat-054 与 P7-10 / feat-055 仍 blocked，当前 `active_feature=feat-062`。nontrivial 未达门槛前，不启动全量 campaign 或矩阵 v2；隔离 fixture 结果不解释为真实 API 或平台兼容性。
 
 ## 8. 验证命令（规划阶段）
 
