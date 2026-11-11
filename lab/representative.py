@@ -771,6 +771,31 @@ def _run_tool_steps(url: str, token: str, host_id: str, steps: list[list[dict[st
     }
 
 
+def _copy_nonebot_context_settings(source: dict[str, str], target: dict[str, str]) -> None:
+    raw = source.get("SUPERUSERS")
+    if raw is None:
+        return
+    try:
+        identifiers = json.loads(raw)
+    except json.JSONDecodeError as error:
+        raise ValueError("P7 SUPERUSERS must be a JSON list of synthetic numeric IDs") from error
+    if (
+        not isinstance(identifiers, list)
+        or not identifiers
+        or any(
+            not isinstance(identifier, str)
+            or not identifier.isascii()
+            or not identifier.isdecimal()
+            or identifier.startswith("0")
+            or len(identifier) > 10
+            for identifier in identifiers
+        )
+        or len(identifiers) != len(set(identifiers))
+    ):
+        raise ValueError("P7 SUPERUSERS must be a JSON list of synthetic numeric IDs")
+    target["SUPERUSERS"] = json.dumps(identifiers, separators=(",", ":"))
+
+
 def run_federated(
     sample: dict[str, Any], work: Path, host_environment: dict[str, str], events: list[dict[str, Any]],
     *, profile_work: Path | None = None,
@@ -824,6 +849,8 @@ def run_federated(
     for key in ("GUESS_NAME", "GUESS_LIMIT", "GUESS_NAME_LIST"):
         if key in host_environment:
             host_env[key] = host_environment[key]
+    if sample["ecosystem"] == "nonebot":
+        _copy_nonebot_context_settings(host_environment, host_env)
     for key in ("TZ", "PYTHONHASHSEED", "LIGAMINA_BEHAVIOR_RANDOM_SEED", "LIGAMINA_BEHAVIOR_FIXED_TIME_UTC"):
         if key in host_environment:
             host_env[key] = host_environment[key]

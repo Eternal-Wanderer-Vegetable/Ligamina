@@ -24,6 +24,25 @@ def _canonical_hash(value: Any) -> str:
     return hashlib.sha256(encoded).hexdigest()
 
 
+def _test_context_profile_sha256(context: dict[str, Any]) -> str | None:
+    profile = context.get("test_context_profile")
+    if profile is None:
+        return None
+    if not isinstance(profile, dict):
+        raise ValueError("P7 test context profile must be an object")
+    if (
+        profile.get("execution_scope") != "linux_worker_only_network_disabled"
+        or profile.get("authority_scope") != "synthetic_test_actor_only"
+        or profile.get("event_envelope_role_claims") is not False
+    ):
+        raise ValueError("P7 test context profile exceeds its synthetic offline Worker scope")
+    payload = {key: value for key, value in profile.items() if key != "profile_sha256"}
+    digest = profile.get("profile_sha256")
+    if not isinstance(digest, str) or _canonical_hash(payload) != digest:
+        raise ValueError("P7 test context profile hash mismatch")
+    return digest
+
+
 def _message_segments(message: Any) -> list[dict[str, Any]]:
     if isinstance(message, str):
         return [{"type": "text", "text": message}]
@@ -58,7 +77,7 @@ def _onebot_message(event: dict[str, Any]) -> list[dict[str, Any]]:
     return segments or [{"type": "text", "data": {"text": ""}}]
 
 
-def _fingerprints(context: dict[str, Any], stimulus: dict[str, Any]) -> dict[str, str]:
+def _fingerprints(context: dict[str, Any], stimulus: dict[str, Any]) -> dict[str, Any]:
     paths = context["fingerprint_paths"]
     sample = context["sample"]
     lockfile = Path(paths["lockfile"])
@@ -76,6 +95,7 @@ def _fingerprints(context: dict[str, Any], stimulus: dict[str, Any]) -> dict[str
         "artifact_hash": artifact_hash,
         "config_sha256": _canonical_hash(context["config"]),
         "stimulus_sha256": _canonical_hash(stimulus),
+        "test_context_profile_sha256": _test_context_profile_sha256(context),
     }
 
 
@@ -183,12 +203,23 @@ async def _run(request: dict[str, Any]) -> dict[str, Any]:
         if not key.startswith("LIGAMINA_SAMPLE_") or not isinstance(value, str):
             raise ValueError(f"invalid sample environment key: {key!r}")
         os.environ[key] = value
+    nonebot_config = context.get("config", {}).get("nonebot_config", {})
+    if not isinstance(nonebot_config, dict):
+        raise ValueError("P7 NoneBot config must be an object")
+    context_profile = context.get("test_context_profile")
+    if context_profile is not None:
+        _test_context_profile_sha256(context)
+        expected_superusers = [context_profile["synthetic_superuser_id"]]
+        if nonebot_config != {"superusers": expected_superusers}:
+            raise ValueError("P7 Native NoneBot config differs from the bound synthetic superuser profile")
+        expected_host_value = json.dumps(expected_superusers, separators=(",", ":"))
+        if context.get("host_environment", {}).get("SUPERUSERS") != expected_host_value:
+            raise ValueError("P7 Native and Federated superuser settings do not match")
     if behavior_fixture:
         if behavior_fixture.get("adapter", {}).get("id") != "nonebot.onebot.v11":
             raise ValueError("v2 fixture adapter does not match the stock NoneBot runner")
         config = behavior_fixture["setup"].get("plugin_config", {})
         package = sample.get("package")
-        nonebot_config: dict[str, Any] = {}
         if package == "nonebot_plugin_help":
             if (
                 set(config) != {"help_at_sender", "help_ignore_plugins"}
@@ -196,7 +227,7 @@ async def _run(request: dict[str, Any]) -> dict[str, Any]:
                 or config["help_ignore_plugins"] != ["phase4_random_seed", "phase4_probe_observer"]
             ):
                 raise ValueError("v2 NoneBot Help config is outside the reviewed allowlist")
-            nonebot_config = config
+            nonebot_config.update(config)
             (work / ".env.prod").write_text(
                 "\n".join(f"{key}={json.dumps(value, ensure_ascii=False, separators=(',', ':'))}" for key, value in sorted(config.items())) + "\n",
                 encoding="utf-8",
@@ -220,7 +251,7 @@ async def _run(request: dict[str, Any]) -> dict[str, Any]:
 
     if nonebot.__version__ != context["expected_environment"]["framework_version"]:
         raise RuntimeError(f"NoneBot version mismatch: {nonebot.__version__}")
-    nonebot.init(driver="~fastapi", nickname={"Bot"}, **(nonebot_config if behavior_fixture and sample.get("package") == "nonebot_plugin_help" else {}))
+    nonebot.init(driver="~fastapi", nickname={"Bot"}, **nonebot_config)
     driver = nonebot.get_driver()
     driver.register_adapter(Adapter)
     adapter = driver._adapters[Adapter.get_name()]

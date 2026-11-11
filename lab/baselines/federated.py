@@ -31,6 +31,32 @@ def _artifact_hash(path: Path, algorithm: str) -> str:
     raise ValueError(f"unsupported artifact digest algorithm: {algorithm}")
 
 
+def _test_context_profile_sha256(context: dict[str, Any]) -> str | None:
+    profile = context.get("test_context_profile")
+    if profile is None:
+        return None
+    if not isinstance(profile, dict):
+        raise ValueError("P7 test context profile must be an object")
+    if (
+        profile.get("execution_scope") != "linux_worker_only_network_disabled"
+        or profile.get("authority_scope") != "synthetic_test_actor_only"
+        or profile.get("event_envelope_role_claims") is not False
+    ):
+        raise ValueError("P7 test context profile exceeds its synthetic offline Worker scope")
+    payload = {key: value for key, value in profile.items() if key != "profile_sha256"}
+    claimed = profile.get("profile_sha256")
+    observed = hashlib.sha256(_canonical(payload)).hexdigest()
+    if not isinstance(claimed, str) or claimed != observed:
+        raise ValueError("P7 test context profile hash mismatch")
+    expected_superusers = [profile["synthetic_superuser_id"]]
+    expected_host_value = json.dumps(expected_superusers, separators=(",", ":"))
+    if context.get("host_environment", {}).get("SUPERUSERS") != expected_host_value:
+        raise ValueError("P7 Federated Host superuser setting differs from the bound profile")
+    if context.get("config", {}).get("nonebot_config") != {"superusers": expected_superusers}:
+        raise ValueError("P7 Native and Federated superuser settings do not match")
+    return claimed
+
+
 def _environment(context: dict[str, Any], request: dict[str, Any]) -> dict[str, Any]:
     paths = context["fingerprint_paths"]
     sample = context["sample"]
@@ -62,6 +88,9 @@ def _environment(context: dict[str, Any], request: dict[str, Any]) -> dict[str, 
         "config_sha256": hashlib.sha256(_canonical(context["config"])).hexdigest(),
         "stimulus_sha256": hashlib.sha256(_canonical(request["stimulus"])).hexdigest(),
     }
+    test_context_profile_sha256 = _test_context_profile_sha256(context)
+    if sample["ecosystem"] == "nonebot" or test_context_profile_sha256 is not None:
+        fingerprints["test_context_profile_sha256"] = test_context_profile_sha256
     if fingerprints != context["expected_environment"]:
         raise RuntimeError(f"federated fingerprint mismatch: expected {context['expected_environment']}, observed {fingerprints}")
     return fingerprints

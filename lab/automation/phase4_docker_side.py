@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
 import sys
 from pathlib import Path
@@ -13,6 +14,56 @@ if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
 from lab.workers import DockerWorker, WorkerLimits, WorkerSpec
+from lab.automation.p7_context_profiles import profile_manifest_sha256
+
+
+def _worker_host_environment(context: dict[str, Any]) -> dict[str, str]:
+    environment = {
+        "PATH": "/usr/local/bin:/usr/bin:/bin",
+        "LIGAMINA_CORE_EXECUTABLE": "/usr/local/bin/ligamina-cli",
+        "LIGAMINA_NODE_EXECUTABLE": "/usr/local/bin/node",
+        "LIGAMINA_PYTHON_EXECUTABLE": "/usr/local/bin/python",
+        "LIGAMINA_PROFILE_SITE_PACKAGES": "/work/profile/site-packages",
+        "PYTHONPATH": "/input/project/hosts/nonebot:/work/profile/site-packages",
+    }
+    supplied = context.get("host_environment", {})
+    profile = context.get("test_context_profile")
+    if not isinstance(supplied, dict):
+        raise ValueError("P7 Worker host environment must be an object")
+    if profile is None:
+        if "SUPERUSERS" in supplied:
+            raise ValueError("P7 SUPERUSERS requires a hash-bound synthetic context profile")
+        return environment
+    if not isinstance(profile, dict):
+        raise ValueError("P7 test context profile must be an object")
+    payload = {key: value for key, value in profile.items() if key != "profile_sha256"}
+    claimed = profile.get("profile_sha256")
+    observed = hashlib.sha256(
+        json.dumps(payload, ensure_ascii=False, sort_keys=True, separators=(",", ":")).encode("utf-8")
+    ).hexdigest()
+    if (
+        not isinstance(claimed, str)
+        or claimed != observed
+        or profile.get("manifest_sha256") != profile_manifest_sha256()
+        or profile.get("execution_scope") != "linux_worker_only_network_disabled"
+        or profile.get("authority_scope") != "synthetic_test_actor_only"
+        or profile.get("event_envelope_role_claims") is not False
+    ):
+        raise ValueError("P7 Worker context profile hash or scope is invalid")
+    sample = context.get("sample", {})
+    if (
+        profile.get("registry_entry_id") != str(sample.get("sample_id", "")).removeprefix("p7-")
+        or profile.get("package") != sample.get("package")
+        or profile.get("version") != sample.get("version")
+        or profile.get("artifact_sha256") != sample.get("_artifact_hash")
+    ):
+        raise ValueError("P7 Worker context profile does not match the installed sample artifact")
+    superusers = [profile["synthetic_superuser_id"]]
+    expected = {"SUPERUSERS": json.dumps(superusers, separators=(",", ":"))}
+    if supplied != expected or context.get("config", {}).get("nonebot_config") != {"superusers": superusers}:
+        raise ValueError("P7 Native and Federated superuser settings do not match")
+    environment.update(expected)
+    return environment
 
 
 def _docker_side(request: dict[str, Any], options: argparse.Namespace) -> dict[str, Any]:
@@ -41,14 +92,7 @@ def _docker_side(request: dict[str, Any], options: argparse.Namespace) -> dict[s
             else "samples/profiles/koishi-group-v0.1.json"
         )),
     }
-    context["host_environment"] = {
-        "PATH": "/usr/local/bin:/usr/bin:/bin",
-        "LIGAMINA_CORE_EXECUTABLE": "/usr/local/bin/ligamina-cli",
-        "LIGAMINA_NODE_EXECUTABLE": "/usr/local/bin/node",
-        "LIGAMINA_PYTHON_EXECUTABLE": "/usr/local/bin/python",
-        "LIGAMINA_PROFILE_SITE_PACKAGES": "/work/profile/site-packages",
-        "PYTHONPATH": "/input/project/hosts/nonebot:/work/profile/site-packages",
-    }
+    context["host_environment"] = _worker_host_environment(context)
     request["context"] = context
     encoded = json.dumps(request, ensure_ascii=False, separators=(",", ":"))
     worker = DockerWorker(image_digest=options.image, repository_root=ROOT)

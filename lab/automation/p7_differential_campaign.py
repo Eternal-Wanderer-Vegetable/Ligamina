@@ -32,6 +32,7 @@ from lab.automation import phase4_campaign
 from lab.automation.behavior_v2 import ARTIFACT_CACHE, CATALOG_ROOT, _canonical
 from lab.automation.phase4_docker_side import _docker_side
 from lab.automation.p7_contracts import CONTRACT_IDS, _pilot_entry_contracts
+from lab.automation.p7_context_profiles import profile_binding, profile_manifest_sha256, validate_profile_document
 from lab.capability_inventory import SCANNER_VERSION
 from lab.pilot_nonebot import _prepare_wheelhouse
 from lab.pilot_workers import _load_npm_lock, _prepare_npm_project
@@ -107,7 +108,12 @@ def _frozen_records() -> tuple[dict[str, dict[str, Any]], dict[str, dict[str, An
     )
 
 
-def select_candidates(selection: dict[str, Any], *, limit_per_ecosystem: int | None = None) -> list[dict[str, Any]]:
+def select_candidates(
+    selection: dict[str, Any],
+    *,
+    limit_per_ecosystem: int | None = None,
+    allow_profile_subset: bool = False,
+) -> list[dict[str, Any]]:
     """Validate the 30-per-ecosystem static selection against load and lock evidence."""
     if selection.get("kind") != "p7_p701_static_inventory_sample":
         raise ValueError("selection is not a source-bound P7-01 inventory sample")
@@ -176,6 +182,18 @@ def select_candidates(selection: dict[str, Any], *, limit_per_ecosystem: int | N
         })
     candidates.sort(key=lambda item: (item["ecosystem"], item["registry_entry_id"]))
     counts = {eco: sum(item["ecosystem"] == eco for item in candidates) for eco in ECOSYSTEMS}
+    if allow_profile_subset:
+        expected_ids = {row["registry_entry_id"] for row in validate_profile_document()["profiles"]}
+        diagnostic_scope = selection.get("diagnostic_scope", {})
+        if (
+            limit_per_ecosystem is not None
+            or diagnostic_scope.get("kind") != "p7_nonebot_context_profile"
+            or diagnostic_scope.get("profile_manifest_sha256") != profile_manifest_sha256()
+            or counts != {"koishi": 0, "nonebot": len(expected_ids)}
+            or {item["registry_entry_id"] for item in candidates} != expected_ids
+        ):
+            raise ValueError("profile-subset selection must exactly match the hash-bound P7 NoneBot context artifacts")
+        return candidates
     requested = limit_per_ecosystem or 30
     if any(count < requested for count in counts.values()):
         raise ValueError(f"P7 pilot selection is below the requested per-ecosystem count: {counts}")
@@ -349,6 +367,17 @@ def _build_context(
 ) -> dict[str, Any]:
     ecosystem = candidate["ecosystem"]
     sample = _native_sample(candidate)
+    test_context_profile = profile_binding(candidate)
+    nonebot_config = (
+        {"superusers": [test_context_profile["synthetic_superuser_id"]]}
+        if test_context_profile is not None
+        else {}
+    )
+    host_environment = (
+        {"SUPERUSERS": json.dumps(nonebot_config["superusers"], separators=(",", ":"))}
+        if nonebot_config
+        else {}
+    )
     config = {
         "ecosystem": ecosystem,
         "package": candidate["package"],
@@ -356,10 +385,12 @@ def _build_context(
         "entry": sample["_entry"],
         "preload_plugins": [],
         "host_profile": phase4_campaign.HOST_VERSIONS[ecosystem],
-        "nonebot_config": {},
+        "nonebot_config": nonebot_config,
         "plugin_config": {},
         "environment": {},
     }
+    if test_context_profile is not None:
+        config["test_context_profile_sha256"] = test_context_profile["profile_sha256"]
     profile = "nonebot-group-v0.1.json" if ecosystem == "nonebot" else "koishi-group-v0.1.json"
     profile_document = candidate.get("profile_document_path")
     profile_document_name = Path(profile_document).name if profile_document else profile
@@ -376,6 +407,10 @@ def _build_context(
         "config_sha256": _sha256_bytes(_canonical(config)),
         "stimulus_sha256": _sha256_bytes(_canonical(stimulus)),
     }
+    if ecosystem == "nonebot":
+        expected["test_context_profile_sha256"] = (
+            test_context_profile["profile_sha256"] if test_context_profile else None
+        )
     context: dict[str, Any] = {
         "repo_root": "/input/project",
         "work_dir": "/work/profile",
@@ -385,7 +420,8 @@ def _build_context(
         "fixture": {"plugin_config": {}},
         "config": config,
         "sample_environment": {},
-        "host_environment": {},
+        "host_environment": host_environment,
+        "test_context_profile": test_context_profile,
         "koishi_entry_url": "",
         "expected_environment": expected,
         "fingerprint_paths": {
@@ -411,7 +447,9 @@ def _build_context(
     return context
 
 
-def _event_from_scenario(scenario: dict[str, Any], *, ecosystem: str) -> dict[str, Any]:
+def _event_from_scenario(
+    scenario: dict[str, Any], *, ecosystem: str, context_profile: dict[str, Any] | None = None,
+) -> dict[str, Any]:
     step = scenario["steps"][0]
     if step["kind"] == "event":
         event = copy.deepcopy(step["event"])
@@ -457,6 +495,23 @@ def _event_from_scenario(scenario: dict[str, Any], *, ecosystem: str) -> dict[st
         event["extensions"] = extensions
         event["platform"] = "onebot.v11"
         event["conversation"] = conversation
+        if context_profile is not None:
+            if ecosystem != "nonebot":
+                raise ValueError("P7 NoneBot context profiles cannot be applied to another ecosystem")
+            actor_id = context_profile["actor_id"]
+            bot_account_id = context_profile["bot_account_id"]
+            event["actor_id"] = actor_id
+            event["account_id"] = bot_account_id
+            if context_profile["conversation_kind"] == "private":
+                event["conversation"] = {"kind": "private", "id": actor_id}
+            elif context_profile["conversation_kind"] != "group":
+                raise ValueError("P7 NoneBot context profile has an unsupported conversation kind")
+            if context_profile["mention_bot"]:
+                event["message"] = [
+                    {"type": "mention", "user_id": bot_account_id},
+                    {"type": "text", "text": " "},
+                    *event["message"],
+                ]
     else:
         extensions = event.get("extensions") if isinstance(event.get("extensions"), dict) else {}
         onebot = extensions.get("onebot.v11") if isinstance(extensions.get("onebot.v11"), dict) else {}
@@ -476,6 +531,7 @@ def build_scenario_batch(candidate: dict[str, Any], runtime_commands: list[dict[
     validator = Draft202012Validator(schema)
     events: list[dict[str, Any]] = []
     scenarios: list[dict[str, Any]] = []
+    test_context_profile = profile_binding(candidate)
     command_descriptors = []
     invalid_descriptors = 0
     for descriptor in runtime_commands:
@@ -491,16 +547,26 @@ def build_scenario_batch(candidate: dict[str, Any], runtime_commands: list[dict[
         "commands": command_descriptors,
     })
     for descriptor in command_descriptors:
+        command_profile = (
+            test_context_profile["command_contexts"].get(descriptor["command_id"])
+            if test_context_profile is not None
+            else None
+        )
+        conversation_kind = command_profile["conversation_kind"] if command_profile else "group"
         batch = generate_scenarios(
             inventory_sha256=inventory_sha,
             descriptor=descriptor,
             host_id=candidate["ecosystem"],
             seed=seed,
-            conversation_kind="group",
+            conversation_kind=conversation_kind,
             max_scenarios=16,
         )
         for scenario in batch.scenarios:
-            event = _event_from_scenario(scenario, ecosystem=candidate["ecosystem"])
+            event = _event_from_scenario(
+                scenario,
+                ecosystem=candidate["ecosystem"],
+                context_profile=command_profile,
+            )
             events.append(event)
             scenario_step = scenario["steps"][0]
             raw = scenario_step.get("arguments", "")
@@ -516,6 +582,14 @@ def build_scenario_batch(candidate: dict[str, Any], runtime_commands: list[dict[
                 "batch_sha256": object_sha256(batch.to_dict()),
                 "pairwise": batch.pairwise,
             })
+            if command_profile and test_context_profile:
+                scenarios[-1].update({
+                    "context_profile_id": test_context_profile["profile_id"],
+                    "test_context_profile_sha256": test_context_profile["profile_sha256"],
+                    "profile_conversation_kind": command_profile["conversation_kind"],
+                    "profile_mention_bot": command_profile["mention_bot"],
+                    "profile_authorization": command_profile["authorization"],
+                })
     if len({event["event_id"] for event in events}) != len(events):
         raise ValueError("generated P7 pilot scenarios contain duplicate event IDs")
     return events, {
@@ -523,8 +597,11 @@ def build_scenario_batch(candidate: dict[str, Any], runtime_commands: list[dict[
         "generator_version": GENERATOR_VERSION,
         "seed": seed,
         "conversation_kind": "group",
+        "conversation_kinds": sorted({event["conversation"]["kind"] for event in events}),
         "commands_valid": len(command_descriptors),
         "commands_invalid": invalid_descriptors,
+        "profiled_commands": len({row["command_id"] for row in scenarios if row.get("test_context_profile_sha256")}),
+        "test_context_profile_sha256": test_context_profile["profile_sha256"] if test_context_profile else None,
         "scenarios": scenarios,
         "scenario_count": len(scenarios),
     }
@@ -886,6 +963,7 @@ def run_campaign(
     bundle_root: Path,
     output_path: Path,
     limit_per_ecosystem: int | None = None,
+    allow_profile_subset: bool = False,
     rounds: int = ROUNDS,
     workers: int = 3,
 ) -> dict[str, Any]:
@@ -923,7 +1001,11 @@ def run_campaign(
     ):
         raise RuntimeError("Linux Worker backend does not have a current admitted report")
     selection = _read(selection_path)
-    candidates = select_candidates(selection, limit_per_ecosystem=limit_per_ecosystem)
+    candidates = select_candidates(
+        selection,
+        limit_per_ecosystem=limit_per_ecosystem,
+        allow_profile_subset=allow_profile_subset,
+    )
     bundle_root.mkdir(parents=True)
     campaign_id = f"p7-p704-{int(time.time())}"
     report: dict[str, Any] = {
@@ -947,8 +1029,10 @@ def run_campaign(
             "timezone": "UTC",
             "node_clock_fixed_time_utc": DEFAULT_FIXED_TIME,
             "node_determinism_preload_sha256": _sha256_file(ROOT / "lab/baselines/seed_node_random.cjs"),
+            "test_context_profile_manifest_sha256": profile_manifest_sha256(),
             "network": "disabled",
             "limit_per_ecosystem": limit_per_ecosystem,
+            "selection_scope": "p7_nonebot_context_profile_subset" if allow_profile_subset else "hash_ranked_30_per_ecosystem",
         },
         "admission_path": str(admission_path),
         "admission_sha256": _sha256_file(admission_path),
@@ -1019,6 +1103,7 @@ def run_campaign(
         events, generation = build_scenario_batch(candidate, descriptors, seed=FIXED_SEED)
         stimulus = {"events": events}
         scenario_meta = generation["scenarios"]
+        test_context_profile = profile_binding(candidate)
         entry_result: dict[str, Any] = {
             "registry_entry_id": entry_id,
             "ecosystem": candidate["ecosystem"],
@@ -1033,8 +1118,35 @@ def run_campaign(
             "scenario_generation": {
                 key: value for key, value in generation.items() if key != "scenarios"
             },
+            "test_context_profile": (
+                {
+                    "profile_id": test_context_profile["profile_id"],
+                    "profile_sha256": test_context_profile["profile_sha256"],
+                    "manifest_sha256": test_context_profile["manifest_sha256"],
+                    "matched_command_count": len(test_context_profile["command_contexts"]),
+                    "superuser_command_count": sum(
+                        context["authorization"] == "superuser"
+                        for context in test_context_profile["command_contexts"].values()
+                    ),
+                }
+                if test_context_profile is not None
+                else None
+            ),
             "scenarios": [
-                {key: item[key] for key in ("scenario_id", "command_id", "kind", "descriptor_sha256", "input_sha256", "arguments_bytes", "arguments_nonempty", "pairwise")}
+                {
+                    **{key: item[key] for key in ("scenario_id", "command_id", "kind", "descriptor_sha256", "input_sha256", "arguments_bytes", "arguments_nonempty", "pairwise")},
+                    **{
+                        key: item[key]
+                        for key in (
+                            "context_profile_id",
+                            "test_context_profile_sha256",
+                            "profile_conversation_kind",
+                            "profile_mention_bot",
+                            "profile_authorization",
+                        )
+                        if key in item
+                    },
+                }
                 for item in scenario_meta
             ],
             "rounds": [],
@@ -1259,6 +1371,7 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--bundle-root", required=True, type=Path)
     parser.add_argument("--output", required=True, type=Path)
     parser.add_argument("--limit-per-ecosystem", type=int)
+    parser.add_argument("--allow-profile-subset", action="store_true")
     parser.add_argument("--rounds", type=int, default=ROUNDS)
     parser.add_argument("--workers", type=int, default=3)
     options = parser.parse_args(argv)
@@ -1271,6 +1384,7 @@ def main(argv: list[str] | None = None) -> int:
             bundle_root=options.bundle_root,
             output_path=options.output,
             limit_per_ecosystem=options.limit_per_ecosystem,
+            allow_profile_subset=options.allow_profile_subset,
             rounds=options.rounds,
             workers=options.workers,
         )
