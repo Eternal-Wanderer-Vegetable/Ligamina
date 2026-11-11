@@ -1,0 +1,70 @@
+{
+  "kind": "p7_p704_source_audit_verification",
+  "schema_version": 1,
+  "verified_at": "2026-11-12",
+  "checkpoint_parent": "44a684b",
+  "feature": "feat-062",
+  "result": "passed",
+  "audit_report": {
+    "path": "outputs/acceptance/p7-p704-nontrivial-unknown-source-audit-20261112.json",
+    "sha256": "a8fec01829e38aed48c77180f8cbdfb61ec30e534e900818f818bf3f896d378a",
+    "sidecar_check": "passed",
+    "entries": 6,
+    "commands": 17,
+    "worker_dispatches": 0,
+    "external_network_requests": 0,
+    "plugin_archive_mutations": 0
+  },
+  "source_facts": {
+    "path": "outputs/acceptance/p7-p704-nontrivial-unknown-source-facts-20261112.json",
+    "sha256": "f3c4f0e0bf84ee34f2b9f413cec783ebab16a4a4f9c6514f6310ec58ba3e1902"
+  },
+  "tdd": {
+    "red_observations": [
+      "The new audit-test import failed before the audit module existed.",
+      "The first collector behavior test failed because candidate order did not preserve the locked report order.",
+      "The archive-source test failed before exact member hash and line-range validation existed."
+    ],
+    "green_command": "wsl bash -lc 'cd /mnt/e/stella/Ligamina && UV_PROJECT_ENVIRONMENT=/tmp/ligamina-p7-diagnostic-venv UV_OFFLINE=1 uv run --locked --project lab --python 3.12.14 python -m unittest lab.tests.test_native_runner lab.tests.test_p7_nontrivial_unknown_source_audit -v'",
+    "green_result": "11 tests passed, including the Native OneBot API recorder forward-node callback and fail-closed malformed input tests."
+  },
+  "checks": [
+    {
+      "command": "uv run --locked --project lab --python 3.12.14 python -m lab.automation.p7_nontrivial_unknown_source_audit --check",
+      "result": "passed",
+      "output": "checked 6 entries / 17 commands; same-selection nontrivial gap 10; report SHA-256 a8fec01829e38aed48c77180f8cbdfb61ec30e534e900818f818bf3f896d378a"
+    },
+    {
+      "command": "cd outputs/acceptance && sha256sum -c p7-p704-nontrivial-unknown-source-audit-20261112.json.sha256",
+      "result": "passed",
+      "output": "p7-p704-nontrivial-unknown-source-audit-20261112.json: OK"
+    },
+    {
+      "command": "pwsh -NoProfile -File init.ps1 -Mode docs",
+      "result": "passed",
+      "output": "29 documents / 742 local links / 16 indexed historical Markdown / 62 features; failures=[]"
+    },
+    {
+      "command": "git diff --check",
+      "result": "passed",
+      "output": "exit 0; Git reported CRLF-to-LF normalization warnings for edited Markdown/JSON files"
+    },
+    {
+      "command": "python -m json.tool on feature_list.json, source facts JSON and audit report JSON; python -m compileall on the audit module and tests",
+      "result": "passed",
+      "output": "all JSON parsed and both Python files compiled"
+    }
+  ],
+  "p7_09_gate": {
+    "nontrivial": 44,
+    "commands": 177,
+    "required_nontrivial": 54,
+    "gap": 10,
+    "status": "blocked"
+  },
+  "scope_changes": {
+    "unknown_reclassified": false,
+    "denominator_changed": false,
+    "full_campaign_started": false
+  }
+}

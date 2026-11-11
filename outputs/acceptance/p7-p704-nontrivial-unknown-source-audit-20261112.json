@@ -1,0 +1,1193 @@
+{
+  "audit_scope": "read_only_exact_artifact_source_reachability",
+  "audit_summary": {
+    "candidate_classifications": {
+      "credential_mutation_requires_isolated_api_fixture": 1,
+      "external_authentication_and_credential_mutation": 1,
+      "external_search_and_config_mutation": 1,
+      "input_independent_external_and_random_behavior": 1,
+      "input_independent_external_output": 2,
+      "input_independent_secret_nondeterminism": 1,
+      "input_independent_time_and_secret_nondeterminism": 1,
+      "input_independent_with_current_empty_config": 1,
+      "input_independent_with_entry_execution_failure": 1,
+      "input_independent_without_api_fixture": 1,
+      "input_sensitive_candidate_after_superuser_profile_and_isolated_config": 1,
+      "input_sensitive_candidate_requires_prompt_free_stimulus": 1,
+      "input_sensitive_with_new_http_fixture": 3,
+      "requires_new_platform_and_network_fixture": 1
+    },
+    "commands": 17,
+    "entries": 6,
+    "offline_input_sensitive_candidates": 0
+  },
+  "cohort_gate": {
+    "gap": 10,
+    "p7_09_remains_blocked": true,
+    "reported_commands": 177,
+    "reported_nontrivial": 44,
+    "required_commands": 54,
+    "required_nontrivial_percent": 30
+  },
+  "entries": [
+    {
+      "artifact_sha256": "702f50402f9f850a61b6b130fec9d65a7a698dbbbca04e53d93d695f97b5f36f",
+      "commands": [
+        {
+          "candidate_classification": "requires_new_platform_and_network_fixture",
+          "candidate_prerequisites": [
+            "iirose-compatible source session",
+            "deterministic trace.moe HTTP fixture",
+            "private-send observation binding"
+          ],
+          "command_id": "trace",
+          "descriptor_sha256": "612c45dd056e2ad3a9af850cfd5347765dc5275b44f042dd64b1e9750d9b0d23",
+          "reason_counts": {
+            "no_native_gateway_operation_observed": 27
+          },
+          "scenarios": 9,
+          "source_conclusion": "Requires the iirose platform and a source image URL; the current OneBot stimulus fails the platform guard. The successful branch calls the external trace.moe HTTPS API and sends a private follow-up.",
+          "source_refs": [
+            {
+              "lines": [
+                9,
+                37
+              ],
+              "member_line_count": 40,
+              "path": "package/lib/index.js",
+              "sha256": "420d5a53a0e1aac3accb1f367fed69ab14995dd9cc1598efe1f307e6c0574528"
+            }
+          ],
+          "status": "unknown"
+        }
+      ],
+      "ecosystem": "koishi",
+      "execution_rounds": [
+        {
+          "cleanup_confirmed": true,
+          "federated_host_reaped": true,
+          "round": 1,
+          "sides": {
+            "federated": {
+              "cleanup_confirmed": true,
+              "gateway_operation_count": 12,
+              "profile_setup_status": "passed",
+              "status": "completed"
+            },
+            "native-1": {
+              "cleanup_confirmed": true,
+              "gateway_operation_count": null,
+              "profile_setup_status": "passed",
+              "status": "completed"
+            },
+            "native-2": {
+              "cleanup_confirmed": true,
+              "gateway_operation_count": null,
+              "profile_setup_status": "passed",
+              "status": "completed"
+            }
+          }
+        },
+        {
+          "cleanup_confirmed": true,
+          "federated_host_reaped": true,
+          "round": 2,
+          "sides": {
+            "federated": {
+              "cleanup_confirmed": true,
+              "gateway_operation_count": 12,
+              "profile_setup_status": "passed",
+              "status": "completed"
+            },
+            "native-1": {
+              "cleanup_confirmed": true,
+              "gateway_operation_count": null,
+              "profile_setup_status": "passed",
+              "status": "completed"
+            },
+            "native-2": {
+              "cleanup_confirmed": true,
+              "gateway_operation_count": null,
+              "profile_setup_status": "passed",
+              "status": "completed"
+            }
+          }
+        },
+        {
+          "cleanup_confirmed": true,
+          "federated_host_reaped": true,
+          "round": 3,
+          "sides": {
+            "federated": {
+              "cleanup_confirmed": true,
+              "gateway_operation_count": 12,
+              "profile_setup_status": "passed",
+              "status": "completed"
+            },
+            "native-1": {
+              "cleanup_confirmed": true,
+              "gateway_operation_count": null,
+              "profile_setup_status": "passed",
+              "status": "completed"
+            },
+            "native-2": {
+              "cleanup_confirmed": true,
+              "gateway_operation_count": null,
+              "profile_setup_status": "passed",
+              "status": "completed"
+            }
+          }
+        }
+      ],
+      "package": "koishi-plugin-iirose-trace",
+      "registry_entry_id": "ko-4b4932093937d2ef47f09a6c",
+      "version": "0.0.4"
+    },
+    {
+      "artifact_sha256": "edb9f833306554a68fd4ca6371256762bfd71ccda93464482f28d3035a0ab452",
+      "commands": [
+        {
+          "candidate_classification": "input_sensitive_candidate_requires_prompt_free_stimulus",
+          "candidate_prerequisites": [
+            "isolate explicit-keyword scenarios from the prompt branch",
+            "bounded re-run of the same exact entry before counting behavior"
+          ],
+          "command_id": "subid",
+          "descriptor_sha256": "0ebac70c0e6d5d90ec8e4511570e5122fe4435fb3f0e2f90958b40af52d8a356",
+          "reason_counts": {
+            "side_failed_or_operation_could_not_be_bound_to_source_event": 48
+          },
+          "scenarios": 16,
+          "source_conclusion": "Performs local keyword transformation and awaits session.prompt for up to 30 seconds when the argument is absent. An explicit keyword is source-level input-sensitive, but the current cohort execution failed before producing observations.",
+          "source_refs": [
+            {
+              "lines": [
+                1125,
+                1198
+              ],
+              "member_line_count": 1214,
+              "path": "package/lib/index.js",
+              "sha256": "96e63acb5dde7bf85b7ea17656bc096d64b071ac7a1d4eba26d4b30cd42b79ed"
+            }
+          ],
+          "status": "unknown"
+        },
+        {
+          "candidate_classification": "input_independent_with_entry_execution_failure",
+          "candidate_prerequisites": [
+            "separate from the subid prompt timeout before assigning a behavior conclusion"
+          ],
+          "command_id": "subid-list",
+          "descriptor_sha256": "d6e8f17a7912c5e823b6968bcfd9b49b7ea5173a06ae1d47906465a557da7c35",
+          "reason_counts": {
+            "side_failed_or_operation_could_not_be_bound_to_source_event": 27
+          },
+          "scenarios": 9,
+          "source_conclusion": "Returns the configured list without consuming command arguments; the containing entry failed its middleware deadline during the same cohort run, so no command behavior was observed.",
+          "source_refs": [
+            {
+              "lines": [
+                1199,
+                1200
+              ],
+              "member_line_count": 1214,
+              "path": "package/lib/index.js",
+              "sha256": "96e63acb5dde7bf85b7ea17656bc096d64b071ac7a1d4eba26d4b30cd42b79ed"
+            }
+          ],
+          "status": "unknown"
+        }
+      ],
+      "ecosystem": "koishi",
+      "execution_rounds": [
+        {
+          "cleanup_confirmed": true,
+          "federated_host_reaped": false,
+          "round": 1,
+          "sides": {
+            "federated": {
+              "cleanup_confirmed": true,
+              "diagnostic_summary": "RuntimeError: federated event did not complete: {\"error\": \"host request failed: request c-5 exceeded its deadline\", \"event_id\": \"event-b72bc06ccbe1aea11cd30f3c\", \"gateway_errors\": [], \"gateway_operation_count\": 3, \"status\": \"failed\"} [trace: federated.py:479:main <- federated.py:388:run <- representative.py:1014:run_fe",
+              "gateway_operation_count": null,
+              "profile_setup_status": "passed",
+              "status": "failed"
+            },
+            "native-1": {
+              "cleanup_confirmed": true,
+              "diagnostic_summary": "Error: Koishi middleware did not settle for event event-b72bc06ccbe1aea11cd30f3c within 15000ms",
+              "gateway_operation_count": null,
+              "profile_setup_status": "passed",
+              "status": "failed"
+            },
+            "native-2": {
+              "cleanup_confirmed": true,
+              "diagnostic_summary": "Error: Koishi middleware did not settle for event event-b72bc06ccbe1aea11cd30f3c within 15000ms",
+              "gateway_operation_count": null,
+              "profile_setup_status": "passed",
+              "status": "failed"
+            }
+          }
+        },
+        {
+          "cleanup_confirmed": true,
+          "federated_host_reaped": false,
+          "round": 2,
+          "sides": {
+            "federated": {
+              "cleanup_confirmed": true,
+              "diagnostic_summary": "RuntimeError: federated event did not complete: {\"error\": \"host request failed: request c-5 exceeded its deadline\", \"event_id\": \"event-b72bc06ccbe1aea11cd30f3c\", \"gateway_errors\": [], \"gateway_operation_count\": 3, \"status\": \"failed\"} [trace: federated.py:479:main <- federated.py:388:run <- representative.py:1014:run_fe",
+              "gateway_operation_count": null,
+              "profile_setup_status": "passed",
+              "status": "failed"
+            },
+            "native-1": {
+              "cleanup_confirmed": true,
+              "diagnostic_summary": "Error: Koishi middleware did not settle for event event-b72bc06ccbe1aea11cd30f3c within 15000ms",
+              "gateway_operation_count": null,
+              "profile_setup_status": "passed",
+              "status": "failed"
+            },
+            "native-2": {
+              "cleanup_confirmed": true,
+              "diagnostic_summary": "Error: Koishi middleware did not settle for event event-b72bc06ccbe1aea11cd30f3c within 15000ms",
+              "gateway_operation_count": null,
+              "profile_setup_status": "passed",
+              "status": "failed"
+            }
+          }
+        },
+        {
+          "cleanup_confirmed": true,
+          "federated_host_reaped": false,
+          "round": 3,
+          "sides": {
+            "federated": {
+              "cleanup_confirmed": true,
+              "diagnostic_summary": "RuntimeError: federated event did not complete: {\"error\": \"host request failed: request c-5 exceeded its deadline\", \"event_id\": \"event-b72bc06ccbe1aea11cd30f3c\", \"gateway_errors\": [], \"gateway_operation_count\": 3, \"status\": \"failed\"} [trace: federated.py:479:main <- federated.py:388:run <- representative.py:1014:run_fe",
+              "gateway_operation_count": null,
+              "profile_setup_status": "passed",
+              "status": "failed"
+            },
+            "native-1": {
+              "cleanup_confirmed": true,
+              "diagnostic_summary": "Error: Koishi middleware did not settle for event event-b72bc06ccbe1aea11cd30f3c within 15000ms",
+              "gateway_operation_count": null,
+              "profile_setup_status": "passed",
+              "status": "failed"
+            },
+            "native-2": {
+              "cleanup_confirmed": true,
+              "diagnostic_summary": "Error: Koishi middleware did not settle for event event-b72bc06ccbe1aea11cd30f3c within 15000ms",
+              "gateway_operation_count": null,
+              "profile_setup_status": "passed",
+              "status": "failed"
+            }
+          }
+        }
+      ],
+      "package": "@deepseaxx/koishi-plugin-subculture-id-tool",
+      "registry_entry_id": "ko-919bd13715bb892a7a8675e3",
+      "version": "0.4.5"
+    },
+    {
+      "artifact_sha256": "2fd7ac90900b4039fb71765ebf53886f6ade3593eb466fed5e615d2d82e02bb0",
+      "commands": [
+        {
+          "candidate_classification": "input_independent_with_current_empty_config",
+          "candidate_prerequisites": [],
+          "command_id": ".check",
+          "descriptor_sha256": "9d710e6b5a7f989c78dc46291b9b980ef18693fd515a91915af75d9f3993f6f7",
+          "reason_counts": {
+            "no_native_gateway_operation_observed": 33
+          },
+          "scenarios": 11,
+          "source_conclusion": "With the synthetic actor's empty subscription record, the handler returns a fixed no-subscriptions message and does not consume arguments.",
+          "source_refs": [
+            {
+              "lines": [
+                17,
+                21
+              ],
+              "member_line_count": 46,
+              "path": "nonebot_plugin_bilichat/command/base.py",
+              "sha256": "b304e16877289115e9dc77367f6312db6d5fbb75ed6205650fd8261e504d8ec9"
+            },
+            {
+              "lines": [
+                20,
+                20
+              ],
+              "member_line_count": 86,
+              "path": "nonebot_plugin_bilichat/command/subs.py",
+              "sha256": "dabc1249ae780ea07282914056829061f85931194429a2b29594d64227bd4e18"
+            },
+            {
+              "lines": [
+                73,
+                86
+              ],
+              "member_line_count": 86,
+              "path": "nonebot_plugin_bilichat/command/subs.py",
+              "sha256": "dabc1249ae780ea07282914056829061f85931194429a2b29594d64227bd4e18"
+            }
+          ],
+          "status": "unknown"
+        },
+        {
+          "candidate_classification": "input_independent_without_api_fixture",
+          "candidate_prerequisites": [
+            "deterministic account API fixture would be needed to reach non-empty output"
+          ],
+          "command_id": ".checklogin",
+          "descriptor_sha256": "a4f704156221a45b7a3142aa43d841dd6a77f54189cd2befcba8d57440f266e1",
+          "reason_counts": {
+            "no_native_gateway_operation_observed": 33
+          },
+          "scenarios": 11,
+          "source_conclusion": "Requires ADMIN or SUPERUSER; it enumerates configured APIs and accounts. With no configured account API the output is the fixed no-account message.",
+          "source_refs": [
+            {
+              "lines": [
+                23,
+                26
+              ],
+              "member_line_count": 163,
+              "path": "nonebot_plugin_bilichat/command/login.py",
+              "sha256": "484a42535370f70580574d3ad28ee2fd875fb2f370d0ca7eb2c975808674a71f"
+            },
+            {
+              "lines": [
+                42,
+                55
+              ],
+              "member_line_count": 163,
+              "path": "nonebot_plugin_bilichat/command/login.py",
+              "sha256": "484a42535370f70580574d3ad28ee2fd875fb2f370d0ca7eb2c975808674a71f"
+            },
+            {
+              "lines": [
+                53,
+                76
+              ],
+              "member_line_count": 78,
+              "path": "nonebot_plugin_bilichat/static/config.yaml",
+              "sha256": "8de9cd5f108814e49c0d0be7aeb1a312d4817faf4f3c582472626fa16f8dc6ee"
+            }
+          ],
+          "status": "unknown"
+        },
+        {
+          "candidate_classification": "credential_mutation_requires_isolated_api_fixture",
+          "candidate_prerequisites": [
+            "synthetic SUPERUSER",
+            "disposable account API and credentials fixture",
+            "isolated persistent config"
+          ],
+          "command_id": ".logout",
+          "descriptor_sha256": "fec7ea1b8b6bd10bf2d04ccccd7f89a5b7bc30c13302c225f4b8bfcc489546f9",
+          "reason_counts": {
+            "no_native_gateway_operation_observed": 33
+          },
+          "scenarios": 11,
+          "source_conclusion": "Requires SUPERUSER and a configured API. A matching account UID calls account_web_delete, so exercising the success branch mutates login credentials.",
+          "source_refs": [
+            {
+              "lines": [
+                35,
+                38
+              ],
+              "member_line_count": 163,
+              "path": "nonebot_plugin_bilichat/command/login.py",
+              "sha256": "484a42535370f70580574d3ad28ee2fd875fb2f370d0ca7eb2c975808674a71f"
+            },
+            {
+              "lines": [
+                153,
+                163
+              ],
+              "member_line_count": 163,
+              "path": "nonebot_plugin_bilichat/command/login.py",
+              "sha256": "484a42535370f70580574d3ad28ee2fd875fb2f370d0ca7eb2c975808674a71f"
+            },
+            {
+              "lines": [
+                53,
+                76
+              ],
+              "member_line_count": 78,
+              "path": "nonebot_plugin_bilichat/static/config.yaml",
+              "sha256": "8de9cd5f108814e49c0d0be7aeb1a312d4817faf4f3c582472626fa16f8dc6ee"
+            }
+          ],
+          "status": "unknown"
+        },
+        {
+          "candidate_classification": "input_independent_time_and_secret_nondeterminism",
+          "candidate_prerequisites": [
+            "fixed synthetic secret and clock would be needed for deterministic output"
+          ],
+          "command_id": ".otp",
+          "descriptor_sha256": "3fe10aeec173e7ed74d82289a9e650f379477e684cfd56261587392c05fa3af8",
+          "reason_counts": {
+            "native_repetitions_differ": 30
+          },
+          "scenarios": 10,
+          "source_conclusion": "Requires private chat and SUPERUSER; emits a time-based TOTP from a random default secret and does not consume command arguments.",
+          "source_refs": [
+            {
+              "lines": [
+                15,
+                34
+              ],
+              "member_line_count": 57,
+              "path": "nonebot_plugin_bilichat/command/otp.py",
+              "sha256": "60f2995eb3ecdbfad4f2866d83b9817909fd1271c0ab2560b894da4dcdddf879"
+            },
+            {
+              "lines": [
+                10,
+                10
+              ],
+              "member_line_count": 295,
+              "path": "nonebot_plugin_bilichat/model/config.py",
+              "sha256": "c850e38ec9397474042aa6ddff9b16bc640ab91d424dda0aead5a5e35b58aa7d"
+            },
+            {
+              "lines": [
+                34,
+                35
+              ],
+              "member_line_count": 295,
+              "path": "nonebot_plugin_bilichat/model/config.py",
+              "sha256": "c850e38ec9397474042aa6ddff9b16bc640ab91d424dda0aead5a5e35b58aa7d"
+            }
+          ],
+          "status": "nondeterministic"
+        },
+        {
+          "candidate_classification": "input_independent_secret_nondeterminism",
+          "candidate_prerequisites": [
+            "fixed synthetic secret would be needed for deterministic output"
+          ],
+          "command_id": ".otp_qrcode",
+          "descriptor_sha256": "6bb915e0241d07e6ef0cc04045d6b8824e449cdf018981b89f4ee527e6f82acb",
+          "reason_counts": {
+            "native_repetitions_differ": 30
+          },
+          "scenarios": 10,
+          "source_conclusion": "Requires private chat and SUPERUSER; renders a QR from the random default OTP secret and does not consume command arguments.",
+          "source_refs": [
+            {
+              "lines": [
+                15,
+                16
+              ],
+              "member_line_count": 57,
+              "path": "nonebot_plugin_bilichat/command/otp.py",
+              "sha256": "60f2995eb3ecdbfad4f2866d83b9817909fd1271c0ab2560b894da4dcdddf879"
+            },
+            {
+              "lines": [
+                36,
+                54
+              ],
+              "member_line_count": 57,
+              "path": "nonebot_plugin_bilichat/command/otp.py",
+              "sha256": "60f2995eb3ecdbfad4f2866d83b9817909fd1271c0ab2560b894da4dcdddf879"
+            },
+            {
+              "lines": [
+                10,
+                10
+              ],
+              "member_line_count": 295,
+              "path": "nonebot_plugin_bilichat/model/config.py",
+              "sha256": "c850e38ec9397474042aa6ddff9b16bc640ab91d424dda0aead5a5e35b58aa7d"
+            },
+            {
+              "lines": [
+                34,
+                35
+              ],
+              "member_line_count": 295,
+              "path": "nonebot_plugin_bilichat/model/config.py",
+              "sha256": "c850e38ec9397474042aa6ddff9b16bc640ab91d424dda0aead5a5e35b58aa7d"
+            }
+          ],
+          "status": "nondeterministic"
+        },
+        {
+          "candidate_classification": "external_authentication_and_credential_mutation",
+          "candidate_prerequisites": [
+            "deterministic HTTPS auth fixture",
+            "disposable credentials/config state"
+          ],
+          "command_id": ".qrlogin",
+          "descriptor_sha256": "1f6a2689acfa3a38b94fd2fb3ae838fcae8c6f859004050779584b366838273c",
+          "reason_counts": {
+            "no_native_gateway_operation_observed": 33
+          },
+          "scenarios": 11,
+          "source_conclusion": "Requires ADMIN or SUPERUSER, accesses Bilibili HTTPS QR generation and polling, and saves returned cookies on successful login.",
+          "source_refs": [
+            {
+              "lines": [
+                30,
+                38
+              ],
+              "member_line_count": 163,
+              "path": "nonebot_plugin_bilichat/command/login.py",
+              "sha256": "484a42535370f70580574d3ad28ee2fd875fb2f370d0ca7eb2c975808674a71f"
+            },
+            {
+              "lines": [
+                58,
+                143
+              ],
+              "member_line_count": 163,
+              "path": "nonebot_plugin_bilichat/command/login.py",
+              "sha256": "484a42535370f70580574d3ad28ee2fd875fb2f370d0ca7eb2c975808674a71f"
+            }
+          ],
+          "status": "unknown"
+        },
+        {
+          "candidate_classification": "external_search_and_config_mutation",
+          "candidate_prerequisites": [
+            "deterministic RequestAPI fixture",
+            "isolated persistent config"
+          ],
+          "command_id": ".sub",
+          "descriptor_sha256": "308e1cbdf89507e427ff7a890ac1e581e8736b3f2ebbae94a7235b792cbfba2f",
+          "reason_counts": {
+            "no_native_gateway_operation_observed": 33
+          },
+          "scenarios": 11,
+          "source_conclusion": "Requires ADMIN or SUPERUSER, searches remote account data through RequestAPI, and mutates the subscription config on success.",
+          "source_refs": [
+            {
+              "lines": [
+                16,
+                47
+              ],
+              "member_line_count": 86,
+              "path": "nonebot_plugin_bilichat/command/subs.py",
+              "sha256": "dabc1249ae780ea07282914056829061f85931194429a2b29594d64227bd4e18"
+            },
+            {
+              "lines": [
+                39,
+                46
+              ],
+              "member_line_count": 46,
+              "path": "nonebot_plugin_bilichat/command/base.py",
+              "sha256": "b304e16877289115e9dc77367f6312db6d5fbb75ed6205650fd8261e504d8ec9"
+            },
+            {
+              "lines": [
+                53,
+                76
+              ],
+              "member_line_count": 78,
+              "path": "nonebot_plugin_bilichat/static/config.yaml",
+              "sha256": "8de9cd5f108814e49c0d0be7aeb1a312d4817faf4f3c582472626fa16f8dc6ee"
+            }
+          ],
+          "status": "unknown"
+        },
+        {
+          "candidate_classification": "input_sensitive_candidate_after_superuser_profile_and_isolated_config",
+          "candidate_prerequisites": [
+            "source-bound SUPERUSER profile",
+            "disposable per-worker subscription config",
+            "bounded same-entry rerun to observe the command"
+          ],
+          "command_id": ".unsub",
+          "descriptor_sha256": "1bc7dbddf289fda0b1204e18d2cfd04ffbd09f83c376cbdd817061be8a995fdd",
+          "reason_counts": {
+            "no_native_gateway_operation_observed": 33
+          },
+          "scenarios": 11,
+          "source_conclusion": "Requires ADMIN or SUPERUSER. Explicit input `all` clears only the synthetic actor's subscriptions and persists the config; the handler is input-sensitive and local.",
+          "source_refs": [
+            {
+              "lines": [
+                17,
+                19
+              ],
+              "member_line_count": 86,
+              "path": "nonebot_plugin_bilichat/command/subs.py",
+              "sha256": "dabc1249ae780ea07282914056829061f85931194429a2b29594d64227bd4e18"
+            },
+            {
+              "lines": [
+                50,
+                70
+              ],
+              "member_line_count": 86,
+              "path": "nonebot_plugin_bilichat/command/subs.py",
+              "sha256": "dabc1249ae780ea07282914056829061f85931194429a2b29594d64227bd4e18"
+            }
+          ],
+          "status": "unknown"
+        }
+      ],
+      "ecosystem": "nonebot",
+      "execution_rounds": [
+        {
+          "cleanup_confirmed": true,
+          "federated_host_reaped": true,
+          "round": 1,
+          "sides": {
+            "federated": {
+              "cleanup_confirmed": true,
+              "gateway_operation_count": 0,
+              "profile_setup_status": "passed",
+              "status": "completed"
+            },
+            "native-1": {
+              "cleanup_confirmed": true,
+              "gateway_operation_count": null,
+              "profile_setup_status": "passed",
+              "status": "completed"
+            },
+            "native-2": {
+              "cleanup_confirmed": true,
+              "gateway_operation_count": null,
+              "profile_setup_status": "passed",
+              "status": "completed"
+            }
+          }
+        },
+        {
+          "cleanup_confirmed": true,
+          "federated_host_reaped": true,
+          "round": 2,
+          "sides": {
+            "federated": {
+              "cleanup_confirmed": true,
+              "gateway_operation_count": 0,
+              "profile_setup_status": "passed",
+              "status": "completed"
+            },
+            "native-1": {
+              "cleanup_confirmed": true,
+              "gateway_operation_count": null,
+              "profile_setup_status": "passed",
+              "status": "completed"
+            },
+            "native-2": {
+              "cleanup_confirmed": true,
+              "gateway_operation_count": null,
+              "profile_setup_status": "passed",
+              "status": "completed"
+            }
+          }
+        },
+        {
+          "cleanup_confirmed": true,
+          "federated_host_reaped": true,
+          "round": 3,
+          "sides": {
+            "federated": {
+              "cleanup_confirmed": true,
+              "gateway_operation_count": 0,
+              "profile_setup_status": "passed",
+              "status": "completed"
+            },
+            "native-1": {
+              "cleanup_confirmed": true,
+              "gateway_operation_count": null,
+              "profile_setup_status": "passed",
+              "status": "completed"
+            },
+            "native-2": {
+              "cleanup_confirmed": true,
+              "gateway_operation_count": null,
+              "profile_setup_status": "passed",
+              "status": "completed"
+            }
+          }
+        }
+      ],
+      "package": "nonebot_plugin_bilichat",
+      "registry_entry_id": "nb-250c92c282d77dcf502b9dbf",
+      "version": "6.5.0"
+    },
+    {
+      "artifact_sha256": "a9c165f99d4cf41a2364141050e4646a7223fab3c152aecc2f975739938fec20",
+      "commands": [
+        {
+          "candidate_classification": "input_sensitive_with_new_http_fixture",
+          "candidate_prerequisites": [
+            "deterministic Bilibili HTTPS and image-response fixture",
+            "repair Native source-event output binding"
+          ],
+          "command_id": "B站封面",
+          "descriptor_sha256": "efc92c5406a8a12f88bedf03e46ebfdf78f0edb081c4d62a43ba7aaffe939bec",
+          "reason_counts": {
+            "side_failed_or_operation_could_not_be_bound_to_source_event": 33
+          },
+          "scenarios": 11,
+          "source_conclusion": "Consumes a video URL/BVID and calls the Bilibili view API before sending a title and image; the current sandbox disables the HTTPS request.",
+          "source_refs": [
+            {
+              "lines": [
+                24,
+                39
+              ],
+              "member_line_count": 153,
+              "path": "nonebot-plugin-bilibili-image/matchers.py",
+              "sha256": "73d2d93ab4b554bae3a0c63728e210c22ec2b2ad93eb46a8abcb0ee82231c4fc"
+            },
+            {
+              "lines": [
+                8,
+                41
+              ],
+              "member_line_count": 41,
+              "path": "nonebot-plugin-bilibili-image/video.py",
+              "sha256": "f04ef64143c657d155a19481639ff22f72d1767fae420ca834e751fbb96a48ef"
+            }
+          ],
+          "status": "unknown"
+        },
+        {
+          "candidate_classification": "input_sensitive_with_new_http_fixture",
+          "candidate_prerequisites": [
+            "deterministic Bilibili HTTPS and image-response fixture",
+            "repair Native source-event output binding"
+          ],
+          "command_id": "专栏下载",
+          "descriptor_sha256": "684fa2aee7128e762d31d633fdb82cf5f40e845e500af65b0d7d4b38421d27e6",
+          "reason_counts": {
+            "side_failed_or_operation_could_not_be_bound_to_source_event": 33
+          },
+          "scenarios": 11,
+          "source_conclusion": "Consumes a CV/article URL, requests article metadata/page and image bodies from Bilibili, then sends a generated archive/forward message; no current local HTTP fixture covers those requests.",
+          "source_refs": [
+            {
+              "lines": [
+                78,
+                106
+              ],
+              "member_line_count": 153,
+              "path": "nonebot-plugin-bilibili-image/matchers.py",
+              "sha256": "73d2d93ab4b554bae3a0c63728e210c22ec2b2ad93eb46a8abcb0ee82231c4fc"
+            },
+            {
+              "lines": [
+                10,
+                65
+              ],
+              "member_line_count": 65,
+              "path": "nonebot-plugin-bilibili-image/article.py",
+              "sha256": "2fcb9af640baf8ee9f84f8a86977ab41abb8237c4b692ee585a251f1c9fb2acf"
+            }
+          ],
+          "status": "unknown"
+        },
+        {
+          "candidate_classification": "input_sensitive_with_new_http_fixture",
+          "candidate_prerequisites": [
+            "deterministic Bilibili HTTPS and image-response fixture",
+            "repair Native source-event output binding"
+          ],
+          "command_id": "动态下载",
+          "descriptor_sha256": "01a672063cb1d0d21a980c1b5819f56ba0fd2fe9e44411bd801a3b8feeac78bb",
+          "reason_counts": {
+            "side_failed_or_operation_could_not_be_bound_to_source_event": 33
+          },
+          "scenarios": 11,
+          "source_conclusion": "Consumes a dynamic URL/ID and requests Bilibili dynamic metadata plus image bodies; those HTTPS dependencies have no current local fixture.",
+          "source_refs": [
+            {
+              "lines": [
+                42,
+                75
+              ],
+              "member_line_count": 153,
+              "path": "nonebot-plugin-bilibili-image/matchers.py",
+              "sha256": "73d2d93ab4b554bae3a0c63728e210c22ec2b2ad93eb46a8abcb0ee82231c4fc"
+            },
+            {
+              "lines": [
+                9,
+                45
+              ],
+              "member_line_count": 47,
+              "path": "nonebot-plugin-bilibili-image/dynamic.py",
+              "sha256": "69df1709722a894a0583ee56a9e8bf313b25819eb2ea01372def248ab348772c"
+            }
+          ],
+          "status": "unknown"
+        }
+      ],
+      "ecosystem": "nonebot",
+      "execution_rounds": [
+        {
+          "cleanup_confirmed": true,
+          "federated_host_reaped": false,
+          "round": 1,
+          "sides": {
+            "federated": {
+              "cleanup_confirmed": true,
+              "diagnostic_summary": "harness timed out",
+              "gateway_operation_count": null,
+              "profile_setup_status": "passed",
+              "status": "failed"
+            },
+            "native-1": {
+              "cleanup_confirmed": true,
+              "diagnostic_summary": "httpx.ConnectError: [Errno -3] Temporary failure in name resolution [trace: default.py:393:handle_async_request <- contextlib.py:158:__exit__ <- default.py:118:map_httpcore_exceptions]",
+              "gateway_operation_count": null,
+              "profile_setup_status": "passed",
+              "status": "failed"
+            },
+            "native-2": {
+              "cleanup_confirmed": true,
+              "diagnostic_summary": "httpx.ConnectError: [Errno -3] Temporary failure in name resolution [trace: default.py:393:handle_async_request <- contextlib.py:158:__exit__ <- default.py:118:map_httpcore_exceptions]",
+              "gateway_operation_count": null,
+              "profile_setup_status": "passed",
+              "status": "failed"
+            }
+          }
+        },
+        {
+          "cleanup_confirmed": true,
+          "federated_host_reaped": false,
+          "round": 2,
+          "sides": {
+            "federated": {
+              "cleanup_confirmed": true,
+              "diagnostic_summary": "harness timed out",
+              "gateway_operation_count": null,
+              "profile_setup_status": "passed",
+              "status": "failed"
+            },
+            "native-1": {
+              "cleanup_confirmed": true,
+              "diagnostic_summary": "httpx.ConnectError: [Errno -3] Temporary failure in name resolution [trace: default.py:393:handle_async_request <- contextlib.py:158:__exit__ <- default.py:118:map_httpcore_exceptions]",
+              "gateway_operation_count": null,
+              "profile_setup_status": "passed",
+              "status": "failed"
+            },
+            "native-2": {
+              "cleanup_confirmed": true,
+              "diagnostic_summary": "httpx.ConnectError: [Errno -3] Temporary failure in name resolution [trace: default.py:393:handle_async_request <- contextlib.py:158:__exit__ <- default.py:118:map_httpcore_exceptions]",
+              "gateway_operation_count": null,
+              "profile_setup_status": "passed",
+              "status": "failed"
+            }
+          }
+        },
+        {
+          "cleanup_confirmed": true,
+          "federated_host_reaped": false,
+          "round": 3,
+          "sides": {
+            "federated": {
+              "cleanup_confirmed": true,
+              "diagnostic_summary": "harness timed out",
+              "gateway_operation_count": null,
+              "profile_setup_status": "passed",
+              "status": "failed"
+            },
+            "native-1": {
+              "cleanup_confirmed": true,
+              "diagnostic_summary": "httpx.ConnectError: [Errno -3] Temporary failure in name resolution [trace: default.py:393:handle_async_request <- contextlib.py:158:__exit__ <- default.py:118:map_httpcore_exceptions]",
+              "gateway_operation_count": null,
+              "profile_setup_status": "passed",
+              "status": "failed"
+            },
+            "native-2": {
+              "cleanup_confirmed": true,
+              "diagnostic_summary": "httpx.ConnectError: [Errno -3] Temporary failure in name resolution [trace: default.py:393:handle_async_request <- contextlib.py:158:__exit__ <- default.py:118:map_httpcore_exceptions]",
+              "gateway_operation_count": null,
+              "profile_setup_status": "passed",
+              "status": "failed"
+            }
+          }
+        }
+      ],
+      "package": "nonebot-plugin-bilibili-image",
+      "registry_entry_id": "nb-8cfb5e4d1632a591a9b8ec7a",
+      "version": "0.0.2.1"
+    },
+    {
+      "artifact_sha256": "fc32f126f7ea4e59b48ab42078e7608c6d5af7f67205cad69895cea9c13270d3",
+      "commands": [
+        {
+          "candidate_classification": "input_independent_external_and_random_behavior",
+          "candidate_prerequisites": [
+            "deterministic wiki HTTP fixture",
+            "controlled randomness for stable outputs"
+          ],
+          "command_id": "pgrmeme",
+          "descriptor_sha256": "97e6e40ad4ee2cdc643a16c5346fa82f444b73fcc66c87f08cf1bb636cb1c399",
+          "reason_counts": {
+            "no_native_gateway_operation_observed": 33
+          },
+          "scenarios": 11,
+          "source_conclusion": "The command takes no arguments; it performs two external wiki requests and selects sections/images with random.randint and random.choice.",
+          "source_refs": [
+            {
+              "lines": [
+                17,
+                23
+              ],
+              "member_line_count": 23,
+              "path": "nonebot_plugin_zsmeme/__init__.py",
+              "sha256": "d6582b4427e9ddb5bdbc18251214c78357c4fcd38d263ced393f8391a8420744"
+            },
+            {
+              "lines": [
+                8,
+                31
+              ],
+              "member_line_count": 31,
+              "path": "nonebot_plugin_zsmeme/utils.py",
+              "sha256": "6d0283e45773a963438131cb0535861e39790b862df3c2d8fc3a4170cafb11da"
+            }
+          ],
+          "status": "unknown"
+        }
+      ],
+      "ecosystem": "nonebot",
+      "execution_rounds": [
+        {
+          "cleanup_confirmed": true,
+          "federated_host_reaped": true,
+          "round": 1,
+          "sides": {
+            "federated": {
+              "cleanup_confirmed": true,
+              "gateway_operation_count": 0,
+              "profile_setup_status": "passed",
+              "status": "completed"
+            },
+            "native-1": {
+              "cleanup_confirmed": true,
+              "gateway_operation_count": null,
+              "profile_setup_status": "passed",
+              "status": "completed"
+            },
+            "native-2": {
+              "cleanup_confirmed": true,
+              "gateway_operation_count": null,
+              "profile_setup_status": "passed",
+              "status": "completed"
+            }
+          }
+        },
+        {
+          "cleanup_confirmed": true,
+          "federated_host_reaped": true,
+          "round": 2,
+          "sides": {
+            "federated": {
+              "cleanup_confirmed": true,
+              "gateway_operation_count": 0,
+              "profile_setup_status": "passed",
+              "status": "completed"
+            },
+            "native-1": {
+              "cleanup_confirmed": true,
+              "gateway_operation_count": null,
+              "profile_setup_status": "passed",
+              "status": "completed"
+            },
+            "native-2": {
+              "cleanup_confirmed": true,
+              "gateway_operation_count": null,
+              "profile_setup_status": "passed",
+              "status": "completed"
+            }
+          }
+        },
+        {
+          "cleanup_confirmed": true,
+          "federated_host_reaped": true,
+          "round": 3,
+          "sides": {
+            "federated": {
+              "cleanup_confirmed": true,
+              "gateway_operation_count": 0,
+              "profile_setup_status": "passed",
+              "status": "completed"
+            },
+            "native-1": {
+              "cleanup_confirmed": true,
+              "gateway_operation_count": null,
+              "profile_setup_status": "passed",
+              "status": "completed"
+            },
+            "native-2": {
+              "cleanup_confirmed": true,
+              "gateway_operation_count": null,
+              "profile_setup_status": "passed",
+              "status": "completed"
+            }
+          }
+        }
+      ],
+      "package": "nonebot_plugin_zsmeme",
+      "registry_entry_id": "nb-8f23c3f6d65d5dc2d9675316",
+      "version": "0.0.4"
+    },
+    {
+      "artifact_sha256": "5e978e4d49fda164666da94e1a15d198a54412255d8340021be605aa9b25ecbd",
+      "commands": [
+        {
+          "candidate_classification": "input_independent_external_output",
+          "candidate_prerequisites": [
+            "deterministic local HTTPS fixture to observe the fixed response"
+          ],
+          "command_id": "毒鸡汤",
+          "descriptor_sha256": "972ea37cc7754b99ef1762d9cac8694f826074e4388cc049ed9818af268ff4b7",
+          "reason_counts": {
+            "no_native_gateway_operation_observed": 30
+          },
+          "scenarios": 10,
+          "source_conclusion": "Takes no arguments and requests a fixed external endpoint. No input-sensitive branch exists in the command handler.",
+          "source_refs": [
+            {
+              "lines": [
+                35,
+                44
+              ],
+              "member_line_count": 44,
+              "path": "nonebot_plugin_soup/__init__.py",
+              "sha256": "7c1f7ccaf24865f80de370554ca489310c4fa0a1ccfb9c6d98bdda5427f78dd5"
+            }
+          ],
+          "status": "unknown"
+        },
+        {
+          "candidate_classification": "input_independent_external_output",
+          "candidate_prerequisites": [
+            "deterministic local HTTPS fixture to observe the fixed response"
+          ],
+          "command_id": "鸡汤",
+          "descriptor_sha256": "dd50d9d39ab66ca208c3fc399077fd40794ba6e40bab9e32b105a1d9003c7875",
+          "reason_counts": {
+            "no_native_gateway_operation_observed": 30
+          },
+          "scenarios": 10,
+          "source_conclusion": "Takes no arguments and requests a fixed external endpoint. No input-sensitive branch exists in the command handler.",
+          "source_refs": [
+            {
+              "lines": [
+                24,
+                34
+              ],
+              "member_line_count": 44,
+              "path": "nonebot_plugin_soup/__init__.py",
+              "sha256": "7c1f7ccaf24865f80de370554ca489310c4fa0a1ccfb9c6d98bdda5427f78dd5"
+            }
+          ],
+          "status": "unknown"
+        }
+      ],
+      "ecosystem": "nonebot",
+      "execution_rounds": [
+        {
+          "cleanup_confirmed": true,
+          "federated_host_reaped": true,
+          "round": 1,
+          "sides": {
+            "federated": {
+              "cleanup_confirmed": true,
+              "gateway_operation_count": 0,
+              "profile_setup_status": "passed",
+              "status": "completed"
+            },
+            "native-1": {
+              "cleanup_confirmed": true,
+              "gateway_operation_count": null,
+              "profile_setup_status": "passed",
+              "status": "completed"
+            },
+            "native-2": {
+              "cleanup_confirmed": true,
+              "gateway_operation_count": null,
+              "profile_setup_status": "passed",
+              "status": "completed"
+            }
+          }
+        },
+        {
+          "cleanup_confirmed": true,
+          "federated_host_reaped": true,
+          "round": 2,
+          "sides": {
+            "federated": {
+              "cleanup_confirmed": true,
+              "gateway_operation_count": 0,
+              "profile_setup_status": "passed",
+              "status": "completed"
+            },
+            "native-1": {
+              "cleanup_confirmed": true,
+              "gateway_operation_count": null,
+              "profile_setup_status": "passed",
+              "status": "completed"
+            },
+            "native-2": {
+              "cleanup_confirmed": true,
+              "gateway_operation_count": null,
+              "profile_setup_status": "passed",
+              "status": "completed"
+            }
+          }
+        },
+        {
+          "cleanup_confirmed": true,
+          "federated_host_reaped": true,
+          "round": 3,
+          "sides": {
+            "federated": {
+              "cleanup_confirmed": true,
+              "gateway_operation_count": 0,
+              "profile_setup_status": "passed",
+              "status": "completed"
+            },
+            "native-1": {
+              "cleanup_confirmed": true,
+              "gateway_operation_count": null,
+              "profile_setup_status": "passed",
+              "status": "completed"
+            },
+            "native-2": {
+              "cleanup_confirmed": true,
+              "gateway_operation_count": null,
+              "profile_setup_status": "passed",
+              "status": "completed"
+            }
+          }
+        }
+      ],
+      "package": "nonebot_plugin_soup",
+      "registry_entry_id": "nb-b03603bc7b12912220d59fa0",
+      "version": "1.1.0"
+    }
+  ],
+  "evidence_bindings": {
+    "artifact_lock_sha256": "8dcec5da7cd81b9ed7d0f4e8aead8e76ef15cd7e17dfcdc4fa6f7b8944b83d4a",
+    "pilot_path": "outputs/acceptance/p7-p704-differential-pilot-20261111-feat061-source-context-rerun2.json",
+    "pilot_sha256": "5979f6f5cde9985c29ba309e30359dd7b56984afaef05e79114d9ec5ec64dbe9",
+    "selection_path": "outputs/acceptance/p7-p704-independent-pilot-selection-20261111.json",
+    "selection_sha256": "3076c70a5e692392b993abb8754d84f0b06787a4781a4dfca68c7aad727f86c4",
+    "source_facts_path": "outputs/acceptance/p7-p704-nontrivial-unknown-source-facts-20261112.json",
+    "source_facts_sha256": "f3c4f0e0bf84ee34f2b9f413cec783ebab16a4a4f9c6514f6310ec58ba3e1902"
+  },
+  "execution": {
+    "behavior_status_changed": false,
+    "denominator_changed": false,
+    "external_network_requests": 0,
+    "plugin_archive_mutations": 0,
+    "worker_dispatches": 0
+  },
+  "kind": "p7_nontrivial_unknown_source_audit",
+  "schema_version": "ligamina.p7.nontrivial-unknown-source-audit.v1"
+}

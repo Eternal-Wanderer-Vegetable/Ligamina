@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "updated_at": "2026-11-12",
-  "active_feature": "feat-062",
+  "active_feature": null,
   "next_feature": null,
   "features": [
     {
@@ -2960,12 +2960,17 @@
         "feat-057",
         "feat-061"
       ],
-      "status": "in-progress",
+      "status": "done",
       "done_when": "17 条候选全部绑定到锁定 selection、pilot entry、artifact/member hashes 和精确命令 ID；源码前置条件及 stimulus 可达性有可复核证据；明确可安全实现候选数量与缺口原因；不改变任何 compatibility/unknown 结论；source audit JSON 及 sidecar 通过 validator。",
-      "evidence": "Started 2026-11-12. Current same-selection cohort has 44/177 nontrivial and needs at least 54, leaving 10; 17 commands remain nontrivial_unknown across six exact entries. This task audits source reachability only before considering any further profile or generator changes.",
+      "evidence": "Completed 2026-11-12. Reproducible read-only source audit binds the exact 30+30 pilot SHA 5979f6f5cde9985c29ba309e30359dd7b56984afaef05e79114d9ec5ec64dbe9, selection SHA 3076c70a5e692392b993abb8754d84f0b06787a4781a4dfca68c7aad727f86c4, six exact artifact hashes, 17 command IDs and every referenced source member SHA/line range. It records entry-level Native/Federated run statuses and diagnostics, zero worker dispatches/network/archive mutations, and no status or denominator changes. Two source-level input-sensitive local candidates remain unverified: Koishi subid (middleware deadline; source can wait 30s for prompt) and BiliChat .unsub (SUPERUSER plus isolated local config). Other candidates require HTTP/platform fixtures, mutate credentials/config, are input-independent, or failed entry execution. Same-selection gate remains 44/177 vs 54 required; P7-09 stays blocked.",
       "evidence_paths": [
         "outputs/acceptance/p7-p704-differential-pilot-20261111-feat061-source-context-rerun2.json",
         "outputs/acceptance/p7-p704-independent-pilot-selection-20261111.json",
+        "outputs/acceptance/p7-p704-nontrivial-unknown-source-facts-20261112.json",
+        "outputs/acceptance/p7-p704-nontrivial-unknown-source-audit-20261112.json",
+        "outputs/acceptance/p7-p704-nontrivial-unknown-source-audit-20261112.json.sha256",
+        "outputs/acceptance/p7-p704-source-audit-verification-20261112.json",
+        "outputs/acceptance/p7-p704-source-audit-verification-20261112.json.sha256",
         "docs/plans/2026-11-09-phase-7-automated-verification.md"
       ],
       "plan_path": "docs/plans/2026-11-09-phase-7-automated-verification.md"
