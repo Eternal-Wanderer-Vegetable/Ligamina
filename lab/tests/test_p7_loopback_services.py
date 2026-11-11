@@ -1,12 +1,16 @@
 from __future__ import annotations
 
+import builtins
+import importlib.util
+import json
 import urllib.error
 import urllib.request
-import json
 import tempfile
 import unittest
 from pathlib import Path
 from unittest.mock import patch
+
+from jsonschema import Draft202012Validator
 
 from lab.automation import p7_loopback_services
 from lab.automation.p7_loopback_services import (
@@ -20,6 +24,7 @@ REGISTRY_ENTRY_ID = "nb-3ebafd8e699febd7a7e4e52b"
 PACKAGE = "nonebot_plugin_warframe_mode"
 VERSION = "1.1.0"
 ARTIFACT_SHA256 = "086911421ce02e46a11c923005ed5028ca3a74ff0cd6f5ee7a69d42386a96827"
+PROFILE_SCHEMA_PATH = p7_loopback_services.ROOT / "contracts/lab/automation/p7-loopback-service-profiles/v1.schema.json"
 
 
 def _candidate() -> dict[str, str]:
@@ -33,6 +38,29 @@ def _candidate() -> dict[str, str]:
 
 
 class P7LoopbackServiceProfileTests(unittest.TestCase):
+    def test_manifest_matches_its_committed_schema(self) -> None:
+        schema = json.loads(PROFILE_SCHEMA_PATH.read_text(encoding="utf-8"))
+        manifest = json.loads(p7_loopback_services.PROFILE_MANIFEST_PATH.read_text(encoding="utf-8"))
+
+        self.assertEqual(list(Draft202012Validator(schema).iter_errors(manifest)), [])
+
+    def test_worker_profile_module_loads_without_jsonschema(self) -> None:
+        module_path = Path(__file__).parents[1] / "automation/p7_loopback_services.py"
+        spec = importlib.util.spec_from_file_location("p7_loopback_services_worker_test", module_path)
+        self.assertIsNotNone(spec)
+        assert spec is not None and spec.loader is not None
+        module = importlib.util.module_from_spec(spec)
+        original_import = builtins.__import__
+
+        def reject_jsonschema(name: str, *args: object, **kwargs: object) -> object:
+            if name == "jsonschema" or name.startswith("jsonschema."):
+                raise ModuleNotFoundError("jsonschema is unavailable in the locked runtime image")
+            return original_import(name, *args, **kwargs)
+
+        with patch("builtins.__import__", side_effect=reject_jsonschema):
+            spec.loader.exec_module(module)
+            self.assertIsNotNone(module.profile_binding(_candidate()))
+
     def test_manifest_rejects_a_changed_wheel_source_hash(self) -> None:
         manifest = json.loads(p7_loopback_services.PROFILE_MANIFEST_PATH.read_text(encoding="utf-8"))
         manifest["source_evidence"][0]["sha256"] = "0" * 64

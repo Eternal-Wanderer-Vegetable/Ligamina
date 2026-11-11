@@ -12,11 +12,9 @@ from pathlib import Path
 from typing import Any
 from urllib.parse import urlsplit
 
-from jsonschema import Draft202012Validator
-
 ROOT = Path(__file__).resolve().parents[2]
 PROFILE_MANIFEST_PATH = ROOT / "lab/automation/data/p7-nonebot-warframe-api-loopback-v1.json"
-PROFILE_SCHEMA_PATH = ROOT / "contracts/lab/automation/p7-loopback-service-profiles/v1.schema.json"
+EXPECTED_PROFILE_MANIFEST_SHA256 = "5ed90faffafbfbe31f3f9f59c5fe352d2e2e3a6248841b4a7553cf545d4c06e1"
 EXPECTED_SOURCE_EVIDENCE = [
     {
         "path": "nonebot_plugin_warframe_mode/data_source.py",
@@ -47,14 +45,12 @@ def _read_json(path: Path) -> dict[str, Any]:
 
 
 def validate_profile_manifest() -> dict[str, Any]:
-    """Validate the committed manifest and the source report it cites."""
+    """Validate the exact committed manifest and the source report it cites."""
     document = _read_json(PROFILE_MANIFEST_PATH)
-    schema = _read_json(PROFILE_SCHEMA_PATH)
-    errors = sorted(Draft202012Validator(schema).iter_errors(document), key=lambda error: list(error.path))
-    if errors:
-        raise ValueError(f"invalid P7 loopback service profile: {errors[0].message}")
     if document.get("source_evidence") != EXPECTED_SOURCE_EVIDENCE:
         raise ValueError("P7 loopback service source hashes differ from the reviewed wheel evidence")
+    if _sha256(PROFILE_MANIFEST_PATH.read_bytes()) != EXPECTED_PROFILE_MANIFEST_SHA256:
+        raise ValueError("P7 loopback service manifest hash differs from the reviewed profile")
     source_report = document["source_report"]
     report_path = ROOT / source_report["path"]
     if not report_path.is_file() or _sha256(report_path.read_bytes()) != source_report["sha256"]:
