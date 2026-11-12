@@ -42,7 +42,7 @@ from lab.queue import QueueError, StageQueue  # noqa: E402
 DEFAULT_CACHE = ROOT.parent / "Ligamina-artifact-cache"
 LOCK_FILE = ROOT / "deploy/lab/linux/astrbot/requirements.lock.txt"
 DOWNLOAD_IMAGE = "python:3.12.14-slim-bookworm@sha256:1aaa65a85fda306ffb8b910824d4e93bdce61e212c7e87168123ea3073b41a1a"
-HOST_FILES = ["__init__.py", "bridge.py", "commands.py", "contracts.py", "lifecycle.py", "runtime.py"]
+HOST_FILES = ["__init__.py", "bridge.py", "commands.py", "contracts.py", "inventory.py", "lifecycle.py", "runtime.py"]
 STRATA = {
     "plain": lambda notes: not notes & {"has_requirements", "platform_specific_code", "llm_dependent"},
     "requirements": lambda notes: "has_requirements" in notes and not notes & {"platform_specific_code", "llm_dependent"},

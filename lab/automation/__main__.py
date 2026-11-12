@@ -66,6 +66,7 @@ def main(argv: list[str] | None = None) -> int:
     preflight = commands.add_parser("preflight", help="collect current Linux Worker admission facts")
     preflight.add_argument("--platform", choices=("linux", "windows"), required=True)
     preflight.add_argument("--probe-report", type=Path)
+    preflight.add_argument("--worker-image", help="optional digest-pinned local Worker image override; its probe report must bind the same image")
     preflight.add_argument("--output", type=Path, required=True)
     behavior = commands.add_parser("validate-behavior", help="validate the frozen entry-bound behavior suite")
     behavior.add_argument("--suite", type=Path)
@@ -181,7 +182,7 @@ def main(argv: list[str] | None = None) -> int:
                 _write_json(options.output, report)
                 print(json.dumps({"status": report["status"], "output": str(options.output.resolve()), "reason_codes": report["reason_codes"]}, ensure_ascii=False))
                 return 3
-            report = collect_linux_health(probe_report_path=options.probe_report)
+            report = collect_linux_health(probe_report_path=options.probe_report, worker_image=options.worker_image)
             _write_json(options.output, report)
             print(json.dumps({"status": report["status"], "output": str(options.output.resolve()), "reason_codes": report["reason_codes"], "environment_fingerprint": report["environment_fingerprint"]}, ensure_ascii=False))
             return 0 if report["status"] == "admitted" else 3
