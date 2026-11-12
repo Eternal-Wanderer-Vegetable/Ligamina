@@ -1,0 +1,165 @@
+{
+  "schema_version": 1,
+  "kind": "p7_p709_feat054_bundlefix_smoke_verification",
+  "collected_at_utc": "2026-11-12T10:56:40Z",
+  "status": "bounded_smoke_unknown_preserved_bulk_campaign_pending",
+  "diagnosis_and_fix": {
+    "preflight_blocker": "The default Linux admission binds python@sha256:f77... while the campaign requires the exact AstrBot runtime digest; digest-pinned --worker-image override now binds the probe and local image ID.",
+    "host_startup_blocker": "Federated Host exited before ready because the prepared package omitted ligamina_astrbot/inventory.py; direct Host handshake reported ModuleNotFoundError. lab/astrbot_census.py HOST_FILES now includes inventory.py.",
+    "tdd_red": "Before the fix, lab.tests.test_astrbot_tool_campaign.AstrBotToolCampaignTests.test_federated_bundle_contains_the_complete_astrbot_worker_package failed because inventory.py was absent.",
+    "tdd_green": "The same regression test passes after the frozen Host package file list includes inventory.py."
+  },
+  "target_image_admission": {
+    "worker_image": "ligamina-astrbot-runtime@sha256:79903467bb35c50018deea736751db56f988d5a996246ba6fe84b34b4a28bdbc",
+    "image_id": "sha256:79903467bb35c50018deea736751db56f988d5a996246ba6fe84b34b4a28bdbc",
+    "binding": "explicit_digest_override",
+    "status": "admitted",
+    "environment_fingerprint": "6ab22487d364250662369697e2ca420bd608c40e68b5d85374c2fd0f4d2fa3eb",
+    "probe_passed": true,
+    "probe_results": 10,
+    "probe_all_passed": true,
+    "cleanup_confirmed": true,
+    "probe_path": "outputs/acceptance/p7-p709-linux-worker-probe-astrbot-postcensus-20261112.json",
+    "probe_sha256": "a19616fe4330b62975daf5c7da429e51cd92ba99221cdce7585985561f6984af",
+    "admission_path": "outputs/acceptance/p7-p709-linux-admission-astrbot-bundlefix-20261112.json",
+    "admission_sha256": "953faf1048b8df54eb5389377f1a41b69f6ff5a400fc08e9c7c9c7e3c7c5e462"
+  },
+  "frozen_campaign_plan": {
+    "path": "outputs/acceptance/p7-p709-astrbot-campaign-plan-bundlefix-20261112.json",
+    "sha256": "a9871842d70641c0ec4bd05fb9fd063a9cee06b8512759c41ed15f1b4ceb0205",
+    "sidecar_matches": true,
+    "run_id": "p7-09-astra-72e7512f6f4d2219cf9b",
+    "manifest_sha256": "72e7512f6f4d2219cf9bc57cb9ffca62ce00026eddf56ede509aac161f331c38",
+    "campaign_sources_sha256": "f396b7f4921c655f0733e9cd083a67b29fda343baca4edc6da5e6e4998d629b8",
+    "denominator": {
+      "snapshot_entries": 3271,
+      "frozen_entries": 3265,
+      "selected_entries": 3265
+    },
+    "counts": {
+      "load_passed": 3012,
+      "load_failed": 154,
+      "load_skipped": 99,
+      "load_unknown": 0,
+      "inventory_backfill_required": 55,
+      "inventory_backfill_jobs": 55,
+      "inventory_truncated": 0,
+      "observed_commands": 14655,
+      "differential_jobs": 14655,
+      "contract_status": "not_evaluated"
+    },
+    "queue_db": "/home/vegetable/.local/share/ligamina/p7-astrbot-command-campaign-bundlefix-20261112.sqlite3",
+    "queue_registration": {
+      "run_id": "p7-09-astra-72e7512f6f4d2219cf9b",
+      "manifest_sha256": "72e7512f6f4d2219cf9bc57cb9ffca62ce00026eddf56ede509aac161f331c38",
+      "created": 14710,
+      "existing": 0,
+      "counts": {
+        "queued": 14710,
+        "leased": 0,
+        "passed": 0,
+        "failed": 0,
+        "skipped": 0,
+        "unknown": 0,
+        "total": 14710
+      }
+    }
+  },
+  "bounded_smoke": {
+    "path": "outputs/acceptance/p7-p709-astrbot-campaign-execution-smoke-bundlefix-20261112.json",
+    "sha256": "e2eccb00b5a602e18416e8b738638a844f4bcc13c86088c9aa57a04ae7a70eeb",
+    "sidecar_matches": true,
+    "status": "running",
+    "queue_counts": {
+      "queued": 14709,
+      "leased": 0,
+      "passed": 0,
+      "failed": 0,
+      "skipped": 0,
+      "unknown": 1,
+      "total": 14710
+    },
+    "worker_attempt_count": 1,
+    "contract_c7": {
+      "passed": 1,
+      "failed": 0,
+      "unknown": 0
+    },
+    "first_call": {
+      "status": "finished",
+      "unit_id": "astrbot-diff-000119fc44fb9c792942d4c6987ade0f92de31953d919039341978cb94f28f32",
+      "reason_code": "worker_observation_incomplete",
+      "comparison": "unknown",
+      "contract_status": "partial",
+      "c7_status": "passed"
+    },
+    "worker_runs": [
+      {
+        "cleanup_confirmed": true,
+        "elapsed_seconds": 13.89,
+        "exit_code": 0,
+        "observation_error": "no_meaningful_command_observation",
+        "output_truncated": false,
+        "peak_memory_bytes": 886361292,
+        "reason_code": null,
+        "status": "passed",
+        "stderr_sha256": "e6a595c06a062ec7390583f0f3349065e202c67cb1192a8687c517cd2a113615",
+        "stdout_sha256": "87515f4b7caaac11ee1634adca49fa60413785aed7ab56ed57380cde457547e4",
+        "worker_id": "ligamina-f1b1fab1056341a9"
+      },
+      {
+        "cleanup_confirmed": true,
+        "elapsed_seconds": 14.045,
+        "exit_code": 0,
+        "observation_error": "no_meaningful_command_observation",
+        "output_truncated": false,
+        "peak_memory_bytes": 885417574,
+        "reason_code": null,
+        "status": "passed",
+        "stderr_sha256": "518876102e76a7d45e69dd79a2fa9ff21dc6f75be28be8e54a088d52ebf81d78",
+        "stdout_sha256": "14722f4ae3d21d7f2aa0c0a7234b148457b69fc313d67a3e2aaabb197438a3a8",
+        "worker_id": "ligamina-ecab214aac0c482e"
+      },
+      {
+        "cleanup_confirmed": true,
+        "elapsed_seconds": 8.022,
+        "exit_code": 0,
+        "observation_error": null,
+        "output_truncated": false,
+        "peak_memory_bytes": 268959744,
+        "reason_code": null,
+        "status": "passed",
+        "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stdout_sha256": "594e87eb2460cdf825af39c8a6de50caabc2a8e212031748d6fa77f375692ed0",
+        "worker_id": "ligamina-20a083ab67ca4b53"
+      }
+    ],
+    "scope": "One generated command job executed through Native x2 and Federated; C7 is observed, while no meaningful Native reply keeps the differential unknown."
+  },
+  "superseded_source_plan": {
+    "run_id": "p7-09-astra-93d777275f319988a46e",
+    "queue_db": "/home/vegetable/.local/share/ligamina/p7-astrbot-command-campaign-20261112.sqlite3",
+    "state": "interrupted",
+    "counts": {
+      "queued": 14708,
+      "leased": 0,
+      "passed": 0,
+      "failed": 0,
+      "skipped": 0,
+      "unknown": 2,
+      "total": 14710
+    },
+    "all_attempt_worker_cleanups_confirmed": true,
+    "disposition": "Interrupted after identifying the missing Host module; preserved for audit and must not be resumed."
+  },
+  "verification": {
+    "targeted_tests": "uv run --locked --project lab --python 3.12.14 python -m unittest lab.tests.test_astrbot_census lab.tests.test_astrbot_tool_campaign lab.tests.test_astrbot_campaign_plan lab.tests.test_automation_health -v",
+    "targeted_tests_passed": 31,
+    "targeted_test_log": "outputs/acceptance/p7-p709-feat054-bundlefix-targeted-tests-20261112.log",
+    "targeted_test_log_sha256": "3d3f6fe0defd1ded11a4dd68cf294af50322a5328a5decb8f4fb347b6d85f532",
+    "py_compile": "passed for the admission CLI/health, Linux probes, AstrBot census and regression tests",
+    "command_log": "outputs/acceptance/p7-p709-postcensus-admission-commands-20261112.log",
+    "command_log_sha256": "606404d16cc1be8be50deb4318e229031f19080837492426ef8d01eeaf423f51"
+  },
+  "acceptance_boundary": "The load census is complete, but the incremental command campaign is not. This one job leaves the command differential unknown; C7 passed only for its directly observed listing/schema/call/Gateway facts. No plugin support conclusion is made."
+}

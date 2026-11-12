@@ -2,22 +2,21 @@
 
 ## Current Objective
 
-- **2026-11-12 当前状态：** P6-01–04、P7-01–08、P7-04F–L / feat-059–065 已完成；P7-09 / feat-054 的 30+30 pilot 准入四门已通过，当前 active feature 为 feat-054，下一步完成可恢复的 AstrBot 全量 load census 与三生态已验证条目 campaign；P7-10 / feat-055 仍 blocked，等待 P7-09。
-- **P7-09 当前运行点（2026-11-12 08:58 UTC）：** AstrBot census 仍在运行；外置 SQLite snapshot 为 passed=2,231、failed=119、skipped=68、leased=2、queued=845，共 3,265 frozen identities、2,422 attempts；`PRAGMA quick_check=ok`。实时 JSON 可能因活动 leases 落后，队列是恢复依据。55 个已通过条目缺 runtime command descriptor，封账后仅补这些 exact identities。campaign planner 已绑定冻结身份、fresh exact-image admission、runtime hashes、稳定环境增量键和外置 fenced/idempotent StageQueue 注册；新增 executor 经 WorkerSpec→WorkerResult 边界运行 Native×2/Federated，支持重启 reconciliation、fencing、cleanup 阻断、结果投影和 C1–C8 evidence boundary。定向 32/32、完整 Lab 414/414、py_compile、README、矩阵、证据哈希与 harness 检查通过，详见 `outputs/acceptance/p7-p709-feat054-campaign-executor-verification-20261112.json`。普查仍进行中，campaign 尚未 dispatch；feat-054 保持 in-progress，P7-10 blocked。
+- **2026-11-12 当前状态：** P6-01–04、P7-01–08、P7-04F–L / feat-059–065 已完成。P7-09 / feat-054 仍 in-progress：AstrBot frozen census 已闭合，增量 campaign 已通过 exact-image admission 并完成一条 bounded smoke；P7-10 / feat-055 继续 blocked，等待 P7-09 campaign 完整闭合。
+- **P7-09 当前运行点（2026-11-12 10:56 UTC）：** frozen denominator 为 3,265（3,271 entries、6 非冻结排除），load census 为 3,012 passed、154 failed、99 skipped、0 unknown；适用的 3,168 cleanup observations 全部确认。新 plan `outputs/acceptance/p7-p709-astrbot-campaign-plan-bundlefix-20261112.json` SHA-256 `a9871842d70641c0ec4bd05fb9fd063a9cee06b8512759c41ed15f1b4ceb0205` 固定 14,710 jobs（55 inventory backfills + 14,655 differential），外置 queue 当前 14,709 queued、1 unknown、0 leased。错误 source 的旧 queue `/home/vegetable/.local/share/ligamina/p7-astrbot-command-campaign-20261112.sqlite3` 已 interrupt，含 2 unknown、14,708 queued、0 leased，保留审计且不得 resume；唯一可续跑 queue 是新 bundlefix queue。目标镜像 admission 已绑定 `ligamina-astrbot-runtime@sha256:79903467bb35c50018deea736751db56f988d5a996246ba6fe84b34b4a28bdbc`，环境 fingerprint `6ab22487d364250662369697e2ca420bd608c40e68b5d85374c2fd0f4d2fa3eb`。修复 Federated bundle 漏掉 `ligamina_astrbot/inventory.py` 后，定向测试 31/31 和 py_compile 均通过；verification record 为 `outputs/acceptance/p7-p709-feat054-bundlefix-smoke-verification-20261112.json`。一条 smoke 的 C7 为 passed、Native×2 命令观察不足而 differential 为 unknown，三侧 cleanup 已确认。全量 campaign 尚未执行完，不得把该 smoke 当成插件兼容结论。
 
-  当前恢复日志 `/tmp/ligamina-p709-resume.log`。恢复命令（同一 manifest，自动等待 lease/reconcile）：
+  下一批每次使用不超过 30 分钟的 fresh exact-image admission；更新 RUN 后生成独立 probe/admission/execution 报告，保持 plan、snapshot、census、bundle、runtime、cache 与新 queue 不变：
   ```bash
   cd /mnt/e/stella/Ligamina
-  uv run --locked --project lab --python 3.12.14 python -m lab.astrbot_census \
-    --snapshot catalogs/ab-15937e90d26b7caf9d12 \
-    --admission outputs/acceptance/p7-p709-linux-admission-20261112.json \
-    --image ligamina-astrbot-runtime@sha256:79903467bb35c50018deea736751db56f988d5a996246ba6fe84b34b4a28bdbc \
-    --bundle-root /home/vegetable/.local/share/ligamina/p7-astrbot-full-bundles-20261112 \
-    --output outputs/acceptance/p7-p709-astrbot-full-census-20261112.json \
-    --queue-db /home/vegetable/.local/share/ligamina/p7-astrbot-census.sqlite3 \
-    --cache-root /mnt/e/stella/Ligamina-artifact-cache --full-census --workers 2 --resume
+  RUN=$(date -u +%Y%m%dT%H%M%SZ)
+  IMAGE=ligamina-astrbot-runtime@sha256:79903467bb35c50018deea736751db56f988d5a996246ba6fe84b34b4a28bdbc
+  PROBE=outputs/acceptance/p7-p709-linux-worker-probe-campaign-$RUN.json
+  ADMISSION=outputs/acceptance/p7-p709-linux-admission-campaign-$RUN.json
+  uv run --locked --project hosts/nonebot --python 3.12.14 python deploy/lab/linux/probes/acceptance.py --worker-image "$IMAGE" --report "$PROBE"
+  uv run --locked --project lab --python 3.12.14 python -m lab.automation preflight --platform linux --worker-image "$IMAGE" --probe-report "$PROBE" --output "$ADMISSION"
+  uv run --locked --project lab --python 3.12.14 python -m lab.astrbot_campaign_execute --plan outputs/acceptance/p7-p709-astrbot-campaign-plan-bundlefix-20261112.json --census outputs/acceptance/p7-p709-astrbot-full-census-20261112.json --snapshot catalogs/ab-15937e90d26b7caf9d12 --admission "$ADMISSION" --runtime-archive /mnt/e/stella/Ligamina-artifact-cache/p7-p703-runtime-20261110.tar.gz --cache-root /mnt/e/stella/Ligamina-artifact-cache --bundle-root /home/vegetable/.local/share/ligamina/p7-astrbot-command-bundles-bundlefix-20261112 --queue-db /home/vegetable/.local/share/ligamina/p7-astrbot-command-campaign-bundlefix-20261112.sqlite3 --output "outputs/acceptance/p7-p709-astrbot-campaign-execution-$RUN.json" --max-jobs 20 --worker-id "p7-p709-$RUN"
   ```
-  Full tests 390/390 pass after command descriptor changes; docs gate 29/764/16/65 pass. Load census is not a compatibility/support result.
+  准入及 smoke 证据分别见 `outputs/acceptance/p7-p709-linux-admission-astrbot-bundlefix-20261112.json` 和上述 verification record。完成后以外置 SQLite quick_check、分母/各状态守恒、每 attempt cleanup 与报告 sidecar 一起封账；未知不得改写成通过。
 - **feat-060 结果与边界：** 精确 `nonebot_plugin_warframe_mode@1.1.0` wheel SHA `086911421ce02e46a11c923005ed5028ca3a74ff0cd6f5ee7a69d42386a96827`；`__init__.py` SHA `0e8c9fc201839d1bcfb7e0f28731c9cd158e919b78f56625adc81d44b7937ed7`。`wm`/`rm`/`tran` 使用 `send_group_forward_msg`。Bridge 和独立 Native recorder 均映射到原有 `send_message` / typed `forward_node`；Reference Gateway 生成标准 OneBot node segments；source-bound Federated 观察器保留 typed segment，避免压成空文本。四个 seam 均有 red-green 回归，Native 不导入 Bridge，Core operation 名和 EventEnvelope schema 未改。
 - **feat-060 隔离诊断：** [forward-node diagnostic](outputs/acceptance/p7-p704-forward-node-diagnostic-observer-fix-20261111.json)，SHA `2e919cea1b6b42d2c3c3bdf8ab20e07cc3cb1f209190b0eeab2ca81c27c2dabb`，选择清单 SHA `fec7b15419c958ae613f09b67b3ce4e57add550476713379c52cb353e3203491`。Koishi control 无运行时命令；绑定 Warframe 条目运行 265 个场景、3 轮，795/795 观察等价，26/26 命令等价，4/26 nontrivial；三轮一致、无 mismatch、11/11 Worker cleanup confirmed，Federated Host 均回收。subset 是诊断证据，不是新 30+30 gate，也不能解除 P7-09。
 - **最新 P7-04 gate：** 同一 hash-ranked 30+30 selection（SHA-256 `3076c70a5e692392b993abb8754d84f0b06787a4781a4dfca68c7aad727f86c4`）复核报告 [feat-065 cohort](outputs/acceptance/p7-p704-differential-pilot-20261112-feat065-rerun1.json)，SHA `2df8b15fb2f21985c0a5b8b1aa3c913e54e0a307d4556c39748732e3690b9d58`：60/60 terminal（56 completed、4 discovery skips），1,904 scenarios，177 commands，56 nontrivial (31.6%)、121 equivalent、34 non-equivalent、2 nondeterministic、20 unknown (11.3%)；32/32 behavior entries 三轮一致，348/348 Worker cleanup confirmed。四项 pilot 准入门通过；unknown/non-equivalent/discovery skips 不改写。C1 30 passed/30 unknown，C2–C8 仍全部 unknown。
