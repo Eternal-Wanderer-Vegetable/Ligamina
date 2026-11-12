@@ -37,7 +37,8 @@ def _read_json(path: Path) -> dict[str, Any]:
 def _hash_bound_json(reference: dict[str, Any], *, label: str) -> tuple[Path, dict[str, Any]]:
     path = (ROOT / reference["path"]).resolve(strict=True)
     raw = path.read_bytes()
-    if _sha256(raw) != reference.get("sha256"):
+    # Git normalizes tracked JSON to LF; hash the same bytes on Windows checkouts.
+    if _sha256(raw.replace(b"\r\n", b"\n")) != reference.get("sha256"):
         raise ValueError(f"{label} SHA-256 changed")
     value = json.loads(raw)
     if not isinstance(value, dict):

@@ -27,6 +27,43 @@ class P7SourceAuditCacheTests(unittest.TestCase):
         self.assertEqual(len(targets), 8)
         self.assertTrue(all(row["artifact_sha256"] for row in targets))
 
+    def test_required_profile_locks_are_hash_bound_to_source_audit_entries(self) -> None:
+        from lab.automation.p7_source_audit_cache import required_profile_lock_targets
+
+        targets = required_profile_lock_targets()
+
+        self.assertEqual(len(targets), 8)
+        self.assertTrue(all(row["status"] == "verified_source_lock" for row in targets))
+        self.assertTrue(all(row["sha256"] == row["path"].name for row in targets))
+        self.assertTrue(all(row["path"].is_file() for row in targets))
+
+    def test_prepare_copies_verified_profile_locks_to_external_cache(self) -> None:
+        import hashlib
+
+        from lab.automation.p7_source_audit_cache import (
+            prepare_source_audit_cache,
+            required_profile_lock_targets,
+        )
+
+        def download(artifact: dict, _cache_root: Path, *, allowed_hosts: set[str]):
+            return (
+                {
+                    **artifact,
+                    "computed_digests": {"sha256": artifact["sha256"]},
+                    "size_bytes": 1,
+                },
+                None,
+            )
+
+        with tempfile.TemporaryDirectory() as temporary:
+            with patch("lab.automation.p7_source_audit_cache.download_artifact", side_effect=download):
+                prepare_source_audit_cache(Path(temporary))
+
+            for target in required_profile_lock_targets():
+                installed = Path(temporary) / target["cache_path"]
+                self.assertEqual(hashlib.sha256(installed.read_bytes()).hexdigest(), target["sha256"])
+                self.assertEqual(installed.stat().st_size, target["size_bytes"])
+
     def test_prepare_uses_locked_registries_and_returns_verified_artifact_hashes(self) -> None:
         from lab.automation.p7_source_audit_cache import prepare_source_audit_cache
 

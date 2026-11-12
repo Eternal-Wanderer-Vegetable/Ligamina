@@ -4,6 +4,28 @@ import unittest
 
 
 class P7LocalCandidateDiagnosticTests(unittest.TestCase):
+    def test_hash_bound_json_accepts_git_normalized_line_endings(self) -> None:
+        import hashlib
+        import tempfile
+        from pathlib import Path
+        from unittest.mock import patch
+
+        from lab.automation import p7_local_candidate_diagnostic as diagnostic
+
+        raw = b'{"marker": "line endings"}\r\n'
+        expected = hashlib.sha256(raw.replace(b"\r\n", b"\n")).hexdigest()
+        with tempfile.TemporaryDirectory() as temporary:
+            path = Path(temporary) / "profile.json"
+            path.write_bytes(raw)
+            with patch.object(diagnostic, "ROOT", Path(temporary)):
+                resolved, document = diagnostic._hash_bound_json(
+                    {"path": "profile.json", "sha256": expected},
+                    label="context profile",
+                )
+
+        self.assertEqual(resolved, path.resolve())
+        self.assertEqual(document, {"marker": "line endings"})
+
     def test_selection_binds_only_the_two_exact_candidates_and_stimulus_manifest(self) -> None:
         from lab.automation.p7_local_candidate_diagnostic import build_selection_document
 
