@@ -3,7 +3,7 @@
 ## Current Objective
 
 - **2026-11-12 当前状态：** P6-01–04、P7-01–08、P7-04F–L / feat-059–065 已完成；P7-09 / feat-054 的 30+30 pilot 准入四门已通过，当前 active feature 为 feat-054，下一步完成可恢复的 AstrBot 全量 load census 与三生态已验证条目 campaign；P7-10 / feat-055 仍 blocked，等待 P7-09。
-- **P7-09 当前运行点（2026-11-12）：** feat-054 census 正在运行。SQLite snapshot（2026-11-12T06:53:04Z）：passed=809、failed=40、skipped=29、unknown=0、queued=2385、leased=2，882 attempts；固定分母 3,265。异步 JSON checkpoint 同时观察到 878 terminal（809/40/29）、1 leased 和 2386 queued，SHA-256 `8ce614eb73492cb88595156c1d54d66513df0200f5b2f7e99026b9a4afd9af9f`；报告有 564 个条目带命令 descriptors，55 个 load-passed 条目缺 descriptor field。两个 snapshot 差一个活动 lease，之后仍以 SQLite queue 为恢复依据。已观察 851 次 cleanup、0 次未确认。普查后只对 exact identities 缺失的 descriptor 补 inventory，不重跑已可复用的条目；再启动增量 inventory/contract/differential stages。SQLite `/home/vegetable/.local/share/ligamina/p7-astrbot-census.sqlite3` 与 bundle 根都在仓库外，不要删除或迁移。
+- **P7-09 当前运行点（2026-11-12 07:42 UTC）：** AstrBot census 仍在运行；外置 SQLite snapshot 为 passed=1,455、failed=76、skipped=47、leased=2、queued=1,685，共 3,265 frozen identities、1,582 attempts；`PRAGMA quick_check=ok`。实时 JSON 可能因活动 leases 落后，队列是恢复依据。55 个已通过条目缺 runtime command descriptor，封账后仅补这些 exact identities。`lab/astrbot_campaign_plan.py` 已有 completed-census/identity/hash 校验、fresh exact-image admission、稳定环境增量键和外置 fenced/idempotent StageQueue 注册；规划器不派发 Worker。最终完整 Lab suite 399 项（393 pass、6 因 WSL 缺 Node.js 跳过），定向 census/planner suite 17/17，py_compile 通过。证据 `outputs/acceptance/p7-p709-feat054-campaign-plan-verification-20261112.json`。
 
   当前恢复日志 `/tmp/ligamina-p709-resume.log`。恢复命令（同一 manifest，自动等待 lease/reconcile）：
   ```bash

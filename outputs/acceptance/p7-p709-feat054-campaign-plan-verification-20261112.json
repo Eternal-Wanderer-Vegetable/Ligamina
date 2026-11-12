@@ -1,0 +1,129 @@
+{
+  "schema_version": 1,
+  "kind": "p7_p709_astrbot_campaign_plan_verification",
+  "collected_at_utc": "2026-11-12T07:43:35Z",
+  "scope": "campaign planning and queue registration only; no AstrBot campaign Worker dispatched",
+  "census": {
+    "run_id": "p7-ab04-ab-15937e90d26b7caf9d12-c4225b507530",
+    "status": "in_progress",
+    "snapshot_id": "ab-15937e90d26b7caf9d12",
+    "frozen_denominator": 3265,
+    "queue_snapshot_utc": "2026-11-12T07:43:35Z",
+    "queue_statuses": {
+      "passed": 1455,
+      "failed": 76,
+      "skipped": 47,
+      "leased": 2,
+      "queued": 1685
+    },
+    "attempt_count": 1582,
+    "report_snapshot_sha256": "45b2834bdcead6e513207b41e5a47d283fcf6f908fe0792f6e0500edbcd5e871",
+    "report_snapshot_status": "in_progress",
+    "report_snapshot_counts": {
+      "queued": 1671,
+      "leased": 1,
+      "passed": 1469,
+      "failed": 77,
+      "skipped": 47,
+      "unknown": 0,
+      "total": 3265
+    },
+    "queue_database": "/home/vegetable/.local/share/ligamina/p7-astrbot-census.sqlite3",
+    "queue_database_is_external": true,
+    "queue_integrity_check": "ok",
+    "snapshot_note": "SQLite status counts are the authoritative snapshot; the on-disk JSON report can lag active leases."
+  },
+  "campaign_plan": {
+    "module": "lab/astrbot_campaign_plan.py",
+    "module_sha256": "9c353c5291da4e7d6123be70cc70c6f15666e325ec46d299a3baf0c9a1f69f65",
+    "test_module": "lab/tests/test_astrbot_campaign_plan.py",
+    "test_module_sha256": "4be90573ae26bad5e4aa3d788b201869514be42f7cff3f048cbfbd38db890a85",
+    "behavior": [
+      "requires a completed, exactly closed census over every frozen identity",
+      "keeps load passed, failed, skipped and unknown dispositions separate",
+      "plans descriptor backfill only for passed rows whose runtime inventory field is absent",
+      "generates hash-bound differential jobs only for observed descriptors",
+      "requires fresh Linux admission for the exact pinned Worker image and binds stable host/Docker facts into incremental identity while excluding timestamps and transient free resources",
+      "fences and idempotently registers jobs in an external SQLite StageQueue without dispatching workers"
+    ],
+    "execution_status": "not_started"
+  },
+  "verification": {
+    "full_lab_suite": {
+      "command": "UV_PROJECT_ENVIRONMENT=/tmp/ligamina-p7-p709-final-planner-full-venv UV_OFFLINE=1 uv run --locked --project lab --python 3.12.14 python -m unittest discover -s lab/tests -v",
+      "environment": "Ubuntu-24.04 WSL",
+      "tests_run": 399,
+      "passed": 393,
+      "skipped": 6,
+      "skip_reason": "Node.js is unavailable in this WSL environment",
+      "note": "Final full-suite run includes the latest admission-environment identity, Docker-version invalidation, and queue-resume regression assertions.",
+      "result": "passed",
+      "log_path": "outputs/acceptance/p7-p709-feat054-campaign-plan-full-lab-tests-20261112.txt",
+      "log_sha256": "1237b5c4f9c45640c5a7f08a16f80a777dca7efb1dda7ca457ec28a66536b6bb"
+    },
+    "targeted_after_admission_and_queue_boundary_tests": {
+      "command": "UV_PROJECT_ENVIRONMENT=/tmp/ligamina-p7-p709-campaign-targeted-venv UV_OFFLINE=1 uv run --locked --project lab --python 3.12.14 python -m unittest lab.tests.test_astrbot_campaign_plan lab.tests.test_astrbot_census -v",
+      "tests_run": 17,
+      "passed": 17,
+      "result": "passed",
+      "log_path": "outputs/acceptance/p7-p709-feat054-campaign-plan-targeted-tests-20261112.txt",
+      "log_sha256": "307290620ef7eb05273446940894cec7357d511ed43f5c05268180319bfd3c0b"
+    },
+    "py_compile": {
+      "command": "UV_PROJECT_ENVIRONMENT=/tmp/ligamina-p7-p709-final-planner-full-venv UV_OFFLINE=1 uv run --locked --project lab --python 3.12.14 python -m py_compile lab/astrbot_campaign_plan.py lab/tests/test_astrbot_campaign_plan.py",
+      "environment": "Ubuntu-24.04 WSL",
+      "result": "passed"
+    },
+    "docs_gate": {
+      "command": "pwsh -NoProfile -File init.ps1 -Mode docs",
+      "documents": 29,
+      "local_links": 765,
+      "indexed_historical_markdown": 16,
+      "features": 65,
+      "failures": 0,
+      "result": "passed"
+    },
+    "readme_check": {
+      "command": "node scripts/render-readme.mjs --check",
+      "result": "passed"
+    },
+    "harness_check": {
+      "command": "node .agents/skills/harness-creator/scripts/validate-harness.mjs --target .",
+      "score": "100/100",
+      "result": "passed"
+    },
+    "git_diff_check": {
+      "command": "git diff --check and git diff --cached --check",
+      "result": "passed"
+    },
+    "ci": {
+      "commit": "d47f7589d15b373b9e562c99fc3c855d7ec8afd2",
+      "ci_run_id": 43171627361,
+      "ci_conclusion": "success",
+      "phase3_self_test_run_id": 43171627369,
+      "phase3_self_test_conclusion": "success"
+    },
+    "tdd_red_green": {
+      "red": {
+        "test": "test_plan_key_is_incremental_for_unchanged_frozen_inputs",
+        "observation": "Before the stable admission-environment identity fix, refreshed admission timestamps/free-resource readings produced different run IDs for otherwise unchanged frozen work."
+      },
+      "green": {
+        "tests": [
+          "test_plan_key_is_incremental_for_unchanged_frozen_inputs",
+          "test_plan_identity_changes_when_admitted_docker_environment_changes"
+        ],
+        "observation": "Same host/Docker/image/capability facts retain the run and manifest identity across refreshed reports; a Docker server version change forks the run identity.",
+        "targeted_result": "17/17 passed"
+      }
+    },
+    "node_evidence_hash_tests": {
+      "command": "node --test scripts/evidence-hash.test.mjs",
+      "tests_run": 4,
+      "passed": 4,
+      "failed": 0,
+      "result": "passed"
+    }
+  },
+  "acceptance_boundary": "This checkpoint verifies planning and queue registration only. It does not close the load census, dispatch inventory/differential workers, evaluate contracts, or establish compatibility or plugin support."
+}
