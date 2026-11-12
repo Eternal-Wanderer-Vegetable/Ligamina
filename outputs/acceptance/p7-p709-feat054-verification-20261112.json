@@ -79,23 +79,36 @@
   "campaign_checkpoint": {
     "run_id": "p7-ab04-ab-15937e90d26b7caf9d12-c4225b507530",
     "report_path": "outputs/acceptance/p7-p709-astrbot-full-census-20261112.json",
-    "report_sha256": "1c5c3f0974d293719a5de3536576f671582356aab358c1d09d4fce0268babbf9",
+    "report_sha256": "8ce614eb73492cb88595156c1d54d66513df0200f5b2f7e99026b9a4afd9af9f",
     "report_status": "in_progress",
     "sqlite_queue": "/home/vegetable/.local/share/ligamina/p7-astrbot-census.sqlite3",
     "sqlite_counts_at_latest_direct_probe": {
-      "passed": 412,
-      "failed": 15,
-      "skipped": 15,
+      "passed": 809,
+      "failed": 40,
+      "skipped": 29,
       "unknown": 0,
-      "queued": 2821,
+      "queued": 2385,
       "leased": 2
     },
-    "resume_state": "active; fenced Worker leases continue; report and SQLite checkpoints can differ by one in-flight lease. Preserve external queue and bundle root.",
+    "sqlite_attempt_count": 882,
+    "sqlite_terminal_entries": 878,
+    "report_counts_at_checkpoint": {
+      "passed": 809,
+      "failed": 40,
+      "skipped": 29,
+      "unknown": 0,
+      "queued": 2386,
+      "leased": 1
+    },
+    "report_terminal_entries": 878,
+    "report_command_inventory_rows": 564,
+    "passed_rows_missing_descriptor_field": 55,
+    "report_cleanup_observations": 851,
+    "report_cleanup_unconfirmed": 0,
+    "resume_state": "active; two SQLite leases and one report lease reflect a one-job concurrent checkpoint difference. Preserve the external queue and bundle root.",
     "scope": "load census only; no compatibility or support conclusion",
-    "report_terminal_entries": 442,
-    "report_command_inventory_rows": 368,
-    "inventory_followup": "after census, select exact load-passed rows whose result.side.load.command_descriptors field is absent; earlier settled rows may include retries, so do not select by ordinal alone.",
-    "checkpoint_observed_at_utc": "2026-11-12T06:24:52Z"
+    "inventory_followup": "after census, select exact load-passed rows whose result.side.load.command_descriptors field is absent; do not select by ordinal or redispatch identities with reusable descriptors.",
+    "checkpoint_observed_at_utc": "2026-11-12T06:53:04Z"
   },
   "implementation_review": {
     "red_green_case": "A plugin load failure paired with unconfirmed Worker cleanup was initially committed as failed and could not enter the reconciliation API, which accepts unknown attempts only.",

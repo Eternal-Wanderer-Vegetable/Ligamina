@@ -3,7 +3,7 @@
 ## Current Objective
 
 - **2026-11-12 当前状态：** P6-01–04、P7-01–08、P7-04F–L / feat-059–065 已完成；P7-09 / feat-054 的 30+30 pilot 准入四门已通过，当前 active feature 为 feat-054，下一步完成可恢复的 AstrBot 全量 load census 与三生态已验证条目 campaign；P7-10 / feat-055 仍 blocked，等待 P7-09。
-- **P7-09 当前运行点（2026-11-12）：** feat-054 census 正在运行。最新 SQLite query（2026-11-12T06:24:52Z）：passed=412、failed=15、skipped=15、queued=2821、leased=2；固定分母 3,265。最新 JSON checkpoint 有 442 terminal，其中 368 entries 带 command descriptors（仅命令 ID/参数名、类型、必填；没有 descriptions/values）。报表和 SQLite 会因并发 lease 短暂不同步，以 queue 为准。早期 load-passed identities 中只对缺 descriptor 的 exact IDs 补 inventory，不重派已有 inventory 的条目。SQLite `/home/vegetable/.local/share/ligamina/p7-astrbot-census.sqlite3` 与 bundle 根都在仓库外，不要删除或迁移。
+- **P7-09 当前运行点（2026-11-12）：** feat-054 census 正在运行。SQLite snapshot（2026-11-12T06:53:04Z）：passed=809、failed=40、skipped=29、unknown=0、queued=2385、leased=2，882 attempts；固定分母 3,265。异步 JSON checkpoint 同时观察到 878 terminal（809/40/29）、1 leased 和 2386 queued，SHA-256 `8ce614eb73492cb88595156c1d54d66513df0200f5b2f7e99026b9a4afd9af9f`；报告有 564 个条目带命令 descriptors，55 个 load-passed 条目缺 descriptor field。两个 snapshot 差一个活动 lease，之后仍以 SQLite queue 为恢复依据。已观察 851 次 cleanup、0 次未确认。普查后只对 exact identities 缺失的 descriptor 补 inventory，不重跑已可复用的条目；再启动增量 inventory/contract/differential stages。SQLite `/home/vegetable/.local/share/ligamina/p7-astrbot-census.sqlite3` 与 bundle 根都在仓库外，不要删除或迁移。
 
   当前恢复日志 `/tmp/ligamina-p709-resume.log`。恢复命令（同一 manifest，自动等待 lease/reconcile）：
   ```bash
