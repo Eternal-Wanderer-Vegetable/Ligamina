@@ -59,6 +59,12 @@ KOISHI_XUN = {
     "version": "0.0.2",
     "artifact_sha256": "f50452569da7fae897dc35addd00d758f20dc6096611bfc26a770d4bd3dd4917",
 }
+HJM = {
+    "registry_entry_id": "ko-68ea4b6fd60ea7b3a207c402",
+    "package": "koishi-plugin-hjm-server-query",
+    "version": "1.0.3",
+    "artifact_sha256": "70407f95613efa823ef643c1314b723afcebaec1489e78f396b240a3cc3aa541",
+}
 
 
 def _candidate(identity: dict[str, str]) -> dict[str, object]:
@@ -81,6 +87,48 @@ def _descriptor(command_id: str) -> dict[str, str]:
 
 
 class P7ContextProfileTests(unittest.TestCase):
+    def test_hjm_profile_shares_rcon_config_and_synthetic_authority_across_paths(self) -> None:
+        candidate = {
+            **HJM,
+            "ecosystem": "koishi",
+            "profile_lock_sha256": "c" * 64,
+            "catalog_entry": {},
+            "preload_plugins": [],
+        }
+        binding = profile_binding(candidate)
+        self.assertIsNotNone(binding)
+        assert binding is not None
+        self.assertEqual(binding["synthetic_actor_id"], "p7-hjm-admin-1")
+        self.assertEqual(binding["synthetic_authority"], 4)
+
+        events, generation = p7.build_scenario_batch(candidate, [_descriptor("hjm.list")], seed=p7.FIXED_SEED)
+        self.assertTrue(events)
+        self.assertTrue(all(event["actor_id"] == binding["synthetic_actor_id"] for event in events))
+        self.assertEqual(generation["test_context_profile_sha256"], binding["profile_sha256"])
+
+        native = p7._build_request(
+            candidate, {"events": events}, {"core_cli_sha256": "a" * 64}, mode="native",
+            seed=p7.FIXED_SEED, discover_commands=False, case_id="hjm-native",
+        )["context"]
+        federated = p7._build_request(
+            candidate, {"events": events}, {"core_cli_sha256": "a" * 64}, mode="federated",
+            seed=p7.FIXED_SEED, discover_commands=False, case_id="hjm-federated",
+        )["context"]
+        expected_config = binding["plugin_config"]
+        self.assertEqual(native["sample"]["fixture"]["plugin_config"], expected_config)
+        self.assertEqual(federated["sample"]["fixture"]["plugin_config"], expected_config)
+        self.assertEqual(native["config"]["plugin_config"], federated["config"]["plugin_config"])
+        self.assertEqual(native["test_context_profile"], federated["test_context_profile"])
+        self.assertEqual(native["hjm_rcon_profile"], federated["hjm_rcon_profile"])
+        federated["repo_root"] = str(p7.ROOT)
+        self.assertEqual(_federated_profile_sha256(federated, {"events": events}), binding["profile_sha256"])
+        worker_environment = _worker_host_environment(federated, {"events": events})
+        self.assertNotIn("rconPassword", json.dumps(worker_environment))
+        tampered = json.loads(json.dumps(federated))
+        tampered["config"]["plugin_config"]["servers"][0]["rconHost"] = "example.invalid"
+        with self.assertRaisesRegex(ValueError, "config or event actor"):
+            _worker_host_environment(tampered, {"events": events})
+
     def test_unprofiled_koishi_context_keeps_native_fingerprint_contract(self) -> None:
         candidate = {
             "registry_entry_id": "ko-unprofiled-context-test",

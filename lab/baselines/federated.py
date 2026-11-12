@@ -61,9 +61,9 @@ def _test_context_profile_sha256(
     elif context.get("sample", {}).get("ecosystem") == "koishi":
         actor_id = profile.get("synthetic_actor_id")
         plugin_config = profile.get("plugin_config")
-        expected_config = {"adminId": [actor_id]}
-        if not isinstance(actor_id, str) or plugin_config != expected_config:
-            raise ValueError("P7 Koishi profile must bind one synthetic admin actor")
+        expected_config = plugin_config
+        if not isinstance(actor_id, str) or not isinstance(expected_config, dict):
+            raise ValueError("P7 Koishi profile must bind a synthetic actor and plugin config")
         if context.get("config", {}).get("plugin_config") != expected_config:
             raise ValueError("P7 Native and Federated Koishi config hashes do not match")
         if context.get("sample", {}).get("fixture", {}).get("plugin_config") != expected_config:
@@ -74,6 +74,18 @@ def _test_context_profile_sha256(
             if isinstance(event, dict)
         ):
             raise ValueError("P7 Koishi events must use the profile's synthetic admin actor")
+        if "synthetic_authority" in profile and (
+            not isinstance(profile.get("synthetic_authority"), int)
+            or isinstance(profile.get("synthetic_authority"), bool)
+            or not 0 <= profile["synthetic_authority"] <= 5
+        ):
+            raise ValueError("P7 Koishi synthetic authority is outside the supported range")
+        if profile.get("profile_id") == "p7-hjm-rcon-v1":
+            from pathlib import Path
+
+            manifest_path = Path(context["repo_root"]) / "lab/automation/data/p7-hjm-rcon-v1.json"
+            if hashlib.sha256(manifest_path.read_bytes()).hexdigest() != profile.get("manifest_sha256"):
+                raise ValueError("P7 HJM RCON profile manifest hash mismatch")
     else:
         raise ValueError("P7 context profile is attached to an unsupported ecosystem")
     return claimed
@@ -355,6 +367,27 @@ def run(request: dict[str, Any]) -> dict[str, Any]:
                     raise ValueError("v2 Koishi authority setup is outside the reviewed allowlist")
                 users.append({"platform": platform, "id": user_id, "authority": authority})
             _seed_koishi_users(context["node_executable"], profile_work, work, users)
+    if not behavior_fixture and sample["ecosystem"] == "koishi":
+        profile = context.get("test_context_profile")
+        if isinstance(profile, dict) and "synthetic_authority" in profile:
+            actor_id = profile.get("synthetic_actor_id")
+            authority = profile.get("synthetic_authority")
+            if (
+                not isinstance(actor_id, str)
+                or not isinstance(authority, int)
+                or isinstance(authority, bool)
+                or not 0 <= authority <= 5
+                or profile.get("plugin_config") != context.get("config", {}).get("plugin_config")
+                or profile.get("plugin_config") != sample.get("fixture", {}).get("plugin_config")
+                or any(event.get("actor_id") != actor_id for event in fixture_events if isinstance(event, dict))
+            ):
+                raise ValueError("P7 Koishi synthetic authority seed differs from its source-bound profile")
+            _seed_koishi_users(
+                context["node_executable"],
+                profile_work,
+                work,
+                [{"platform": "onebot.v11", "id": actor_id, "authority": authority}],
+            )
     events = []
     for event in fixture_events:
         platform = "onebot.v11" if sample["ecosystem"] == "nonebot" else "koishi"

@@ -21,6 +21,7 @@ MANIFEST_PATHS = (
     ROOT / "lab/automation/data/p7-koishi-source-bound-context-v1.json",
     ROOT / "lab/automation/data/p7-bilibili-image-https-v1.json",
     ROOT / "lab/automation/data/p7-local-candidate-stimuli-v1.json",
+    ROOT / "lab/automation/data/p7-hjm-rcon-v1.json",
 )
 ALLOWED_HOSTS = {
     "nonebot": {"files.pythonhosted.org"},

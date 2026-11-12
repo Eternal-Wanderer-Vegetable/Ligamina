@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "updated_at": "2026-11-12",
-  "active_feature": null,
+  "active_feature": "feat-054",
   "next_feature": null,
   "features": [
     {
@@ -2638,9 +2638,9 @@
         "feat-051",
         "feat-053"
       ],
-      "status": "blocked",
+      "status": "in-progress",
       "done_when": "分母守恒；清理全部确认；增量键可复跑；unknown 不改写为通过。",
-      "evidence": "P7-09 remains blocked. The latest same-selection hash-ranked 30+30 recheck is outputs/acceptance/p7-p704-differential-pilot-20261111-feat061-source-context-rerun2.json (selection SHA-256 3076c70a5e692392b993abb8754d84f0b06787a4781a4dfca68c7aad727f86c4; report SHA-256 5979f6f5cde9985c29ba309e30359dd7b56984afaef05e79114d9ec5ec64dbe9). It completed 60 terminal entries (56 completed, 4 discovery skips), 348/348 cleanups, and 32/32 consistent behavior entries. It exercised the unchanged 177-command denominator: 44 nontrivial (24.9%), 133 equivalent, 22 non-equivalent, 2 nondeterministic, and 20 unknown (11.3%). Unknown, consistency, and cleanup pass; nontrivial >=30% fails and is 10 commands below the minimum 54. C1–C8 remain as in the bound contract report; no unknown was promoted and no full catalog campaign was started.",
+      "evidence": "Pilot admission gate passed 2026-11-12 using the exact frozen 30+30 selection (SHA-256 3076c70a5e692392b993abb8754d84f0b06787a4781a4dfca68c7aad727f86c4): 60/60 terminal entries (56 completed, 4 discovery skips), 1,904 scenarios, 348/348 Worker cleanups, 177 commands, 56 nontrivial (31.6%, threshold 54), 20 unknown (11.3%), and 32/32 behavior entries consistent. Pilot threshold alone no longer blocks P7-09. Full campaign is now active; first required substage is a restartable full AstrBot frozen-catalog load census (3,265 frozen artifacts), then inventory/contract/differential execution for all load-verified identities. Four discovery skips and all unknown/non-equivalent outcomes remain distinct.",
       "evidence_paths": [
         "outputs/acceptance/p7-p704-differential-pilot-20261110-retry4.json",
         "outputs/acceptance/p7-p704-differential-pilot-20261110-retry4.json.sha256",
@@ -2700,9 +2700,12 @@
         "outputs/acceptance/p7-p705-contract-pilot-20261111-loopback-fixture-retry2.json",
         "outputs/acceptance/p7-p704-loopback-fixture-verification-20261111.json",
         "outputs/acceptance/p7-p704-loopback-fixture-verification-20261111.json.sha256",
-        "outputs/acceptance/p7-p704-independent-pilot-selection-20261111.json",
         "outputs/acceptance/p7-p704-differential-pilot-20261111-feat061-source-context-rerun2.json",
-        "outputs/acceptance/p7-p704-feat061-verification-20261112.json"
+        "outputs/acceptance/p7-p704-feat061-verification-20261112.json",
+        "outputs/acceptance/p7-p704-differential-pilot-20261112-feat065-rerun1.json",
+        "outputs/acceptance/p7-p704-differential-pilot-20261112-feat065-rerun1.json.sha256",
+        "outputs/acceptance/p7-p704-feat065-verification-20261112.json",
+        "outputs/acceptance/p7-p704-feat065-verification-20261112.json.sha256"
       ],
       "plan_path": "docs/plans/2026-11-09-phase-7-automated-verification.md"
     },
@@ -3035,6 +3038,45 @@
         "lab/baselines/nonebot/runner.py",
         "lab/automation/p7_differential_campaign.py"
       ]
+    },
+    {
+      "id": "feat-065",
+      "task_id": "P7-04L",
+      "name": "HJM 命令的 source-bound 合成 RCON fixture",
+      "description": "范围扩展原因：P7-09 在固定 177 命令 cohort 中还差 10 条 nontrivial。精确锁定的 koishi-plugin-hjm-server-query@1.0.3 与 koishi-plugin-hjm-server-query-plus@1.1.1 在 cohort 中共有 14 条命令，其中 13 条当前对生成输入表现为 trivial；源码均通过配置的 RCON TCP 服务执行查询/管理。新增只绑定两份 artifact/source、由 Native 和 Federated 共用的合成回环 RCON 服务与 authority/config profile，以 normal/edge 事件检验输入差异。不修改插件归档、Core/EventEnvelope、command denominator 或 unknown 标签。",
+      "dependencies": [
+        "feat-061",
+        "feat-062",
+        "feat-064"
+      ],
+      "status": "done",
+      "done_when": "按锁定 SHA 校验两份 HJM artifact 与相关 source members；profile 仅允许两个精确 registry/artifact，Native/Federated 共用相同 synthetic actor、authority、plugin config 与 RCON response profile；Worker 内仅绑定 loopback 且 Docker network=none，响应与请求计数不泄露原始命令/密码；14 条原 cohort 命令均运行正常和边界输入，其中至少 10 条对原门槛贡献 nontrivial，Native×2/Federated 关联 source_event_id，Worker/Host 清理全确认；用同一 30+30 selection 重跑全部 60 entries/177 commands并复核四门，未达 54 时 P7-09 继续 blocked。",
+      "evidence": "Completed 2026-11-12. Exact HJM artifacts/source members and both frozen profile locks are hash-bound; Native×2 and Federated share the synthetic actor, authority, Koishi config, RCON response profile, and loopback-only fixture with Docker network disabled. The isolated 2-entry diagnostic exercised all 14 commands across normal/edge inputs; 13/14 were input-sensitive, 0 unknown, and all three fresh rounds were consistent. Formal rerun of the unchanged 30+30 selection completed 60/60 terminal entries, 177/177 commands, and 348/348 Worker cleanups: 56 nontrivial (31.6%), 20 unknown (11.3%), 32/32 behavior entries consistent. The P7-09 pilot gate now passes; this does not promote unknown/non-equivalent results or imply plugin support. First diagnostic attempt with a WSL-built Core hit the runtime image GLIBC_2.39 boundary and is retained as a failed attempt; retry and full cohort used the previously admitted ABI-compatible Core.",
+      "evidence_paths": [
+        "outputs/acceptance/p7-p704-independent-pilot-selection-20261111.json",
+        "outputs/acceptance/p7-p704-differential-pilot-20261111-feat061-source-context-rerun2.json",
+        "lab/automation/data/p7-koishi-source-bound-context-v1.json",
+        "lab/baselines/koishi/runner.mjs",
+        "lab/automation/phase4_worker_side.py",
+        "lab/automation/data/p7-hjm-rcon-v1.json",
+        "lab/automation/data/p7-profile-locks/0899d3a484ae0c5a0f2bad7aad2e473c4e48d7ae60171065ac462483f5a47717",
+        "lab/automation/data/p7-profile-locks/26cf233d1eb2758d098ad586f6ac9b48787d59bbdaedacf1952cc94c43ed41f8",
+        "lab/automation/p7_hjm_rcon_fixture.py",
+        "lab/tests/test_p7_hjm_rcon_fixture.py",
+        "outputs/acceptance/p7-p704-hjm-rcon-source-audit-20261112.json",
+        "outputs/acceptance/p7-p704-hjm-rcon-source-audit-20261112.json.sha256",
+        "outputs/acceptance/p7-p704-hjm-rcon-diagnostic-selection-20261112.json",
+        "outputs/acceptance/p7-p704-hjm-rcon-diagnostic-selection-20261112.json.sha256",
+        "outputs/acceptance/p7-p704-hjm-rcon-diagnostic-20261112-retry2.json",
+        "outputs/acceptance/p7-p704-hjm-rcon-diagnostic-20261112-retry2.json.sha256",
+        "outputs/acceptance/p7-p704-hjm-rcon-diagnostic-20261112.json",
+        "outputs/acceptance/p7-p704-hjm-rcon-diagnostic-20261112.json.sha256",
+        "outputs/acceptance/p7-p704-differential-pilot-20261112-feat065-rerun1.json",
+        "outputs/acceptance/p7-p704-differential-pilot-20261112-feat065-rerun1.json.sha256",
+        "outputs/acceptance/p7-p704-feat065-verification-20261112.json",
+        "outputs/acceptance/p7-p704-feat065-verification-20261112.json.sha256"
+      ],
+      "plan_path": "docs/plans/2026-11-09-phase-7-automated-verification.md"
     }
   ]
 }

@@ -42,6 +42,7 @@ from lab.automation.p7_context_profiles import (
 )
 from lab.automation.p7_loopback_services import profile_binding as loopback_profile_binding
 from lab.automation.p7_loopback_services import profile_manifest_sha256 as loopback_profile_manifest_sha256
+from lab.automation.p7_hjm_rcon_fixture import profile_manifest_sha256 as hjm_rcon_profile_manifest_sha256
 from lab.automation.p7_bilibili_image_diagnostic import (
     COMMAND_IDS as BILIBILI_COMMAND_IDS,
     profile_binding as bilibili_fixture_profile_binding,
@@ -129,6 +130,7 @@ def select_candidates(
     allow_source_context_subset: bool = False,
     allow_local_candidate_diagnostic: bool = False,
     allow_bilibili_image_diagnostic: bool = False,
+    allow_hjm_rcon_diagnostic: bool = False,
 ) -> list[dict[str, Any]]:
     """Validate the 30-per-ecosystem static selection against load and lock evidence."""
     if selection.get("kind") != "p7_p701_static_inventory_sample":
@@ -198,7 +200,7 @@ def select_candidates(
         })
     candidates.sort(key=lambda item: (item["ecosystem"], item["registry_entry_id"]))
     counts = {eco: sum(item["ecosystem"] == eco for item in candidates) for eco in ECOSYSTEMS}
-    if sum((allow_profile_subset, allow_source_context_subset, allow_local_candidate_diagnostic, allow_bilibili_image_diagnostic)) > 1:
+    if sum((allow_profile_subset, allow_source_context_subset, allow_local_candidate_diagnostic, allow_bilibili_image_diagnostic, allow_hjm_rcon_diagnostic)) > 1:
         raise ValueError("P7 profile subset modes are mutually exclusive")
     if allow_bilibili_image_diagnostic:
         from lab.automation.p7_bilibili_image_diagnostic import (
@@ -216,6 +218,20 @@ def select_candidates(
         ):
             raise ValueError("Bilibili diagnostic requires its exact source-bound one-entry selection")
         candidates[0]["bilibili_https_fixture_profile"] = bilibili_fixture_profile_binding(candidates[0])
+        return candidates
+    if allow_hjm_rcon_diagnostic:
+        from lab.automation.p7_hjm_rcon_fixture import EXPECTED_IDENTITIES, validate_diagnostic_selection
+
+        diagnostic_scope = selection.get("diagnostic_scope", {})
+        validate_diagnostic_selection(selection)
+        expected_ids = set(EXPECTED_IDENTITIES)
+        if (
+            limit_per_ecosystem is not None
+            or diagnostic_scope.get("kind") != "p7_source_bound_hjm_rcon_diagnostic"
+            or counts != {"koishi": 2, "nonebot": 0}
+            or {item["registry_entry_id"] for item in candidates} != expected_ids
+        ):
+            raise ValueError("HJM RCON diagnostic requires its exact hash-bound two-artifact selection")
         return candidates
     if allow_local_candidate_diagnostic:
         from lab.automation.p7_local_candidate_diagnostic import EXPECTED_IDS, validate_selection_document
@@ -354,6 +370,9 @@ def prepare_bundle(candidate: dict[str, Any], *, bundle_root: Path, core_binary:
     bilibili_fixture_profile = candidate.get("bilibili_https_fixture_profile")
     if bilibili_fixture_profile is not None:
         context_files["bilibili_https_fixture_profile_sha256"] = bilibili_fixture_profile["profile_sha256"]
+    hjm_rcon_profile = profile_binding(candidate)
+    if hjm_rcon_profile is not None and hjm_rcon_profile.get("profile_id") == "p7-hjm-rcon-v1":
+        context_files["hjm_rcon_profile_sha256"] = hjm_rcon_profile["profile_sha256"]
     manifest = {
         "schema_version": 1,
         "registry_entry_id": entry_id,
@@ -368,6 +387,11 @@ def prepare_bundle(candidate: dict[str, Any], *, bundle_root: Path, core_binary:
         ),
         "bilibili_https_fixture_profile_sha256": (
             bilibili_fixture_profile["profile_sha256"] if bilibili_fixture_profile is not None else None
+        ),
+        "hjm_rcon_profile_sha256": (
+            hjm_rcon_profile["profile_sha256"]
+            if hjm_rcon_profile is not None and hjm_rcon_profile.get("profile_id") == "p7-hjm-rcon-v1"
+            else None
         ),
         "files": [
             {"path": path.relative_to(bundle).as_posix(), "size_bytes": path.stat().st_size, "sha256": _sha256_file(path)}
@@ -442,6 +466,11 @@ def _build_context(
     ecosystem = candidate["ecosystem"]
     sample = _native_sample(candidate)
     test_context_profile = profile_binding(candidate)
+    hjm_rcon_profile = (
+        test_context_profile
+        if test_context_profile is not None and test_context_profile.get("profile_id") == "p7-hjm-rcon-v1"
+        else None
+    )
     nonebot_config = (
         {"superusers": [test_context_profile["synthetic_superuser_id"]]}
         if test_context_profile is not None and ecosystem == "nonebot"
@@ -499,6 +528,7 @@ def _build_context(
         "sample_environment": {},
         "host_environment": host_environment,
         "test_context_profile": test_context_profile,
+        "hjm_rcon_profile": hjm_rcon_profile,
         "koishi_entry_url": "",
         "expected_environment": expected,
         "fingerprint_paths": {
@@ -524,6 +554,8 @@ def _build_context(
     loopback_service_profile = loopback_profile_binding(candidate)
     if loopback_service_profile is not None:
         context["loopback_service_profile"] = loopback_service_profile
+    if hjm_rcon_profile is not None:
+        context["hjm_rcon_profile"] = hjm_rcon_profile
     if ecosystem == "koishi":
         context["host_lock_sha256"] = _sha256_file(ROOT / "hosts/koishi/package-lock.json")
     return context
@@ -881,6 +913,9 @@ def _worker_summary(result: dict[str, Any]) -> dict[str, Any]:
     bilibili_fixture = result.get("bilibili_https_fixture")
     if isinstance(bilibili_fixture, dict):
         summary["bilibili_https_fixture"] = copy.deepcopy(bilibili_fixture)
+    hjm_fixture = result.get("hjm_rcon_fixture")
+    if isinstance(hjm_fixture, dict):
+        summary["hjm_rcon_fixture"] = copy.deepcopy(hjm_fixture)
     return summary
 
 
@@ -1259,6 +1294,7 @@ def run_campaign(
     allow_source_context_subset: bool = False,
     allow_local_candidate_diagnostic: bool = False,
     allow_bilibili_image_diagnostic: bool = False,
+    allow_hjm_rcon_diagnostic: bool = False,
     bilibili_command_id: str | None = None,
     rounds: int = ROUNDS,
     workers: int = 3,
@@ -1309,6 +1345,7 @@ def run_campaign(
         allow_source_context_subset=allow_source_context_subset,
         allow_local_candidate_diagnostic=allow_local_candidate_diagnostic,
         allow_bilibili_image_diagnostic=allow_bilibili_image_diagnostic,
+        allow_hjm_rcon_diagnostic=allow_hjm_rcon_diagnostic,
     )
     local_stimulus_profile_sha256 = None
     if allow_local_candidate_diagnostic:
@@ -1348,8 +1385,11 @@ def run_campaign(
             },
             "network": "disabled",
             "limit_per_ecosystem": limit_per_ecosystem,
-            "diagnostic_only": allow_profile_subset or allow_source_context_subset or allow_local_candidate_diagnostic or allow_bilibili_image_diagnostic or limit_per_ecosystem is not None,
+            "diagnostic_only": allow_profile_subset or allow_source_context_subset or allow_local_candidate_diagnostic or allow_bilibili_image_diagnostic or allow_hjm_rcon_diagnostic or limit_per_ecosystem is not None,
             "selection_scope": (
+                "p7_source_bound_hjm_rcon_diagnostic"
+                if allow_hjm_rcon_diagnostic
+                else
                 "p7_source_bound_bilibili_image_diagnostic"
                 if allow_bilibili_image_diagnostic
                 else
@@ -1397,6 +1437,14 @@ def run_campaign(
     if loopback_profiled_ids:
         report["scope"]["loopback_service_profile_manifest_sha256"] = loopback_profile_manifest_sha256()
         report["scope"]["loopback_profiled_registry_entry_ids"] = loopback_profiled_ids
+    hjm_profiled_ids = [
+        candidate["registry_entry_id"]
+        for candidate in candidates
+        if candidate["registry_entry_id"] in {"ko-68ea4b6fd60ea7b3a207c402", "ko-fcd188bbb6d1c2f93bd5b727"}
+    ]
+    if hjm_profiled_ids:
+        report["scope"]["hjm_rcon_profile_manifest_sha256"] = hjm_rcon_profile_manifest_sha256()
+        report["scope"]["hjm_rcon_profiled_registry_entry_ids"] = hjm_profiled_ids
     bilibili_profiled_ids = [
         candidate["registry_entry_id"] for candidate in candidates
         if candidate.get("bilibili_https_fixture_profile") is not None
@@ -1527,6 +1575,19 @@ def run_campaign(
                 if loopback_service_profile is not None
                 else None
             ),
+            "hjm_rcon_profile": (
+                {
+                    "profile_id": test_context_profile["profile_id"],
+                    "profile_sha256": test_context_profile["profile_sha256"],
+                    "manifest_sha256": test_context_profile["manifest_sha256"],
+                    "fixture_address": test_context_profile["fixture_address"],
+                    "fixture_port": test_context_profile["fixture_port"],
+                    "network_mode": test_context_profile["network_mode"],
+                    "synthetic_authority": test_context_profile["synthetic_authority"],
+                }
+                if test_context_profile is not None and test_context_profile.get("profile_id") == "p7-hjm-rcon-v1"
+                else None
+            ),
             "bilibili_https_fixture_profile": (
                 {
                     "profile_id": bilibili_fixture_profile["profile_id"],
@@ -1570,7 +1631,7 @@ def run_campaign(
 
         if not discovery_ok:
             entry_result["commands"] = {
-                "discovered": len(descriptors) if allow_local_candidate_diagnostic or allow_bilibili_image_diagnostic else len(raw_descriptors) if isinstance(raw_descriptors, list) else 0,
+                "discovered": len(descriptors) if allow_local_candidate_diagnostic or allow_bilibili_image_diagnostic or allow_hjm_rcon_diagnostic else len(raw_descriptors) if isinstance(raw_descriptors, list) else 0,
                 "native_inventory_discovered": len(raw_descriptors) if isinstance(raw_descriptors, list) else 0,
                 "valid_descriptors": len(descriptors),
                 "invalid_descriptors": generation["commands_invalid"],
@@ -1604,7 +1665,7 @@ def run_campaign(
 
         if not descriptors:
             entry_result["commands"] = {
-                "discovered": len(descriptors) if allow_local_candidate_diagnostic or allow_bilibili_image_diagnostic else len(raw_descriptors) if isinstance(raw_descriptors, list) else 0,
+                "discovered": len(descriptors) if allow_local_candidate_diagnostic or allow_bilibili_image_diagnostic or allow_hjm_rcon_diagnostic else len(raw_descriptors) if isinstance(raw_descriptors, list) else 0,
                 "native_inventory_discovered": len(raw_descriptors) if isinstance(raw_descriptors, list) else 0,
                 "valid_descriptors": 0,
                 "invalid_descriptors": generation["commands_invalid"],
@@ -1715,7 +1776,7 @@ def run_campaign(
                 scenario_meta, entry_result["rounds"]
             )
         entry_result["commands"] = {
-            "discovered": len(descriptors) if allow_local_candidate_diagnostic or allow_bilibili_image_diagnostic else len(raw_descriptors) if isinstance(raw_descriptors, list) else 0,
+            "discovered": len(descriptors) if allow_local_candidate_diagnostic or allow_bilibili_image_diagnostic or allow_hjm_rcon_diagnostic else len(raw_descriptors) if isinstance(raw_descriptors, list) else 0,
             "native_inventory_discovered": len(raw_descriptors) if isinstance(raw_descriptors, list) else 0,
             "valid_descriptors": len(descriptors),
             "invalid_descriptors": generation["commands_invalid"],
@@ -1800,6 +1861,7 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--allow-source-context-subset", action="store_true")
     parser.add_argument("--allow-local-candidate-diagnostic", action="store_true")
     parser.add_argument("--allow-bilibili-image-diagnostic", action="store_true")
+    parser.add_argument("--allow-hjm-rcon-diagnostic", action="store_true")
     parser.add_argument("--bilibili-command", choices=BILIBILI_COMMAND_IDS)
     parser.add_argument("--rounds", type=int, default=ROUNDS)
     parser.add_argument("--workers", type=int, default=3)
@@ -1817,6 +1879,7 @@ def main(argv: list[str] | None = None) -> int:
             allow_source_context_subset=options.allow_source_context_subset,
             allow_local_candidate_diagnostic=options.allow_local_candidate_diagnostic,
             allow_bilibili_image_diagnostic=options.allow_bilibili_image_diagnostic,
+            allow_hjm_rcon_diagnostic=options.allow_hjm_rcon_diagnostic,
             bilibili_command_id=options.bilibili_command,
             rounds=options.rounds,
             workers=options.workers,

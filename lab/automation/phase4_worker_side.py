@@ -24,6 +24,10 @@ from lab.automation.p7_bilibili_image_diagnostic import (
     BilibiliImageHttpsFixture,
     validate_bound_profile as validate_bilibili_fixture_profile,
 )
+from lab.automation.p7_hjm_rcon_fixture import (
+    HjmRconFixture,
+    validate_bound_profile as validate_hjm_rcon_profile,
+)
 
 
 _SENSITIVE_VALUE = re.compile(
@@ -429,8 +433,10 @@ def run_side(request: dict[str, Any]) -> dict[str, Any]:
             command = [sys.executable, "/input/project/lab/baselines/federated.py"]
     loopback_fixture = None
     bilibili_fixture = None
+    hjm_rcon_fixture = None
     loopback_profile = context.get("loopback_service_profile")
     bilibili_profile = context.get("bilibili_https_fixture_profile")
+    hjm_profile = context.get("hjm_rcon_profile")
     try:
         if loopback_profile is not None:
             if ecosystem != "nonebot" or mode not in {"native", "federated"}:
@@ -444,8 +450,16 @@ def run_side(request: dict[str, Any]) -> dict[str, Any]:
             bilibili_profile = validate_bilibili_fixture_profile(bilibili_profile, context.get("sample"))
             bilibili_fixture = BilibiliImageHttpsFixture(bilibili_profile)
             bilibili_fixture.start()
+        if hjm_profile is not None:
+            if ecosystem != "koishi" or mode not in {"native", "federated"}:
+                raise ValueError("P7 HJM RCON fixtures are limited to Native/Federated Koishi behavior Workers")
+            hjm_profile = validate_hjm_rcon_profile(hjm_profile, context.get("sample"))
+            hjm_rcon_fixture = HjmRconFixture(hjm_profile)
+            hjm_rcon_fixture.start()
         result = execute_harness(command, request, mode, harness_timeout, cwd=Path("/work/side"))
     finally:
+        if hjm_rcon_fixture is not None:
+            hjm_rcon_fixture.close()
         if bilibili_fixture is not None:
             bilibili_fixture.close()
         if loopback_fixture is not None:
@@ -456,6 +470,8 @@ def run_side(request: dict[str, Any]) -> dict[str, Any]:
         result["loopback_fixture"] = loopback_fixture.evidence()
     if bilibili_fixture is not None:
         result["bilibili_https_fixture"] = bilibili_fixture.evidence()
+    if hjm_rcon_fixture is not None:
+        result["hjm_rcon_fixture"] = hjm_rcon_fixture.evidence()
     return result
 
 

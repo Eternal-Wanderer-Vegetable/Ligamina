@@ -274,6 +274,12 @@ async function main() {
     }
     await app.database.createUser(platform, userId, { authority })
   }
+  const authorityProfile = context.test_context_profile
+  if (authorityProfile && Object.hasOwn(authorityProfile, 'synthetic_authority')) {
+    await app.database.createUser('onebot.v11', authorityProfile.synthetic_actor_id, {
+      authority: authorityProfile.synthetic_authority,
+    })
+  }
 
   let runtimeCommands = []
   let runtimeServices = []
@@ -360,15 +366,29 @@ async function main() {
     if (claimedProfileHash !== observedProfileHash) {
       throw new Error('P7 Koishi test context profile hash mismatch')
     }
-    const expectedPluginConfig = { adminId: [testContextProfile.synthetic_actor_id] }
+    const expectedPluginConfig = testContextProfile.plugin_config
     if (
       !testContextProfile.synthetic_actor_id
+      || !expectedPluginConfig || typeof expectedPluginConfig !== 'object' || Array.isArray(expectedPluginConfig)
       || canonical(testContextProfile.plugin_config) !== canonical(expectedPluginConfig)
       || canonical(context.config.plugin_config) !== canonical(expectedPluginConfig)
       || canonical(sample.fixture?.plugin_config ?? {}) !== canonical(expectedPluginConfig)
       || request.stimulus.events.some((event) => event.actor_id !== testContextProfile.synthetic_actor_id)
+      || (
+        Object.hasOwn(testContextProfile, 'synthetic_authority')
+        && (!Number.isInteger(testContextProfile.synthetic_authority)
+          || testContextProfile.synthetic_authority < 0
+          || testContextProfile.synthetic_authority > 5)
+      )
     ) {
-      throw new Error('P7 Koishi actor/config differs from the source-bound synthetic admin profile')
+      throw new Error('P7 Koishi actor/config differs from its source-bound synthetic profile')
+    }
+    if (testContextProfile.profile_id === 'p7-hjm-rcon-v1') {
+      const manifestPath = resolve(context.repo_root, 'lab/automation/data/p7-hjm-rcon-v1.json')
+      const manifestHash = createHash('sha256').update(await readFile(manifestPath)).digest('hex')
+      if (manifestHash !== testContextProfile.manifest_sha256) {
+        throw new Error('P7 HJM RCON profile manifest hash mismatch')
+      }
     }
     environment.test_context_profile_sha256 = claimedProfileHash
   }

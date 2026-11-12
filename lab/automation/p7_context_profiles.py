@@ -180,6 +180,11 @@ def context_profile_manifest_hashes() -> dict[str, str]:
 def profile_binding(candidate: dict[str, Any]) -> dict[str, Any] | None:
     """Build an immutable-by-hash context binding for one exact catalog artifact."""
     if candidate.get("ecosystem") == "koishi":
+        from lab.automation.p7_hjm_rcon_fixture import profile_binding as hjm_profile_binding
+
+        hjm_profile = hjm_profile_binding(candidate)
+        if hjm_profile is not None:
+            return hjm_profile
         from lab.automation.p7_koishi_context_profiles import profile_binding as koishi_profile_binding
 
         return koishi_profile_binding(candidate)

@@ -18,6 +18,7 @@ from lab.automation.p7_context_profiles import profile_manifest_sha256
 from lab.automation.p7_koishi_context_profiles import profile_manifest_sha256 as koishi_context_profile_manifest_sha256
 from lab.automation.p7_loopback_services import validate_bound_profile
 from lab.automation.p7_bilibili_image_diagnostic import validate_bound_profile as validate_bilibili_fixture_profile
+from lab.automation.p7_hjm_rcon_fixture import profile_manifest_sha256 as hjm_rcon_profile_manifest_sha256
 
 
 def _worker_host_environment(
@@ -75,14 +76,27 @@ def _worker_host_environment(
         return environment
     if sample.get("ecosystem") == "koishi":
         actor_id = profile.get("synthetic_actor_id")
-        expected_config = {"adminId": [actor_id]}
+        expected_config = profile.get("plugin_config")
+        expected_manifest_sha256 = (
+            hjm_rcon_profile_manifest_sha256()
+            if profile.get("profile_id") == "p7-hjm-rcon-v1"
+            else koishi_context_profile_manifest_sha256()
+        )
         if (
-            profile.get("manifest_sha256") != koishi_context_profile_manifest_sha256()
+            profile.get("manifest_sha256") != expected_manifest_sha256
             or not isinstance(actor_id, str)
-            or profile.get("plugin_config") != expected_config
+            or not isinstance(expected_config, dict)
             or supplied
             or context.get("config", {}).get("plugin_config") != expected_config
             or sample.get("fixture", {}).get("plugin_config") != expected_config
+            or (
+                "synthetic_authority" in profile
+                and (
+                    not isinstance(profile.get("synthetic_authority"), int)
+                    or isinstance(profile.get("synthetic_authority"), bool)
+                    or not 0 <= profile["synthetic_authority"] <= 5
+                )
+            )
             or (stimulus is not None and any(
                 event.get("actor_id") != actor_id
                 for event in stimulus.get("events", [])
