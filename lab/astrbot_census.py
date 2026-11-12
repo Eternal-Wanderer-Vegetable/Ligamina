@@ -52,6 +52,8 @@ STRATA = {
 DEFAULT_FULL_CENSUS_QUEUE = Path.home() / ".local" / "share" / "ligamina" / "p7-astrbot-census.sqlite3"
 FULL_CENSUS_LEASE_SECONDS = 1500
 FULL_CENSUS_MAX_WORKERS = 2
+MAX_CENSUS_COMMANDS = 512
+MAX_CENSUS_COMMAND_BYTES = 256 * 1024
 
 
 def _now() -> str:
@@ -466,11 +468,38 @@ def _summarize_worker_side(side: dict[str, Any]) -> dict[str, Any]:
         loaded = load.get("loaded_plugins")
         failed = load.get("failed_plugins")
         commands = load.get("commands")
+        command_descriptors = []
+        command_bytes = 0
+        for descriptor in commands[:MAX_CENSUS_COMMANDS] if isinstance(commands, list) else []:
+            if not isinstance(descriptor, dict):
+                continue
+            command_id = descriptor.get("command_id")
+            if not isinstance(command_id, str) or not command_id.strip():
+                continue
+            arguments = []
+            raw_arguments = descriptor.get("arguments")
+            for argument in raw_arguments[:64] if isinstance(raw_arguments, list) else []:
+                if not isinstance(argument, dict):
+                    continue
+                name, required, kind = argument.get("name"), argument.get("required"), argument.get("type")
+                if isinstance(name, str) and isinstance(required, bool) and isinstance(kind, str):
+                    arguments.append({"name": name[:128], "required": required, "type": kind[:64]})
+            item = {"command_id": command_id[:96], "arguments": arguments}
+            size = len(_canonical_json(item))
+            if command_bytes + size > MAX_CENSUS_COMMAND_BYTES:
+                break
+            command_descriptors.append(item)
+            command_bytes += size
+        commands_truncated = bool(load.get("commands_truncated")) or (
+            isinstance(commands, list) and len(commands) > len(command_descriptors)
+        )
         summary["load"] = {
             "seconds": load.get("seconds") if isinstance(load.get("seconds"), (int, float)) else None,
             "loaded_plugins": len(loaded) if isinstance(loaded, list) else 0,
             "failed_plugins": len(failed) if isinstance(failed, dict) else 0,
             "commands": len(commands) if isinstance(commands, list) else 0,
+            "command_descriptors": command_descriptors,
+            "commands_truncated": commands_truncated,
             "startup_sends": load.get("startup_sends") if isinstance(load.get("startup_sends"), int) else 0,
         }
     return summary

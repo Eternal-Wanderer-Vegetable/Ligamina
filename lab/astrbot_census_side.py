@@ -80,11 +80,27 @@ async def load(plugin_dir: Path, settle: list) -> dict:
             for star in {id(meta): meta for meta in star_map.values()}.values() if not star.reserved
         ]
         commands = describe_commands(lifecycle.wake_prefix())
+        command_descriptors = []
+        command_bytes = 0
+        for command in commands[:512]:
+            descriptor = {
+                "command_id": command["command_id"],
+                "arguments": [
+                    {"name": argument["name"], "required": argument["required"], "type": argument["type"]}
+                    for argument in command.get("arguments", [])[:64]
+                ],
+            }
+            size = len(json.dumps(descriptor, ensure_ascii=False, sort_keys=True, separators=(",", ":")).encode("utf-8"))
+            if command_bytes + size > 256 * 1024:
+                break
+            command_descriptors.append(descriptor)
+            command_bytes += size
         return {
             "seconds": round(time.monotonic() - started, 1),
             "loaded_plugins": loaded,
             "failed_plugins": failed,
-            "commands": [{"command_id": c["command_id"], "arguments": c.get("arguments", [])} for c in commands][:100],
+            "commands": command_descriptors,
+            "commands_truncated": len(command_descriptors) < len(commands) or len(commands) >= 512,
             "startup_sends": len(sends),
         }
     finally:

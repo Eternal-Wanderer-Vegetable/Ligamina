@@ -266,7 +266,13 @@ class AstrBotCensusSelectionTests(unittest.TestCase):
                 "seconds": 2.5,
                 "loaded_plugins": [{"name": "fixture"}],
                 "failed_plugins": {"fixture": {"error": secret, "traceback_tail": secret}},
-                "commands": [{"command_id": "ping"}],
+                "commands": [{
+                    "command_id": "ping",
+                    "description": secret,
+                    "arguments": [
+                        {"name": "target", "required": True, "type": "string", "value": secret},
+                    ],
+                }],
                 "startup_sends": 0,
             },
         })
@@ -275,7 +281,13 @@ class AstrBotCensusSelectionTests(unittest.TestCase):
         self.assertEqual(summary["reason_code"], "plugin_load_failed")
         self.assertEqual(summary["install"], {"status": "installed", "seconds": 1.5})
         self.assertEqual(summary["load"], {
-            "seconds": 2.5, "loaded_plugins": 1, "failed_plugins": 1, "commands": 1, "startup_sends": 0,
+            "seconds": 2.5, "loaded_plugins": 1, "failed_plugins": 1, "commands": 1,
+            "command_descriptors": [{
+                "command_id": "ping",
+                "arguments": [{"name": "target", "required": True, "type": "string"}],
+            }],
+            "commands_truncated": False,
+            "startup_sends": 0,
         })
         self.assertNotIn(secret, json.dumps(summary))
 
