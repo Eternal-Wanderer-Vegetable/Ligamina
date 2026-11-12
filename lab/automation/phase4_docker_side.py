@@ -17,6 +17,7 @@ from lab.workers import DockerWorker, WorkerLimits, WorkerSpec
 from lab.automation.p7_context_profiles import profile_manifest_sha256
 from lab.automation.p7_koishi_context_profiles import profile_manifest_sha256 as koishi_context_profile_manifest_sha256
 from lab.automation.p7_loopback_services import validate_bound_profile
+from lab.automation.p7_bilibili_image_diagnostic import validate_bound_profile as validate_bilibili_fixture_profile
 
 
 def _worker_host_environment(
@@ -121,6 +122,7 @@ def _docker_side(request: dict[str, Any], options: argparse.Namespace) -> dict[s
     }
     context["host_environment"] = _worker_host_environment(context, request.get("stimulus"))
     loopback_service_profile = context.get("loopback_service_profile")
+    bilibili_fixture_profile = context.get("bilibili_https_fixture_profile")
     loopback_host_aliases: tuple[str, ...] = ()
     if loopback_service_profile is not None:
         loopback_service_profile = validate_bound_profile(loopback_service_profile, context.get("sample"))
@@ -128,6 +130,13 @@ def _docker_side(request: dict[str, Any], options: argparse.Namespace) -> dict[s
             raise ValueError("P7 loopback service profiles are restricted to their bound NoneBot artifact")
         loopback_host_aliases = (loopback_service_profile["fixture_host"],)
         context["loopback_service_profile"] = loopback_service_profile
+    if bilibili_fixture_profile is not None:
+        bilibili_fixture_profile = validate_bilibili_fixture_profile(bilibili_fixture_profile, context.get("sample"))
+        if context.get("sample", {}).get("ecosystem") != "nonebot":
+            raise ValueError("Bilibili HTTPS fixture profiles are restricted to their bound NoneBot artifact")
+        loopback_host_aliases += tuple(bilibili_fixture_profile["host_aliases"])
+        context["bilibili_https_fixture_profile"] = bilibili_fixture_profile
+        context["host_environment"]["SSL_CERT_FILE"] = "/input/project/" + bilibili_fixture_profile["tls_certificate_path"]
     request["context"] = context
     encoded = json.dumps(request, ensure_ascii=False, separators=(",", ":"))
     worker = DockerWorker(image_digest=options.image, repository_root=ROOT)

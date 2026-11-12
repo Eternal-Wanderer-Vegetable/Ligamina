@@ -154,6 +154,31 @@ def _probe_observation(work: Path, events: list[dict[str, Any]]) -> dict[str, An
         str(event.get("extensions", {}).get("onebot.v11", {}).get("message_id", "")): event
         for event in events
     }
+    observations = []
+    for row in rows:
+        event = event_by_message_id.get(str(row.get("message_id", "")))
+        if event is None:
+            raise RuntimeError("phase4 observer wrote an unbound OneBot message id")
+        observations.append({
+            "event_id": str(event["event_id"]),
+            "account_id": row["account_id"],
+            "actor_id": row["actor_id"],
+            "conversation": row["conversation"],
+            "timestamp": row["timestamp"],
+        })
+    if len(observations) != len(events):
+        raise RuntimeError("phase4 observer did not persist exactly one record per dispatched OneBot event")
+    source_path = Path(__file__).resolve().parent / "fixtures" / "phase4_probe_observer.py"
+    return {
+        "status": "recorded",
+        "storage": {
+            "relative_path": str(path.relative_to(work.resolve())).replace("\\", "/"),
+            "file_sha256": hashlib.sha256(raw).hexdigest(),
+            "record_count": len(rows),
+            "probe_source_sha256": hashlib.sha256(source_path.read_bytes()).hexdigest(),
+        },
+        "events": observations,
+    }
 
 
 class NativeOneBotApiRecorder:
@@ -195,13 +220,7 @@ class NativeOneBotApiRecorder:
         self.api_inputs.append({
             "api": api,
             "message_type": type(raw_message).__name__,
-            "message": [
-                {
-                    "type": getattr(segment, "type", None) if not isinstance(segment, dict) else segment.get("type"),
-                    "data": getattr(segment, "data", None) if not isinstance(segment, dict) else segment.get("data"),
-                }
-                for segment in raw_message
-            ] if isinstance(raw_message, (list, tuple)) else str(raw_message),
+            "message": _native_api_input_value(raw_message),
         })
         if is_forward:
             group_id = params.get("group_id")
@@ -281,51 +300,62 @@ def _native_onebot_id(value: Any, label: str) -> str:
 def _native_forward_content(value: Any) -> str | list[dict[str, Any]]:
     if isinstance(value, str):
         return value
-    if not isinstance(value, list) or not value:
+    if not isinstance(value, (list, tuple)) or not value:
         raise RuntimeError("forward node content must be a string or non-empty message list")
     segments = []
     for item in value:
-        if not isinstance(item, dict) or set(item) != {"type", "data"} or not isinstance(item.get("data"), dict):
-            raise RuntimeError("forward node content segments must have type and data")
-        data = item["data"]
-        if item["type"] == "text" and isinstance(data.get("text"), str):
-            segments.append({"type": "text", "text": data["text"]})
-        elif item["type"] == "at":
-            segments.append({"type": "mention", "user_id": _native_onebot_id(data.get("qq"), "forward node mention ID")})
-        elif item["type"] == "reply":
-            segments.append({"type": "reply", "message_id": _native_onebot_id(data.get("id"), "forward node reply ID")})
-        elif item["type"] == "image" and isinstance(data.get("file"), str) and data["file"]:
-            segments.append({"type": "image_ref", "resource_ref": data["file"]})
-        elif item["type"] in {"text", "image"}:
-            raise RuntimeError(f"forward node {item['type']} segment has invalid data")
+        if isinstance(item, dict):
+            if set(item) != {"type", "data"}:
+                raise RuntimeError("forward node content segments must have type and data")
+            segment_type, data = item.get("type"), item.get("data")
         else:
-            raise RuntimeError(f"unsupported forward node content segment {item['type']!r}")
+            segment_type = getattr(item, "type", None)
+            data = getattr(item, "data", None)
+        if not isinstance(segment_type, str) or not isinstance(data, dict):
+            raise RuntimeError("forward node content segments must have type and data")
+        if segment_type == "text" and isinstance(data.get("text"), str):
+            segments.append({"type": "text", "text": data["text"]})
+        elif segment_type == "at":
+            segments.append({"type": "mention", "user_id": _native_onebot_id(data.get("qq"), "forward node mention ID")})
+        elif segment_type == "reply":
+            segments.append({"type": "reply", "message_id": _native_onebot_id(data.get("id"), "forward node reply ID")})
+        elif segment_type == "image" and isinstance(data.get("file"), str) and data["file"]:
+            segments.append({"type": "image_ref", "resource_ref": data["file"]})
+        elif segment_type == "image":
+            raise RuntimeError("forward node image segment has no stable resource reference")
+        elif segment_type == "text":
+            raise RuntimeError("forward node text segment has invalid data")
+        else:
+            raise RuntimeError(f"unsupported forward node content segment {segment_type!r}")
     return segments
-    observations = []
-    for row in rows:
-        event = event_by_message_id.get(str(row.get("message_id", "")))
-        if event is None:
-            raise RuntimeError("phase4 observer wrote an unbound OneBot message id")
-        observations.append({
-            "event_id": str(event["event_id"]),
-            "account_id": row["account_id"],
-            "actor_id": row["actor_id"],
-            "conversation": row["conversation"],
-            "timestamp": row["timestamp"],
-        })
-    if len(observations) != len(events):
-        raise RuntimeError("phase4 observer did not persist exactly one record per dispatched OneBot event")
-    source_path = Path(__file__).resolve().parent / "fixtures" / "phase4_probe_observer.py"
-    return {
-        "status": "recorded",
-        "storage": {
-            "relative_path": str(path.relative_to(work.resolve())).replace("\\", "/"),
-            "file_sha256": hashlib.sha256(raw).hexdigest(),
-            "record_count": len(rows),
-            "probe_source_sha256": hashlib.sha256(source_path.read_bytes()).hexdigest(),
-        },
-        "events": observations,
-    }
+
+
+def _native_api_input_value(value: Any) -> Any:
+    """Keep API input evidence JSON-safe without copying image payload bytes."""
+    if value is None or isinstance(value, (str, int, float, bool)):
+        return value
+    if isinstance(value, dict):
+        return {str(key): _native_api_input_value(item) for key, item in value.items()}
+    if isinstance(value, (list, tuple)):
+        return [_native_api_input_value(item) for item in value]
+    if hasattr(value, "type") and hasattr(value, "data"):
+        return {
+            "type": str(getattr(value, "type")),
+            "data": _native_api_input_value(getattr(value, "data")),
+        }
+    if isinstance(value, (bytes, bytearray, memoryview)):
+        raw = bytes(value)
+        return {"byte_length": len(raw), "sha256": hashlib.sha256(raw).hexdigest()}
+    getvalue = getattr(value, "getvalue", None)
+    if callable(getvalue):
+        try:
+            raw = getvalue()
+        except Exception:
+            raw = None
+        if isinstance(raw, (bytes, bytearray, memoryview)):
+            raw = bytes(raw)
+            return {"byte_length": len(raw), "sha256": hashlib.sha256(raw).hexdigest()}
+    return {"unsupported_type": type(value).__name__}
 
 
 async def _run(request: dict[str, Any]) -> dict[str, Any]:

@@ -46,6 +46,12 @@ def _harness_environment(mode: str, case: dict[str, Any] | None = None) -> dict[
     environment["LIGAMINA_RUN_MODE"] = mode
     context = (case or {}).get("context", {})
     execution = context.get("execution", {}) if isinstance(context, dict) else {}
+    bilibili_profile = context.get("bilibili_https_fixture_profile") if isinstance(context, dict) else None
+    if bilibili_profile is not None:
+        from lab.automation.p7_bilibili_image_diagnostic import validate_bound_profile
+
+        bilibili_profile = validate_bound_profile(bilibili_profile, context.get("sample"))
+        environment["SSL_CERT_FILE"] = "/input/project/" + bilibili_profile["tls_certificate_path"]
     seed = execution.get("random_seed") if isinstance(execution, dict) else None
     if isinstance(seed, int) and not isinstance(seed, bool) and seed >= 0:
         environment.update({

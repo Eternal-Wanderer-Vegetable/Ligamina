@@ -294,6 +294,23 @@ class DifferentialCampaignTests(unittest.TestCase):
         self.assertEqual(summary["loopback_fixture"], fixture)
         self.assertNotIn("request_text", json.dumps(summary))
 
+    def test_worker_summary_preserves_bilibili_fixture_route_counts_without_payloads(self) -> None:
+        fixture = {
+            "profile_id": "p7-bilibili-image-https-v1",
+            "profile_sha256": "b" * 64,
+            "network_mode": "none",
+            "bind_address": "127.0.0.1",
+            "request_count": 2,
+            "route_counts": {"video-view-a": 1, "cover-image-a": 1},
+            "unmatched_request_count": 0,
+        }
+
+        summary = _worker_summary({"status": "completed", "bilibili_https_fixture": fixture})
+
+        self.assertEqual(summary["bilibili_https_fixture"], fixture)
+        self.assertNotIn("Fixture video", json.dumps(summary))
+        self.assertNotIn("request_text", json.dumps(summary))
+
     def test_final_report_sidecar_hash_matches_written_bytes(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
             path = Path(directory) / "report.json"
@@ -313,6 +330,12 @@ class DifferentialCampaignTests(unittest.TestCase):
             self.assertTrue((project / "contracts/lab/v1/catalog.schema.json").is_file())
             self.assertTrue((project / "contracts/lab/v1/run.schema.json").is_file())
             self.assertTrue((project / "lab/automation/p7_loopback_services.py").is_file())
+            self.assertTrue((project / "lab/automation/p7_bilibili_image_diagnostic.py").is_file())
+            self.assertTrue((project / "lab/automation/data/p7-bilibili-image-https-v1.json").is_file())
+            self.assertTrue((project / "lab/automation/data/p7-bilibili-fixture-cert.pem").is_file())
+            self.assertTrue((project / "lab/automation/data/p7-bilibili-fixture-key.pem").is_file())
+            self.assertTrue((project / "outputs/acceptance/p7-p704-independent-pilot-selection-20261111.json").is_file())
+            self.assertTrue((project / "outputs/acceptance/p7-p704-nontrivial-unknown-source-audit-20261112.json").is_file())
             self.assertTrue((project / "lab/automation/data/p7-nonebot-warframe-api-loopback-v1.json").is_file())
             self.assertTrue((project / "contracts/lab/automation/p7-loopback-service-profiles/v1.schema.json").is_file())
             self.assertTrue((project / "outputs/acceptance/p7-p704-no-operation-source-diagnostic-20261111.json").is_file())

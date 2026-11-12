@@ -42,6 +42,10 @@ from lab.automation.p7_context_profiles import (
 )
 from lab.automation.p7_loopback_services import profile_binding as loopback_profile_binding
 from lab.automation.p7_loopback_services import profile_manifest_sha256 as loopback_profile_manifest_sha256
+from lab.automation.p7_bilibili_image_diagnostic import (
+    COMMAND_IDS as BILIBILI_COMMAND_IDS,
+    profile_binding as bilibili_fixture_profile_binding,
+)
 from lab.capability_inventory import SCANNER_VERSION
 from lab.pilot_nonebot import _prepare_wheelhouse
 from lab.pilot_workers import _load_npm_lock, _prepare_npm_project
@@ -124,6 +128,7 @@ def select_candidates(
     allow_profile_subset: bool = False,
     allow_source_context_subset: bool = False,
     allow_local_candidate_diagnostic: bool = False,
+    allow_bilibili_image_diagnostic: bool = False,
 ) -> list[dict[str, Any]]:
     """Validate the 30-per-ecosystem static selection against load and lock evidence."""
     if selection.get("kind") != "p7_p701_static_inventory_sample":
@@ -193,8 +198,25 @@ def select_candidates(
         })
     candidates.sort(key=lambda item: (item["ecosystem"], item["registry_entry_id"]))
     counts = {eco: sum(item["ecosystem"] == eco for item in candidates) for eco in ECOSYSTEMS}
-    if sum((allow_profile_subset, allow_source_context_subset, allow_local_candidate_diagnostic)) > 1:
+    if sum((allow_profile_subset, allow_source_context_subset, allow_local_candidate_diagnostic, allow_bilibili_image_diagnostic)) > 1:
         raise ValueError("P7 profile subset modes are mutually exclusive")
+    if allow_bilibili_image_diagnostic:
+        from lab.automation.p7_bilibili_image_diagnostic import (
+            BILIBILI_ENTRY_ID,
+            validate_selection_document,
+        )
+
+        validate_selection_document(selection)
+        diagnostic_scope = selection.get("diagnostic_scope", {})
+        if (
+            limit_per_ecosystem is not None
+            or diagnostic_scope.get("kind") != "p7_source_bound_bilibili_image_diagnostic"
+            or counts != {"koishi": 0, "nonebot": 1}
+            or {item["registry_entry_id"] for item in candidates} != {BILIBILI_ENTRY_ID}
+        ):
+            raise ValueError("Bilibili diagnostic requires its exact source-bound one-entry selection")
+        candidates[0]["bilibili_https_fixture_profile"] = bilibili_fixture_profile_binding(candidates[0])
+        return candidates
     if allow_local_candidate_diagnostic:
         from lab.automation.p7_local_candidate_diagnostic import EXPECTED_IDS, validate_selection_document
 
@@ -329,6 +351,9 @@ def prepare_bundle(candidate: dict[str, Any], *, bundle_root: Path, core_binary:
     loopback_service_profile = loopback_profile_binding(candidate)
     if loopback_service_profile is not None:
         context_files["loopback_service_profile_sha256"] = loopback_service_profile["profile_sha256"]
+    bilibili_fixture_profile = candidate.get("bilibili_https_fixture_profile")
+    if bilibili_fixture_profile is not None:
+        context_files["bilibili_https_fixture_profile_sha256"] = bilibili_fixture_profile["profile_sha256"]
     manifest = {
         "schema_version": 1,
         "registry_entry_id": entry_id,
@@ -340,6 +365,9 @@ def prepare_bundle(candidate: dict[str, Any], *, bundle_root: Path, core_binary:
         "service_profile_sha256": candidate.get("service_profile_sha256"),
         "loopback_service_profile_sha256": (
             loopback_service_profile["profile_sha256"] if loopback_service_profile is not None else None
+        ),
+        "bilibili_https_fixture_profile_sha256": (
+            bilibili_fixture_profile["profile_sha256"] if bilibili_fixture_profile is not None else None
         ),
         "files": [
             {"path": path.relative_to(bundle).as_posix(), "size_bytes": path.stat().st_size, "sha256": _sha256_file(path)}
@@ -491,6 +519,8 @@ def _build_context(
         },
         "runtime_artifacts": copy.deepcopy(runtime_artifacts),
     }
+    if candidate.get("bilibili_https_fixture_profile") is not None:
+        context["bilibili_https_fixture_profile"] = copy.deepcopy(candidate["bilibili_https_fixture_profile"])
     loopback_service_profile = loopback_profile_binding(candidate)
     if loopback_service_profile is not None:
         context["loopback_service_profile"] = loopback_service_profile
@@ -848,6 +878,9 @@ def _worker_summary(result: dict[str, Any]) -> dict[str, Any]:
     loopback_fixture = result.get("loopback_fixture")
     if isinstance(loopback_fixture, dict):
         summary["loopback_fixture"] = copy.deepcopy(loopback_fixture)
+    bilibili_fixture = result.get("bilibili_https_fixture")
+    if isinstance(bilibili_fixture, dict):
+        summary["bilibili_https_fixture"] = copy.deepcopy(bilibili_fixture)
     return summary
 
 
@@ -1225,6 +1258,8 @@ def run_campaign(
     allow_profile_subset: bool = False,
     allow_source_context_subset: bool = False,
     allow_local_candidate_diagnostic: bool = False,
+    allow_bilibili_image_diagnostic: bool = False,
+    bilibili_command_id: str | None = None,
     rounds: int = ROUNDS,
     workers: int = 3,
 ) -> dict[str, Any]:
@@ -1232,6 +1267,11 @@ def run_campaign(
         raise ValueError("P7-04 acceptance requires exactly three fresh reruns")
     if workers not in {1, 2, 3}:
         raise ValueError("P7-04 permits one to three concurrent isolated Workers")
+    if allow_bilibili_image_diagnostic:
+        if bilibili_command_id not in BILIBILI_COMMAND_IDS:
+            raise ValueError("Bilibili diagnostic requires one exact source-bound command ID")
+    elif bilibili_command_id is not None:
+        raise ValueError("--bilibili-command is only valid with the Bilibili image diagnostic mode")
     output_path = output_path.expanduser().absolute()
     progress_path = output_path.with_suffix(output_path.suffix + ".progress.json")
     bundle_root = bundle_root.expanduser().absolute()
@@ -1268,10 +1308,15 @@ def run_campaign(
         allow_profile_subset=allow_profile_subset,
         allow_source_context_subset=allow_source_context_subset,
         allow_local_candidate_diagnostic=allow_local_candidate_diagnostic,
+        allow_bilibili_image_diagnostic=allow_bilibili_image_diagnostic,
     )
     local_stimulus_profile_sha256 = None
     if allow_local_candidate_diagnostic:
         from lab.automation.p7_local_candidate_diagnostic import stimulus_profile_sha256 as local_profile_sha256
+
+        local_stimulus_profile_sha256 = local_profile_sha256()
+    elif allow_bilibili_image_diagnostic:
+        from lab.automation.p7_bilibili_image_diagnostic import stimulus_profile_sha256 as local_profile_sha256
 
         local_stimulus_profile_sha256 = local_profile_sha256()
     bundle_root.mkdir(parents=True)
@@ -1303,8 +1348,11 @@ def run_campaign(
             },
             "network": "disabled",
             "limit_per_ecosystem": limit_per_ecosystem,
-            "diagnostic_only": allow_profile_subset or allow_source_context_subset or allow_local_candidate_diagnostic or limit_per_ecosystem is not None,
+            "diagnostic_only": allow_profile_subset or allow_source_context_subset or allow_local_candidate_diagnostic or allow_bilibili_image_diagnostic or limit_per_ecosystem is not None,
             "selection_scope": (
+                "p7_source_bound_bilibili_image_diagnostic"
+                if allow_bilibili_image_diagnostic
+                else
                 "p7_source_bound_local_candidate_diagnostic"
                 if allow_local_candidate_diagnostic
                 else "p7_nonebot_context_profile_subset"
@@ -1330,10 +1378,17 @@ def run_campaign(
         "counts": {"entries": 0, "worker_runs": 0, "cleanup_unconfirmed": 0, "scenarios": 0},
     }
     if local_stimulus_profile_sha256 is not None:
-        from lab.automation.p7_local_candidate_diagnostic import STIMULUS_PROFILE_PATH
+        if allow_bilibili_image_diagnostic:
+            from lab.automation.p7_bilibili_image_diagnostic import PROFILE_MANIFEST_PATH
 
-        report["scope"]["local_stimulus_profile_path"] = STIMULUS_PROFILE_PATH.relative_to(ROOT).as_posix()
-        report["scope"]["local_stimulus_profile_sha256"] = local_stimulus_profile_sha256
+            report["scope"]["source_bound_stimulus_profile_path"] = PROFILE_MANIFEST_PATH.relative_to(ROOT).as_posix()
+            report["scope"]["source_bound_stimulus_profile_sha256"] = local_stimulus_profile_sha256
+            report["scope"]["bilibili_command_id"] = bilibili_command_id
+        else:
+            from lab.automation.p7_local_candidate_diagnostic import STIMULUS_PROFILE_PATH
+
+            report["scope"]["local_stimulus_profile_path"] = STIMULUS_PROFILE_PATH.relative_to(ROOT).as_posix()
+            report["scope"]["local_stimulus_profile_sha256"] = local_stimulus_profile_sha256
     loopback_profiled_ids = [
         candidate["registry_entry_id"]
         for candidate in candidates
@@ -1342,6 +1397,15 @@ def run_campaign(
     if loopback_profiled_ids:
         report["scope"]["loopback_service_profile_manifest_sha256"] = loopback_profile_manifest_sha256()
         report["scope"]["loopback_profiled_registry_entry_ids"] = loopback_profiled_ids
+    bilibili_profiled_ids = [
+        candidate["registry_entry_id"] for candidate in candidates
+        if candidate.get("bilibili_https_fixture_profile") is not None
+    ]
+    if bilibili_profiled_ids:
+        from lab.automation.p7_bilibili_image_diagnostic import profile_manifest_sha256 as bilibili_manifest_sha256
+
+        report["scope"]["bilibili_https_fixture_manifest_sha256"] = bilibili_manifest_sha256()
+        report["scope"]["bilibili_https_fixture_registry_entry_ids"] = bilibili_profiled_ids
     _write_progress(progress_path, report)
 
     # The P4 runtime image is re-probed through an admitted Docker Worker before any plugin bundle runs.
@@ -1403,6 +1467,13 @@ def run_campaign(
             if local_stimulus is None:
                 raise ValueError(f"local-candidate stimulus is not defined for selected entry {entry_id}")
             descriptors = filter_local_stimulus_descriptors(descriptors, local_stimulus)
+        elif allow_bilibili_image_diagnostic:
+            from lab.automation.p7_bilibili_image_diagnostic import stimulus_for_command
+
+            local_stimulus = stimulus_for_command(str(bilibili_command_id))
+            if local_stimulus.get("registry_entry_id") != entry_id:
+                raise ValueError(f"Bilibili stimulus is not defined for selected entry {entry_id}")
+            descriptors = filter_local_stimulus_descriptors(descriptors, local_stimulus)
         events, generation = build_scenario_batch(
             candidate,
             descriptors,
@@ -1414,6 +1485,7 @@ def run_campaign(
         scenario_meta = generation["scenarios"]
         test_context_profile = profile_binding(candidate)
         loopback_service_profile = loopback_profile_binding(candidate)
+        bilibili_fixture_profile = candidate.get("bilibili_https_fixture_profile")
         entry_result: dict[str, Any] = {
             "registry_entry_id": entry_id,
             "ecosystem": candidate["ecosystem"],
@@ -1455,6 +1527,20 @@ def run_campaign(
                 if loopback_service_profile is not None
                 else None
             ),
+            "bilibili_https_fixture_profile": (
+                {
+                    "profile_id": bilibili_fixture_profile["profile_id"],
+                    "profile_sha256": bilibili_fixture_profile["profile_sha256"],
+                    "manifest_sha256": bilibili_fixture_profile["manifest_sha256"],
+                    "network_mode": bilibili_fixture_profile["network_mode"],
+                    "fixture_address": bilibili_fixture_profile["fixture_address"],
+                    "fixture_port": bilibili_fixture_profile["fixture_port"],
+                    "host_aliases": bilibili_fixture_profile["host_aliases"],
+                    "tls_certificate_sha256": bilibili_fixture_profile["tls_certificate_sha256"],
+                }
+                if bilibili_fixture_profile is not None
+                else None
+            ),
             "scenarios": [
                 {
                     **{key: item[key] for key in ("scenario_id", "command_id", "kind", "descriptor_sha256", "input_sha256", "arguments_bytes", "arguments_nonempty", "pairwise")},
@@ -1484,7 +1570,7 @@ def run_campaign(
 
         if not discovery_ok:
             entry_result["commands"] = {
-                "discovered": len(descriptors) if allow_local_candidate_diagnostic else len(raw_descriptors) if isinstance(raw_descriptors, list) else 0,
+                "discovered": len(descriptors) if allow_local_candidate_diagnostic or allow_bilibili_image_diagnostic else len(raw_descriptors) if isinstance(raw_descriptors, list) else 0,
                 "native_inventory_discovered": len(raw_descriptors) if isinstance(raw_descriptors, list) else 0,
                 "valid_descriptors": len(descriptors),
                 "invalid_descriptors": generation["commands_invalid"],
@@ -1518,7 +1604,7 @@ def run_campaign(
 
         if not descriptors:
             entry_result["commands"] = {
-                "discovered": len(descriptors) if allow_local_candidate_diagnostic else len(raw_descriptors) if isinstance(raw_descriptors, list) else 0,
+                "discovered": len(descriptors) if allow_local_candidate_diagnostic or allow_bilibili_image_diagnostic else len(raw_descriptors) if isinstance(raw_descriptors, list) else 0,
                 "native_inventory_discovered": len(raw_descriptors) if isinstance(raw_descriptors, list) else 0,
                 "valid_descriptors": 0,
                 "invalid_descriptors": generation["commands_invalid"],
@@ -1629,7 +1715,7 @@ def run_campaign(
                 scenario_meta, entry_result["rounds"]
             )
         entry_result["commands"] = {
-            "discovered": len(descriptors) if allow_local_candidate_diagnostic else len(raw_descriptors) if isinstance(raw_descriptors, list) else 0,
+            "discovered": len(descriptors) if allow_local_candidate_diagnostic or allow_bilibili_image_diagnostic else len(raw_descriptors) if isinstance(raw_descriptors, list) else 0,
             "native_inventory_discovered": len(raw_descriptors) if isinstance(raw_descriptors, list) else 0,
             "valid_descriptors": len(descriptors),
             "invalid_descriptors": generation["commands_invalid"],
@@ -1713,6 +1799,8 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--allow-profile-subset", action="store_true")
     parser.add_argument("--allow-source-context-subset", action="store_true")
     parser.add_argument("--allow-local-candidate-diagnostic", action="store_true")
+    parser.add_argument("--allow-bilibili-image-diagnostic", action="store_true")
+    parser.add_argument("--bilibili-command", choices=BILIBILI_COMMAND_IDS)
     parser.add_argument("--rounds", type=int, default=ROUNDS)
     parser.add_argument("--workers", type=int, default=3)
     options = parser.parse_args(argv)
@@ -1728,6 +1816,8 @@ def main(argv: list[str] | None = None) -> int:
             allow_profile_subset=options.allow_profile_subset,
             allow_source_context_subset=options.allow_source_context_subset,
             allow_local_candidate_diagnostic=options.allow_local_candidate_diagnostic,
+            allow_bilibili_image_diagnostic=options.allow_bilibili_image_diagnostic,
+            bilibili_command_id=options.bilibili_command,
             rounds=options.rounds,
             workers=options.workers,
         )
