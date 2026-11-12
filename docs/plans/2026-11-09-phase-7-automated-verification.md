@@ -318,6 +318,8 @@ P7-03、P7-08 与 P7-04 可并行。P7-04 与 P7-06 是两个决策点，见第 
 
 **P7-09 / feat-054 bounded AstrBot campaign execution checkpoint（2026-11-12 13:24 UTC）：** 十三个 sidecar-verified bounded batch 共完成 260 个 differential jobs：37 equivalent、119 non-equivalent、32 nondeterministic、72 unknown；C7 108 passed / 152 failed。260/260 报告 ID 匹配外置 StageQueue 终态，cleanup confirmed。14,710-job queue 在 13:24:29 UTC 快照为 14,426 queued、204 passed、79 unknown、1 leased；284 attempts、quick_check=ok、terminal cleanup unconfirmed=0。unknown reason 保留为 worker_observation_incomplete。完整逐批 hash、probe/admission hash 与队列关联见 [checkpoint](../../outputs/acceptance/p7-p709-astrbot-campaign-checkpoint-20261112T132429Z.json) SHA-256 3df7408105a51a5e09139eff77882f288cb7aef177cdd223de8c38b5db4cc65f。executor targeted regression 32/32 passed。双 bounded supervisor 仍运行；P7-09 in-progress、P7-10 blocked，不据此声称插件兼容或支持。
 
+**P7-09 / feat-054 bounded AstrBot campaign execution checkpoint（2026-11-12 13:26 UTC）：** 十四个 sidecar-verified bounded batch 共完成 280 个 differential jobs：39 equivalent、127 non-equivalent、36 nondeterministic、78 unknown；C7 119 passed / 161 failed。280/280 报告 ID 匹配外置 StageQueue 终态，cleanup confirmed。14,710-job queue 在 13:26:58 UTC 快照为 14,421 queued、207 passed、80 unknown、2 leased；289 attempts、quick_check=ok、terminal cleanup unconfirmed=0。unknown reason 保留为 worker_observation_incomplete。完整逐批 hash、probe/admission hash 与队列关联见 [checkpoint](../../outputs/acceptance/p7-p709-astrbot-campaign-checkpoint-20261112T132658Z.json) SHA-256 3bcbf804f9d23b6e67f443a8734b5c12859509eb4793379e42f9ae7b22a9c932。executor targeted regression 32/32 passed。双 bounded supervisor 仍运行；P7-09 in-progress、P7-10 blocked，不据此声称插件兼容或支持。
+
 ## 8. 验证命令（规划阶段）
 
 ```powershell
