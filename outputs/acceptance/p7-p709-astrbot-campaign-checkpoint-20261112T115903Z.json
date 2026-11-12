@@ -1,0 +1,179 @@
+{
+  "schema_version": 1,
+  "kind": "p7_p709_astrbot_campaign_checkpoint",
+  "observed_at_utc": "2026-11-12T11:59:47+00:00",
+  "status": "running",
+  "run_id": "p7-09-astra-72e7512f6f4d2219cf9b",
+  "plan_sha256": "a9871842d70641c0ec4bd05fb9fd063a9cee06b8512759c41ed15f1b4ceb0205",
+  "census_sha256": "b5d149ebbfc690a6889c2e32d4443d8a341771a9c1f07ec1965f27c7baa0a9b0",
+  "frozen_denominator": {
+    "snapshot_entries": 3271,
+    "frozen_entries": 3265,
+    "excluded_non_frozen": 6
+  },
+  "registered_jobs": {
+    "inventory_backfill": 55,
+    "differential": 14655,
+    "total": 14710
+  },
+  "completed_bounded_batches": [
+    {
+      "path": "outputs/acceptance/p7-p709-astrbot-campaign-execution-batch-20261112T111020Z.json",
+      "sha256": "8f32b8f70332dd539005746f21bcc6636ed9111314a48bf2604070f0ad91fc22",
+      "calls": 20,
+      "status": "bounded_calls_finished_campaign_running",
+      "comparison": {
+        "equivalent": 3,
+        "non_equivalent": 9,
+        "nondeterministic": 4,
+        "unknown": 4
+      },
+      "C7": {
+        "failed": 13,
+        "passed": 7
+      },
+      "queue_counts_at_report": {
+        "queued": 14672,
+        "leased": 1,
+        "passed": 26,
+        "failed": 0,
+        "skipped": 0,
+        "unknown": 11,
+        "total": 14710
+      }
+    },
+    {
+      "path": "outputs/acceptance/p7-p709-astrbot-campaign-execution-batch-20261112T111200Z.json",
+      "sha256": "a62b63e1d411f9ad9ebcc7341dfc0f5b467aa230253c79807622dd3281142d9b",
+      "calls": 20,
+      "status": "bounded_calls_finished_campaign_running",
+      "comparison": {
+        "equivalent": 3,
+        "non_equivalent": 7,
+        "nondeterministic": 2,
+        "unknown": 8
+      },
+      "C7": {
+        "failed": 13,
+        "passed": 7
+      },
+      "queue_counts_at_report": {
+        "queued": 14668,
+        "leased": 1,
+        "passed": 28,
+        "failed": 0,
+        "skipped": 0,
+        "unknown": 13,
+        "total": 14710
+      }
+    },
+    {
+      "path": "outputs/acceptance/p7-p709-astrbot-campaign-execution-batch-20261112T112900Z.json",
+      "sha256": "7b385a36526bcdaa2d4c9622156ba3509cf61227a4bfa8a5708bc6cb6a54ad7e",
+      "calls": 20,
+      "status": "bounded_calls_finished_campaign_running",
+      "comparison": {
+        "equivalent": 3,
+        "non_equivalent": 9,
+        "nondeterministic": 4,
+        "unknown": 4
+      },
+      "C7": {
+        "failed": 15,
+        "passed": 5
+      },
+      "queue_counts_at_report": {
+        "queued": 14636,
+        "leased": 1,
+        "passed": 52,
+        "failed": 0,
+        "skipped": 0,
+        "unknown": 21,
+        "total": 14710
+      }
+    },
+    {
+      "path": "outputs/acceptance/p7-p709-astrbot-campaign-execution-batch-20261112T113620Z.json",
+      "sha256": "f9b4e99ef59c0a72db5652d37aaf4f0568a3eaa8c2bb452b31222aac7d0b2ff7",
+      "calls": 20,
+      "status": "bounded_calls_finished_campaign_running",
+      "comparison": {
+        "equivalent": 1,
+        "non_equivalent": 11,
+        "nondeterministic": 2,
+        "unknown": 6
+      },
+      "C7": {
+        "failed": 11,
+        "passed": 9
+      },
+      "queue_counts_at_report": {
+        "queued": 14626,
+        "leased": 1,
+        "passed": 60,
+        "failed": 0,
+        "skipped": 0,
+        "unknown": 23,
+        "total": 14710
+      }
+    }
+  ],
+  "completed_report_aggregate": {
+    "calls": 80,
+    "comparison": {
+      "equivalent": 10,
+      "non_equivalent": 36,
+      "nondeterministic": 12,
+      "unknown": 22
+    },
+    "C7": {
+      "failed": 52,
+      "passed": 28
+    },
+    "all_reported_calls_finished": true,
+    "matched_queue_rows": 80,
+    "reported_rows_cleanup_confirmed": 80
+  },
+  "queue": {
+    "path": "/home/vegetable/.local/share/ligamina/p7-astrbot-command-campaign-bundlefix-20261112.sqlite3",
+    "quick_check": "ok",
+    "counts": {
+      "leased": 2,
+      "passed": 65,
+      "queued": 14618,
+      "unknown": 25
+    },
+    "attempts_used_sum": 92,
+    "conserved_total": 14710,
+    "terminal_cleanup_unconfirmed": 0,
+    "unknown_reasons": {
+      "worker_observation_incomplete": 25
+    },
+    "active_leases": [
+      {
+        "case_id": "163music",
+        "worker_id": "p7-p709-20261112T115100Z",
+        "attempts_used": 1
+      },
+      {
+        "case_id": "搜图",
+        "worker_id": "p7-p709-20261112T115700Z",
+        "attempts_used": 1
+      }
+    ]
+  },
+  "executor_tdd_boundary": {
+    "seam": "StageQueue claim/finish/reconciliation and WorkerSpec-to-WorkerResult projection",
+    "tests": [
+      "test_claimed_job_runs_native_twice_and_federated_then_finishes_with_fenced_comparison",
+      "test_finished_queue_result_contains_sanitized_c7_projection",
+      "test_unconfirmed_worker_cleanup_quarantines_job_until_reconciliation_confirms_cleanup",
+      "test_restart_reconciles_expired_fenced_lease_before_reclaiming"
+    ],
+    "test_module": "lab/tests/test_astrbot_campaign_execute.py",
+    "verification_record": "outputs/acceptance/p7-p709-feat054-campaign-executor-verification-20261112.json",
+    "reported_targeted_tests": "32/32 passed"
+  },
+  "acceptance_boundary": "This checkpoint accounts for 80 finished command jobs from four sidecar-verified bounded reports. Queue passed means execution recorded, not compatible. Equivalent, non-equivalent, nondeterministic and unknown remain separate; 55 inventory backfills and 14,655 differential jobs remain in the registered denominator. Unknown stays unknown. No compatibility or support conclusion is inferred.",
+  "next": "Resume only the bundlefix queue with a new exact-image probe and admitted batch; preserve plan, frozen census, snapshot, bundle, runtime, cache and queue identity."
+}
