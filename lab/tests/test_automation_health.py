@@ -45,8 +45,9 @@ class LinuxAdmissionTests(unittest.TestCase):
         self.assertEqual(report["facts"]["probe"]["worker_image"], worker_image)
 
     def test_worker_image_override_must_be_digest_pinned(self) -> None:
-        with self.assertRaisesRegex(AutomationContractError, "digest-pinned"):
-            collect_linux_health(worker_image="ligamina-astrbot-runtime:latest")
+        with patch("lab.automation.health.platform.system", return_value="Linux"):
+            with self.assertRaisesRegex(AutomationContractError, "digest-pinned"):
+                collect_linux_health(worker_image="ligamina-astrbot-runtime:latest")
 
     def test_preflight_cli_passes_explicit_worker_image_to_admission(self) -> None:
         worker_image = "ligamina-astrbot-runtime@sha256:" + "c" * 64
