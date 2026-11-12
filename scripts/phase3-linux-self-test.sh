@@ -49,6 +49,7 @@ trap finish EXIT
   node --test scripts/evidence-hash.test.mjs scripts/phase3-workflows.test.mjs
   node scripts/check-docs.mjs
   uv python install 3.12.14
+  uv run --locked --project lab --python 3.12.14 python -m lab.automation.p7_source_audit_cache
   uv run --locked --project lab --python 3.12.14 python -m unittest \
     lab.tests.test_automation_execution \
     lab.tests.test_automation_recovery \

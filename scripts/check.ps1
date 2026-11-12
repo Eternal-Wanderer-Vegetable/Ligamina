@@ -27,6 +27,8 @@ try {
     Invoke-Checked node @('scripts/check-docs.mjs')
     Invoke-Checked uv @('python', 'install', '3.12.14')
     Invoke-Checked uv @('run', '--locked', '--project', 'hosts/nonebot', '--python', '3.12.14', 'pytest', '-q', 'hosts/nonebot/tests')
+    # Source-bound P7 validation needs exact archives; fetch and hash-check them without installing or running plugins.
+    Invoke-Checked uv @('run', '--locked', '--project', 'lab', '--python', '3.12.14', 'python', '-m', 'lab.automation.p7_source_audit_cache')
     Invoke-Checked uv @('run', '--locked', '--project', 'lab', '--python', '3.12.14', 'python', '-m', 'unittest', 'discover', '-s', 'lab/tests', '-v')
     Invoke-Checked uv @('run', '--locked', '--project', 'hosts/nonebot', '--python', '3.12.14', 'python', 'hosts/nonebot/tests/native_smoke.py')
     Invoke-Checked uv @('run', '--locked', '--project', 'hosts/nonebot', '--python', '3.12.14', 'python', 'hosts/nonebot/tests/native_bridge.py')

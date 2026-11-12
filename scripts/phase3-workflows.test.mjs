@@ -114,6 +114,7 @@ test('Linux self-test records failure state and never dispatches third-party plu
   assert.match(selfTestScript, /lab\.tests\.test_p7_contracts/);
   assert.match(selfTestScript, /lab\.tests\.test_p7_service_profiles/);
   assert.match(selfTestScript, /lab\.tests\.test_p7_stateful/);
+  assert.match(selfTestScript, /lab\.automation\.p7_source_audit_cache/);
   assert.doesNotMatch(selfTestScript, /execute-recovery-pilot|run_s205/);
 });
 

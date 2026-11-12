@@ -40,6 +40,8 @@ bash init.sh full
 | 目录发布物/依赖锁 | `uv run --locked --project lab --python 3.12.14 python -m lab.artifacts verify catalogs/<snapshot>` 与 `python -m lab.profiles verify catalogs/<snapshot>`；缓存根必须与生成时一致 |
 | 跨语言/协议/安装 | 完整入口和双 OS CI；安装改动追加 [Windows 安装验收](../../scripts/windows-install-acceptance.ps1) / Linux容器验收 |
 
+双平台完整检查会在 Lab 全量测试前运行 `python -m lab.automation.p7_source_audit_cache`，从冻结 catalog lock 下载并校验 P7 来源审计测试需要的精确归档。归档只保存在外置 artifact cache，不安装或执行；下载 host 与 SHA-256/upstream digest 都受锁定记录约束。
+
 ## 运行与诊断
 
 ```powershell
