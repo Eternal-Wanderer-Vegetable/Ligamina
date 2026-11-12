@@ -3,6 +3,21 @@
 ## Current Objective
 
 - **2026-11-12 当前状态：** P6-01–04、P7-01–08、P7-04F–L / feat-059–065 已完成；P7-09 / feat-054 的 30+30 pilot 准入四门已通过，当前 active feature 为 feat-054，下一步完成可恢复的 AstrBot 全量 load census 与三生态已验证条目 campaign；P7-10 / feat-055 仍 blocked，等待 P7-09。
+- **P7-09 当前恢复点（2026-11-12）：** feat-054 full AstrBot census 计划、probe、admission 与 checkpoint 已生成。冻结分母 3,265；当前 SQLite counts 为 passed=55、failed=4、skipped=4、queued=3,200、leased=2；last JSON checkpoint 可能少看到一个并发 lease，resume 后会由 queue 重算。执行器在安全复核时退出，当前 `--resume` 已启动并等待 1,500 秒 fenced lease 自然到期；Docker 当前无残留 Worker。不要删除或迁移 `/home/vegetable/.local/share/ligamina/p7-astrbot-census.sqlite3`、bundle 根或 checkpoint。
+
+  恢复命令（该命令校验相同 frozen manifest，先等租约过期，再对精确 campaign/job/attempt/generation 标签做 reconciliation；清理确认后才重试）：
+  ```bash
+  cd /mnt/e/stella/Ligamina
+  uv run --locked --project lab --python 3.12.14 python -m lab.astrbot_census \
+    --snapshot catalogs/ab-15937e90d26b7caf9d12 \
+    --admission outputs/acceptance/p7-p709-linux-admission-20261112.json \
+    --image ligamina-astrbot-runtime@sha256:79903467bb35c50018deea736751db56f988d5a996246ba6fe84b34b4a28bdbc \
+    --bundle-root /home/vegetable/.local/share/ligamina/p7-astrbot-full-bundles-20261112 \
+    --output outputs/acceptance/p7-p709-astrbot-full-census-20261112.json \
+    --queue-db /home/vegetable/.local/share/ligamina/p7-astrbot-census.sqlite3 \
+    --cache-root /mnt/e/stella/Ligamina-artifact-cache --full-census --workers 2 --resume
+  ```
+  当前过程日志 `/tmp/ligamina-p709-resume.log`。全量 load census 仍 in progress；不是兼容或支持结论。验证：`uv run --locked --project lab --python 3.12.14 python -m unittest discover -s lab/tests -v` 为 390/390 passed；定向 AstrBot census 8/8；`pwsh -NoProfile -File init.ps1 -Mode docs` 为 29 docs / 763 links / 16 historical / 65 features passed；README/harness checker passed。
 - **feat-060 结果与边界：** 精确 `nonebot_plugin_warframe_mode@1.1.0` wheel SHA `086911421ce02e46a11c923005ed5028ca3a74ff0cd6f5ee7a69d42386a96827`；`__init__.py` SHA `0e8c9fc201839d1bcfb7e0f28731c9cd158e919b78f56625adc81d44b7937ed7`。`wm`/`rm`/`tran` 使用 `send_group_forward_msg`。Bridge 和独立 Native recorder 均映射到原有 `send_message` / typed `forward_node`；Reference Gateway 生成标准 OneBot node segments；source-bound Federated 观察器保留 typed segment，避免压成空文本。四个 seam 均有 red-green 回归，Native 不导入 Bridge，Core operation 名和 EventEnvelope schema 未改。
 - **feat-060 隔离诊断：** [forward-node diagnostic](outputs/acceptance/p7-p704-forward-node-diagnostic-observer-fix-20261111.json)，SHA `2e919cea1b6b42d2c3c3bdf8ab20e07cc3cb1f209190b0eeab2ca81c27c2dabb`，选择清单 SHA `fec7b15419c958ae613f09b67b3ce4e57add550476713379c52cb353e3203491`。Koishi control 无运行时命令；绑定 Warframe 条目运行 265 个场景、3 轮，795/795 观察等价，26/26 命令等价，4/26 nontrivial；三轮一致、无 mismatch、11/11 Worker cleanup confirmed，Federated Host 均回收。subset 是诊断证据，不是新 30+30 gate，也不能解除 P7-09。
 - **最新 P7-04 gate：** 同一 hash-ranked 30+30 selection（SHA-256 `3076c70a5e692392b993abb8754d84f0b06787a4781a4dfca68c7aad727f86c4`）复核报告 [feat-065 cohort](outputs/acceptance/p7-p704-differential-pilot-20261112-feat065-rerun1.json)，SHA `2df8b15fb2f21985c0a5b8b1aa3c913e54e0a307d4556c39748732e3690b9d58`：60/60 terminal（56 completed、4 discovery skips），1,904 scenarios，177 commands，56 nontrivial (31.6%)、121 equivalent、34 non-equivalent、2 nondeterministic、20 unknown (11.3%)；32/32 behavior entries 三轮一致，348/348 Worker cleanup confirmed。四项 pilot 准入门通过；unknown/non-equivalent/discovery skips 不改写。C1 30 passed/30 unknown，C2–C8 仍全部 unknown。

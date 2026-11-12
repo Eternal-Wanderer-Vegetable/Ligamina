@@ -23,8 +23,10 @@ import re
 import shutil
 import subprocess
 import sys
+import threading
 import time
 import zipfile
+from concurrent.futures import ThreadPoolExecutor
 from datetime import datetime, timezone
 from pathlib import Path, PurePosixPath
 from typing import Any
@@ -34,6 +36,8 @@ if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
 from lab.workers import DockerWorker, WorkerLimits, WorkerSpec  # noqa: E402
+from lab.automation.reconcile import DockerReconciler, resume_reconciled_run  # noqa: E402
+from lab.queue import QueueError, StageQueue  # noqa: E402
 
 DEFAULT_CACHE = ROOT.parent / "Ligamina-artifact-cache"
 LOCK_FILE = ROOT / "deploy/lab/linux/astrbot/requirements.lock.txt"
@@ -45,6 +49,9 @@ STRATA = {
     "platform_specific": lambda notes: "platform_specific_code" in notes,
     "llm_dependent": lambda notes: "llm_dependent" in notes and "platform_specific_code" not in notes,
 }
+DEFAULT_FULL_CENSUS_QUEUE = Path.home() / ".local" / "share" / "ligamina" / "p7-astrbot-census.sqlite3"
+FULL_CENSUS_LEASE_SECONDS = 1500
+FULL_CENSUS_MAX_WORKERS = 2
 
 
 def _now() -> str:
@@ -71,6 +78,90 @@ def select_pilot(lock: dict[str, Any], per_stratum: int) -> list[tuple[str, dict
             used.add(entry["registry_entry_id"])
             picked += 1
     return chosen
+
+
+def select_full_census(lock: dict[str, Any]) -> list[tuple[str, dict[str, Any]]]:
+    """Select every frozen artifact exactly once, retaining the pilot's stratum precedence."""
+    entries = lock.get("entries")
+    if not isinstance(entries, list):
+        raise ValueError("artifact lock entries must be a list")
+    if any(not isinstance(entry, dict) for entry in entries):
+        raise ValueError("artifact lock entries must be objects")
+    frozen = sorted((entry for entry in entries if entry.get("status") == "frozen"), key=lambda e: e.get("registry_entry_id", ""))
+    ids = [entry.get("registry_entry_id") for entry in frozen]
+    if (
+        any(not isinstance(entry_id, str) or not re.fullmatch(r"[A-Za-z0-9][A-Za-z0-9._-]{0,255}", entry_id) for entry_id in ids)
+        or len(set(ids)) != len(ids)
+    ):
+        raise ValueError("frozen artifact identities must be non-empty and unique")
+    selected = []
+    for entry in frozen:
+        notes = set(entry.get("hosting_notes", []))
+        stratum = next((name for name, predicate in STRATA.items() if predicate(notes)), "plain")
+        selected.append((stratum, entry))
+    return selected
+
+
+def _canonical_json(value: Any) -> bytes:
+    return json.dumps(value, ensure_ascii=False, sort_keys=True, separators=(",", ":"), allow_nan=False).encode("utf-8")
+
+
+def _load_full_artifact_lock(snapshot: Path) -> tuple[dict[str, Any], Path]:
+    snapshot = Path(snapshot).expanduser().resolve(strict=True)
+    lock_path = snapshot / "artifacts.lock.json"
+    raw = lock_path.read_bytes()
+    sidecar = lock_path.with_suffix(lock_path.suffix + ".sha256")
+    try:
+        expected_sha256 = sidecar.read_text(encoding="ascii").split()[0]
+    except (OSError, IndexError, UnicodeDecodeError) as error:
+        raise ValueError("frozen AstrBot artifact lock has no valid SHA-256 sidecar") from error
+    actual_sha256 = hashlib.sha256(raw).hexdigest()
+    if expected_sha256 != actual_sha256:
+        raise ValueError("frozen AstrBot artifact lock SHA-256 sidecar mismatch")
+    lock = json.loads(raw.decode("utf-8"))
+    if not isinstance(lock, dict) or lock.get("snapshot_id") != snapshot.name:
+        raise ValueError("AstrBot artifact lock snapshot identity does not match its frozen directory")
+    select_full_census(lock)
+    return lock, lock_path
+
+
+def full_census_plan(snapshot: Path) -> dict[str, Any]:
+    lock, lock_path = _load_full_artifact_lock(snapshot)
+    selected = select_full_census(lock)
+    selection_ids_sha256 = hashlib.sha256(_canonical_json([entry["registry_entry_id"] for _, entry in selected])).hexdigest()
+    manifest = {
+        "schema_version": 1,
+        "kind": "astrbot_full_frozen_load_census",
+        "snapshot_id": lock.get("snapshot_id"),
+        "artifacts_lock_sha256": _sha256(lock_path),
+        "selection_sha256": selection_ids_sha256,
+        "selected_entries": len(selected),
+        "snapshot_entries": len(lock["entries"]),
+        "excluded_non_frozen": len(lock["entries"]) - len(selected),
+        "policy": "all frozen artifact identities sorted by registry_entry_id exactly once",
+    }
+    manifest_sha256 = hashlib.sha256(_canonical_json(manifest)).hexdigest()
+    return {
+        "schema_version": 1,
+        "kind": "astrbot_full_census_plan",
+        "status": "planned",
+        "snapshot_id": lock.get("snapshot_id"),
+        "artifacts_lock_sha256": manifest["artifacts_lock_sha256"],
+        "denominator": {
+            "snapshot_entries": len(lock["entries"]),
+            "frozen_entries": len(selected),
+            "selected_entries": len(selected),
+            "excluded_non_frozen": len(lock["entries"]) - len(selected),
+            "closed_exactly_once": len({entry["registry_entry_id"] for _, entry in selected}) == len(selected),
+        },
+        "selection": {
+            "policy": manifest["policy"],
+            "strata": {name: sum(stratum == name for stratum, _ in selected) for name in STRATA},
+            "selected_ids_sha256": selection_ids_sha256,
+        },
+        "manifest": {**manifest, "manifest_sha256": manifest_sha256},
+        "scope_note": "Plan only; does not install plugins, start Workers, or claim load results.",
+    }
 
 
 def _requirement_name(line: str) -> str:
@@ -133,13 +224,33 @@ def extract_plugin(archive_path: Path, plugin_root: str, target: Path) -> tuple[
     return name, source
 
 
-def download_wheels(bundle: Path) -> dict[str, Any]:
+def download_wheels(
+    bundle: Path,
+    *,
+    resource_identity: dict[str, str] | None = None,
+) -> dict[str, Any]:
     """Binary-only resolution in a pinned container with network; no build backend runs."""
     proxy_env = [arg for key in ("HTTP_PROXY", "HTTPS_PROXY", "http_proxy", "https_proxy", "NO_PROXY")
                  if os.environ.get(key) for arg in ("-e", f"{key}={os.environ[key]}")]
     started = time.monotonic()
+    resource_labels = []
+    if resource_identity is not None:
+        expected = {"campaign", "job", "attempt", "generation"}
+        if set(resource_identity) != expected or any(not resource_identity[key] for key in expected):
+            raise ValueError("dependency Worker requires exact campaign, job, attempt, and generation labels")
+        resource_labels = [
+            argument
+            for key, label in (
+                ("campaign", "io.ligamina.campaign"),
+                ("job", "io.ligamina.job"),
+                ("attempt", "io.ligamina.attempt"),
+                ("generation", "io.ligamina.generation"),
+            )
+            for argument in ("--label", f"{label}={resource_identity[key]}")
+        ]
     completed = subprocess.run(
         ["docker", "run", "--rm", "--network", "host", *proxy_env,
+         *resource_labels,
          "--user", f"{os.getuid()}:{os.getgid()}", "-e", "HOME=/tmp",
          "-v", f"{bundle}:/bundle", DOWNLOAD_IMAGE,
          "python", "-m", "pip", "download", "--disable-pip-version-check", "--only-binary=:all:",
@@ -288,16 +399,534 @@ def run(options: argparse.Namespace) -> dict[str, Any]:
     return report
 
 
+def _full_census_identity(options: argparse.Namespace, lock_path: Path) -> tuple[dict[str, Any], str, str]:
+    lock, verified_lock_path = _load_full_artifact_lock(lock_path.parent)
+    selected = select_full_census(lock)
+    selection_sha256 = hashlib.sha256(_canonical_json([entry["registry_entry_id"] for _, entry in selected])).hexdigest()
+    admission_path = options.admission.expanduser().resolve(strict=True)
+    bundle_root = options.bundle_root.expanduser().absolute().resolve()
+    cache_root = options.cache_root.expanduser().resolve(strict=True)
+    output = options.output.expanduser().absolute()
+    manifest = {
+        "schema_version": 1,
+        "kind": "astrbot_full_frozen_load_census",
+        "snapshot_id": lock["snapshot_id"],
+        "artifacts_lock_sha256": _sha256(verified_lock_path),
+        "selection_sha256": selection_sha256,
+        "selected_entries": len(selected),
+        "snapshot_entries": len(lock["entries"]),
+        "excluded_non_frozen": len(lock["entries"]) - len(selected),
+        "admission_path": str(admission_path),
+        "admission_sha256": _sha256(admission_path),
+        "runtime_image": options.image,
+        "bundle_root": str(bundle_root),
+        "cache_root": str(cache_root),
+        "report_path": str(output),
+        "workers": options.workers,
+        "lease_seconds": FULL_CENSUS_LEASE_SECONDS,
+        "worker_timeout_seconds": 420,
+        "dependency_timeout_seconds": 900,
+    }
+    manifest_sha256 = hashlib.sha256(_canonical_json(manifest)).hexdigest()
+    run_id = f"p7-ab04-{lock['snapshot_id']}-{manifest_sha256[:12]}"
+    return manifest, manifest_sha256, run_id
+
+
+def _write_full_census_report(output: Path, report: dict[str, Any]) -> str:
+    data = (json.dumps(report, ensure_ascii=False, indent=2) + "\n").encode("utf-8")
+    output.parent.mkdir(parents=True, exist_ok=True)
+    temporary = output.with_name(output.name + ".tmp")
+    with temporary.open("wb") as stream:
+        stream.write(data)
+        stream.flush()
+        os.fsync(stream.fileno())
+    os.replace(temporary, output)
+    digest = hashlib.sha256(data).hexdigest()
+    sidecar = output.with_suffix(output.suffix + ".sha256")
+    sidecar_tmp = sidecar.with_name(sidecar.name + ".tmp")
+    sidecar_tmp.write_text(f"{digest}  {output.name}\n", encoding="ascii")
+    os.replace(sidecar_tmp, sidecar)
+    return digest
+
+
+def _summarize_worker_side(side: dict[str, Any]) -> dict[str, Any]:
+    """Keep only bounded census facts; plugin diagnostics can contain private config."""
+    summary: dict[str, Any] = {
+        "status": side.get("status") if side.get("status") in {"passed", "failed", "skipped", "unknown"} else "unknown",
+        "reason_code": side.get("reason_code") if isinstance(side.get("reason_code"), str) else None,
+    }
+    install = side.get("install")
+    if isinstance(install, dict):
+        summary["install"] = {
+            "status": install.get("status") if isinstance(install.get("status"), str) else "unknown",
+            "seconds": install.get("seconds") if isinstance(install.get("seconds"), (int, float)) else None,
+        }
+    load = side.get("load")
+    if isinstance(load, dict):
+        loaded = load.get("loaded_plugins")
+        failed = load.get("failed_plugins")
+        commands = load.get("commands")
+        summary["load"] = {
+            "seconds": load.get("seconds") if isinstance(load.get("seconds"), (int, float)) else None,
+            "loaded_plugins": len(loaded) if isinstance(loaded, list) else 0,
+            "failed_plugins": len(failed) if isinstance(failed, dict) else 0,
+            "commands": len(commands) if isinstance(commands, list) else 0,
+            "startup_sends": load.get("startup_sends") if isinstance(load.get("startup_sends"), int) else 0,
+        }
+    return summary
+
+
+def _full_census_report(
+    queue: StageQueue,
+    run_id: str,
+    manifest: dict[str, Any],
+    manifest_sha256: str,
+    selected: list[tuple[str, dict[str, Any]]],
+    *,
+    forced_status: str | None = None,
+) -> dict[str, Any]:
+    jobs = queue.list_jobs(run_id)
+    attempts = queue.list_attempts(run_id)
+    job_attempts: dict[str, list[dict[str, Any]]] = {}
+    for attempt in attempts:
+        job_attempts.setdefault(attempt["unit_id"], []).append(attempt)
+    entry_strata = {entry["registry_entry_id"]: stratum for stratum, entry in selected}
+    entry_hashes = {
+        entry["registry_entry_id"]: entry["artifact"]["computed_digests"]["sha256"]
+        for _, entry in selected
+    }
+    results = []
+    for job in jobs:
+        result = job.get("result") or {}
+        results.append({
+            "registry_entry_id": job["registry_entry_id"],
+            "stratum": entry_strata[job["registry_entry_id"]],
+            "artifact_sha256": entry_hashes[job["registry_entry_id"]],
+            "status": job["status"],
+            "reason_code": (result.get("reason_code") if isinstance(result, dict) else None),
+            "attempts_used": job["attempts_used"],
+            "attempt_history": job_attempts.get(job["unit_id"], []),
+            "result": result,
+        })
+    queue_counts = queue.counts(run_id)
+    terminal_entries = sum(queue_counts.get(status, 0) for status in ("passed", "failed", "skipped", "unknown"))
+    cleanup_observations = []
+    for attempt in attempts:
+        result = attempt.get("result") or {}
+        worker = result.get("worker") if isinstance(result, dict) else None
+        reconciliation = result.get("reconciliation") if isinstance(result, dict) else None
+        if isinstance(result, dict) and result.get("requires_reconciliation"):
+            cleanup_observations.append(
+                reconciliation.get("cleanup_confirmed") is True if isinstance(reconciliation, dict) else False
+            )
+        elif isinstance(worker, dict) and isinstance(worker.get("cleanup_confirmed"), bool):
+            cleanup_observations.append(worker["cleanup_confirmed"])
+        elif isinstance(reconciliation, dict) and isinstance(reconciliation.get("cleanup_confirmed"), bool):
+            cleanup_observations.append(reconciliation["cleanup_confirmed"])
+    cleanup_unconfirmed = sum(value is False for value in cleanup_observations)
+    queue_state = queue.run(run_id)["state"]
+    closed_once = (
+        len(jobs) == len(selected)
+        and len({job["registry_entry_id"] for job in jobs}) == len(selected)
+        and terminal_entries == len(selected)
+    )
+    status = forced_status or (
+        "completed" if closed_once and cleanup_unconfirmed == 0 and queue_state == "completed"
+        else "blocked_cleanup" if cleanup_unconfirmed or queue_state == "interrupted"
+        else "in_progress"
+    )
+    from collections import Counter
+
+    return {
+        "schema_version": 1,
+        "kind": "astrbot_linux_install_load_census",
+        "status": status,
+        "run_id": run_id,
+        "snapshot_id": manifest["snapshot_id"],
+        "manifest": {**manifest, "manifest_sha256": manifest_sha256},
+        "denominator": {
+            "snapshot_entries": manifest["snapshot_entries"],
+            "frozen_entries": len(selected),
+        "selected_entries": len(selected),
+            "terminal_entries": terminal_entries,
+            "closed_exactly_once": closed_once,
+        },
+        "counts": {
+            "selected": len(selected),
+            "settled": terminal_entries,
+            "status": {key: queue_counts.get(key, 0) for key in ("passed", "failed", "skipped", "unknown", "queued", "leased")},
+            "reason_codes": dict(sorted(Counter(
+                (job.get("result") or {}).get("reason_code") or "none"
+                for job in jobs
+            ).items())),
+        },
+        "cleanup": {
+            "attempt_count": len(attempts),
+            "cleanup_observations": len(cleanup_observations),
+            "cleanup_unconfirmed": cleanup_unconfirmed,
+            "all_observed_cleanup_confirmed": cleanup_unconfirmed == 0,
+        },
+        "queue": {
+            "state": queue_state,
+            "counts": queue_counts,
+            "journal_event_count": len(queue.journal(run_id)),
+        },
+        "results": results,
+        "attempts": attempts,
+        "scope_note": "AstrBot Linux install/load census only. A passed load is not behavior compatibility or plugin support; unknown and skipped outcomes remain distinct.",
+    }
+
+
+def _remove_reconciled_bundles(queue: StageQueue, run_id: str, bundle_root: Path) -> None:
+    attempts_by_unit: dict[str, list[dict[str, Any]]] = {}
+    for attempt in queue.list_attempts(run_id):
+        attempts_by_unit.setdefault(attempt["unit_id"], []).append(attempt)
+    resolved_root = bundle_root.resolve(strict=True)
+    for job in queue.list_jobs(run_id):
+        if job["status"] != "queued" or job["attempts_used"] < 1:
+            continue
+        history = attempts_by_unit.get(job["unit_id"], [])
+        latest = history[-1].get("result") if history else None
+        reconciliation = latest.get("reconciliation") if isinstance(latest, dict) else None
+        if not isinstance(reconciliation, dict) or reconciliation.get("cleanup_confirmed") is not True:
+            continue
+        target = bundle_root / job["registry_entry_id"]
+        if target.exists():
+            resolved = target.resolve(strict=True)
+            if resolved == resolved_root or resolved_root not in resolved.parents:
+                raise RuntimeError("AstrBot bundle retry target escaped its external bundle root")
+            shutil.rmtree(resolved)
+
+
+def _wait_for_leased_attempts(queue: StageQueue, run_id: str) -> None:
+    """Wait for old executors to finish or reach their bounded Worker lease before reconciliation."""
+    while True:
+        leased = [job for job in queue.list_jobs(run_id) if job["status"] == "leased"]
+        if not leased:
+            return
+        expires = [job["lease_expires_at"] for job in leased if isinstance(job.get("lease_expires_at"), (int, float))]
+        if not expires:
+            raise QueueError("leased AstrBot jobs have no expiry for safe reconciliation")
+        delay = max(expires) - time.time()
+        if delay <= 0:
+            return
+        print(f"waiting for {len(leased)} active AstrBot lease(s) to finish or expire", file=sys.stderr, flush=True)
+        time.sleep(min(delay, 10.0))
+
+
+def run_full_census(options: argparse.Namespace) -> dict[str, Any]:
+    output = options.output.expanduser().absolute()
+    snapshot = options.snapshot.expanduser().resolve(strict=True)
+    lock, lock_path = _load_full_artifact_lock(snapshot)
+    selected = select_full_census(lock)
+    if options.workers < 1 or options.workers > FULL_CENSUS_MAX_WORKERS:
+        raise ValueError(f"--workers must be between 1 and {FULL_CENSUS_MAX_WORKERS}")
+    admission = json.loads(options.admission.read_text(encoding="utf-8"))
+    capabilities = admission.get("capabilities", {})
+    if not (
+        admission.get("status") == "admitted"
+        and capabilities.get("network_disabled") is True
+        and capabilities.get("cleanup_evidence_required") is True
+    ):
+        raise RuntimeError("the Linux Worker backend has no admitted report")
+    if not re.fullmatch(r"[^\s@]+@sha256:[a-f0-9]{64}", options.image):
+        raise ValueError("runtime image must be pinned by sha256 digest")
+
+    manifest, manifest_sha256, run_id = _full_census_identity(options, lock_path)
+    if output.exists() and not options.resume:
+        raise FileExistsError(f"refusing to overwrite an existing report: {output}")
+    if options.resume and output.exists():
+        existing_report = json.loads(output.read_text(encoding="utf-8"))
+        if existing_report.get("run_id") != run_id or existing_report.get("manifest", {}).get("manifest_sha256") != manifest_sha256:
+            raise ValueError("resume report belongs to a different frozen run manifest")
+
+    bundle_root = options.bundle_root.expanduser().absolute()
+    resolved_bundle_root = bundle_root.resolve()
+    repository_root = ROOT.resolve(strict=True)
+    if resolved_bundle_root == repository_root or repository_root in resolved_bundle_root.parents:
+        raise ValueError("AstrBot Worker bundles must be outside the repository")
+    if bundle_root.exists() and not options.resume:
+        raise FileExistsError(f"refusing to reuse a bundle root: {bundle_root}")
+    queue_path = options.queue_db.expanduser().absolute().resolve()
+    if queue_path == repository_root or repository_root in queue_path.parents:
+        raise ValueError("AstrBot census SQLite queue must be outside the repository")
+    if options.resume and not queue_path.is_file():
+        raise QueueError("cannot resume a full-census run without its SQLite queue")
+    worker = DockerWorker(image_digest=options.image, repository_root=ROOT)
+    bundle_root.mkdir(parents=True, exist_ok=True)
+
+    queue = StageQueue(queue_path)
+    if options.resume:
+        try:
+            existing_run = queue.run(run_id)
+        except QueueError as error:
+            raise QueueError("cannot resume the matching full-census run; frozen inputs or runtime identity changed") from error
+        queue.create_run(run_id, lock["snapshot_id"], manifest_sha256, manifest, fencing_required=True)
+        queue.enqueue_jobs(run_id, [
+            {
+                "unit_id": entry["registry_entry_id"],
+                "registry_entry_id": entry["registry_entry_id"],
+                "ecosystem": "astrbot",
+                "platform": "linux",
+                "profile_id": "astrbot-4.29.1-load",
+                "stage": "load",
+                "case_id": "full-frozen-catalog",
+                "max_attempts": 2,
+                "payload": {"stratum": stratum, "artifact_sha256": entry["artifact"]["computed_digests"]["sha256"]},
+            }
+            for stratum, entry in selected
+        ])
+        if existing_run["state"] != "completed":
+            if existing_run["state"] != "interrupted":
+                queue.interrupt_run(run_id)
+            _wait_for_leased_attempts(queue, run_id)
+            try:
+                resume_reconciled_run(queue, run_id, DockerReconciler())
+            except QueueError:
+                blocked = _full_census_report(
+                    queue, run_id, manifest, manifest_sha256, selected, forced_status="blocked_cleanup",
+                )
+                _write_full_census_report(output, blocked)
+                return blocked
+            _remove_reconciled_bundles(queue, run_id, bundle_root)
+    else:
+        created = queue.create_run(run_id, lock["snapshot_id"], manifest_sha256, manifest, fencing_required=True)
+        if not created:
+            raise FileExistsError(f"full-census queue run already exists; use --resume: {run_id}")
+        queue.enqueue_jobs(run_id, [
+            {
+                "unit_id": entry["registry_entry_id"],
+                "registry_entry_id": entry["registry_entry_id"],
+                "ecosystem": "astrbot",
+                "platform": "linux",
+                "profile_id": "astrbot-4.29.1-load",
+                "stage": "load",
+                "case_id": "full-frozen-catalog",
+                "max_attempts": 2,
+                "payload": {"stratum": stratum, "artifact_sha256": entry["artifact"]["computed_digests"]["sha256"]},
+            }
+            for stratum, entry in selected
+        ])
+
+    entries_by_id = {entry["registry_entry_id"]: entry for _, entry in selected}
+    stop = threading.Event()
+    report_lock = threading.RLock()
+    last_report: dict[str, Any] = {}
+
+    def save_report(forced_status: str | None = None) -> dict[str, Any]:
+        with report_lock:
+            current = _full_census_report(queue, run_id, manifest, manifest_sha256, selected, forced_status=forced_status)
+            _write_full_census_report(output, current)
+            last_report.clear()
+            last_report.update(current)
+            return current
+
+    def process_claimed(job: dict[str, Any], worker_id: str) -> bool:
+        entry = entries_by_id[job["registry_entry_id"]]
+        bundle = bundle_root / job["registry_entry_id"]
+        result: dict[str, Any]
+        try:
+            cache_root = options.cache_root.expanduser().resolve(strict=True)
+            artifact_path = (cache_root / entry["artifact"]["cache_path"]).resolve(strict=True)
+            if cache_root not in artifact_path.parents:
+                raise ValueError("cached AstrBot artifact escaped the configured cache root")
+            if bundle.exists():
+                raise FileExistsError(f"refusing to overwrite an existing per-entry bundle: {bundle}")
+            bundle_result = prepare_bundle(bundle, entry, cache_root)
+        except Exception as error:
+            result = {"status": "skipped", "reason_code": "bundle_preparation_failed", "diagnostic": str(error)[:300], "cleanup_applicable": False}
+            queue.finish(job["job_id"], worker_id, result, attempt_id=job["attempt_id"])
+            save_report()
+            return True
+
+        if bundle_result["requirement_count"]:
+            try:
+                resource_identity = {
+                    "campaign": run_id,
+                    "job": job["job_id"],
+                    "attempt": job["attempt_id"],
+                    "generation": str(job["generation"]),
+                }
+                dependencies = download_wheels(bundle, resource_identity=resource_identity)
+                error_tail = dependencies.pop("error_tail", None)
+                if error_tail:
+                    error_bytes = str(error_tail).encode("utf-8", errors="replace")
+                    dependencies["error_tail_sha256"] = hashlib.sha256(error_bytes).hexdigest()
+                    dependencies["error_tail_bytes"] = len(error_bytes)
+                dependency_cleanup = DockerReconciler().reconcile(
+                    campaign_id=run_id,
+                    job_id=job["job_id"],
+                    attempt_id=job["attempt_id"],
+                    generation=job["generation"],
+                ).as_evidence()
+                dependencies["container_cleanup"] = dependency_cleanup
+            except Exception as error:
+                result = {"status": "unknown", "reason_code": "dependency_resolution_interrupted", "diagnostic": type(error).__name__, "requires_reconciliation": True}
+                queue.finish(job["job_id"], worker_id, result, attempt_id=job["attempt_id"])
+                queue.interrupt_run(run_id)
+                save_report("blocked_cleanup")
+                return False
+            if not dependency_cleanup.get("cleanup_confirmed"):
+                result = {
+                    "status": "unknown",
+                    "reason_code": "dependency_worker_cleanup_unconfirmed",
+                    "dependencies": dependencies,
+                    "requires_reconciliation": True,
+                }
+                queue.finish(job["job_id"], worker_id, result, attempt_id=job["attempt_id"])
+                queue.interrupt_run(run_id)
+                save_report("blocked_cleanup")
+                return False
+            if dependencies["status"] != "resolved":
+                result = {"status": "skipped", "reason_code": "dependency_unresolvable", "dependencies": dependencies, "cleanup_applicable": False}
+                queue.finish(job["job_id"], worker_id, result, attempt_id=job["attempt_id"])
+                save_report()
+                return True
+
+        spec = WorkerSpec(
+            run_id=run_id,
+            entry_id=job["registry_entry_id"],
+            attempt_id=job["attempt_id"],
+            generation=job["generation"],
+            job_id=job["job_id"],
+            command=("/opt/astrbot/venv/bin/python", "/input/side/astrbot_census_side.py"),
+            input_dir=bundle,
+            limits=WorkerLimits(timeout_seconds=420, memory_mb=3072, cpu_cores=2.0, process_limit=256, output_limit_bytes=1024 * 1024),
+            entrypoint="/usr/bin/env",
+        )
+        try:
+            outcome = worker.run(spec)
+        except KeyboardInterrupt:
+            raise
+        except Exception as error:
+            result = {
+                "status": "unknown", "reason_code": "worker_dispatch_exception",
+                "diagnostic": type(error).__name__,
+                "requires_reconciliation": True,
+                "worker": {"cleanup_confirmed": False},
+            }
+            queue.finish(job["job_id"], worker_id, result, attempt_id=job["attempt_id"])
+            queue.interrupt_run(run_id)
+            save_report("blocked_cleanup")
+            return False
+
+        try:
+            side = json.loads(outcome.stdout.decode("utf-8").strip().splitlines()[-1])
+        except (IndexError, UnicodeDecodeError, json.JSONDecodeError):
+            side = {"status": "unknown", "reason_code": "worker_output_unreadable"}
+        if not isinstance(side, dict):
+            side = {"status": "unknown", "reason_code": "worker_output_invalid_shape"}
+        if outcome.status != "passed" and side.get("status") in (None, "passed"):
+            side = {"status": "unknown", "reason_code": outcome.reason_code or "worker_failed"}
+        status = side.get("status", "unknown")
+        if status not in {"passed", "failed", "skipped", "unknown"}:
+            side = {"status": "unknown", "reason_code": "invalid_worker_status"}
+            status = "unknown"
+        cleanup_confirmed = outcome.cleanup_confirmed is True
+        result_status = status if cleanup_confirmed else "unknown"
+        reason_code = side.get("reason_code") if cleanup_confirmed else "worker_cleanup_unconfirmed"
+        result = {
+            "status": result_status,
+            "reason_code": reason_code,
+            "side": _summarize_worker_side(side),
+            "worker": {
+                "worker_id": outcome.worker_id,
+                "status": outcome.status,
+                "reason_code": outcome.reason_code,
+                "exit_code": outcome.exit_code,
+                "cleanup_confirmed": cleanup_confirmed,
+                "elapsed_seconds": round(outcome.elapsed_seconds, 1),
+                "peak_memory_bytes": outcome.peak_memory_bytes,
+                "stdout_sha256": outcome.stdout_sha256,
+                "stderr_sha256": outcome.stderr_sha256,
+                "output_truncated": outcome.output_truncated,
+            },
+            "requires_reconciliation": not cleanup_confirmed,
+        }
+        queue.finish(job["job_id"], worker_id, result, attempt_id=job["attempt_id"])
+        if not cleanup_confirmed:
+            stop.set()
+            queue.interrupt_run(run_id)
+            save_report("blocked_cleanup")
+            return False
+        save_report()
+        return True
+
+    def drain(worker_index: int) -> None:
+        worker_id = f"{run_id}-worker-{worker_index}"
+        while not stop.is_set():
+            try:
+                job = queue.claim(run_id, worker_id, lease_seconds=FULL_CENSUS_LEASE_SECONDS)
+            except QueueError:
+                if queue.run(run_id)["state"] == "interrupted":
+                    return
+                raise
+            if job is None:
+                return
+            if not process_claimed(job, worker_id):
+                stop.set()
+                return
+
+    forced_status = None
+    try:
+        save_report()
+        with ThreadPoolExecutor(max_workers=options.workers, thread_name_prefix="astrbot-census") as pool:
+            futures = [pool.submit(drain, index) for index in range(options.workers)]
+            for future in futures:
+                future.result()
+    except KeyboardInterrupt:
+        stop.set()
+        forced_status = "interrupted"
+        try:
+            if queue.run(run_id)["state"] != "interrupted":
+                queue.interrupt_run(run_id)
+        finally:
+            save_report(forced_status)
+    except Exception:
+        stop.set()
+        try:
+            if queue.run(run_id)["state"] != "interrupted":
+                queue.interrupt_run(run_id)
+        finally:
+            save_report("interrupted")
+        raise
+    report = save_report(forced_status)
+    return report
+
+
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument("--snapshot", type=Path, required=True)
-    parser.add_argument("--admission", type=Path, required=True)
-    parser.add_argument("--image", required=True)
-    parser.add_argument("--bundle-root", type=Path, required=True)
-    parser.add_argument("--output", type=Path, required=True)
+    parser.add_argument("--admission", type=Path)
+    parser.add_argument("--image")
+    parser.add_argument("--bundle-root", type=Path)
+    parser.add_argument("--output", type=Path)
     parser.add_argument("--cache-root", type=Path, default=DEFAULT_CACHE)
     parser.add_argument("--per-stratum", type=int, default=6)
+    parser.add_argument("--full-census", action="store_true", help="select every frozen AstrBot artifact")
+    parser.add_argument("--plan-only", action="store_true", help="print the hash-bound frozen selection without dispatching Workers")
+    parser.add_argument("--queue-db", type=Path, default=DEFAULT_FULL_CENSUS_QUEUE)
+    parser.add_argument("--resume", action="store_true", help="resume the exact full-census run in --queue-db")
+    parser.add_argument("--workers", type=int, default=2)
     options = parser.parse_args(argv)
+    if options.plan_only:
+        if not options.full_census:
+            parser.error("--plan-only requires --full-census")
+        plan = full_census_plan(options.snapshot)
+        print(json.dumps(plan, ensure_ascii=False))
+        return 0
+    if not all((options.admission, options.image, options.bundle_root, options.output)):
+        parser.error("--admission, --image, --bundle-root, and --output are required unless --plan-only is used")
+    if options.resume and not options.full_census:
+        parser.error("--resume is supported only with --full-census")
+    if options.full_census:
+        try:
+            report = run_full_census(options)
+        except (QueueError, OSError, RuntimeError, ValueError, KeyError, TypeError) as error:
+            print(f"AstrBot full census failed: {error}", file=sys.stderr)
+            return 2
+        print(json.dumps({"status": report["status"], "counts": report["counts"], "run_id": report["run_id"]}, ensure_ascii=False))
+        return 0 if report["status"] == "completed" else (130 if report["status"] == "interrupted" else 3)
     report = run(options)
     print(json.dumps({"status": report["status"], "counts": report["counts"]}, ensure_ascii=False))
     return 0 if report["status"] == "completed" else 1
