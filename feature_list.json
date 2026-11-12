@@ -3007,6 +3007,34 @@
         "outputs/acceptance/p7-p704-feat063-docs-gate-final-20261112.log"
       ],
       "plan_path": "docs/plans/2026-11-09-phase-7-automated-verification.md"
+    },
+    {
+      "id": "feat-064",
+      "task_id": "P7-04K",
+      "name": "Bilibili 图片命令的禁网 TLS fixture 与 Native recorder seam",
+      "description": "范围扩展原因：feat-062 的 exact-artifact 源码审计指出同一 NoneBot 插件的 B站封面、专栏下载、动态下载三条输入敏感命令依赖 HTTPS/API/图片响应，现有禁网 Worker 无法观察输出。按用户确认，新增精确 artifact/source/input 哈希绑定的 Worker-local TLS fixture，并验证 Native recorder 对 Bridge 同形 forward node 中 NoneBot Message/MessageSegment 的公开 API 调用边界；不导入 Bridge、不修改第三方插件、不扩展 Core operation/EventEnvelope 或 30+30 分母。",
+      "dependencies": [
+        "feat-060",
+        "feat-062",
+        "feat-063"
+      ],
+      "status": "done",
+      "done_when": "固定 NoneBot artifact/source、两输入周期、TLS证书和逐路由响应哈希；Native 与 Federated 使用相同 profile 与禁网 Worker TLS fixture；三个命令均在 Native×2/Federated 运行并保留 source_event_id、命令观察、路由计数与清理证据；Native recorder 将标准 MessageSegment 等价投影到现有 send_message，且不导入 Bridge；失败保持 unknown，cohort 分母和准入门槛不变。",
+      "evidence": "Completed 2026-11-12. Added a TLS loopback fixture bound to the exact nonebot-plugin-bilibili-image@0.0.2.1 wheel, source members, two-input cycles, certificate, and response routes; Native and Federated Workers share the same profile while Docker network remains disabled. Added the Native recorder seam for NoneBot Message/MessageSegment objects in Bridge-shaped forward nodes, projecting supported text/image-ref/mention/reply segments into the existing send_message operation; inline image bytes fail closed without serializing payloads. Restored the existing P4 Native probe observer's source-event result and added regression coverage after a focused test exposed its None return. The three source-bound commands completed Native×2/Federated in three fresh rounds with source_event_id correlation, 36/36 Worker cleanup confirmations, and 9/9 Federated Host reaps. B站封面 is stably input-sensitive and non-equivalent with unresolved attribution; 专栏下载 and 动态下载 are equivalent but input-insensitive. All results are diagnostic-only and do not count toward the 30+30 nontrivial gate. Full evidence and checks: outputs/acceptance/p7-p704-feat064-verification-20261112.json.",
+      "evidence_paths": [
+        "outputs/acceptance/p7-p704-feat064-verification-20261112.json",
+        "outputs/acceptance/p7-p704-feat064-verification-20261112.json.sha256",
+        "outputs/acceptance/p7-p704-bilibili-image-selection-20261112.json",
+        "outputs/acceptance/p7-p704-bilibili-image-selection-20261112.json.sha256",
+        "outputs/acceptance/p7-p704-bilibili-cover-diagnostic-retry2-20261112.json",
+        "outputs/acceptance/p7-p704-bilibili-article-diagnostic-20261112.json",
+        "outputs/acceptance/p7-p704-bilibili-dynamic-diagnostic-20261112.json",
+        "lab/automation/data/p7-bilibili-image-https-v1.json",
+        "lab/automation/p7_bilibili_image_diagnostic.py",
+        "docs/plans/2026-11-09-phase-7-automated-verification.md",
+        "lab/baselines/nonebot/runner.py",
+        "lab/automation/p7_differential_campaign.py"
+      ]
     }
   ]
 }
