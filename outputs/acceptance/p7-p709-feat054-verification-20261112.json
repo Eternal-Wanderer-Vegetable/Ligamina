@@ -1,10 +1,10 @@
 {
   "schema_version": 1,
   "kind": "p7_feat054_astrbot_full_census_executor_verification",
-  "recorded_at_utc": "2026-11-12T05:50:27Z",
+  "recorded_at_utc": "2026-11-12T06:24:52Z",
   "feature": "feat-054",
   "task": "P7-09",
-  "commit": "b09258622441fb41fe72793101435b5580bf719f",
+  "commit": "bbe232ed1bc3042969873d59492f1fdfa573c7a8",
   "status": "executor_verified_campaign_in_progress",
   "inputs": {
     "snapshot_id": "ab-15937e90d26b7caf9d12",
@@ -35,7 +35,8 @@
       "status": "admitted",
       "environment_fingerprint": "2cc2a1967e20ebdfcb2a2562d6afa206b335f8643a10ae3a958691bf09714594"
     },
-    "executor_source_sha256": "706d75a4ae4360eede542c7a8fce2be1c2058f1406e67c76610a41c6bfc7c119"
+    "executor_source_sha256": "99ced178d978ed7411e9289c98ac3e93399b985d09ca94cae7405b525a634d50",
+    "worker_side_source_sha256": "a1b40c299c062a03fd46a87f9d9ec087b349b806782d71fea78dc86137c5249b"
   },
   "verification": [
     {
@@ -46,15 +47,15 @@
     {
       "command": "UV_PROJECT_ENVIRONMENT=/tmp/ligamina-p7-p709-full-tests-venv UV_OFFLINE=1 uv run --locked --project lab --python 3.12.14 python -m unittest discover -s lab/tests -v",
       "exit_code": 0,
-      "duration_seconds": 212.583,
+      "duration_seconds": 232.021,
       "output_log": "outputs/acceptance/p7-p709-feat054-full-lab-tests-20261112.log",
-      "output_log_sha256": "171767da9b645b222f66362e4fee4aec4175e4e438401189c2abb907a47dfabc",
-      "output_summary": "Ran 390 tests; OK."
+      "output_log_sha256": "72d84193bf5871b90e06dd4ad9749a25315dbcc9ecb8362a8554d9a9ff365ec8",
+      "output_summary": "Ran 390 tests; OK. Trailing whitespace was removed from verbose log lines before sealing."
     },
     {
       "command": "pwsh -NoProfile -File init.ps1 -Mode docs",
       "exit_code": 0,
-      "output_summary": "29 documents; 767 local links; 16 indexed historical Markdown; 65 features; no failures."
+      "output_summary": "29 documents; 764 local links; 16 indexed historical Markdown; 65 features; no failures."
     },
     {
       "command": "node scripts/render-readme.mjs --check",
@@ -64,10 +65,10 @@
     {
       "command": "node scripts/check-docs.mjs",
       "exit_code": 0,
-      "output_summary": "status passed; 29 documents; 767 local links; 16 indexed historical Markdown; 65 features."
+      "output_summary": "status passed; 29 documents; 764 local links; 16 indexed historical Markdown; 65 features."
     },
     {
-      "command": "python -m compileall -q lab/astrbot_census.py lab/tests/test_astrbot_census.py",
+      "command": "python -m compileall -q lab/astrbot_census.py lab/astrbot_census_side.py lab/tests/test_astrbot_census.py",
       "exit_code": 0
     },
     {
@@ -78,22 +79,28 @@
   "campaign_checkpoint": {
     "run_id": "p7-ab04-ab-15937e90d26b7caf9d12-c4225b507530",
     "report_path": "outputs/acceptance/p7-p709-astrbot-full-census-20261112.json",
-    "report_sha256": "d32ca34e89d85ce2876e50666d76f7a6b3f29d74e0f9c0454a1707aa98aa6a77",
+    "report_sha256": "1c5c3f0974d293719a5de3536576f671582356aab358c1d09d4fce0268babbf9",
     "report_status": "in_progress",
     "sqlite_queue": "/home/vegetable/.local/share/ligamina/p7-astrbot-census.sqlite3",
     "sqlite_counts_at_latest_direct_probe": {
-      "passed": 55,
-      "failed": 4,
-      "skipped": 4,
-      "queued": 3200,
+      "passed": 412,
+      "failed": 15,
+      "skipped": 15,
+      "unknown": 0,
+      "queued": 2821,
       "leased": 2
     },
-    "resume_state": "executor restarted with --resume and is waiting for the two original 1500-second fenced leases to expire; exact Docker label reconciliation precedes retry",
-    "scope": "load census only; no compatibility or support conclusion"
+    "resume_state": "active; fenced Worker leases continue; report and SQLite checkpoints can differ by one in-flight lease. Preserve external queue and bundle root.",
+    "scope": "load census only; no compatibility or support conclusion",
+    "report_terminal_entries": 442,
+    "report_command_inventory_rows": 368,
+    "inventory_followup": "after census, select exact load-passed rows whose result.side.load.command_descriptors field is absent; earlier settled rows may include retries, so do not select by ordinal alone.",
+    "checkpoint_observed_at_utc": "2026-11-12T06:24:52Z"
   },
   "implementation_review": {
     "red_green_case": "A plugin load failure paired with unconfirmed Worker cleanup was initially committed as failed and could not enter the reconciliation API, which accepts unknown attempts only.",
     "fix": "The census now records every unconfirmed-cleanup Worker outcome as unknown with requires_reconciliation=true; exact cleanup confirmation is required before retry.",
-    "mixed_attempt_boundary": "The first 63 terminal attempts were made before this edge-case fix; the executor was stopped during review, and the remaining attempts use the committed fix after reconciliation. The two stale attempts are not treated as terminal successes."
+    "mixed_attempt_boundary": "The first 73 settled jobs predate command descriptor capture; 63 were load-passed at that checkpoint. Some may have new attempts after restart. Build the post-census backfill selection from exact rows with the descriptor field absent, not from ordinal positions.",
+    "command_inventory_capture": "The Worker returns at most 512 command IDs and normalized argument name/type/required fields within 256 KiB. Descriptions, aliases, invocations and values are omitted. The report marks possible truncation."
   }
 }
