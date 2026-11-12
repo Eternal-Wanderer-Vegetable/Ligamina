@@ -33,6 +33,16 @@ def emit(value: dict[str, Any]) -> None:
     PROTOCOL_OUT.flush()
 
 
+def worker_request() -> dict[str, Any]:
+    request_path = INPUT / "request.json"
+    if request_path.is_file():
+        return json.loads(request_path.read_text(encoding="utf-8"))
+    raw = sys.stdin.buffer.read()
+    if not raw:
+        raise ValueError("Worker request is missing")
+    return json.loads(raw.decode("utf-8"))
+
+
 def tool_name_part(value: str) -> str:
     import hashlib
 
@@ -291,7 +301,7 @@ async def run(request: dict[str, Any], plugin_dir: Path) -> dict[str, Any]:
 
 
 def main() -> None:
-    request = json.loads((INPUT / "request.json").read_text(encoding="utf-8"))
+    request = worker_request()
     plugin_dirs = [path for path in (INPUT / "plugin").iterdir() if path.is_dir()]
     if len(plugin_dirs) != 1:
         emit({"status": "unknown", "diagnostic": "expected exactly one frozen plugin directory"})

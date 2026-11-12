@@ -1,0 +1,111 @@
+{
+  "schema_version": 1,
+  "kind": "p7_p709_feat054_campaign_executor_verification",
+  "collected_at_utc": "2026-11-12T08:58:08Z",
+  "scope": "restartable campaign executor implementation and isolated verification; census and full campaign execution remain active/pending",
+  "baseline": {
+    "commit": "f4aaca62f6aaa51b22110cebb9834d884cd43745",
+    "branch": "codex/phase6-p7-automated-verification",
+    "pull_request": 22
+  },
+  "campaign_sources": {
+    "sha256": "e8d9867c8b306358217669cbdf757c6f1c7d5a1e4664beb05f584355ef59e0fa",
+    "identity_files": 24
+  },
+  "executor": {
+    "module": "lab/astrbot_campaign_execute.py",
+    "status": "implemented_not_dispatched",
+    "behaviors": [
+      "claims and fences public StageQueue work, reconciles interrupted attempts before retry, and requires exact Docker cleanup confirmation",
+      "runs Native twice and Federated once through the existing WorkerSpec to WorkerResult boundary",
+      "compares bounded observation projections and persists hashes/counts without raw plugin replies",
+      "projects C1-C8 from observed evidence; unsupported campaign stimuli remain unknown",
+      "shares one immutable prepared entry bundle and transfers bounded requests through Worker stdin",
+      "binds controller, Worker, Host, generator, and protocol schema source hashes into campaign identity"
+    ],
+    "real_campaign_workers_dispatched": 0,
+    "full_census_closed": false
+  },
+  "census": {
+    "run_id": "p7-ab04-ab-15937e90d26b7caf9d12-c4225b507530",
+    "snapshot_id": "ab-15937e90d26b7caf9d12",
+    "status": "in_progress",
+    "queue_database": "/home/vegetable/.local/share/ligamina/p7-astrbot-census.sqlite3",
+    "queue_database_is_external": true,
+    "snapshot_at_utc": "2026-11-12T08:58:02Z",
+    "frozen_denominator": 3265,
+    "queue_statuses": {
+      "passed": 2231,
+      "failed": 119,
+      "skipped": 68,
+      "leased": 2,
+      "queued": 845
+    },
+    "attempt_count": 2422,
+    "queue_integrity_check": "ok",
+    "live_report_and_sidecar_staged": false
+  },
+  "verification": {
+    "targeted_suite": {
+      "command": "uv run --locked --project lab --python 3.12.14 python -m unittest lab.tests.test_astrbot_campaign_plan lab.tests.test_astrbot_campaign_execute lab.tests.test_astrbot_census lab.tests.test_astrbot_worker_stdin -v",
+      "tests_run": 32,
+      "result": "passed",
+      "log_path": "outputs/acceptance/p7-p709-feat054-campaign-executor-target-tests-20261112.log",
+      "log_sha256": "c7ecb0d6284c54dc579f61eefb54c9f1db74865408510af59db602c07ebbad4e"
+    },
+    "full_lab_suite": {
+      "command": "uv run --locked --project lab --python 3.12.14 python -m unittest discover -s lab/tests -v",
+      "tests_run": 414,
+      "result": "passed",
+      "log_path": "outputs/acceptance/p7-p709-feat054-campaign-executor-full-lab-tests-20261112.log",
+      "log_sha256": "8881cadd1dd3e0fbc017840d0ffe8563da98d2cba24d74f6bfdcc11454e567de"
+    },
+    "py_compile": {
+      "result": "passed",
+      "modules": [
+        "lab/astrbot_campaign_plan.py",
+        "lab/astrbot_campaign_execute.py",
+        "lab/astrbot_native_tool_side.py",
+        "lab/astrbot_tool_side.py",
+        "lab/tests/test_astrbot_campaign_plan.py",
+        "lab/tests/test_astrbot_campaign_execute.py",
+        "lab/tests/test_astrbot_worker_stdin.py"
+      ]
+    },
+    "matrix_validation": {
+      "entries": 8961,
+      "sources": 539,
+      "result": "passed"
+    },
+    "docs_gate": {
+      "documents": 29,
+      "local_links": 767,
+      "indexed_historical_markdown": 16,
+      "features": 65,
+      "failures": 0,
+      "result": "passed"
+    },
+    "readme_check": {
+      "result": "passed"
+    },
+    "evidence_hash_tests": {
+      "tests_run": 4,
+      "result": "passed"
+    },
+    "harness_check": {
+      "score": "100/100",
+      "result": "passed"
+    },
+    "git_diff_check": {
+      "command": "git diff --check",
+      "result": "passed"
+    }
+  },
+  "remaining": [
+    "complete and close the 3,265-identity census, preserving non-passing dispositions and confirming all cleanup",
+    "refresh admission and exact runtime identity after census closure, then register the frozen incremental plan in the external fenced queue",
+    "execute bounded preflight and resumable inventory, C1-C8 contract projection, and Native×2/Federated differential work",
+    "keep P7-10 blocked until P7-09 done criteria and evidence are satisfied"
+  ],
+  "interpretation": "All current results validate implementation seams only. No full AstrBot campaign execution or plugin compatibility/support conclusion is claimed."
+}

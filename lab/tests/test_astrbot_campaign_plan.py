@@ -5,6 +5,7 @@ import tempfile
 import time
 import unittest
 from pathlib import Path
+from unittest.mock import patch
 
 from lab.astrbot_campaign_plan import plan_astrbot_command_campaign, register_campaign_plan
 from lab.astrbot_census import LOCK_FILE
@@ -165,6 +166,16 @@ class AstrBotCampaignPlanTests(unittest.TestCase):
 
         self.assertNotEqual(first["inputs"]["admission_environment_sha256"],
                             second["inputs"]["admission_environment_sha256"])
+        self.assertNotEqual(first["run_id"], second["run_id"])
+
+    def test_plan_identity_changes_when_campaign_worker_sources_change(self) -> None:
+        lock, census, lock_sha, _ = self._fixture()
+        with patch("lab.astrbot_campaign_plan._campaign_source_identity", return_value={"sha256": _sha("a"), "files": {}}):
+            first = self._plan(lock, census, lock_sha)
+        with patch("lab.astrbot_campaign_plan._campaign_source_identity", return_value={"sha256": _sha("b"), "files": {}}):
+            second = self._plan(lock, census, lock_sha)
+
+        self.assertNotEqual(first["inputs"]["campaign_sources_sha256"], second["inputs"]["campaign_sources_sha256"])
         self.assertNotEqual(first["run_id"], second["run_id"])
 
     def test_in_progress_census_cannot_be_dispatched(self) -> None:

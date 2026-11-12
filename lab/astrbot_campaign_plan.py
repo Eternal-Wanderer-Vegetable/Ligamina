@@ -25,6 +25,32 @@ DEFAULT_HOST_ID = "astrbot-p709"
 SHA256_RE = re.compile(r"^[a-f0-9]{64}$")
 IMAGE_RE = re.compile(r"^[^\s@]+@sha256:[a-f0-9]{64}$")
 ARGUMENT_KEYS = {"name", "required", "type"}
+CAMPAIGN_SOURCE_PATHS = (
+    "lab/astrbot_campaign_plan.py",
+    "lab/astrbot_campaign_execute.py",
+    "lab/astrbot_census.py",
+    "lab/astrbot_census_side.py",
+    "lab/astrbot_native_tool_campaign.py",
+    "lab/astrbot_native_tool_side.py",
+    "lab/astrbot_tool_campaign.py",
+    "lab/astrbot_tool_side.py",
+    "lab/automation/p7_contracts.py",
+    "lab/automation/reconcile.py",
+    "lab/mcp_http.py",
+    "lab/queue.py",
+    "lab/scenario_generator.py",
+    "lab/workers/base.py",
+    "lab/workers/linux.py",
+    "hosts/astrbot/ligamina_astrbot/__init__.py",
+    "hosts/astrbot/ligamina_astrbot/bridge.py",
+    "hosts/astrbot/ligamina_astrbot/commands.py",
+    "hosts/astrbot/ligamina_astrbot/contracts.py",
+    "hosts/astrbot/ligamina_astrbot/lifecycle.py",
+    "hosts/astrbot/ligamina_astrbot/runtime.py",
+    "hosts/astrbot/ligamina_astrbot/worker.py",
+    "contracts/v0.1/event-envelope.schema.json",
+    "contracts/v0.2/command-descriptor.schema.json",
+)
 
 
 def _canonical(value: Any) -> bytes:
@@ -33,6 +59,18 @@ def _canonical(value: Any) -> bytes:
 
 def _sha256(value: bytes) -> str:
     return hashlib.sha256(value).hexdigest()
+
+
+def _campaign_source_identity() -> dict[str, Any]:
+    """Bind the exact controller, Worker, Host, generator, and contract sources."""
+    root = Path(__file__).resolve().parents[1]
+    sources = {}
+    for relative in CAMPAIGN_SOURCE_PATHS:
+        path = root / relative
+        if not path.is_file():
+            raise ValueError(f"campaign source required for run identity is missing: {relative}")
+        sources[relative] = _sha256(path.read_bytes())
+    return {"sha256": _sha256(_canonical(sources)), "files": sources}
 
 
 def _digest(value: Any, label: str) -> str:
@@ -100,6 +138,81 @@ def _normalized_descriptor(value: Any, label: str) -> dict[str, Any]:
         "invocation": command_id,
         "arguments": arguments,
     }
+
+
+def differential_jobs_for_inventory(
+    *,
+    snapshot_id: str,
+    artifacts_lock_sha256: str,
+    selection_sha256: str,
+    worker_image: str,
+    native_runtime: dict[str, str],
+    admission_environment_sha256: str,
+    registry_entry_id: str,
+    artifact_sha256: str,
+    descriptors: list[dict[str, Any]],
+    max_scenarios: int = 16,
+) -> tuple[str, list[dict[str, Any]]]:
+    """Derive the same command jobs for observed inventory and later backfills."""
+    normalized = [_normalized_descriptor(item, f"{registry_entry_id} descriptor {index}")
+                  for index, item in enumerate(descriptors)]
+    command_ids = [item["command_id"] for item in normalized]
+    if len(command_ids) != len(set(command_ids)):
+        raise ValueError(f"{registry_entry_id} inventory contains duplicate command descriptors")
+    if not isinstance(max_scenarios, int) or isinstance(max_scenarios, bool) or not 1 <= max_scenarios <= 16:
+        raise ValueError("max_scenarios must be between 1 and 16")
+    inventory_sha = _sha256(_canonical({
+        "registry_entry_id": registry_entry_id,
+        "artifact_sha256": artifact_sha256,
+        "command_descriptors": normalized,
+    }))
+    jobs = []
+    for descriptor in normalized:
+        descriptor_sha = _sha256(_canonical(descriptor))
+        seed = int(_sha256(f"{inventory_sha}:{descriptor_sha}".encode("utf-8"))[:13], 16)
+        batch = generate_scenarios(
+            inventory_sha256=inventory_sha,
+            descriptor=descriptor,
+            host_id=DEFAULT_HOST_ID,
+            seed=seed,
+            max_scenarios=max_scenarios,
+        )
+        batch_sha = _sha256(_canonical(batch.to_dict()))
+        key = _sha256(_canonical({
+            "campaign_schema_version": CAMPAIGN_SCHEMA_VERSION,
+            "stage": "differential",
+            "snapshot_id": snapshot_id,
+            "artifacts_lock_sha256": artifacts_lock_sha256,
+            "selection_sha256": selection_sha256,
+            "worker_image": worker_image,
+            "native_runtime": native_runtime,
+            "admission_environment_sha256": admission_environment_sha256,
+            "registry_entry_id": registry_entry_id,
+            "artifact_sha256": artifact_sha256,
+            "command_id": descriptor["command_id"],
+            "descriptor_sha256": descriptor_sha,
+            "generator": {"name": GENERATOR_NAME, "version": GENERATOR_VERSION, "seed": seed},
+            "scenario_batch_sha256": batch_sha,
+        }))
+        jobs.append({
+            "unit_id": f"astrbot-diff-{key}",
+            "registry_entry_id": registry_entry_id,
+            "ecosystem": "astrbot",
+            "platform": "linux",
+            "profile_id": "astrbot-4.29.1-native-federated-tool",
+            "stage": "differential",
+            "case_id": descriptor["command_id"],
+            "max_attempts": 2,
+            "payload": {
+                "artifact_sha256": artifact_sha256,
+                "inventory_sha256": inventory_sha,
+                "descriptor_sha256": descriptor_sha,
+                "scenario_batch_sha256": batch_sha,
+                "scenario_count": len(batch.scenarios),
+                "generator": {"name": GENERATOR_NAME, "version": GENERATOR_VERSION, "seed": seed},
+            },
+        })
+    return inventory_sha, jobs
 
 
 def plan_astrbot_command_campaign(
@@ -267,58 +380,22 @@ def plan_astrbot_command_campaign(
             disposition["inventory_status"] = "observed"
         disposition["observed_command_count"] = len(descriptors)
         totals["observed_commands"] += len(descriptors)
-        inventory_sha = _sha256(_canonical({
-            "registry_entry_id": entry_id,
-            "artifact_sha256": row["artifact_sha256"],
-            "command_descriptors": descriptors,
-        }))
-        for descriptor in descriptors:
-            descriptor_sha = _sha256(_canonical(descriptor))
-            seed = int(_sha256(f"{inventory_sha}:{descriptor_sha}".encode("utf-8"))[:13], 16)
-            batch = generate_scenarios(
-                inventory_sha256=inventory_sha,
-                descriptor=descriptor,
-                host_id=DEFAULT_HOST_ID,
-                seed=seed,
-                max_scenarios=max_scenarios,
-            )
-            batch_sha = _sha256(_canonical(batch.to_dict()))
-            key = _sha256(_canonical({
-                "campaign_schema_version": CAMPAIGN_SCHEMA_VERSION,
-                "stage": "differential",
-                "snapshot_id": snapshot_id,
-                "artifacts_lock_sha256": lock_sha,
-                "selection_sha256": selection_sha,
-                "worker_image": worker_image,
-                "native_runtime": runtime_identity,
-                "admission_environment_sha256": admission_environment_sha,
-                "registry_entry_id": entry_id,
-                "artifact_sha256": row["artifact_sha256"],
-                "command_id": descriptor["command_id"],
-                "descriptor_sha256": descriptor_sha,
-                "generator": {"name": GENERATOR_NAME, "version": GENERATOR_VERSION, "seed": seed},
-                "scenario_batch_sha256": batch_sha,
-            }))
-            jobs.append({
-                "unit_id": f"astrbot-diff-{key}",
-                "registry_entry_id": entry_id,
-                "ecosystem": "astrbot",
-                "platform": "linux",
-                "profile_id": "astrbot-4.29.1-native-federated-tool",
-                "stage": "differential",
-                "case_id": descriptor["command_id"],
-                "max_attempts": 2,
-                "payload": {
-                    "artifact_sha256": row["artifact_sha256"],
-                    "inventory_sha256": inventory_sha,
-                    "descriptor_sha256": descriptor_sha,
-                    "scenario_batch_sha256": batch_sha,
-                    "scenario_count": len(batch.scenarios),
-                    "generator": {"name": GENERATOR_NAME, "version": GENERATOR_VERSION, "seed": seed},
-                },
-            })
+        inventory_sha, differential_jobs = differential_jobs_for_inventory(
+            snapshot_id=snapshot_id,
+            artifacts_lock_sha256=lock_sha,
+            selection_sha256=selection_sha,
+            worker_image=worker_image,
+            native_runtime=runtime_identity,
+            admission_environment_sha256=admission_environment_sha,
+            registry_entry_id=entry_id,
+            artifact_sha256=row["artifact_sha256"],
+            descriptors=descriptors,
+            max_scenarios=max_scenarios,
+        )
+        jobs.extend(differential_jobs)
     jobs.sort(key=lambda item: (item["stage"], item["registry_entry_id"], item["unit_id"]))
     totals["differential_jobs"] = sum(job["stage"] == "differential" for job in jobs)
+    campaign_sources = _campaign_source_identity()
 
     key_material = {
         "campaign_schema_version": CAMPAIGN_SCHEMA_VERSION,
@@ -329,6 +406,7 @@ def plan_astrbot_command_campaign(
         "native_runtime": runtime_identity,
         "admission_environment_sha256": admission_environment_sha,
         "max_scenarios": max_scenarios,
+        "campaign_sources_sha256": campaign_sources["sha256"],
         "generator": {"name": GENERATOR_NAME, "version": GENERATOR_VERSION},
         "dispositions": dispositions,
         "job_keys": [job["unit_id"] for job in jobs],
@@ -352,6 +430,9 @@ def plan_astrbot_command_campaign(
             "admission_sha256": admission_sha,
             "admission_environment_sha256": admission_environment_sha,
             "generator": {"name": GENERATOR_NAME, "version": GENERATOR_VERSION},
+            "max_scenarios": max_scenarios,
+            "campaign_sources_sha256": campaign_sources["sha256"],
+            "campaign_sources": campaign_sources["files"],
         },
         "denominator": {
             "snapshot_entries": len(lock.get("entries", [])),
@@ -385,6 +466,9 @@ def register_campaign_plan(queue_path: str, plan: dict[str, Any]) -> dict[str, A
         "worker_image": inputs.get("worker_image"),
         "native_runtime": inputs.get("native_runtime"),
         "admission_environment_sha256": inputs.get("admission_environment_sha256"),
+        "max_scenarios": inputs.get("max_scenarios"),
+        "campaign_sources_sha256": inputs.get("campaign_sources_sha256"),
+        "campaign_sources": inputs.get("campaign_sources"),
         "denominator": plan.get("denominator"),
         "plan_counts": plan.get("counts"),
         "dispositions": plan.get("dispositions"),

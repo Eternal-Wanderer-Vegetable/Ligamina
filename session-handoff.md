@@ -3,7 +3,7 @@
 ## Current Objective
 
 - **2026-11-12 当前状态：** P6-01–04、P7-01–08、P7-04F–L / feat-059–065 已完成；P7-09 / feat-054 的 30+30 pilot 准入四门已通过，当前 active feature 为 feat-054，下一步完成可恢复的 AstrBot 全量 load census 与三生态已验证条目 campaign；P7-10 / feat-055 仍 blocked，等待 P7-09。
-- **P7-09 当前运行点（2026-11-12 07:42 UTC）：** AstrBot census 仍在运行；外置 SQLite snapshot 为 passed=1,455、failed=76、skipped=47、leased=2、queued=1,685，共 3,265 frozen identities、1,582 attempts；`PRAGMA quick_check=ok`。实时 JSON 可能因活动 leases 落后，队列是恢复依据。55 个已通过条目缺 runtime command descriptor，封账后仅补这些 exact identities。`lab/astrbot_campaign_plan.py` 已有 completed-census/identity/hash 校验、fresh exact-image admission、稳定环境增量键和外置 fenced/idempotent StageQueue 注册；规划器不派发 Worker。最终完整 Lab suite 399 项（393 pass、6 因 WSL 缺 Node.js 跳过），定向 census/planner suite 17/17，py_compile 通过。证据 `outputs/acceptance/p7-p709-feat054-campaign-plan-verification-20261112.json`。
+- **P7-09 当前运行点（2026-11-12 08:58 UTC）：** AstrBot census 仍在运行；外置 SQLite snapshot 为 passed=2,231、failed=119、skipped=68、leased=2、queued=845，共 3,265 frozen identities、2,422 attempts；`PRAGMA quick_check=ok`。实时 JSON 可能因活动 leases 落后，队列是恢复依据。55 个已通过条目缺 runtime command descriptor，封账后仅补这些 exact identities。campaign planner 已绑定冻结身份、fresh exact-image admission、runtime hashes、稳定环境增量键和外置 fenced/idempotent StageQueue 注册；新增 executor 经 WorkerSpec→WorkerResult 边界运行 Native×2/Federated，支持重启 reconciliation、fencing、cleanup 阻断、结果投影和 C1–C8 evidence boundary。定向 32/32、完整 Lab 414/414、py_compile、README、矩阵、证据哈希与 harness 检查通过，详见 `outputs/acceptance/p7-p709-feat054-campaign-executor-verification-20261112.json`。普查仍进行中，campaign 尚未 dispatch；feat-054 保持 in-progress，P7-10 blocked。
 
   当前恢复日志 `/tmp/ligamina-p709-resume.log`。恢复命令（同一 manifest，自动等待 lease/reconcile）：
   ```bash
