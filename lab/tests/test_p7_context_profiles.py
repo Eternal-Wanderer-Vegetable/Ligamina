@@ -424,7 +424,7 @@ class P7ContextProfileTests(unittest.TestCase):
         candidate = _candidate(BILICHAT)
         events, generation = p7.build_scenario_batch(
             candidate,
-            [_descriptor(".otp"), _descriptor(".check"), _descriptor("unprofiled")],
+            [_descriptor(".otp"), _descriptor(".check"), _descriptor(".unsub"), _descriptor("unprofiled")],
             seed=p7.FIXED_SEED,
         )
         by_command = {
@@ -437,11 +437,22 @@ class P7ContextProfileTests(unittest.TestCase):
 
         private = by_command[".otp"]
         group = by_command[".check"]
+        unsub = by_command[".unsub"]
         unchanged = by_command["unprofiled"]
         self.assertEqual(private["conversation"]["kind"], "private")
         self.assertEqual(private["conversation"]["id"], private["actor_id"])
         self.assertEqual(group["conversation"]["kind"], "group")
         self.assertTrue(any(segment.get("type") == "mention" for segment in group["message"]))
+        self.assertEqual(unsub["actor_id"], private["actor_id"])
+        self.assertEqual(unsub["conversation"]["kind"], "group")
+        self.assertTrue(any(segment.get("type") == "mention" for segment in unsub["message"]))
+        unsub_profile = profile_for_command(candidate, ".unsub")
+        self.assertEqual(unsub_profile["authorization"], "superuser")
+        self.assertTrue(any(
+            source["path"] == "nonebot_plugin_bilichat/command/subs.py"
+            and source["sha256"] == "dabc1249ae780ea07282914056829061f85931194429a2b29594d64227bd4e18"
+            for source in profile_binding(candidate)["source_evidence"]
+        ))
         self.assertNotEqual(unchanged["actor_id"], private["actor_id"])
         self.assertFalse(any(segment.get("type") == "mention" for segment in unchanged["message"]))
 

@@ -119,20 +119,27 @@ def _validate_profile_document(document: dict[str, Any] | None) -> dict[str, Any
             raise ValueError(f"duplicate P7 context profile command override: {entry_id}")
         if not set(overrides).issubset(source_commands):
             raise ValueError(f"P7 context profile override names an unbound command: {entry_id}")
-        source_file_hashes = (
-            {
-                row.get("package_source"): row.get("package_source_sha256")
-                for source in finding.get("wheel", {}).get("source_files", [])
-                for row in [source]
-                if isinstance(row, dict)
-            }
-            if entry_id in finding_by_id
-            else {
-                row.get("path"): row.get("sha256")
-                for row in finding.get("source_files", [])
-                if isinstance(row, dict)
-            }
-        )
+        source_file_hashes: dict[str, str] = {}
+        for source_finding in (finding_by_id.get(entry_id), audit_finding_by_id.get(entry_id)):
+            if not isinstance(source_finding, dict):
+                continue
+            source_files = (
+                [
+                    {
+                        "path": row.get("package_source"),
+                        "sha256": row.get("package_source_sha256"),
+                    }
+                    for row in source_finding.get("wheel", {}).get("source_files", [])
+                    if isinstance(row, dict)
+                ]
+                if entry_id in finding_by_id and source_finding is finding_by_id.get(entry_id)
+                else source_finding.get("source_files", [])
+            )
+            for source in source_files:
+                source_path, source_sha256 = source.get("path"), source.get("sha256")
+                if source_path in source_file_hashes and source_file_hashes[source_path] != source_sha256:
+                    raise ValueError(f"P7 context profile source reports conflict for member: {source_path}")
+                source_file_hashes[source_path] = source_sha256
         for source in profile["source_evidence"]:
             if source_file_hashes.get(source["path"]) != source["sha256"]:
                 raise ValueError(f"P7 context profile source hash is not bound to its locked wheel: {source['path']}")

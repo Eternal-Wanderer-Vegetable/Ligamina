@@ -123,6 +123,7 @@ def select_candidates(
     limit_per_ecosystem: int | None = None,
     allow_profile_subset: bool = False,
     allow_source_context_subset: bool = False,
+    allow_local_candidate_diagnostic: bool = False,
 ) -> list[dict[str, Any]]:
     """Validate the 30-per-ecosystem static selection against load and lock evidence."""
     if selection.get("kind") != "p7_p701_static_inventory_sample":
@@ -192,8 +193,18 @@ def select_candidates(
         })
     candidates.sort(key=lambda item: (item["ecosystem"], item["registry_entry_id"]))
     counts = {eco: sum(item["ecosystem"] == eco for item in candidates) for eco in ECOSYSTEMS}
-    if allow_profile_subset and allow_source_context_subset:
+    if sum((allow_profile_subset, allow_source_context_subset, allow_local_candidate_diagnostic)) > 1:
         raise ValueError("P7 profile subset modes are mutually exclusive")
+    if allow_local_candidate_diagnostic:
+        from lab.automation.p7_local_candidate_diagnostic import EXPECTED_IDS, validate_selection_document
+
+        diagnostic_scope = selection.get("diagnostic_scope", {})
+        validate_selection_document(selection)
+        if limit_per_ecosystem is not None or diagnostic_scope.get("kind") != "p7_source_bound_local_candidate_diagnostic":
+            raise ValueError("local-candidate diagnostic requires its exact source-bound 1+1 selection")
+        if counts != {"koishi": 1, "nonebot": 1} or {item["registry_entry_id"] for item in candidates} != EXPECTED_IDS:
+            raise ValueError("local-candidate diagnostic must resolve exactly one locked entry per ecosystem")
+        return candidates
     if allow_source_context_subset:
         expected_ids = context_profile_entry_ids()
         diagnostic_scope = selection.get("diagnostic_scope", {})
@@ -569,7 +580,41 @@ def _event_from_scenario(
     return event
 
 
-def build_scenario_batch(candidate: dict[str, Any], runtime_commands: list[dict[str, Any]], *, seed: int = FIXED_SEED) -> tuple[list[dict[str, Any]], dict[str, Any]]:
+def _local_command_tokens(descriptor: dict[str, Any]) -> set[str]:
+    values = [descriptor.get("command_id"), descriptor.get("invocation"), *descriptor.get("aliases", [])]
+    tokens: set[str] = set()
+    for value in values:
+        if not isinstance(value, str):
+            continue
+        token = value.strip().split(maxsplit=1)[0] if value.strip() else ""
+        token = token.lstrip("./")
+        if token:
+            tokens.add(token.casefold())
+    return tokens
+
+
+def filter_local_stimulus_descriptors(
+    descriptors: list[dict[str, Any]], local_stimulus: dict[str, Any],
+) -> list[dict[str, Any]]:
+    """Return only the uniquely matched source-bound command, or empty if not discovered."""
+    target_command = str(local_stimulus.get("command_id", "")).lstrip(".").casefold()
+    matches = [descriptor for descriptor in descriptors if target_command in _local_command_tokens(descriptor)]
+    if len(matches) > 1:
+        raise ValueError(
+            f"source-bound local stimulus has an ambiguous runtime command match for "
+            f"{local_stimulus.get('registry_entry_id')}:{local_stimulus.get('command_id')}"
+        )
+    return matches
+
+
+def build_scenario_batch(
+    candidate: dict[str, Any],
+    runtime_commands: list[dict[str, Any]],
+    *,
+    seed: int = FIXED_SEED,
+    local_stimulus: dict[str, Any] | None = None,
+    local_stimulus_profile_sha256: str | None = None,
+) -> tuple[list[dict[str, Any]], dict[str, Any]]:
     schema = _read(DESCRIPTOR_SCHEMA_PATH)
     validator = Draft202012Validator(schema)
     events: list[dict[str, Any]] = []
@@ -582,6 +627,24 @@ def build_scenario_batch(candidate: dict[str, Any], runtime_commands: list[dict[
             invalid_descriptors += 1
             continue
         command_descriptors.append(descriptor)
+    if local_stimulus is not None:
+        expected_identity = (
+            local_stimulus.get("registry_entry_id"),
+            local_stimulus.get("ecosystem"),
+            local_stimulus.get("package"),
+            local_stimulus.get("version"),
+            local_stimulus.get("artifact_sha256"),
+        )
+        observed_identity = tuple(candidate.get(key) for key in (
+            "registry_entry_id", "ecosystem", "package", "version", "artifact_sha256"
+        ))
+        if expected_identity != observed_identity:
+            raise ValueError("source-bound local stimulus does not match the exact selected artifact")
+        if not isinstance(local_stimulus_profile_sha256, str) or len(local_stimulus_profile_sha256) != 64:
+            raise ValueError("source-bound local stimulus requires its profile SHA-256")
+        command_descriptors = filter_local_stimulus_descriptors(command_descriptors, local_stimulus)
+        if len(command_descriptors) > 1:
+            raise AssertionError("source-bound local descriptor filter returned an ambiguous result")
     inventory_sha = object_sha256({
         "ecosystem": candidate["ecosystem"],
         "registry_entry_id": candidate["registry_entry_id"],
@@ -590,8 +653,13 @@ def build_scenario_batch(candidate: dict[str, Any], runtime_commands: list[dict[
         "commands": command_descriptors,
     })
     for descriptor in command_descriptors:
+        profile_command_id = (
+            local_stimulus.get("context_command_id", descriptor["command_id"])
+            if local_stimulus is not None
+            else descriptor["command_id"]
+        )
         command_profile = (
-            test_context_profile["command_contexts"].get(descriptor["command_id"])
+            test_context_profile["command_contexts"].get(profile_command_id)
             if test_context_profile is not None
             else None
         )
@@ -604,7 +672,35 @@ def build_scenario_batch(candidate: dict[str, Any], runtime_commands: list[dict[
             conversation_kind=conversation_kind,
             max_scenarios=16,
         )
-        for scenario in batch.scenarios:
+        source_scenarios = batch.scenarios
+        if local_stimulus is not None:
+            stimulus_cycle = local_stimulus.get("input_cycle")
+            if not isinstance(stimulus_cycle, list) or len(stimulus_cycle) != 2:
+                raise ValueError("source-bound local stimulus requires an exact two-input cycle")
+            if command_descriptors and len(source_scenarios) < len(stimulus_cycle):
+                raise ValueError("scenario generator produced too few bases for the source-bound input cycle")
+            source_scenarios = source_scenarios[:len(stimulus_cycle)] if command_descriptors else []
+        for cycle_index, original_scenario in enumerate(source_scenarios):
+            scenario = copy.deepcopy(original_scenario)
+            if local_stimulus is not None:
+                explicit_input = local_stimulus["input_cycle"][cycle_index]
+                scenario_step = scenario["steps"][0]
+                if scenario_step.get("kind") != "tool_call":
+                    raise ValueError("source-bound input override only supports generated tool-call scenarios")
+                scenario_step["arguments"] = explicit_input
+                scenario["case"] = {
+                    **scenario.get("case", {}),
+                    "kind": "source_bound_input",
+                    "index": cycle_index,
+                }
+                scenario["scenario_id"] = "scn-" + object_sha256({
+                    "source_scenario_id": original_scenario["scenario_id"],
+                    "stimulus_profile_sha256": local_stimulus_profile_sha256,
+                    "registry_entry_id": candidate["registry_entry_id"],
+                    "command_id": descriptor["command_id"],
+                    "cycle_index": cycle_index,
+                    "input_sha256": object_sha256(explicit_input),
+                })[:24]
             event = _event_from_scenario(
                 scenario,
                 ecosystem=candidate["ecosystem"],
@@ -625,6 +721,13 @@ def build_scenario_batch(candidate: dict[str, Any], runtime_commands: list[dict[
                 "batch_sha256": object_sha256(batch.to_dict()),
                 "pairwise": batch.pairwise,
             })
+            if local_stimulus is not None:
+                scenarios[-1].update({
+                    "local_stimulus_profile_sha256": local_stimulus_profile_sha256,
+                    "local_stimulus_kind": local_stimulus["input_kind"],
+                    "local_stimulus_cycle_index": cycle_index,
+                    "local_stimulus_input_sha256": object_sha256(local_stimulus["input_cycle"][cycle_index]),
+                })
             if command_profile and test_context_profile:
                 scenarios[-1].update({
                     "context_profile_id": test_context_profile["profile_id"],
@@ -645,6 +748,9 @@ def build_scenario_batch(candidate: dict[str, Any], runtime_commands: list[dict[
         "commands_invalid": invalid_descriptors,
         "profiled_commands": len({row["command_id"] for row in scenarios if row.get("test_context_profile_sha256")}),
         "test_context_profile_sha256": test_context_profile["profile_sha256"] if test_context_profile else None,
+        "local_stimulus_profile_sha256": local_stimulus_profile_sha256 if local_stimulus is not None else None,
+        "local_stimulus_input_count": len(scenarios) if local_stimulus is not None else 0,
+        "local_stimulus_command_found": bool(command_descriptors) if local_stimulus is not None else None,
         "scenarios": scenarios,
         "scenario_count": len(scenarios),
     }
@@ -869,6 +975,112 @@ def _round_scenario_results(
     return case_results, first, second, fed
 
 
+def _source_bound_input_adjudication(
+    scenarios: list[dict[str, Any]], rounds: list[dict[str, Any]],
+) -> dict[str, Any]:
+    """Summarize local input-cycle evidence without contributing to the cohort gate."""
+    scenario_by_id: dict[str, dict[str, Any]] = {}
+    for scenario in scenarios:
+        scenario_id = scenario.get("scenario_id")
+        cycle_index = scenario.get("local_stimulus_cycle_index")
+        input_sha256 = scenario.get("local_stimulus_input_sha256")
+        if not isinstance(scenario_id, str) or not isinstance(cycle_index, int) or not isinstance(input_sha256, str):
+            raise ValueError("source-bound input adjudication requires scenario IDs, cycle indexes, and input hashes")
+        if scenario_id in scenario_by_id:
+            raise ValueError("source-bound input adjudication received duplicate scenario IDs")
+        scenario_by_id[scenario_id] = scenario
+
+    per_scenario: dict[str, list[dict[str, Any] | None]] = {scenario_id: [] for scenario_id in scenario_by_id}
+    for round_row in rounds:
+        case_rows = {
+            row.get("scenario_id"): row
+            for row in round_row.get("scenario_results", [])
+            if isinstance(row, dict) and isinstance(row.get("scenario_id"), str)
+        }
+        for scenario_id in per_scenario:
+            per_scenario[scenario_id].append(case_rows.get(scenario_id))
+
+    inputs = []
+    unresolved_reason: str | None = None
+    stable_non_equivalent = False
+    for scenario_id, scenario in sorted(
+        scenario_by_id.items(), key=lambda item: (item[1]["local_stimulus_cycle_index"], item[0])
+    ):
+        observations = per_scenario[scenario_id]
+        if len(rounds) != ROUNDS or len(observations) != ROUNDS or any(row is None for row in observations):
+            unresolved_reason = unresolved_reason or "unknown_incomplete_three_round_source_event_observation"
+        valid_rows = [row for row in observations if row is not None]
+        if any(
+            row.get("status") == "unknown" and row.get("reason_code") == "no_native_gateway_operation_observed"
+            for row in valid_rows
+        ):
+            unresolved_reason = "unknown_missing_native_or_federated_observation"
+        elif any(row.get("status") == "unknown" for row in valid_rows):
+            unresolved_reason = unresolved_reason or "unknown_unresolved_source_event_observation"
+        elif any(
+            row.get("status") == "nondeterministic" or row.get("native_self_status") == "nondeterministic"
+            for row in valid_rows
+        ):
+            unresolved_reason = unresolved_reason or "unknown_nondeterministic_native_observation"
+
+        signatures = [
+            (
+                row.get("native_one_observation_sha256"),
+                row.get("native_two_observation_sha256"),
+                row.get("federated_observation_sha256"),
+            )
+            for row in valid_rows
+        ]
+        if any(any(not isinstance(value, str) for value in signature) for signature in signatures):
+            unresolved_reason = unresolved_reason or "unknown_missing_native_or_federated_observation"
+        if signatures and any(signature != signatures[0] for signature in signatures[1:]):
+            unresolved_reason = unresolved_reason or "unknown_observation_changed_across_fresh_rounds"
+        if valid_rows and all(row.get("status") == "non_equivalent" for row in valid_rows):
+            stable_non_equivalent = True
+        elif valid_rows and any(row.get("status") not in {"equivalent", "non_equivalent"} for row in valid_rows):
+            unresolved_reason = unresolved_reason or "unknown_unresolved_source_event_observation"
+
+        inputs.append({
+            "cycle_index": scenario["local_stimulus_cycle_index"],
+            "input_sha256": scenario["local_stimulus_input_sha256"],
+            "source_event_id": scenario.get("event_id"),
+            "scenario_id": scenario_id,
+            "round_statuses": [row.get("status") if row is not None else None for row in observations],
+            "observation_sha256_by_round": [list(signature) for signature in signatures],
+        })
+
+    signatures_by_input = [tuple(row["observation_sha256_by_round"][0]) for row in inputs if row["observation_sha256_by_round"]]
+    input_sensitive = len(signatures_by_input) > 1 and len(set(signatures_by_input)) > 1
+    all_equivalent = bool(inputs) and all(
+        len(row["round_statuses"]) == ROUNDS and all(status == "equivalent" for status in row["round_statuses"])
+        for row in inputs
+    )
+    if unresolved_reason:
+        classification = unresolved_reason
+    elif stable_non_equivalent:
+        classification = (
+            "input_sensitive_native_federated_non_equivalent"
+            if input_sensitive
+            else "stable_native_federated_non_equivalent"
+        )
+    elif all_equivalent and input_sensitive:
+        classification = "input_sensitive_native_federated_equivalent"
+    elif all_equivalent:
+        classification = "input_insensitive_native_federated_equivalent"
+    else:
+        classification = "unknown_incomplete_source_bound_input_evidence"
+
+    return {
+        "scope": "bounded_source_bound_diagnostic_only",
+        "classification": classification,
+        "input_count": len(inputs),
+        "input_sensitive": input_sensitive if unresolved_reason is None else None,
+        "input_sensitivity_assessed": unresolved_reason is None,
+        "inputs": inputs,
+        "counts_toward_cohort_nontrivial_gate": False,
+    }
+
+
 def _nontrivial_commands(
     scenario_meta: list[dict[str, Any]],
     round_observations: list[tuple[dict[str, Any] | None, dict[str, Any] | None]],
@@ -1012,6 +1224,7 @@ def run_campaign(
     limit_per_ecosystem: int | None = None,
     allow_profile_subset: bool = False,
     allow_source_context_subset: bool = False,
+    allow_local_candidate_diagnostic: bool = False,
     rounds: int = ROUNDS,
     workers: int = 3,
 ) -> dict[str, Any]:
@@ -1054,7 +1267,13 @@ def run_campaign(
         limit_per_ecosystem=limit_per_ecosystem,
         allow_profile_subset=allow_profile_subset,
         allow_source_context_subset=allow_source_context_subset,
+        allow_local_candidate_diagnostic=allow_local_candidate_diagnostic,
     )
+    local_stimulus_profile_sha256 = None
+    if allow_local_candidate_diagnostic:
+        from lab.automation.p7_local_candidate_diagnostic import stimulus_profile_sha256 as local_profile_sha256
+
+        local_stimulus_profile_sha256 = local_profile_sha256()
     bundle_root.mkdir(parents=True)
     campaign_id = f"p7-p704-{int(time.time())}"
     report: dict[str, Any] = {
@@ -1084,9 +1303,11 @@ def run_campaign(
             },
             "network": "disabled",
             "limit_per_ecosystem": limit_per_ecosystem,
-            "diagnostic_only": allow_profile_subset or allow_source_context_subset or limit_per_ecosystem is not None,
+            "diagnostic_only": allow_profile_subset or allow_source_context_subset or allow_local_candidate_diagnostic or limit_per_ecosystem is not None,
             "selection_scope": (
-                "p7_nonebot_context_profile_subset"
+                "p7_source_bound_local_candidate_diagnostic"
+                if allow_local_candidate_diagnostic
+                else "p7_nonebot_context_profile_subset"
                 if allow_profile_subset
                 else "p7_source_bound_context_profile_subset"
                 if allow_source_context_subset
@@ -1108,6 +1329,11 @@ def run_campaign(
         "entries": [],
         "counts": {"entries": 0, "worker_runs": 0, "cleanup_unconfirmed": 0, "scenarios": 0},
     }
+    if local_stimulus_profile_sha256 is not None:
+        from lab.automation.p7_local_candidate_diagnostic import STIMULUS_PROFILE_PATH
+
+        report["scope"]["local_stimulus_profile_path"] = STIMULUS_PROFILE_PATH.relative_to(ROOT).as_posix()
+        report["scope"]["local_stimulus_profile_sha256"] = local_stimulus_profile_sha256
     loopback_profiled_ids = [
         candidate["registry_entry_id"]
         for candidate in candidates
@@ -1169,7 +1395,21 @@ def run_campaign(
         )
         raw_descriptors = discovery.get("stock_native", {}).get("runtime_commands", [])
         descriptors = [item for item in raw_descriptors if isinstance(item, dict) and not list(schema_validator.iter_errors(item))]
-        events, generation = build_scenario_batch(candidate, descriptors, seed=FIXED_SEED)
+        local_stimulus = None
+        if allow_local_candidate_diagnostic:
+            from lab.automation.p7_local_candidate_diagnostic import stimulus_for_candidate
+
+            local_stimulus = stimulus_for_candidate(candidate)
+            if local_stimulus is None:
+                raise ValueError(f"local-candidate stimulus is not defined for selected entry {entry_id}")
+            descriptors = filter_local_stimulus_descriptors(descriptors, local_stimulus)
+        events, generation = build_scenario_batch(
+            candidate,
+            descriptors,
+            seed=FIXED_SEED,
+            local_stimulus=local_stimulus,
+            local_stimulus_profile_sha256=local_stimulus_profile_sha256 if local_stimulus is not None else None,
+        )
         stimulus = {"events": events}
         scenario_meta = generation["scenarios"]
         test_context_profile = profile_binding(candidate)
@@ -1218,6 +1458,7 @@ def run_campaign(
             "scenarios": [
                 {
                     **{key: item[key] for key in ("scenario_id", "command_id", "kind", "descriptor_sha256", "input_sha256", "arguments_bytes", "arguments_nonempty", "pairwise")},
+                    **({"source_event_id": item["event_id"]} if local_stimulus is not None else {}),
                     **{
                         key: item[key]
                         for key in (
@@ -1226,6 +1467,10 @@ def run_campaign(
                             "profile_conversation_kind",
                             "profile_mention_bot",
                             "profile_authorization",
+                            "local_stimulus_profile_sha256",
+                            "local_stimulus_kind",
+                            "local_stimulus_cycle_index",
+                            "local_stimulus_input_sha256",
                         )
                         if key in item
                     },
@@ -1239,7 +1484,8 @@ def run_campaign(
 
         if not discovery_ok:
             entry_result["commands"] = {
-                "discovered": len(raw_descriptors) if isinstance(raw_descriptors, list) else 0,
+                "discovered": len(descriptors) if allow_local_candidate_diagnostic else len(raw_descriptors) if isinstance(raw_descriptors, list) else 0,
+                "native_inventory_discovered": len(raw_descriptors) if isinstance(raw_descriptors, list) else 0,
                 "valid_descriptors": len(descriptors),
                 "invalid_descriptors": generation["commands_invalid"],
                 "exercised": 0,
@@ -1272,7 +1518,8 @@ def run_campaign(
 
         if not descriptors:
             entry_result["commands"] = {
-                "discovered": len(raw_descriptors) if isinstance(raw_descriptors, list) else 0,
+                "discovered": len(descriptors) if allow_local_candidate_diagnostic else len(raw_descriptors) if isinstance(raw_descriptors, list) else 0,
+                "native_inventory_discovered": len(raw_descriptors) if isinstance(raw_descriptors, list) else 0,
                 "valid_descriptors": 0,
                 "invalid_descriptors": generation["commands_invalid"],
                 "exercised": 0,
@@ -1344,6 +1591,10 @@ def run_campaign(
                 run_results["native-2"],
                 run_results["federated"],
             )
+            if local_stimulus is not None:
+                event_by_scenario = {item["scenario_id"]: item["event_id"] for item in scenario_meta}
+                for case_row in case_rows:
+                    case_row["source_event_id"] = event_by_scenario[case_row["scenario_id"]]
             raw_observations.append((first_obs, second_obs))
             round_case_rows.append(case_rows)
             exposure = _tool_exposure(candidate, descriptors, run_results["federated"])
@@ -1373,8 +1624,13 @@ def run_campaign(
                 break
 
         command_summary = _command_summary(descriptors, scenario_meta, entry_result["rounds"], round_case_rows, raw_observations)
+        if local_stimulus is not None:
+            entry_result["source_bound_input_adjudication"] = _source_bound_input_adjudication(
+                scenario_meta, entry_result["rounds"]
+            )
         entry_result["commands"] = {
-            "discovered": len(raw_descriptors) if isinstance(raw_descriptors, list) else 0,
+            "discovered": len(descriptors) if allow_local_candidate_diagnostic else len(raw_descriptors) if isinstance(raw_descriptors, list) else 0,
+            "native_inventory_discovered": len(raw_descriptors) if isinstance(raw_descriptors, list) else 0,
             "valid_descriptors": len(descriptors),
             "invalid_descriptors": generation["commands_invalid"],
             "exercised": command_summary["counts"]["exercised"],
@@ -1456,6 +1712,7 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--limit-per-ecosystem", type=int)
     parser.add_argument("--allow-profile-subset", action="store_true")
     parser.add_argument("--allow-source-context-subset", action="store_true")
+    parser.add_argument("--allow-local-candidate-diagnostic", action="store_true")
     parser.add_argument("--rounds", type=int, default=ROUNDS)
     parser.add_argument("--workers", type=int, default=3)
     options = parser.parse_args(argv)
@@ -1470,6 +1727,7 @@ def main(argv: list[str] | None = None) -> int:
             limit_per_ecosystem=options.limit_per_ecosystem,
             allow_profile_subset=options.allow_profile_subset,
             allow_source_context_subset=options.allow_source_context_subset,
+            allow_local_candidate_diagnostic=options.allow_local_candidate_diagnostic,
             rounds=options.rounds,
             workers=options.workers,
         )

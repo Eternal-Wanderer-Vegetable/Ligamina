@@ -1,0 +1,175 @@
+{
+  "schema_version": 1,
+  "kind": "p7_p704_source_bound_context_profile_audit",
+  "source_selection": {
+    "path": "outputs/acceptance/p7-p704-independent-pilot-selection-20261111.json",
+    "sha256": "3076c70a5e692392b993abb8754d84f0b06787a4781a4dfca68c7aad727f86c4"
+  },
+  "scope": "static inspection of exact locked archives only; plugin code was not executed; feat-063 adds the exact BiliChat .unsub authorization and local-mutation source reference",
+  "findings": [
+    {
+      "registry_entry_id": "ko-d1c6923c1c0ddff7a16a31bf",
+      "ecosystem": "koishi",
+      "package": "koishi-plugin-xun-jiangshanfuzhu",
+      "version": "0.0.2",
+      "artifact_sha256": "f50452569da7fae897dc35addd00d758f20dc6096611bfc26a770d4bd3dd4917",
+      "command_ids": [
+        "银两",
+        "背包",
+        "商城",
+        "购买",
+        "删背包",
+        "添加商品",
+        "删除商品",
+        "修改商品名称",
+        "修改商品价格",
+        "修改商品库存",
+        "修改商品限购",
+        "用户列表",
+        "用户背包",
+        "加背包",
+        "清空用户",
+        "清空商城",
+        "清空背包数据",
+        "重置金钱"
+      ],
+      "source_files": [
+        {
+          "path": "package/lib/index.js",
+          "sha256": "6d89b1c1c9a25983a9b10a71e0fecba36f6e86acc7a73b095f945deb2f280c11",
+          "lines": [
+            31,
+            66,
+            67,
+            406,
+            409,
+            426,
+            429,
+            455,
+            458,
+            474,
+            477,
+            486,
+            489,
+            499,
+            502,
+            515,
+            518,
+            532,
+            535,
+            557,
+            560,
+            582,
+            585,
+            601,
+            604,
+            622,
+            625,
+            639,
+            642,
+            658,
+            661
+          ]
+        }
+      ],
+      "source_claims": [
+        "adminId is a string array, default empty; isAdmin checks the session user ID against this configured list.",
+        "Selected management handlers are guarded by isAdmin; profile grants only one synthetic actor ID."
+      ],
+      "static_command_ids": [
+        "银两",
+        "背包",
+        "商城",
+        "购买 <itemId:string> <quantity:number>",
+        "删背包 <targetId:string> <itemId:string> <quantity:number>",
+        "添加商品 <id:string> <name:string> <price:number> <stock:number> <limitCount:number> <limitDays:number>",
+        "删除商品 <itemId:string>",
+        "修改商品名称 <itemId:string> <name:string>",
+        "修改商品价格 <itemId:string> <price:number>",
+        "修改商品库存 <itemId:string> <stock:number>",
+        "修改商品限购 <itemId:string> <count:number> <days:number>",
+        "用户列表",
+        "用户背包 <targetId:string>",
+        "加背包 <targetId:string> <itemId:string> <quantity:number>",
+        "清空用户 <targetId:string>",
+        "清空商城",
+        "清空背包数据",
+        "重置金钱"
+      ]
+    },
+    {
+      "registry_entry_id": "nb-5729c6688b584271718b810f",
+      "ecosystem": "nonebot",
+      "package": "nonebot_plugin_kawaii_robot",
+      "version": "4.1.5",
+      "artifact_sha256": "dc92f205b3b10091bac1ae6ea6b77be998b62ac7e20966a552a445086374d81a",
+      "command_ids": [
+        "重载词库"
+      ],
+      "source_files": [
+        {
+          "path": "nonebot_plugin_kawaii_robot/__main__.py",
+          "sha256": "2dfcd0fb49865f3fd50136786cec96e343f4092b3ba92daf7b0a215ec3e6ecad",
+          "lines": [
+            227,
+            228,
+            229
+          ]
+        }
+      ],
+      "source_claims": [
+        "The 重载词库 command is registered with the NoneBot SUPERUSER permission."
+      ],
+      "static_command_ids": [
+        "重载词库"
+      ]
+    },
+    {
+      "registry_entry_id": "nb-250c92c282d77dcf502b9dbf",
+      "ecosystem": "nonebot",
+      "package": "nonebot_plugin_bilichat",
+      "version": "6.5.0",
+      "artifact_sha256": "2fd7ac90900b4039fb71765ebf53886f6ade3593eb466fed5e615d2d82e02bb0",
+      "command_ids": [
+        "checkdynamic",
+        "fetch",
+        "checklogin",
+        "qrlogin",
+        "logout",
+        "otp",
+        "otp_qrcode",
+        "sub",
+        "unsub",
+        "check"
+      ],
+      "source_files": [
+        {
+          "path": "nonebot_plugin_bilichat/command/subs.py",
+          "sha256": "dabc1249ae780ea07282914056829061f85931194429a2b29594d64227bd4e18",
+          "lines": [
+            17,
+            18,
+            50,
+            70
+          ]
+        }
+      ],
+      "source_claims": [
+        "The .unsub matcher requires ADMIN or SUPERUSER.",
+        "The explicit all/全部 input clears the synthetic session subscription mapping and writes ConfigCTX; unmatched input returns a distinct not-found response."
+      ],
+      "static_command_ids": [
+        "checkdynamic",
+        "fetch",
+        "checklogin",
+        "qrlogin",
+        "logout",
+        "otp",
+        "otp_qrcode",
+        "sub",
+        "unsub",
+        "check"
+      ]
+    }
+  ]
+}
