@@ -1,0 +1,130 @@
+{
+  "acceptance_boundary": "Expired fenced attempts were reconciled only by exact campaign/job/attempt/generation Docker labels. Cleanup evidence authorizes retry only for remaining attempts; unknown outcomes remain unknown.",
+  "after_reconciliation": {
+    "attempts": 1021,
+    "counts": {
+      "failed": 1,
+      "passed": 753,
+      "queued": 13692,
+      "unknown": 264
+    },
+    "quick_check": "ok",
+    "run_state": "running"
+  },
+  "before": {
+    "attempts": 1021,
+    "counts": {
+      "failed": 1,
+      "leased": 2,
+      "passed": 753,
+      "queued": 13691,
+      "unknown": 263
+    },
+    "leases": [
+      {
+        "job_id": "40b3b0491549b701eef3108c3326d4a22074ef143192d83b3f4743db007a9753",
+        "lease_expires_at": 1794512054.1973617,
+        "lease_owner": "p7-p709-20261112T190042Z-slot-1-pid-864110-b0021",
+        "unit_id": "astrbot-diff-116a15cbbcda5eb5ec90fb76a0f57007dd3fab4cbe68dbc4ca7587cd95627878"
+      },
+      {
+        "job_id": "3e7ce057194629c2e5a2fdb4c7b905e7e3b296e8387c30a77c34aa07c419f52f",
+        "lease_expires_at": 1794512080.4437163,
+        "lease_owner": "p7-p709-20261112T190157Z-slot-2-pid-842825-b0024",
+        "unit_id": "astrbot-diff-1192fd7c7b46dd29975bfe59499f0f49e89f698c49006c12826c8331a82bff12"
+      }
+    ],
+    "quick_check": "ok",
+    "run_state": "running"
+  },
+  "census_sha256": "b5d149ebbfc690a6889c2e32d4443d8a341771a9c1f07ec1965f27c7baa0a9b0",
+  "command": "uv run --locked --project lab --python 3.12.14 python - (resume_reconciled_run with DockerReconciler)",
+  "fresh_slot_admissions": [
+    {
+      "admission_report": "outputs/acceptance/p7-p709-linux-admission-campaign-20261112T235618Z-slot-1-pid-1598740-b0001.json",
+      "admission_sha256": "1b605c19620b77c9dd1dec085ba429327f30131f43b2a29e6ef14cffe77d17d7",
+      "admission_status": "admitted",
+      "environment_fingerprint": "a33920f9c77fd843009cf7996557fe395259e47487e3d12de1860604abe35d56",
+      "pid": 1598740,
+      "probe_checks": 10,
+      "probe_cleanup_confirmed": true,
+      "probe_passed": true,
+      "probe_report": "outputs/acceptance/p7-p709-linux-worker-probe-campaign-20261112T235618Z-slot-1-pid-1598740-b0001.json",
+      "probe_sha256": "8d2b5d183d7ac9c906ec27c0555376e1a0ce62354b9c15494a271f2418bedc0b",
+      "slot": 1
+    },
+    {
+      "admission_report": "outputs/acceptance/p7-p709-linux-admission-campaign-20261112T235618Z-slot-2-pid-1598741-b0001.json",
+      "admission_sha256": "41313377bba9338291962f5d959b48c665e109630355f6ee9b987611353ea309",
+      "admission_status": "admitted",
+      "environment_fingerprint": "2cae1491b5153dc424630e72e7de1b62db5dbba3ba8d19190615c811ce24a14c",
+      "pid": 1598741,
+      "probe_checks": 10,
+      "probe_cleanup_confirmed": true,
+      "probe_passed": true,
+      "probe_report": "outputs/acceptance/p7-p709-linux-worker-probe-campaign-20261112T235618Z-slot-2-pid-1598741-b0001.json",
+      "probe_sha256": "829b25237dd9aba1f54a6e6379cf758b63cb7baabc96b456455afc39d9ec7e2f",
+      "slot": 2
+    }
+  ],
+  "head": "48a7fc543483c303db9ad6fe565a8f267979adeb",
+  "kind": "p7_p709_astrbot_campaign_recovery",
+  "plan_sha256": "a9871842d70641c0ec4bd05fb9fd063a9cee06b8512759c41ed15f1b4ceb0205",
+  "queue_db": "/home/vegetable/.local/share/ligamina/p7-astrbot-command-campaign-bundlefix-20261112.sqlite3",
+  "reconciled_attempts": {
+    "2d0cbd7f8a60b7c9e1a8e73eaf4cb8f4c5042451b1b68d95": {
+      "generation": 2,
+      "job_id": "40b3b0491549b701eef3108c3326d4a22074ef143192d83b3f4743db007a9753",
+      "result": {
+        "reason": "lease expired before a terminal result was recorded",
+        "reason_code": "worker_lost",
+        "reconciliation": {
+          "cleanup_confirmed": true,
+          "reason_code": null,
+          "removed_ids": [
+            "252d122bd2f46b2e552cb69ff892ceac958341f056b796964c7916a04db57613"
+          ],
+          "resource_ids": [
+            "252d122bd2f4"
+          ],
+          "source": "docker_label_reconciliation"
+        },
+        "requires_reconciliation": true,
+        "status": "unknown"
+      },
+      "status": "unknown"
+    },
+    "c6f9be7bba97d6981af892d07df3959cbbcc2221a37940a6": {
+      "generation": 1,
+      "job_id": "3e7ce057194629c2e5a2fdb4c7b905e7e3b296e8387c30a77c34aa07c419f52f",
+      "result": {
+        "reason": "lease expired before a terminal result was recorded",
+        "reason_code": "worker_lost",
+        "reconciliation": {
+          "cleanup_confirmed": true,
+          "reason_code": null,
+          "removed_ids": [
+            "79aabc3ecca4111095a7ea84cc153e8deb501b164f7504a832acd06391db6ca2"
+          ],
+          "resource_ids": [
+            "79aabc3ecca4"
+          ],
+          "source": "docker_label_reconciliation"
+        },
+        "requires_reconciliation": true,
+        "status": "unknown"
+      },
+      "status": "unknown"
+    }
+  },
+  "recorded_at": "2026-11-12T23:55:33.288182+00:00",
+  "resume": {
+    "expired_leases_recovered": 2,
+    "reconciliation_required": true,
+    "run_id": "p7-09-astra-72e7512f6f4d2219cf9b",
+    "state": "interrupted"
+  },
+  "run_id": "p7-09-astra-72e7512f6f4d2219cf9b",
+  "schema_version": 1,
+  "supervisor_script_sha256": "433dd27e891eab7a310064a5425d7afbdfbc247762103f4baee7b25ee15c5fa6"
+}
