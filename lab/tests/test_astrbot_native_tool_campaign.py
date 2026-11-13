@@ -30,6 +30,23 @@ class AstrBotNativeToolCampaignTests(unittest.TestCase):
         self.assertNotIn("import ligamina_astrbot", source)
         self.assertIn('name="p7_native_test"', source)
 
+    def test_group_subcommands_are_dispatched_with_spaces_as_astrbot_matches_them(self):
+        from types import SimpleNamespace
+
+        from lab.astrbot_native_tool_side import _command_path, _dispatch_text
+
+        grouped = SimpleNamespace(parent_command_names=["米游社"], command_name="帮助")
+        nested = SimpleNamespace(parent_command_names=["mf  queue"], command_name="retention")
+        plain = SimpleNamespace(parent_command_names=[""], command_name="tts_on")
+        self.assertEqual(_command_path(grouped), ["米游社", "帮助"])
+        self.assertEqual(_command_path(nested), ["mf", "queue", "retention"])
+        self.assertEqual(_command_path(plain), ["tts_on"])
+        # AstrBot CommandFilter.get_complete_command_names() joins parent and command with a space;
+        # the dotted command ID is only the tool-surface identity and never matches natively.
+        self.assertEqual(_dispatch_text("/", _command_path(grouped), "hello"), "/米游社 帮助 hello")
+        self.assertEqual(_dispatch_text("/", _command_path(nested), ""), "/mf queue retention")
+        self.assertEqual(_dispatch_text("/", _command_path(plain), "x"), "/tts_on x")
+
     def test_reply_projection_preserves_event_step_and_call_order(self):
         observation = {"tool_calls": {"steps": [
             [{"replies": ["first"]}, {"replies": []}],

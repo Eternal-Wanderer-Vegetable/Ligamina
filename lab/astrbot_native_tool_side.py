@@ -58,6 +58,18 @@ def _stringify(value: Any) -> str:
     return str(value)
 
 
+def _command_path(command: Any) -> list[str]:
+    """Words of a CommandFilter's primary name: parent group words, then the command."""
+    parents = [name for name in (command.parent_command_names or []) if name]
+    return [*parents[0].split(), command.command_name] if parents else [command.command_name]
+
+
+def _dispatch_text(prefix: str, path: list[str], raw: str) -> str:
+    # The dotted command ID is only the tool identity. AstrBot's CommandFilter matches
+    # "<parent> <command>" (get_complete_command_names), so group subcommands are typed with spaces.
+    return f"{prefix}{' '.join(path)}" + (f" {raw}" if raw else "")
+
+
 def _command_map() -> dict[str, tuple[Any, Any]]:
     from astrbot.core.star.filter.command import CommandFilter
     from astrbot.core.star.star import star_map
@@ -71,10 +83,7 @@ def _command_map() -> dict[str, tuple[Any, Any]]:
         if star is None or getattr(star, "reserved", False) or not getattr(star, "activated", True):
             continue
         for command in (item for item in handler.event_filters if isinstance(item, CommandFilter)):
-            parents = [name for name in (command.parent_command_names or []) if name]
-            path = [*parents[0].split()] if parents else []
-            path.append(command.command_name)
-            command_id = ".".join(path)
+            command_id = ".".join(_command_path(command))
             if command_id and command_id not in commands:
                 commands[command_id] = (handler, command)
     return commands
@@ -279,7 +288,7 @@ async def run(request: dict[str, Any], plugin_dir: Path) -> dict[str, Any]:
                 wake_prefixes = config.get("wake_prefix") or ["/"]
                 prefix = str(wake_prefixes[0]) if wake_prefixes else ""
                 raw = _arguments_text(command, spec.get("arguments", {}))
-                message = f"{prefix}{command_id}" + (f" {raw}" if raw else "")
+                message = _dispatch_text(prefix, _command_path(command), raw)
                 record["replies"] = await adapter.dispatch(core, message, index)
             except Exception as error:
                 record.update({"is_error": True, "protocol_error": f"{type(error).__name__}: {str(error)[:400]}", "replies": []})
