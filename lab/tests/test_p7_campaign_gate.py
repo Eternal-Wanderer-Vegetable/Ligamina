@@ -19,7 +19,7 @@ def _result(federated: dict | None = None, c7_reason: str | None = None, categor
         "comparison": {"category": category, "call_signals": {
             "native_first": _signals(), "native_second": _signals(), "federated": federated or _signals()}},
         "contracts": {"C7": {"reason_code": c7_reason}},
-        "worker_runs": [{"cleanup_confirmed": True}] * 3,
+        "worker_runs": [{"status": "passed", "reason_code": None, "cleanup_confirmed": True}] * 3,
     }
 
 
@@ -52,6 +52,36 @@ class CampaignGateTests(unittest.TestCase):
         self.assertIn("native_all_calls_silent:4/5>0.2", verdict["reasons"])
         self.assertIn("call_signals_missing:1", verdict["reasons"])
         self.assertIn("non_terminal_queue_rows:1", verdict["reasons"])
+
+    def test_timed_out_worker_without_signals_is_a_rate_not_a_harness_anomaly(self) -> None:
+        # 2026-11-13 b0006: both Native Workers of one hanging command hit the 420 s Worker
+        # timeout, so those sides had no readable output and no call signals.
+        timed_out = _result(federated=_signals(errors=1), category="unknown")
+        timed_out["comparison"]["call_signals"]["native_first"] = None
+        timed_out["comparison"]["call_signals"]["native_second"] = None
+        timed_out["worker_runs"] = [
+            {"status": "unknown", "reason_code": "worker_timeout", "cleanup_confirmed": True},
+            {"status": "unknown", "reason_code": "worker_timeout", "cleanup_confirmed": True},
+            {"status": "passed", "reason_code": None, "cleanup_confirmed": True},
+        ]
+        rows = {f"u{i}": {"status": "passed", "result": _result()} for i in range(10)}
+        rows["u0"] = {"status": "unknown", "result": timed_out}
+        verdict = gate.evaluate(_report(10), rows, gate.DEFAULT_LIMITS)
+        self.assertEqual(verdict["status"], "passed", verdict["reasons"])
+        self.assertEqual(verdict["counts"]["worker_not_passed"], 1)
+
+        for i in range(1, 3):
+            rows[f"u{i}"] = {"status": "unknown", "result": timed_out}
+        verdict = gate.evaluate(_report(10), rows, gate.DEFAULT_LIMITS)
+        self.assertIn("worker_not_passed:3/10>0.1", verdict["reasons"])
+
+    def test_passed_worker_without_signals_is_still_a_harness_anomaly(self) -> None:
+        broken = _result()
+        broken["comparison"]["call_signals"]["federated"] = None
+        rows = {f"u{i}": {"status": "passed", "result": _result()} for i in range(10)}
+        rows["u0"] = {"status": "passed", "result": broken}
+        verdict = gate.evaluate(_report(10), rows, gate.DEFAULT_LIMITS)
+        self.assertIn("call_signals_missing:1", verdict["reasons"])
 
 
 if __name__ == "__main__":

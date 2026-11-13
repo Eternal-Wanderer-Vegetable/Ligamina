@@ -72,6 +72,12 @@ def batch_entry(root: Path, rel: str, run_id: str) -> tuple[dict, list[dict]]:
         if gate.get("report", {}).get("sha256") != sha256_file(path):
             raise CheckpointError(f"gate record is bound to different report bytes: {gate_rel}")
         inputs.append({"path": gate_rel, "sha256": verified_sha(root / gate_rel), "gate_status": gate.get("status")})
+    regate_rel = rel.replace("-execution-batch-", "-batch-regate-")
+    if (root / regate_rel).is_file():
+        regate = json.loads((root / regate_rel).read_text(encoding="utf-8"))
+        if regate.get("report", {}).get("sha256") != sha256_file(path):
+            raise CheckpointError(f"gate re-evaluation is bound to different report bytes: {regate_rel}")
+        inputs.append({"path": regate_rel, "sha256": verified_sha(root / regate_rel), "gate_status": regate.get("status")})
     entry = {
         "path": rel,
         "sha256": verified_sha(path),

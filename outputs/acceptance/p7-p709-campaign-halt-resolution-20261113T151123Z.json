@@ -1,0 +1,24 @@
+{
+  "schema_version": 1,
+  "kind": "p7_p709_campaign_halt_resolution",
+  "resolved_at_utc": "20261113T151123Z",
+  "run_id": "p7-09-astra-ed2757f945832f49c4b8",
+  "halt_record": "2026-11-13T14:21:46Z slot=2 gate_anomaly run=20261113T122459Z-slot-2-pid-2267318-b0006",
+  "trigger": {
+    "gate": "outputs/acceptance/p7-p709-astrbot-campaign-batch-gate-20261113T122459Z-slot-2-pid-2267318-b0006.json",
+    "gate_sha256": "b373d94be9e3ce14cb04dd71fd21e113d4288e4264760c8bc20ea308c04b9389",
+    "reasons": [
+      "call_signals_missing:2"
+    ]
+  },
+  "diagnosis": "One job (ab-f004240385903168d9925de1 / 创建卡片, attempted twice) had both Native Workers hit the 420 s Worker timeout, so those sides had no readable output and no call signals; the Federated side completed with 11/12 calls erroring. The executor correctly recorded the job unknown/worker_timeout. Across 1,290 dispatched jobs this was the only non-passed Worker run, and no passed Worker run lacked call signals.",
+  "classification": "gate_rule_too_strict; no harness or data defect",
+  "fix": "Gate counts missing call signals as an anomaly only when that side's Worker exited normally; timed-out or failed Worker runs count toward a new worker_not_passed rate (limit 10%).",
+  "reevaluation": {
+    "gate": "outputs/acceptance/p7-p709-astrbot-campaign-batch-regate-20261113T122459Z-slot-2-pid-2267318-b0006.json",
+    "gate_sha256": "c676bb0c839045692a68d9ae602bcdf7227892844fed170b6ce0089e4b4f777f",
+    "status": "passed"
+  },
+  "batch_rerun": "Not required: the batch's queue results are correct as recorded (terminal rows are never rewritten).",
+  "halt_file_kept_as": "p7-astrbot-command-campaign-toolruntime-20261113.sqlite3.halt.resolved-20261113T151123Z"
+}

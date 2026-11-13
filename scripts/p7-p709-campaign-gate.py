@@ -30,7 +30,11 @@ DEFAULT_LIMITS = {
     "c7_command_not_listed": 0.05,
     "federated_all_calls_error": 0.20,
     "native_all_calls_silent": 0.20,
+    # Jobs with a Worker run that timed out or failed. Such a side has no readable output, so it
+    # is a per-job outcome (recorded unknown), not a harness signature, unless it becomes common.
+    "worker_not_passed": 0.10,
 }
+SIDES = ("native_first", "native_second", "federated")
 
 
 def _all(signals: dict | None, key: str) -> bool:
@@ -68,9 +72,16 @@ def evaluate(report: dict, rows: dict[str, dict], limits: dict[str, float]) -> d
             counts["federated_all_calls_error"] += 1
         if _all(native, "silent"):
             counts["native_all_calls_silent"] += 1
-        if any(not isinstance(signals.get(side), dict) for side in ("native_first", "native_second", "federated")):
+        runs = result.get("worker_runs") or []
+        if any(run.get("status") != "passed" for run in runs):
+            counts["worker_not_passed"] += 1
+        # Missing signals are a harness anomaly only when that side's Worker exited normally
+        # (or no run is recorded): its output was readable but carried no tool calls.
+        if any(not isinstance(signals.get(side), dict)
+               and (index >= len(runs) or runs[index].get("status") == "passed")
+               for index, side in enumerate(SIDES)):
             counts["call_signals_missing"] += 1
-        if any(run.get("cleanup_confirmed") is not True for run in result.get("worker_runs") or []):
+        if any(run.get("cleanup_confirmed") is not True for run in runs):
             counts["cleanup_unconfirmed"] += 1
     if counts["call_signals_missing"]:
         reasons.append(f"call_signals_missing:{counts['call_signals_missing']}")
@@ -93,6 +104,8 @@ def evaluate(report: dict, rows: dict[str, dict], limits: dict[str, float]) -> d
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     parser.add_argument("--report", type=Path, required=True)
+    parser.add_argument("--reevaluate", action="store_true",
+                        help="write a separate -batch-regate- record; the original gate record is kept")
     for key, value in DEFAULT_LIMITS.items():
         parser.add_argument(f"--max-{key.replace('_', '-')}", type=float, default=value, dest=key)
     args = parser.parse_args()
@@ -108,18 +121,24 @@ def main() -> int:
         }
     finally:
         con.close()
+    marker = "-batch-regate-" if args.reevaluate else "-batch-gate-"
+    output = args.report.with_name(args.report.name.replace("-execution-batch-", marker))
+    gate_previous = None
+    if args.reevaluate:
+        previous = args.report.with_name(args.report.name.replace("-execution-batch-", "-batch-gate-"))
+        gate_previous = {"path": previous.as_posix(), "sha256": hashlib.sha256(previous.read_bytes()).hexdigest()}
+    if output == args.report or output.exists():
+        raise SystemExit(f"refusing to overwrite gate record: {output}")
     gate = {
         "schema_version": 1,
         "kind": "p7_p709_astrbot_campaign_batch_gate",
         "observed_at_utc": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
         "report": {"path": args.report.as_posix(), "sha256": hashlib.sha256(report_bytes).hexdigest()},
         "run_id": report["run_id"],
+        **({"reevaluates": gate_previous} if gate_previous else {}),
         **evaluate(report, rows, limits),
         "acceptance_boundary": "A passed gate only means no harness anomaly signature crossed its limit; it is not plugin correctness or support.",
     }
-    output = args.report.with_name(args.report.name.replace("-execution-batch-", "-batch-gate-"))
-    if output == args.report or output.exists():
-        raise SystemExit(f"refusing to overwrite gate record: {output}")
     text = json.dumps(gate, ensure_ascii=False, indent=2) + "\n"
     output.write_text(text, encoding="utf-8")
     output.with_name(output.name + ".sha256").write_text(
