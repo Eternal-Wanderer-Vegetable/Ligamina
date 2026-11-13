@@ -3,11 +3,15 @@
 from __future__ import annotations
 
 import hashlib
+import ipaddress
+import re
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Literal
 
 WorkerStatus = Literal["passed", "failed", "unknown"]
+MAX_WORKER_STDIN_BYTES = 16 * 1024 * 1024
+_HOST_LABEL = re.compile(r"[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\Z")
 
 
 @dataclass(frozen=True)
@@ -42,6 +46,8 @@ class WorkerSpec:
     generation: int | None = None
     job_id: str | None = None
     entrypoint: str | None = None
+    stdin_data: bytes | None = None
+    loopback_host_aliases: tuple[str, ...] = ()
 
     def __post_init__(self) -> None:
         if not self.run_id or not self.entry_id:
@@ -50,6 +56,31 @@ class WorkerSpec:
             raise ValueError("command must be a non-empty string argument list")
         if self.entrypoint is not None and (not self.entrypoint.startswith("/") or "\x00" in self.entrypoint):
             raise ValueError("entrypoint must be an absolute container path")
+        if self.stdin_data is not None:
+            if not isinstance(self.stdin_data, bytes):
+                raise ValueError("stdin_data must be bytes")
+            if len(self.stdin_data) > MAX_WORKER_STDIN_BYTES:
+                raise ValueError(f"stdin_data exceeds the {MAX_WORKER_STDIN_BYTES}-byte Worker limit")
+        aliases = self.loopback_host_aliases
+        if not isinstance(aliases, tuple) or len(aliases) > 4:
+            raise ValueError("loopback_host_aliases must be a tuple with at most four hostnames")
+        if len(set(aliases)) != len(aliases):
+            raise ValueError("loopback_host_aliases must be unique")
+        for alias in aliases:
+            if (
+                not isinstance(alias, str)
+                or alias != alias.lower()
+                or len(alias) > 253
+                or "." not in alias
+                or any(not _HOST_LABEL.fullmatch(label) for label in alias.split("."))
+            ):
+                raise ValueError("loopback host aliases must be lowercase DNS hostnames")
+            try:
+                ipaddress.ip_address(alias)
+            except ValueError:
+                pass
+            else:
+                raise ValueError("loopback host aliases must be DNS hostnames, not IP addresses")
         if not self.input_dir.is_dir():
             raise ValueError("input_dir must be an existing directory")
         if (self.attempt_id is None) != (self.generation is None):

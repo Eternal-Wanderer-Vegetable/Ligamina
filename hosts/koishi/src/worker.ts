@@ -5,6 +5,7 @@ import { EventEnvelope, PlatformOperation } from './adapter.js'
 import { CapabilityError, capabilityDescriptors, invokeCapability } from './capabilities.js'
 import { describeCommands } from './commands.js'
 import { validateCommandDescriptor } from './contracts.js'
+import { describeRuntimeInventory } from './inventory.js'
 
 const PROTOCOL_VERSION = '0.1'
 const MAX_FRAME_BYTES = 1024 * 1024
@@ -90,10 +91,17 @@ class Worker {
           serviceCall: (invocation) => this.serviceCall(invocation),
           plugins: parseList(process.env.LIGAMINA_KOISHI_PLUGINS),
           pluginConfig: parsePluginConfig(process.env.LIGAMINA_KOISHI_PLUGIN_CONFIG),
+          databaseProvider: process.env.LIGAMINA_KOISHI_DATABASE_PROVIDER,
         })
         await this.lifecycle.start()
         this.ready = true
-        result = { ready: true, protocol_version: PROTOCOL_VERSION, capabilities: capabilityDescriptors(), commands: this.commands() }
+        result = {
+          ready: true,
+          protocol_version: PROTOCOL_VERSION,
+          capabilities: capabilityDescriptors(),
+          commands: this.commands(),
+          inventory: describeRuntimeInventory(this.lifecycle.app, parseList(process.env.LIGAMINA_KOISHI_PLUGINS)),
+        }
       } else if (method === 'event.dispatch') {
         this.requireReady()
         const envelope = (params.event ?? params) as EventEnvelope
@@ -113,7 +121,11 @@ class Worker {
         result = { ready: this.ready && !this.draining && !this.stopping, host_id: this.hostId, epoch: this.epoch, protocol_version: PROTOCOL_VERSION }
       } else if (method === 'runtime.capabilities') {
         this.requireReady()
-        result = { capabilities: capabilityDescriptors(), commands: this.commands() }
+        result = {
+          capabilities: capabilityDescriptors(),
+          commands: this.commands(),
+          inventory: describeRuntimeInventory(this.lifecycle?.app, parseList(process.env.LIGAMINA_KOISHI_PLUGINS)),
+        }
       } else if (method === 'runtime.stop' || method === 'host.shutdown') {
         this.draining = true
         const activeEvents = [...this.requests.entries()]

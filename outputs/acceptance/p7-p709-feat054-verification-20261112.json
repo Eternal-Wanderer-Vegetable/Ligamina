@@ -1,0 +1,119 @@
+{
+  "schema_version": 1,
+  "kind": "p7_feat054_astrbot_full_census_executor_verification",
+  "recorded_at_utc": "2026-11-12T06:24:52Z",
+  "feature": "feat-054",
+  "task": "P7-09",
+  "commit": "bbe232ed1bc3042969873d59492f1fdfa573c7a8",
+  "status": "executor_verified_campaign_in_progress",
+  "inputs": {
+    "snapshot_id": "ab-15937e90d26b7caf9d12",
+    "artifact_lock_sha256": "99f90addfa40a17634201b40b721ac406f5a4f8c1fcc5907c6fa8d7af01bb903",
+    "selection_sha256": "464c03ec136074434cee721d1159eeb2020a8a2ba5caf8fa904d541e23f9dec1",
+    "runtime_image": "ligamina-astrbot-runtime@sha256:79903467bb35c50018deea736751db56f988d5a996246ba6fe84b34b4a28bdbc",
+    "plan_report": {
+      "path": "outputs/acceptance/p7-p709-astrbot-full-census-plan-20261112.json",
+      "sha256": "910780b617ad66da9be4be591a04d9b76f4fe77842e170111567eea3696e16fa",
+      "manifest_sha256": "1814b3fabe8763fc802526f578de45b59ea6f1ebca4d9d46e72e4fd7f52ee669",
+      "denominator": {
+        "snapshot_entries": 3271,
+        "frozen_entries": 3265,
+        "selected_entries": 3265,
+        "excluded_non_frozen": 6
+      }
+    },
+    "probe_report": {
+      "path": "outputs/acceptance/p7-p709-linux-worker-probe-20261112.json",
+      "sha256": "b6b46b750a1734da2b4353482ab3eb043b6112490056bbc82b2ef6ca35eeb90b",
+      "status": "passed",
+      "cases": 10,
+      "cleanup_confirmed": 10
+    },
+    "admission_report": {
+      "path": "outputs/acceptance/p7-p709-linux-admission-20261112.json",
+      "sha256": "09cd3031e05b37fe89bbfc47dcdb0aba8161949b8802ad7c1ff0988c8faf83c3",
+      "status": "admitted",
+      "environment_fingerprint": "2cc2a1967e20ebdfcb2a2562d6afa206b335f8643a10ae3a958691bf09714594"
+    },
+    "executor_source_sha256": "99ced178d978ed7411e9289c98ac3e93399b985d09ca94cae7405b525a634d50",
+    "worker_side_source_sha256": "a1b40c299c062a03fd46a87f9d9ec087b349b806782d71fea78dc86137c5249b"
+  },
+  "verification": [
+    {
+      "command": "python -m unittest lab.tests.test_astrbot_census -v",
+      "exit_code": 0,
+      "output_summary": "Ran 8 tests; OK."
+    },
+    {
+      "command": "UV_PROJECT_ENVIRONMENT=/tmp/ligamina-p7-p709-full-tests-venv UV_OFFLINE=1 uv run --locked --project lab --python 3.12.14 python -m unittest discover -s lab/tests -v",
+      "exit_code": 0,
+      "duration_seconds": 232.021,
+      "output_log": "outputs/acceptance/p7-p709-feat054-full-lab-tests-20261112.log",
+      "output_log_sha256": "72d84193bf5871b90e06dd4ad9749a25315dbcc9ecb8362a8554d9a9ff365ec8",
+      "output_summary": "Ran 390 tests; OK. Trailing whitespace was removed from verbose log lines before sealing."
+    },
+    {
+      "command": "pwsh -NoProfile -File init.ps1 -Mode docs",
+      "exit_code": 0,
+      "output_summary": "29 documents; 764 local links; 16 indexed historical Markdown; 65 features; no failures."
+    },
+    {
+      "command": "node scripts/render-readme.mjs --check",
+      "exit_code": 0,
+      "output_summary": "README evidence blocks match validated phase-one, phase-two, and phase-three reports."
+    },
+    {
+      "command": "node scripts/check-docs.mjs",
+      "exit_code": 0,
+      "output_summary": "status passed; 29 documents; 764 local links; 16 indexed historical Markdown; 65 features."
+    },
+    {
+      "command": "python -m compileall -q lab/astrbot_census.py lab/astrbot_census_side.py lab/tests/test_astrbot_census.py",
+      "exit_code": 0
+    },
+    {
+      "command": "git diff --check",
+      "exit_code": 0
+    }
+  ],
+  "campaign_checkpoint": {
+    "run_id": "p7-ab04-ab-15937e90d26b7caf9d12-c4225b507530",
+    "report_path": "outputs/acceptance/p7-p709-astrbot-full-census-20261112.json",
+    "report_sha256": "8ce614eb73492cb88595156c1d54d66513df0200f5b2f7e99026b9a4afd9af9f",
+    "report_status": "in_progress",
+    "sqlite_queue": "/home/vegetable/.local/share/ligamina/p7-astrbot-census.sqlite3",
+    "sqlite_counts_at_latest_direct_probe": {
+      "passed": 809,
+      "failed": 40,
+      "skipped": 29,
+      "unknown": 0,
+      "queued": 2385,
+      "leased": 2
+    },
+    "sqlite_attempt_count": 882,
+    "sqlite_terminal_entries": 878,
+    "report_counts_at_checkpoint": {
+      "passed": 809,
+      "failed": 40,
+      "skipped": 29,
+      "unknown": 0,
+      "queued": 2386,
+      "leased": 1
+    },
+    "report_terminal_entries": 878,
+    "report_command_inventory_rows": 564,
+    "passed_rows_missing_descriptor_field": 55,
+    "report_cleanup_observations": 851,
+    "report_cleanup_unconfirmed": 0,
+    "resume_state": "active; two SQLite leases and one report lease reflect a one-job concurrent checkpoint difference. Preserve the external queue and bundle root.",
+    "scope": "load census only; no compatibility or support conclusion",
+    "inventory_followup": "after census, select exact load-passed rows whose result.side.load.command_descriptors field is absent; do not select by ordinal or redispatch identities with reusable descriptors.",
+    "checkpoint_observed_at_utc": "2026-11-12T06:53:04Z"
+  },
+  "implementation_review": {
+    "red_green_case": "A plugin load failure paired with unconfirmed Worker cleanup was initially committed as failed and could not enter the reconciliation API, which accepts unknown attempts only.",
+    "fix": "The census now records every unconfirmed-cleanup Worker outcome as unknown with requires_reconciliation=true; exact cleanup confirmation is required before retry.",
+    "mixed_attempt_boundary": "The first 73 settled jobs predate command descriptor capture; 63 were load-passed at that checkpoint. Some may have new attempts after restart. Build the post-census backfill selection from exact rows with the descriptor field absent, not from ordinal positions.",
+    "command_inventory_capture": "The Worker returns at most 512 command IDs and normalized argument name/type/required fields within 256 KiB. Descriptions, aliases, invocations and values are omitted. The report marks possible truncation."
+  }
+}

@@ -31,6 +31,66 @@ def _artifact_hash(path: Path, algorithm: str) -> str:
     raise ValueError(f"unsupported artifact digest algorithm: {algorithm}")
 
 
+def _test_context_profile_sha256(
+    context: dict[str, Any], stimulus: dict[str, Any] | None = None,
+) -> str | None:
+    profile = context.get("test_context_profile")
+    if profile is None:
+        return None
+    if not isinstance(profile, dict):
+        raise ValueError("P7 test context profile must be an object")
+    if (
+        profile.get("execution_scope") != "linux_worker_only_network_disabled"
+        or profile.get("authority_scope") != "synthetic_test_actor_only"
+    ):
+        raise ValueError("P7 test context profile exceeds its synthetic offline Worker scope")
+    payload = {key: value for key, value in profile.items() if key != "profile_sha256"}
+    claimed = profile.get("profile_sha256")
+    observed = hashlib.sha256(_canonical(payload)).hexdigest()
+    if not isinstance(claimed, str) or claimed != observed:
+        raise ValueError("P7 test context profile hash mismatch")
+    if context.get("sample", {}).get("ecosystem") == "nonebot":
+        if profile.get("event_envelope_role_claims") is not False:
+            raise ValueError("P7 NoneBot profile must not claim EventEnvelope roles")
+        expected_superusers = [profile["synthetic_superuser_id"]]
+        expected_host_value = json.dumps(expected_superusers, separators=(",", ":"))
+        if context.get("host_environment", {}).get("SUPERUSERS") != expected_host_value:
+            raise ValueError("P7 Federated Host superuser setting differs from the bound profile")
+        if context.get("config", {}).get("nonebot_config") != {"superusers": expected_superusers}:
+            raise ValueError("P7 Native and Federated superuser settings do not match")
+    elif context.get("sample", {}).get("ecosystem") == "koishi":
+        actor_id = profile.get("synthetic_actor_id")
+        plugin_config = profile.get("plugin_config")
+        expected_config = plugin_config
+        if not isinstance(actor_id, str) or not isinstance(expected_config, dict):
+            raise ValueError("P7 Koishi profile must bind a synthetic actor and plugin config")
+        if context.get("config", {}).get("plugin_config") != expected_config:
+            raise ValueError("P7 Native and Federated Koishi config hashes do not match")
+        if context.get("sample", {}).get("fixture", {}).get("plugin_config") != expected_config:
+            raise ValueError("P7 Federated Koishi plugin config differs from its source-bound profile")
+        if stimulus is not None and any(
+            event.get("actor_id") != actor_id
+            for event in stimulus.get("events", [])
+            if isinstance(event, dict)
+        ):
+            raise ValueError("P7 Koishi events must use the profile's synthetic admin actor")
+        if "synthetic_authority" in profile and (
+            not isinstance(profile.get("synthetic_authority"), int)
+            or isinstance(profile.get("synthetic_authority"), bool)
+            or not 0 <= profile["synthetic_authority"] <= 5
+        ):
+            raise ValueError("P7 Koishi synthetic authority is outside the supported range")
+        if profile.get("profile_id") == "p7-hjm-rcon-v1":
+            from pathlib import Path
+
+            manifest_path = Path(context["repo_root"]) / "lab/automation/data/p7-hjm-rcon-v1.json"
+            if hashlib.sha256(manifest_path.read_bytes()).hexdigest() != profile.get("manifest_sha256"):
+                raise ValueError("P7 HJM RCON profile manifest hash mismatch")
+    else:
+        raise ValueError("P7 context profile is attached to an unsupported ecosystem")
+    return claimed
+
+
 def _environment(context: dict[str, Any], request: dict[str, Any]) -> dict[str, Any]:
     paths = context["fingerprint_paths"]
     sample = context["sample"]
@@ -62,6 +122,9 @@ def _environment(context: dict[str, Any], request: dict[str, Any]) -> dict[str, 
         "config_sha256": hashlib.sha256(_canonical(context["config"])).hexdigest(),
         "stimulus_sha256": hashlib.sha256(_canonical(request["stimulus"])).hexdigest(),
     }
+    test_context_profile_sha256 = _test_context_profile_sha256(context, request["stimulus"])
+    if sample["ecosystem"] == "nonebot" or test_context_profile_sha256 is not None:
+        fingerprints["test_context_profile_sha256"] = test_context_profile_sha256
     if fingerprints != context["expected_environment"]:
         raise RuntimeError(f"federated fingerprint mismatch: expected {context['expected_environment']}, observed {fingerprints}")
     return fingerprints
@@ -99,9 +162,39 @@ def _segments(message: Any) -> list[dict[str, Any]]:
             result.append({"type": "reply", "message_id": str(segment.get("message_id", segment.get("data", {}).get("id", "")))})
         elif kind == "image_ref":
             result.append({"type": "image_ref", "resource_ref": str(segment.get("resource_ref", segment.get("data", {}).get("file", "")))})
+        elif kind == "forward_node":
+            user_id = segment.get("user_id")
+            if isinstance(user_id, int) and not isinstance(user_id, bool):
+                numeric_user_id = user_id
+            elif isinstance(user_id, str) and user_id.isascii() and user_id.isdigit():
+                numeric_user_id = int(user_id)
+            else:
+                raise RuntimeError("federated Gateway captured a forward node without a numeric user_id")
+            nickname = segment.get("nickname")
+            content = segment.get("content")
+            if not isinstance(nickname, str) or numeric_user_id < 0 or numeric_user_id > (1 << 63) - 1:
+                raise RuntimeError("federated Gateway captured an invalid forward node identity")
+            if isinstance(content, str):
+                observed_content = content
+            elif isinstance(content, list) and content:
+                observed_content = _segments(content)
+            else:
+                raise RuntimeError("federated Gateway captured invalid forward node content")
+            result.append({
+                "type": "forward_node",
+                "user_id": str(numeric_user_id),
+                "nickname": nickname,
+                "content": observed_content,
+            })
         else:
             raise RuntimeError(f"federated Gateway captured unsupported message segment {kind!r}")
     return result
+
+
+def _observed_message(message: Any, *, preserve_segments: bool) -> list[dict[str, Any]]:
+    if preserve_segments:
+        return _segments(message)
+    return [{"type": "text", "text": _text(message)}]
 
 
 def _phase4_probe_observation(ecosystem: str, work: Path, events: list[dict[str, Any]]) -> dict[str, Any]:
@@ -203,6 +296,7 @@ def run(request: dict[str, Any]) -> dict[str, Any]:
     # Tool mode (TOOL-04): call the plugin's native commands as MCP tools instead of
     # sending platform events. Tool sessions run as a fresh, unprivileged actor.
     tool_calls = request["stimulus"].get("tool_calls")
+    discover_commands = context.get("execution", {}).get("discover_commands") is True
     fixture_events = [] if tool_calls is not None else request["stimulus"]["events"]
     if behavior_fixture:
         if behavior_fixture.get("adapter", {}).get("id") != f"{sample['ecosystem']}.onebot.v11":
@@ -254,12 +348,17 @@ def run(request: dict[str, Any]) -> dict[str, Any]:
             sample["fixture"] = {"plugin_config": config}
             module_url = context["koishi_entry_url"]
             probe_url = (root / "lab/baselines/koishi/phase4_probe_plugin.mjs").resolve().as_uri()
+            provider_urls = list(context.get("provider_urls", []))
+            database_provider_url = context.get("database_provider_url")
+            if database_provider_url:
+                environment["LIGAMINA_KOISHI_DATABASE_PROVIDER"] = database_provider_url
+            provider_config = {url: {} for url in provider_urls}
             if tool_calls is not None:
-                environment["LIGAMINA_KOISHI_PLUGINS"] = module_url
-                environment["LIGAMINA_KOISHI_PLUGIN_CONFIG"] = json.dumps({module_url: config}, ensure_ascii=False)
+                environment["LIGAMINA_KOISHI_PLUGINS"] = ",".join((*provider_urls, module_url))
+                environment["LIGAMINA_KOISHI_PLUGIN_CONFIG"] = json.dumps({**provider_config, module_url: config}, ensure_ascii=False)
             else:
-                environment["LIGAMINA_KOISHI_PLUGINS"] = ",".join((module_url, probe_url))
-                environment["LIGAMINA_KOISHI_PLUGIN_CONFIG"] = json.dumps({module_url: config, probe_url: {}}, ensure_ascii=False)
+                environment["LIGAMINA_KOISHI_PLUGINS"] = ",".join((*provider_urls, module_url, probe_url))
+                environment["LIGAMINA_KOISHI_PLUGIN_CONFIG"] = json.dumps({**provider_config, module_url: config, probe_url: {}}, ensure_ascii=False)
             users = []
             seeded = {} if tool_calls is not None else behavior_fixture["setup"].get("user_authority", {})
             for key, authority in seeded.items():
@@ -268,6 +367,27 @@ def run(request: dict[str, Any]) -> dict[str, Any]:
                     raise ValueError("v2 Koishi authority setup is outside the reviewed allowlist")
                 users.append({"platform": platform, "id": user_id, "authority": authority})
             _seed_koishi_users(context["node_executable"], profile_work, work, users)
+    if not behavior_fixture and sample["ecosystem"] == "koishi":
+        profile = context.get("test_context_profile")
+        if isinstance(profile, dict) and "synthetic_authority" in profile:
+            actor_id = profile.get("synthetic_actor_id")
+            authority = profile.get("synthetic_authority")
+            if (
+                not isinstance(actor_id, str)
+                or not isinstance(authority, int)
+                or isinstance(authority, bool)
+                or not 0 <= authority <= 5
+                or profile.get("plugin_config") != context.get("config", {}).get("plugin_config")
+                or profile.get("plugin_config") != sample.get("fixture", {}).get("plugin_config")
+                or any(event.get("actor_id") != actor_id for event in fixture_events if isinstance(event, dict))
+            ):
+                raise ValueError("P7 Koishi synthetic authority seed differs from its source-bound profile")
+            _seed_koishi_users(
+                context["node_executable"],
+                profile_work,
+                work,
+                [{"platform": "onebot.v11", "id": actor_id, "authority": authority}],
+            )
     events = []
     for event in fixture_events:
         platform = "onebot.v11" if sample["ecosystem"] == "nonebot" else "koishi"
@@ -289,11 +409,24 @@ def run(request: dict[str, Any]) -> dict[str, Any]:
         })
     if sample["ecosystem"] == "koishi" and not behavior_fixture:
         module_url = context["koishi_entry_url"]
-        environment["LIGAMINA_KOISHI_PLUGINS"] = module_url
+        provider_urls = list(context.get("provider_urls", []))
+        database_provider_url = context.get("database_provider_url")
+        if database_provider_url:
+            environment["LIGAMINA_KOISHI_DATABASE_PROVIDER"] = database_provider_url
+        environment["LIGAMINA_KOISHI_PLUGINS"] = ",".join((*provider_urls, module_url))
         config = sample.get("fixture", {}).get("plugin_config")
-        if config:
-            environment["LIGAMINA_KOISHI_PLUGIN_CONFIG"] = json.dumps({module_url: config}, ensure_ascii=False)
-    trace = run_federated(sample, work, environment, events, profile_work=profile_work, tool_calls=tool_calls)
+        provider_config = {url: {} for url in provider_urls}
+        if config or provider_config:
+            environment["LIGAMINA_KOISHI_PLUGIN_CONFIG"] = json.dumps({**provider_config, module_url: config or {}}, ensure_ascii=False)
+    trace = run_federated(
+        sample,
+        work,
+        environment,
+        events,
+        profile_work=profile_work,
+        tool_calls=tool_calls,
+        discover_commands=discover_commands,
+    )
     if trace.get("cleanup", {}).get("host_alive_after_shutdown") is not False:
         raise RuntimeError("federated Host process cleanup was not confirmed")
 
@@ -306,7 +439,8 @@ def run(request: dict[str, Any]) -> dict[str, Any]:
         payload = operation.get("operation_payload", {})
         target = payload.get("target")
         raw_message = payload.get("params", {}).get("message")
-        message = _segments(raw_message) if behavior_fixture else [{"type": "text", "text": _text(raw_message)}]
+        preserve_segments = bool(behavior_fixture) or context.get("execution", {}).get("capture_source_event_id") is True
+        message = _observed_message(raw_message, preserve_segments=preserve_segments)
         if not isinstance(target, dict) or target.get("kind") not in {"group", "private"}:
             raise RuntimeError("federated Gateway captured an invalid message target")
         operation_id = f"operation-{index}"
@@ -317,9 +451,10 @@ def run(request: dict[str, Any]) -> dict[str, Any]:
             "target": target,
             "params": {"message": message},
         })
-        if behavior_fixture:
-            trace_id = operation.get("trace_id")
-            messages[-1]["source_event_id"] = event_by_trace.get(trace_id)
+        trace_id = operation.get("trace_id")
+        source_event_id = event_by_trace.get(trace_id)
+        if source_event_id is not None:
+            messages[-1]["source_event_id"] = source_event_id
         receipt_doc = record.get("receipt", {})
         receipt = receipt_doc.get("result", receipt_doc)
         if receipt.get("status") != "succeeded":
@@ -355,6 +490,8 @@ def run(request: dict[str, Any]) -> dict[str, Any]:
             "gateway_operation_count": len(messages),
         }
         return result
+    if discover_commands:
+        result["command_inventory"] = trace.get("command_inventory", {})
     if behavior_fixture:
         result["binding"] = context.get("binding")
         result["capability_probe_observation"] = _phase4_probe_observation(sample["ecosystem"], work, fixture_events)

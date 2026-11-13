@@ -1,0 +1,60 @@
+{
+  "schema_version": 1,
+  "task": "P7-02 / feat-047",
+  "checked_at": "2026-11-10",
+  "status": "passed",
+  "scope": "Scenario contract v1, typed deterministic command scenario generation, pairwise coverage, deterministic Hypothesis shrinking, volatile normalization; no plugin or Worker execution.",
+  "baseline": "outputs/acceptance/p7-p702-baseline-20261110.json",
+  "environment": {
+    "os": "Windows",
+    "python": "3.12.14",
+    "uv": "0.12.5",
+    "isolated_environment": ".work/uv-p7-02-lab-20261110",
+    "shared_lab_venv_modified": false
+  },
+  "checks": [
+    {
+      "command": "uv run --locked --project lab --python 3.12.14 python -m unittest lab.tests.test_scenario_generator lab.tests.test_capability_inventory lab.tests.test_inventory_quality -v",
+      "exit_code": 0,
+      "result": "14 tests passed",
+      "log": ".work/p7-p702-tests-20261110.log",
+      "log_sha256": "e12a4f5bdf3ad0366e8fff083e89315df7e81c76c5da023885c6a1eea9c374ae"
+    },
+    {
+      "command": "uv run --locked --project lab --python 3.12.14 python -m py_compile lab/scenario_generator.py lab/tests/test_scenario_generator.py",
+      "exit_code": 0,
+      "result": "passed"
+    },
+    {
+      "command": "pwsh -NoProfile -File init.ps1 -Mode docs",
+      "exit_code": 0,
+      "result": "29 documents, 663 local links, 16 indexed historical Markdown, 55 features; no failures",
+      "log": ".work/p7-p702-docs-20261110.log",
+      "log_sha256": "725565ec8b784715dbf202a5b14ab894681ec79801d61a74cf4640afccf289ad"
+    },
+    {
+      "command": "git diff --check",
+      "exit_code": 0,
+      "result": "passed"
+    }
+  ],
+  "artifacts_sha256": {
+    "lab/tests/test_scenario_generator.py": "9dd3a738239075a2054aff60925bef88439248c36e755b69f79c601bd7d47245",
+    "contracts/lab/scenario/v1/fixtures/positive.json": "e5236dfb6f96a281c143df560b93b9b2cd5a8c495ce9e80fba9fb090aeef92ec",
+    "contracts/lab/scenario/v1/fixtures/negative.json": "4ae82246ca4a4b9dad33b25550c29c9de3bb3d7f4f96c932cef4befc195d2dbb",
+    "contracts/lab/scenario/v1/scenario-batch.schema.json": "74dd45552a67666fa9fd939adfa799abae82064c23b99e066a58193adb40121a",
+    "feature_list.json": "8152b36c3b2394599e0c758203880df0eaddb1c86abdb1512c5d8216f9b73c87",
+    "progress.md": "99de50abf080af4afe6f77c795e10c2e18180043b3fe794c96479a23f0375e43",
+    "lab/scenario_generator.py": "e8adb47c9a2eae62ce5c429ee1fc9da3f7cb6d2e408696706fb914e23adc23bc",
+    "docs/plans/2026-11-09-phase-7-automated-verification.md": "8f05420dce25858dbb8fdb2421a3901220c533018d92cd6d757873890a093ecc",
+    "lab/pyproject.toml": "b1201240405177dd7ef5ba24340ecf704780da3f807c06cd99127b8d6f4de3db",
+    "contracts/lab/scenario/v1/scenario.schema.json": "eec6a02adba6d676f3956e158ec44817e69f5c0e92435ff682a8ef3bbe9011f7",
+    "session-handoff.md": "e5e18939f84095200e0d4215c2b6d3291943942a9e5f1429632947bd63fd9dd1",
+    "lab/uv.lock": "52cf2ae11157b131de7156f8b05e77fa0420cc6e55659a2c92dedb9382ca7083"
+  },
+  "limitations": [
+    "Pairwise generation reports incomplete coverage when the scenario cap prevents covering all pairs.",
+    "No third-party plugin was loaded or executed.",
+    "Timestamp and volatile-field normalization is heuristic and does not substitute for runtime determinism controls."
+  ]
+}

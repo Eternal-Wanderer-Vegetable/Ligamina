@@ -129,6 +129,8 @@ class BridgeAdapter(BaseAdapter):
             return await self._send_message(bot, data)
         if api == "send_group_msg":
             return await self._send_message(bot, data, expected_kind="group")
+        if api == "send_group_forward_msg":
+            return await self._send_group_forward_message(bot, data)
         if api == "send_private_msg":
             return await self._send_message(bot, data, expected_kind="private")
         if api == "get_msg":
@@ -169,6 +171,28 @@ class BridgeAdapter(BaseAdapter):
             target,
             {"message": segments},
         )
+        result = await self._execute(operation)
+        message_id = result.get("platform_message_id")
+        if not isinstance(message_id, str):
+            raise BridgeApiError("invalid_platform_result", "send_message result has no platform_message_id")
+        numeric_message_id = _onebot_id(message_id, "platform_message_id")
+        self._remember_message_target(message_id, target)
+        return {"message_id": numeric_message_id}
+
+    async def _send_group_forward_message(self, bot: Bot, data: dict[str, Any]) -> dict[str, int]:
+        allowed = {"group_id", "messages", "_timeout"}
+        unexpected = set(data) - allowed
+        if unexpected:
+            raise BridgeApiError("unsupported_api", f"send_group_forward_msg parameters are unsupported: {sorted(unexpected)}")
+        group_id = data.get("group_id")
+        if group_id is None:
+            raise BridgeApiError("invalid_request", "send_group_forward_msg requires group_id")
+        messages = data.get("messages")
+        if not isinstance(messages, list) or not messages:
+            raise BridgeApiError("invalid_request", "send_group_forward_msg requires a non-empty messages list")
+        nodes = [_forward_node(message) for message in messages]
+        target = {"kind": "group", "id": str(_onebot_id(group_id, "group_id"))}
+        operation = self._operation(bot, "send_message", target, {"message": nodes})
         result = await self._execute(operation)
         message_id = result.get("platform_message_id")
         if not isinstance(message_id, str):
@@ -423,6 +447,64 @@ def _outgoing_segments(message: Any, *, auto_escape: bool = False) -> list[dict[
         else:
             raise BridgeApiError("unsupported_api", f"OneBot message segment {segment.type!r} is unsupported")
     return segments
+
+
+def _forward_node(value: Any) -> dict[str, Any]:
+    if not isinstance(value, dict) or value.get("type") != "node":
+        raise BridgeApiError("invalid_request", "forward messages must contain OneBot node objects")
+    data = value.get("data")
+    if not isinstance(data, dict):
+        raise BridgeApiError("invalid_request", "forward node data must be an object")
+    if set(value) - {"type", "data"}:
+        raise BridgeApiError("unsupported_api", "forward node has unsupported fields")
+    if {"name", "uin", "content"} <= data.keys():
+        if set(data) != {"name", "uin", "content"}:
+            raise BridgeApiError("unsupported_api", "forward node has unsupported data fields")
+        nickname = data["name"]
+        user_id = data["uin"]
+    elif {"nickname", "user_id", "content"} <= data.keys():
+        if set(data) != {"nickname", "user_id", "content"}:
+            raise BridgeApiError("unsupported_api", "forward node has unsupported data fields")
+        nickname = data["nickname"]
+        user_id = data["user_id"]
+    else:
+        raise BridgeApiError("invalid_request", "forward node requires name/uin/content or nickname/user_id/content")
+    if not isinstance(nickname, str):
+        raise BridgeApiError("invalid_request", "forward node nickname must be a string")
+    return {
+        "type": "forward_node",
+        "user_id": str(_onebot_id(user_id, "forward_node.user_id")),
+        "nickname": nickname,
+        "content": _forward_content(data["content"]),
+    }
+
+
+def _forward_content(value: Any) -> str | list[dict[str, Any]]:
+    if isinstance(value, str):
+        return value
+    if isinstance(value, Message):
+        return _outgoing_segments(value)
+    if not isinstance(value, list) or not value:
+        raise BridgeApiError("invalid_request", "forward node content must be a string or non-empty message list")
+    segments: list[MessageSegment] = []
+    for item in value:
+        if not isinstance(item, dict) or set(item) != {"type", "data"} or not isinstance(item.get("data"), dict):
+            raise BridgeApiError("invalid_request", "forward node content segments must have type and data")
+        segment_type = item["type"]
+        data = item["data"]
+        if segment_type == "text" and isinstance(data.get("text"), str):
+            segments.append(MessageSegment.text(data["text"]))
+        elif segment_type == "at":
+            segments.append(MessageSegment.at(_onebot_id(data.get("qq"), "forward_node.content.at.qq")))
+        elif segment_type == "reply":
+            segments.append(MessageSegment.reply(_onebot_id(data.get("id"), "forward_node.content.reply.id")))
+        elif segment_type == "image" and isinstance(data.get("file"), str) and data["file"]:
+            segments.append(MessageSegment.image(data["file"]))
+        elif segment_type in {"text", "image"}:
+            raise BridgeApiError("invalid_request", f"forward node {segment_type} segment has invalid data")
+        else:
+            raise BridgeApiError("unsupported_api", f"forward node content segment {segment_type!r} is unsupported")
+    return _outgoing_segments(Message(segments))
 
 
 def _send_target(data: dict[str, Any]) -> dict[str, str]:

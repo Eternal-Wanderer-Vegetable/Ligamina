@@ -26,7 +26,9 @@ node scripts/check-docs.mjs
 uv python install 3.12.14
 
 uv run --locked --project hosts/nonebot --python 3.12.14 pytest -q hosts/nonebot/tests
-uv run --locked --project hosts/nonebot --python 3.12.14 python -m unittest discover -s lab/tests -v
+# Source-bound P7 validation needs exact archives and dependency locks; hash-check both without installing or running plugins.
+uv run --locked --project lab --python 3.12.14 python -m lab.automation.p7_source_audit_cache
+uv run --locked --project lab --python 3.12.14 python -m unittest discover -s lab/tests -v
 uv run --locked --project hosts/nonebot --python 3.12.14 python hosts/nonebot/tests/native_smoke.py
 uv run --locked --project hosts/nonebot --python 3.12.14 python hosts/nonebot/tests/native_bridge.py
 uv run --locked --project hosts/nonebot --python 3.12.14 python hosts/nonebot/tests/command_tools.py

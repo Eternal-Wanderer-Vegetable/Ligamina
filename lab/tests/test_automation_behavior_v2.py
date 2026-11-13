@@ -22,6 +22,21 @@ from lab.automation.phase4_campaign import _phase4_capability_results
 
 
 class WorkerDiagnosticTests(unittest.TestCase):
+    def test_python_traceback_summary_keeps_bounded_source_frames(self) -> None:
+        summary = _safe_diagnostic_summary(
+            'Traceback (most recent call last):\n'
+            '  File "/work/side/nonebot_plugin_bilichat/command/functions.py", line 42, in fetch\n'
+            '  File "/work/side/nonebot/drivers/abstract.py", line 89, in task_group\n'
+            '  File "/work/side/nonebot/internal/driver/_lifespan.py", line 27, in task_group\n'
+            'RuntimeError: Lifespan not started'
+        )
+
+        self.assertIn("RuntimeError: Lifespan not started", summary)
+        self.assertIn("functions.py:42:fetch", summary)
+        self.assertIn("abstract.py:89:task_group", summary)
+        self.assertIn("_lifespan.py:27:task_group", summary)
+        self.assertNotIn("/work/side", summary)
+
     def test_summary_keeps_failure_context_and_scrubs_values_and_worker_paths(self) -> None:
         summary = _safe_diagnostic_summary(
             "Traceback (most recent call last):\n"

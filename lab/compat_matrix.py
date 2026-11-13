@@ -17,8 +17,10 @@ Capabilities (values: verified / failed / skipped / unknown / untested):
 - ``mcp_tool``: commands called as MCP tools (TOOL-04, AB-05).
 - ``federated_event``: Native/Federated paired behavior (P4-01 v10, P4-02 v2r3).
 - ``platform_delivery``: replies delivered to a real chat platform (P6-01 positive round
-  plus the scenario round: negative/authority, Core restart, Host timeout; duplicate
-  redelivery not covered; earlier P4-05 canaries stayed unknown and are listed as history).
+  plus the scenario round: negative/authority, Core restart, Host timeout). Controlled
+  same-event deduplication is separately tested against a local fake OneBot endpoint;
+  duplicate redelivery was not sent to real QQ. Earlier P4-05 canaries stayed unknown and
+  are listed as history.
 """
 
 from __future__ import annotations
@@ -55,6 +57,7 @@ P401 = f"{ACCEPTANCE}/phase4-p401-behavior-runs-20261026-v10.json"
 P402 = f"{ACCEPTANCE}/phase4-p402-behavior-runs-20261026-v2r3.json"
 P601 = f"{ACCEPTANCE}/p6-p601-qq-mcp-field-20261108.json"
 P601_SCENARIOS = f"{ACCEPTANCE}/p6-p601-qq-scenarios-20261108.json"
+P601_DEDUP = f"{ACCEPTANCE}/p6-p601-gateway-dedup-20261110.json"
 P405_CANARY_GLOB = "phase4-p405-live-20261029/phase4-p405-koishi-live-canary-20261029*.json"
 # P6-01 names plugins by package@version / artifact hash; resolved against the catalogs.
 P601_PLUGINS = {
@@ -226,6 +229,7 @@ def build(root: Path = ROOT) -> dict:
     # platform_delivery: P6-01 round 5 (positive) and the scenario round, P4-05 canaries as history
     field = src.json(P601)
     scenarios = src.json(P601_SCENARIOS)
+    dedup = src.json(P601_DEDUP)
     final = next(r for r in field["rounds"] if r.get("outcome") == "passed")
     by_key = {(e["package"], e["version"]): rid for rid, e in entries.items()}
     teamup_sha = field["plugins"]["astrbot"].split("sha256", 1)[1].strip()
@@ -237,11 +241,26 @@ def build(root: Path = ROOT) -> dict:
         covered = scenarios["coverage_passed_by_ecosystem"][ecosystem]
         if min(covered.get(k, 0) for k in ("positive", "negative", "restart", "timeout")) < 3:
             raise SystemExit(f"P6-01 scenario coverage below 3 for {ecosystem}: {covered}")
+        duplicate = next((item for item in dedup["ecosystems"] if item.get("id") == ecosystem), None)
+        if duplicate is None:
+            raise SystemExit(f"P6-01 controlled duplicate-delivery evidence missing for {ecosystem}")
+        per_run = duplicate.get("per_run") or {}
+        if (
+            duplicate.get("independent_runs", 0) < 3
+            or per_run.get("duplicates", 0) < 3
+            or per_run.get("platform_sends") != 1
+            or per_run.get("event_status_after_restart") != "completed"
+            or per_run.get("payload_conflict_rejected") is not True
+        ):
+            raise SystemExit(f"P6-01 controlled duplicate-delivery evidence incomplete for {ecosystem}: {duplicate}")
         caps[rid]["platform_delivery"] = {"qq": claim(
             "verified", [src.ref(P601, f"rounds[{field['rounds'].index(final)}]"),
-                         src.ref(P601_SCENARIOS, f"coverage_passed_by_ecosystem.{ecosystem}")],
-            scope="positive, negative/authority, Core restart and Host timeout cases (>=3 each), MCP path through "
-                  "one bot in isolated containers, user-observed; duplicate event redelivery not run")}
+                         src.ref(P601_SCENARIOS, f"coverage_passed_by_ecosystem.{ecosystem}"),
+                         src.ref(P601_DEDUP, f"ecosystems[{dedup['ecosystems'].index(duplicate)}]")],
+            scope="real QQ positive, negative/authority, Core restart and Host timeout cases (>=3 each), MCP path "
+                  "through one bot in isolated containers, user-observed; same-event redelivery (in-flight, completed, "
+                  "and after restart) passed in 3 independent local runs per ecosystem against a fake OneBot endpoint; "
+                  "duplicate redelivery was not sent to real QQ")}
     for rel in src.glob(P405_CANARY_GLOB):
         report = src.json(rel)
         rid = (report.get("candidate") or {}).get("registry_entry_id")

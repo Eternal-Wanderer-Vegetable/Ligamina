@@ -61,6 +61,12 @@ def run_result(name: str, worker: DockerWorker, spec: WorkerSpec, expected_statu
     return record
 
 
+def _probe_spec(*args: Any, **kwargs: Any) -> WorkerSpec:
+    """Run probe commands through env instead of inheriting an application ENTRYPOINT."""
+    kwargs["entrypoint"] = "/usr/bin/env"
+    return WorkerSpec(*args, **kwargs)
+
+
 def docker_server_version() -> str:
     completed = subprocess.run(
         ["docker", "info", "--format", "{{.ServerVersion}} {{.OSType}} {{.Architecture}}"],
@@ -77,9 +83,11 @@ def docker_server_version() -> str:
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description="Run benign Linux Docker Worker admission probes")
     parser.add_argument("--report", type=Path, default=REPORT_PATH, help="write evidence to this report path")
+    parser.add_argument("--worker-image", help="optional digest-pinned local Worker image override")
     options = parser.parse_args(argv)
     image_lock = json.loads(IMAGE_LOCK.read_text(encoding="utf-8"))
-    worker = DockerWorker(image_digest=image_lock["image"], repository_root=REPOSITORY_ROOT)
+    worker_image = image_lock["image"] if options.worker_image is None else options.worker_image
+    worker = DockerWorker(image_digest=worker_image, repository_root=REPOSITORY_ROOT)
     records: list[dict[str, Any]] = []
 
     with tempfile.TemporaryDirectory(prefix="ligamina-linux-probes-") as temporary_directory:
@@ -108,7 +116,7 @@ def main(argv: list[str] | None = None) -> int:
                 run_result(
                     "filesystem-network-and-secret-boundaries",
                     worker,
-                    WorkerSpec("s2-04-linux-boundary", "linux-boundary", ("python", "-c", boundary_code), artifact_dir),
+                    _probe_spec("s2-04-linux-boundary", "linux-boundary", ("python", "-c", boundary_code), artifact_dir),
                     "passed",
                     None,
                 )
@@ -128,7 +136,7 @@ def main(argv: list[str] | None = None) -> int:
             run_result(
                 "sibling-one-write",
                 worker,
-                WorkerSpec("s2-04-sibling-one", "linux-sibling-one", ("python", "-c", first_sibling_code), artifact_dir),
+                _probe_spec("s2-04-sibling-one", "linux-sibling-one", ("python", "-c", first_sibling_code), artifact_dir),
                 "passed",
                 None,
             )
@@ -137,7 +145,7 @@ def main(argv: list[str] | None = None) -> int:
             run_result(
                 "sibling-two-state-isolated",
                 worker,
-                WorkerSpec("s2-04-sibling-two", "linux-sibling-two", ("python", "-c", second_sibling_code), artifact_dir),
+                _probe_spec("s2-04-sibling-two", "linux-sibling-two", ("python", "-c", second_sibling_code), artifact_dir),
                 "passed",
                 None,
             )
@@ -146,7 +154,7 @@ def main(argv: list[str] | None = None) -> int:
             run_result(
                 "nonzero-exit",
                 worker,
-                WorkerSpec("s2-04-nonzero", "linux-nonzero", ("python", "-c", "raise SystemExit(17)"), artifact_dir),
+                _probe_spec("s2-04-nonzero", "linux-nonzero", ("python", "-c", "raise SystemExit(17)"), artifact_dir),
                 "failed",
                 "worker_nonzero_exit",
             )
@@ -184,7 +192,7 @@ def main(argv: list[str] | None = None) -> int:
             run_result(
                 "cgroup-memory-cpu-and-pid-limits",
                 worker,
-                WorkerSpec(
+                _probe_spec(
                     "s2-04-resources",
                     "linux-resources",
                     ("python", "-c", resource_code),
@@ -199,7 +207,7 @@ def main(argv: list[str] | None = None) -> int:
             run_result(
                 "timeout",
                 worker,
-                WorkerSpec(
+                _probe_spec(
                     "s2-04-timeout",
                     "linux-timeout",
                     ("python", "-c", "import time; time.sleep(30)"),
@@ -215,7 +223,7 @@ def main(argv: list[str] | None = None) -> int:
             run_result(
                 "output-overflow",
                 worker,
-                WorkerSpec(
+                _probe_spec(
                     "s2-04-overflow",
                     "linux-overflow",
                     ("python", "-c", overflow_code),
@@ -231,7 +239,7 @@ def main(argv: list[str] | None = None) -> int:
             run_result(
                 "memory-limit",
                 worker,
-                WorkerSpec(
+                _probe_spec(
                     "s2-04-memory",
                     "linux-memory",
                     ("python", "-c", memory_code),
@@ -247,14 +255,14 @@ def main(argv: list[str] | None = None) -> int:
             run_result(
                 "process-tree-cleanup",
                 worker,
-                WorkerSpec("s2-04-process-tree", "linux-process-tree", ("python", "-c", tree_code), artifact_dir),
+                _probe_spec("s2-04-process-tree", "linux-process-tree", ("python", "-c", tree_code), artifact_dir),
                 "passed",
                 None,
             )
         )
 
-        lost_worker = CapturingDockerWorker(image_digest=image_lock["image"], repository_root=REPOSITORY_ROOT)
-        long_spec = WorkerSpec(
+        lost_worker = CapturingDockerWorker(image_digest=worker_image, repository_root=REPOSITORY_ROOT)
+        long_spec = _probe_spec(
             "s2-04-worker-loss",
             "linux-worker-loss",
             ("python", "-c", "import time; time.sleep(60)"),
@@ -305,8 +313,9 @@ def main(argv: list[str] | None = None) -> int:
         "backend": "Docker Engine",
         "host_platform": platform.platform(),
         "docker_server": docker_server_version(),
-        "worker_image": image_lock["image"],
-        "worker_image_lock": str(IMAGE_LOCK.relative_to(REPOSITORY_ROOT)),
+        "worker_image": worker_image,
+        "worker_image_binding": "repository_image_lock" if worker_image == image_lock["image"] else "explicit_digest_override",
+        "worker_image_lock": str(IMAGE_LOCK.relative_to(REPOSITORY_ROOT)) if worker_image == image_lock["image"] else None,
         "results": records,
         "passed": all(record["passed"] for record in records),
     }

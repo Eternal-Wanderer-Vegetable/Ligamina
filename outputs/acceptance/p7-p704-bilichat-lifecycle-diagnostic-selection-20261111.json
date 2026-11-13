@@ -1,0 +1,867 @@
+{
+  "schema_version": 1,
+  "kind": "p7_p701_static_inventory_sample",
+  "selection": {
+    "source_matrix": "outputs/compat/compatibility-matrix-v1.json",
+    "source_matrix_sha256": "40bc6559dc6c360857f919dc43f6060732041820cc1bd479f6449ad1bb15d787",
+    "rule": "Within each ecosystem, rank Linux load-verified frozen rows by SHA-256(selection_seed + ':' + registry_entry_id), then select the first cached artifacts until the per-ecosystem target is met.",
+    "selection_seed": "p7-p704-independent-20261111-v1",
+    "per_ecosystem_target": 30,
+    "counts": {
+      "koishi": 1,
+      "nonebot": 1,
+      "astrbot": 0
+    },
+    "purpose": "bounded_native_lifecycle_diagnostic",
+    "parent_selection": {
+      "path": "outputs/acceptance/p7-p704-independent-pilot-selection-20261111.json",
+      "sha256": "3076c70a5e692392b993abb8754d84f0b06787a4781a4dfca68c7aad727f86c4"
+    }
+  },
+  "execution": "static_only_no_plugin_import_or_execution",
+  "samples": [
+    {
+      "ecosystem": "koishi",
+      "sample_index": 8,
+      "entry": {
+        "registry_entry_id": "ko-24d9ed266a017c505a69dd60",
+        "package": "koishi-plugin-chat-analyse",
+        "version": "1.7.9",
+        "artifact_sha256": "6f3386cd4ca47310e1405e9970c6e51d790e18bb49a49d959e6cca0a473cc89f",
+        "load_evidence": [
+          {
+            "path": "outputs/acceptance/phase2-s211-rerun-census-linux-shard113of256-20261014.json",
+            "ref": "plugin_reports[10] result_id=catalog:ko-24d9ed266a017c505a69dd60|linux",
+            "sha256": "91c6d2f97f808922db022b85bca1a0f38d94cabe1412997408a890eec011ca7c"
+          }
+        ]
+      },
+      "static_inventory": {
+        "schema_version": 1,
+        "ecosystem": "koishi",
+        "plugin": {
+          "registry_entry_id": "ko-24d9ed266a017c505a69dd60",
+          "package": "koishi-plugin-chat-analyse",
+          "version": "1.7.9",
+          "artifact_sha256": "6f3386cd4ca47310e1405e9970c6e51d790e18bb49a49d959e6cca0a473cc89f"
+        },
+        "source": {
+          "kind": "static",
+          "collector": "capability-inventory-static/2",
+          "confidence": "heuristic",
+          "evidence": [
+            {
+              "reference": "sha256:6f3386cd4ca47310e1405e9970c6e51d790e18bb49a49d959e6cca0a473cc89f"
+            }
+          ]
+        },
+        "capabilities": {
+          "commands": {
+            "status": "observed",
+            "items": [
+              {
+                "kind": "command",
+                "name": "analyse",
+                "evidence": [
+                  {
+                    "reference": "package/lib/index.js:2826",
+                    "path": "package/lib/index.js",
+                    "line": 2826
+                  }
+                ],
+                "attributes": {
+                  "call": "command",
+                  "name_confidence": "literal"
+                }
+              }
+            ]
+          },
+          "handlers": {
+            "status": "observed",
+            "items": [
+              {
+                "kind": "event_listener",
+                "name": "message",
+                "evidence": [
+                  {
+                    "reference": "package/lib/index.js:70",
+                    "path": "package/lib/index.js",
+                    "line": 70
+                  }
+                ],
+                "attributes": {
+                  "call": "on",
+                  "name_confidence": "literal"
+                }
+              }
+            ]
+          },
+          "services": {
+            "status": "observed",
+            "items": []
+          },
+          "schedulers": {
+            "status": "observed",
+            "items": [
+              {
+                "kind": "interval",
+                "name": "setInterval",
+                "evidence": [
+                  {
+                    "reference": "package/lib/index.js:71",
+                    "path": "package/lib/index.js",
+                    "line": 71
+                  }
+                ],
+                "attributes": {
+                  "call": "setInterval",
+                  "name_confidence": "unknown"
+                }
+              },
+              {
+                "kind": "timeout",
+                "name": "setTimeout",
+                "evidence": [
+                  {
+                    "reference": "package/lib/index.js:313",
+                    "path": "package/lib/index.js",
+                    "line": 313
+                  }
+                ],
+                "attributes": {
+                  "call": "setTimeout",
+                  "name_confidence": "unknown"
+                }
+              },
+              {
+                "kind": "cron",
+                "name": "0 0 * * *",
+                "evidence": [
+                  {
+                    "reference": "package/lib/index.js:1878",
+                    "path": "package/lib/index.js",
+                    "line": 1878
+                  }
+                ],
+                "attributes": {
+                  "call": "cron",
+                  "name_confidence": "literal"
+                }
+              },
+              {
+                "kind": "cron",
+                "name": "0 0 * * *",
+                "evidence": [
+                  {
+                    "reference": "package/lib/index.js:2101",
+                    "path": "package/lib/index.js",
+                    "line": 2101
+                  }
+                ],
+                "attributes": {
+                  "call": "cron",
+                  "name_confidence": "literal"
+                }
+              },
+              {
+                "kind": "cron",
+                "name": "0 0 * * *",
+                "evidence": [
+                  {
+                    "reference": "package/lib/index.js:2155",
+                    "path": "package/lib/index.js",
+                    "line": 2155
+                  }
+                ],
+                "attributes": {
+                  "call": "cron",
+                  "name_confidence": "literal"
+                }
+              },
+              {
+                "kind": "cron",
+                "name": "0 0 * * *",
+                "evidence": [
+                  {
+                    "reference": "package/lib/index.js:2457",
+                    "path": "package/lib/index.js",
+                    "line": 2457
+                  }
+                ],
+                "attributes": {
+                  "call": "cron",
+                  "name_confidence": "literal"
+                }
+              },
+              {
+                "kind": "timeout",
+                "name": "setTimeout",
+                "evidence": [
+                  {
+                    "reference": "package/lib/index.js:2708",
+                    "path": "package/lib/index.js",
+                    "line": 2708
+                  }
+                ],
+                "attributes": {
+                  "call": "setTimeout",
+                  "name_confidence": "unknown"
+                }
+              },
+              {
+                "kind": "timeout",
+                "name": "setTimeout",
+                "evidence": [
+                  {
+                    "reference": "package/lib/wordcloud.d.ts:1",
+                    "path": "package/lib/wordcloud.d.ts",
+                    "line": 1
+                  }
+                ],
+                "attributes": {
+                  "call": "setTimeout",
+                  "name_confidence": "unknown"
+                }
+              }
+            ]
+          },
+          "configuration": {
+            "status": "observed",
+            "items": []
+          }
+        },
+        "limitations": []
+      }
+    },
+    {
+      "ecosystem": "nonebot",
+      "sample_index": 14,
+      "entry": {
+        "registry_entry_id": "nb-250c92c282d77dcf502b9dbf",
+        "package": "nonebot_plugin_bilichat",
+        "version": "6.5.0",
+        "artifact_sha256": "2fd7ac90900b4039fb71765ebf53886f6ade3593eb466fed5e615d2d82e02bb0",
+        "load_evidence": [
+          {
+            "path": "outputs/acceptance/phase2-s211-rerun-census-linux-shard70of256-20261014.json",
+            "ref": "plugin_reports[1] result_id=catalog:nb-250c92c282d77dcf502b9dbf|linux",
+            "sha256": "a9762d8fd9d39c238943f50fb2f0dc581a7e5d70e1ff94657e4104be352940e0"
+          }
+        ]
+      },
+      "static_inventory": {
+        "schema_version": 1,
+        "ecosystem": "nonebot",
+        "plugin": {
+          "registry_entry_id": "nb-250c92c282d77dcf502b9dbf",
+          "package": "nonebot_plugin_bilichat",
+          "version": "6.5.0",
+          "artifact_sha256": "2fd7ac90900b4039fb71765ebf53886f6ade3593eb466fed5e615d2d82e02bb0"
+        },
+        "source": {
+          "kind": "static",
+          "collector": "capability-inventory-static/2",
+          "confidence": "heuristic",
+          "evidence": [
+            {
+              "reference": "sha256:2fd7ac90900b4039fb71765ebf53886f6ade3593eb466fed5e615d2d82e02bb0"
+            }
+          ]
+        },
+        "capabilities": {
+          "commands": {
+            "status": "observed",
+            "items": [
+              {
+                "kind": "command",
+                "name": "checkdynamic",
+                "evidence": [
+                  {
+                    "reference": "nonebot_plugin_bilichat/command/functions.py:15",
+                    "path": "nonebot_plugin_bilichat/command/functions.py",
+                    "line": 15
+                  }
+                ],
+                "attributes": {
+                  "call": "command",
+                  "name_confidence": "literal"
+                }
+              },
+              {
+                "kind": "command",
+                "name": "fetch",
+                "evidence": [
+                  {
+                    "reference": "nonebot_plugin_bilichat/command/functions.py:36",
+                    "path": "nonebot_plugin_bilichat/command/functions.py",
+                    "line": 36
+                  }
+                ],
+                "attributes": {
+                  "call": "command",
+                  "name_confidence": "literal"
+                }
+              },
+              {
+                "kind": "command",
+                "name": "checklogin",
+                "evidence": [
+                  {
+                    "reference": "nonebot_plugin_bilichat/command/login.py:23",
+                    "path": "nonebot_plugin_bilichat/command/login.py",
+                    "line": 23
+                  }
+                ],
+                "attributes": {
+                  "call": "command",
+                  "name_confidence": "literal"
+                }
+              },
+              {
+                "kind": "command",
+                "name": "qrlogin",
+                "evidence": [
+                  {
+                    "reference": "nonebot_plugin_bilichat/command/login.py:30",
+                    "path": "nonebot_plugin_bilichat/command/login.py",
+                    "line": 30
+                  }
+                ],
+                "attributes": {
+                  "call": "command",
+                  "name_confidence": "literal"
+                }
+              },
+              {
+                "kind": "command",
+                "name": "logout",
+                "evidence": [
+                  {
+                    "reference": "nonebot_plugin_bilichat/command/login.py:35",
+                    "path": "nonebot_plugin_bilichat/command/login.py",
+                    "line": 35
+                  }
+                ],
+                "attributes": {
+                  "call": "command",
+                  "name_confidence": "literal"
+                }
+              },
+              {
+                "kind": "command",
+                "name": "otp",
+                "evidence": [
+                  {
+                    "reference": "nonebot_plugin_bilichat/command/otp.py:15",
+                    "path": "nonebot_plugin_bilichat/command/otp.py",
+                    "line": 15
+                  }
+                ],
+                "attributes": {
+                  "call": "command",
+                  "name_confidence": "literal"
+                }
+              },
+              {
+                "kind": "command",
+                "name": "otp_qrcode",
+                "evidence": [
+                  {
+                    "reference": "nonebot_plugin_bilichat/command/otp.py:16",
+                    "path": "nonebot_plugin_bilichat/command/otp.py",
+                    "line": 16
+                  }
+                ],
+                "attributes": {
+                  "call": "command",
+                  "name_confidence": "literal"
+                }
+              },
+              {
+                "kind": "command",
+                "name": "sub",
+                "evidence": [
+                  {
+                    "reference": "nonebot_plugin_bilichat/command/subs.py:16",
+                    "path": "nonebot_plugin_bilichat/command/subs.py",
+                    "line": 16
+                  }
+                ],
+                "attributes": {
+                  "call": "command",
+                  "name_confidence": "literal"
+                }
+              },
+              {
+                "kind": "command",
+                "name": "unsub",
+                "evidence": [
+                  {
+                    "reference": "nonebot_plugin_bilichat/command/subs.py:17",
+                    "path": "nonebot_plugin_bilichat/command/subs.py",
+                    "line": 17
+                  }
+                ],
+                "attributes": {
+                  "call": "command",
+                  "name_confidence": "literal"
+                }
+              },
+              {
+                "kind": "command",
+                "name": "check",
+                "evidence": [
+                  {
+                    "reference": "nonebot_plugin_bilichat/command/subs.py:20",
+                    "path": "nonebot_plugin_bilichat/command/subs.py",
+                    "line": 20
+                  }
+                ],
+                "attributes": {
+                  "call": "command",
+                  "name_confidence": "literal"
+                }
+              }
+            ]
+          },
+          "handlers": {
+            "status": "observed",
+            "items": [
+              {
+                "kind": "message",
+                "name": "on_message",
+                "evidence": [
+                  {
+                    "reference": "nonebot_plugin_bilichat/base_content_parsing.py:116",
+                    "path": "nonebot_plugin_bilichat/base_content_parsing.py",
+                    "line": 116
+                  }
+                ],
+                "attributes": {
+                  "call": "on_message",
+                  "name_confidence": "unknown"
+                }
+              }
+            ]
+          },
+          "services": {
+            "status": "observed",
+            "items": [
+              {
+                "kind": "plugin_dependency",
+                "name": "nonebot_plugin_apscheduler",
+                "evidence": [
+                  {
+                    "reference": "nonebot_plugin_bilichat/__init__.py:4",
+                    "path": "nonebot_plugin_bilichat/__init__.py",
+                    "line": 4
+                  }
+                ],
+                "attributes": {
+                  "call": "require",
+                  "name_confidence": "literal"
+                }
+              },
+              {
+                "kind": "plugin_dependency",
+                "name": "nonebot_plugin_alconna",
+                "evidence": [
+                  {
+                    "reference": "nonebot_plugin_bilichat/__init__.py:5",
+                    "path": "nonebot_plugin_bilichat/__init__.py",
+                    "line": 5
+                  }
+                ],
+                "attributes": {
+                  "call": "require",
+                  "name_confidence": "literal"
+                }
+              },
+              {
+                "kind": "plugin_dependency",
+                "name": "nonebot_plugin_waiter",
+                "evidence": [
+                  {
+                    "reference": "nonebot_plugin_bilichat/__init__.py:6",
+                    "path": "nonebot_plugin_bilichat/__init__.py",
+                    "line": 6
+                  }
+                ],
+                "attributes": {
+                  "call": "require",
+                  "name_confidence": "literal"
+                }
+              },
+              {
+                "kind": "plugin_dependency",
+                "name": "nonebot_plugin_uninfo",
+                "evidence": [
+                  {
+                    "reference": "nonebot_plugin_bilichat/__init__.py:7",
+                    "path": "nonebot_plugin_bilichat/__init__.py",
+                    "line": 7
+                  }
+                ],
+                "attributes": {
+                  "call": "require",
+                  "name_confidence": "literal"
+                }
+              },
+              {
+                "kind": "plugin_dependency",
+                "name": "nonebot_plugin_localstore",
+                "evidence": [
+                  {
+                    "reference": "nonebot_plugin_bilichat/config.py:16",
+                    "path": "nonebot_plugin_bilichat/config.py",
+                    "line": 16
+                  }
+                ],
+                "attributes": {
+                  "call": "require",
+                  "name_confidence": "literal"
+                }
+              }
+            ]
+          },
+          "schedulers": {
+            "status": "observed",
+            "items": [
+              {
+                "kind": "timeout",
+                "name": "setTimeout",
+                "evidence": [
+                  {
+                    "reference": "nonebot_plugin_bilichat/static/html/_next/static/chunks/4bd1b696-7169861da40f817b.js:1",
+                    "path": "nonebot_plugin_bilichat/static/html/_next/static/chunks/4bd1b696-7169861da40f817b.js",
+                    "line": 1
+                  }
+                ],
+                "attributes": {
+                  "call": "setTimeout",
+                  "name_confidence": "unknown"
+                }
+              },
+              {
+                "kind": "timeout",
+                "name": "setTimeout",
+                "evidence": [
+                  {
+                    "reference": "nonebot_plugin_bilichat/static/html/_next/static/chunks/684-5a9ecabb2c5a99ca.js:1",
+                    "path": "nonebot_plugin_bilichat/static/html/_next/static/chunks/684-5a9ecabb2c5a99ca.js",
+                    "line": 1
+                  }
+                ],
+                "attributes": {
+                  "call": "setTimeout",
+                  "name_confidence": "unknown"
+                }
+              },
+              {
+                "kind": "timeout",
+                "name": "setTimeout",
+                "evidence": [
+                  {
+                    "reference": "nonebot_plugin_bilichat/static/html/_next/static/chunks/824-6ec2445d552b1a95.js:1",
+                    "path": "nonebot_plugin_bilichat/static/html/_next/static/chunks/824-6ec2445d552b1a95.js",
+                    "line": 1
+                  }
+                ],
+                "attributes": {
+                  "call": "setTimeout",
+                  "name_confidence": "unknown"
+                }
+              },
+              {
+                "kind": "timeout",
+                "name": "setTimeout",
+                "evidence": [
+                  {
+                    "reference": "nonebot_plugin_bilichat/static/html/_next/static/chunks/framework-29ac49a6a3fd316f.js:1",
+                    "path": "nonebot_plugin_bilichat/static/html/_next/static/chunks/framework-29ac49a6a3fd316f.js",
+                    "line": 1
+                  }
+                ],
+                "attributes": {
+                  "call": "setTimeout",
+                  "name_confidence": "unknown"
+                }
+              },
+              {
+                "kind": "timeout",
+                "name": "setTimeout",
+                "evidence": [
+                  {
+                    "reference": "nonebot_plugin_bilichat/static/html/_next/static/chunks/main-f3d62d66a9882872.js:1",
+                    "path": "nonebot_plugin_bilichat/static/html/_next/static/chunks/main-f3d62d66a9882872.js",
+                    "line": 1
+                  }
+                ],
+                "attributes": {
+                  "call": "setTimeout",
+                  "name_confidence": "unknown"
+                }
+              },
+              {
+                "kind": "timeout",
+                "name": "setTimeout",
+                "evidence": [
+                  {
+                    "reference": "nonebot_plugin_bilichat/static/html/_next/static/chunks/polyfills-42372ed130431b0a.js:3",
+                    "path": "nonebot_plugin_bilichat/static/html/_next/static/chunks/polyfills-42372ed130431b0a.js",
+                    "line": 3
+                  }
+                ],
+                "attributes": {
+                  "call": "setTimeout",
+                  "name_confidence": "unknown"
+                }
+              },
+              {
+                "kind": "timeout",
+                "name": "setTimeout",
+                "evidence": [
+                  {
+                    "reference": "nonebot_plugin_bilichat/static/html/_next/static/chunks/webpack-d8f6f781f4818f13.js:1",
+                    "path": "nonebot_plugin_bilichat/static/html/_next/static/chunks/webpack-d8f6f781f4818f13.js",
+                    "line": 1
+                  }
+                ],
+                "attributes": {
+                  "call": "setTimeout",
+                  "name_confidence": "unknown"
+                }
+              }
+            ]
+          },
+          "configuration": {
+            "status": "observed",
+            "items": [
+              {
+                "kind": "config_model",
+                "name": "OTPLoginRequest",
+                "evidence": [
+                  {
+                    "reference": "nonebot_plugin_bilichat/api/auth.py:14",
+                    "path": "nonebot_plugin_bilichat/api/auth.py",
+                    "line": 14
+                  }
+                ]
+              },
+              {
+                "kind": "config_model",
+                "name": "OTPLoginResponse",
+                "evidence": [
+                  {
+                    "reference": "nonebot_plugin_bilichat/api/auth.py:20",
+                    "path": "nonebot_plugin_bilichat/api/auth.py",
+                    "line": 20
+                  }
+                ]
+              },
+              {
+                "kind": "config_model",
+                "name": "WebUIConfig",
+                "evidence": [
+                  {
+                    "reference": "nonebot_plugin_bilichat/model/config.py:13",
+                    "path": "nonebot_plugin_bilichat/model/config.py",
+                    "line": 13
+                  }
+                ]
+              },
+              {
+                "kind": "config_model",
+                "name": "NoneBotConfig",
+                "evidence": [
+                  {
+                    "reference": "nonebot_plugin_bilichat/model/config.py:42",
+                    "path": "nonebot_plugin_bilichat/model/config.py",
+                    "line": 42
+                  }
+                ]
+              },
+              {
+                "kind": "config_model",
+                "name": "AnalyzeConfig",
+                "evidence": [
+                  {
+                    "reference": "nonebot_plugin_bilichat/model/config.py:167",
+                    "path": "nonebot_plugin_bilichat/model/config.py",
+                    "line": 167
+                  }
+                ]
+              },
+              {
+                "kind": "config_model",
+                "name": "LocalApiConfig",
+                "evidence": [
+                  {
+                    "reference": "nonebot_plugin_bilichat/model/config.py:176",
+                    "path": "nonebot_plugin_bilichat/model/config.py",
+                    "line": 176
+                  }
+                ]
+              },
+              {
+                "kind": "config_model",
+                "name": "RequestApiInfo",
+                "evidence": [
+                  {
+                    "reference": "nonebot_plugin_bilichat/model/config.py:214",
+                    "path": "nonebot_plugin_bilichat/model/config.py",
+                    "line": 214
+                  }
+                ]
+              },
+              {
+                "kind": "config_model",
+                "name": "ApiConfig",
+                "evidence": [
+                  {
+                    "reference": "nonebot_plugin_bilichat/model/config.py:224",
+                    "path": "nonebot_plugin_bilichat/model/config.py",
+                    "line": 224
+                  }
+                ]
+              },
+              {
+                "kind": "config_model",
+                "name": "SubscribeConfig",
+                "evidence": [
+                  {
+                    "reference": "nonebot_plugin_bilichat/model/config.py:247",
+                    "path": "nonebot_plugin_bilichat/model/config.py",
+                    "line": 247
+                  }
+                ]
+              },
+              {
+                "kind": "config_model",
+                "name": "Config",
+                "evidence": [
+                  {
+                    "reference": "nonebot_plugin_bilichat/model/config.py:277",
+                    "path": "nonebot_plugin_bilichat/model/config.py",
+                    "line": 277
+                  }
+                ]
+              },
+              {
+                "kind": "config_model",
+                "name": "VersionInfo",
+                "evidence": [
+                  {
+                    "reference": "nonebot_plugin_bilichat/model/request_api.py:9",
+                    "path": "nonebot_plugin_bilichat/model/request_api.py",
+                    "line": 9
+                  }
+                ]
+              },
+              {
+                "kind": "config_model",
+                "name": "Note",
+                "evidence": [
+                  {
+                    "reference": "nonebot_plugin_bilichat/model/request_api.py:20",
+                    "path": "nonebot_plugin_bilichat/model/request_api.py",
+                    "line": 20
+                  }
+                ]
+              },
+              {
+                "kind": "config_model",
+                "name": "Account",
+                "evidence": [
+                  {
+                    "reference": "nonebot_plugin_bilichat/model/request_api.py:27",
+                    "path": "nonebot_plugin_bilichat/model/request_api.py",
+                    "line": 27
+                  }
+                ]
+              },
+              {
+                "kind": "config_model",
+                "name": "Dynamic",
+                "evidence": [
+                  {
+                    "reference": "nonebot_plugin_bilichat/model/request_api.py:61",
+                    "path": "nonebot_plugin_bilichat/model/request_api.py",
+                    "line": 61
+                  }
+                ]
+              },
+              {
+                "kind": "config_model",
+                "name": "LiveRoom",
+                "evidence": [
+                  {
+                    "reference": "nonebot_plugin_bilichat/model/request_api.py:67",
+                    "path": "nonebot_plugin_bilichat/model/request_api.py",
+                    "line": 67
+                  }
+                ]
+              },
+              {
+                "kind": "config_model",
+                "name": "Content",
+                "evidence": [
+                  {
+                    "reference": "nonebot_plugin_bilichat/model/request_api.py:92",
+                    "path": "nonebot_plugin_bilichat/model/request_api.py",
+                    "line": 92
+                  }
+                ]
+              },
+              {
+                "kind": "config_model",
+                "name": "SearchUp",
+                "evidence": [
+                  {
+                    "reference": "nonebot_plugin_bilichat/model/request_api.py:103",
+                    "path": "nonebot_plugin_bilichat/model/request_api.py",
+                    "line": 103
+                  }
+                ]
+              },
+              {
+                "kind": "config_model",
+                "name": "UP",
+                "evidence": [
+                  {
+                    "reference": "nonebot_plugin_bilichat/model/subscribe.py:31",
+                    "path": "nonebot_plugin_bilichat/model/subscribe.py",
+                    "line": 31
+                  }
+                ]
+              },
+              {
+                "kind": "config_model",
+                "name": "UserInfo",
+                "evidence": [
+                  {
+                    "reference": "nonebot_plugin_bilichat/model/subscribe.py:46",
+                    "path": "nonebot_plugin_bilichat/model/subscribe.py",
+                    "line": 46
+                  }
+                ]
+              },
+              {
+                "kind": "config_model",
+                "name": "UPStatus",
+                "evidence": [
+                  {
+                    "reference": "nonebot_plugin_bilichat/subscribe/status.py:13",
+                    "path": "nonebot_plugin_bilichat/subscribe/status.py",
+                    "line": 13
+                  }
+                ]
+              }
+            ]
+          }
+        },
+        "limitations": []
+      }
+    }
+  ]
+}

@@ -49,6 +49,7 @@ trap finish EXIT
   node --test scripts/evidence-hash.test.mjs scripts/phase3-workflows.test.mjs
   node scripts/check-docs.mjs
   uv python install 3.12.14
+  uv run --locked --project lab --python 3.12.14 python -m lab.automation.p7_source_audit_cache
   uv run --locked --project lab --python 3.12.14 python -m unittest \
     lab.tests.test_automation_execution \
     lab.tests.test_automation_recovery \
@@ -59,6 +60,10 @@ trap finish EXIT
     lab.tests.test_native_runner \
     lab.tests.test_compare \
     lab.tests.test_compat_matrix \
+    lab.tests.test_p7_contracts \
+    lab.tests.test_p7_mutations \
+    lab.tests.test_p7_stateful \
+    lab.tests.test_p7_service_profiles \
     lab.tests.test_baselines.StockBaselineSourceTests.test_both_native_host_profiles_are_present \
     lab.tests.test_baselines.StockBaselineSourceTests.test_linux_profile_cleanup_removes_host_owned_staging_without_docker \
     lab.tests.test_baselines.StockBaselineSourceTests.test_native_baseline_sources_do_not_import_ligamina_bridge \

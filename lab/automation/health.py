@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import json
 import platform
+import re
 import shutil
 import subprocess
 import time
@@ -11,6 +12,8 @@ from pathlib import Path
 from typing import Any
 
 from .selection import ROOT, AutomationContractError, object_sha256, sha256
+
+_PINNED_IMAGE = re.compile(r"^[^\s@]+@sha256:[a-f0-9]{64}$")
 
 
 def _docker_facts(docker_cli: str | None) -> dict[str, Any]:
@@ -58,15 +61,29 @@ def _linux_available_memory_bytes(meminfo_path: Path | None = None) -> int | Non
     return None
 
 
-def collect_linux_health(*, probe_report_path: Path | None = None) -> dict[str, Any]:
-    """Collect current Linux backend facts; admit only after exact pinned probes pass."""
+def collect_linux_health(
+    *, probe_report_path: Path | None = None, worker_image: str | None = None,
+) -> dict[str, Any]:
+    """Collect Linux admission facts for the repository image lock or one pinned image override."""
     if platform.system() != "Linux":
         raise AutomationContractError("Linux admission can only be collected on Linux")
     image_lock_path = ROOT / "deploy/lab/linux/worker-image.lock.json"
-    image_lock = json.loads(image_lock_path.read_text(encoding="utf-8"))
+    image_lock_raw = image_lock_path.read_bytes()
+    image_lock = json.loads(image_lock_raw.decode("utf-8"))
+    locked_default = image_lock.get("image")
+    selected_image = locked_default if worker_image is None else worker_image
+    if not isinstance(selected_image, str) or not _PINNED_IMAGE.fullmatch(selected_image):
+        raise AutomationContractError("worker image must be digest-pinned")
+    uses_repository_lock = selected_image == locked_default
     docker_cli = shutil.which("docker") or shutil.which("docker.exe")
     docker = _docker_facts(docker_cli)
-    image: dict[str, Any] = {"locked_reference": image_lock.get("image"), "lock_sha256": sha256(image_lock_path.read_bytes()), "present": False}
+    image: dict[str, Any] = {
+        "locked_reference": selected_image,
+        "lock_sha256": sha256(image_lock_raw) if uses_repository_lock else None,
+        "reference_sha256": sha256(selected_image.encode("utf-8")),
+        "binding": "repository_image_lock" if uses_repository_lock else "explicit_digest_override",
+        "present": False,
+    }
     failures: list[str] = []
     if not docker_cli:
         failures.append("docker_cli_unavailable")
@@ -74,7 +91,7 @@ def collect_linux_health(*, probe_report_path: Path | None = None) -> dict[str, 
         failures.append(str(docker.get("reason_code", "docker_daemon_unavailable")))
     else:
         inspect = subprocess.run(
-            [docker_cli, "image", "inspect", image_lock["image"], "--format", "{{.Id}}"],
+            [docker_cli, "image", "inspect", selected_image, "--format", "{{.Id}}"],
             stdin=subprocess.DEVNULL, capture_output=True, text=True, timeout=20, check=False,
         )
         image["present"] = inspect.returncode == 0
@@ -97,7 +114,7 @@ def collect_linux_health(*, probe_report_path: Path | None = None) -> dict[str, 
             for item in results
         )
         probe = {"status": "passed" if value.get("passed") is True and results_valid else "failed", "report_path": str(report_path), "report_sha256": sha256(raw), "worker_image": value.get("worker_image"), "result_count": len(results) if isinstance(results, list) else 0}
-        if probe["status"] != "passed" or probe["worker_image"] != image_lock["image"]:
+        if probe["status"] != "passed" or probe["worker_image"] != selected_image:
             failures.append("benign_probe_report_not_accepted")
     host = {"system": platform.system(), "release": platform.release(), "machine": platform.machine(), "python": platform.python_version()}
     config = json.loads((ROOT / "config/lab/phase3-automation-v1.json").read_text(encoding="utf-8"))

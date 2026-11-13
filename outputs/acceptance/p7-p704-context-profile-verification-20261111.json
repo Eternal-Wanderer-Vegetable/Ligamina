@@ -1,0 +1,95 @@
+{
+  "schema_version": 1,
+  "kind": "p7_p704_context_profile_verification",
+  "date": "2026-11-11",
+  "scope": "P7-04E feat-058 profile implementation, P7-04 profile-bound 30+30 pilot, and P7-05 contract audit",
+  "status": "passed_with_p7_09_admission_blocked",
+  "verification": [
+    {
+      "name": "targeted_lab_tests",
+      "command": "wsl -d Ubuntu-24.04 --cd /mnt/e/stella/Ligamina -- env UV_PROJECT_ENVIRONMENT=/tmp/ligamina-p7-ci-fix-venv UV_OFFLINE=1 uv run --locked --project lab --python 3.12.14 python -m unittest lab.tests.test_p7_context_profiles lab.tests.test_p7_differential_campaign lab.tests.test_scenario_generator lab.tests.test_p7_service_profiles -v",
+      "result": "passed",
+      "output_summary": "42 tests passed in 3.187 seconds after the CI portability fix"
+    },
+    {
+      "name": "ci_cache_independent_regression_test",
+      "command": "wsl -d Ubuntu-24.04 --cd /mnt/e/stella/Ligamina -- env UV_PROJECT_ENVIRONMENT=/tmp/ligamina-p7-ci-fix-venv UV_OFFLINE=1 uv run --locked --project lab --python 3.12.14 python -m unittest lab.tests.test_p7_context_profiles.P7ContextProfileTests.test_diagnostic_selection_is_the_exact_profile_bound_subset -v",
+      "result": "passed",
+      "output_summary": "Ran 1 test in 0.221 seconds; OK. Test now uses a temporary artifact cache and mocked frozen records/hashes."
+    },
+    {
+      "name": "full_lab_suite",
+      "command": "wsl -d Ubuntu-24.04 --cd /mnt/e/stella/Ligamina -- env UV_PROJECT_ENVIRONMENT=/tmp/ligamina-p7-ci-fix-venv UV_OFFLINE=1 uv run --locked --project lab --python 3.12.14 python -m unittest discover -s lab/tests -v",
+      "result": "passed",
+      "output_summary": "337 tests passed; 6 skipped; duration 242.818 seconds; compatibility matrix check ok (8961 entries, 539 sources)"
+    },
+    {
+      "name": "py_compile",
+      "command": "python -c \"import py_compile; files=['lab/automation/p7_differential_campaign.py','lab/automation/phase4_docker_side.py','lab/automation/p7_context_profiles.py','lab/automation/p7_context_profile_diagnostic.py','lab/baselines/federated.py','lab/baselines/nonebot/runner.py','lab/representative.py','lab/tests/test_p7_context_profiles.py']; [py_compile.compile(path, doraise=True) for path in files]; print(f'py_compile passed ({len(files)} files)')\"",
+      "result": "passed",
+      "output_summary": "py_compile passed (8 files)"
+    },
+    {
+      "name": "documentation_gate",
+      "command": "pwsh -NoProfile -File init.ps1 -Mode docs",
+      "result": "passed",
+      "output_summary": "29 documents; 717 local links; 16 indexed historical Markdown files; 58 features; 0 failures"
+    },
+    {
+      "name": "readme_evidence_check",
+      "command": "node scripts/render-readme.mjs --check",
+      "result": "passed",
+      "output_summary": "README evidence blocks match validated phase-one, phase-two, and phase-three reports"
+    },
+    {
+      "name": "harness_validation",
+      "command": "node .agents/skills/harness-creator/scripts/validate-harness.mjs --target .",
+      "result": "passed",
+      "output_summary": "Overall 100/100"
+    },
+    {
+      "name": "evidence_sidecars",
+      "command": "wsl -d Ubuntu-24.04 --cd /mnt/e/stella/Ligamina -- bash -lc \"cd outputs/acceptance && sha256sum -c p7-p704-independent-pilot-selection-20261111.json.sha256 p7-p704-context-profile-diagnostic-selection-20261111.json.sha256 p7-p704-context-profile-diagnostic-20261111.json.sha256 p7-p704-context-profile-diagnostic-retry2-20261111.json.sha256 p7-p704-differential-pilot-20261111-context-profile-attempt1-partial.json.sha256 p7-p704-differential-pilot-20261111-context-profile-corrected.json.sha256 p7-p704-differential-pilot-20261111-independent-context-profile.json.sha256 p7-p704-koishi-fingerprint-diagnostic-20261111.json.sha256 p7-p705-contract-pilot-20261111-independent-context-profile.json.sha256 p7-p704-context-profile-verification-20261111.json.sha256\"",
+      "result": "passed",
+      "output_summary": "All ten SHA-256 sidecars: OK"
+    },
+    {
+      "name": "diff_check",
+      "command": "git diff --check",
+      "result": "passed",
+      "output_summary": "exit 0; only Git CRLF-to-LF normalization warnings for Markdown/JSON files"
+    }
+  ],
+  "runtime_evidence": {
+    "linux_worker_probes": "10/10 passed",
+    "admission": "admitted",
+    "differential_worker_cleanup": "348/348 confirmed",
+    "profile_diagnostic_worker_cleanup": "33/33 confirmed"
+  },
+  "pilot_gate": {
+    "differential_report_sha256": "0cb90a044ba883fbf048a0be13e9cdc716fedf1ac9bd79c2c38000063d8a06ae",
+    "selection_report_sha256": "3076c70a5e692392b993abb8754d84f0b06787a4781a4dfca68c7aad727f86c4",
+    "commands_exercised": 177,
+    "commands_nontrivial": 29,
+    "nontrivial_share": 0.164,
+    "commands_unknown": 48,
+    "unknown_share": 0.271,
+    "behavior_entries_consistent": "32/32",
+    "p7_09_admission": "blocked_nontrivial_below_30_percent",
+    "p7_10": "unstarted_blocked"
+  },
+  "limitations": [
+    "Differential verified means agreement with the native baseline only.",
+    "Unknown outcomes remain unknown.",
+    "Synthetic profiles do not grant real-user privileges and do not establish live-platform compatibility.",
+    "EventEnvelope schema was not extended; P7-09 full catalog campaign was not started."
+  ],
+  "ci_follow_up": {
+    "previous_head": "f6ba4bd",
+    "workflow_run": 174,
+    "failure": "Linux checks failed in test_diagnostic_selection_is_the_exact_profile_bound_subset because the test resolved the external Ligamina artifact-cache directory, absent on a clean GitHub runner.",
+    "fix": "Make the test self-contained with temporary artifact/lock files and patched frozen records/hash lookup; no runtime behavior changed.",
+    "retest": "isolated regression 1/1 and targeted Lab suite 42/42 passed; full Lab suite 337 passed with 6 skipped.",
+    "new_head_ci": "passed: CI run 175 (Windows and Linux jobs, including packaged Windows runtime and Linux container build); Phase 3 Linux self-test run 157 passed."
+  }
+}

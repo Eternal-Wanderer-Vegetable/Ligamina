@@ -44,6 +44,16 @@ def emit(result: dict[str, Any]) -> None:
     PROTOCOL_OUT.flush()
 
 
+def worker_request() -> dict[str, Any]:
+    request_path = INPUT / "request.json"
+    if request_path.is_file():
+        return json.loads(request_path.read_text(encoding="utf-8"))
+    raw = sys.stdin.buffer.read()
+    if not raw:
+        raise ValueError("Worker request is missing")
+    return json.loads(raw.decode("utf-8"))
+
+
 def tool_name_part(value: str) -> str:
     """Mirror of ligamina_core::commands::tool_name_part."""
     sanitized = "".join(char if char.isascii() and (char.isalnum() or char in "_-.") else "_" for char in value)
@@ -79,11 +89,13 @@ def run_tool_steps(client: Any, host_id: str, steps: list[list[dict[str, Any]]])
         def call(index: int, spec: dict[str, Any]) -> None:
             name = f"cmd.{tool_name_part(host_id)}.{tool_name_part(str(spec['command_id']))}"
             record: dict[str, Any] = {"command_id": spec["command_id"], "tool": name, "arguments": spec.get("arguments", {})}
+            started = time.monotonic()
             try:
                 response = client.call_tool(name, spec.get("arguments", {}))
                 structured = response.get("structuredContent") or {}
                 record.update({
                     "is_error": response.get("isError") is True,
+                    "response_observed": True,
                     "replies": [message.get("text", "") for message in structured.get("messages", [])],
                     "segments": [message.get("segments", []) for message in structured.get("messages", [])],
                     "refused_operations": structured.get("refused_operations", []),
@@ -92,7 +104,10 @@ def run_tool_steps(client: Any, host_id: str, steps: list[list[dict[str, Any]]])
                         block.get("text", "") for block in response.get("content", []) if isinstance(block, dict))[:500],
                 })
             except McpError as error:
-                record.update({"is_error": True, "protocol_error": str(error)[:500], "replies": [], "refused_operations": []})
+                record.update({"is_error": True, "response_observed": False,
+                               "protocol_error": str(error)[:500], "replies": [], "refused_operations": []})
+            finally:
+                record["elapsed_ms"] = max(0, int((time.monotonic() - started) * 1000))
             outcomes[index] = record
 
         threads = [threading.Thread(target=call, args=(index, spec), daemon=True) for index, spec in enumerate(step)]
@@ -100,8 +115,12 @@ def run_tool_steps(client: Any, host_id: str, steps: list[list[dict[str, Any]]])
             thread.start()
         for thread in threads:
             thread.join(timeout=90)
-        recorded.append([outcome or {"command_id": None, "is_error": True, "protocol_error": "call did not finish"}
-                         for outcome in outcomes])
+        recorded.append([outcome or {
+            "command_id": step[index].get("command_id"), "is_error": True,
+            "response_observed": False, "timed_out": True,
+            "protocol_error": "call did not finish", "replies": [], "elapsed_ms": 90_000,
+        }
+                         for index, outcome in enumerate(outcomes)])
     return recorded
 
 
@@ -206,15 +225,25 @@ def run(request: dict[str, Any], install_result: dict[str, Any], plugin_dir: Pat
         initialize = client.initialize()
         prefix = f"cmd.{tool_name_part(host_id)}."
         listed: list[str] = []
+        listed_tools: list[dict[str, Any]] = []
         deadline = time.monotonic() + 60
         while time.monotonic() < deadline:
-            listed = sorted(tool["name"] for tool in client.list_tools() if tool.get("name", "").startswith(prefix))
+            listed_tools = client.list_tools()
+            listed = sorted(tool["name"] for tool in listed_tools if tool.get("name", "").startswith(prefix))
             if listed:
                 break
             time.sleep(0.5)
+        target_tool_name = f"{prefix}{tool_name_part(request['case_id'])}"
+        target_tool = next((tool for tool in listed_tools if tool.get("name") == target_tool_name), None)
         result["tool_calls"] = {
             "protocol_version": initialize.get("protocolVersion"),
             "listed_command_tools": listed,
+            # This one transient schema is consumed by the outer contract projector;
+            # the checkpoint stores only its digest and validity result.
+            "command_tool_schemas": ([{
+                "name": target_tool_name,
+                "input_schema": target_tool.get("inputSchema"),
+            }] if target_tool is not None else []),
             "steps": run_tool_steps(client, host_id, request["tool_calls"]),
         }
         stop.wait(1.0)  # let a leaked operation, if any, reach the Gateway before it stops polling
@@ -250,7 +279,7 @@ def run(request: dict[str, Any], install_result: dict[str, Any], plugin_dir: Pat
 
 
 def main() -> None:
-    request = json.loads((INPUT / "request.json").read_text(encoding="utf-8"))
+    request = worker_request()
     if set(request) - {"case_id", "host_id", "tool_calls"}:
         emit({"status": "failed", "diagnostic": f"unexpected request keys: {sorted(set(request) - {'case_id', 'host_id', 'tool_calls'})}"})
         return

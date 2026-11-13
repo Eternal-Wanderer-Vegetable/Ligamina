@@ -1,0 +1,67 @@
+{
+  "schema_version": 1,
+  "profile_id": "p7-koishi-offline-services-v1",
+  "ecosystem": "koishi",
+  "framework_version": "4.18.11",
+  "runtime_version": "24.20.0",
+  "platform": "linux-x86_64",
+  "lock_strategy": "target plus exact provider packages in one npm lockfile v3; every tarball integrity must match the frozen artifact catalog",
+  "database_provider": {
+    "registry_entry_id": "ko-425f40033e5723525e57e410",
+    "package": "@koishijs/plugin-database-memory",
+    "version": "3.7.0",
+    "artifact_sha256": "6ca2e4ecc7ffe4f48b2814e826cf13ff7465a3e69d48a6ab080e2e87034879d7",
+    "service": "database",
+    "config_defaults": {}
+  },
+  "startup_accounts": [
+    {
+      "account_id": "p7-offline-account",
+      "guild_ids": ["p7-offline-group"]
+    }
+  ],
+  "providers": [
+    {
+      "registry_entry_id": "ko-425f40033e5723525e57e410",
+      "package": "@koishijs/plugin-database-memory",
+      "version": "3.7.0",
+      "artifact_sha256": "6ca2e4ecc7ffe4f48b2814e826cf13ff7465a3e69d48a6ab080e2e87034879d7",
+      "services": ["database"],
+      "config_defaults": {}
+    },
+    {
+      "registry_entry_id": "ko-8ebf383d9a00ea24c0dad5a2",
+      "package": "koishi-plugin-cron",
+      "version": "3.1.0",
+      "artifact_sha256": "768f77b3f55fcf2e8268a99eb330e5cc8b94632f9e5f421146d821b6bf0b9a05",
+      "services": ["cron"],
+      "config_defaults": {}
+    },
+    {
+      "registry_entry_id": "ko-187be45372ea214c5d8fce80",
+      "package": "koishi-plugin-smmcat-localstorage",
+      "version": "0.0.2",
+      "artifact_sha256": "c70472b948795eddd56597fcf04411e6d90617d36a1a70f639759d7ac8a56b6a",
+      "services": ["localstorage"],
+      "config_defaults": {}
+    },
+    {
+      "registry_entry_id": "ko-bcc8a237e43796843e1c8bc1",
+      "package": "@koishijs/plugin-http",
+      "version": "0.6.3",
+      "artifact_sha256": "3fc813dfefea83993103784da11d196424f5a13812886d9212014d637f86b8e8",
+      "services": ["http"],
+      "config_defaults": {}
+    }
+  ],
+  "sample": {
+    "registry_entry_id": "ko-49faa76157ad072ec5791025",
+    "package": "koishi-plugin-auto-checkin-all",
+    "version": "1.0.3",
+    "previous_skip_reason": "required_host_service_unavailable",
+    "previously_missing_services": ["database", "cron"],
+    "previous_report": "outputs/acceptance/phase3-p305-host-service-autocheckin-v3-diagnostic-20261025.json"
+  },
+  "network_scope": "Worker network disabled. The HTTP provider may only be used for offline error-path checks; this admission dispatches no events and issues no HTTP request. A synthetic offline account/group satisfies the sample plugin's ready-hook discovery precondition so its default cron job can be registered; the callback is not invoked during the load-only run.",
+  "credentials": "none; provider configuration uses empty schema defaults"
+}

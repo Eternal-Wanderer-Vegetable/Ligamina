@@ -11,6 +11,8 @@ const controlledScript = await readFile(new URL('scripts/phase3-linux-controlled
 const p403Script = await readFile(new URL('scripts/phase4-p403-linux-runner.sh', root), 'utf8');
 const p403SelfTestScript = await readFile(new URL('scripts/phase4-p403-runner-self-test.sh', root), 'utf8');
 const p403FinalizeScript = await readFile(new URL('scripts/phase4-p403-finalize-linux-run.sh', root), 'utf8');
+const checkPs1 = await readFile(new URL('scripts/check.ps1', root), 'utf8');
+const checkSh = await readFile(new URL('scripts/check.sh', root), 'utf8');
 
 test('PR and scheduled self-test uses only an unprivileged Linux hosted runner', () => {
   assert.match(selfTest, /pull_request:/);
@@ -108,5 +110,15 @@ test('Linux self-test records failure state and never dispatches third-party plu
   assert.match(selfTestScript, /trap finish EXIT/);
   assert.match(selfTestScript, /"windows_tests_run": False/);
   assert.match(selfTestScript, /"plugin_execution": False/);
+  assert.match(selfTestScript, /lab\.tests\.test_p7_mutations/);
+  assert.match(selfTestScript, /lab\.tests\.test_p7_contracts/);
+  assert.match(selfTestScript, /lab\.tests\.test_p7_service_profiles/);
+  assert.match(selfTestScript, /lab\.tests\.test_p7_stateful/);
+  assert.match(selfTestScript, /lab\.automation\.p7_source_audit_cache/);
   assert.doesNotMatch(selfTestScript, /execute-recovery-pilot|run_s205/);
+});
+
+test('full checks use the Lab project environment for Lab tests', () => {
+  assert.match(checkPs1, /--project', 'lab'.*'unittest', 'discover'/);
+  assert.match(checkSh, /--project lab .*unittest discover -s lab\/tests/);
 });

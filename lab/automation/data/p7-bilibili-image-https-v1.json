@@ -1,0 +1,324 @@
+{
+  "schema_version": 1,
+  "kind": "p7_bilibili_image_https_fixture",
+  "profile_id": "p7-bilibili-image-https-v1",
+  "execution_scope": "linux_worker_only_network_disabled",
+  "authority_scope": "synthetic_bilibili_responses_only",
+  "network_mode": "none",
+  "registry_entry_id": "nb-8cfb5e4d1632a591a9b8ec7a",
+  "package": "nonebot-plugin-bilibili-image",
+  "version": "0.0.2.1",
+  "artifact_sha256": "a9c165f99d4cf41a2364141050e4646a7223fab3c152aecc2f975739938fec20",
+  "fixture_address": "127.0.0.1",
+  "fixture_port": 443,
+  "host_aliases": [
+    "api.bilibili.com",
+    "api.vc.bilibili.com",
+    "www.bilibili.com",
+    "i0.hdslb.com"
+  ],
+  "tls_certificate_path": "lab/automation/data/p7-bilibili-fixture-cert.pem",
+  "tls_certificate_sha256": "ac46ea7a15d2d3bb36724b5cffff57584be99e7fa22f18c11a549c0e1ec6f8a3",
+  "tls_key_path": "lab/automation/data/p7-bilibili-fixture-key.pem",
+  "tls_key_sha256": "4e1172f4dcc464d8d5abbbef879e47fdf3652187c9bbb5bf380bca524e3fadbb",
+  "source_selection": {
+    "path": "outputs/acceptance/p7-p704-independent-pilot-selection-20261111.json",
+    "sha256": "3076c70a5e692392b993abb8754d84f0b06787a4781a4dfca68c7aad727f86c4"
+  },
+  "source_audit": {
+    "path": "outputs/acceptance/p7-p704-nontrivial-unknown-source-audit-20261112.json",
+    "sha256": "a8fec01829e38aed48c77180f8cbdfb61ec30e534e900818f818bf3f896d378a"
+  },
+  "source_members": [
+    {
+      "path": "nonebot-plugin-bilibili-image/matchers.py",
+      "sha256": "73d2d93ab4b554bae3a0c63728e210c22ec2b2ad93eb46a8abcb0ee82231c4fc",
+      "lines": [
+        24,
+        39,
+        42,
+        75,
+        78,
+        106
+      ]
+    },
+    {
+      "path": "nonebot-plugin-bilibili-image/video.py",
+      "sha256": "f04ef64143c657d155a19481639ff22f72d1767fae420ca834e751fbb96a48ef",
+      "lines": [
+        8,
+        41
+      ]
+    },
+    {
+      "path": "nonebot-plugin-bilibili-image/article.py",
+      "sha256": "2fcb9af640baf8ee9f84f8a86977ab41abb8237c4b692ee585a251f1c9fb2acf",
+      "lines": [
+        10,
+        65
+      ]
+    },
+    {
+      "path": "nonebot-plugin-bilibili-image/dynamic.py",
+      "sha256": "69df1709722a894a0583ee56a9e8bf313b25819eb2ea01372def248ab348772c",
+      "lines": [
+        9,
+        45
+      ]
+    }
+  ],
+  "stimuli": [
+    {
+      "command_id": "B站封面",
+      "input_cycle": [
+        "BV1TESTA",
+        "BV1TESTB"
+      ],
+      "input_kind": "explicit_video_bvid",
+      "source_member_refs": [
+        {
+          "path": "nonebot-plugin-bilibili-image/matchers.py",
+          "sha256": "73d2d93ab4b554bae3a0c63728e210c22ec2b2ad93eb46a8abcb0ee82231c4fc",
+          "lines": [
+            24,
+            39
+          ]
+        },
+        {
+          "path": "nonebot-plugin-bilibili-image/video.py",
+          "sha256": "f04ef64143c657d155a19481639ff22f72d1767fae420ca834e751fbb96a48ef",
+          "lines": [
+            8,
+            41
+          ]
+        }
+      ]
+    },
+    {
+      "command_id": "专栏下载",
+      "input_cycle": [
+        "1001",
+        "1002"
+      ],
+      "input_kind": "explicit_article_id",
+      "source_member_refs": [
+        {
+          "path": "nonebot-plugin-bilibili-image/matchers.py",
+          "sha256": "73d2d93ab4b554bae3a0c63728e210c22ec2b2ad93eb46a8abcb0ee82231c4fc",
+          "lines": [
+            78,
+            106
+          ]
+        },
+        {
+          "path": "nonebot-plugin-bilibili-image/article.py",
+          "sha256": "2fcb9af640baf8ee9f84f8a86977ab41abb8237c4b692ee585a251f1c9fb2acf",
+          "lines": [
+            10,
+            65
+          ]
+        }
+      ]
+    },
+    {
+      "command_id": "动态下载",
+      "input_cycle": [
+        "7001",
+        "7002"
+      ],
+      "input_kind": "explicit_dynamic_id",
+      "source_member_refs": [
+        {
+          "path": "nonebot-plugin-bilibili-image/matchers.py",
+          "sha256": "73d2d93ab4b554bae3a0c63728e210c22ec2b2ad93eb46a8abcb0ee82231c4fc",
+          "lines": [
+            42,
+            75
+          ]
+        },
+        {
+          "path": "nonebot-plugin-bilibili-image/dynamic.py",
+          "sha256": "69df1709722a894a0583ee56a9e8bf313b25819eb2ea01372def248ab348772c",
+          "lines": [
+            9,
+            45
+          ]
+        }
+      ]
+    }
+  ],
+  "routes": [
+    {
+      "id": "video-view-a",
+      "method": "GET",
+      "host": "api.bilibili.com",
+      "path": "/x/web-interface/view",
+      "query": {
+        "bvid": "1TESTA"
+      },
+      "status": 200,
+      "content_type": "application/json",
+      "body": "{\"code\":0,\"data\":{\"title\":\"Fixture video A\",\"owner\":{\"name\":\"Fixture Uploader A\"},\"tname\":\"Technology\",\"pic\":\"https://i0.hdslb.com/fixture/cover-a.png\"}}"
+    },
+    {
+      "id": "cover-image-a",
+      "method": "GET",
+      "host": "i0.hdslb.com",
+      "path": "/fixture/cover-a.png",
+      "query": {},
+      "status": 200,
+      "content_type": "image/png",
+      "body_base64": "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+jUVsAAAAASUVORK5CYII="
+    },
+    {
+      "id": "video-view-b",
+      "method": "GET",
+      "host": "api.bilibili.com",
+      "path": "/x/web-interface/view",
+      "query": {
+        "bvid": "1TESTB"
+      },
+      "status": 200,
+      "content_type": "application/json",
+      "body": "{\"code\":0,\"data\":{\"title\":\"Fixture video B\",\"owner\":{\"name\":\"Fixture Uploader B\"},\"tname\":\"Technology\",\"pic\":\"https://i0.hdslb.com/fixture/cover-b.png\"}}"
+    },
+    {
+      "id": "cover-image-b",
+      "method": "GET",
+      "host": "i0.hdslb.com",
+      "path": "/fixture/cover-b.png",
+      "query": {},
+      "status": 200,
+      "content_type": "image/png",
+      "body_base64": "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+jUVsAAAAASUVORK5CYII="
+    },
+    {
+      "id": "article-view-a",
+      "method": "GET",
+      "host": "api.bilibili.com",
+      "path": "/x/article/viewinfo",
+      "query": {
+        "id": "1001"
+      },
+      "status": 200,
+      "content_type": "application/json",
+      "body": "{\"code\":0,\"data\":{\"banner_url\":\"https://i0.hdslb.com/fixture/article-banner-a.png\",\"title\":\"Fixture article A\"}}"
+    },
+    {
+      "id": "article-page-a",
+      "method": "GET",
+      "host": "www.bilibili.com",
+      "path": "/read/cv1001",
+      "query": {},
+      "status": 200,
+      "content_type": "text/html; charset=utf-8",
+      "body": "<html><div id=\"article-content\"><img data-src=\"//i0.hdslb.com/fixture/article-a.png\"></div></html>"
+    },
+    {
+      "id": "article-banner-a",
+      "method": "GET",
+      "host": "i0.hdslb.com",
+      "path": "/fixture/article-banner-a.png",
+      "query": {},
+      "status": 200,
+      "content_type": "image/png",
+      "body_base64": "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+jUVsAAAAASUVORK5CYII="
+    },
+    {
+      "id": "article-image-a",
+      "method": "GET",
+      "host": "i0.hdslb.com",
+      "path": "/fixture/article-a.png",
+      "query": {},
+      "status": 200,
+      "content_type": "image/png",
+      "body_base64": "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+jUVsAAAAASUVORK5CYII="
+    },
+    {
+      "id": "article-view-b",
+      "method": "GET",
+      "host": "api.bilibili.com",
+      "path": "/x/article/viewinfo",
+      "query": {
+        "id": "1002"
+      },
+      "status": 200,
+      "content_type": "application/json",
+      "body": "{\"code\":0,\"data\":{\"banner_url\":\"https://i0.hdslb.com/fixture/article-banner-b.png\",\"title\":\"Fixture article B\"}}"
+    },
+    {
+      "id": "article-page-b",
+      "method": "GET",
+      "host": "www.bilibili.com",
+      "path": "/read/cv1002",
+      "query": {},
+      "status": 200,
+      "content_type": "text/html; charset=utf-8",
+      "body": "<html><div id=\"article-content\"><img data-src=\"//i0.hdslb.com/fixture/article-b.png\"></div></html>"
+    },
+    {
+      "id": "article-banner-b",
+      "method": "GET",
+      "host": "i0.hdslb.com",
+      "path": "/fixture/article-banner-b.png",
+      "query": {},
+      "status": 200,
+      "content_type": "image/png",
+      "body_base64": "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+jUVsAAAAASUVORK5CYII="
+    },
+    {
+      "id": "article-image-b",
+      "method": "GET",
+      "host": "i0.hdslb.com",
+      "path": "/fixture/article-b.png",
+      "query": {},
+      "status": 200,
+      "content_type": "image/png",
+      "body_base64": "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+jUVsAAAAASUVORK5CYII="
+    },
+    {
+      "id": "dynamic-view-a",
+      "method": "GET",
+      "host": "api.vc.bilibili.com",
+      "path": "/dynamic_svr/v1/dynamic_svr/get_dynamic_detail",
+      "query": {
+        "dynamic_id": "7001"
+      },
+      "status": 200,
+      "content_type": "application/json",
+      "body": "{\"code\":0,\"data\":{\"card\":{\"desc\":{\"type\":2},\"card\":\"{\\\"item\\\":{\\\"pictures\\\":[{\\\"img_src\\\":\\\"https://i0.hdslb.com/fixture/dynamic-a.png\\\"}]}}\"}}}"
+    },
+    {
+      "id": "dynamic-image-a",
+      "method": "GET",
+      "host": "i0.hdslb.com",
+      "path": "/fixture/dynamic-a.png",
+      "query": {},
+      "status": 200,
+      "content_type": "image/png",
+      "body_base64": "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+jUVsAAAAASUVORK5CYII="
+    },
+    {
+      "id": "dynamic-view-b",
+      "method": "GET",
+      "host": "api.vc.bilibili.com",
+      "path": "/dynamic_svr/v1/dynamic_svr/get_dynamic_detail",
+      "query": {
+        "dynamic_id": "7002"
+      },
+      "status": 200,
+      "content_type": "application/json",
+      "body": "{\"code\":0,\"data\":{\"card\":{\"desc\":{\"type\":2},\"card\":\"{\\\"item\\\":{\\\"pictures\\\":[{\\\"img_src\\\":\\\"https://i0.hdslb.com/fixture/dynamic-b.png\\\"}]}}\"}}}"
+    },
+    {
+      "id": "dynamic-image-b",
+      "method": "GET",
+      "host": "i0.hdslb.com",
+      "path": "/fixture/dynamic-b.png",
+      "query": {},
+      "status": 200,
+      "content_type": "image/png",
+      "body_base64": "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+jUVsAAAAASUVORK5CYII="
+    }
+  ]
+}

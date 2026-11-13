@@ -1,0 +1,160 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ligamina.dev/contracts/lab/scenario/v1/scenario.schema.json",
+  "title": "Ligamina generated scenario v1",
+  "type": "object",
+  "required": [
+    "schema_version",
+    "scenario_id",
+    "source_inventory_sha256",
+    "command_descriptor_sha256",
+    "generator",
+    "relation",
+    "actors",
+    "conversations",
+    "steps",
+    "controls",
+    "normalization",
+    "case"
+  ],
+  "properties": {
+    "schema_version": { "const": 1 },
+    "scenario_id": { "type": "string", "pattern": "^scn-[a-f0-9]{24}$" },
+    "source_inventory_sha256": { "$ref": "#/$defs/sha256" },
+    "command_descriptor_sha256": { "$ref": "#/$defs/sha256" },
+    "generator": {
+      "type": "object",
+      "required": ["name", "version", "seed"],
+      "properties": {
+        "name": { "const": "ligamina-scenario-generator" },
+        "version": { "type": "string", "minLength": 1, "maxLength": 32 },
+        "seed": { "type": "integer", "minimum": 0, "maximum": 9007199254740991 }
+      },
+      "additionalProperties": false
+    },
+    "relation": {
+      "type": "object",
+      "required": ["kind", "id"],
+      "properties": {
+        "kind": { "enum": ["differential", "property", "metamorphic"] },
+        "id": { "type": "string", "minLength": 1, "maxLength": 128 }
+      },
+      "additionalProperties": false
+    },
+    "actors": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": ["actor_id", "account_id"],
+        "properties": {
+          "actor_id": { "type": "string", "minLength": 1, "maxLength": 128 },
+          "account_id": { "type": "string", "minLength": 1, "maxLength": 128 }
+        },
+        "additionalProperties": false
+      }
+    },
+    "conversations": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": ["conversation_id", "kind", "actor_id", "account_id"],
+        "properties": {
+          "conversation_id": { "type": "string", "minLength": 1, "maxLength": 128 },
+          "kind": { "enum": ["private", "group"] },
+          "actor_id": { "type": "string", "minLength": 1, "maxLength": 128 },
+          "account_id": { "type": "string", "minLength": 1, "maxLength": 128 }
+        },
+        "additionalProperties": false
+      }
+    },
+    "steps": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 64,
+      "items": { "$ref": "#/$defs/step" }
+    },
+    "controls": {
+      "type": "object",
+      "required": ["random_seed", "timezone", "fixed_time_utc", "network"],
+      "properties": {
+        "random_seed": { "type": "integer", "minimum": 0, "maximum": 9007199254740991 },
+        "timezone": { "const": "UTC" },
+        "fixed_time_utc": { "type": "string", "format": "date-time" },
+        "network": { "const": "offline" }
+      },
+      "additionalProperties": false
+    },
+    "normalization": {
+      "type": "object",
+      "required": ["volatile_fields"],
+      "properties": {
+        "volatile_fields": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": { "type": "string", "minLength": 1, "maxLength": 64 }
+        }
+      },
+      "additionalProperties": false
+    },
+    "case": {
+      "type": "object",
+      "required": ["kind", "index", "pairwise"],
+      "properties": {
+        "kind": {
+          "enum": ["pairwise", "missing_required", "extra_argument", "alias", "raw_text"]
+        },
+        "index": { "type": "integer", "minimum": 0 },
+        "pairwise": {
+          "type": "object",
+          "required": ["complete", "covered_pairs", "total_pairs"],
+          "properties": {
+            "complete": { "type": "boolean" },
+            "covered_pairs": { "type": "integer", "minimum": 0 },
+            "total_pairs": { "type": "integer", "minimum": 0 }
+          },
+          "additionalProperties": false
+        }
+      },
+      "additionalProperties": false
+    }
+  },
+  "$defs": {
+    "sha256": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+    "step": {
+      "oneOf": [
+        {
+          "type": "object",
+          "required": ["step_id", "kind", "host_id", "actor_id", "conversation_id", "command_id", "invocation", "arguments", "inputs"],
+          "properties": {
+            "step_id": { "type": "string", "minLength": 1, "maxLength": 64 },
+            "kind": { "const": "tool_call" },
+            "host_id": { "type": "string", "minLength": 1, "maxLength": 128 },
+            "actor_id": { "type": "string", "minLength": 1, "maxLength": 128 },
+            "conversation_id": { "type": "string", "minLength": 1, "maxLength": 128 },
+            "command_id": { "type": "string", "minLength": 1, "maxLength": 96 },
+            "invocation": { "type": "string", "minLength": 1, "maxLength": 256 },
+            "arguments": { "type": "string", "maxLength": 4096 },
+            "inputs": { "type": "object" }
+          },
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "required": ["step_id", "kind", "host_id", "actor_id", "conversation_id", "event"],
+          "properties": {
+            "step_id": { "type": "string", "minLength": 1, "maxLength": 64 },
+            "kind": { "const": "event" },
+            "host_id": { "type": "string", "minLength": 1, "maxLength": 128 },
+            "actor_id": { "type": "string", "minLength": 1, "maxLength": 128 },
+            "conversation_id": { "type": "string", "minLength": 1, "maxLength": 128 },
+            "event": { "type": "object" }
+          },
+          "additionalProperties": false
+        }
+      ]
+    }
+  },
+  "additionalProperties": false
+}

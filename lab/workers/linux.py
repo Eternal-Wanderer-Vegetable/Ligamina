@@ -60,12 +60,14 @@ class DockerWorker:
         return [
             self.docker,
             "run",
+            *(("--interactive",) if spec.stdin_data is not None else ()),
             "--pull=never",
             "--name",
             worker_id,
             *self._resource_labels(spec),
             "--init",
             "--network=none",
+            *[argument for alias in spec.loopback_host_aliases for argument in ("--add-host", f"{alias}:127.0.0.1")],
             "--read-only",
             "--cap-drop=ALL",
             "--security-opt=no-new-privileges:true",
@@ -119,7 +121,7 @@ class DockerWorker:
         try:
             process = subprocess.Popen(
                 command,
-                stdin=subprocess.DEVNULL,
+                stdin=subprocess.PIPE if spec.stdin_data is not None else subprocess.DEVNULL,
                 stdout=subprocess.PIPE,
                 stderr=subprocess.PIPE,
                 env={
@@ -142,6 +144,26 @@ class DockerWorker:
                 worker_id=worker_id,
             )
         assert process.stdout is not None and process.stderr is not None
+        stdin_thread: threading.Thread | None = None
+        if spec.stdin_data is not None:
+            assert process.stdin is not None
+
+            def write_stdin() -> None:
+                try:
+                    process.stdin.write(spec.stdin_data or b"")
+                    process.stdin.flush()
+                except (BrokenPipeError, OSError):
+                    # A failed/early-exit Worker reports its status through the
+                    # Docker process result; stdin shutdown must not mask that.
+                    pass
+                finally:
+                    try:
+                        process.stdin.close()
+                    except OSError:
+                        pass
+
+            stdin_thread = threading.Thread(target=write_stdin, daemon=True)
+            stdin_thread.start()
         overflow = threading.Event()
         stdout = _BoundedCapture(process.stdout, spec.limits.output_limit_bytes, overflow)
         stderr = _BoundedCapture(process.stderr, spec.limits.output_limit_bytes, overflow)
@@ -213,6 +235,8 @@ class DockerWorker:
         cleanup_confirmed = self._container_gone(worker_id)
         for thread in threads:
             thread.join(timeout=5)
+        if stdin_thread is not None:
+            stdin_thread.join(timeout=5)
         truncated = stdout.truncated or stderr.truncated
         if timed_out:
             status, reason_code = "unknown", "worker_timeout"

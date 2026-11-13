@@ -1,0 +1,39 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ligamina.dev/contracts/lab/scenario/v1/scenario-batch.schema.json",
+  "title": "Ligamina deterministic scenario batch v1",
+  "type": "object",
+  "required": ["schema_version", "generator", "source_inventory_sha256", "command_descriptor_sha256", "pairwise", "scenarios"],
+  "properties": {
+    "schema_version": { "const": 1 },
+    "generator": {
+      "type": "object",
+      "required": ["name", "version", "seed"],
+      "properties": {
+        "name": { "const": "ligamina-scenario-generator" },
+        "version": { "type": "string", "minLength": 1 },
+        "seed": { "type": "integer", "minimum": 0, "maximum": 9007199254740991 }
+      },
+      "additionalProperties": false
+    },
+    "source_inventory_sha256": { "$ref": "scenario.schema.json#/$defs/sha256" },
+    "command_descriptor_sha256": { "$ref": "scenario.schema.json#/$defs/sha256" },
+    "pairwise": {
+      "type": "object",
+      "required": ["complete", "covered_pairs", "total_pairs"],
+      "properties": {
+        "complete": { "type": "boolean" },
+        "covered_pairs": { "type": "integer", "minimum": 0 },
+        "total_pairs": { "type": "integer", "minimum": 0 }
+      },
+      "additionalProperties": false
+    },
+    "scenarios": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 16,
+      "items": { "$ref": "scenario.schema.json" }
+    }
+  },
+  "additionalProperties": false
+}

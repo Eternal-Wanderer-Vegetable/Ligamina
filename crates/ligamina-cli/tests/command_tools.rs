@@ -5,7 +5,7 @@
 //! come back through the in-Core tool sink: without a Gateway lease, any send that
 //! reached the operation ledger would be rejected and the plugin would not reply.
 
-use std::{path::PathBuf, time::Duration};
+use std::{path::PathBuf, sync::OnceLock, time::Duration};
 
 use ligamina_cli::mcp::{CommandTools, LigaminaMcp};
 use ligamina_core::{
@@ -44,20 +44,26 @@ fn file_url(path: &std::path::Path) -> String {
 }
 
 async fn start_runtime(work: &std::path::Path) -> CoreRuntime {
+    static KOISHI_BUILD: OnceLock<()> = OnceLock::new();
+
     let koishi_dir = PathBuf::from(env!("CARGO_MANIFEST_DIR"))
         .join("../../hosts/koishi")
         .canonicalize()
         .unwrap();
-    let build = std::process::Command::new("node")
-        .args([
-            "node_modules/typescript/bin/tsc",
-            "--project",
-            "tsconfig.json",
-        ])
-        .current_dir(&koishi_dir)
-        .status()
-        .expect("Node.js and the locked Koishi Host dependencies (npm ci) are required");
-    assert!(build.success(), "Koishi Host TypeScript build failed");
+    KOISHI_BUILD.get_or_init(|| {
+        // The Koishi integration tests run in parallel and share this `dist` tree.
+        // Never start a Worker while another test's TypeScript build is rewriting it.
+        let build = std::process::Command::new("node")
+            .args([
+                "node_modules/typescript/bin/tsc",
+                "--project",
+                "tsconfig.json",
+            ])
+            .current_dir(&koishi_dir)
+            .status()
+            .expect("Node.js and the locked Koishi Host dependencies (npm ci) are required");
+        assert!(build.success(), "Koishi Host TypeScript build failed");
+    });
 
     let mut command = LocalCommand::new("node");
     command.args = vec!["dist/worker.js".into()];

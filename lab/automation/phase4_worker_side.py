@@ -19,12 +19,22 @@ if str(PROJECT) not in sys.path:
     sys.path.insert(0, str(PROJECT))
 
 from lab.native_runner import execute_harness
+from lab.automation.p7_loopback_services import LoopbackApiFixture, validate_bound_profile
+from lab.automation.p7_bilibili_image_diagnostic import (
+    BilibiliImageHttpsFixture,
+    validate_bound_profile as validate_bilibili_fixture_profile,
+)
+from lab.automation.p7_hjm_rcon_fixture import (
+    HjmRconFixture,
+    validate_bound_profile as validate_hjm_rcon_profile,
+)
 
 
 _SENSITIVE_VALUE = re.compile(
     r"(?i)(?:token|secret|password|authorization|api[_-]?key|cookie|credential)\s*[:=]\s*[^\s,;]+"
 )
 _LONG_VALUE = re.compile(r"(?<![A-Za-z0-9])[A-Fa-f0-9]{32,}(?![A-Za-z0-9])")
+_PYTHON_TRACEBACK_FRAME = re.compile(r"^\s*File [\"'](.+?)[\"'], line (\d+), in ([^\s]+)\s*$", re.MULTILINE)
 
 
 def _safe_diagnostic_summary(raw: str) -> str:
@@ -33,11 +43,18 @@ def _safe_diagnostic_summary(raw: str) -> str:
     if not lines:
         return "diagnostic output was empty"
     summary = lines[-1]
+    traceback_frames = _PYTHON_TRACEBACK_FRAME.findall(raw)
+    if traceback_frames:
+        frames = [
+            f"{re.split(r'[/\\\\]', filename)[-1][:120]}:{line}:{function[:96]}"
+            for filename, line, function in traceback_frames[-3:]
+        ]
+        summary = f"{summary} [trace: {' <- '.join(frames)}]"
     if summary.startswith("Node.js v"):
         errors = [
             line
             for line in lines
-            if re.search(r"\b(?:Error|TypeError|SyntaxError|ReferenceError|RangeError)(?:\b|\[)", line)
+            if re.search(r"^\s*(?:Error|TypeError|SyntaxError|ReferenceError|RangeError)(?:\b|\[)", line)
             and not line.startswith("Node.js v")
         ]
         summary = errors[0] if errors else (lines[-2] if len(lines) > 1 else summary)
@@ -63,6 +80,19 @@ def _safe_diagnostic_summary(raw: str) -> str:
         else:
             summary = "<redacted diagnostic>"
     return summary[:320]
+
+
+def _koishi_database_provider_module(service_profile: dict[str, Any], provider_modules: list[str]) -> str | None:
+    """Resolve the selected Koishi database provider from its structured profile record."""
+    provider = service_profile.get("database_provider")
+    if provider is None:
+        return None
+    module_name = provider.get("package") if isinstance(provider, dict) else provider
+    if not isinstance(module_name, str) or not module_name:
+        raise ValueError("Koishi service profile database provider has no package name")
+    if module_name not in provider_modules:
+        raise ValueError("Koishi service profile database provider is absent from its preloaded package set")
+    return module_name
 
 
 def _assert_oracle_absent(value: Any) -> None:
@@ -96,6 +126,30 @@ def _sha256_file(path: Path) -> str:
         for chunk in iter(lambda: stream.read(1024 * 1024), b""):
             digest.update(chunk)
     return digest.hexdigest()
+
+
+def _tree_sha256(root: Path) -> str:
+    rows = []
+    for path in sorted(root.rglob("*")):
+        if path.is_symlink():
+            raise ValueError(f"runtime artifact tree contains a symlink: {path}")
+        if path.is_file():
+            rows.append({"path": path.relative_to(root).as_posix(), "sha256": _sha256_file(path)})
+    encoded = json.dumps(rows, ensure_ascii=False, sort_keys=True, separators=(",", ":")).encode("utf-8")
+    return hashlib.sha256(encoded).hexdigest()
+
+
+def _scrub_result_diagnostics(result: dict[str, Any]) -> dict[str, Any]:
+    """Replace raw harness diagnostics with bounded scrubbed summaries and hashes."""
+    for key in ("diagnostic", "diagnostics", "stderr"):
+        raw = result.pop(key, None)
+        if isinstance(raw, str) and raw:
+            result[f"{key}_evidence"] = {
+                "sha256": hashlib.sha256(raw.encode("utf-8", errors="replace")).hexdigest(),
+                "size_bytes": len(raw.encode("utf-8", errors="replace")),
+            }
+            result["diagnostic_summary" if key == "diagnostic" else f"{key}_summary"] = _safe_diagnostic_summary(raw)
+    return result
 
 
 def _prepare_profile(request: dict[str, Any]) -> dict[str, Any]:
@@ -147,34 +201,43 @@ def _prepare_profile(request: dict[str, Any]) -> dict[str, Any]:
 
     if ecosystem != "koishi":
         raise ValueError(f"unsupported Phase 4 ecosystem: {ecosystem!r}")
-    archive = Path("/input/project/sample/npm-cache.tar.gz")
-    if _sha256_file(archive) != context["npm_cache_sha256"]:
-        raise RuntimeError("offline npm cache archive differs from its prepared asset report")
-    with tarfile.open(archive, mode="r:gz") as stream:
-        stream.extractall("/work", filter="data")
-    shutil.copy2("/input/project/sample/package.json", profile / "package.json")
-    shutil.copy2("/input/project/sample/package-lock.json", profile / "package-lock.json")
+    runtime_artifacts = context.get("runtime_artifacts", {})
+    local_tarballs = runtime_artifacts.get("koishi_install") == "localized_tarballs"
+    if local_tarballs:
+        expected_local_lock = runtime_artifacts.get("localized_package_lock_sha256")
+        localized_lock = Path("/input/project/sample/package-lock.json")
+        if not isinstance(expected_local_lock, str) or _sha256_file(localized_lock) != expected_local_lock:
+            raise RuntimeError("localized Koishi lock differs from its prepared input manifest")
+        shutil.copy2("/input/project/sample/package.json", profile / "package.json")
+        shutil.copy2(localized_lock, profile / "package-lock.json")
+        shutil.copytree("/input/project/sample/tarballs", profile / "tarballs")
+        cache = None
+    else:
+        archive = Path("/input/project/sample/npm-cache.tar.gz")
+        if _sha256_file(archive) != context["npm_cache_sha256"]:
+            raise RuntimeError("offline npm cache archive differs from its prepared asset report")
+        with tarfile.open(archive, mode="r:gz") as stream:
+            stream.extractall("/work", filter="data")
+        shutil.copy2("/input/project/sample/package.json", profile / "package.json")
+        shutil.copy2("/input/project/sample/package-lock.json", profile / "package-lock.json")
+        cache = Path("/work/npm-cache")
+        if not cache.is_dir():
+            raise RuntimeError("offline npm cache archive has no npm-cache directory")
     shutil.copy2("/input/project/sample/artifact.bin", profile / "artifact.bin")
-    cache = Path("/work/npm-cache")
-    if not cache.is_dir():
-        raise RuntimeError("offline npm cache archive has no npm-cache directory")
-    install = _run(
-        [
-            "/usr/local/bin/node",
-            "/usr/local/lib/node_modules/npm/bin/npm-cli.js",
-            "ci",
-            "--offline",
-            "--ignore-scripts",
-            "--no-audit",
-            "--fund=false",
-            "--strict-peer-deps",
-            "--engine-strict",
-            "--cache",
-            str(cache),
-        ],
-        cwd=profile,
-        timeout=600,
-    )
+    npm_command = [
+        "/usr/local/bin/node",
+        "/usr/local/lib/node_modules/npm/bin/npm-cli.js",
+        "ci",
+        "--offline",
+        "--ignore-scripts",
+        "--no-audit",
+        "--fund=false",
+        "--strict-peer-deps",
+        "--engine-strict",
+    ]
+    if cache is not None:
+        npm_command.extend(["--cache", str(cache)])
+    install = _run(npm_command, cwd=profile, timeout=600)
     if install.returncode:
         raise RuntimeError(f"locked offline npm profile install failed: {install.stderr[-2000:]}")
     package_name = context["sample"]["package"]
@@ -210,6 +273,38 @@ def _prepare_profile(request: dict[str, Any]) -> dict[str, Any]:
     driver_target.parent.mkdir(parents=True, exist_ok=True)
     driver_target.symlink_to(sqlite_driver, target_is_directory=True)
 
+    expected_host_dist = runtime_artifacts.get("koishi_host_dist_sha256")
+    if expected_host_dist is not None:
+        bundled_host_dist = Path("/input/project/sample/koishi-host-dist").resolve(strict=True)
+        if _tree_sha256(bundled_host_dist) != expected_host_dist:
+            raise RuntimeError("current Koishi Host build differs from its bound runtime artifact hash")
+        bundled_host_root = profile / "ligamina-koishi-host"
+        if not bundled_host_root.is_symlink():
+            raise RuntimeError("expected the profile Koishi Host link before applying the current build")
+        bundled_host_root.unlink()
+        bundled_host_root.mkdir(parents=True)
+        shutil.copytree(bundled_host_dist, bundled_host_root / "dist")
+        (bundled_host_root / "node_modules").symlink_to(host_root / "node_modules", target_is_directory=True)
+
+        contract_source = Path("/input/project/contracts")
+        required_contracts = (
+            "v0.1/event-envelope.schema.json",
+            "v0.1/platform-operation.schema.json",
+            "v0.1/capability-descriptor.schema.json",
+            "v0.2/command-descriptor.schema.json",
+            "lab/v1/catalog.schema.json",
+            "lab/v1/result.schema.json",
+            "lab/v1/summary.schema.json",
+            "lab/v1/run.schema.json",
+        )
+        missing_contracts = [name for name in required_contracts if not (contract_source / name).is_file()]
+        if missing_contracts:
+            raise RuntimeError("bundled Koishi Host contract schemas are incomplete")
+        contract_root = Path("/work/contracts")
+        if contract_root.exists() or contract_root.is_symlink():
+            raise RuntimeError("Worker contract staging path already exists")
+        contract_root.symlink_to(contract_source, target_is_directory=True)
+
     resolver = _run(
         [
             "/usr/local/bin/node",
@@ -223,6 +318,31 @@ def _prepare_profile(request: dict[str, Any]) -> dict[str, Any]:
     if resolver.returncode or not resolver.stdout.strip().startswith("file:"):
         raise RuntimeError(f"could not resolve the frozen Koishi package {package_name!r}: {resolver.stderr[-1000:]}")
     context["koishi_entry_url"] = resolver.stdout.strip().splitlines()[-1]
+    provider_modules = context.get("sample", {}).get("preload_plugins", [])
+    if not isinstance(provider_modules, list) or any(not isinstance(item, str) or not item for item in provider_modules):
+        raise ValueError("Koishi service profile has malformed preload plugin names")
+    provider_url_by_module: dict[str, str] = {}
+    for module_name in provider_modules:
+        provider_resolver = _run(
+            [
+                "/usr/local/bin/node",
+                "--input-type=module",
+                "-e",
+                f"console.log(import.meta.resolve({json.dumps(module_name)}))",
+            ],
+            cwd=profile,
+            timeout=15,
+        )
+        if provider_resolver.returncode or not provider_resolver.stdout.strip().startswith("file:"):
+            raise RuntimeError(f"could not resolve a locked Koishi service provider {module_name!r}: {provider_resolver.stderr[-1000:]}")
+        provider_url_by_module[module_name] = provider_resolver.stdout.strip().splitlines()[-1]
+    database_provider = _koishi_database_provider_module(
+        context.get("service_profile", {}), provider_modules
+    )
+    context["database_provider_url"] = provider_url_by_module.get(database_provider)
+    context["provider_urls"] = [
+        url for module_name, url in provider_url_by_module.items() if module_name != database_provider
+    ]
     context["host_environment"].update(
         {
             "LIGAMINA_NODE_EXECUTABLE": "/usr/local/bin/node",
@@ -232,13 +352,26 @@ def _prepare_profile(request: dict[str, Any]) -> dict[str, Any]:
     harness = profile / ".ligamina/koishi/runner.mjs"
     harness.parent.mkdir(parents=True, exist_ok=True)
     shutil.copy2("/input/project/lab/baselines/koishi/runner.mjs", harness)
+    shutil.copy2(
+        "/input/project/lab/baselines/koishi/artifact_fingerprint.mjs",
+        harness.parent / "artifact_fingerprint.mjs",
+    )
+    shutil.copy2(
+        "/input/project/lab/baselines/koishi/plugin_export.mjs",
+        harness.parent / "plugin_export.mjs",
+    )
     return {
         "status": "passed",
-        "kind": "locked_npm_offline_install",
+        "kind": "locked_npm_offline_install_local_tarballs" if local_tarballs else "locked_npm_offline_install",
         "lock_sha256": context["expected_environment"]["lockfile_sha256"],
-        "npm_cache_sha256": context["npm_cache_sha256"],
+        "npm_cache_sha256": context.get("npm_cache_sha256"),
+        "localized_package_lock_sha256": runtime_artifacts.get("localized_package_lock_sha256"),
+        "koishi_host_dist_sha256": expected_host_dist,
         "framework_version": "4.18.11",
         "host_lock_sha256": context["host_lock_sha256"],
+        "provider_modules": provider_modules,
+        "provider_urls": context["provider_urls"],
+        "database_provider_url": context.get("database_provider_url"),
     }
 
 
@@ -251,18 +384,41 @@ def run_side(request: dict[str, Any]) -> dict[str, Any]:
     if mode not in {"native", "federated", "tool"}:
         raise ValueError("side request does not select a registered execution mode")
     ecosystem = context.get("sample", {}).get("ecosystem")
+    harness_timeout = context.get("execution", {}).get("harness_timeout_seconds", 180)
+    if isinstance(harness_timeout, bool) or not isinstance(harness_timeout, int) or not 1 <= harness_timeout <= 180:
+        raise ValueError("harness_timeout_seconds must be an integer from 1 to 180")
     setup_evidence = _prepare_profile(request)
+    runtime_artifacts = context.get("runtime_artifacts", {})
+    core_path = "/usr/local/bin/ligamina-cli"
+    expected_core_hash = runtime_artifacts.get("core_cli_sha256")
+    if expected_core_hash is not None:
+        bundled_core = Path("/input/project/sample/ligamina-cli").resolve(strict=True)
+        if _sha256_file(bundled_core) != expected_core_hash:
+            raise RuntimeError("current Linux Core binary differs from its bound runtime artifact hash")
+        core_path = str(bundled_core)
     context["repo_root"] = "/input/project"
     context["work_dir"] = "/work/profile"
     context["node_executable"] = "/usr/local/bin/node"
     context["execution"]["workspace"] = "/work/side"
     context["host_environment"].update(
         {
-            "LIGAMINA_CORE_EXECUTABLE": "/usr/local/bin/ligamina-cli",
+            "LIGAMINA_CORE_EXECUTABLE": core_path,
             "LIGAMINA_NODE_EXECUTABLE": "/usr/local/bin/node",
             "PATH": "/usr/local/bin:/usr/bin:/bin",
         }
     )
+    seed = context["execution"].get("random_seed")
+    if isinstance(seed, int) and not isinstance(seed, bool) and seed >= 0:
+        fixed_time = context["execution"].get("fixed_time_utc")
+        context["host_environment"].update({
+            "TZ": "UTC",
+            "PYTHONHASHSEED": str(seed % 2**32),
+            "LIGAMINA_BEHAVIOR_RANDOM_SEED": str(seed),
+        })
+        if isinstance(fixed_time, str):
+            context["host_environment"]["LIGAMINA_BEHAVIOR_FIXED_TIME_UTC"] = fixed_time
+        if ecosystem == "koishi":
+            context["host_environment"]["LIGAMINA_NODE_RANDOM_PRELOAD"] = "/input/project/lab/baselines/seed_node_random.cjs"
     Path("/work/side").mkdir(parents=True, exist_ok=True)
     if ecosystem == "nonebot":
         # Tool mode reuses the Federated harness: same Core/Host, MCP tool calls instead of events.
@@ -275,30 +431,69 @@ def run_side(request: dict[str, Any]) -> dict[str, Any]:
         ]
         if mode in {"federated", "tool"}:
             command = [sys.executable, "/input/project/lab/baselines/federated.py"]
-    result = execute_harness(command, request, mode, 180, cwd=Path("/work/side"))
-    for key in ("diagnostics", "stderr"):
-        raw = result.pop(key, None)
-        if isinstance(raw, str) and raw:
-            result[f"{key}_evidence"] = {
-                "sha256": hashlib.sha256(raw.encode("utf-8", errors="replace")).hexdigest(),
-                "size_bytes": len(raw.encode("utf-8", errors="replace")),
-            }
-            result[f"{key}_summary"] = _safe_diagnostic_summary(raw)
+    loopback_fixture = None
+    bilibili_fixture = None
+    hjm_rcon_fixture = None
+    loopback_profile = context.get("loopback_service_profile")
+    bilibili_profile = context.get("bilibili_https_fixture_profile")
+    hjm_profile = context.get("hjm_rcon_profile")
+    try:
+        if loopback_profile is not None:
+            if ecosystem != "nonebot" or mode not in {"native", "federated"}:
+                raise ValueError("P7 loopback API fixtures are limited to Native/Federated NoneBot behavior Workers")
+            loopback_profile = validate_bound_profile(loopback_profile, context.get("sample"))
+            loopback_fixture = LoopbackApiFixture(loopback_profile)
+            loopback_fixture.start()
+        if bilibili_profile is not None:
+            if ecosystem != "nonebot" or mode not in {"native", "federated"}:
+                raise ValueError("Bilibili HTTPS fixtures are limited to Native/Federated NoneBot behavior Workers")
+            bilibili_profile = validate_bilibili_fixture_profile(bilibili_profile, context.get("sample"))
+            bilibili_fixture = BilibiliImageHttpsFixture(bilibili_profile)
+            bilibili_fixture.start()
+        if hjm_profile is not None:
+            if ecosystem != "koishi" or mode not in {"native", "federated"}:
+                raise ValueError("P7 HJM RCON fixtures are limited to Native/Federated Koishi behavior Workers")
+            hjm_profile = validate_hjm_rcon_profile(hjm_profile, context.get("sample"))
+            hjm_rcon_fixture = HjmRconFixture(hjm_profile)
+            hjm_rcon_fixture.start()
+        result = execute_harness(command, request, mode, harness_timeout, cwd=Path("/work/side"))
+    finally:
+        if hjm_rcon_fixture is not None:
+            hjm_rcon_fixture.close()
+        if bilibili_fixture is not None:
+            bilibili_fixture.close()
+        if loopback_fixture is not None:
+            loopback_fixture.close()
+    result = _scrub_result_diagnostics(result)
     result["profile_setup"] = setup_evidence
+    if loopback_fixture is not None:
+        result["loopback_fixture"] = loopback_fixture.evidence()
+    if bilibili_fixture is not None:
+        result["bilibili_https_fixture"] = bilibili_fixture.evidence()
+    if hjm_rcon_fixture is not None:
+        result["hjm_rcon_fixture"] = hjm_rcon_fixture.evidence()
     return result
 
 
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--request-json", required=True)
+    request = parser.add_mutually_exclusive_group(required=True)
+    request.add_argument("--request-json")
+    request.add_argument("--request-stdin", action="store_true")
     options = parser.parse_args()
     try:
-        request = json.loads(options.request_json)
-        result = run_side(request)
+        value = json.load(sys.stdin) if options.request_stdin else json.loads(options.request_json)
+        result = run_side(value)
         print(json.dumps(result, ensure_ascii=False))
         return 0
     except Exception as error:  # Worker boundary converts setup faults into explicit attempt output.
-        print(json.dumps({"status": "failed", "reason_code": "worker_side_setup_failed", "diagnostic": str(error)}, ensure_ascii=False))
+        diagnostic = str(error)
+        print(json.dumps({
+            "status": "failed",
+            "reason_code": "worker_side_setup_failed",
+            "diagnostic_summary": _safe_diagnostic_summary(diagnostic),
+            "diagnostic_sha256": hashlib.sha256(diagnostic.encode("utf-8", errors="replace")).hexdigest(),
+        }, ensure_ascii=False))
         return 0
 
 

@@ -1,0 +1,936 @@
+{
+  "inputs": {
+    "bundle_root": "E:\\stella\\Ligamina-artifact-cache\\p7-p704-differential-bundles-empty-input-v3-20261111",
+    "generator_version": "3",
+    "pilot_file_sha256": "4962fc3080afdd6aa8dcd233f7ad28d51ba69fc78609260a377bce222db1557b",
+    "pilot_path": "outputs/acceptance/p7-p704-differential-pilot-20261111-empty-input-v3.json",
+    "pilot_status": "completed",
+    "selection_path": "outputs/acceptance/p7-p704-independent-pilot-selection-20261111.json",
+    "selection_sha256": "3076c70a5e692392b993abb8754d84f0b06787a4781a4dfca68c7aad727f86c4"
+  },
+  "interpretation": [
+    "The 2,048-byte raw_text value is the generator's synthetic x*2048 stress token. No-native-operation observations also occur for empty and 1-127 byte inputs, so the long token alone does not explain the no-operation cluster; length correlations are descriptive, not causal.",
+    "Exact locked-source review confirms permission/context prerequisites for selected command clusters and confirms that the current scenario contract carries no OneBot sender role. The P7 report records operations, not matcher rule failures, response text, or permission denials; these source findings do not adjudicate individual unknown scenarios.",
+    "For the selected permission/context-gated commands, Native and Federated observations are both empty in the pilot; no Federated-only operation was observed in these clusters."
+  ],
+  "kind": "p7-p704-source-bound-no-operation-diagnostic",
+  "limitations": [
+    "Read-only review of the already completed 30+30 pilot and exact cached wheel artifacts only. No third-party plugin was executed, no Worker/profile was changed, and no external network or service was used.",
+    "This diagnostic explains representative command clusters only; it does not attribute all 1,941 no_native_gateway_operation_observed scenario-rounds.",
+    "All pilot unknowns and the 65 not_assessed commands remain unchanged; this is not an acceptance or support claim."
+  ],
+  "runner_context_source": {
+    "contracts/v0.1/event-envelope.schema.json": {
+      "references": [
+        {
+          "line_numbers": [
+            26
+          ],
+          "text": "\"actor_id\": { \"$ref\": \"#/$defs/id\" }"
+        },
+        {
+          "line_numbers": [
+            33
+          ],
+          "text": "\"extensions\": { \"type\": \"object\", \"additionalProperties\": true }"
+        }
+      ],
+      "sha256": "7981c6a492314b45ea306f68f47f6e32f70577b6c036fde48bca0d2b531ada01"
+    },
+    "hosts/nonebot/ligamina_nonebot/adapter.py": {
+      "references": [
+        {
+          "line_numbers": [
+            280,
+            340
+          ],
+          "text": "sender = metadata.get(\"sender\")"
+        },
+        {
+          "line_numbers": [
+            293
+          ],
+          "text": "\"sender\": {\"user_id\": actor_id, **({\"nickname\": sender_name} if sender_name else {})}"
+        }
+      ],
+      "sha256": "09588a14fdec6ae0f33c1d5981f9dc1e471f93bee20bf04a54c6426668107212"
+    },
+    "lab/automation/p7_differential_campaign.py": {
+      "references": [
+        {
+          "line_numbers": [
+            359
+          ],
+          "text": "\"nonebot_config\": {}"
+        },
+        {
+          "line_numbers": [
+            499
+          ],
+          "text": "conversation_kind=\"group\""
+        },
+        {
+          "line_numbers": [
+            437
+          ],
+          "text": "\"message\": [{\"type\": \"text\", \"text\": message}]"
+        }
+      ],
+      "sha256": "19fa978ad8d9d554e297753954bef481819fb3a81997ea545ce660db61432f09"
+    },
+    "lab/baselines/nonebot/runner.py": {
+      "references": [
+        {
+          "line_numbers": [
+            223
+          ],
+          "text": "nonebot.init(driver=\"~fastapi\", nickname={\"Bot\"}"
+        }
+      ],
+      "sha256": "c1c380b4d84f87443c563c7721612ec87d8282648668d3f052dd7bd7ad3635cc"
+    },
+    "lab/scenario_generator.py": {
+      "references": [
+        {
+          "line_numbers": [
+            473
+          ],
+          "text": "\"x\" * 2048"
+        },
+        {
+          "line_numbers": [
+            263
+          ],
+          "text": "empty_input_budget = int(max_scenarios > 1)"
+        }
+      ],
+      "sha256": "5755810d534446d2165e70f381d72b8bf44cbdbfee578ee6ed6e7ce8ff7f83fb"
+    }
+  },
+  "schema_version": 1,
+  "scope": {
+    "cleanup_unconfirmed": 0,
+    "entries": 60,
+    "generated_scenarios": 1904,
+    "results_by_argument_length_bytes": {
+      "empty_0_bytes": {
+        "equivalent": 330,
+        "no_native_gateway_operation_observed": 270,
+        "normalized_native_and_federated_observations_differ": 69,
+        "side_failed_or_operation_could_not_be_bound_to_source_event": 27
+      },
+      "medium_128_to_2047_bytes": {
+        "equivalent": 6
+      },
+      "over_2048_bytes": {
+        "equivalent": 129,
+        "side_failed_or_operation_could_not_be_bound_to_source_event": 18
+      },
+      "short_1_to_127_bytes": {
+        "equivalent": 2343,
+        "no_native_gateway_operation_observed": 1485,
+        "normalized_native_and_federated_observations_differ": 465,
+        "side_failed_or_operation_could_not_be_bound_to_source_event": 117
+      },
+      "synthetic_2048_byte_token": {
+        "equivalent": 195,
+        "no_native_gateway_operation_observed": 186,
+        "normalized_native_and_federated_observations_differ": 60,
+        "side_failed_or_operation_could_not_be_bound_to_source_event": 12
+      }
+    },
+    "results_by_observation_reason_or_status": {
+      "equivalent": 3003,
+      "no_native_gateway_operation_observed": 1941,
+      "normalized_native_and_federated_observations_differ": 594,
+      "side_failed_or_operation_could_not_be_bound_to_source_event": 174
+    },
+    "scenario_round_observations": 5712,
+    "unknown_command_count": 69,
+    "worker_runs": 348
+  },
+  "source_bound_findings": [
+    {
+      "artifact_sha256": "7562ca642a1e08fb1d0507e3178501f4d87cb790a0b1b5c2935d65455850fd95",
+      "bundle_manifest_sha256": "e581e17756bbfbe057b07253506c037490f705242fc7433b417f891f372bef08",
+      "commands_with_native_no_operation": [
+        {
+          "argument_bytes": [
+            0,
+            2,
+            5,
+            8,
+            9,
+            10,
+            11,
+            15,
+            16,
+            2048
+          ],
+          "case_kinds": [
+            "raw_text"
+          ],
+          "command_id": "删除屏蔽词",
+          "federated_nonempty_scenario_rounds": 0,
+          "no_native_operation_scenario_rounds": 30
+        },
+        {
+          "argument_bytes": [
+            0,
+            2,
+            5,
+            8,
+            9,
+            10,
+            11,
+            15,
+            16,
+            2048
+          ],
+          "case_kinds": [
+            "alias",
+            "raw_text"
+          ],
+          "command_id": "启用飞妈令",
+          "federated_nonempty_scenario_rounds": 0,
+          "no_native_operation_scenario_rounds": 33
+        },
+        {
+          "argument_bytes": [
+            0,
+            2,
+            5,
+            8,
+            9,
+            10,
+            11,
+            15,
+            2048
+          ],
+          "case_kinds": [
+            "alias",
+            "raw_text"
+          ],
+          "command_id": "摘口球",
+          "federated_nonempty_scenario_rounds": 0,
+          "no_native_operation_scenario_rounds": 33
+        },
+        {
+          "argument_bytes": [
+            0,
+            2,
+            5,
+            8,
+            9,
+            10,
+            11,
+            15,
+            22,
+            2048
+          ],
+          "case_kinds": [
+            "raw_text"
+          ],
+          "command_id": "查看临时黑名单",
+          "federated_nonempty_scenario_rounds": 0,
+          "no_native_operation_scenario_rounds": 30
+        },
+        {
+          "argument_bytes": [
+            0,
+            2,
+            5,
+            8,
+            9,
+            10,
+            11,
+            15,
+            16,
+            2048
+          ],
+          "case_kinds": [
+            "raw_text"
+          ],
+          "command_id": "添加屏蔽词",
+          "federated_nonempty_scenario_rounds": 0,
+          "no_native_operation_scenario_rounds": 30
+        },
+        {
+          "argument_bytes": [
+            0,
+            2,
+            5,
+            8,
+            9,
+            10,
+            11,
+            15,
+            16,
+            2048
+          ],
+          "case_kinds": [
+            "alias",
+            "raw_text"
+          ],
+          "command_id": "禁用飞妈令",
+          "federated_nonempty_scenario_rounds": 0,
+          "no_native_operation_scenario_rounds": 33
+        }
+      ],
+      "ecosystem": "nonebot",
+      "package": "nonebot_plugin_antiinsult",
+      "profile_lock_sha256": "fa4a3cd128605765088294782d6634e357ae6ded13678f9b1bdbff1ad03ddb53",
+      "profile_sha256": "4b77454753fa5181a90bb3c339de6970bbe1b2f57ff8ff2dc15d63a2bea929a6",
+      "registry_entry_id": "nb-47f239e4b2ed71a255157441",
+      "source_summary": "Selected administrative commands are guarded by SUPERUSER. The P7 runner uses an empty NoneBot config, so this test actor is not configured as a superuser. This explains a missing test precondition, not each individual unknown result.",
+      "version": "0.7.1",
+      "wheel": {
+        "source_files": [
+          {
+            "package_source": "nonebot_plugin_antiinsult/__init__.py",
+            "package_source_sha256": "259310a2e5653cfd672e88924606d88c13a639b64cce440bdfdc3d4209472bdb",
+            "references": [
+              {
+                "line_numbers": [
+                  149,
+                  158,
+                  170,
+                  186,
+                  240,
+                  270
+                ],
+                "text": "permission=SUPERUSER"
+              }
+            ]
+          }
+        ],
+        "wheel": "nonebot_plugin_antiinsult-0.7.1-py3-none-any.whl",
+        "wheel_sha256": "7562ca642a1e08fb1d0507e3178501f4d87cb790a0b1b5c2935d65455850fd95"
+      }
+    },
+    {
+      "artifact_sha256": "f85b8d122a60d89cbcc7b5a6c095cd28b2eca5bab6e2286f0f286462bdd9023c",
+      "bundle_manifest_sha256": "1d3058c133c09102b0936d3d4e807cc854a0dae4541e21320496289b790b0fc2",
+      "commands_with_native_no_operation": [
+        {
+          "argument_bytes": [
+            0,
+            2,
+            5,
+            8,
+            9,
+            10,
+            11,
+            15,
+            2048
+          ],
+          "case_kinds": [
+            "alias",
+            "raw_text"
+          ],
+          "command_id": "disable",
+          "federated_nonempty_scenario_rounds": 0,
+          "no_native_operation_scenario_rounds": 33
+        },
+        {
+          "argument_bytes": [
+            0,
+            2,
+            5,
+            7,
+            8,
+            9,
+            10,
+            11,
+            15,
+            2048
+          ],
+          "case_kinds": [
+            "alias",
+            "raw_text"
+          ],
+          "command_id": "enable",
+          "federated_nonempty_scenario_rounds": 0,
+          "no_native_operation_scenario_rounds": 33
+        },
+        {
+          "argument_bytes": [
+            0,
+            2,
+            5,
+            8,
+            9,
+            10,
+            11,
+            15,
+            22,
+            2048
+          ],
+          "case_kinds": [
+            "alias",
+            "raw_text"
+          ],
+          "command_id": "停用防撤回监听",
+          "federated_nonempty_scenario_rounds": 0,
+          "no_native_operation_scenario_rounds": 33
+        },
+        {
+          "argument_bytes": [
+            0,
+            2,
+            5,
+            8,
+            9,
+            10,
+            11,
+            15,
+            22,
+            2048
+          ],
+          "case_kinds": [
+            "alias",
+            "raw_text"
+          ],
+          "command_id": "停用防撤回私聊",
+          "federated_nonempty_scenario_rounds": 0,
+          "no_native_operation_scenario_rounds": 33
+        },
+        {
+          "argument_bytes": [
+            0,
+            2,
+            5,
+            8,
+            9,
+            10,
+            11,
+            15,
+            22,
+            2048
+          ],
+          "case_kinds": [
+            "alias",
+            "raw_text"
+          ],
+          "command_id": "关闭当前防撤回",
+          "federated_nonempty_scenario_rounds": 0,
+          "no_native_operation_scenario_rounds": 33
+        },
+        {
+          "argument_bytes": [
+            0,
+            2,
+            5,
+            8,
+            9,
+            10,
+            11,
+            15,
+            22,
+            2048
+          ],
+          "case_kinds": [
+            "raw_text"
+          ],
+          "command_id": "关闭绕过管理层",
+          "federated_nonempty_scenario_rounds": 0,
+          "no_native_operation_scenario_rounds": 30
+        },
+        {
+          "argument_bytes": [
+            0,
+            2,
+            5,
+            8,
+            9,
+            10,
+            11,
+            15,
+            22,
+            2048
+          ],
+          "case_kinds": [
+            "alias",
+            "raw_text"
+          ],
+          "command_id": "删除防撤回监听",
+          "federated_nonempty_scenario_rounds": 0,
+          "no_native_operation_scenario_rounds": 33
+        },
+        {
+          "argument_bytes": [
+            0,
+            2,
+            5,
+            8,
+            9,
+            10,
+            11,
+            15,
+            22,
+            2048
+          ],
+          "case_kinds": [
+            "alias",
+            "raw_text"
+          ],
+          "command_id": "启用防撤回监听",
+          "federated_nonempty_scenario_rounds": 0,
+          "no_native_operation_scenario_rounds": 33
+        },
+        {
+          "argument_bytes": [
+            0,
+            2,
+            5,
+            8,
+            9,
+            10,
+            11,
+            15,
+            22,
+            2048
+          ],
+          "case_kinds": [
+            "alias",
+            "raw_text"
+          ],
+          "command_id": "启用防撤回私聊",
+          "federated_nonempty_scenario_rounds": 0,
+          "no_native_operation_scenario_rounds": 33
+        },
+        {
+          "argument_bytes": [
+            0,
+            2,
+            5,
+            8,
+            9,
+            10,
+            11,
+            15,
+            22,
+            2048
+          ],
+          "case_kinds": [
+            "alias",
+            "raw_text"
+          ],
+          "command_id": "开启当前防撤回",
+          "federated_nonempty_scenario_rounds": 0,
+          "no_native_operation_scenario_rounds": 33
+        },
+        {
+          "argument_bytes": [
+            0,
+            2,
+            5,
+            8,
+            9,
+            10,
+            11,
+            15,
+            22,
+            2048
+          ],
+          "case_kinds": [
+            "raw_text"
+          ],
+          "command_id": "开启绕过管理层",
+          "federated_nonempty_scenario_rounds": 0,
+          "no_native_operation_scenario_rounds": 30
+        },
+        {
+          "argument_bytes": [
+            0,
+            2,
+            5,
+            8,
+            9,
+            10,
+            11,
+            15,
+            22,
+            2048
+          ],
+          "case_kinds": [
+            "alias",
+            "raw_text"
+          ],
+          "command_id": "查看防撤回监听",
+          "federated_nonempty_scenario_rounds": 0,
+          "no_native_operation_scenario_rounds": 33
+        },
+        {
+          "argument_bytes": [
+            0,
+            2,
+            5,
+            8,
+            9,
+            10,
+            11,
+            15,
+            22,
+            2048
+          ],
+          "case_kinds": [
+            "raw_text"
+          ],
+          "command_id": "查看防撤回私聊",
+          "federated_nonempty_scenario_rounds": 0,
+          "no_native_operation_scenario_rounds": 30
+        },
+        {
+          "argument_bytes": [
+            0,
+            2,
+            5,
+            8,
+            9,
+            10,
+            11,
+            15,
+            22,
+            2048
+          ],
+          "case_kinds": [
+            "raw_text"
+          ],
+          "command_id": "查看防撤回群聊",
+          "federated_nonempty_scenario_rounds": 0,
+          "no_native_operation_scenario_rounds": 30
+        },
+        {
+          "argument_bytes": [
+            0,
+            2,
+            5,
+            8,
+            9,
+            10,
+            11,
+            15,
+            22,
+            2048
+          ],
+          "case_kinds": [
+            "alias",
+            "raw_text"
+          ],
+          "command_id": "添加防撤回监听",
+          "federated_nonempty_scenario_rounds": 0,
+          "no_native_operation_scenario_rounds": 33
+        },
+        {
+          "argument_bytes": [
+            0,
+            2,
+            5,
+            8,
+            9,
+            10,
+            11,
+            15,
+            19,
+            2048
+          ],
+          "case_kinds": [
+            "alias",
+            "raw_text"
+          ],
+          "command_id": "清空开启名单",
+          "federated_nonempty_scenario_rounds": 0,
+          "no_native_operation_scenario_rounds": 33
+        }
+      ],
+      "ecosystem": "nonebot",
+      "package": "nonebot_plugin_antirecall",
+      "profile_lock_sha256": "31087a31ffb2ca6646fc9b7e13b5cc74225360159d4ab61bf6d1fdba16cfedc6",
+      "profile_sha256": "4b77454753fa5181a90bb3c339de6970bbe1b2f57ff8ff2dc15d63a2bea929a6",
+      "registry_entry_id": "nb-ed10c5014456c4e265167187",
+      "source_summary": "Selected administrative commands are guarded by SUPERUSER or SUPERUSER | GROUP_OWNER. P7 does not set a test superuser, and the EventEnvelope-to-OneBot mapping does not carry sender role.",
+      "version": "0.1.4",
+      "wheel": {
+        "source_files": [
+          {
+            "package_source": "nonebot_plugin_antirecall/__init__.py",
+            "package_source_sha256": "a4cedd68e248d8189c2608c3ba0e41c9ce6243eaa6a399af537ea669c71c7e41",
+            "references": [
+              {
+                "line_numbers": [
+                  111,
+                  119,
+                  127,
+                  133,
+                  140,
+                  148,
+                  156,
+                  164,
+                  225,
+                  242,
+                  261,
+                  268,
+                  278,
+                  287,
+                  297,
+                  310
+                ],
+                "text": "permission = SUPERUSER"
+              },
+              {
+                "line_numbers": [
+                  133,
+                  140,
+                  148,
+                  156
+                ],
+                "text": "SUPERUSER | GROUP_OWNER"
+              }
+            ]
+          }
+        ],
+        "wheel": "nonebot_plugin_antirecall-0.1.4-py3-none-any.whl",
+        "wheel_sha256": "f85b8d122a60d89cbcc7b5a6c095cd28b2eca5bab6e2286f0f286462bdd9023c"
+      }
+    },
+    {
+      "artifact_sha256": "2fd7ac90900b4039fb71765ebf53886f6ade3593eb466fed5e615d2d82e02bb0",
+      "bundle_manifest_sha256": "71293ed31e3f7a6e577aead1c5ca7c4879798fb3a8fd3b82465d9a2ea03348a4",
+      "commands_with_native_no_operation": [
+        {
+          "argument_bytes": [
+            0,
+            2,
+            5,
+            7,
+            8,
+            9,
+            10,
+            11,
+            15,
+            2048
+          ],
+          "case_kinds": [
+            "alias",
+            "raw_text"
+          ],
+          "command_id": ".check",
+          "federated_nonempty_scenario_rounds": 0,
+          "no_native_operation_scenario_rounds": 33
+        },
+        {
+          "argument_bytes": [
+            0,
+            2,
+            5,
+            8,
+            9,
+            10,
+            11,
+            12,
+            15,
+            2048
+          ],
+          "case_kinds": [
+            "alias",
+            "raw_text"
+          ],
+          "command_id": ".checklogin",
+          "federated_nonempty_scenario_rounds": 0,
+          "no_native_operation_scenario_rounds": 33
+        },
+        {
+          "argument_bytes": [
+            0,
+            2,
+            5,
+            8,
+            9,
+            10,
+            11,
+            15,
+            2048
+          ],
+          "case_kinds": [
+            "alias",
+            "raw_text"
+          ],
+          "command_id": ".logout",
+          "federated_nonempty_scenario_rounds": 0,
+          "no_native_operation_scenario_rounds": 33
+        },
+        {
+          "argument_bytes": [
+            0,
+            2,
+            5,
+            8,
+            9,
+            10,
+            11,
+            15,
+            2048
+          ],
+          "case_kinds": [
+            "raw_text"
+          ],
+          "command_id": ".otp",
+          "federated_nonempty_scenario_rounds": 0,
+          "no_native_operation_scenario_rounds": 30
+        },
+        {
+          "argument_bytes": [
+            0,
+            2,
+            5,
+            8,
+            9,
+            10,
+            11,
+            12,
+            15,
+            2048
+          ],
+          "case_kinds": [
+            "raw_text"
+          ],
+          "command_id": ".otp_qrcode",
+          "federated_nonempty_scenario_rounds": 0,
+          "no_native_operation_scenario_rounds": 30
+        },
+        {
+          "argument_bytes": [
+            0,
+            2,
+            5,
+            8,
+            9,
+            10,
+            11,
+            15,
+            2048
+          ],
+          "case_kinds": [
+            "alias",
+            "raw_text"
+          ],
+          "command_id": ".qrlogin",
+          "federated_nonempty_scenario_rounds": 0,
+          "no_native_operation_scenario_rounds": 33
+        },
+        {
+          "argument_bytes": [
+            0,
+            2,
+            5,
+            8,
+            9,
+            10,
+            11,
+            15,
+            2048
+          ],
+          "case_kinds": [
+            "alias",
+            "raw_text"
+          ],
+          "command_id": ".sub",
+          "federated_nonempty_scenario_rounds": 0,
+          "no_native_operation_scenario_rounds": 33
+        },
+        {
+          "argument_bytes": [
+            0,
+            2,
+            5,
+            7,
+            8,
+            9,
+            10,
+            11,
+            15,
+            2048
+          ],
+          "case_kinds": [
+            "alias",
+            "raw_text"
+          ],
+          "command_id": ".unsub",
+          "federated_nonempty_scenario_rounds": 0,
+          "no_native_operation_scenario_rounds": 33
+        }
+      ],
+      "ecosystem": "nonebot",
+      "package": "nonebot_plugin_bilichat",
+      "profile_lock_sha256": "3d344292c41539b5c99007ac38d3bf200221d4cdafe7c48def9c10d6868b7a7e",
+      "profile_sha256": "4b77454753fa5181a90bb3c339de6970bbe1b2f57ff8ff2dc15d63a2bea929a6",
+      "registry_entry_id": "nb-250c92c282d77dcf502b9dbf",
+      "source_summary": "otp and otp_qrcode require SUPERUSER and return outside private conversations, while P7 emits group-only batches. The command group defaults command_to_me to true, but the scenario message is text-only and has no mention segment. These are source-bound missing-context candidates; the pilot has no per-event matcher trace.",
+      "version": "6.5.0",
+      "wheel": {
+        "source_files": [
+          {
+            "package_source": "nonebot_plugin_bilichat/command/otp.py",
+            "package_source_sha256": "60f2995eb3ecdbfad4f2866d83b9817909fd1271c0ab2560b894da4dcdddf879",
+            "references": [
+              {
+                "line_numbers": [
+                  15,
+                  16
+                ],
+                "text": "permission=SUPERUSER"
+              },
+              {
+                "line_numbers": [
+                  24,
+                  40
+                ],
+                "text": "if not target.private"
+              }
+            ]
+          },
+          {
+            "package_source": "nonebot_plugin_bilichat/command/base.py",
+            "package_source_sha256": "b304e16877289115e9dc77367f6312db6d5fbb75ed6205650fd8261e504d8ec9",
+            "references": [
+              {
+                "line_numbers": [
+                  19
+                ],
+                "text": "rule=to_me() if ConfigCTX.get().nonebot.command_to_me else None"
+              }
+            ]
+          },
+          {
+            "package_source": "nonebot_plugin_bilichat/model/config.py",
+            "package_source_sha256": "c850e38ec9397474042aa6ddff9b16bc640ab91d424dda0aead5a5e35b58aa7d",
+            "references": [
+              {
+                "line_numbers": [
+                  75
+                ],
+                "text": "command_to_me: bool = Field("
+              },
+              {
+                "line_numbers": [
+                  17,
+                  52,
+                  76,
+                  170,
+                  171,
+                  172,
+                  220,
+                  253
+                ],
+                "text": "default=True"
+              }
+            ]
+          }
+        ],
+        "wheel": "nonebot_plugin_bilichat-6.5.0-py3-none-any.whl",
+        "wheel_sha256": "2fd7ac90900b4039fb71765ebf53886f6ade3593eb466fed5e615d2d82e02bb0"
+      }
+    }
+  ]
+}

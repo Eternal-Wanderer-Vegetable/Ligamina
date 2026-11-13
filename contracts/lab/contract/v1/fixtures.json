@@ -1,0 +1,119 @@
+{
+  "schema_version": 1,
+  "kind": "p7_synthetic_plugin_contract_fixtures",
+  "description": "Self-owned synthetic observations for checking the C1-C8 contract oracle. These fixtures validate the checker and do not claim runtime acceptance.",
+  "cases": [
+    {
+      "fixture_id": "c1-positive-bounded-cleanup",
+      "contract_id": "C1",
+      "polarity": "positive",
+      "expected_status": "passed",
+      "evidence": {"deadlines_ms": {"load": 1000, "ready": 1000, "stop": 1000}, "elapsed_ms": {"load": 12, "ready": 40, "stop": 8}, "cleanup": {"process_reaped": true, "container_removed": true}}
+    },
+    {
+      "fixture_id": "c1-negative-unreaped-process",
+      "contract_id": "C1",
+      "polarity": "negative",
+      "expected_status": "failed",
+      "evidence": {"deadlines_ms": {"load": 1000, "ready": 1000, "stop": 1000}, "elapsed_ms": {"load": 12, "ready": 40, "stop": 1001}, "cleanup": {"process_reaped": false, "container_removed": true}}
+    },
+    {
+      "fixture_id": "c2-positive-protocol-and-unknown-event",
+      "contract_id": "C2",
+      "polarity": "positive",
+      "expected_status": "passed",
+      "evidence": {"stdout_lines": ["{\"jsonrpc\":\"2.0\",\"id\":\"1\",\"result\":{\"ready\":true}}", "{\"jsonrpc\":\"2.0\",\"id\":\"2\",\"error\":{\"code\":-32601}}"], "unknown_event": {"rejected": true, "host_alive_after": true, "next_valid_event_completed": true}}
+    },
+    {
+      "fixture_id": "c2-negative-host-exits-on-unknown-event",
+      "contract_id": "C2",
+      "polarity": "negative",
+      "expected_status": "failed",
+      "evidence": {"stdout_lines": ["{\"jsonrpc\":\"2.0\",\"id\":\"1\",\"result\":{}}"], "unknown_event": {"rejected": true, "host_alive_after": false, "next_valid_event_completed": false}}
+    },
+    {
+      "fixture_id": "c3-positive-native-scoped-operation",
+      "contract_id": "C3",
+      "polarity": "positive",
+      "expected_status": "passed",
+      "evidence": {"events": {"evt-a": {"native_allowed_targets": [{"account_id": "bot-a", "kind": "group", "id": "g-a"}]}}, "operations": [{"event_id": "evt-a", "target": {"account_id": "bot-a", "kind": "group", "id": "g-a"}}]}
+    },
+    {
+      "fixture_id": "c3-negative-cross-event-target",
+      "contract_id": "C3",
+      "polarity": "negative",
+      "expected_status": "failed",
+      "evidence": {"events": {"evt-a": {"native_allowed_targets": [{"account_id": "bot-a", "kind": "group", "id": "g-a"}]}}, "operations": [{"event_id": "evt-a", "target": {"account_id": "bot-b", "kind": "private", "id": "u-b"}}]}
+    },
+    {
+      "fixture_id": "c4-positive-quiet-idle-window",
+      "contract_id": "C4",
+      "polarity": "positive",
+      "expected_status": "passed",
+      "evidence": {"idle_operations": []}
+    },
+    {
+      "fixture_id": "c4-negative-undeclared-idle-send",
+      "contract_id": "C4",
+      "polarity": "negative",
+      "expected_status": "failed",
+      "evidence": {"idle_operations": [{"operation": "send_message", "text": "unsolicited"}], "timer": {"declared": false, "native_operations": [], "federated_operations": [{"operation": "send_message", "text": "unsolicited"}]}}
+    },
+    {
+      "fixture_id": "c5-positive-next-event-after-exception",
+      "contract_id": "C5",
+      "polarity": "positive",
+      "expected_status": "passed",
+      "evidence": {"handler_exception": {"raised": true, "host_alive_after": true, "next_event_status": "completed"}}
+    },
+    {
+      "fixture_id": "c5-negative-next-event-lost",
+      "contract_id": "C5",
+      "polarity": "negative",
+      "expected_status": "failed",
+      "evidence": {"handler_exception": {"raised": true, "host_alive_after": false, "next_event_status": "failed"}}
+    },
+    {
+      "fixture_id": "c6-positive-late-reply-excluded",
+      "contract_id": "C6",
+      "polarity": "positive",
+      "expected_status": "passed",
+      "evidence": {"timeout": {"deadline_ms": 100, "core_closed_elapsed_ms": 98, "late_reply_observed": true, "late_reply_in_closed_session": false}}
+    },
+    {
+      "fixture_id": "c6-negative-late-reply-admitted",
+      "contract_id": "C6",
+      "polarity": "negative",
+      "expected_status": "failed",
+      "evidence": {"timeout": {"deadline_ms": 100, "core_closed_elapsed_ms": 101, "late_reply_observed": true, "late_reply_in_closed_session": true}}
+    },
+    {
+      "fixture_id": "c7-positive-valid-and-bounded-tools",
+      "contract_id": "C7",
+      "polarity": "positive",
+      "expected_status": "passed",
+      "evidence": {"descriptors": [{"command_id": "echo", "invocation": "echo", "framework": "koishi", "description": "Echo", "usage": "echo <message...>", "aliases": ["say"], "arguments": [{"name": "message", "required": true, "variadic": false, "type": "text"}], "options": []}], "calls": [{"command_id": "echo", "elapsed_ms": 4, "result": {"dispatch": "completed"}}], "call_deadline_ms": 1000, "gateway_operation_count": 0}
+    },
+    {
+      "fixture_id": "c7-negative-gateway-side-effect",
+      "contract_id": "C7",
+      "polarity": "negative",
+      "expected_status": "failed",
+      "evidence": {"descriptors": [{"command_id": "echo", "invocation": "echo", "framework": "koishi"}], "calls": [{"command_id": "echo", "elapsed_ms": 4, "is_error": true}], "call_deadline_ms": 1000, "gateway_operation_count": 1}
+    },
+    {
+      "fixture_id": "c8-positive-peer-survives-plugin-crash",
+      "contract_id": "C8",
+      "polarity": "positive",
+      "expected_status": "passed",
+      "evidence": {"plugin_crash": {"first_plugin_crashed": true, "second_plugin_event_status": "completed", "host_alive_after": true}}
+    },
+    {
+      "fixture_id": "c8-negative-peer-event-lost",
+      "contract_id": "C8",
+      "polarity": "negative",
+      "expected_status": "failed",
+      "evidence": {"plugin_crash": {"first_plugin_crashed": true, "second_plugin_event_status": "failed", "host_alive_after": false}}
+    }
+  ]
+}

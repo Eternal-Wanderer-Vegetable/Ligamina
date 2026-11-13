@@ -12,6 +12,7 @@ from typing import Any
 from .commands import describe_commands
 from .contracts import event_error_code, validate_command_descriptor
 from .lifecycle import HostLifecycle, configured_plugins
+from .inventory import describe_runtime_inventory
 
 # Keep the real stdout for protocol frames only. AstrBot and its plugins log to
 # sys.stdout, which would corrupt the NDJSON stream, so route them to stderr.
@@ -132,6 +133,7 @@ class Worker:
                 "protocol_version": PROTOCOL_VERSION,
                 "capabilities": [],
                 "commands": self._commands(),
+                "inventory": self._inventory(),
             }
         if method == "event.dispatch":
             self._require_ready()
@@ -153,7 +155,7 @@ class Worker:
             }
         if method == "runtime.capabilities":
             self._require_ready()
-            return {"capabilities": [], "commands": self._commands()}
+            return {"capabilities": [], "commands": self._commands(), "inventory": self._inventory()}
         if method in {"runtime.stop", "host.shutdown"}:
             self._draining = True
             current = asyncio.current_task()
@@ -178,6 +180,9 @@ class Worker:
             else:
                 valid.append(descriptor)
         return valid
+
+    def _inventory(self) -> dict[str, Any]:
+        return describe_runtime_inventory(self._lifecycle)
 
     def _require_ready(self, *, allow_draining: bool = False) -> None:
         if not self._ready or self._stopping or (self._draining and not allow_draining):

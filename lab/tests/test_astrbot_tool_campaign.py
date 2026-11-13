@@ -10,7 +10,7 @@ import unittest
 import zipfile
 from pathlib import Path
 
-from lab.astrbot_tool_campaign import evaluate, tool_name_part, validate_cases
+from lab.astrbot_tool_campaign import evaluate, prepare, tool_name_part, validate_cases
 
 SOURCE = '''from astrbot.api.star import Star
 
@@ -114,6 +114,17 @@ class AstrBotToolCampaignTests(unittest.TestCase):
         self.assertEqual(tool_name_part("组队菜单"), "____-fda2f352")
         self.assertEqual(tool_name_part("炒股.菜单"), "__.__-ff5e4afa")
         self.assertEqual(tool_name_part("astrbot-ab05"), "astrbot-ab05")
+
+    def test_federated_bundle_contains_the_complete_astrbot_worker_package(self) -> None:
+        entry = self.cases["entries"][0]
+        lock_entry = self.lock["entries"][0]
+        bundle = self.cache / "federated-bundle"
+
+        prepare(entry, lock_entry, bundle, self.cache)
+
+        host_package = bundle / "project/hosts/astrbot/ligamina_astrbot"
+        self.assertTrue((host_package / "worker.py").is_file())
+        self.assertTrue((host_package / "inventory.py").is_file())
 
 
 if __name__ == "__main__":

@@ -40,6 +40,8 @@ bash init.sh full
 | 目录发布物/依赖锁 | `uv run --locked --project lab --python 3.12.14 python -m lab.artifacts verify catalogs/<snapshot>` 与 `python -m lab.profiles verify catalogs/<snapshot>`；缓存根必须与生成时一致 |
 | 跨语言/协议/安装 | 完整入口和双 OS CI；安装改动追加 [Windows 安装验收](../../scripts/windows-install-acceptance.ps1) / Linux容器验收 |
 
+双平台完整检查会在 Lab 全量测试前运行 `python -m lab.automation.p7_source_audit_cache`，从冻结 catalog lock 下载并校验 P7 来源审计测试需要的精确归档，再将版本库内 hash-bound 的依赖锁副本写入外置 artifact cache。归档和依赖锁都按 SHA-256 与锁定记录核验；归档不安装或执行，下载 host 受 allowlist 限制。
+
 ## 运行与诊断
 
 ```powershell
@@ -64,6 +66,8 @@ S2-04 双平台运行时探针可复跑：`uv run --locked --project hosts/noneb
 P3 Linux Worker 准入先用 `uv run --locked --project lab --python 3.12.14 python -m lab.automation preflight --platform linux --probe-report <report.json> --output <health.json>`。只有 Docker daemon、锁定镜像、主机资源余量及真实 benign probe（包含逐项 cleanup）都通过时，报告才允许 claim。Docker 不可用、probe 缺失或资源不足会退出 3 并留下 `blocked` 证据；不能用 mock 代替准入。为避免覆盖 S2 历史证据，可将 Linux probe 输出写到新路径：`uv run --locked --project hosts/nonebot --python 3.12.14 python deploy/lab/linux/probes/acceptance.py --report outputs/acceptance/phase3-p302-linux-workers-20261020.json`。Windows preflight 入口当前只会写 `not_tested` blocker。Windows host-only runtime 探针只能诊断本机解释器能否启动，不能代替 Sandbox 内低权限启动、隔离/限额和进程清理准入；App Control 拦截应保留对应 Win32 证据，不关闭策略来伪造通过。
 
 P3-05 默认生成 20 项分层 pilot；`plan-recovery-pilot --selection-scope affected-linux --probe-semantics-version 3` 会按 P3-01 冻结身份选出全部锁定的 Linux affected entries，并把实际归档长度和 Koishi core-only Host service profile 绑定进新 manifest。示例：`uv run --locked --project lab --python 3.12.14 python -m lab.automation plan-recovery-pilot --selection-scope affected-linux --probe-semantics-version 3 --archive-cache-root <cache-root> --output <manifest.json>`。执行前仍需 `validate-recovery-pilot` 与 30 分钟内的真实 Worker 准入；Worker image 必须是本机可用且 digest 匹配的引用，必要时使用 `--nonebot-image` / `--koishi-image` 覆盖并冻结到新 manifest。v3 的缺失 Host service 会在目标插件回调前记为 `skipped/required_host_service_unavailable`；该结果是依赖归因，不是行为兼容通过。
+
+P7 AstrBot campaign 使用非默认 runtime image 时，probe 与 preflight 必须绑定同一个本机 digest-pinned image：probe 通过 `deploy/lab/linux/probes/acceptance.py --worker-image <image@sha256:...>`，preflight 通过 `python -m lab.automation preflight --platform linux --worker-image <same-image@sha256:...> --probe-report <probe.json> --output <admission.json>`。覆盖值必须含 `@sha256:`，并与 probe 报告中的 image ref/image ID 一致；preflight 会拒绝错配。Benign probe 使用 `/usr/bin/env` 显式 entrypoint 执行探针命令，以免应用镜像默认 entrypoint 抢先处理它。每个有界 campaign executor 批次都要使用 30 分钟内的新 admission；续跑仍绑定原 plan、外置 queue、frozen census、bundle 和 runtime/cache 身份。
 
 Linux recovery executor 从 `config/lab/phase3-automation-v1.json` 读取 `initial_linux_concurrency`，当前上限为 2 个 Worker。共享 backend circuit breaker 在并发访问下加锁；后端故障会中断 fenced run、停止新 claim，并等待已领取 attempt 收尾。恢复时继续使用原 manifest 与 SQLite queue；有过期 lease 时，必须先按精确 attempt/generation 核验 Worker 清理，再恢复派发。
 

@@ -771,10 +771,36 @@ def _run_tool_steps(url: str, token: str, host_id: str, steps: list[list[dict[st
     }
 
 
+def _copy_nonebot_context_settings(source: dict[str, str], target: dict[str, str]) -> None:
+    raw = source.get("SUPERUSERS")
+    if raw is None:
+        return
+    try:
+        identifiers = json.loads(raw)
+    except json.JSONDecodeError as error:
+        raise ValueError("P7 SUPERUSERS must be a JSON list of synthetic numeric IDs") from error
+    if (
+        not isinstance(identifiers, list)
+        or not identifiers
+        or any(
+            not isinstance(identifier, str)
+            or not identifier.isascii()
+            or not identifier.isdecimal()
+            or identifier.startswith("0")
+            or len(identifier) > 10
+            for identifier in identifiers
+        )
+        or len(identifiers) != len(set(identifiers))
+    ):
+        raise ValueError("P7 SUPERUSERS must be a JSON list of synthetic numeric IDs")
+    target["SUPERUSERS"] = json.dumps(identifiers, separators=(",", ":"))
+
+
 def run_federated(
     sample: dict[str, Any], work: Path, host_environment: dict[str, str], events: list[dict[str, Any]],
     *, profile_work: Path | None = None,
     tool_calls: list[list[dict[str, Any]]] | None = None,
+    discover_commands: bool = False,
 ) -> dict[str, Any]:
     """Run events through Core/Host/Gateway, or with ``tool_calls`` call the Host's
     native commands as MCP tools (ADR 0002). Each step is a list of calls run
@@ -818,9 +844,18 @@ def run_federated(
         "PYTHONPATH": host_environment.get("PYTHONPATH", str(ROOT / "hosts/nonebot")),
         "LIGAMINA_BEHAVIOR_RANDOM_SEED": host_environment.get("LIGAMINA_BEHAVIOR_RANDOM_SEED", ""),
     }
+    if host_environment.get("LIGAMINA_BEHAVIOR_FIXED_TIME_UTC"):
+        host_env["LIGAMINA_BEHAVIOR_FIXED_TIME_UTC"] = host_environment["LIGAMINA_BEHAVIOR_FIXED_TIME_UTC"]
     for key in ("GUESS_NAME", "GUESS_LIMIT", "GUESS_NAME_LIST"):
         if key in host_environment:
             host_env[key] = host_environment[key]
+    if sample["ecosystem"] == "nonebot":
+        _copy_nonebot_context_settings(host_environment, host_env)
+    for key in ("TZ", "PYTHONHASHSEED", "LIGAMINA_BEHAVIOR_RANDOM_SEED", "LIGAMINA_BEHAVIOR_FIXED_TIME_UTC"):
+        if key in host_environment:
+            host_env[key] = host_environment[key]
+    if sample["ecosystem"] == "koishi" and host_environment.get("LIGAMINA_NODE_RANDOM_PRELOAD"):
+        host_env["NODE_OPTIONS"] = f"--require={host_environment['LIGAMINA_NODE_RANDOM_PRELOAD']}"
     if sample["ecosystem"] == "nonebot":
         python_executable = host_environment.get("LIGAMINA_PYTHON_EXECUTABLE")
         if python_executable:
@@ -852,7 +887,7 @@ def run_federated(
                    "max_tracked_conversations": 64, "max_concurrent_conversations": 8,
                    "processing_timeout_ms": 30000},
     }
-    if tool_calls is not None:
+    if tool_calls is not None or discover_commands:
         config["command_tools"] = {"enabled": True, "allow": [f"cmd.{_tool_name_part(host_id)}.*"]}
     config_path = work / "daemon.json"
     config_path.write_text(json.dumps(config, ensure_ascii=False, indent=2), encoding="utf-8")
@@ -950,6 +985,8 @@ def run_federated(
             gateway_thread.start()
         if tool_calls is not None:
             result["tool_calls"] = _run_tool_steps(f"{base_url}/mcp", client_token, host_id, tool_calls)
+        elif discover_commands:
+            result["command_inventory"] = _run_tool_steps(f"{base_url}/mcp", client_token, host_id, [])
         statuses = []
         for event in events:
             accepted = api_request(base_url, "POST", "/v1/events", client_token, event, expected=(202,))
