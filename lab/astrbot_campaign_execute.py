@@ -95,17 +95,44 @@ def _observation_projection(value: Any) -> tuple[dict[str, Any] | None, str | No
     return projection, None
 
 
+def _call_signals(value: Any) -> dict[str, int] | None:
+    """Count calls, errors and silent calls of one side without retaining any reply text."""
+    tool_calls = value.get("tool_calls") if isinstance(value, dict) else None
+    steps = tool_calls.get("steps") if isinstance(tool_calls, dict) else None
+    if not isinstance(steps, list):
+        return None
+    signals = {"calls": 0, "errors": 0, "silent": 0}
+    for step in steps:
+        for call in step if isinstance(step, list) else []:
+            if not isinstance(call, dict):
+                continue
+            signals["calls"] += 1
+            replies = call.get("replies")
+            if call.get("is_error") is True:
+                signals["errors"] += 1
+            elif not (isinstance(replies, list) and any(isinstance(reply, str) and reply.strip() for reply in replies)):
+                signals["silent"] += 1
+    return signals
+
+
 def compare_astrbot_observations(
     native_first: Any,
     native_second: Any,
     federated: Any,
+    *,
+    raw_observations: tuple[Any, Any, Any] | None = None,
 ) -> dict[str, Any]:
-    """Compare bounded Native×2/Federated observations without retaining plugin replies."""
+    """Compare bounded Native×2/Federated observations without retaining plugin replies.
+
+    ``raw_observations`` are the decoded Worker outputs, used only for call signals when a
+    side could not be projected (for example a side whose every call was silent).
+    """
     inputs = {
         "native_first": native_first,
         "native_second": native_second,
         "federated": federated,
     }
+    raw = dict(zip(inputs, raw_observations)) if raw_observations is not None else inputs
     projections: dict[str, dict[str, Any]] = {}
     failures: dict[str, str] = {}
     for name, value in inputs.items():
@@ -124,6 +151,7 @@ def compare_astrbot_observations(
         "native_repeat_equal": None,
         "federated_gateway_operation_count": None,
         "observation_sha256": hashes,
+        "call_signals": {name: _call_signals(raw[name]) for name in inputs},
     }
     if failures:
         result["incomplete_sides"] = failures
@@ -473,6 +501,7 @@ def execute_campaign_once(
     heartbeat_thread.start()
     outcomes: list[WorkerResult] = []
     observations: list[dict[str, Any] | None] = []
+    raw_observations: list[dict[str, Any] | None] = []
     observation_errors: list[str | None] = []
     worker_error = False
     try:
@@ -488,7 +517,9 @@ def execute_campaign_once(
             outcomes.append(outcome)
             if job["stage"] == "inventory":
                 observation, observation_error = _decode_worker_json(outcome)
+                raw_observations.append(observation)
             else:
+                raw_observations.append(_decode_worker_json(outcome)[0])
                 observation, observation_error = _decode_worker_observation(outcome)
             observations.append(observation)
             observation_errors.append(observation_error)
@@ -545,7 +576,7 @@ def execute_campaign_once(
             }
             retryable = False
     else:
-        comparison = compare_astrbot_observations(*observations)
+        comparison = compare_astrbot_observations(*observations, raw_observations=tuple(raw_observations))
         all_worker_runs_passed = all(item.status == "passed" for item in outcomes)
         descriptor_provider = getattr(spec_factory, "descriptors_for_job", None)
         try:

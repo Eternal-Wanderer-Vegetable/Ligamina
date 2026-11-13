@@ -71,6 +71,23 @@ class AstrBotObservationComparisonTests(unittest.TestCase):
         self.assertEqual(gateway_activity["category"], "non_equivalent")
         self.assertEqual(gateway_activity["reason_code"], "federated_gateway_activity")
 
+    def test_comparison_reports_bounded_per_side_error_and_silent_call_counts(self) -> None:
+        refused = _observation("")
+        refused["tool_calls"]["steps"][0][0]["is_error"] = True
+        silent = _observation("")
+        mismatch = compare_astrbot_observations(_observation("reply"), _observation("reply"), refused)
+        incomplete = compare_astrbot_observations(silent, silent, _observation("reply"))
+
+        self.assertEqual(mismatch["call_signals"], {
+            "native_first": {"calls": 1, "errors": 0, "silent": 0},
+            "native_second": {"calls": 1, "errors": 0, "silent": 0},
+            "federated": {"calls": 1, "errors": 1, "silent": 0},
+        })
+        # Signals are also kept when a side cannot be projected, so an operator can see why.
+        self.assertEqual(incomplete["call_signals"]["native_first"], {"calls": 1, "errors": 0, "silent": 1})
+        self.assertNotIn("reply", json.dumps(mismatch["call_signals"]))
+        self.assertIsNone(compare_astrbot_observations(None, None, None)["call_signals"]["federated"])
+
     def test_contract_projection_evaluates_observed_mcp_calls_and_keeps_unstimulated_contracts_unknown(self) -> None:
         descriptors = [{
             "command_id": "echo",
